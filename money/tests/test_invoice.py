@@ -40,7 +40,7 @@ class test_invoice(TransactionCase):
         # 确认发票为已审核状态
         self.assertEqual(invoice.state, 'done')
         # 客户的应收余额
-        self.assertEqual(self.partner.recievable, 10.0)
+        self.assertEqual(self.partner.receivable, 10.0)
         '''
         # 已审核的发票应该不可删除
         with self.assertRaises(ValidationError):
