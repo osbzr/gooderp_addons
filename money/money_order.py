@@ -107,18 +107,32 @@ class money_order(models.Model):
 
         total = 0
         for line in self.line_ids:
-            if self.type == 'pay': # 付款账号余额减少
-                if line.bank_id.balance < line.amount:
-                    raise except_orm(u'错误', u'账户余额不足')
-                line.bank_id.balance -= line.amount
-            else: # 收款账号余额增加
-                line.bank_id.balance += line.amount
+            if self.type == 'pay': # 付款账号余额减少, 退款账号余额增加
+                if self.source_ids.amount > 0: # 付款
+                    if line.bank_id.balance < line.amount:
+                        raise except_orm(u'错误', u'账户余额不足')
+                    line.bank_id.balance -= line.amount
+                else: # 付款退款
+                    line.bank_id.balance += line.amount
+            else: # 收款账号余额增加, 退款账号余额减少
+                if self.source_ids.amount > 0: # 收款
+                    line.bank_id.balance += line.amount
+                else: # 收款退款
+                    if line.bank_id.balance > line.amount:
+                        raise except_orm(u'错误', u'账户余额不足')
+                    line.bank_id.balance -= line.amount
             total += line.amount
 
         if self.type == 'pay':
-            self.partner_id.payable -= total
+            if self.source_ids.amount > 0: # 付款
+                self.partner_id.payable -= total
+            else: # 付款退款
+                self.partner_id.payable += total
         else:
-            self.partner_id.receivable -= total
+            if self.source_ids.amount > 0: # 收款
+                self.partner_id.receivable -= total
+            else: # 收款退款
+                self.partner_id.receivable += total
 
         # 更新源单的未核销金额、已核销金额
         for source in self.source_ids:
@@ -175,7 +189,7 @@ class money_invoice(models.Model):
                           ('done', u'完成')
                            ], string=u'状态', readonly=True, default='draft', copy=False)
     partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True, readonly=True, states={'draft': [('readonly', False)]})
-    name = fields.Char(string=u'订单编号', copy=False, required=True) # 为了测试，以后添加readonly=True,
+    name = fields.Char(string=u'订单编号', copy=False, readonly=True, required=True)
     category_id = fields.Many2one('core.category', string=u'类别', readonly=True, states={'draft': [('readonly', False)]})
     date = fields.Date(string=u'单据日期', readonly=True, states={'draft': [('readonly', False)]})
     amount = fields.Float(string=u'单据金额', readonly=True, states={'draft': [('readonly', False)]})
