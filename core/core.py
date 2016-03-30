@@ -100,14 +100,3 @@ class bank_account(models.Model):
     _name = 'bank.account'
     name = fields.Char(u'名称')
     balance = fields.Float(u'余额', readonly=True)
-
-class cost_line(models.Model):
-    _name = 'cost.line'
-    _description = u"采购销售费用"
-
-    buy_id = fields.Many2one('buy.receipt', u'入库单号')
-    sell_id = fields.Many2one('sell.delivery', u'出库单号')
-    partner_id = fields.Many2one('partner', u'供应商')
-    category_id = fields.Many2one('core.category', u'类别', domain="[('type', '=', 'other_pay')]")
-    amount = fields.Float(u'金额')
-    note = fields.Char(u'备注')

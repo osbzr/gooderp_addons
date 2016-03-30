@@ -122,10 +122,9 @@ class money_order(models.Model):
 
         # 更新源单的未核销金额、已核销金额
         for source in self.source_ids:
-            if source.to_reconcile < source.this_reconcile:
+            if abs(source.to_reconcile) < source.this_reconcile:
                 raise except_orm(u'错误', u'本次核销金额不能大于未核销金额')
-            source.name.to_reconcile = source.to_reconcile - source.this_reconcile
-            source.name.reconciled = source.reconciled + source.this_reconcile
+
         self.state = 'done'
         return True
 
@@ -149,10 +148,6 @@ class money_order(models.Model):
         else:
             self.partner_id.receivable += total
 
-        # 更新源单的未核销金额、已核销金额
-        for source in self.source_ids:
-            source.name.to_reconcile = source.to_reconcile + source.this_reconcile
-            source.name.reconciled = source.reconciled - source.this_reconcile
         self.state = 'draft'
         return True
 
@@ -404,3 +399,12 @@ class advance_payment(models.Model):
     reconciled = fields.Float(string=u'已核销金额')
     to_reconcile = fields.Float(string=u'未核销金额')
     this_reconcile = fields.Float(string=u'本次核销金额')
+
+class cost_line(models.Model):
+    _name = 'cost.line'
+    _description = u"采购销售费用"
+
+    partner_id = fields.Many2one('partner', u'供应商')
+    category_id = fields.Many2one('core.category', u'类别', domain="[('type', '=', 'other_pay')]")
+    amount = fields.Float(u'金额')
+    note = fields.Char(u'备注')
