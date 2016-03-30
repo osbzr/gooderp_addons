@@ -398,7 +398,8 @@ class buy_receipt(models.Model):
                 'this_reconcile': self.payment,
             })
 
-            money_order = self.pool.get('money.order').create(self._cr, self._uid, {
+            rec = self.with_context(type='pay')
+            money_order = rec.env['money.order'].create({
                                 'partner_id': self.partner_id.id,
                                 'date': fields.Date.context_today(self),
                                 'line_ids': [(0, 0, line) for line in money_lines],
@@ -408,8 +409,8 @@ class buy_receipt(models.Model):
                                 'reconciled': self.payment,
                                 'to_reconcile': to_reconcile,
                                 'state': 'draft',
-                            }, context={'type': 'pay'})
-            self.pool.get('money.order').browse(self._cr, self._uid, money_order, context=self._context).money_order_done()
+                            })
+            money_order.money_order_done()
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.buy_move_id.approve_order()
         # 生成分拆单 FIXME:无法跳转到新生成的分单
