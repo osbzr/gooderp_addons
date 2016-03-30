@@ -4,6 +4,8 @@
     'author': "judy@osbzr.com",
     'website': "http://www.osbzr.com",
     'category': 'gooderp',
+    "description": """
+    """,
     'version': '8.0.0.1',
     'depends': ['core','base'],
     'data': [
@@ -18,5 +20,6 @@
         'wizard/bank_statements_wizard_view.xml',
         'report/other_money_statements_view.xml',
         'wizard/other_money_statements_wizard_view.xml',
+        'security/ir.model.access.csv',
         ]
 }

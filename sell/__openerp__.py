@@ -30,6 +30,7 @@
             'sell_data.xml',
             'report/customer_statements_view.xml',
             'wizard/customer_statements_wizard_view.xml',
+            'security/ir.model.access.csv',
             ],
     'installable': True,
     'auto_install': False,

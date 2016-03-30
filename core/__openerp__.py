@@ -4,9 +4,12 @@
     'author': "开阖软件",
     'website': "http://www.osbzr.com",
     'category': 'gooderp',
+    "description": """
+    """,
     'version': '8.0.0.1',
     'depends': [],
     'data': [
         'core_view.xml',
+        'security/ir.model.access.csv',
         ]
 }
