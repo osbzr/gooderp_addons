@@ -177,7 +177,6 @@
 		                            <field name="subtotal" sum="价税合计的合计"/>
 		                            <field name="note"/>
 		                            <field name="share_cost" readonly="1"/>
-		                            <field name="type"/>
 		                        </tree>
 		                    </field>
 		                </page>
@@ -287,10 +286,10 @@
 		                            <field name="attribute_id"/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
-		                            <field name='lot_qty' invisible='1' />
+		                            <field name='lot_qty' invisible='1'/>
                     				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
                     					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]"
-                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}" />
+                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"/>
 		                            <field name="warehouse_id" required="1"/>
 		                            <field name="warehouse_dest_id" invisible="1"/>
 		                            <field name="goods_qty" sum="合计数量"/>
@@ -303,7 +302,6 @@
 		                            <field name="tax_amount" sum="合计税额"/>
 		                            <field name="subtotal" sum="价税合计的合计"/>
 		                            <field name="note"/>
-		                            <field name="type"/>
 		                        </tree>
 		                    </field>
 		                </page>
