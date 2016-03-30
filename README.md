@@ -2,9 +2,9 @@
 ======
 
 [![Join the chat at https://gitter.im/osbzr/gooderp](https://badges.gitter.im/osbzr/gooderp.svg)](https://gitter.im/osbzr/gooderp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/osbzr/gooderp.svg?branch=master)](https://travis-ci.org/osbzr/gooderp)
-[![Coverage Status](https://coveralls.io/repos/github/osbzr/gooderp/badge.svg?branch=master)](https://coveralls.io/github/osbzr/gooderp?branch=master)
-[![Issue Count](https://codeclimate.com/github/osbzr/gooderp/badges/issue_count.svg)](https://codeclimate.com/github/osbzr/gooderp)
+[![Build Status](https://travis-ci.org/osbzr/gooderp_addons.svg?branch=master)](https://travis-ci.org/osbzr/gooderp_addons)
+[![Coverage Status](https://coveralls.io/repos/github/osbzr/gooderp_addons/badge.svg?branch=master)](https://coveralls.io/github/osbzr/gooderp_addons?branch=master)
+[![Issue Count](https://codeclimate.com/github/osbzr/gooderp_addons/badges/issue_count.svg)](https://codeclimate.com/github/osbzr/gooderp_addons)
 
 开阖软件发起的开源ERP项目
 
