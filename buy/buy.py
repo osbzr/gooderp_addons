@@ -166,7 +166,6 @@ class buy_order(models.Model):
         receipt_id = self.env['buy.receipt'].create({
                             'partner_id': self.partner_id.id,
                             'date': self.planned_date,
-                            'type': 'receipt',
                             'order_id': self.id,
                             'line_in_ids': [(0, 0, line[0]) for line in receipt_line],
                             'origin': 'buy.receipt',
@@ -251,10 +250,14 @@ class buy_receipt(models.Model):
     _order = 'date desc, id desc'
 
     @api.one
-    @api.depends('line_in_ids.subtotal', 'discount_amount', 'payment')
+    @api.depends('line_in_ids.subtotal', 'discount_amount', 'payment', 'line_out_ids.subtotal')
     def _compute_all_amount(self):
         '''当优惠金额改变时，改变优惠后金额和本次欠款'''
-        total = sum(line.subtotal for line in self.line_in_ids)
+        total = 0
+        if self.line_in_ids:
+            total = sum(line.subtotal for line in self.line_in_ids) # 入库时优惠前总金额
+        elif self.line_out_ids:
+            total = sum(line.subtotal for line in self.line_out_ids) # 退货时优惠前总金额
         self.amount = total - self.discount_amount
         self.debt = self.amount - self.payment
 
@@ -262,21 +265,22 @@ class buy_receipt(models.Model):
     @api.depends('state', 'amount', 'payment')
     def _get_buy_money_state(self):
         '''返回付款状态'''
-        if self.state == 'draft':
-            self.money_state = u'未付款'
-        else:
-            if self.payment == 0:
+        if not self.is_return:
+            if self.state == 'draft':
                 self.money_state = u'未付款'
-            elif self.amount > self.payment:
-                self.money_state = u'部分付款'
-            elif self.amount == self.payment:
-                self.money_state = u'全部付款'
+            else:
+                if self.payment == 0:
+                    self.money_state = u'未付款'
+                elif self.amount > self.payment:
+                    self.money_state = u'部分付款'
+                elif self.amount == self.payment:
+                    self.money_state = u'全部付款'
 
     @api.one
     @api.depends('state', 'amount', 'payment')
     def _get_buy_return_state(self):
         '''返回退款状态'''
-        if self.type == 'return':
+        if self.is_return:
             if self.state == 'draft':
                 self.return_state = u'未退款'
             else:
@@ -288,7 +292,7 @@ class buy_receipt(models.Model):
                     self.return_state = u'全部退款'
 
     buy_move_id = fields.Many2one('wh.move', u'入库单', required=True, ondelete='cascade')
-    type = fields.Selection([('receipt', u'入库'), ('return', u'退货')], u'类型', default=lambda self: self.env.context.get('type'))
+    is_return = fields.Boolean(u'是否退货', default=lambda self: self.env.context.get('is_return'))
     order_id = fields.Many2one('buy.order', u'源单号', copy=False)
     invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False)
     date_due = fields.Date(u'到期日期', copy=False)
@@ -307,7 +311,11 @@ class buy_receipt(models.Model):
     @api.one
     @api.onchange('discount_rate')
     def onchange_discount_rate(self):
-        total = sum(line.subtotal for line in self.line_in_ids)
+        total = 0
+        if self.line_in_ids:
+            total = sum(line.subtotal for line in self.line_in_ids) # 入库时优惠前总金额
+        elif self.line_out_ids:
+            total = sum(line.subtotal for line in self.line_out_ids) # 退货时优惠前总金额
         if self.discount_rate:
             self.discount_amount = total * self.discount_rate * 0.01
 
@@ -320,7 +328,7 @@ class buy_receipt(models.Model):
 
     @api.one
     def buy_receipt_done(self):
-        '''审核采购入库单，更新购货订单的状态和本单的付款状态，并生成源单'''
+        '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
         if self.bank_account_id and not self.payment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')
         if not self.bank_account_id and self.payment:
@@ -336,7 +344,13 @@ class buy_receipt(models.Model):
             for line in self.line_in_ids:
                 line.buy_line_id.quantity_in += line.goods_qty
 
-        # 入库单生成源单
+        # 入库单/退货单 生成源单
+        if not self.is_return:
+            amount = self.amount
+            to_reconcile = self.debt
+        else:
+            amount = - self.amount
+            to_reconcile = - self.debt
         categ = self.env.ref('money.core_category_purchase')
         source_id = self.env['money.invoice'].create({
                             'move_id': self.buy_move_id.id,
@@ -344,9 +358,9 @@ class buy_receipt(models.Model):
                             'partner_id': self.partner_id.id,
                             'category_id': categ.id,
                             'date': fields.Date.context_today(self),
-                            'amount': self.amount,
+                            'amount': amount,
                             'reconciled': self.payment,
-                            'to_reconcile': self.debt,
+                            'to_reconcile': to_reconcile,
                             'date_due': self.date_due,
                             'state': 'draft',
                         })
@@ -378,9 +392,9 @@ class buy_receipt(models.Model):
                 'name': source_id.id,
                 'category_id': categ.id,
                 'date': source_id.date,
-                'amount': self.amount,
+                'amount': amount,
                 'reconciled': 0.0,
-                'to_reconcile': self.amount,
+                'to_reconcile': to_reconcile,
                 'this_reconcile': self.payment,
             })
 
@@ -390,9 +404,9 @@ class buy_receipt(models.Model):
                                 'line_ids': [(0, 0, line) for line in money_lines],
                                 'source_ids': [(0, 0, line) for line in source_lines],
                                 'type': 'pay',
-                                'amount': self.amount,
+                                'amount': amount,
                                 'reconciled': self.payment,
-                                'to_reconcile': self.debt,
+                                'to_reconcile': to_reconcile,
                                 'state': 'draft',
                             })
             money_order.money_order_done()
@@ -420,14 +434,3 @@ class buy_receipt_line(models.Model):
 
     buy_line_id = fields.Many2one('buy.order.line', u'购货单行')
     share_cost = fields.Float(u'采购费用')
-
-class cost_line(models.Model):
-    _name = 'cost.line'
-    _description = u"采购销售费用"
-
-    buy_id = fields.Many2one('buy.receipt', u'入库单号')
-    sell_id = fields.Many2one('sell.delivery', u'出库单号')
-    partner_id = fields.Many2one('partner', u'供应商')
-    category_id = fields.Many2one('core.category', u'类别', domain="[('type', '=', 'other_pay')]")
-    amount = fields.Float(u'金额')
-    note = fields.Char(u'备注')
