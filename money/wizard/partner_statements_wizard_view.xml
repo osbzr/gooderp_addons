@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        <!--客户对账单向导 form-->
+        <!--业务伙伴对账单向导 form-->
     	<record id="partner_statements_report_wizard_form" model="ir.ui.view">
             <field name="name">partner.statements.report.wizard.form</field>
             <field name="model">partner.statements.report.wizard</field>
