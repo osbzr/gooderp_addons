@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--其他支出单tree-->
+    	<record id="other_money_statements_report_tree" model="ir.ui.view">
+            <field name="name">other.money.statements.report.tree</field>
+            <field name="model">other.money.statements.report</field>
+            <field name="arch" type="xml">
+                <tree string="Other Money Partner Statements Report">
+                	<field name="date"/>
+                    <field name="name"/>
+                    <field name="note"/>
+                    <field name="type"/>
+                    <field name="category_id"/>
+                    <field name="get" sum="合计"/>
+                    <field name="pay" sum="合计"/>
+                    <field name="partner_id"/>
+                </tree>
+            </field>
+        </record>
+	</data>
+</openerp>
+	

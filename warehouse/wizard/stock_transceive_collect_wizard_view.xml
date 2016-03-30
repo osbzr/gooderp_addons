@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<openerp>
+    <data>
+        <record id='report_stock_transceive_collect_wizard_form' model='ir.ui.view'>
+            <field name='name'>report.stock.transceive.collect.wizard.form</field>
+            <field name='model'>report.stock.transceive.collect.wizard</field>
+            <field name='arch' type='xml'>
+                <form string='商品收发汇总表'>
+                    <group>
+                        <group>
+                            <label for="date_start" string="单据期间" class='oe_inline' />
+                            <div>
+                                <field name="date_start" class="oe_inline" nolabel='1' required='1' /> - 
+                                <field name="date_end" class="oe_inline" nolabel='1' required='1' />
+                            </div>
+                            <field name='goods' />
+                        </group>
+                        <group>
+                            <field name='warehouse' />
+                        </group>
+                    </group>
+                    <footer>
+                        <button name='open_report' string='确定' type='object' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

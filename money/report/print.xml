@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+        <report
+            id="other_money_order_print"
+            string="打印其他收入/支出"
+            model="account.invoice"
+            report_type="qweb-pdf"
+            file="money.print_money_order"
+            name="money.report_other_money_order"
+            menu="False"
+        />
+        
+        <!-- <record id="invoice_draft_print" model="ir.actions.report.xml">
+            <field name="download_filename">${o.name}发票草稿.pdf</field>
+            <field name='paperformat_id' eval="ref('max_report_voucher_paperformat')" />
+        </record> -->
+</data>
+</openerp>

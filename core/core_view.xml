@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        
+        <!--根菜单-->
+        
+        <menuitem id='scm_menu' name='进销存'/>
+        
+        <menuitem id='config_menu' name='设置' parent='scm_menu'/>
+        
+        <!--类别-->
+        
+        <record id="core_category_tree" model="ir.ui.view">
+            <field name="name">core.category.tree</field>
+            <field name="model">core.category</field>
+            <field name="arch" type="xml">
+                <tree string="类别">                  
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="core_category_action" model="ir.actions.act_window">
+            <field name="name">类别</field>
+            <field name="res_model">core.category</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+        
+        <menuitem id='core_category_menu' action='core_category_action' parent='config_menu'/>
+
+        <!--可选值-->
+        <record id="core_value_tree" model="ir.ui.view">
+            <field name="name">core.value.tree</field>
+            <field name="model">core.value</field>
+            <field name="arch" type="xml">
+                <tree string="可选值">                  
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="core_value_action" model="ir.actions.act_window">
+            <field name="name">可选值</field>
+            <field name="res_model">core.value</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+        
+        <menuitem id='core_value_menu' action='core_value_action' parent='config_menu'/>
+        
+        <!--系统参数-->
+        <record id="company_form" model="ir.ui.view">
+            <field name="name">company.form</field>
+            <field name="model">res.company</field>
+            <field name="arch" type="xml">
+                <form string="系统参数">
+                   <group string="基础参数">                  
+                    <field name="name"/>
+                    <field name="street"/>
+                    <field name="phone"/>
+                    <field name="fax"/>
+                    <field name="zip"/>
+                    <field name="start_date"/>
+                    <field name="currency_id"/>
+                    <field name="quantity_digits"/>
+                    <field name="amount_digits"/>
+                    <field name="cost_method"/>
+                    <field name="negtive_quantity"/>
+                   </group>
+                </form>
+            </field>
+        </record>
+        <record id="company_action" model="ir.actions.act_window">
+            <field name="name">系统参数</field>
+            <field name="res_model">res.company</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="res_id">1</field>
+        </record>
+        <record id="company_action_view_form" model="ir.actions.act_window.view">
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="company_form"/>
+            <field name="act_window_id" ref="company_action"/>
+        </record>
+        <menuitem id='company_menu' action='company_action' parent='config_menu'/>
+    </data>
+</openerp>

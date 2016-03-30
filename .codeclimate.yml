@@ -1,0 +1,11 @@
+engines:
+  csslint:
+    enabled: true
+  pep8:
+    enabled: true
+  eslint:
+    enabled: true
+  FIXME:
+    enabled: true
+  duplication:
+    enabled: false

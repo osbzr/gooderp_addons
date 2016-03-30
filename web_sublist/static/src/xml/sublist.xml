@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates id='template' xml:space='preserve'>
+<t t-name='web_sublist.sublist'>
+    <table>
+        <tr t-foreach='values' t-as='value'>
+            <td><t t-esc='value' /></td>
+        </tr>
+    </table>
+</t>
+</templates>

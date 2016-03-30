@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="assets_backend" name="web sublist" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/web_sublist/static/src/js/sublist.js"></script>
+                <link rel="stylesheet" href="/web_sublist/static/src/css/style.css"/>
+            </xpath>
+        </template>
+    </data>
+</openerp>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='report_stock_transceive_collect_tree' model='ir.ui.view'>
+            <field name='name'>report.stock.transceive.collect.tree</field>
+            <field name='model'>report.stock.transceive.collect</field>
+            <field name='arch' type='xml'>
+                <tree string='商品收发汇总表'>
+                    <field name='goods' />
+                    <field name='uom' />
+                    <field name='warehouse' />
+
+                    <field name='goods_qty_begain' />
+                    <field name='cost_begain' />
+
+                    <field name='internal_in_qty' />
+                    <field name='internal_in_cost' />
+
+                    <field name='others_in_qty' />
+                    <field name='others_in_cost' />
+
+                    <field name='overage_in_qty' />
+                    <field name='overage_in_cost' />
+
+                    <field name='assembly_in_qty' />
+                    <field name='assembly_in_cost' />
+
+                    <field name='disassembly_in_qty' />
+                    <field name='disassembly_in_cost' />
+
+                    <field name='goods_qty_in' />
+                    <field name='cost_in' />
+
+                    <field name='internal_out_qty' />
+                    <field name='internal_out_cost' />
+
+                    <field name='others_out_qty' />
+                    <field name='others_out_cost' />
+
+                    <field name='losses_out_qty' />
+                    <field name='losses_out_cost' />
+
+                    <field name='assembly_out_qty' />
+                    <field name='assembly_out_cost' />
+
+                    <field name='disassembly_out_qty' />
+                    <field name='disassembly_out_cost' />
+
+                    <field name='goods_qty_out' />
+                    <field name='cost_out' />
+
+                    <field name='goods_qty_end' />
+                    <field name='cost_end' />
+                </tree>
+            </field>
+        </record>
+
+        <record id='report_stock_transceive_collect_search' model='ir.ui.view'>
+            <field name='name'>report.stock.transceive.collect.search</field>
+            <field name='model'>report.stock.transceive.collect</field>
+            <field name='arch' type='xml'>
+                <search string='商品收发汇总表' >
+                    <field name='goods' string='产品' filter_domain="[('goods', 'ilike', self)]" />
+                    <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" />
+                    <field name='uom' string='单位' filter_domain="[('uom', 'ilike', self)]" />
+
+                    <group expand="0" string="Group By">
+                        <filter string="产品" context="{'group_by':'goods'}"/>
+                        <filter string="仓库" context="{'group_by': 'warehouse'}"/>
+                        <filter string="单位" context="{'group_by': 'uom'}"/>
+                    </group>
+                </search>
+            </field>
+        </record> 
+
+    </data>
+</openerp>

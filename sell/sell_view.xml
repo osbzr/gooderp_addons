@@ -1,0 +1,250 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<!--销货订单tree视图-->
+    	<record id='sell_order_tree' model='ir.ui.view'>
+        	<field name='name'>sell.order.tree</field>
+        	<field name='model'>sell.order</field>
+        	<field name='arch' type='xml'>
+            	<tree string='销货订单'>
+            		<field name='date'/>
+            		<field name='name'/>
+            		<field name='type'/>
+            		<field name='staff_id'/>
+            		<field name='partner_id'/>
+            		<field name='state'/>
+            		<field name='goods_state'/>
+            		<field name='delivery_date'/>
+            		<field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+            	</tree>
+        	</field>
+    	</record>
+    	
+    	<!--销货订单form视图-->
+    	<record id='sell_order_form' model='ir.ui.view'>
+        	<field name='name'>sell.order.form</field>
+        	<field name='model'>sell.order</field>
+        	<field name='arch' type='xml'> 
+            	<form string='销货订单'>
+            		<header>
+            			<button name='sell_order_done' states='draft' string='审核' type='object' class='oe_highlight'/>
+            			<button name="sell_order_draft" states="done" string="反审核" type="object"/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
+            		</header>
+            		<sheet>
+            			<div class="oe_title">
+                        	<h1>
+                            	<label string="销货订单 "/>
+                        	</h1>
+                     	</div>
+            			<group>
+            				<group>
+            					<field name='partner_id' required='1'/>
+            					<field name='staff_id'/>
+            					<field name='date'/>
+            				</group>
+            				<group>
+            					<field name='delivery_date'/>
+            					<field name='name' readonly='1'/>
+            					<field name='type' widget='radio'/>
+            					<field name='goods_state' readonly='1'/>
+            				</group> 
+            			</group>
+            			<notebook>
+            				<page string="销货订单行">    		
+            					<field name='line_ids' context="{'warehouse_dest_type': 'customer'}">
+                 					<tree string='销货订单行' editable='bottom'>
+                 						<field name='goods_id'/>
+                 						<field name='attribute_id'/>
+				 						<field name='uom_id'/>
+				 						<field name='warehouse_id' required='1'/>
+				 						<field name='warehouse_dest_id' invisible='1'/>
+                 						<field name='quantity' sum='数量合计'/>
+				 						<field name='price'/>
+				 						<field name="price_taxed"/>
+				 						<field name='discount_rate'/>
+                 						<field name='discount_amount' sum='折扣额合计' />
+				 						<field name='amount' sum='金额合计'/>
+				 						<field name='tax_rate'/>
+                 						<field name='tax_amount' sum='税额合计'/>
+				 						<field name='subtotal' sum='价税合计'/>
+				 						<field name='note'/>
+				 					</tree>
+				 				</field>
+				 				<field name="note" placeholder="暂无备注信息"/>
+				 				<group>
+                        			<group col="6" colspan="6">
+                            			<field name="benefit_rate"/>
+                            			<field name="benefit_amount"/>
+                            			<field name="amount"/>
+                        			</group>
+                    			</group>
+                    			<group>
+                        			<group col="8" colspan="2">
+                            			<field name="create_uid" readonly="1" string="制单人"/>
+                            			<field name="approve_uid" readonly="1"/>
+                            			<field name="create_date" readonly="1" string="录单时间"/>
+                            			<field name="write_date" readonly="1" string="最后修改时间"/>
+                        			</group>
+                    			</group>
+				 			</page>
+				 		</notebook>
+            		</sheet>
+                	<div class="oe_chatter">
+                    	<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    	<field name="message_ids" widget="mail_thread"/>
+                	</div>	
+            	</form>
+        	</field> 
+    	</record>
+    	
+    	<!--销售订单发货单tree视图-->
+    	<record id='sell_delivery_tree' model='ir.ui.view'>
+        	<field name='name'>sell.delivery.tree</field>
+        	<field name='model'>sell.delivery</field>
+        	<field name='arch' type='xml'> 
+            	<tree string='销售订单发货单'>
+            		<field name='date'/>
+            		<field name='name'/>
+            		<field name="order_id"/>
+            		<field name='staff_id'/>
+            		<field name='partner_id'/>
+            		<field name="amount"/>
+            		<field name='receipt'/>
+            		<field name='state'/>
+            		<field name='money_state'/>
+            		<field name='date_due'/>
+            		<field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+            	</tree>
+        	</field> 
+    	</record>
+    	
+    	<!--销售发货单form视图-->
+    	<record id='sell_delivery_form' model='ir.ui.view'>
+        	<field name='name'>sell.delivery.form</field>
+        	<field name='model'>sell.delivery</field>
+        	<field name='arch' type='xml'> 
+            	<form string='销售发货单'>
+            		<header>
+            			<button name='sell_delivery_done' states="draft" type='object' string='审核' class='oe_highlight'/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
+            		</header>
+            		<sheet>
+            			<div class="oe_title">
+                        	<h1>
+                            	<label string="销售发货单 "/>
+                        	</h1>
+                     	</div>
+            			<group>
+            				<group>
+            					<field name='partner_id' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
+            				</group>
+            				<group>
+            					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='name' readonly='1'/>
+            					<field name='order_id' readonly='1'/>
+            					<field name='invoice_id' readonly='1'/>
+            					<field name="money_state" readonly="1"/>
+            				</group>
+            			</group>
+            			<notebook>
+                    		<page string="发库单行">
+		    					<field name='line_out_ids' attrs="{'readonly': [('state','!=','draft')]}"
+		    						context="{'warehouse_dest_type': 'customer'}">
+		         					<tree string='销售发货单行' editable='bottom'>
+		         						<field name='goods_id'/>
+		         						<field name='attribute_id'/>
+				 						<field name='uom_id'/>
+				 						<field name='warehouse_id' required='1'/>
+				 						<field name='warehouse_dest_id' invisible='1'/>
+		         						<field name='goods_qty' sum='数量合计'/>
+				 						<field name='price'/>
+				 						<field name="price_taxed"/>
+				 						<field name='discount_rate'/>
+		         						<field name='discount_amount' sum='折扣额合计'/>
+				 						<field name='amount' string='销售金额' sum='金额合计'/>
+				 						<field name='tax_rate'/>
+		         						<field name='tax_amount' sum='税额合计'/>
+				 						<field name='subtotal' sum='价税合计'/>
+				 						<field name='note'/>
+				 						<field name='origin'/>
+				 					</tree>
+				 				</field>
+			 				</page>
+			                <page string="销售费用行">
+			                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
+			                		<tree string="Cost Lines" editable="bottom">
+			                			<field name="partner_id"/>
+				                		<field name="category_id"/>
+				                		<field name="amount"/>
+				                		<field name="note"/>
+				                	</tree>
+			                	</field>
+			                </page>
+			            </notebook>
+		 				<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+		 				<group>
+                			<group>
+                    			<field name="benefit_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
+                    			<field name="benefit_amount"/>
+                    			<field name="amount"/>
+                    			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
+                    			<field name="create_uid" readonly="1" string="制单人"/>
+                    			<field name="approve_uid" readonly="1"/>
+                			</group>
+                			<group>
+                				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="debt"/>
+                				<field name="total_debt"/>
+                				<field name="create_date" readonly="1" string="录单时间"/>
+                				<field name="write_date" readonly="1" string="最后修改时间"/>
+                			</group>
+            			</group>
+            		</sheet>
+            	</form>
+        	</field> 
+    	</record>
+    	
+    	
+    	<!--销货订单，销售发货单action-->
+    	<record id='sell_order_action' model='ir.actions.act_window'>
+        	<field name='name'>销货订单</field>
+        	<field name='res_model'>sell.order</field>
+        	<field name='view_type'>form</field>
+        	<field name='view_mode'>tree,form</field>
+        	<field name="context">{}</field>
+        	<field name='view_id' ref='sell_order_tree'/>
+        	<field name="help" type="html">
+               <p class="oe_view_nocontent_create">
+                	 点击创建销货订单
+               </p>
+             </field>
+    	</record>
+    	
+    	<record id='sell_delivery_action' model='ir.actions.act_window'>
+        	<field name='name'>销售发货单</field>
+        	<field name='res_model'>sell.delivery</field>
+        	<field name='view_type'>form</field>
+        	<field name='view_mode'>tree,form</field>
+        	<field name="context">{}</field>
+        	<field name='view_id' ref='sell_delivery_tree'/>
+        	<field name="help" type="html">
+               <p class="oe_view_nocontent_create">
+                	 点击创建销售发货单
+               </p>
+             </field>
+    	</record>
+    	
+    	<!--根菜单-->
+        <menuitem id='sell_menu' name='销货' />
+    	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' />
+    	<menuitem id='sell_order_menu' name='销货订单' parent='sell_order_menu_root' action='sell_order_action' sequence='1' />
+    	<menuitem id='sell_delivery_menu' name='销售发货单' parent='sell_order_menu_root' action='sell_delivery_action' sequence='2' />
+
+    </data>
+</openerp>

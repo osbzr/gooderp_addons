@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 销货订单序列号 -->
+        <record id="seq_type_sell_order" model="ir.sequence.type">
+            <field name="name">Sell Order</field>
+            <field name="code">sell.order</field>
+        </record>
+        <record id="seq_sell_order" model="ir.sequence">
+            <field name="name">Sell Order</field>
+            <field name="code">sell.order</field>
+            <field name="prefix">SO</field>
+            <field name="padding">5</field>
+        </record>
+    </data>
+    <data>
+		<!-- 销售发货单序列号 -->
+        <record id="seq_type_buy_receipt" model="ir.sequence.type">
+            <field name="name">Sell Delivery</field>
+            <field name="code">sell.delivery</field>
+        </record>
+        <record id="seq_buy_receipt" model="ir.sequence">
+            <field name="name">Sell Delivery</field>
+            <field name="code">sell.delivery</field>
+            <field name="prefix">WH/OUT/</field>
+            <field name="padding">5</field>
+        </record>
+    </data>
+</openerp>

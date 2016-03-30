@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate='1'>
+        <record id='warehouse_supplier' model='warehouse'>
+            <field name='name'>供应商仓库</field>
+            <field name='code'>Supplier</field>
+            <field name='type'>supplier</field>
+        </record>
+
+        <record id='warehouse_customer' model='warehouse'>
+            <field name='name'>客户仓库</field>
+            <field name='code'>Customer</field>
+            <field name='type'>customer</field>
+        </record>
+
+        <record id='warehouse_inventory' model='warehouse'>
+            <field name='name'>盘点仓库</field>
+            <field name='code'>Inventory</field>
+            <field name='type'>inventory</field>
+        </record>
+
+        <record id='warehouse_production' model='warehouse'>
+            <field name='name'>生产仓库</field>
+            <field name='code'>Production</field>
+            <field name='type'>production</field>
+        </record>
+
+        <record id='warehouse_others' model='warehouse'>
+            <field name='name'>其他仓库</field>
+            <field name='code'>others</field>
+            <field name='type'>others</field>
+        </record>
+    </data>
+</openerp>

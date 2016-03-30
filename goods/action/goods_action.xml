@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='goods_action' model='ir.actions.act_window'>
+            <field name='name'>产品</field>
+            <field name='res_model'>goods</field>
+            <field name='view_mode'>tree,form</field>
+            <field name='view_id' ref='goods_tree' />
+        </record>
+    </data>
+</openerp>

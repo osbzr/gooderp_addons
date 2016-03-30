@@ -1,0 +1,20 @@
+
+.openerp table.oe_list_content td:not(.oe_list_field_relation_sublist),
+.openerp div.oe_form_container span.oe_form_field
+{
+    vertical-align: middle !important;
+}
+
+.openerp td.oe_list_field_relation_sublist {
+    padding: 3px 0px !important;
+}
+
+.oe_list_field_relation_sublist table {
+    width: 100%;
+}
+
+
+
+/*tr .oe_list_field_relation_sublist tr:nth-child(2n) {
+    background-color: white;
+}*/

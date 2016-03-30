@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--现金银行报表向导 form-->
+    	<record id="bank_statements_report_wizard_form" model="ir.ui.view">
+            <field name="name">bank.statements.report.wizard.form</field>
+            <field name="model">bank.statements.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Bank Statements Report Wizard">
+                    <group>
+                        <group>
+                        	<field name="bank_id"/>
+                        </group>
+                        <group>
+                        	<field name="from_date"/>
+                            <field name="to_date"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name='confirm_bank_statements' string='确定' type='object' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                	</footer>
+                </form>
+            </field>
+        </record>
+
+		<!-- 现金银行报表向导 action -->
+		<record id='bank_statements_report_wizard_action' model='ir.actions.act_window'>
+            <field name='name'>现金银行报表向导</field>
+            <field name='res_model'>bank.statements.report.wizard</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>form</field>
+            <field name='view_id' ref='bank_statements_report_wizard_form' />
+            <field name='target'>new</field>
+        </record>
+
+		<!-- 现金银行报表向导 menu -->
+        <menuitem id="report_bank_statements_action" name="现金银行报表" action="bank_statements_report_wizard_action" parent="menu_money_report" sequence="3"/>
+	</data>
+</openerp>
+	

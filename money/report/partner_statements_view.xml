@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--客户对账单不带商品明细tree-->
+		<record id="customer_statements_report_tree" model="ir.ui.view">
+            <field name="name">customer.statements.report.tree</field>
+            <field name="model">customer.statements.report</field>
+            <field name="arch" type="xml">
+                <tree string="Partner Statements Report">
+                	<field name="date"/>
+                    <field name="name"/>
+                    <button name="find_source_order" type="object" string="查看源单" icon="terp-stock_zoom" class="oe_highlight"/>
+                    <field name="sale_amount"/>
+                    <field name="benefit_amount"/>
+                    <field name="fee"/>
+                    <field name="note"/>
+                    <field name="amount"/>
+                    <field name="pay_amount"/>
+                    <field name="balance_amount"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--供应商对账单不带商品明细tree-->
+		<record id="supplier_statements_report_tree" model="ir.ui.view">
+            <field name="name">supplier.statements.report.tree</field>
+            <field name="model">supplier.statements.report</field>
+            <field name="arch" type="xml">
+                <tree string="Partner Statements Report">
+                	<field name="date"/>
+                    <field name="name"/>
+                    <button name="find_source_order" type="object" string="查看源单" icon="terp-stock_zoom" class="oe_highlight"/>
+                    <field name="purchase_amount"/>
+                    <field name="benefit_amount"/>
+                    <field name="note"/>
+                    <field name="amount"/>
+                    <field name="pay_amount"/>
+                    <field name="balance_amount"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--客户对账单带商品明细tree-->
+		<record id="customer_statements_report_with_goods_tree" model="ir.ui.view">
+            <field name="name">customer.statements.report.with.goods.tree</field>
+            <field name="model">partner.statements.report.with.goods</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Statements Report">
+					<field name="date"/>
+                    <field name="name"/>
+                    <button name="find_source_order" type="object" string="查看源单" class="oe_highlight" icon="terp-stock_zoom" attrs="{'invisible':[('name','=',False)]}"/>
+                    <field name="note"/>
+                    <field name="goods_code"/>
+                    <field name="goods_name"/>
+                    <field name="attribute_id"/>
+                    <field name="uom_id"/>
+                    <field name="quantity"/>
+                    <field name="price"/>
+                    <field name="discount_amount"/>
+                    <field name="without_tax_amount"/>
+                    <field name="tax_amount"/>
+                    <field name="order_amount" string="销售金额"/>
+                    <field name="benefit_amount"/>
+                    <field name="fee"/>
+                    <field name="amount"/>
+                    <field name="pay_amount"/>
+                    <field name="balance_amount"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--供应商对账单带商品明细tree-->
+		<record id="supplier_statements_report_with_goods_tree" model="ir.ui.view">
+            <field name="name">supplier.statements.report.with.goods.tree</field>
+            <field name="model">partner.statements.report.with.goods</field>
+            <field name="arch" type="xml">
+                <tree string="Supplier Statements Report">
+					<field name="date"/>
+                    <field name="name"/>
+                    <button name="find_source_order" type="object" string="查看源单" class="oe_highlight" icon="terp-stock_zoom" attrs="{'invisible':[('name','=',False)]}"/>
+                    <field name="note"/>
+                    <field name="goods_code"/>
+                    <field name="goods_name"/>
+                    <field name="attribute_id"/>
+                    <field name="uom_id"/>
+                    <field name="quantity"/>
+                    <field name="price"/>
+                    <field name="discount_amount"/>
+                    <field name="without_tax_amount"/>
+                    <field name="tax_amount"/>
+                    <field name="order_amount" string="采购金额"/>
+                    <field name="benefit_amount"/>
+                    <field name="amount" string="应付金额"/>
+                    <field name="pay_amount" string="实际付款金额"/>
+                    <field name="balance_amount" string="应付款余额"/>
+                </tree>
+            </field>
+        </record>
+	</data>
+</openerp>
+	

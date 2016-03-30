@@ -1,0 +1,13 @@
+
+span.menu-create-tag {
+    overflow: hidden;;
+    display: inline-block;
+    max-width: 85%;
+    margin-top: 1px;
+    margin-left: 12px; 
+    background-color: #00FFCC;
+    padding: 0px, 4px;
+    border-radius: 2.5px;
+    color: white;
+    font-size: 12px;
+}

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+    <template id="report_other_money_order">
+        <t t-call="report.external_layout">
+            <div class="page">
+                <div class="oe_structure"/>
+                <div class="row">
+                    <div>
+                        <h1>其他收入单</h1>
+                        <span>客户名称：</span><span t-field="o.partner_id"/><br/>
+                        <span>单据日期：</span><span t-field="o.date"/><br/>
+                        <span>单据编号：</span><span t-field="o.name"/><br/>
+                    </div>
+                    <table class="table table-condensed" style="border-bottom: 2px solid black;">
+                        <thread>
+                            <tr style="vertical-align: bottom;border-bottom: 2px solid black;border-top: 2px solid black">
+                                <th class="text-right">收入类别</th>
+                                <th class="text-right">金额</th>
+                                <th class="text-right">备注</th>
+                            </tr>
+                        </thread>
+                        <tbody class="invoice_tbody">
+                            <tr t-foreach="o.line_ids" t-as="l">
+                                <td><span t-field="l.other_money_type"/></td>
+                                <td>
+                                    <span t-field="l.amount"/>
+                                </td>
+                                <td>
+                                    <span t-field="l.note"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <div class="row">
+                        <div class="col-xs-4 pull-right">
+                            <table class="table table-condensed">
+                                <tr class="border-black">
+                                    <td><strong>税前小计</strong></td>
+                                    <td class="text-right">
+                                        <span t-field="o.amount_untaxed" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>税</td>
+                                    <td class="text-right">
+                                        <span t-field="o.amount_tax" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td><strong>合计</strong></td>
+                                    <td class="text-right">
+                                         <span t-field="o.amount_total" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <strong class="text-left">支付条款：</strong><span t-field="o.payment_term"/><br/>
+                    <strong class="text-left">开票说明：</strong><span t-field="o.invoice_note"/><br/><br/>
+                    <div style="float:right ;">
+                        <font style="line-height:200%;">
+                            <strong>纸质发票号：__________________________</strong><br/>
+                            <strong>销售员：<span t-field='o.user_id'/></strong>
+                        </font>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+<template id="report_invoice_draft">
+    <t t-call="report.html_container">
+        <t t-foreach="doc_ids" t-as="doc_id">
+            <t t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang', 'osbzr_max.report_invoice_draft_document')"/>
+        </t>
+    </t>
+</template>
+</data>
+</openerp>

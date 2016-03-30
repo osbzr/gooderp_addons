@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<openerp>
+    <data>
+        <record id='save_bom_memory_form' model='ir.ui.view'>
+            <field name='name'>save.bom.memory.form</field>
+            <field name='model'>save.bom.memory</field>
+            <field name='arch' type='xml'>
+                <form string='模板名称'>
+                    <h1>
+                        <p>为你新的模板命名</p>
+                    </h1>
+                    <group>
+
+                        <field name='name' required='1' />
+                    </group>
+                    <footer>
+                        <button name='save_bom' string='确定' type='object' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

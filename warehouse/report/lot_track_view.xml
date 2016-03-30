@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='report_lot_track_tree' model='ir.ui.view'>
+            <field name='name'>report.lot.track.tree</field>
+            <field name='model'>report.lot.track</field>
+            <field name='arch' type='xml'>
+                <tree string='序列号状态表'>
+                    <field name='goods' />
+                    <field name='uom' />
+                    <field name='lot' />
+                    <field name='qty' />
+                    <field name='date' />
+                    <field name='warehouse' />
+                    <field name='origin' />
+                </tree>
+            </field>
+        </record>
+
+        <record id='report_lot_track_search' model='ir.ui.view'>
+            <field name='name'>report.lot.track.search</field>
+            <field name='model'>report.lot.track</field>
+            <field name='arch' type='xml'>
+                <search string='序列号状态表' >
+                    <field name='goods' string='产品' filter_domain="[('goods', 'ilike', self)]" />
+                    <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" />
+                    <field name='uom' string='单位' filter_domain="[('uom', 'ilike', self)]" />
+
+                    <group expand="0" string="Group By">
+                        <filter string="产品" context="{'group_by':'goods'}"/>
+                        <filter string="仓库" context="{'group_by': 'warehouse'}"/>
+                        <filter string="单位" context="{'group_by': 'uom'}"/>
+                    </group>
+                </search>
+            </field>
+        </record> 
+
+        <record id='report_lot_track_graph' model='ir.ui.view'>
+            <field name='name'>report.lot.track.graph</field>
+            <field name='model'>report.lot.track</field>
+            <field name='arch' type='xml'>
+                <graph type='pivot'>
+                    <field name='lot' type='row' />
+                    <field name='goods' type='row' />
+                    <field name='warehouse' type='col' />
+                    <field name='qty' type='measure' />
+                </graph>
+            </field>
+        </record>
+
+    </data>
+</openerp>
