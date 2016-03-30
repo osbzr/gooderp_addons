@@ -131,4 +131,63 @@ class supplier_statements_report(models.Model):
             'context': {'type': 'pay'}
         }
 
+class supplier_statements_report_with_goods(models.TransientModel):
+    _name = "supplier.statements.report.with.goods"
+    _description = u"供应商对账单带商品明细"
+
+    partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
+    name = fields.Char(string=u'单据编号', readonly=True)
+    date = fields.Date(string=u'单据日期', readonly=True)
+    category_id = fields.Many2one('core.category', u'商品类别')
+    goods_code = fields.Char(u'商品编号')
+    goods_name = fields.Char(u'商品名称')
+    attribute_id = fields.Many2one('attribute', u'规格型号')
+    uom_id = fields.Many2one('uom', u'单位')
+    quantity = fields.Float(u'数量')
+    price = fields.Float(u'单价')
+    discount_amount = fields.Float(u'折扣额')
+    without_tax_amount = fields.Float(u'不含税金额')
+    tax_amount = fields.Float(u'税额')
+    order_amount = fields.Float(string=u'采购金额', readonly=True) # 采购
+    benefit_amount = fields.Float(string=u'优惠金额', readonly=True)
+    fee = fields.Float(string=u'客户承担费用', readonly=True)
+    amount = fields.Float(string=u'应付金额', readonly=True)
+    pay_amount = fields.Float(string=u'实际付款金额', readonly=True)
+    balance_amount = fields.Float(string=u'应付款余额', readonly=True)
+    note = fields.Char(string=u'备注', readonly=True)
+    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
+
+    @api.multi
+    def find_source_order(self):
+        # 查看源单，两种情况：付款单、采购入库单
+        money = self.env['money.order'].search([('name', '=', self.name)])
+        if money: # 付款单
+            view = self.env.ref('money.money_order_form')
+            return {
+                'name': u'付款单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'money.order',
+                'type': 'ir.actions.act_window',
+                'res_id': money.id,
+                'context': {'type': 'pay'}
+            }
+
+        # 采购入库单
+        buy = self.env['buy.receipt'].search([('name', '=', self.name)])
+        view = self.env.ref('buy.buy_receipt_form')
+        return {
+            'name': u'采购入库单',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': False,
+            'views': [(view.id, 'form')],
+            'res_model': 'buy.receipt',
+            'type': 'ir.actions.act_window',
+            'res_id': buy.id,
+            'context': {'type': 'pay'}
+        }
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

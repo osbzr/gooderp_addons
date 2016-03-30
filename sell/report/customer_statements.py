@@ -135,4 +135,63 @@ class customer_statements_report(models.Model):
             'context': {'type': 'get'}
         }
 
+class customer_statements_report_with_goods(models.TransientModel):
+    _name = "customer.statements.report.with.goods"
+    _description = u"客户对账单带商品明细"
+
+    partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
+    name = fields.Char(string=u'单据编号', readonly=True)
+    date = fields.Date(string=u'单据日期', readonly=True)
+    category_id = fields.Many2one('core.category', u'商品类别')
+    goods_code = fields.Char(u'商品编号')
+    goods_name = fields.Char(u'商品名称')
+    attribute_id = fields.Many2one('attribute', u'规格型号')
+    uom_id = fields.Many2one('uom', u'单位')
+    quantity = fields.Float(u'数量')
+    price = fields.Float(u'单价')
+    discount_amount = fields.Float(u'折扣额')
+    without_tax_amount = fields.Float(u'不含税金额')
+    tax_amount = fields.Float(u'税额')
+    order_amount = fields.Float(string=u'销售金额', readonly=True)
+    benefit_amount = fields.Float(string=u'优惠金额', readonly=True)
+    fee = fields.Float(string=u'客户承担费用', readonly=True)
+    amount = fields.Float(string=u'应收金额', readonly=True)
+    pay_amount = fields.Float(string=u'付款金额', readonly=True)
+    balance_amount = fields.Float(string=u'应收款余额', readonly=True)
+    note = fields.Char(string=u'备注', readonly=True)
+    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
+
+    @api.multi
+    def find_source_order(self):
+        # 查看源单，两种情况：收款单、销售发货单
+        money = self.env['money.order'].search([('name', '=', self.name)])
+        if money: # 收款单
+            view = self.env.ref('money.money_order_form')
+            return {
+                'name': u'收款单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'money.order',
+                'type': 'ir.actions.act_window',
+                'res_id': money.id,
+                'context': {'type': 'get'}
+            }
+
+        # 销售发货单
+        delivery = self.env['sell.delivery'].search([('name', '=', self.name)])
+        view = self.env.ref('sell.sell_delivery_form')
+        return {
+            'name': u'销售发货单',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': False,
+            'views': [(view.id, 'form')],
+            'res_model': 'sell.delivery',
+            'type': 'ir.actions.act_window',
+            'res_id': delivery.id,
+            'context': {'type': 'get'}
+        }
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

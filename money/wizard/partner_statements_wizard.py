@@ -2,7 +2,7 @@
 from openerp.exceptions import except_orm
 from openerp import fields, models, api
 
-class partner_statements_report_wizard(models.Model):
+class partner_statements_report_wizard(models.TransientModel):
     _name = "partner.statements.report.wizard"
     _description = u"业务伙伴对账单向导"
 
@@ -53,7 +53,7 @@ class partner_statements_report_wizard(models.Model):
                                                                     ('date','<=', self.to_date)])
             for report in reports:
                 # 生成不带商品明细的对账单记录
-                res_ids.append(self.env['partner.statements.report.with.goods'].create({
+                res_ids.append(self.env['customer.statements.report.with.goods'].create({
                         'partner_id': report.partner_id.id,
                         'name': report.name,
                         'date': report.date,
@@ -69,7 +69,7 @@ class partner_statements_report_wizard(models.Model):
                 # 生成带商品明细的对账单记录
                 if report.move_id:
                     for line in report.move_id.line_out_ids:
-                        res_ids.append(self.env['partner.statements.report.with.goods'].create({
+                        res_ids.append(self.env['customer.statements.report.with.goods'].create({
                                 'goods_code': line.goods_id.code,
                                 'goods_name': line.goods_id.name,
                                 'attribute_id': line.attribute_id.id,
@@ -89,7 +89,7 @@ class partner_statements_report_wizard(models.Model):
                     'name': u'客户对账单:' + self.partner_id.name,
                     'view_type': 'form',
                     'view_mode': 'tree',
-                    'res_model': 'partner.statements.report.with.goods',
+                    'res_model': 'customer.statements.report.with.goods',
                     'view_id': False,
                     'views': [(view.id, 'tree')],
                     'type': 'ir.actions.act_window',
@@ -102,7 +102,7 @@ class partner_statements_report_wizard(models.Model):
                                                                     ('date','<=', self.to_date)])
             for report in reports:
                 # 生成不带商品明细的对账单记录
-                res_ids.append(self.env['partner.statements.report.with.goods'].create({
+                res_ids.append(self.env['supplier.statements.report.with.goods'].create({
                         'partner_id': report.partner_id.id,
                         'name': report.name,
                         'date': report.date,
@@ -117,7 +117,7 @@ class partner_statements_report_wizard(models.Model):
                 # 生成带商品明细的对账单记录
                 if report.move_id:
                     for line in report.move_id.line_in_ids:
-                        res_ids.append(self.env['partner.statements.report.with.goods'].create({
+                        res_ids.append(self.env['supplier.statements.report.with.goods'].create({
                                 'goods_code': line.goods_id.code,
                                 'goods_name': line.goods_id.name,
                                 'attribute_id': line.attribute_id.id,
@@ -137,7 +137,7 @@ class partner_statements_report_wizard(models.Model):
                     'name': u'供应商对账单:' + self.partner_id.name,
                     'view_type': 'form',
                     'view_mode': 'tree',
-                    'res_model': 'partner.statements.report.with.goods',
+                    'res_model': 'supplier.statements.report.with.goods',
                     'view_id': False,
                     'views': [(view.id, 'tree')],
                     'type': 'ir.actions.act_window',
