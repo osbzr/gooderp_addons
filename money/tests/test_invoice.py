@@ -33,7 +33,7 @@ class test_invoice(TransactionCase):
             'amount':10.0,
             })
         # 如果公司的 draft_invoice参数未设，发票自动审核
-        if self.env.User.company_id.draft_invoice:
+        if self.env.ref('base.main_company').draft_invoice:
             self.assertEqual(invoice.state, 'draft')
             # 发票审核
             invoice.money_invoice_done()
