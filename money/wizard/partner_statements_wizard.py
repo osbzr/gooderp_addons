@@ -21,11 +21,11 @@ class partner_statements_report_wizard(models.Model):
             raise except_orm(u'错误！', u'结束日期不能小于开始日期！')
 
         if self._context.get('default_customer'): # 客户
-            view = self.env.ref('money.customer_statements_report_tree')
+            view = self.env.ref('sell.customer_statements_report_tree')
             name = u'客户对账单:' + self.partner_id.name
             res_model = 'customer.statements.report'
         else: # 供应商
-            view = self.env.ref('money.supplier_statements_report_tree')
+            view = self.env.ref('buy.supplier_statements_report_tree')
             name = u'供应商对账单:' + self.partner_id.name
             res_model = 'supplier.statements.report'
 
@@ -83,7 +83,7 @@ class partner_statements_report_wizard(models.Model):
                                 'balance_amount': report.balance_amount
                                 }).id)
 
-            view = self.env.ref('money.customer_statements_report_with_goods_tree')
+            view = self.env.ref('sell.customer_statements_report_with_goods_tree')
 
             return {
                     'name': u'客户对账单:' + self.partner_id.name,
@@ -131,7 +131,7 @@ class partner_statements_report_wizard(models.Model):
                                 'balance_amount': report.balance_amount
                                 }).id)
 
-            view = self.env.ref('money.supplier_statements_report_with_goods_tree')
+            view = self.env.ref('buy.supplier_statements_report_with_goods_tree')
 
             return {
                     'name': u'供应商对账单:' + self.partner_id.name,
