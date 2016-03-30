@@ -9,5 +9,7 @@
     'data': [
         'buy_view.xml',
         'buy_data.xml',
+        'report/supplier_statements_view.xml',
+        'wizard/supplier_statements_wizard_view.xml',
         ]
 }

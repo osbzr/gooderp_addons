@@ -13,7 +13,6 @@
         'view/reconcile_order_view.xml',
         'data/money_sequence.xml',
         'data/money_data.xml',
-        'report/partner_statements_view.xml',
         'wizard/partner_statements_wizard_view.xml',
         'report/bank_statements_view.xml',
         'wizard/bank_statements_wizard_view.xml',
