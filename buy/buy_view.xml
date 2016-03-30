@@ -62,7 +62,7 @@
                             <field name='warehouse_id' invisible='1'/>
                             <field name='warehouse_dest_id' required='1'/>
                             <field name="quantity" sum="合计数量"/>
-                            <field name="quantity_in"  sum="合计已入库数量"/>
+                            <field name="quantity_in" readonly="1" sum="合计已入库数量"/>
                             <field name="price"/>
                             <field name="price_taxed"/>
                             <field name="discount_rate"/>
@@ -108,7 +108,7 @@
             <field name="name">buy.receipt.tree</field>
             <field name="model">buy.receipt</field>
             <field name="arch" type="xml">
-                <tree colors="blue:state in ('approved','confirmed'))" string="采购入库单">
+                <tree string="采购入库单">
                     <field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -136,57 +136,33 @@
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <label string="采购入库单 " attrs="{'invisible': [('type','!=','receipt')]}"/>
-                            <label string="采购退货单 " attrs="{'invisible': [('type','=','receipt')]}"/>
+                            <label string="采购入库单 " attrs="{'invisible': [('is_return','=',True)]}"/>
                         </h1>
                     </div>
                     <group>
                         <group>
                             <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="type"/>
+                            <field name="is_return" readonly="1"/>
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="name" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
-                            <field name="money_state" readonly="1" attrs="{'invisible': [('type','!=','receipt')]}"/>
-                            <field name="return_state" readonly="1" attrs="{'invisible': [('type','=','receipt')]}"/>
+                            <field name="money_state" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
-                    	<page string="明细单行">
-		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')], 'invisible': [('type','!=','in')]}"
+                    	<page string="入库单行">
+		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_type':'supplier','type':'in'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
 		                            <field name="goods_id" required='1'/>
-		                            <field name="attribute_id"/>
+		                            <field name="attribute_id" domain="[('goods_id', '=', goods_id)]"/>
 		                            <field name="uom_id"/>
 		                            <field name="warehouse_id" invisible="1"/>
 		                            <field name="warehouse_dest_id" required="1"/>
-		                            <field name="goods_qty" sum="合计数量"/>
-		                            <field name="price"/>
-		                            <field name="price_taxed"/>
-		                            <field name="discount_rate"/>
-		                            <field name="discount_amount" readonly="0" sum="合计折扣额"/>
-		                            <field name="amount" string="购货金额" sum="合计金额"/>
-		                            <field name="tax_rate"/>
-		                            <field name="tax_amount" sum="合计税额"/>
-		                            <field name="subtotal" sum="价税合计的合计"/>
-		                            <field name="note"/>
-		                            <field name="share_cost" readonly="1"/>
-		                            <field name="type"/>
-		                        </tree>
-		                    </field>
-		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')], 'invisible': [('type','=','return')]}"
-		                    	context="{'warehouse_dest_type':'supplier','type':'return'}">
-		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'/>
-		                            <field name="attribute_id"/>
-		                            <field name="uom_id"/>
-		                            <field name="warehouse_id" required="1"/>
-		                            <field name="warehouse_dest_id" />
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="price"/>
 		                            <field name="price_taxed"/>
@@ -248,12 +224,132 @@
             </field>
         </record>
 
+		<!-- 采购退货单视图 -->
+
+        <record id="buy_return_tree" model="ir.ui.view">
+            <field name="name">buy.return.tree</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <tree string="采购退货单">
+                    <field name='date'/>
+            		<field name='name'/>
+            		<field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="amount"/>
+            		<field name='payment'/>
+            		<field name='state'/>
+            		<field name='return_state'/>
+            		<field name='date_due'/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="buy_return_form" model="ir.ui.view">
+            <field name="name">buy.return.form</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <form string="采购退货单">
+                <header>
+                	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <label string="采购退货单 "/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="is_return" readonly="1"/>
+                        </group>
+                        <group>
+                        	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="name" readonly="1"/>
+                            <field name="order_id" readonly="1"/>
+                            <field name='invoice_id' readonly='1'/>
+                            <field name="return_state" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                    	<page string="退货单行">
+		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
+		                    	context="{'warehouse_dest_type':'supplier','type':'out'}">
+		                    	<tree string="Buy Receipt Lines" editable="bottom">
+		                            <field name="goods_id" required='1'/>
+		                            <field name="attribute_id"/>
+		                            <field name="uom_id"/>
+		                            <field name="warehouse_id" required="1"/>
+		                            <field name="warehouse_dest_id" invisible="1"/>
+		                            <field name="goods_qty" sum="合计数量"/>
+		                            <field name="price"/>
+		                            <field name="price_taxed"/>
+		                            <field name="discount_rate"/>
+		                            <field name="discount_amount" readonly="0" sum="合计折扣额"/>
+		                            <field name="amount" string="购货金额" sum="合计金额"/>
+		                            <field name="tax_rate"/>
+		                            <field name="tax_amount" sum="合计税额"/>
+		                            <field name="subtotal" sum="价税合计的合计"/>
+		                            <field name="note"/>
+		                            <field name="type"/>
+		                        </tree>
+		                    </field>
+		                </page>
+		                <page string="采购费用行">
+		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
+		                		<tree string="Cost Lines" editable="bottom">
+		                			<field name="partner_id"/>
+			                		<field name="category_id"/>
+			                		<field name="amount"/>
+			                		<field name="note"/>
+			                	</tree>
+		                	</field>
+		                	<button name="buy_share_cost" string="分摊" type="object"/>
+		                </page>
+		            </notebook>
+                    <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+                    <group>
+                        <group col="8" colspan="8">
+                            <field name="discount_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="discount_amount"/>
+                            <field name="amount"/>
+                            <field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group col="6" colspan="6">
+                            <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="debt"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="create_uid" readonly="1" string="制单人"/>
+                            <field name="approve_uid" readonly="1"/>
+                        </group>
+                    	<group>
+                            <field name="create_date" readonly="1" string="录单时间"/>
+                            <field name="write_date" readonly="1" string="最后修改时间"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+        </record>
+
         <!-- 购货管理 action -->
 
         <record id="buy_order_action" model="ir.actions.act_window">
             <field name="name">购货订单</field>
             <field name="res_model">buy.order</field>
-            <field name="context">{}</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
@@ -266,8 +362,8 @@
             <field name="name">采购入库单</field>
             <field name="res_model">buy.receipt</field>
             <field name="view_mode">tree,form</field>
-            <field name="context">{'type':'receipt'}</field>
-            <field name="domain">[('type','=','receipt')]</field>
+            <field name="context">{'is_return':False}</field>
+            <field name="domain">[('is_return','=',False)]</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建采购入库单
@@ -279,8 +375,8 @@
             <field name="name">采购退货单</field>
             <field name="res_model">buy.receipt</field>
             <field name="view_mode">tree,form</field>
-            <field name="context">{'type':'return'}</field>
-            <field name="domain">[('type','=','return')]</field>
+            <field name="context">{'is_return':True}</field>
+            <field name="domain">[('is_return','=',True)]</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建采购退货单
@@ -288,12 +384,24 @@
             </field>
         </record>
 
-        <menuitem id="menu_buy_order_action" action="buy_order_action"
+		<record id="buy_return_action_tree" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="buy_return_tree"/>
+            <field name="act_window_id" ref="buy_return_action"/>
+        </record>
+        <record id="buy_return_action_form" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="buy_return_form"/>
+            <field name="act_window_id" ref="buy_return_action"/>
+        </record>
+
+        <menuitem id="menu_buy_order" action="buy_order_action"
             parent="menu_buy_manage" sequence="1"/>
-        <menuitem id="menu_buy_receipt_action" action="buy_receipt_action"
+        <menuitem id="menu_buy_receipt" action="buy_receipt_action"
             parent="menu_buy_manage" sequence="2"/>
-        <menuitem id="menu_buy_return_action" action="buy_return_action"
+        <menuitem id="menu_buy_return" action="buy_return_action"
             parent="menu_buy_manage" sequence="3"/>
 	</data>
 </openerp>
-	
