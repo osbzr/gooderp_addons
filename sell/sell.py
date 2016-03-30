@@ -380,7 +380,7 @@ class sell_delivery(models.Model):
                 'this_reconcile': self.receipt,
             })
 
-            money_order = self.env['money.order'].create(self._cr, self._uid, {
+            money_order = self.pool.get('money.order').create(self._cr, self._uid, {
                                 'partner_id': self.partner_id.id,
                                 'date': fields.Date.context_today(self),
                                 'line_ids': [(0, 0, line) for line in money_lines],
