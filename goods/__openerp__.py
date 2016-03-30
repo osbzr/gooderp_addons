@@ -32,6 +32,7 @@
         'view/goods_view.xml',
         'action/goods_action.xml',
         'menu/goods_menu.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     "active": False,

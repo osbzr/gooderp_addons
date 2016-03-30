@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_core_value,access_core_value,model_core_value,,1,1,1,1
+access_core_category,access_core_category,model_core_category,,1,1,1,1
+access_uom,access_uom,model_uom,,1,1,1,1
+access_settle_mode,access_settle_mode,model_settle_mode,,1,1,1,1
+access_partner,access_partner,model_partner,,1,1,1,1
+access_goods,access_goods,model_goods,,1,1,1,1
+access_goods_price,access_goods_price,model_goods_price,,1,1,1,1
+access_warehouse,access_warehouse,model_warehouse,,1,1,1,1
+access_staff,access_staff,model_staff,,1,1,1,1
+access_bank_account,access_bank_account,model_bank_account,,1,1,1,1
+access_settle_mode,access_settle_mode,model_settle_mode,,1,1,1,1

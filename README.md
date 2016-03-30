@@ -119,11 +119,11 @@ How——如何让GOODERP持续健康发展
 
 2.clone到本地
 
-    git clone https://github.com/你的名字/gooderp.git
+    git clone https://github.com/你的名字/gooderp_addons.git
  
 3.增加远程分支（也就是osbzr的分支）名为osbzr到你本地。
 
-    git remote add osbzr https://github.com/osbzr/gooderp.git
+    git remote add osbzr https://github.com/osbzr/gooderp_addons.git
     
 环境就准备好了
 
