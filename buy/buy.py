@@ -440,3 +440,8 @@ class cost_line(models.Model):
     _inherit = 'cost.line'
 
     buy_id = fields.Many2one('buy.receipt', u'入库单号')
+
+class money_invoice(models.Model):
+    _inherit = 'money.invoice'
+
+    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)

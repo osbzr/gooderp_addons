@@ -196,7 +196,6 @@ class money_invoice(models.Model):
     reconciled = fields.Float(string=u'已核销金额', readonly=True, states={'draft': [('readonly', False)]})
     to_reconcile = fields.Float(string=u'未核销金额', readonly=True, states={'draft': [('readonly', False)]})
     date_due = fields.Date(string=u'到期日')
-    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True, states={'draft': [('readonly', False)]})
 
     @api.multi
     def money_invoice_done(self):
