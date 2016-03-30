@@ -49,6 +49,6 @@ class test_invoice(TransactionCase):
         # 发票取消审核
         invoice.money_invoice_draft()
         # 客户的应收余额
-        self.assertEqual(self.partner.recievable, 0.0)
+        self.assertEqual(self.partner.receivable, 0.0)
         # 未审核的发票可以删除
         invoice.unlink()
