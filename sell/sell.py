@@ -380,7 +380,7 @@ class sell_delivery(models.Model):
                 'this_reconcile': self.receipt,
             })
 
-            money_order = self.env['money.order'].create({
+            money_order = self.env['money.order'].create(self._cr, self._uid, {
                                 'partner_id': self.partner_id.id,
                                 'date': fields.Date.context_today(self),
                                 'line_ids': [(0, 0, line) for line in money_lines],
@@ -390,8 +390,8 @@ class sell_delivery(models.Model):
                                 'reconciled': self.receipt,
                                 'to_reconcile': to_reconcile,
                                 'state': 'draft',
-                            })
-            money_order.money_order_done()
+                            }, context={'type': 'get'})
+            self.pool.get('money.order').browse(self._cr, self._uid, money_order, context=self._context).money_order_done()
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.sell_move_id.approve_order()
         # 生成分拆单 FIXME:无法跳转到新生成的分单
@@ -406,3 +406,8 @@ class sell_delivery_line(models.Model):
 
     sell_line_id = fields.Many2one('sell.order.line', u'销货单行')
     origin = fields.Char(u'源单号')
+
+class cost_line(models.Model):
+    _inherit = 'cost.line'
+
+    sell_id = fields.Many2one('sell.delivery', u'出库单号')

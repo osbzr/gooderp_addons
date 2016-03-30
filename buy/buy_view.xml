@@ -308,7 +308,6 @@
 			                		<field name="note"/>
 			                	</tree>
 		                	</field>
-		                	<button name="buy_share_cost" string="分摊" type="object"/>
 		                </page>
 		            </notebook>
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
