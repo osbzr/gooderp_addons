@@ -28,7 +28,7 @@ class test_invoice(TransactionCase):
         # 创建发票
         invoice = self.env['money.invoice'].create({
             'partner_id':self.partner.id,
-            'category_id':self.env.ref('core_category_sale').id,
+            'category_id':self.env.ref('money.core_category_sale').id,
             'amount':10.0,
             })
         # 如果公司的 draft_invoice参数未设，发票自动审核
