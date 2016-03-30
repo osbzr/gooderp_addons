@@ -24,7 +24,7 @@
         <!--客户对账单带商品明细tree-->
 		<record id="customer_statements_report_with_goods_tree" model="ir.ui.view">
             <field name="name">customer.statements.report.with.goods.tree</field>
-            <field name="model">partner.statements.report.with.goods</field>
+            <field name="model">customer.statements.report.with.goods</field>
             <field name="arch" type="xml">
                 <tree string="Customer Statements Report">
 					<field name="date"/>
@@ -40,7 +40,7 @@
                     <field name="discount_amount"/>
                     <field name="without_tax_amount"/>
                     <field name="tax_amount"/>
-                    <field name="order_amount" string="销售金额"/>
+                    <field name="order_amount"/>
                     <field name="benefit_amount"/>
                     <field name="fee"/>
                     <field name="amount"/>

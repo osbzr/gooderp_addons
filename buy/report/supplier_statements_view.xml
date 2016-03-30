@@ -23,7 +23,7 @@
         <!--供应商对账单带商品明细tree-->
 		<record id="supplier_statements_report_with_goods_tree" model="ir.ui.view">
             <field name="name">supplier.statements.report.with.goods.tree</field>
-            <field name="model">partner.statements.report.with.goods</field>
+            <field name="model">supplier.statements.report.with.goods</field>
             <field name="arch" type="xml">
                 <tree string="Supplier Statements Report">
 					<field name="date"/>
@@ -39,11 +39,11 @@
                     <field name="discount_amount"/>
                     <field name="without_tax_amount"/>
                     <field name="tax_amount"/>
-                    <field name="order_amount" string="采购金额"/>
+                    <field name="order_amount"/>
                     <field name="benefit_amount"/>
-                    <field name="amount" string="应付金额"/>
-                    <field name="pay_amount" string="实际付款金额"/>
-                    <field name="balance_amount" string="应付款余额"/>
+                    <field name="amount"/>
+                    <field name="pay_amount"/>
+                    <field name="balance_amount"/>
                 </tree>
             </field>
         </record>
