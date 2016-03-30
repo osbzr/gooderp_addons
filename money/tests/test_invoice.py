@@ -27,7 +27,7 @@ class test_invoice(TransactionCase):
         '''测试发票创建和删除'''
         # 创建发票
         invoice = self.env['money.invoice'].create({
-            'partner_id':self.partner_id.id,
+            'partner_id':self.partner.id,
             'category_id':self.env.ref('core_category_sale').id,
             'amount':10.0,
             })
