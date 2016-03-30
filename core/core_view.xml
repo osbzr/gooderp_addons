@@ -4,9 +4,11 @@
         
         <!--根菜单-->
         
-        <menuitem id='scm_menu' name='进销存'/>
+        <menuitem id='setting_menu' name='配置'/>
         
-        <menuitem id='config_menu' name='设置' parent='scm_menu'/>
+        <menuitem id='master_data_menu' name='基础资料' parent='setting_menu' sequence='10'/>
+        <menuitem id='config_data_menu' name='辅助资料' parent='setting_menu' sequence='20'/>
+        <menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
         
         <!--类别-->
         
@@ -14,7 +16,7 @@
             <field name="name">core.category.tree</field>
             <field name="model">core.category</field>
             <field name="arch" type="xml">
-                <tree string="类别">                  
+                <tree editable="TOP" string="类别">
                     <field name="name"/>
                     <field name="type"/>
                 </tree>
@@ -29,14 +31,14 @@
             <field name="view_mode">tree</field>
         </record>
         
-        <menuitem id='core_category_menu' action='core_category_action' parent='config_menu'/>
+        <menuitem id='core_category_menu' action='core_category_action' parent='config_data_menu' sequence='10'/>
 
         <!--可选值-->
         <record id="core_value_tree" model="ir.ui.view">
             <field name="name">core.value.tree</field>
             <field name="model">core.value</field>
             <field name="arch" type="xml">
-                <tree string="可选值">                  
+                <tree editable="TOP" string="可选值">
                     <field name="name"/>
                     <field name="type"/>
                 </tree>
@@ -51,14 +53,14 @@
             <field name="view_mode">tree</field>
         </record>
         
-        <menuitem id='core_value_menu' action='core_value_action' parent='config_menu'/>
+        <menuitem id='core_value_menu' action='core_value_action' parent='config_data_menu' sequence='900'/>
         
         <!--系统参数-->
         <record id="company_form" model="ir.ui.view">
             <field name="name">company.form</field>
             <field name="model">res.company</field>
             <field name="arch" type="xml">
-                <form string="系统参数">
+                <form string="系统参数" create='0'>
                    <group string="基础参数">                  
                     <field name="name"/>
                     <field name="street"/>
@@ -71,6 +73,7 @@
                     <field name="amount_digits"/>
                     <field name="cost_method"/>
                     <field name="negtive_quantity"/>
+                    <field name="draft_invoice"/>
                    </group>
                 </form>
             </field>
@@ -88,6 +91,122 @@
             <field name="view_id" ref="company_form"/>
             <field name="act_window_id" ref="company_action"/>
         </record>
-        <menuitem id='company_menu' action='company_action' parent='config_menu'/>
+        <menuitem id='company_menu' action='company_action' parent='system_menu' sequence='10'/>
+        <!--单位-->
+        <record id="uom_tree" model="ir.ui.view">
+            <field name="name">uom.tree</field>
+            <field name="model">uom</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="单位">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="uom_action" model="ir.actions.act_window">
+            <field name="name">单位</field>
+            <field name="res_model">uom</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='uom_menu' action='uom_action' parent='config_data_menu' sequence='20'/>
+        <!--结算方式-->
+        <record id="settle_mode_tree" model="ir.ui.view">
+            <field name="name">settle.mode.tree</field>
+            <field name="model">settle.mode</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="结算方式">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="settle_mode_action" model="ir.actions.act_window">
+            <field name="name">结算方式</field>
+            <field name="res_model">settle.mode</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='settle_mode_menu' action='settle_mode_action' parent='config_data_menu' sequence='30'/>
+        <!--客户-->
+        <record id="customer_tree" model="ir.ui.view">
+            <field name="name">客户列表</field>
+            <field name="model">partner</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="客户">
+                    <field name="c_category_id" required="1"/>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="receivable" sum='sum'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="customer_action" model="ir.actions.act_window">
+            <field name="name">客户</field>
+            <field name="res_model">partner</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="customer_tree" />
+            <field name="domain">[('c_category_id','!=',False)]</field>
+        </record>
+
+        <menuitem id='customer_menu' action='customer_action' parent='master_data_menu' sequence='10'/>
+        <!--供应商-->
+        <record id="vendor_tree" model="ir.ui.view">
+            <field name="name">供应商列表</field>
+            <field name="model">partner</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="供应商">
+                    <field name="s_category_id" required="1"/>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="payable" sum='sum'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="vendor_action" model="ir.actions.act_window">
+            <field name="name">供应商</field>
+            <field name="res_model">partner</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="vendor_tree" />
+            <field name="domain">[('s_category_id','!=',False)]</field>
+        </record>
+
+        <menuitem id='vendor_menu' action='vendor_action' parent='master_data_menu' sequence='20'/>
+        <!--用户-->
+        <menuitem id='users_menu' name="用户" action='base.action_res_users' parent='master_data_menu' sequence='50'/>
+        <!--账户-->
+        <record id="bank_account_tree" model="ir.ui.view">
+            <field name="name">bank.account.tree</field>
+            <field name="model">bank.account</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="账户">
+                    <field name="name"/>
+                    <field name="balance" sum='sum'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="bank_account_action" model="ir.actions.act_window">
+            <field name="name">账户</field>
+            <field name="res_model">bank.account</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='bank_account_menu' action='bank_account_action' parent='master_data_menu' sequence='60'/>
+        <!-- 角色 -->
+        <menuitem id='groups_menu' name='权限设置' action='base.action_res_groups' parent='system_menu' sequence='20'/>
+
     </data>
 </openerp>
