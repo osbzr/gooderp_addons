@@ -36,6 +36,7 @@
         </record>
 
 		<!-- 现金银行报表向导 menu -->
+		<menuitem id="menu_money_report" name="报表" parent="menu_money_root" sequence="2"/>
         <menuitem id="report_bank_statements_action" name="现金银行报表" action="bank_statements_report_wizard_action" parent="menu_money_report" sequence="3"/>
 	</data>
 </openerp>

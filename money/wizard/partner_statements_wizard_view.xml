@@ -25,32 +25,6 @@
                 </form>
             </field>
         </record>
-
-		<!-- 客户对账单向导 action -->
-		<record id='customer_statements_report_wizard_action' model='ir.actions.act_window'>
-            <field name='name'>客户对账单向导</field>
-            <field name='res_model'>partner.statements.report.wizard</field>
-            <field name='view_type'>form</field>
-            <field name='view_mode'>form</field>
-            <field name='context'>{'default_customer': True}</field>
-            <field name='target'>new</field>
-        </record>
-
-        <!-- 供应商对账单向导 action -->
-		<record id='supplier_statements_report_wizard_action' model='ir.actions.act_window'>
-            <field name='name'>供应商对账单向导</field>
-            <field name='res_model'>partner.statements.report.wizard</field>
-            <field name='view_type'>form</field>
-            <field name='view_mode'>form</field>
-            <field name='context'>{'default_supplier': True}</field>
-            <field name='target'>new</field>
-        </record>
-
-		<!-- 客户对账单向导 menu-->
-		<menuitem id="menu_money_report" name="报表" parent="menu_money_root" sequence="2"/>
-        <menuitem id="report_customer_statements_action" name="客户对账单" action="customer_statements_report_wizard_action" parent="menu_money_report" sequence="1"/>
-        <!-- 供应商对账单向导 menu-->
-        <menuitem id="report_supplier_statements_action" name="供应商对账单" action="supplier_statements_report_wizard_action" parent="menu_money_report" sequence="2"/>
 	</data>
 </openerp>
 	
