@@ -10,6 +10,13 @@ class goods(models.Model):
     force_batch_one = fields.Boolean(u'每批次数量为1')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
 
+    def conversion_unit(self, qty):
+        self.ensure_one()
+        return self.conversion * qty
+
+    def anti_conversion_unit(self, qty):
+        self.ensure_one()
+        return self.conversion and qty / self.conversion or 0
 
 class attribute(models.Model):
     _name = 'attribute'
@@ -19,7 +26,7 @@ class attribute(models.Model):
     def _compute_name(self):
         self.name = ' '.join([value.value_id.name for value in self.value_ids])
 
-    name = fields.Char(u'名称', compute='_compute_name', store=True,readonly=True)
+    name = fields.Char(u'名称', compute='_compute_name', store=True, readonly=True)
     goods_id = fields.Many2one('goods', u'商品')
     value_ids = fields.One2many('attribute.value', 'attribute_id', string=u'属性')
 
@@ -32,6 +39,7 @@ class attribute_value(models.Model):
                                        domain=[('type','=','attribute')],context={'type':'attribute'}
                                        ,required='1')
     value_id = fields.Many2one('attribute.value.value',u'值',
+
                                        domain="[('category_id','=',category_id)]"
                                        ,required='1')
 class attribute_value(models.Model):

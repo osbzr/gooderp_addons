@@ -6,8 +6,12 @@
             <field name='model'>goods</field>
             <field name='arch' type='xml'>
                 <tree string='产品'>
+                    <field name='code' />
                     <field name='name' />
+                    <field name='category_id' />
                     <field name='uom_id' />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                    <field name='conversion' string='转化率' groups='goods.auxiliary_unit_groups' />
                     <field name='cost' />
                 </tree>
             </field>
@@ -27,8 +31,8 @@
                             </group>
                             <group>
                                 <field name='uom_id' />
-                                <field name='uos_id' />
-                                <field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" />
+                                <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                                <field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" groups='goods.auxiliary_unit_groups' />
                             </group>
                         </group>
 

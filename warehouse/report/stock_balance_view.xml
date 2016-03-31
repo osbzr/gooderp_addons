@@ -9,7 +9,9 @@
                     <field name='goods' />
                     <field name='lot' />
                     <field name='uom' />
+                    <field name='uos' />
                     <field name='warehouse' />
+                    <field name='goods_uos_qty' />
                     <field name='goods_qty' />
                     <field name='cost' />
                 </tree>
@@ -25,6 +27,7 @@
                     <field name='lot' type='row' />
                     <field name='warehouse' type='col' />
                     <field name='goods_qty' type='measure' />
+                    <field name='goods_uos_qty' type='measure' />
                     <field name='cost' type='measure' />
                 </graph>
             </field>
@@ -39,15 +42,17 @@
                     <field name='lot' string='批次' filter_domain="[('lot', 'ilike', self)]" />
                     <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" />
                     <field name='uom' string='单位' filter_domain="[('uom', 'ilike', self)]" />
+                    <field name='uos' string='辅助单位' filter_domain="[('uos', 'ilike', self)]" />
 
                     <group expand="0" string="Group By">
                         <filter string="产品" context="{'group_by':'goods'}"/>
                         <filter string="批次" context="{'group_by': 'lot'}"/>
                         <filter string="仓库" context="{'group_by': 'warehouse'}"/>
                         <filter string="单位" context="{'group_by': 'uom'}"/>
+                        <filter string="辅助单位" context="{'group_by': 'uos'}"/>
                     </group>
                 </search>
             </field>
-        </record> 
+        </record>
     </data>
 </openerp>
