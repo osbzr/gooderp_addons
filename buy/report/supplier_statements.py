@@ -31,9 +31,12 @@ class supplier_statements_report(models.Model):
     @api.depends('amount', 'pay_amount', 'partner_id')
     def _compute_balance_amount(self):
         pre_record = self.search([('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
-        # 相邻的两条记录，partner不同，应付款余额重新计算
+        # 相邻的两条记录，partner不同，应收款余额重新计算
         if pre_record:
-            before_balance = pre_record.balance_amount
+            if pre_record.name != '期初余额':
+                before_balance = pre_record.balance_amount
+            else:
+                before_balance = pre_record.amount
         else:
             before_balance = 0
         self.balance_amount += before_balance + self.amount - self.pay_amount
@@ -66,7 +69,22 @@ class supplier_statements_report(models.Model):
                     note,
                     move_id
             FROM
-                (SELECT m.partner_id,
+                (SELECT go.partner_id AS partner_id,
+                        '期初余额' AS name,
+                        go.date AS date,
+                        0 AS purchase_amount,
+                        0 AS benefit_amount,
+                        go.payable AS amount,
+                        0 AS pay_amount,
+                        0 AS balance_amount,
+                        Null AS note,
+                        0 AS move_id
+                FROM go_live_order AS go
+                LEFT JOIN partner AS p ON go.partner_id = p.id
+                LEFT JOIN core_category AS c ON p.s_category_id = c.id
+                WHERE c.type = 'supplier'
+                UNION ALL
+                SELECT m.partner_id,
                         m.name,
                         m.date,
                         0 AS purchase_amount,
@@ -148,7 +166,7 @@ class supplier_statements_report_with_goods(models.TransientModel):
     discount_amount = fields.Float(u'折扣额')
     without_tax_amount = fields.Float(u'不含税金额')
     tax_amount = fields.Float(u'税额')
-    order_amount = fields.Float(string=u'采购金额', readonly=True) # 采购
+    order_amount = fields.Float(string=u'采购金额', readonly=True)  # 采购
     benefit_amount = fields.Float(string=u'优惠金额', readonly=True)
     fee = fields.Float(string=u'客户承担费用', readonly=True)
     amount = fields.Float(string=u'应付金额', readonly=True)
@@ -161,7 +179,7 @@ class supplier_statements_report_with_goods(models.TransientModel):
     def find_source_order(self):
         # 查看源单，两种情况：付款单、采购入库单
         money = self.env['money.order'].search([('name', '=', self.name)])
-        if money: # 付款单
+        if money:  # 付款单
             view = self.env.ref('money.money_order_form')
             return {
                 'name': u'付款单',

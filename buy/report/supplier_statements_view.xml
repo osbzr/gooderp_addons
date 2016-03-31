@@ -9,7 +9,7 @@
                 <tree string="Partner Statements Report">
                 	<field name="date"/>
                     <field name="name"/>
-                    <button name="find_source_order" type="object" string="查看源单" icon="terp-stock_zoom" class="oe_highlight"/>
+                    <button name="find_source_order" type="object" string="查看源单" icon="terp-stock_zoom" attrs="{'invisible':[('name','=','期初余额')]}" class="oe_highlight"/>
                     <field name="purchase_amount"/>
                     <field name="benefit_amount"/>
                     <field name="note"/>
@@ -28,7 +28,7 @@
                 <tree string="Supplier Statements Report">
 					<field name="date"/>
                     <field name="name"/>
-                    <button name="find_source_order" type="object" string="查看源单" class="oe_highlight" icon="terp-stock_zoom" attrs="{'invisible':[('name','=',False)]}"/>
+                    <button name="find_source_order" type="object" string="查看源单" class="oe_highlight" icon="terp-stock_zoom" attrs="{'invisible':[('name','=','期初余额')]}"/>
                     <field name="note"/>
                     <field name="goods_code"/>
                     <field name="goods_name"/>
