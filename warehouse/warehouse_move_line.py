@@ -63,7 +63,6 @@ class wh_move_line(models.Model):
         self.subtotal = amount + tax_amt
 
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade')
-    order_name = fields.Char(related='move_id.name', string=u'单据编号')
     date = fields.Datetime(u'完成日期', copy=False)
     type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),)
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft')

@@ -40,7 +40,7 @@
             <field name='priority'>1</field>
             <field name='arch' type='xml'>
                 <tree string='库存调拨' >
-                    <field name='order_name' />
+                    <field name='move_id' string='单据编号' />
                     <field name='goods_id' />
                     <field name='uom_id' />
                     <field name='goods_qty' sum='1' />
