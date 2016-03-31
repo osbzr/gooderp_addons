@@ -64,8 +64,8 @@ class money_order(models.Model):
     line_ids = fields.One2many('money.order.line', 'money_id', string=u'收付款单行', readonly=True, states={'draft': [('readonly', False)]})
     source_ids = fields.One2many('source.order.line', 'money_id', string=u'源单行', readonly=True, states={'draft': [('readonly', False)]})
     type = fields.Selection(TYPE_SELECTION, string=u'类型', default=lambda self: self._context.get('type'))
-    amount = fields.Float(string=u'总金额', compute='_compute_advance_payment', store=True,readonly=True)
-    advance_payment = fields.Float(string=u'本次预收款', compute='_compute_advance_payment', store=True,readonly=True)
+    amount = fields.Float(string=u'总金额', compute='_compute_advance_payment', store=True, readonly=True)
+    advance_payment = fields.Float(string=u'本次预收款', compute='_compute_advance_payment', store=True, readonly=True)
     to_reconcile = fields.Float(string=u'未核销预收款')
     reconciled = fields.Float(string=u'已核销预收款')
 
@@ -107,31 +107,31 @@ class money_order(models.Model):
 
         total = 0
         for line in self.line_ids:
-            if self.type == 'pay': # 付款账号余额减少, 退款账号余额增加
-                if self.source_ids.amount > 0: # 付款
+            if self.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
+                if self.source_ids.amount > 0:  # 付款
                     if line.bank_id.balance < line.amount:
                         raise except_orm(u'错误', u'账户余额不足')
                     line.bank_id.balance -= line.amount
-                else: # 付款退款
+                else:  # 付款退款
                     line.bank_id.balance += line.amount
-            else: # 收款账号余额增加, 退款账号余额减少
-                if self.source_ids.amount > 0: # 收款
+            else:  # 收款账号余额增加, 退款账号余额减少
+                if self.source_ids.amount > 0:  # 收款
                     line.bank_id.balance += line.amount
-                else: # 收款退款
+                else:  # 收款退款
                     if line.bank_id.balance > line.amount:
                         raise except_orm(u'错误', u'账户余额不足')
                     line.bank_id.balance -= line.amount
             total += line.amount
 
         if self.type == 'pay':
-            if self.source_ids.amount > 0: # 付款
+            if self.source_ids.amount > 0:  # 付款
                 self.partner_id.payable -= total
-            else: # 付款退款
+            else:  # 付款退款
                 self.partner_id.payable += total
         else:
-            if self.source_ids.amount > 0: # 收款
+            if self.source_ids.amount > 0:  # 收款
                 self.partner_id.receivable -= total
-            else: # 收款退款
+            else:  # 收款退款
                 self.partner_id.receivable += total
 
         # 更新源单的未核销金额、已核销金额
@@ -149,9 +149,9 @@ class money_order(models.Model):
 
         total = 0
         for line in self.line_ids:
-            if self.type == 'pay': # 付款账号余额减少
+            if self.type == 'pay':  # 付款账号余额减少
                 line.bank_id.balance += line.amount
-            else: # 收款账号余额增加
+            else:  # 收款账号余额增加
                 if line.bank_id.balance < line.amount:
                     raise except_orm(u'错误', u'账户余额不足')
                 line.bank_id.balance -= line.amount
@@ -173,11 +173,11 @@ class money_order_line(models.Model):
     _name = 'money.order.line'
     _description = u'收付款单明细'
 
-    money_id = fields.Many2one('money.order',string=u'收付款单')
-    bank_id =  fields.Many2one('bank.account', string=u'结算账户', required=True)
+    money_id = fields.Many2one('money.order', string=u'收付款单')
+    bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True)
     amount = fields.Float(string=u'金额')
     mode_id = fields.Many2one('settle.mode', string=u'结算方式')
-    number =  fields.Char(string=u'结算号')
+    number = fields.Char(string=u'结算号')
     note = fields.Char(string=u'备注')
 
 class money_invoice(models.Model):
@@ -188,13 +188,13 @@ class money_invoice(models.Model):
                           ('draft', u'草稿'),
                           ('done', u'完成')
                            ], string=u'状态', readonly=True, default='draft', copy=False)
-    partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True, readonly=True, states={'draft': [('readonly', False)]})
+    partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True, readonly=True)
     name = fields.Char(string=u'订单编号', copy=False, readonly=True, required=True)
-    category_id = fields.Many2one('core.category', string=u'类别', readonly=True, states={'draft': [('readonly', False)]})
-    date = fields.Date(string=u'单据日期', readonly=True, states={'draft': [('readonly', False)]})
-    amount = fields.Float(string=u'单据金额', readonly=True, states={'draft': [('readonly', False)]})
-    reconciled = fields.Float(string=u'已核销金额', readonly=True, states={'draft': [('readonly', False)]})
-    to_reconcile = fields.Float(string=u'未核销金额', readonly=True, states={'draft': [('readonly', False)]})
+    category_id = fields.Many2one('core.category', string=u'类别', readonly=True)
+    date = fields.Date(string=u'单据日期', readonly=True)
+    amount = fields.Float(string=u'单据金额', readonly=True)
+    reconciled = fields.Float(string=u'已核销金额', readonly=True)
+    to_reconcile = fields.Float(string=u'未核销金额', readonly=True)
     date_due = fields.Date(string=u'到期日')
 
     @api.multi
@@ -214,6 +214,7 @@ class money_invoice(models.Model):
                 inv.partner_id.receivable -= inv.amount
             if self.category_id.type == 'expense':
                 inv.partner_id.payable -= inv.amount
+
     @api.model
     def create(self, values):
         new_id = super(money_invoice, self).create(values)
@@ -225,9 +226,9 @@ class source_order_line(models.Model):
     _name = 'source.order.line'
     _description = u'源单明细'
 
-    money_id = fields.Many2one('money.order', string=u'收付款单') # 收付款单上的源单明细
-    receivable_reconcile_id = fields.Many2one('reconcile.order', string=u'核销单') # 核销单上的应收源单明细
-    payable_reconcile_id = fields.Many2one('reconcile.order', string=u'核销单') # 核销单上的应付源单明细
+    money_id = fields.Many2one('money.order', string=u'收付款单')  # 收付款单上的源单明细
+    receivable_reconcile_id = fields.Many2one('reconcile.order', string=u'核销单')  # 核销单上的应收源单明细
+    payable_reconcile_id = fields.Many2one('reconcile.order', string=u'核销单')  # 核销单上的应付源单明细
     name = fields.Many2one('money.invoice', string=u'源单编号', copy=False, required=True)
     category_id = fields.Many2one('core.category', string=u'类别', required=True)
     date = fields.Date(string=u'单据日期')
@@ -291,8 +292,8 @@ class reconcile_order(models.Model):
 
     @api.multi
     def _get_money_invoice(self, way='income'):
-        money_invoice = self.env['money.invoice'].search([('category_id.type', '=', way), 
-                                                          ('partner_id', '=', self.partner_id.id), 
+        money_invoice = self.env['money.invoice'].search([('category_id.type', '=', way),
+                                                          ('partner_id', '=', self.partner_id.id),
                                                           ('to_reconcile', '>', 0)])
         result = []
         for invoice in money_invoice:
@@ -319,22 +320,22 @@ class reconcile_order(models.Model):
         money_order = self.env['money.order']
         money_invoice = self.env['money.invoice']
 
-        if self.business_type == 'adv_pay_to_get': # 预收冲应收
+        if self.business_type == 'adv_pay_to_get':  # 预收冲应收
             self.advance_payment_ids = self._get_money_order('get')
             self.receivable_source_ids = self._get_money_invoice('income')
 
-        if self.business_type == 'adv_get_to_pay': # 预付冲应付
+        if self.business_type == 'adv_get_to_pay':  # 预付冲应付
             self.advance_payment_ids = self._get_money_order('pay')
             self.payable_source_ids = self._get_money_invoice('expense')
 
-        if self.business_type == 'get_to_pay': # 应收冲应付
+        if self.business_type == 'get_to_pay':  # 应收冲应付
             self.receivable_source_ids = self._get_money_invoice('income')
             self.payable_source_ids = self._get_money_invoice('expense')
 
-        if self.business_type == 'get_to_get': # 应收转应收
+        if self.business_type == 'get_to_get':  # 应收转应收
             self.receivable_source_ids = self._get_money_invoice('income')
 
-        if self.business_type == 'pay_to_pay': # 应付转应付
+        if self.business_type == 'pay_to_pay':  # 应付转应付
             self.payable_source_ids = self._get_money_invoice('expense')
 
     @api.multi
@@ -352,8 +353,8 @@ class reconcile_order(models.Model):
                    'category_id': line.category_id.id,
                    'amount': line.this_reconcile,
                    'date': line.date,
-                   'reconciled': 0, # 已核销金额
-                   'to_reconcile': line.this_reconcile, # 未核销金额
+                   'reconciled': 0,  # 已核销金额
+                   'to_reconcile': line.this_reconcile,  # 未核销金额
                    'date_due': line.date_due,
                    'partner_id': to_partner_id.id,
                    })

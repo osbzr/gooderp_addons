@@ -13,7 +13,10 @@ class bank_statements_report(models.Model):
         # 相邻的两条记录，bank_id不同，重新计算账户余额
         pre_record = self.search([('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
         if pre_record:
-            before_balance = pre_record.balance
+            if pre_record.name != '期初余额':
+                before_balance = pre_record.balance
+            else:
+                before_balance = pre_record.get
         else:
             before_balance = 0
         self.balance += before_balance + self.get - self.pay
@@ -42,7 +45,18 @@ class bank_statements_report(models.Model):
                     partner_id,
                     note
             FROM
-                (SELECT mol.bank_id,
+                (SELECT
+        go.bank_id AS bank_id,
+                go.date AS date,
+                        '期初余额' AS name,
+                        go.balance AS get,
+                        0 AS pay,
+                        0 AS balance,
+                        NULL AS partner_id,
+                        NULL AS note
+                FROM go_live_order AS go
+                UNION ALL
+                SELECT mol.bank_id,
                         mo.date,
                         mo.name,
                         (CASE WHEN mo.type = 'get' THEN mol.amount ELSE 0 END) AS get,
