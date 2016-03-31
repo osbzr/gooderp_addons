@@ -395,7 +395,7 @@ class reconcile_order(models.Model):
                 self._get_or_pay(line, self.business_type, self.partner_id, self.to_partner_id, self.name)
 
             # 核销金额必须相同
-            if self.business_type in ['adv_pay_rec_get', 'adv_get_rec_pay', 'get_rec_pay']:
+            if self.business_type in ['adv_pay_to_get', 'adv_get_to_pay', 'get_to_pay']:
                 if order_reconcile != invoice_reconcile:
                     raise except_orm(u'错误', u'核销金额必须相同')
 
