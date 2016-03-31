@@ -48,7 +48,7 @@ class sell_order(models.Model):
     delivery_date = fields.Date(u'要求交货日期', states=READONLY_STATES, 
                                 default=lambda self: fields.Date.context_today(self),
                                 select=True, copy=False, help=u"订单的要求交货日期")
-    type = fields.Selection([('sell',u'销货'), ('return', u'退货')], u'类型', default='sell')
+    type = fields.Selection([('sell',u'销货'), ('return', u'退货')], u'类型', default='sell', states=READONLY_STATES)
     name = fields.Char(u'单据编号', select=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
     line_ids = fields.One2many('sell.order.line', 'order_id', u'销货订单行',
