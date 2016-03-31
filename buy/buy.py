@@ -67,7 +67,7 @@ class buy_order(models.Model):
                                select=True, copy=False, help=u"订单的要求交货日期")
     name = fields.Char(u'单据编号', select=True, copy=False,
                        default='/', help=u"购货订单的唯一编号，当创建时它会自动生成下一个编号。")
-    type = fields.Selection([('buy', u'购货'), ('return', u'退货')], u'类型', default='buy')
+    type = fields.Selection([('buy', u'购货'), ('return', u'退货')], u'类型', default='buy', states=READONLY_STATES)
     line_ids = fields.One2many('buy.order.line', 'order_id', u'购货订单行',
                                states=READONLY_STATES, copy=True)
     note = fields.Text(u'备注')
@@ -226,7 +226,7 @@ class buy_order_line(models.Model):
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, store=True, readonly=True)
     note = fields.Char(u'备注')
     # TODO:放到单独模块中 sell_to_buy many2one 到sell.order
-    origin = fields.Char(u'源单号')
+    origin = fields.Char(u'销售单号')
 
     @api.one
     @api.onchange('goods_id')
