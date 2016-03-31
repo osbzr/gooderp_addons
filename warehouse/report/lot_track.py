@@ -2,6 +2,7 @@
 
 import openerp.addons.decimal_precision as dp
 from openerp import models, fields
+import datetime
 
 
 class report_lot_track(models.Model):
@@ -10,9 +11,11 @@ class report_lot_track(models.Model):
 
     goods = fields.Char(u'产品')
     uom = fields.Char(u'单位')
+    uos = fields.Char(u'辅助单位')
     lot = fields.Char(u'序列号')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')
+    uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Goods Quantity'))
     qty = fields.Float(u'数量', digits_compute=dp.get_precision('Goods Quantity'))
     origin = fields.Char(u'业务类型')
 
@@ -29,11 +32,13 @@ class report_lot_track(models.Model):
         SELECT line.id as id,
                 goods.name as goods,
                 uom.name as uom,
+                uos.name as uos,
                 %s.lot as lot,
                 '%s' as type,
                 wh.name as warehouse,
                 line.date as date,
-                line.qty_remaining as qty
+                line.goods_qty as qty,
+                line.goods_uos_qty as uos_qty
         ''' % (sql_type == 'out' and 'lot' or 'line', sql_type)
 
     def from_sql(self, sql_type='out'):
@@ -46,7 +51,8 @@ class report_lot_track(models.Model):
         return '''
         FROM wh_move_line line
             LEFT JOIN goods goods ON line.goods_id = goods.id
-            LEFT JOIN uom uom ON line.uom_id = uom.id
+                LEFT JOIN uom uom ON goods.uom_id = uom.id
+                LEFT JOIN uom uos ON goods.uos_id = uos.id
             LEFT JOIN warehouse wh ON line.{warehouse} = wh.id
             {extra}
         '''.format(warehouse=warehouse, extra=extra)
@@ -68,9 +74,16 @@ class report_lot_track(models.Model):
         '''
 
     def get_context(self, sql_type='out', context=None):
+        if context.get('date_end'):
+            date_end = datetime.datetime.strptime(
+                context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
+            date_end = date_end.strftime('%Y-%m-%d')
+        else:
+            date_end = ''
+
         return {
             'date_start': context.get('date_start') or '',
-            'date_end': context.get('date_end') or '',
+            'date_end': date_end,
             'warehouse': context.get('warehouse') or '',
             'goods': context.get('goods') or '',
         }

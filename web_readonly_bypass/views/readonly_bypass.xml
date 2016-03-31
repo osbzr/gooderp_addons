@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="assets_backend" name="web_readonly_bypass" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/web_readonly_bypass/static/src/js/readonly_bypass.js"></script>
+            </xpath>
+        </template>
+        <template id="qunit_suite" name="web_readonly_bypass" inherit_id="web.qunit_suite">
+            <xpath expr="//head" position="inside">
+                <script type="text/javascript" src="/web_readonly_bypass/static/test/web_readonly_bypass.js"></script>
+            </xpath>
+        </template>
+    </data>
+</openerp>

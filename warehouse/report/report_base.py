@@ -28,8 +28,12 @@ class report_base(models.Model):
     def get_context(self, sql_type='out', context=None):
         return {}
 
-    @api.model
     def execute_sql(self, sql_type='out'):
+        sql_text = (self.select_sql(sql_type) + self.from_sql(sql_type) + self.where_sql(
+            sql_type) + self.group_sql(sql_type) + self.order_sql(
+            sql_type)).format(**self.get_context(sql_type, context=self.env.context))
+
+        print sql_text
         self.env.cr.execute((self.select_sql(sql_type) + self.from_sql(sql_type) + self.where_sql(
             sql_type) + self.group_sql(sql_type) + self.order_sql(
             sql_type)).format(**self.get_context(sql_type, context=self.env.context)))

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='auxiliary_unit_groups' model='res.groups'>
+            <field name='name'>辅助单位</field>
+        </record>
+    </data>
+</openerp>

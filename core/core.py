@@ -72,7 +72,7 @@ class goods(models.Model):
                                   context={'type': 'goods'})
     uom_id = fields.Many2one('uom', u'计量单位')
     uos_id = fields.Many2one('uom', u'辅助单位')
-    conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)')
+    conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
     cost = fields.Float(u'成本')
     price_ids = fields.One2many('goods.price', 'goods_id', u'价格清单')
 

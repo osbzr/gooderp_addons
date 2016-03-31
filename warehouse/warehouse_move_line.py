@@ -72,14 +72,18 @@ class wh_move_line(models.Model):
     force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批次数量为1')
     lot = fields.Char(u'序列号')
     lot_id = fields.Many2one('wh.move.line', u'序列号')
-    lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'序列号数量')
+    lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'序列号数量',
+                           digits_compute=dp.get_precision('Goods Quantity'))
+    lot_uos_qty = fields.Float(u'序列号辅助数量', digits_compute=dp.get_precision('Goods Quantity'))
     production_date = fields.Date(u'生产日期', default=fields.Date.context_today)
     shelf_life = fields.Integer(u'保质期(天)')
     valid_date = fields.Date(u'有效期至')
-    uom_id = fields.Many2one('uom', string=u'单位')
+    uom_id = fields.Many2one('uom', string=u'单位', readonly=True)
+    uos_id = fields.Many2one('uom', string=u'辅助单位', readonly=True)
     warehouse_id = fields.Many2one('warehouse', string=u'调出仓库', required=True, default=_get_default_warehouse)
     warehouse_dest_id = fields.Many2one('warehouse', string=u'调入仓库', required=True, default=_get_default_warehouse_dest)
     goods_qty = fields.Float(u'数量', digits_compute=dp.get_precision('Goods Quantity'), default=1)
+    goods_uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Goods Quantity'), default=1)
     price = fields.Float(u'单价', digits_compute=dp.get_precision('Accounting'))
     price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount, store=True, readonly=True)
     discount_rate = fields.Float(u'折扣率%')
@@ -193,11 +197,16 @@ class wh_move_line(models.Model):
     @api.multi
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        if self.goods_id and self.goods_id.using_batch and self.goods_id.force_batch_one:
-            self.goods_qty = 1
-
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
+            self.uos_id = self.goods_id.uos_id
+            if self.goods_id.using_batch and self.goods_id.force_batch_one:
+                self.goods_qty = 1
+                self.goods_uos_qty = self.goods_id.anti_conversion_unit(
+                    self.goods_qty)
+            else:
+                self.goods_qty = self.goods_id.conversion_unit(
+                    self.goods_uos_qty)
 
         self.compute_suggested_cost()
         self.compute_lot_compatible()
@@ -219,11 +228,19 @@ class wh_move_line(models.Model):
         self.compute_suggested_cost()
 
     @api.one
+    @api.onchange('goods_uos_qty')
+    def onchange_goods_uos_qty(self):
+        if self.goods_id:
+            self.goods_qty = self.goods_id.conversion_unit(self.goods_uos_qty)
+        self.compute_suggested_cost()
+
+    @api.one
     @api.onchange('lot_id')
     def onchange_lot_id(self):
         if self.lot_id:
             self.warehouse_id = self.lot_id.warehouse_dest_id
             self.lot_qty = self.lot_id.qty_remaining
+            self.lot_uos_qty = self.goods_id.anti_conversion_unit(self.lot_qty)
 
             if self.env.context.get('type') == 'internal':
                 self.lot = self.lot_id.lot
