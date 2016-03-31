@@ -2,7 +2,7 @@
 
 from openerp import fields, models
 
-class buy_order_track(models.Model):
+class buy_order_track(models.TransientModel):
     _name = 'buy.order.track'
     _description = u'采购订单跟踪表'
 
