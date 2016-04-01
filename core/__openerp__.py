@@ -7,9 +7,12 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': [],
+    'depends': ['base'],
+    'demo': [
+        'core_demo.xml',
+        ],
     'data': [
         'core_view.xml',
         'security/ir.model.access.csv',
-        ]
+        ],
 }

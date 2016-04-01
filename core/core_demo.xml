@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="customer_category_1" model="core.category">
+            <field name="name">一级客户</field>
+            <field name="type">customer</field>
+        </record>
+        <record id="customer_category_2" model="core.category">
+            <field name="name">二级客户</field>
+            <field name="type">customer</field>
+        </record>
+         <record id="customer_category_vip" model="core.category">
+            <field name="name">高级客户</field>
+            <field name="type">customer</field>
+        </record>
+    </data>
+</openerp>
