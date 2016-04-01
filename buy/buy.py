@@ -321,7 +321,7 @@ class buy_receipt(models.Model):
             self.discount_amount = total * self.discount_rate * 0.01
 
     def get_move_origin(self, vals):
-        return self._name + (self.env.context.get('is_return') and '.return' or '.sell')
+        return self._name + (self.env.context.get('is_return') and '.return' or '.buy')
 
     @api.model
     def create(self, vals):

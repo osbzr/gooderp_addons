@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import date, timedelta
+from datetime import date
 from openerp import models, fields, api
 from openerp.exceptions import except_orm
 
