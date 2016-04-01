@@ -1,6 +1,7 @@
-[在线试用](http://gooderp.osbzr.net/login?db=gooderp&login=admin&key=good)
+可能是中国用户数最多的开源ERP
 ======
 
+[![在线试用](./try-now.png)](http://gooderp.osbzr.net/login?db=gooderp&login=admin&key=good)
 [![Join the chat at https://gitter.im/osbzr/gooderp](https://badges.gitter.im/osbzr/gooderp.svg)](https://gitter.im/osbzr/gooderp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/osbzr/gooderp_addons.svg?branch=master)](https://travis-ci.org/osbzr/gooderp_addons)
 [![Coverage Status](https://coveralls.io/repos/github/osbzr/gooderp_addons/badge.svg?branch=master)](https://coveralls.io/github/osbzr/gooderp_addons?branch=master)
