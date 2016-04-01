@@ -158,6 +158,7 @@ class sell_order(models.Model):
                             'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
                             'note': self.note,
                             'discount_rate': self.discount_rate,
+                            'discount_amount': self.discount_amount,
                         })
         view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_delivery_form')
         return {
@@ -341,10 +342,10 @@ class sell_delivery(models.Model):
         # 发库单/退货单 生成源单
         if not self.is_return:
             amount = self.amount + self.partner_cost
-            to_reconcile = self.debt
+            this_reconcile = self.receipt
         else:
             amount = - (self.amount + self.partner_cost)
-            to_reconcile = - self.debt
+            this_reconcile = - self.receipt
         categ = self.env.ref('money.core_category_sale')
         source_id = self.env['money.invoice'].create({
                             'move_id': self.sell_move_id.id,
@@ -353,8 +354,8 @@ class sell_delivery(models.Model):
                             'category_id': categ.id,
                             'date': fields.Date.context_today(self),
                             'amount': amount,
-                            'reconciled': self.receipt,
-                            'to_reconcile': to_reconcile,
+                            'reconciled': 0,
+                            'to_reconcile': amount,
                             'date_due': self.date_due,
                             'state': 'draft',
                         })
@@ -380,7 +381,7 @@ class sell_delivery(models.Model):
             source_lines = []
             money_lines.append({
                 'bank_id': self.bank_account_id.id,
-                'amount': self.receipt,
+                'amount': this_reconcile,
             })
             source_lines.append({
                 'name': source_id.id,
@@ -388,8 +389,8 @@ class sell_delivery(models.Model):
                 'date': source_id.date,
                 'amount': amount,
                 'reconciled': 0.0,
-                'to_reconcile': to_reconcile,
-                'this_reconcile': self.receipt,
+                'to_reconcile': amount,
+                'this_reconcile': this_reconcile,
             })
             rec = self.with_context(type='get')
             money_order = rec.env['money.order'].create({
@@ -399,8 +400,8 @@ class sell_delivery(models.Model):
                                 'source_ids': [(0, 0, line) for line in source_lines],
                                 'type': 'get',
                                 'amount': amount,
-                                'reconciled': self.receipt,
-                                'to_reconcile': to_reconcile,
+                                'reconciled': this_reconcile,
+                                'to_reconcile': amount,
                                 'state': 'draft',
                             })
             money_order.money_order_done()
