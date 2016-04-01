@@ -11,15 +11,11 @@ class buy_order_track_wizard(models.TransientModel):
 
     @api.model
     def _default_date_start(self):
-        return date.today().replace(day=1).strftime('%Y-%m-%d')
+        return self.env.user.company_id.start_date
 
     @api.model
     def _default_date_end(self):
-        now = date.today()
-        next_month = now.month == 12 and now.replace(year=now.year + 1,
-            month=1, day=1) or now.replace(month=now.month + 1, day=1)
-
-        return (next_month - timedelta(days=1)).strftime('%Y-%m-%d')
+        return date.today()
 
     date_start = fields.Date(u'开始日期', default=_default_date_start)
     date_end = fields.Date(u'结束日期', default=_default_date_end)
@@ -28,25 +24,34 @@ class buy_order_track_wizard(models.TransientModel):
 
     @api.multi
     def button_ok(self):
-        date_start = self.date_start
-        date_end = self.date_end
-        if date_start and date_end and date_end < date_start:
+        res = []
+        if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
 
-        partner_id = self.partner_id
-        goods_id = self.goods_id
-        domain = [('order_id.date', '>=', date_start), ('order_id.date', '<=', date_end)]
-        res = []
-        goods_ids = None
-        if goods_id:
-            goods_ids = goods_id
-            domain.append(('goods_id', '=', goods_id.id))
-        else:
-            goods_ids = self.env['goods'].search([])
-        if partner_id:
-            domain.append(('partner_id', '=', partner_id.id))
+        domain = [('order_id.date', '>=', self.date_start), ('order_id.date', '<=', self.date_end)]
 
-        for line in self.env['buy.order.line'].search(domain):
+        if self.goods_id:
+            domain.append(('goods_id', '=', self.goods_id.id))
+        if self.partner_id:
+            domain.append(('order_id.partner_id', '=', self.partner_id.id))
+
+        index = 0
+        total_qty = total_amount = total_not_in =0
+        line_ids = []
+        for line in self.env['buy.order.line'].search(domain, order='goods_id'):
+            line_ids.append(line)
+        for line in self.env['buy.order.line'].search(domain, order='goods_id'):
+            index += 1
+            after_id = line_ids[index:] and line_ids[index:][0] # 下一个明细行
+            if after_id:
+                after = self.env['buy.order.line'].search([('id', '=', after_id.id)])
+
+            wh_in_date = None
+            wh_move_line = self.env['wh.move.line'].search([('buy_line_id', '=', line.id), ('state', '=', 'done')])
+            if len(wh_move_line) > 1:   # 如果是分批入库，则入库单明细行上的buy_line_id相同
+                wh_in_date = wh_move_line[0].date
+            else:
+                wh_in_date = wh_move_line.date
             track = self.env['buy.order.track'].create({
                     'goods_code': line.goods_id.code,
                     'goods_id': line.goods_id.id,
@@ -60,34 +65,19 @@ class buy_order_track_wizard(models.TransientModel):
                     'amount': line.subtotal,
                     'qty_not_in': line.quantity - line.quantity_in,
                     'planned_date': line.order_id.planned_date,
-                    'wh_in_date': line.order_id.date,   # FIXME: 找出入库日期
+                    'wh_in_date': wh_in_date,   # 入库日期
                     'note': line.note,
                 })
             res.append(track.id)
 
-        index = 0
-        total_qty = total_amount = total_not_in =0
-        track_ids = []
-        for track in self.env['buy.order.track'].search([('id', 'in', res)], order='goods_code,date'):
-            track_ids.append(track)
-        for track in self.env['buy.order.track'].search([('id', 'in', res)], order='goods_code,date'):
-            index += 1
-            after_id = track_ids[index:] and track_ids[index:][0] # 下一个明细行
-            if after_id:
-                after = self.env['buy.order.track'].search([('id', '=', after_id.id)])
-            else:
-                total_qty = track.qty
-                total_not_in = track.qty_not_in
-                total_amount = track.amount
-            if track.goods_id == after.goods_id:
-                total_qty += track.qty
-                total_not_in += track.qty_not_in
-                total_amount += track.amount
-                print index,track.order_name
-            elif track.goods_id != after.goods_id:
-                total_qty += track.qty
-                total_not_in += track.qty_not_in
-                total_amount += track.amount
+            if line.goods_id == after.goods_id: # 如果下一个是相同商品，则累加数量、采购额和未入库数量
+                total_qty += line.quantity
+                total_not_in += line.quantity - line.quantity_in
+                total_amount += line.subtotal
+            elif line.goods_id != after.goods_id:   # 如果下一个是不同商品，则增加一个小计行
+                total_qty += line.quantity
+                total_not_in += line.quantity - line.quantity_in
+                total_amount += line.subtotal
                 summary_track = self.env['buy.order.track'].create({
                     'goods_state': u'小计',
                     'qty': total_qty,
@@ -95,14 +85,16 @@ class buy_order_track_wizard(models.TransientModel):
                     'qty_not_in': total_not_in,
                 })
                 res.append(summary_track.id)
-            if not after_id:
+                total_qty = total_amount = total_not_in =0 # 计算不同的商品时先将初始值清零
+            if not after_id:    # 如果是最后一个明细行，则在最后增加一个小计行
                 summary_last_track = self.env['buy.order.track'].create({
                     'goods_state': u'小计',
-                    'qty': track.qty,
-                    'amount': track.amount,
-                    'qty_not_in': track.qty_not_in,
+                    'qty': total_qty,
+                    'amount': total_amount,
+                    'qty_not_in': total_not_in,
                 })
                 res.append(summary_last_track.id)
+
         view = self.env.ref('buy.buy_order_track_tree')
         return {
             'name': u'采购订单跟踪表:',
@@ -112,6 +104,6 @@ class buy_order_track_wizard(models.TransientModel):
             'views': [(view.id, 'tree')],
             'res_model': 'buy.order.track',
             'type': 'ir.actions.act_window',
-            'domain':[('id','in',res)],
+            'domain': [('id', 'in', res)],
             'limit': 300,
         }
