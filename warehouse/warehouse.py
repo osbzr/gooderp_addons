@@ -47,11 +47,25 @@ class warehouse(models.Model):
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         args = args or []
+        # 让warehouse支持使用code来搜索
+        if name and not filter(lambda _type: _type[0] == 'code', args):
+            warehouses = self.search([('type', '=', 'stock'), ('code', 'ilike', name)])
+            if warehouses:
+                return warehouses.name_get()
+
         if not filter(lambda _type: _type[0] == 'type', args):
             args = [['type', '=', 'stock']] + args
 
         return super(warehouse, self).name_search(name=name, args=args,
             operator=operator, limit=limit)
+
+    @api.multi
+    def name_get(self):
+        res = []
+        for warehouse in self:
+            res.append((warehouse.id, '[{}]{}'.format(warehouse.code, warehouse.name)))
+
+        return res
 
     def get_warehouse_by_type(self, _type):
         if not _type or _type not in map(lambda _type: _type[0], self.WAREHOUSE_TYPE):

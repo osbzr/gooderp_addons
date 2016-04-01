@@ -16,7 +16,7 @@
             <field name='name'>出库单</field>
             <field name='code'>wh.out</field>
             <field eval='4' name='padding'/>
-            <field name='prefix'>WH/OUT/%(y)s%(month)s</field>
+            <field name='prefix'>OTHERS/OUT/%(y)s%(month)s</field>
         </record>
 
         <record id='wh_in_sequence_type' model='ir.sequence.type'>
@@ -28,7 +28,7 @@
             <field name='name'>入库单</field>
             <field name='code'>wh.in</field>
             <field eval='4' name='padding'/>
-            <field name='prefix'>WH/IN/%(y)s%(month)s</field>
+            <field name='prefix'>OTHERS/IN/%(y)s%(month)s</field>
         </record>
 
         <record id='wh_internal_sequence_type' model='ir.sequence.type'>
@@ -40,7 +40,7 @@
             <field name='name'>移库单</field>
             <field name='code'>wh.internal</field>
             <field eval='4' name='padding'/>
-            <field name='prefix'>WH/INT/%(y)s%(month)s</field>
+            <field name='prefix'>OTHERS/INT/%(y)s%(month)s</field>
         </record>
 
         <record id='wh_inventory_sequence_type' model='ir.sequence.type'>

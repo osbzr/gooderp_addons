@@ -41,6 +41,6 @@ class report_lot_track_wizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'res_model': 'report.lot.track',
             'view_mode': 'tree',
-            'name': u'序列号跟踪表',
+            'name': u'批号跟踪表',
             'context': self.read(['date_start', 'date_end', 'warehouse', 'goods'])[0],
         }

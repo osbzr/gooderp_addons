@@ -45,7 +45,7 @@ class sell_order(models.Model):
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        select=True, copy=False, help=u"默认是订单创建日期")
-    delivery_date = fields.Date(u'要求交货日期', states=READONLY_STATES, 
+    delivery_date = fields.Date(u'要求交货日期', states=READONLY_STATES,
                                 default=lambda self: fields.Date.context_today(self),
                                 select=True, copy=False, help=u"订单的要求交货日期")
     type = fields.Selection([('sell',u'销货'), ('return', u'退货')], u'类型', default='sell', states=READONLY_STATES)
@@ -72,10 +72,12 @@ class sell_order(models.Model):
         if self.discount_rate:
             self.discount_amount = total * self.discount_rate * 0.01
 
+
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
             vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+
         return super(sell_order, self).create(vals)
 
     @api.one
@@ -305,11 +307,21 @@ class sell_delivery(models.Model):
         if self.discount_rate:
             self.discount_amount = total * self.discount_rate * 0.01
 
+    def get_move_origin(self, vals):
+        print '=' * 10
+        print self.env.context
+        return self._name + (self.env.context.get('is_return') and '.return' or '.sell')
+
     @api.model
     def create(self, vals):
         '''创建销售发货单时生成有序编号'''
         if vals.get('name', '/') == '/':
             vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+
+        vals.update({
+            'origin': self.get_move_origin(vals),
+        })
+
         return super(sell_delivery, self).create(vals)
 
     @api.one

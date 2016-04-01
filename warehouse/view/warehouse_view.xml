@@ -43,7 +43,7 @@
                     <field name='move_id' string='单据编号' />
                     <field name='goods_id' />
                     <field name='uom_id' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' required='1' />
                     <field name='goods_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' sum='1' />
                     <field name='warehouse_id' />
@@ -68,7 +68,7 @@
                     <field name='using_batch' invisible='1' />
                     <field name='force_batch_one' invisible='1' />
                     <field name='uom_id' required='1' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' required='1' />
                     <field name='lot_qty' invisible='1' />
                     <field name='lot_uos_qty' invisible='1' />
                     <field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]" context="{'lot': True}" options="{'no_open': True, 'no_create': True}" />
@@ -91,7 +91,7 @@
                 <tree string='库存调拨' editable='bottom'>
                     <field name='goods_id' required='1' />
                     <field name='uom_id' required='1' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' required='1' />
                     <field name='using_batch' invisible='1' />
                     <field name='force_batch_one' invisible='1' />
 
@@ -117,7 +117,7 @@
                     <field name='using_batch' invisible='1' />
                     <field name='force_batch_one' invisible='1' />
                     <field name='uom_id' required='1' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' required='1' />
                     <field name='lot' invisible='1' />
                     <field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0)]" context="{'lot': True}" options="{'no_open': True, 'no_create': True}" />
 

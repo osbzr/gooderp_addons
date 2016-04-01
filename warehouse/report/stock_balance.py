@@ -12,7 +12,7 @@ class report_stock_balance(models.Model):
     goods = fields.Char(u'产品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
-    lot = fields.Char(u'批次')
+    lot = fields.Char(u'批号')
     warehouse = fields.Char(u'仓库')
     goods_qty = fields.Float('数量', digits_compute=dp.get_precision('Goods Quantity'))
     goods_uos_qty = fields.Float('辅助单位数量', digits_compute=dp.get_precision('Goods Quantity'))
