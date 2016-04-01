@@ -6,7 +6,7 @@
             <field name='name'>仓库</field>
             <field name='res_model'>warehouse</field>
             <field name='view_mode'>tree</field>
-            <field name='domain'>['|', ('active', '!=', 1), ('active', '=', 1)]</field>
+            <field name='domain'>[('type', '=', 'stock'), '|', ('active', '!=', 1), ('active', '=', 1)]</field>
         </record>
 
         <!-- 出入库单 -->

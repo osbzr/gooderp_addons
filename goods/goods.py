@@ -17,6 +17,9 @@ class goods(models.Model):
     def anti_conversion_unit(self, qty):
         self.ensure_one()
         return self.conversion and qty / self.conversion or 0
+        # return round(self.conversion and qty / self.conversion or 0,
+        #              self.env['decimal.precision'].precision_get('Goods Quantity'))
+
 
 class attribute(models.Model):
     _name = 'attribute'
@@ -34,14 +37,16 @@ class attribute(models.Model):
 class attribute_value(models.Model):
     _name = 'attribute.value'
     _rec_name = 'value_id'
+
     attribute_id = fields.Many2one('attribute',u'属性')
     category_id = fields.Many2one('core.category',u'属性',
-                                       domain=[('type','=','attribute')],context={'type':'attribute'}
-                                       ,required='1')
+                                  domain=[('type','=','attribute')],
+                                  context={'type':'attribute'}, required='1')
     value_id = fields.Many2one('attribute.value.value',u'值',
+                               domain="[('category_id','=',category_id)]",
+                               required='1')
 
-                                       domain="[('category_id','=',category_id)]"
-                                       ,required='1')
+
 class attribute_value(models.Model):
     _name = 'attribute.value.value'
     category_id = fields.Many2one('core.category',u'属性',
