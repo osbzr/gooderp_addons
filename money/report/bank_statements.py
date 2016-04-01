@@ -45,9 +45,8 @@ class bank_statements_report(models.Model):
                     partner_id,
                     note
             FROM
-                (SELECT
-        go.bank_id AS bank_id,
-                go.date AS date,
+                (SELECT go.bank_id AS bank_id,
+                        go.date AS date,
                         '期初余额' AS name,
                         go.balance AS get,
                         0 AS pay,
@@ -66,6 +65,7 @@ class bank_statements_report(models.Model):
                         mol.note
                 FROM money_order_line AS mol
                 LEFT JOIN money_order AS mo ON mol.money_id = mo.id
+                WHERE mo.state = 'done'
                 UNION ALL
                 SELECT  omo.bank_id,
                         omo.date,
@@ -76,6 +76,7 @@ class bank_statements_report(models.Model):
                         omo.partner_id,
                         NULL AS note
                 FROM other_money_order AS omo
+                WHERE omo.state = 'done'
                 UNION ALL
                 SELECT  mtol.out_bank_id AS bank_id,
                         mto.date,
@@ -87,6 +88,7 @@ class bank_statements_report(models.Model):
                         mto.note
                 FROM money_transfer_order_line AS mtol
                 LEFT JOIN money_transfer_order AS mto ON mtol.transfer_id = mto.id
+                WHERE mto.state = 'done'
                 UNION ALL
                 SELECT  mtol.in_bank_id AS bank_id,
                         mto.date,
@@ -98,6 +100,7 @@ class bank_statements_report(models.Model):
                         mto.note
                 FROM money_transfer_order_line AS mtol
                 LEFT JOIN money_transfer_order AS mto ON mtol.transfer_id = mto.id
+                WHERE mto.state = 'done'
                 ) AS bs)
         """)
 

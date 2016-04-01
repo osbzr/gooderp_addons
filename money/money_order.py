@@ -142,7 +142,9 @@ class money_order(models.Model):
                 if abs(source.to_reconcile) < source.this_reconcile:
                     raise except_orm(u'错误', u'本次核销金额不能大于未核销金额')
 
-                source.name.to_reconcile = source.to_reconcile - source.this_reconcile
+                source.to_reconcile = source.to_reconcile - source.this_reconcile
+                source.name.to_reconcile = source.to_reconcile
+#                 source.name.to_reconcile = source.to_reconcile - source.this_reconcile
                 source.name.reconciled = source.reconciled + source.this_reconcile
 
             order.state = 'done'

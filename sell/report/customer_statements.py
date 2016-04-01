@@ -99,7 +99,7 @@ class customer_statements_report(models.Model):
                         m.note,
                         0 AS move_id
                 FROM money_order AS m
-                WHERE m.type = 'get'
+                WHERE m.type = 'get' AND m.state = 'done'
                 UNION ALL
                 SELECT  mi.partner_id,
                         mi.name,
@@ -115,7 +115,7 @@ class customer_statements_report(models.Model):
                 FROM money_invoice AS mi
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
                 JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
-                WHERE c.type = 'income'
+                WHERE c.type = 'income' AND mi.state = 'done'
                 ) AS ps)
         """)
 

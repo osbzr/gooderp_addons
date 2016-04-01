@@ -32,6 +32,7 @@ class other_money_statements_report(models.Model):
                     omol.note
             FROM other_money_order_line AS omol
             LEFT JOIN other_money_order AS omo ON omol.other_money_id = omo.id
+            WHERE omo.state = 'done'
             ORDER BY date)
         """)
 
