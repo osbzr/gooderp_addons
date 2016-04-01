@@ -319,11 +319,19 @@ class buy_receipt(models.Model):
         if self.discount_rate:
             self.discount_amount = total * self.discount_rate * 0.01
 
+    def get_move_origin(self, vals):
+        return self._name + (self.env.context.get('is_return') and '.return' or '.sell')
+
     @api.model
     def create(self, vals):
         '''创建采购入库单时生成有序编号'''
         if vals.get('name', '/') == '/':
             vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+
+        vals.update({
+            'origin': self.get_move_origin(vals)
+        })
+
         return super(buy_receipt, self).create(vals)
 
     @api.one

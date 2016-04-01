@@ -33,8 +33,10 @@ class wh_move_line(models.Model):
         'wh.out.others': u'其他出库',
         'wh.in.overage': u'盘盈',
         'wh.in.others': u'其他入库',
-        'buy.receipt': u'采购入库',
-        'sell.delivery': u'销售出库',
+        'buy.receipt.sell': u'采购入库',
+        'buy.receipt.return': u'采购退货',
+        'sell.delivery.sell': u'销售出库',
+        'sell.delivery.return': u'销售退货',
     }
 
     @api.model
@@ -99,10 +101,11 @@ class wh_move_line(models.Model):
         self.ensure_one()
         if self.move_id.origin in ('wh.assembly', 'wh.disassembly'):
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.type))
-        elif self.move_id.origin in ('wh.out.losses', 'wh.out.others', 'wh.in.overage', 'wh.in.others'):
-            return self.ORIGIN_EXPLAIN.get(self.move_id.origin)
         elif self.move_id.origin == 'wh.internal':
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.env.context.get('internal_out', False)))
+        # elif self.move_id.origin in ('wh.out.losses', 'wh.out.others', 'wh.in.overage', 'wh.in.others'):
+        else:
+            return self.ORIGIN_EXPLAIN.get(self.move_id.origin)
 
         return ''
 

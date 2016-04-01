@@ -2,6 +2,7 @@
 
 import openerp.addons.decimal_precision as dp
 from openerp import models, fields
+import datetime
 
 
 class report_stock_transceive(models.Model):
