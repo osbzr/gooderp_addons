@@ -77,10 +77,18 @@ class money_order(models.Model):
     to_reconcile = fields.Float(string=u'未核销预收款')
     reconciled = fields.Float(string=u'已核销预收款')
 
+    @api.onchange('date')
+    def onchange_date(self):
+        if self._context.get('type') == 'get':
+            return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
+        else:
+            return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
+
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if not self.partner_id:
             return {}
+
         source_lines = []
         self.source_ids = []
         if self.env.context.get('type') == 'get':
