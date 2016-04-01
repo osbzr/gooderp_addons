@@ -25,7 +25,7 @@ class wh_inventory(models.Model):
     name = fields.Char(u'名称', copy=False, default='/')
     warehouse_id = fields.Many2one('warehouse', u'仓库')
     goods = fields.Char(u'产品')
-    zero_inventory = fields.Boolean(u'零库存')
+    uos_not_zero = fields.Boolean(u'辅助数量不为0')
     out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False)
     in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False)
     state = fields.Selection(INVENTORY_STATE, u'状态', copy=False, default='draft')
@@ -125,10 +125,15 @@ class wh_inventory(models.Model):
         for inventory in self:
             out_line, in_line = [], []
             for line in (line for line in inventory.line_ids if line.difference_qty):
-                if line.difference_qty < 0:
+                if line.difference_qty <= 0 and line.difference_uos_qty <= 0 and \
+                        line.difference_qty * line.difference_uos_qty != 0:
                     out_line.append(line)
-                else:
+                elif ine.difference_qty >= 0 and line.difference_uos_qty >= 0 and \
+                        line.difference_qty * line.difference_uos_qty != 0:
                     in_line.append(line)
+                else:
+                    raise osv.except_osv(u'错误',
+                        u'产品%s行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致' % line.goods_id.name)
 
             if out_line:
                 self.create_losses_out(inventory, out_line)
@@ -141,29 +146,38 @@ class wh_inventory(models.Model):
 
         return True
 
-    def get_line_detail(self):
+    def get_line_detail(self, uos_zero=False):
         for inventory in self:
+            if uos_zero:
+                remaining_text = '(line.qty_remaining > 0 OR line.uos_qty_remaining > 0)'
+            else:
+                remaining_text = 'line.qty_remaining > 0'
+
             sql_text = '''
                 SELECT wh.id as warehouse_id,
                        goods.id as goods_id,
+                       line.attribute_id as attribute_id,
+                       line.lot as lot,
                        uom.id as uom_id,
-                       sum(line.qty_remaining) as qty
+                       uos.id as uos_id,
+                       sum(line.qty_remaining) as qty,
+                       sum(line.uos_qty_remaining) as uos_qty
 
                 FROM wh_move_line line
                 LEFT JOIN goods goods ON line.goods_id = goods.id
                     LEFT JOIN uom uom ON goods.uom_id = uom.id
+                    LEFT JOIN uom uos ON goods.uos_id = uos.id
                 LEFT JOIN warehouse wh ON line.warehouse_dest_id = wh.id
 
-                WHERE line.qty_remaining > 0
+                WHERE {}
                   AND wh.type = 'stock'
                   AND line.state = 'done'
                   %s
 
-                GROUP BY wh.id, goods.id, uom.id
-            '''
+                GROUP BY wh.id, line.lot, line.attribute_id, goods.id, uom.id, uos.id
+            '''.format(remaining_text)
 
             extra_text = ''
-            # TODO @zzx 可能需要添加一种全部仓库的判断
             if inventory.warehouse_id:
                 extra_text += ' AND wh.id = %s' % inventory.warehouse_id.id
 
@@ -173,41 +187,26 @@ class wh_inventory(models.Model):
             inventory.env.cr.execute(sql_text % extra_text)
             return inventory.env.cr.dictfetchall()
 
-    def get_zero_inventory(self, exist_goods_ids):
-        for inventory in self:
-            domain = inventory.goods and [('name', 'ilike', '%%%s%%' % inventory.goods)] or []
-            zero_goods = self.env['goods'].search(domain)
-
-            res = []
-            temp_warehouse = self.env['warehouse'].search([('type', '=', 'stock')], limit=1)
-            for goods in zero_goods.filtered(lambda goods: goods.id not in exist_goods_ids):
-                res.append({
-                        # 'warehouse_id': goods.main_warehouse_id.id, TODO
-                        'warehouse_id': temp_warehouse[0].id,
-                        'goods_id': goods.id,
-                        'uom_id': goods.uom_id.id,
-                        'qty': 0,
-                    })
-
-            return res
-
     @api.multi
     def query_inventory(self):
         line_obj = self.env['wh.inventory.line']
         for inventory in self:
             inventory.delete_line()
-            line_ids = inventory.get_line_detail()
-
-            if inventory.zero_inventory:
-                line_ids.extend(inventory.get_zero_inventory([line.get('goods_id') for line in line_ids]))
+            line_ids = inventory.get_line_detail(inventory.uos_not_zero)
 
             for line in line_ids:
                 line_obj.create({
                         'inventory_id': inventory.id,
                         'warehouse_id': line.get('warehouse_id'),
                         'goods_id': line.get('goods_id'),
+                        'attribute_id': line.get('attribute_id'),
+                        'lot': line.get('lot'),
                         'uom_id': line.get('uom_id'),
+                        'uos_id': line.get('uos_id'),
                         'real_qty': line.get('qty'),
+                        'real_uos_qty': line.get('uos_qty'),
+                        'inventory_qty': line.get('qty'),
+                        'inventory_uos_qty': line.get('uos_qty'),
                     })
 
             if line_ids:
@@ -219,18 +218,75 @@ class wh_inventory(models.Model):
 class wh_inventory_line(models.Model):
     _name = 'wh.inventory.line'
 
+    LOT_TYPE = [
+        ('out', u'出库'),
+        ('in', u'入库'),
+        ('nothing', u'不做处理'),
+    ]
+
     inventory_id = fields.Many2one('wh.inventory', u'盘点', ondelete='cascade')
     warehouse_id = fields.Many2one('warehouse', u'仓库')
     goods_id = fields.Many2one('goods', u'产品')
+    attribute_id = fields.Many2one('attribute', u'属性')
+    using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理')
+    force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
+    lot = fields.Char(u'批号')
+    new_lot = fields.Char(u'盘盈批号')
+    lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing')
     uom_id = fields.Many2one('uom', u'单位')
+    uos_id = fields.Many2one('uom', u'辅助单位')
     real_qty = fields.Float(u'系统库存', digits_compute=dp.get_precision('Goods Quantity'))
+    real_uos_qty = fields.Float(u'系统辅助单位库存', digits_compute=dp.get_precision('Goods Quantity'))
     inventory_qty = fields.Float(u'盘点库存', digits_compute=dp.get_precision('Goods Quantity'))
+    inventory_uos_qty = fields.Float(u'盘点辅助单位库存', digits_compute=dp.get_precision('Goods Quantity'))
     difference_qty = fields.Float(u'盘盈盘亏', digits_compute=dp.get_precision('Goods Quantity'))
+    difference_uos_qty = fields.Float(u'辅助单位盘盈盘亏', digits_compute=dp.get_precision('Goods Quantity'))
+
+    def check_difference_identical(self):
+        if self.difference_qty * self.difference_uos_qty < 0:
+            self.inventory_qty = self.real_qty
+            self.inventory_uos_qty = self.real_uos_qty
+
+            return {'warning': {
+                'title': u'错误',
+                'message': u'盘盈盘亏数量应该与辅助单位的盘盈盘亏数量盈亏方向一致',
+            }}
+
+    @api.multi
+    @api.onchange('inventory_qty')
+    def onchange_qty(self):
+        self.ensure_one()
+        self.difference_qty = self.inventory_qty - self.real_qty
+        self.difference_uos_qty = self.inventory_uos_qty - self.real_uos_qty
+
+        if self.goods_id and self.goods_id.using_batch:
+            if self.difference_qty > 0:
+                self.lot_type = 'in'
+                self.new_lot = self.new_lot or self.lot
+            elif self.difference_qty < 0:
+                self.lot_type = 'out'
+                self.new_lot = ''
+            else:
+                self.lot_type = 'nothing'
+                self.new_lot = ''
+
+            if self.goods_id.force_batch_one and self.difference_qty:
+                flag = self.difference_qty > 0 and 1 or -1
+                if abs(self.difference_qty) != 1:
+                    self.inventory_qty = self.real_qty
+                    self.inventory_uos_qty = self.inventory_uos_qty
+
+                    return {'warning': {
+                        'title': u'警告',
+                        'message': u'产品上设置了序号为1，此时一次只能盘亏或盘盈一个产品数量',
+                    }}
+
+        return self.check_difference_identical()
 
     @api.one
-    @api.onchange('real_qty', 'inventory_qty')
-    def onchange_qty(self):
-        self.difference_qty = self.inventory_qty - self.real_qty
+    @api.onchange('inventory_uos_qty')
+    def onchange_uos_qty(self):
+        self.inventory_qty = self.goods_id.conversion_unit(self.inventory_uos_qty)
 
     def get_move_line(self, wh_type='in', context=None):
         inventory_warehouse = self.env['warehouse'].get_warehouse_by_type('inventory')
@@ -241,9 +297,14 @@ class wh_inventory_line(models.Model):
             return {
                 'warehouse_id': wh_type == 'out' and inventory.warehouse_id.id or inventory_warehouse.id,
                 'warehouse_dest_id': wh_type == 'in' and inventory.warehouse_id.id or inventory_warehouse.id,
+                'lot': wh_type == 'in' and inventory.new_lot,
+                # 'lot_id': wh_type == 'in' and inventory.lot and inve
                 'goods_id': inventory.goods_id.id,
+                'attribute_id': inventory.attribute_id.id,
                 'uom_id': inventory.uom_id.id,
+                'uos_id': inventory.uos_id.id,
                 'goods_qty': abs(inventory.difference_qty),
+                'goods_uos_qty': abs(inventory.difference_uos_qty),
                 'price': safe_division(subtotal, matching_qty),
                 'subtotal': subtotal,
             }

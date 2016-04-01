@@ -55,7 +55,7 @@
             <field name='name'>盘点单</field>
             <field name='res_model'>wh.inventory</field>
             <field name='view_mode'>tree,form</field>
-            <field name='context'>{'readonly_by_pass': ['difference_qty']}</field>
+            <field name='context'>{'readonly_by_pass': ['difference_uos_qty', 'difference_qty']}</field>
             <field name='view_id' ref='wh_inventory_tree' />
         </record>
 

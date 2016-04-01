@@ -69,6 +69,7 @@ class wh_move_line(models.Model):
     type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),)
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft')
     goods_id = fields.Many2one('goods', string=u'产品', required=True, index=True)
+    using_attribute = fields.Boolean(u'使用属性')
     attribute_id = fields.Many2one('attribute', u'属性')
     using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理')
     force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
@@ -195,7 +196,7 @@ class wh_move_line(models.Model):
             subtotal, price = self.goods_id.get_suggested_cost_by_warehouse(self.warehouse_id, self.goods_qty)
 
             self.price = price
-            self.subtotal = subtotal
+            # self.subtotal = subtotal
 
     @api.multi
     @api.onchange('goods_id')
@@ -203,6 +204,8 @@ class wh_move_line(models.Model):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.uos_id = self.goods_id.uos_id
+            self.using_attribute = self.goods_id.attribute_ids
+            self.attribute_id = False
             if self.goods_id.using_batch and self.goods_id.force_batch_one:
                 self.goods_qty = 1
                 self.goods_uos_qty = self.goods_id.anti_conversion_unit(
@@ -248,11 +251,11 @@ class wh_move_line(models.Model):
             if self.env.context.get('type') == 'internal':
                 self.lot = self.lot_id.lot
 
-    @api.one
-    @api.onchange('price')
-    def onchange_price(self):
-        self.subtotal = self.price and self.price \
-            and self._get_subtotal_util(self.goods_qty, self.price) or 0
+    # @api.one
+    # @api.onchange('price')
+    # def onchange_price(self):
+    #     self.subtotal = self.price and self.price \
+    #         and self._get_subtotal_util(self.goods_qty, self.price) or 0
 
     @api.one
     @api.onchange('discount_rate')
