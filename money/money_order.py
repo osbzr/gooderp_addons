@@ -41,6 +41,14 @@ class money_order(models.Model):
 
         return super(money_order, self).create(values)
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+
+        return super(money_order, self).unlink()
+
     @api.one
     @api.depends('discount_amount', 'line_ids.amount', 'source_ids.this_reconcile')
     def _compute_advance_payment(self):
@@ -78,11 +86,11 @@ class money_order(models.Model):
         if self.env.context.get('type') == 'get':
             money_invoice = self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id),
                                                               ('category_id.type', '=', 'income'),
-                                                              ('to_reconcile', '>', 0)])
+                                                              ('to_reconcile', '!=', 0)])
         if self.env.context.get('type') == 'pay':
             money_invoice = self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id),
                                                               ('category_id.type', '=', 'expense'),
-                                                              ('to_reconcile', '>', 0)])
+                                                              ('to_reconcile', '!=', 0)])
         for invoice in money_invoice:
             source_lines.append({
                    'name': invoice.id,
@@ -108,36 +116,25 @@ class money_order(models.Model):
         total = 0
         for line in self.line_ids:
             if self.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
-                if self.source_ids.amount > 0:  # 付款
-                    if line.bank_id.balance < line.amount:
-                        raise except_orm(u'错误', u'账户余额不足')
-                    line.bank_id.balance -= line.amount
-                else:  # 付款退款
-                    line.bank_id.balance += line.amount
+                if line.bank_id.balance < line.amount:
+                    raise except_orm(u'错误', u'账户余额不足')
+                line.bank_id.balance -= line.amount
             else:  # 收款账号余额增加, 退款账号余额减少
-                if self.source_ids.amount > 0:  # 收款
-                    line.bank_id.balance += line.amount
-                else:  # 收款退款
-                    if line.bank_id.balance > line.amount:
-                        raise except_orm(u'错误', u'账户余额不足')
-                    line.bank_id.balance -= line.amount
+                line.bank_id.balance += line.amount
             total += line.amount
 
         if self.type == 'pay':
-            if self.source_ids.amount > 0:  # 付款
-                self.partner_id.payable -= total
-            else:  # 付款退款
-                self.partner_id.payable += total
+            self.partner_id.payable -= total
         else:
-            if self.source_ids.amount > 0:  # 收款
-                self.partner_id.receivable -= total
-            else:  # 收款退款
-                self.partner_id.receivable += total
+            self.partner_id.receivable -= total
 
         # 更新源单的未核销金额、已核销金额
         for source in self.source_ids:
             if abs(source.to_reconcile) < source.this_reconcile:
                 raise except_orm(u'错误', u'本次核销金额不能大于未核销金额')
+
+            source.name.to_reconcile = source.to_reconcile - source.this_reconcile
+            source.name.reconciled = source.reconciled + source.this_reconcile
 
         self.state = 'done'
         return True
@@ -161,6 +158,10 @@ class money_order(models.Model):
             self.partner_id.payable += total
         else:
             self.partner_id.receivable += total
+
+        for source in self.source_ids:
+            source.name.to_reconcile = source.to_reconcile + source.this_reconcile
+            source.name.reconciled = source.reconciled - source.this_reconcile
 
         self.state = 'draft'
         return True
@@ -221,6 +222,14 @@ class money_invoice(models.Model):
         if not self.env.user.company_id.draft_invoice:
             new_id.money_invoice_done()
         return new_id
+
+    @api.multi
+    def unlink(self):
+        for invoice in self:
+            if invoice.state == 'done':
+                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+
+        return super(money_invoice, self).unlink()
         
 class source_order_line(models.Model):
     _name = 'source.order.line'
@@ -258,6 +267,14 @@ class reconcile_order(models.Model):
 
         return super(reconcile_order, self).create(values)
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+
+        return super(reconcile_order, self).unlink()
+
     state = fields.Selection([
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
@@ -277,7 +294,7 @@ class reconcile_order(models.Model):
         money_orders = self.env['money.order'].search([('partner_id', '=', self.partner_id.id),
                                                       ('type', '=', way),
                                                       ('state', '=', 'done'),
-                                                      ('to_reconcile', '>', 0)])
+                                                      ('to_reconcile', '!=', 0)])
         result = []
         for order in money_orders:
             result.append((0, 0, {
@@ -294,7 +311,7 @@ class reconcile_order(models.Model):
     def _get_money_invoice(self, way='income'):
         money_invoice = self.env['money.invoice'].search([('category_id.type', '=', way),
                                                           ('partner_id', '=', self.partner_id.id),
-                                                          ('to_reconcile', '>', 0)])
+                                                          ('to_reconcile', '!=', 0)])
         result = []
         for invoice in money_invoice:
             result.append((0, 0, {
@@ -373,8 +390,10 @@ class reconcile_order(models.Model):
         '''核销单的审核按钮'''
         # 核销金额不能大于未核销金额
         for order in self:
+            if order.state == 'done':
+                continue
             order_reconcile, invoice_reconcile = 0, 0
-            if self.business_type in ['get_to_get', 'pay_to_pay'] and self.partner_id.id == self.to_partner_id.id:
+            if self.business_type in ['get_to_get', 'pay_to_pay'] and order.partner_id.id == order.to_partner_id.id:
                 raise except_orm(u'错误', u'转出客户和转入客户不能相同')
 
             # 核销预收预付
@@ -387,19 +406,19 @@ class reconcile_order(models.Model):
                 line.name.to_reconcile -= line.this_reconcile
                 line.name.reconciled += line.this_reconcile
 
-            for line in self.receivable_source_ids:
+            for line in order.receivable_source_ids:
                 invoice_reconcile += line.this_reconcile
-                self._get_or_pay(line, self.business_type, self.partner_id, self.to_partner_id, self.name)
-            for line in self.payable_source_ids:
+                self._get_or_pay(line, order.business_type, order.partner_id, order.to_partner_id, order.name)
+            for line in order.payable_source_ids:
                 order_reconcile += line.this_reconcile
-                self._get_or_pay(line, self.business_type, self.partner_id, self.to_partner_id, self.name)
+                self._get_or_pay(line, order.business_type, order.partner_id, order.to_partner_id, order.name)
 
             # 核销金额必须相同
             if self.business_type in ['adv_pay_to_get', 'adv_get_to_pay', 'get_to_pay']:
                 if order_reconcile != invoice_reconcile:
                     raise except_orm(u'错误', u'核销金额必须相同')
 
-            self.state = 'done'
+            order.state = 'done'
         return True
 
 class advance_payment(models.Model):
