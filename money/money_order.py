@@ -115,63 +115,65 @@ class money_order(models.Model):
     @api.multi
     def money_order_done(self):
         '''对收支单的审核按钮'''
-        if self.advance_payment < 0:
-            raise except_orm(u'错误', u'核销金额不能大于付款金额')
+        for order in self:
+            if order.advance_payment < 0:
+                raise except_orm(u'错误', u'核销金额不能大于付款金额')
 
-        self.to_reconcile = self.advance_payment
-        self.reconciled = self.amount - self.advance_payment
+            order.to_reconcile = order.advance_payment
+            order.reconciled = order.amount - order.advance_payment
 
-        total = 0
-        for line in self.line_ids:
-            if self.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
-                if line.bank_id.balance < line.amount:
-                    raise except_orm(u'错误', u'账户余额不足')
-                line.bank_id.balance -= line.amount
-            else:  # 收款账号余额增加, 退款账号余额减少
-                line.bank_id.balance += line.amount
-            total += line.amount
+            total = 0
+            for line in order.line_ids:
+                if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
+                    if line.bank_id.balance < line.amount:
+                        raise except_orm(u'错误', u'账户余额不足')
+                    line.bank_id.balance -= line.amount
+                else:  # 收款账号余额增加, 退款账号余额减少
+                    line.bank_id.balance += line.amount
+                total += line.amount
 
-        if self.type == 'pay':
-            self.partner_id.payable -= total
-        else:
-            self.partner_id.receivable -= total
+            if order.type == 'pay':
+                order.partner_id.payable -= total
+            else:
+                order.partner_id.receivable -= total
 
-        # 更新源单的未核销金额、已核销金额
-        for source in self.source_ids:
-            if abs(source.to_reconcile) < source.this_reconcile:
-                raise except_orm(u'错误', u'本次核销金额不能大于未核销金额')
+            # 更新源单的未核销金额、已核销金额
+            for source in order.source_ids:
+                if abs(source.to_reconcile) < source.this_reconcile:
+                    raise except_orm(u'错误', u'本次核销金额不能大于未核销金额')
 
-            source.name.to_reconcile = source.to_reconcile - source.this_reconcile
-            source.name.reconciled = source.reconciled + source.this_reconcile
+                source.name.to_reconcile = source.to_reconcile - source.this_reconcile
+                source.name.reconciled = source.reconciled + source.this_reconcile
 
-        self.state = 'done'
+            order.state = 'done'
         return True
 
     @api.multi
     def money_order_draft(self):
-        self.to_reconcile = 0
-        self.reconciled = 0
+        for order in self:
+            order.to_reconcile = 0
+            order.reconciled = 0
 
-        total = 0
-        for line in self.line_ids:
-            if self.type == 'pay':  # 付款账号余额减少
-                line.bank_id.balance += line.amount
-            else:  # 收款账号余额增加
-                if line.bank_id.balance < line.amount:
-                    raise except_orm(u'错误', u'账户余额不足')
-                line.bank_id.balance -= line.amount
-            total += line.amount
+            total = 0
+            for line in order.line_ids:
+                if order.type == 'pay':  # 付款账号余额减少
+                    line.bank_id.balance += line.amount
+                else:  # 收款账号余额增加
+                    if line.bank_id.balance < line.amount:
+                        raise except_orm(u'错误', u'账户余额不足')
+                    line.bank_id.balance -= line.amount
+                total += line.amount
 
-        if self.type == 'pay':
-            self.partner_id.payable += total
-        else:
-            self.partner_id.receivable += total
+            if order.type == 'pay':
+                order.partner_id.payable += total
+            else:
+                order.partner_id.receivable += total
 
-        for source in self.source_ids:
-            source.name.to_reconcile = source.to_reconcile + source.this_reconcile
-            source.name.reconciled = source.reconciled - source.this_reconcile
+            for source in order.source_ids:
+                source.name.to_reconcile = source.to_reconcile + source.this_reconcile
+                source.name.reconciled = source.reconciled - source.this_reconcile
 
-        self.state = 'draft'
+            order.state = 'draft'
         return True
 
     @api.multi
