@@ -12,7 +12,7 @@ class report_lot_status(models.Model):
     goods = fields.Char(u'产品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
-    lot = fields.Char(u'序列号')
+    lot = fields.Char(u'批号')
     status = fields.Char(u'状态')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')

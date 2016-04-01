@@ -102,17 +102,17 @@
             <field name='view_id' ref='report_stock_transceive_wizard_form' />
         </record>
 
-        <!-- 序列号状态表 -->
+        <!-- 批号状态表 -->
         <record id='report_lot_status_action' model='ir.actions.act_window' >
-            <field name='name'>序列号状态表</field>
+            <field name='name'>批号状态表</field>
             <field name='res_model'>report.lot.status</field>
             <field name='view_mode'>graph,tree</field>
             <field name='view_id' ref='report_lot_status_graph' />
         </record>
 
-        <!-- 序列号跟踪表 -->
+        <!-- 批号跟踪表 -->
         <record id='report_lot_track_wizard_action' model='ir.actions.act_window' >
-            <field name='name'>序列号跟踪表</field>
+            <field name='name'>批号跟踪表</field>
             <field name='res_model'>report.lot.track.wizard</field>
             <field name='target'>new</field>
             <field name='view_id' ref='report_lot_track_wizard_form' />

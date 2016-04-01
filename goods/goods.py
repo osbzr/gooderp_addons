@@ -6,8 +6,8 @@ from openerp import models, fields, api
 class goods(models.Model):
     _inherit = 'goods'
 
-    using_batch = fields.Boolean(u'批次管理')
-    force_batch_one = fields.Boolean(u'每批次数量为1')
+    using_batch = fields.Boolean(u'批号管理')
+    force_batch_one = fields.Boolean(u'每批号数量为1')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
 
     def conversion_unit(self, qty):

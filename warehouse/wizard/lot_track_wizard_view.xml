@@ -5,12 +5,12 @@
             <field name='name'>report.lot.track.wizard.form</field>
             <field name='model'>report.lot.track.wizard</field>
             <field name='arch' type='xml'>
-                <form string='序列号跟踪表'>
+                <form string='批号跟踪表'>
                     <group>
                         <group>
                             <label for="date_start" string="单据期间" class='oe_inline' />
                             <div>
-                                <field name="date_start" class="oe_inline" nolabel='1' required='1' /> - 
+                                <field name="date_start" class="oe_inline" nolabel='1' required='1' /> -
                                 <field name="date_end" class="oe_inline" nolabel='1' required='1' />
                             </div>
                             <field name='goods' />
