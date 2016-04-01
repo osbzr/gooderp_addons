@@ -12,8 +12,10 @@
         'buy_view.xml',
         'buy_data.xml',
         'wizard/buy_order_track_wizard_view.xml',
+        'wizard/buy_order_detail_wizard_view.xml',
         'wizard/supplier_statements_wizard_view.xml',
         'report/buy_order_track_view.xml',
+        'report/buy_order_detail_view.xml',
         'report/supplier_statements_view.xml',
         'security/ir.model.access.csv',
         ]
