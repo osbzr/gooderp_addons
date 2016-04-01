@@ -24,6 +24,18 @@
 				</field>
             </field>
         </record>
+
+        <!--继承账户 tree，添加"查看对账单"按钮-->
+		<record id="bank_account_tree_inherit" model="ir.ui.view">
+            <field name="name">bank.account.tree.inherit</field>
+            <field name="model">bank.account</field>
+            <field name='inherit_id' ref='core.bank_account_tree' />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <button name="bank_statements" type="object" string="查看对账单" class="oe_highlight"/>
+				</field>
+            </field>
+        </record>
 	</data>
 </openerp>
 	
