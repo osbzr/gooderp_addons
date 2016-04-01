@@ -30,9 +30,7 @@ class report_stock_balance(models.Model):
                        uos.name as uos,
                        wh.name as warehouse,
                        sum(line.qty_remaining) as goods_qty,
-                       sum(CASE WHEN goods.conversion != 0 THEN
-                       line.qty_remaining / goods.conversion ELSE
-                       line.qty_remaining END) as goods_uos_qty,
+                       sum(line.uos_qty_remaining) as goods_uos_qty,
                        sum(line.subtotal) as cost
 
                 FROM wh_move_line line

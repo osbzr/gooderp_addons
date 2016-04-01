@@ -27,7 +27,7 @@ class attribute(models.Model):
     @api.one
     @api.depends('value_ids')
     def _compute_name(self):
-        self.name = ' '.join([value.value_id.name for value in self.value_ids])
+        self.name = ' '.join([value.category_id.name + ':' + value.value_id.name for value in self.value_ids])
 
     name = fields.Char(u'名称', compute='_compute_name', store=True, readonly=True)
     goods_id = fields.Many2one('goods', u'商品')
@@ -36,7 +36,6 @@ class attribute(models.Model):
 
 class attribute_value(models.Model):
     _name = 'attribute.value'
-    _rec_name = 'value_id'
 
     attribute_id = fields.Many2one('attribute',u'属性')
     category_id = fields.Many2one('core.category',u'属性',
@@ -47,7 +46,7 @@ class attribute_value(models.Model):
                                required='1')
 
 
-class attribute_value(models.Model):
+class attribute_value_value(models.Model):
     _name = 'attribute.value.value'
     category_id = fields.Many2one('core.category',u'属性',
                                        domain=[('type','=','attribute')],context={'type':'attribute'}

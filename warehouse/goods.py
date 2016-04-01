@@ -57,7 +57,7 @@ class goods(models.Model):
 
         return False
 
-    def get_matching_records(self, warehouse, qty, ignore_stock=False):
+    def get_matching_records(self, warehouse, qty, uos_qty=0, ignore_stock=False):
         matching_records = []
         for goods in self:
             domain = [
@@ -70,16 +70,21 @@ class goods(models.Model):
             # TODO @zzx需要在大量数据的情况下评估一下速度
             lines = self.env['wh.move.line'].search(domain, order='date, id')
 
-            qty_to_go, subtotal = qty, 0
+            qty_to_go, uos_qty_to_go, subtotal = qty, uos_qty, 0
             for line in lines:
-                if qty_to_go <= 0:
+                if qty_to_go <= 0 and uos_qty_to_go <= 0:
                     break
 
                 matching_qty = min(line.qty_remaining, qty_to_go)
-                matching_records.append({'line_in_id': line.id, 'qty': matching_qty})
+                matching_uos_qty = line.qty_remaining == qty_to_go and \
+                    uos_qty_to_go or line.uos_qty_remaining
+
+                matching_records.append({'line_in_id': line.id,
+                                         'qty': matching_qty, 'uos_qty': matching_uos_qty})
                 subtotal += matching_qty * line.get_real_price()
 
                 qty_to_go -= matching_qty
+                uos_qty_to_go -= matching_uos_qty
             else:
                 if not ignore_stock and qty_to_go > 0:
                     raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (goods.name, ))
