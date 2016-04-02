@@ -23,5 +23,8 @@
         'security/ir.model.access.csv',
         'view/go_live_order_view.xml',
         'view/partner_view.xml',
-        ]
+        ],
+    'demo':[
+        'money_demo.xml',
+            ],
 }

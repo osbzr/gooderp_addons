@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="sell_order_1" model="sell.order">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="type">sell</field>
+            <field eval="32.0" name="discount_amount"/>
+            <field name="delivery_date">2016-11-02</field>
+        </record>
+        <record id="sell_order_line_1" model="sell.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.mouse"/>
+            <field name="warehouse_dest_id" ref="warehouse.warehouse_customer"/>
+            <field name="order_id" ref="sell_order_1"/>
+            <field eval="2400.0" name="price"/>
+            <field name="warehouse_id" ref="warehouse.bj_stock"/>
+            <field eval="17.0" name="tax_rate"/>
+            <field eval="14400.0" name="discount_amount"/>
+            <field eval="60.0" name="quantity"/>
+        </record>
+    </data>
+</openerp>

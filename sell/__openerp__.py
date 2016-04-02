@@ -32,6 +32,9 @@
             'wizard/customer_statements_wizard_view.xml',
             'security/ir.model.access.csv',
             ],
+    'demo': [
+             'sell_demo.xml',
+             ],
     'installable': True,
     'auto_install': False,
     'application': True,

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>   
+        <record id="get_40000" model="money.order">
+            <field name="type">get</field>
+            <field name="partner_id" ref="core.jd"/>
+        </record>
+        <record id="get_line_1" model="money.order.line">
+            <field name="money_id" ref="get_40000"/>
+            <field name="bank_id" ref="core.comm"/>
+            <field eval="40000.0" name="amount"/>
+        </record>
+        
+        <record id="pay_2000" model="money.order">
+            <field name="type">pay</field>
+            <field name="partner_id" ref="core.lenovo"/>
+        </record>
+        <record id="pay_line_1" model="money.order.line">
+            <field name="money_id" ref="pay_2000"/>
+            <field name="bank_id" ref="core.comm"/>
+            <field eval="2000.0" name="amount"/>
+        </record>
+        
+        <record id="other_get_60" model="other.money.order">
+            <field name="type">other_get</field>
+            <field name="partner_id" ref="core.lenovo"/>
+            <field name="bank_id" ref="core.comm"/>
+        </record>
+        <record id="other_get_line_1" model="other.money.order.line">
+            <field name="other_money_id" ref="other_get_60"/>
+            <field name="category_id" ref="core.cat_freight"/>
+            <field eval="60.0" name="amount"/>
+        </record>
+        
+        <record id="other_pay_9000" model="other.money.order">
+            <field name="type">other_pay</field>
+            <field name="bank_id" ref="core.alipay"/>
+        </record>
+        
+        <record id="other_pay_line_1" model="other.money.order.line">
+            <field name="other_money_id" ref="other_pay_9000"/>
+            <field name="category_id" ref="core.cat_consult"/>
+            <field eval="9000.0" name="amount"/>
+        </record>
+        
+        <record id="transfer_300" model="money.transfer.order">
+            <field name="note"></field>
+        </record>
+        
+        <record id="transfer_line_1" model="money.transfer.order.line">
+            <field name="transfer_id" ref="transfer_300"/>
+            <field name="out_bank_id" ref="core.comm"/>
+            <field name="in_bank_id" ref="core.alipay"/>
+            <field eval="300.0" name="amount"/>
+        </record>
+        
+    </data>
+</openerp>

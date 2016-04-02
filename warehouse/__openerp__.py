@@ -49,6 +49,9 @@
         'data/sequence.xml',
         'security/ir.model.access.csv',
     ],
+    'demo': [
+        'warehouse_demo.xml',
+             ],
     'installable': True,
     "active": False,
 }
