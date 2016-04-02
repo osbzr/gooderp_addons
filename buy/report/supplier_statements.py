@@ -95,7 +95,7 @@ class supplier_statements_report(models.Model):
                         m.note,
                         NULL AS move_id
                 FROM money_order AS m
-                WHERE m.type = 'pay'
+                WHERE m.type = 'pay' AND m.state = 'done'
                 UNION ALL
                 SELECT  mi.partner_id,
                         mi.name,
@@ -110,7 +110,7 @@ class supplier_statements_report(models.Model):
                 FROM money_invoice AS mi
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
                 JOIN buy_receipt AS br ON br.buy_move_id = mi.move_id
-                WHERE c.type = 'expense'
+                WHERE c.type = 'expense' AND mi.state = 'done'
                 ) AS ps)
         """)
 

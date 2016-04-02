@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        
+
         <!--根菜单-->
-        
+
         <menuitem id='setting_menu' name='配置'/>
-        
+
         <menuitem id='master_data_menu' name='基础资料' parent='setting_menu' sequence='10'/>
         <menuitem id='config_data_menu' name='辅助资料' parent='setting_menu' sequence='20'/>
         <menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
-        
+
         <!--类别-->
-        
+
         <record id="core_category_tree" model="ir.ui.view">
             <field name="name">core.category.tree</field>
             <field name="model">core.category</field>
@@ -22,7 +22,7 @@
                 </tree>
             </field>
         </record>
-        
+
         <record id="core_category_action" model="ir.actions.act_window">
             <field name="name">类别</field>
             <field name="res_model">core.category</field>
@@ -30,7 +30,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>
-        
+
         <menuitem id='core_category_menu' action='core_category_action' parent='config_data_menu' sequence='10'/>
 
         <!--可选值-->
@@ -52,16 +52,16 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>
-        
+
         <menuitem id='core_value_menu' action='core_value_action' parent='config_data_menu' sequence='900'/>
-        
+
         <!--系统参数-->
         <record id="company_form" model="ir.ui.view">
             <field name="name">company.form</field>
             <field name="model">res.company</field>
             <field name="arch" type="xml">
                 <form string="系统参数" create='0'>
-                   <group string="基础参数">                  
+                   <group string="基础参数">
                     <field name="name"/>
                     <field name="street"/>
                     <field name="phone"/>
@@ -72,7 +72,6 @@
                     <field name="quantity_digits"/>
                     <field name="amount_digits"/>
                     <field name="cost_method"/>
-                    <field name="negtive_quantity"/>
                     <field name="draft_invoice"/>
                    </group>
                 </form>

@@ -35,8 +35,10 @@ class wh_move_line(models.Model):
         'wh.out.others': u'其他出库',
         'wh.in.overage': u'盘盈',
         'wh.in.others': u'其他入库',
-        'buy.receipt': u'采购入库',
-        'sell.delivery': u'销售出库',
+        'buy.receipt.sell': u'采购入库',
+        'buy.receipt.return': u'采购退货',
+        'sell.delivery.sell': u'销售出库',
+        'sell.delivery.return': u'销售退货',
     }
 
     @api.model
@@ -69,14 +71,15 @@ class wh_move_line(models.Model):
     type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),)
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft')
     goods_id = fields.Many2one('goods', string=u'产品', required=True, index=True)
+    using_attribute = fields.Boolean(u'使用属性')
     attribute_id = fields.Many2one('attribute', u'属性')
-    using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批次管理')
-    force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批次数量为1')
-    lot = fields.Char(u'序列号')
-    lot_id = fields.Many2one('wh.move.line', u'序列号')
-    lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'序列号数量',
+    using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理')
+    force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
+    lot = fields.Char(u'批号')
+    lot_id = fields.Many2one('wh.move.line', u'批号')
+    lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'批号数量',
                            digits_compute=dp.get_precision('Goods Quantity'))
-    lot_uos_qty = fields.Float(u'序列号辅助数量', digits_compute=dp.get_precision('Goods Quantity'))
+    lot_uos_qty = fields.Float(u'批号辅助数量', digits_compute=dp.get_precision('Goods Quantity'))
     production_date = fields.Date(u'生产日期', default=fields.Date.context_today)
     shelf_life = fields.Integer(u'保质期(天)')
     valid_date = fields.Date(u'有效期至')
@@ -101,10 +104,11 @@ class wh_move_line(models.Model):
         self.ensure_one()
         if self.move_id.origin in ('wh.assembly', 'wh.disassembly'):
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.type))
-        elif self.move_id.origin in ('wh.out.losses', 'wh.out.others', 'wh.in.overage', 'wh.in.others'):
-            return self.ORIGIN_EXPLAIN.get(self.move_id.origin)
         elif self.move_id.origin == 'wh.internal':
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.env.context.get('internal_out', False)))
+        # elif self.move_id.origin in ('wh.out.losses', 'wh.out.others', 'wh.in.overage', 'wh.in.others'):
+        else:
+            return self.ORIGIN_EXPLAIN.get(self.move_id.origin)
 
         return ''
 
@@ -194,7 +198,7 @@ class wh_move_line(models.Model):
             subtotal, price = self.goods_id.get_suggested_cost_by_warehouse(self.warehouse_id, self.goods_qty)
 
             self.price = price
-            self.subtotal = subtotal
+            # self.subtotal = subtotal
 
     @api.multi
     @api.onchange('goods_id')
@@ -202,6 +206,8 @@ class wh_move_line(models.Model):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.uos_id = self.goods_id.uos_id
+            self.using_attribute = self.goods_id.attribute_ids
+            self.attribute_id = False
             if self.goods_id.using_batch and self.goods_id.force_batch_one:
                 self.goods_qty = 1
                 self.goods_uos_qty = self.goods_id.anti_conversion_unit(
@@ -247,11 +253,11 @@ class wh_move_line(models.Model):
             if self.env.context.get('type') == 'internal':
                 self.lot = self.lot_id.lot
 
-    @api.one
-    @api.onchange('price')
-    def onchange_price(self):
-        self.subtotal = self.price and self.price \
-            and self._get_subtotal_util(self.goods_qty, self.price) or 0
+    # @api.one
+    # @api.onchange('price')
+    # def onchange_price(self):
+    #     self.subtotal = self.price and self.price \
+    #         and self._get_subtotal_util(self.goods_qty, self.price) or 0
 
     @api.one
     @api.onchange('discount_rate')

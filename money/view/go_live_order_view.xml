@@ -6,7 +6,7 @@
             <field name="name">go.live.order.tree</field>
             <field name="model">go.live.order</field>
             <field name="arch" type="xml">
-                <tree string="Go Live Order" editable="bottom">
+                <tree string="Go Live Order" edit="false" delete="false" editable="bottom">
                     <field name="partner_id" attrs="{'required':[('bank_id','=',False)],'readonly':[('bank_id','!=',False)]}"/>
                     <field name="bank_id" attrs="{'required':[('partner_id','=',False)],'readonly':[('partner_id','!=',False)]}"/>
                     <field name="date"/>

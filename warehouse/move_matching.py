@@ -27,7 +27,7 @@ class wh_move_line(models.Model):
     _inherit = 'wh.move.line'
 
     qty_remaining = fields.Float(compute='_get_qty_remaining', string=u'剩余数量',
-        digits_compute=dp.get_precision('Goods Quantity'), index=True, store=True,readonly=True)
+        digits_compute=dp.get_precision('Goods Quantity'), index=True, store=True, readonly=True)
 
     matching_in_ids = fields.One2many('wh.move.matching', 'line_in_id', string=u'关联的入库')
     matching_out_ids = fields.One2many('wh.move.matching', 'line_out_id', string=u'关联的出库')
@@ -57,7 +57,7 @@ class wh_move_line(models.Model):
     def get_matching_records_by_lot(self):
         for line in self:
             if line.goods_qty > line.lot_id.qty_remaining:
-                raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name, ))
+                raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name,))
 
             return [{'line_in_id': line.lot_id.id, 'qty': line.goods_qty}], \
                 line.lot_id.price * line.goods_qty

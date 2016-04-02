@@ -35,7 +35,6 @@ class res_company(models.Model):
     quantity_digits = fields.Integer(u'数量小数位')
     amount_digits = fields.Integer(u'单价小数位')
     cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法')
-    negtive_quantity = fields.Boolean(u'是否检查负库存')
     draft_invoice = fields.Boolean(u'根据发票确认应收应付')
 
 

@@ -12,7 +12,7 @@ class report_stock_balance(models.Model):
     goods = fields.Char(u'产品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
-    lot = fields.Char(u'批次')
+    lot = fields.Char(u'批号')
     warehouse = fields.Char(u'仓库')
     goods_qty = fields.Float('数量', digits_compute=dp.get_precision('Goods Quantity'))
     goods_uos_qty = fields.Float('辅助单位数量', digits_compute=dp.get_precision('Goods Quantity'))
@@ -30,9 +30,7 @@ class report_stock_balance(models.Model):
                        uos.name as uos,
                        wh.name as warehouse,
                        sum(line.qty_remaining) as goods_qty,
-                       sum(CASE WHEN goods.conversion != 0 THEN
-                       line.qty_remaining / goods.conversion ELSE
-                       line.qty_remaining END) as goods_uos_qty,
+                       sum(line.uos_qty_remaining) as goods_uos_qty,
                        sum(line.subtotal) as cost
 
                 FROM wh_move_line line

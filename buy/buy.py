@@ -171,6 +171,7 @@ class buy_order(models.Model):
                             'origin': 'buy.receipt',
                             'note': self.note,
                             'discount_rate': self.discount_rate,
+                            'discount_amount': self.discount_amount,
                         })
         view_id = self.env['ir.model.data'].xmlid_to_res_id('buy.buy_receipt_form')
         return {
@@ -319,11 +320,19 @@ class buy_receipt(models.Model):
         if self.discount_rate:
             self.discount_amount = total * self.discount_rate * 0.01
 
+    def get_move_origin(self, vals):
+        return self._name + (self.env.context.get('is_return') and '.return' or '.buy')
+
     @api.model
     def create(self, vals):
         '''创建采购入库单时生成有序编号'''
         if vals.get('name', '/') == '/':
             vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+
+        vals.update({
+            'origin': self.get_move_origin(vals)
+        })
+
         return super(buy_receipt, self).create(vals)
 
     @api.one
@@ -347,10 +356,10 @@ class buy_receipt(models.Model):
         # 入库单/退货单 生成源单
         if not self.is_return:
             amount = self.amount
-            to_reconcile = self.debt
+            this_reconcile = self.payment
         else:
             amount = -self.amount
-            to_reconcile = -self.debt
+            this_reconcile = -self.payment
         categ = self.env.ref('money.core_category_purchase')
         source_id = self.env['money.invoice'].create({
                             'move_id': self.buy_move_id.id,
@@ -359,8 +368,8 @@ class buy_receipt(models.Model):
                             'category_id': categ.id,
                             'date': fields.Date.context_today(self),
                             'amount': amount,
-                            'reconciled': self.payment,
-                            'to_reconcile': to_reconcile,
+                            'reconciled': 0,
+                            'to_reconcile': amount,
                             'date_due': self.date_due,
                             'state': 'draft',
                         })
@@ -386,7 +395,7 @@ class buy_receipt(models.Model):
             source_lines = []
             money_lines.append({
                 'bank_id': self.bank_account_id.id,
-                'amount': self.payment,
+                'amount': this_reconcile,
             })
             source_lines.append({
                 'name': source_id.id,
@@ -394,8 +403,8 @@ class buy_receipt(models.Model):
                 'date': source_id.date,
                 'amount': amount,
                 'reconciled': 0.0,
-                'to_reconcile': to_reconcile,
-                'this_reconcile': self.payment,
+                'to_reconcile': amount,
+                'this_reconcile': this_reconcile,
             })
 
             rec = self.with_context(type='pay')
@@ -406,8 +415,8 @@ class buy_receipt(models.Model):
                                 'source_ids': [(0, 0, line) for line in source_lines],
                                 'type': 'pay',
                                 'amount': amount,
-                                'reconciled': self.payment,
-                                'to_reconcile': to_reconcile,
+                                'reconciled': this_reconcile,
+                                'to_reconcile': amount,
                                 'state': 'draft',
                             })
             money_order.money_order_done()

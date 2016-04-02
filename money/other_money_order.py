@@ -40,6 +40,14 @@ class other_money_order(models.Model):
 
         return super(other_money_order, self).create(values)
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+
+        return super(other_money_order, self).unlink()
+
     @api.one
     @api.depends('line_ids.amount')
     def _compute_total_amount(self):
@@ -57,6 +65,13 @@ class other_money_order(models.Model):
     bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True, readonly=True, states={'draft': [('readonly', False)]})
     line_ids = fields.One2many('other.money.order.line', 'other_money_id', string=u'收支单行', readonly=True, states={'draft': [('readonly', False)]})
     type = fields.Selection(TYPE_SELECTION, string=u'类型', default=lambda self: self._context.get('type'), readonly=True, states={'draft': [('readonly', False)]})
+
+    @api.onchange('date')
+    def onchange_date(self):
+        if self._context.get('type') == 'other_get':
+            return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
+        else:
+            return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
     @api.onchange('partner_id')
     def _onchange_partner(self):

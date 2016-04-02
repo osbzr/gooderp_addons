@@ -12,7 +12,7 @@ class report_lot_status(models.Model):
     goods = fields.Char(u'产品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
-    lot = fields.Char(u'序列号')
+    lot = fields.Char(u'批号')
     status = fields.Char(u'状态')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')
@@ -33,9 +33,7 @@ class report_lot_status(models.Model):
                         wh.name as warehouse,
                         max(line.date) as date,
                         sum(line.qty_remaining) as qty,
-                        sum(CASE WHEN goods.conversion != 0 THEN
-                        line.qty_remaining / goods.conversion ELSE
-                        line.qty_remaining END) as uos_qty
+                        sum(line.uos_qty_remaining) as uos_qty
 
                 FROM wh_move_line line
                     LEFT JOIN goods goods ON line.goods_id = goods.id

@@ -22,3 +22,24 @@ class partner(models.Model):
             'context': {'default_partner_id': self.id},
             'target': 'new',
         }
+
+class bank_account(models.Model):
+    _inherit = 'bank.account'
+    _description = u'查看账户对账单'
+
+    @api.multi
+    def bank_statements(self):
+        self.ensure_one()
+        view = self.env.ref('money.bank_statements_report_wizard_form')
+
+        return {
+            'name': u'账户对账单向导',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': False,
+            'views': [(view.id, 'form')],
+            'res_model': 'bank.statements.report.wizard',
+            'type': 'ir.actions.act_window',
+            'context': {'default_bank_id': self.id},
+            'target': 'new',
+        }

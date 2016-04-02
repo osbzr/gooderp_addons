@@ -32,6 +32,14 @@ class money_transfer_order(models.Model):
 
         return super(money_transfer_order, self).create(values)
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+
+        return super(money_transfer_order, self).unlink()
+
     state = fields.Selection([
                           ('draft', u'未审核'),
                           ('done', u'已审核'),

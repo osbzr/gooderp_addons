@@ -12,7 +12,7 @@ class report_lot_track(models.Model):
     goods = fields.Char(u'产品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
-    lot = fields.Char(u'序列号')
+    lot = fields.Char(u'批号')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')
     uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Goods Quantity'))

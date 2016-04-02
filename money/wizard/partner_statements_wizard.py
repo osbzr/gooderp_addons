@@ -144,3 +144,10 @@ class partner_statements_report_wizard(models.TransientModel):
                     'domain':[('id', 'in', res_ids)],
                     'context': {'is_customer': False, 'is_supplier': True},
                     }
+
+    @api.onchange('from_date')
+    def onchange_from_date(self):
+        if self._context.get('default_customer'):
+            return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
+        else:
+            return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
