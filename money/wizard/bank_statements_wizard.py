@@ -11,8 +11,8 @@ class partner_statements_report_wizard(models.Model):
         return self.env.user.company_id.start_date
 
     bank_id = fields.Many2one('bank.account', string=u'账户名称', required=True)
-    from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date) # 默认公司启用日期
-    to_date = fields.Date(string=u'结束日期', required=True, default=lambda self: fields.Date.context_today(self)) # 默认当前日期
+    from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date)  # 默认公司启用日期
+    to_date = fields.Date(string=u'结束日期', required=True, default=lambda self: fields.Date.context_today(self))  # 默认当前日期
 
     @api.multi
     def confirm_bank_statements(self):
@@ -30,5 +30,5 @@ class partner_statements_report_wizard(models.Model):
                 'view_id': False,
                 'views': [(view.id, 'tree')],
                 'type': 'ir.actions.act_window',
-                'domain':[('bank_id','=', self.bank_id.id), ('date','>=', self.from_date), ('date','<=', self.to_date)]
+                'domain':[('bank_id', '=', self.bank_id.id), ('date', '>=', self.from_date), ('date', '<=', self.to_date)]
                 }

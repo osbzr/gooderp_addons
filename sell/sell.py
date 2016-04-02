@@ -41,14 +41,14 @@ class sell_order(models.Model):
                 self.goods_state = u'全部出库'
 
     partner_id = fields.Many2one('partner', u'客户', states=READONLY_STATES)
-    staff_id = fields.Many2one('staff', u'销售员',states=READONLY_STATES)
+    staff_id = fields.Many2one('staff', u'销售员', states=READONLY_STATES)
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        select=True, copy=False, help=u"默认是订单创建日期")
-    delivery_date = fields.Date(u'要求交货日期', states=READONLY_STATES, 
+    delivery_date = fields.Date(u'要求交货日期', states=READONLY_STATES,
                                 default=lambda self: fields.Date.context_today(self),
                                 select=True, copy=False, help=u"订单的要求交货日期")
-    type = fields.Selection([('sell',u'销货'), ('return', u'退货')], u'类型', default='sell', states=READONLY_STATES)
+    type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', default='sell', states=READONLY_STATES)
     name = fields.Char(u'单据编号', select=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
     line_ids = fields.One2many('sell.order.line', 'order_id', u'销货订单行',
@@ -103,7 +103,7 @@ class sell_order(models.Model):
 
     @api.one
     def get_delivery_line(self, line, single=False):
-        #TODO：如果退货，warehouse_dest_id，warehouse_id要调换
+        # TODO：如果退货，warehouse_dest_id，warehouse_id要调换
         qty = 0
         discount_amount = 0
         if single:
@@ -186,8 +186,8 @@ class sell_order_line(models.Model):
     @api.depends('quantity', 'price', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
-        amount = self.quantity * self.price - self.discount_amount # 折扣后金额
-        tax_amt = amount * self.tax_rate * 0.01 # 税额
+        amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
+        tax_amt = amount * self.tax_rate * 0.01  # 税额
         self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
         self.amount = amount
         self.tax_amount = tax_amt
@@ -217,7 +217,7 @@ class sell_order_line(models.Model):
         '''当订单行的产品变化时，带出产品上的单位和默认仓库'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            self.warehouse_id = self.goods_id.default_wh # 取产品的默认仓库
+            self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
 
     @api.one
     @api.onchange('discount_rate')
@@ -238,9 +238,9 @@ class sell_delivery(models.Model):
         '''当优惠金额改变时，改变优惠后金额、本次欠款和总欠款'''
         total = 0
         if self.line_out_ids:
-            total = sum(line.subtotal for line in self.line_out_ids) # 发货时优惠前总金额
+            total = sum(line.subtotal for line in self.line_out_ids)  # 发货时优惠前总金额
         elif self.line_in_ids:
-            total = sum(line.subtotal for line in self.line_in_ids) # 退货时优惠前总金额
+            total = sum(line.subtotal for line in self.line_in_ids)  # 退货时优惠前总金额
         self.amount = total - self.discount_amount
         self.debt = self.amount - self.receipt + self.partner_cost
         self.total_debt = self.partner_id.receivable
@@ -299,9 +299,9 @@ class sell_delivery(models.Model):
     def onchange_discount_rate(self):
         total = 0
         if self.line_out_ids:
-            total = sum(line.subtotal for line in self.line_out_ids) # 发货时优惠前总金额
+            total = sum(line.subtotal for line in self.line_out_ids)  # 发货时优惠前总金额
         elif self.line_in_ids:
-            total = sum(line.subtotal for line in self.line_in_ids) # 退货时优惠前总金额
+            total = sum(line.subtotal for line in self.line_in_ids)  # 退货时优惠前总金额
         if self.discount_rate:
             self.discount_amount = total * self.discount_rate * 0.01
 
@@ -331,8 +331,8 @@ class sell_delivery(models.Model):
             amount = self.amount + self.partner_cost
             to_reconcile = self.debt
         else:
-            amount = - (self.amount + self.partner_cost)
-            to_reconcile = - self.debt
+            amount = -(self.amount + self.partner_cost)
+            to_reconcile = -self.debt
         categ = self.env.ref('money.core_category_sale')
         source_id = self.env['money.invoice'].create({
                             'move_id': self.sell_move_id.id,

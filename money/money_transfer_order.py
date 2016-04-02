@@ -27,7 +27,6 @@ class money_transfer_order(models.Model):
 
     @api.model
     def create(self, values):
-        print self._name
         if values.get('name', '/') == '/':
             values.update({'name': self.env['ir.sequence'].get(self._name) or '/'})
 
@@ -47,14 +46,14 @@ class money_transfer_order(models.Model):
         '''转账单的审核按钮'''
         for transfer in self:
             if not transfer.line_ids:
-                raise except_orm('错误','请先输入转账金额')
+                raise except_orm('错误', '请先输入转账金额')
             if transfer.line_ids.out_bank_id == transfer.line_ids.in_bank_id:
-                raise except_orm('错误','转出账户与转入账户不能相同')
+                raise except_orm('错误', '转出账户与转入账户不能相同')
             for line in transfer.line_ids:
                 if line.amount < 0:
-                    raise except_orm('错误','转账金额必须大于0')
+                    raise except_orm('错误', '转账金额必须大于0')
                 if line.out_bank_id.balance < line.amount:
-                    raise except_orm('错误','转出账户余额不足')
+                    raise except_orm('错误', '转出账户余额不足')
                 else:
                     line.out_bank_id.balance -= line.amount
                     line.in_bank_id.balance += line.amount
@@ -67,7 +66,7 @@ class money_transfer_order(models.Model):
         for transfer in self:
             for line in transfer.line_ids:
                 if line.in_bank_id.balance < line.amount:
-                    raise except_orm('错误','转入账户余额不足')
+                    raise except_orm('错误', '转入账户余额不足')
                 else:
                     line.in_bank_id.balance -= line.amount
                     line.out_bank_id.balance += line.amount

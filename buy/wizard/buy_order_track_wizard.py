@@ -60,19 +60,19 @@ class buy_order_track_wizard(models.TransientModel):
                     'amount': line.subtotal,
                     'qty_not_in': line.quantity - line.quantity_in,
                     'planned_date': line.order_id.planned_date,
-                    'wh_in_date': line.order_id.date,   # FIXME: 找出入库日期
+                    'wh_in_date': line.order_id.date,  # FIXME: 找出入库日期
                     'note': line.note,
                 })
             res.append(track.id)
 
         index = 0
-        total_qty = total_amount = total_not_in =0
+        total_qty = total_amount = total_not_in = 0
         track_ids = []
         for track in self.env['buy.order.track'].search([('id', 'in', res)], order='goods_code,date'):
             track_ids.append(track)
         for track in self.env['buy.order.track'].search([('id', 'in', res)], order='goods_code,date'):
             index += 1
-            after_id = track_ids[index:] and track_ids[index:][0] # 下一个明细行
+            after_id = track_ids[index:] and track_ids[index:][0]  # 下一个明细行
             if after_id:
                 after = self.env['buy.order.track'].search([('id', '=', after_id.id)])
             else:
@@ -83,7 +83,7 @@ class buy_order_track_wizard(models.TransientModel):
                 total_qty += track.qty
                 total_not_in += track.qty_not_in
                 total_amount += track.amount
-                print index,track.order_name
+                print index, track.order_name
             elif track.goods_id != after.goods_id:
                 total_qty += track.qty
                 total_not_in += track.qty_not_in
@@ -112,6 +112,6 @@ class buy_order_track_wizard(models.TransientModel):
             'views': [(view.id, 'tree')],
             'res_model': 'buy.order.track',
             'type': 'ir.actions.act_window',
-            'domain':[('id','in',res)],
+            'domain':[('id', 'in', res)],
             'limit': 300,
         }

@@ -15,7 +15,7 @@ class buy_order_track(models.TransientModel):
     partner_id = fields.Many2one('partner', u'供应商')
     goods_state = fields.Char(u'状态')
     qty = fields.Float(u'数量')
-    amount = fields.Float(u'采购额') # 商品的价税合计
+    amount = fields.Float(u'采购额')  # 商品的价税合计
     qty_not_in = fields.Float(u'未入库数量')
     planned_date = fields.Date(u'要求交货日期')
     wh_in_date = fields.Date(u'入库日期')

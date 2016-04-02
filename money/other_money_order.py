@@ -54,7 +54,7 @@ class other_money_order(models.Model):
     date = fields.Date(string=u'单据日期', default=lambda self: fields.Date.context_today(self), readonly=True, states={'draft': [('readonly', False)]})
     name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/')
     total_amount = fields.Float(string=u'金额', compute='_compute_total_amount', store=True, readonly=True)
-    bank_id = fields.Many2one('bank.account', string=u'结算账户',required=True, readonly=True, states={'draft': [('readonly', False)]})
+    bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True, readonly=True, states={'draft': [('readonly', False)]})
     line_ids = fields.One2many('other.money.order.line', 'other_money_id', string=u'收支单行', readonly=True, states={'draft': [('readonly', False)]})
     type = fields.Selection(TYPE_SELECTION, string=u'类型', default=lambda self: self._context.get('type'), readonly=True, states={'draft': [('readonly', False)]})
 
@@ -65,8 +65,8 @@ class other_money_order(models.Model):
         '''
         self.line_ids = []
         lines = []
-        for invoice in self.env['money.invoice'].search([('partner_id','=',self.partner_id.id),('to_reconcile','>',0)]):
-            lines.append((0,0,{
+        for invoice in self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id), ('to_reconcile', '>', 0)]):
+            lines.append((0, 0, {
                 'category_id':invoice.category_id.id,
                 'source_id':invoice.id,
                 'amount':invoice.to_reconcile,

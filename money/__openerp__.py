@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['core','base'],
+    'depends': ['core', 'base'],
     'data': [
         'view/money_order_view.xml',
         'view/other_money_order_view.xml',

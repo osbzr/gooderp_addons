@@ -11,8 +11,8 @@ class partner_statements_report_wizard(models.TransientModel):
         return self.env.user.company_id.start_date
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True)
-    from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date) # 默认公司启用日期
-    to_date = fields.Date(string=u'结束日期', required=True, default=lambda self: fields.Date.context_today(self)) # 默认当前日期
+    from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date)  # 默认公司启用日期
+    to_date = fields.Date(string=u'结束日期', required=True, default=lambda self: fields.Date.context_today(self))  # 默认当前日期
 
     @api.multi
     def partner_statements_without_goods(self):
@@ -20,11 +20,11 @@ class partner_statements_report_wizard(models.TransientModel):
         if self.from_date > self.to_date:
             raise except_orm(u'错误！', u'结束日期不能小于开始日期！')
 
-        if self._context.get('default_customer'): # 客户
+        if self._context.get('default_customer'):  # 客户
             view = self.env.ref('sell.customer_statements_report_tree')
             name = u'客户对账单:' + self.partner_id.name
             res_model = 'customer.statements.report'
-        else: # 供应商
+        else:  # 供应商
             view = self.env.ref('buy.supplier_statements_report_tree')
             name = u'供应商对账单:' + self.partner_id.name
             res_model = 'supplier.statements.report'
@@ -37,7 +37,7 @@ class partner_statements_report_wizard(models.TransientModel):
                 'view_id': False,
                 'views': [(view.id, 'tree')],
                 'type': 'ir.actions.act_window',
-                'domain':[('partner_id','=',self.partner_id.id), ('date','>=', self.from_date), ('date','<=', self.to_date)]
+                'domain':[('partner_id', '=', self.partner_id.id), ('date', '>=', self.from_date), ('date', '<=', self.to_date)]
                 }
 
     @api.multi
@@ -47,10 +47,10 @@ class partner_statements_report_wizard(models.TransientModel):
         if self.from_date > self.to_date:
             raise except_orm(u'错误！', u'结束日期不能小于开始日期！')
 
-        if self._context.get('default_customer'): # 客户
-            reports = self.env['customer.statements.report'].search([('partner_id','=',self.partner_id.id),
-                                                                    ('date','>=', self.from_date),
-                                                                    ('date','<=', self.to_date)])
+        if self._context.get('default_customer'):  # 客户
+            reports = self.env['customer.statements.report'].search([('partner_id', '=', self.partner_id.id),
+                                                                    ('date', '>=', self.from_date),
+                                                                    ('date', '<=', self.to_date)])
             for report in reports:
                 # 生成不带商品明细的对账单记录
                 res_ids.append(self.env['customer.statements.report.with.goods'].create({
@@ -93,13 +93,13 @@ class partner_statements_report_wizard(models.TransientModel):
                     'view_id': False,
                     'views': [(view.id, 'tree')],
                     'type': 'ir.actions.act_window',
-                    'domain':[('id','in', res_ids)],
+                    'domain':[('id', 'in', res_ids)],
                     'context': {'is_customer': True, 'is_supplier': False},
                     }
-        else: # 供应商
-            reports = self.env['supplier.statements.report'].search([('partner_id','=',self.partner_id.id),
-                                                                    ('date','>=', self.from_date),
-                                                                    ('date','<=', self.to_date)])
+        else:  # 供应商
+            reports = self.env['supplier.statements.report'].search([('partner_id', '=', self.partner_id.id),
+                                                                    ('date', '>=', self.from_date),
+                                                                    ('date', '<=', self.to_date)])
             for report in reports:
                 # 生成不带商品明细的对账单记录
                 res_ids.append(self.env['supplier.statements.report.with.goods'].create({
@@ -141,6 +141,6 @@ class partner_statements_report_wizard(models.TransientModel):
                     'view_id': False,
                     'views': [(view.id, 'tree')],
                     'type': 'ir.actions.act_window',
-                    'domain':[('id','in', res_ids)],
+                    'domain':[('id', 'in', res_ids)],
                     'context': {'is_customer': False, 'is_supplier': True},
                     }

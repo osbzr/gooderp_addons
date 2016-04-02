@@ -25,7 +25,7 @@ class core_value(models.Model):
 class core_category(models.Model):
     _name = 'core.category'
     name = fields.Char(u'名称')
-    type = fields.Selection(CORE_CATEGORY_TYPE,u'类型',
+    type = fields.Selection(CORE_CATEGORY_TYPE, u'类型',
                             default=lambda self: self._context.get('type'))
 
 
@@ -79,9 +79,9 @@ class goods(models.Model):
 
 class goods_price(models.Model):
     _name = 'goods.price'
-    goods_id = fields.Many2one('goods','商品')
+    goods_id = fields.Many2one('goods', '商品')
     category_id = fields.Many2one('core.category', u'客户类别',
-                                       domain=[('type','=','customer')],
+                                       domain=[('type', '=', 'customer')],
                                        context={'type':'customer'})
     price = fields.Float(u'价格')
 

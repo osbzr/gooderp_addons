@@ -10,8 +10,8 @@ class other_money_statements_report_wizard(models.Model):
     def _get_company_start_date(self):
         return self.env.user.company_id.start_date
 
-    from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date) # 默认公司启用日期
-    to_date = fields.Date(string=u'结束日期', required=True, default=lambda self: fields.Date.context_today(self)) # 默认当前日期
+    from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date)  # 默认公司启用日期
+    to_date = fields.Date(string=u'结束日期', required=True, default=lambda self: fields.Date.context_today(self))  # 默认当前日期
 
     @api.multi
     def confirm_other_money_statements(self):
@@ -29,5 +29,5 @@ class other_money_statements_report_wizard(models.Model):
                 'view_id': False,
                 'views': [(view.id, 'tree')],
                 'type': 'ir.actions.act_window',
-                'domain':[('date','>=', self.from_date), ('date','<=', self.to_date)]
+                'domain':[('date', '>=', self.from_date), ('date', '<=', self.to_date)]
                 }
