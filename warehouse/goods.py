@@ -28,7 +28,7 @@ class goods(models.Model):
                   AND line.goods_id = %s
 
                 GROUP BY wh.name
-            ''' % (goods.id, ))
+            ''' % (goods.id,))
 
             return self.env.cr.dictfetchall()
 
@@ -87,6 +87,6 @@ class goods(models.Model):
                 uos_qty_to_go -= matching_uos_qty
             else:
                 if not ignore_stock and qty_to_go > 0:
-                    raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (goods.name, ))
+                    raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (goods.name,))
 
             return matching_records, subtotal

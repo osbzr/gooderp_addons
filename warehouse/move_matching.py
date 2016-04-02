@@ -64,7 +64,7 @@ class wh_move_line(models.Model):
     def get_matching_records_by_lot(self):
         for line in self:
             if line.goods_qty > line.lot_id.qty_remaining:
-                raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name, ))
+                raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name,))
 
             return [{'line_in_id': line.lot_id.id, 'qty': line.goods_qty, 'uos_qty': line.goods_uos_qty}], \
                 line.lot_id.price * line.goods_qty
