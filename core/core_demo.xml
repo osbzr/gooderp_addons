@@ -22,12 +22,12 @@
             <field name="type">goods</field>
         </record>
 
-        <record id="other_get_1" model="core.category">
+        <record id="cat_consult" model="core.category">
             <field name="name">咨询费</field>
             <field name="type">other_get</field>
         </record>
         
-        <record id="other_pay_1" model="core.category">
+        <record id="cat_freight" model="core.category">
             <field name="name">运费</field>
             <field name="type">other_pay</field>
         </record>
@@ -35,8 +35,8 @@
          <record id="uom_pc" model="uom">
             <field name="name">件</field>
         </record>
-         <record id="uom_kg" model="uom">
-            <field name="name">公斤</field>
+         <record id="uom_set" model="uom">
+            <field name="name">捆</field>
         </record>
          <record id="check" model="settle.mode">
             <field name="name">支票</field>
@@ -45,37 +45,35 @@
             <field name="name">信用卡</field>
         </record>
         
-        <record id="partner_level_one" model="partner">
-            <field name="name">judy001</field>
-            <field name="code">001</field>
-            <field name="c_category_id" eval="customer_category_1"/>
+        <record id="jd" model="partner">
+            <field name="name">京东</field>
+            <field name="code">jd</field>
+            <field name="c_category_id" ref="customer_category_1"/>
         </record>
 
-        <record id="partner_two_level" model="partner">
-               <field name="name">judy002</field>
-               <field name="code">002</field>
-            <field name="c_category_id" eval="customer_category_2"/>
+        <record id="yixun" model="partner">
+               <field name="name">易迅</field>
+               <field name="code">yixun</field>
+            <field name="c_category_id" ref="customer_category_2"/>
         </record>
 
-        <record id="partner_high_vip" model="partner">
-               <field name="name">judy003</field>
-               <field name="code">003</field>
-            <field name="c_category_id" eval="customer_category_vip" />
+        <record id="1" model="partner">
+               <field name="name">1号店</field>
+               <field name="code">1</field>
+            <field name="c_category_id" ref="customer_category_vip" />
         </record>
 
-        <record id="partner_core_category_supplier_flower" model="partner">
-             <field name="name">flower001</field>
-              <field name="code">001</field>
-            <field name="s_category_id" eval="supplier_category_1"/>
+        <record id="lenovo" model="partner">
+             <field name="name">联想</field>
+              <field name="code">lenovo</field>
+            <field name="s_category_id" ref="supplier_category_1"/>
         </record>
         
-                <record id="bank_account_zhifu_bao" model="bank.account">
+        <record id="alipay" model="bank.account">
             <field name="name">支付宝(1888888888)</field>
-            <field name="balance">2000</field>
         </record>
-        <record id="bank_account_yinghang" model="bank.account">
+        <record id="comm" model="bank.account">
             <field name="name">交通银行(622262 8888888888888)</field>
-            <field name="balance">6000</field>
         </record>
         
     </data>

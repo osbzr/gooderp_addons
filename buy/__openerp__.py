@@ -16,5 +16,8 @@
         'report/buy_order_track_view.xml',
         'report/supplier_statements_view.xml',
         'security/ir.model.access.csv',
-        ]
+        ],
+    'demo': [
+             'buy_demo.xml',
+             ],
 }

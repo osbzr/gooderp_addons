@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>   
+        <record id="hd_stock" model="warehouse">
+            <field name="name">总仓</field>
+            <field name="code">000</field>
+            <field name='type'>stock</field>
+        </record>
+        <record id="sh_stock" model="warehouse">
+            <field name="name">上海仓</field>
+            <field name="code">021</field>
+            <field name='type'>stock</field>
+        </record>
+        <record id="bj_stock" model="warehouse">
+            <field name="name">北京仓</field>
+            <field name="code">010</field>
+            <field name='type'>stock</field>
+        </record>
+    </data>
+</openerp>

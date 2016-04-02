@@ -11,6 +11,8 @@ env = Environment(loader=PackageLoader('openerp.addons.warehouse', 'html'), auto
 
 class wh_move_line(models.Model):
     _name = 'wh.move.line'
+    
+    _rec_name = 'note'
 
     MOVE_LINE_TYPE = [
         ('out', u'出库'),
