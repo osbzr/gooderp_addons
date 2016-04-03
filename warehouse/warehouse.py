@@ -63,7 +63,7 @@ class warehouse(models.Model):
     def name_get(self):
         res = []
         for warehouse in self:
-            res.append((warehouse.id, '[{}]{}'.format(warehouse.code, warehouse.name)))
+            res.append((warehouse.id, u'[{}]{}'.format(warehouse.code, warehouse.name)))
 
         return res
 
