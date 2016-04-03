@@ -6,8 +6,22 @@ from openerp.exceptions import except_orm
 class test_money(TransactionCase):
     def test_money_order(self):
         ''' 测试收付款  '''
+        
+        # 余额不足不能付款
+        with self.assertRaises(except_orm):
+            self.env.ref('money.pay_2000').money_order_done()
+        # 先收款后付款
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
+        # 审核后不能删除
+        with self.assertRaises(except_orm):
+            self.env.ref('money.get_40000').unlink()
+        # 余额不足不能反审核
+        with self.assertRaises(except_orm):
+            self.env.ref('money.get_40000').money_order_draft()
+        # 反审核
+        self.env.ref('money.pay_2000').money_order_draft()
+        self.env.ref('money.pay_2000').unlink()
     
     def test_other_money_order(self):
         ''' 测试其他收入支出 '''
@@ -18,6 +32,13 @@ class test_money(TransactionCase):
         # 转出账户收一笔款
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.other_pay_9000').other_money_done()
+        # 审核状态不可删除
+        with self.assertRaises(except_orm):
+            self.env.ref('money.other_pay_9000').unlink()
+        # 反审核
+        self.env.ref('money.other_pay_9000').other_money_draft()
+        # 未审核可以删除
+        self.env.ref('money.other_pay_9000').unlink()
     
     def test_money_transfer_order(self):
         ''' 测试转账 '''
@@ -27,6 +48,10 @@ class test_money(TransactionCase):
         # 转出账户收一笔款
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.transfer_300').money_transfer_done()
+        with self.assertRaises(except_orm):
+            self.env.ref('money.transfer_300').unlink()
+        self.env.ref('money.transfer_300').money_transfer_draft()
+        self.env.ref('money.transfer_300').unlink()
     
     def test_partner(self):
         ''' 客户对账单 和  银行帐'''
