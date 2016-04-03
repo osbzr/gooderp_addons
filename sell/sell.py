@@ -309,8 +309,6 @@ class sell_delivery(models.Model):
             self.discount_amount = total * self.discount_rate * 0.01
 
     def get_move_origin(self, vals):
-        print '=' * 10
-        print self.env.context
         return self._name + (self.env.context.get('is_return') and '.return' or '.sell')
 
     @api.model
