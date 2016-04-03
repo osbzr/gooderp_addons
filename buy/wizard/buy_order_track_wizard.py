@@ -69,6 +69,16 @@ class buy_order_track_wizard(models.TransientModel):
                     'note': line.note,
                 })
             res.append(track.id)
+            
+            if not after_id:  # 如果是最后一个明细行，则在最后增加一个小计行
+                summary_last_track = self.env['buy.order.track'].create({
+                    'goods_state': u'小计',
+                    'qty': total_qty,
+                    'amount': total_amount,
+                    'qty_not_in': total_not_in,
+                })
+                res.append(summary_last_track.id)
+                continue
 
             if line.goods_id == after.goods_id:  # 如果下一个是相同商品，则累加数量、采购额和未入库数量
                 total_qty += line.quantity
@@ -86,14 +96,6 @@ class buy_order_track_wizard(models.TransientModel):
                 })
                 res.append(summary_track.id)
                 total_qty = total_amount = total_not_in = 0  # 计算不同的商品时先将初始值清零
-            if not after_id:  # 如果是最后一个明细行，则在最后增加一个小计行
-                summary_last_track = self.env['buy.order.track'].create({
-                    'goods_state': u'小计',
-                    'qty': total_qty,
-                    'amount': total_amount,
-                    'qty_not_in': total_not_in,
-                })
-                res.append(summary_last_track.id)
 
         view = self.env.ref('buy.buy_order_track_tree')
         return {

@@ -186,7 +186,7 @@ class buy_order(models.Model):
                             'discount_rate': self.discount_rate,
                             'discount_amount': self.discount_amount,
                         })
-        view_id = self.ref('buy.buy_receipt_form').id
+        view_id = self.env.ref('buy.buy_receipt_form').id
         return {
             'name': u'采购入库单',
             'view_type': 'form',

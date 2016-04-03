@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sell_order,access_sell_order,model_sell_order,,1,1,1,1
 access_sell_order_line,access_sell_order_line,model_sell_order_line,,1,1,1,1
 access_customer_statements_report,access_customer_statements_report,model_customer_statements_report,,1,1,1,1
