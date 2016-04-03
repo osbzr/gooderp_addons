@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 from openerp.tests.common import TransactionCase
+
 
 class test_invoice(TransactionCase):
 
