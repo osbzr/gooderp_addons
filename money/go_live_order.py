@@ -10,10 +10,14 @@ class go_live_order(models.Model):
     def create(self, values):
         new_id = super(go_live_order, self).create(values)
         if values.get('bank_id'):
-            self.env['bank.account'].search([('id', '=', values.get('bank_id'))]).balance += values.get('balance')
+            bank = self.env['bank.account'].search(
+                        [('id', '=', values.get('bank_id'))])
+            bank.balance += values.get('balance')
         if values.get('partner_id'):
-            self.env['partner'].search([('id', '=', values.get('partner_id'))]).receivable += values.get('receivable')
-            self.env['partner'].search([('id', '=', values.get('partner_id'))]).payable += values.get('payable')
+            partner = self.env['partner'].search(
+                        [('id', '=', values.get('partner_id'))])
+            partner.receivable += (values.get('receivable') or 0.0)
+            partner.payable += (values.get('payable') or 0.0)
 
         return new_id
 
