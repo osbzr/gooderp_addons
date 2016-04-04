@@ -124,16 +124,14 @@ class wh_inventory(models.Model):
     def generate_inventory(self):
         for inventory in self:
             out_line, in_line = [], []
-            for line in (line for line in inventory.line_ids if line.difference_qty):
-                if line.difference_qty <= 0 and line.difference_uos_qty <= 0 and \
-                        line.difference_qty * line.difference_uos_qty != 0:
+            for line in inventory.line_ids.filtered(lambda line: line.difference_qty + line.difference_uos_qty):
+                if line.difference_qty <= 0 and line.difference_uos_qty <= 0:
                     out_line.append(line)
-                elif ine.difference_qty >= 0 and line.difference_uos_qty >= 0 and \
-                        line.difference_qty * line.difference_uos_qty != 0:
+                elif line.difference_qty >= 0 and line.difference_uos_qty >= 0:
                     in_line.append(line)
                 else:
                     raise osv.except_osv(u'错误',
-                        u'产品%s行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致' % line.goods_id.name)
+                        u'产品"%s"行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致' % line.goods_id.name)
 
             if out_line:
                 self.create_losses_out(inventory, out_line)
@@ -232,6 +230,7 @@ class wh_inventory_line(models.Model):
     force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
     lot = fields.Char(u'批号')
     new_lot = fields.Char(u'盘盈批号')
+    new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号')
     lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing')
     uom_id = fields.Many2one('uom', u'单位')
     uos_id = fields.Many2one('uom', u'辅助单位')
@@ -252,6 +251,15 @@ class wh_inventory_line(models.Model):
                 'message': u'盘盈盘亏数量应该与辅助单位的盘盈盘亏数量盈亏方向一致',
             }}
 
+    def line_role_back(self):
+        self.inventory_qty = self.real_qty
+        self.inventory_uos_qty = self.real_uos_qty
+        self.difference_qty = 0
+        self.difference_uos_qty = 0
+        self.new_lot = ''
+        self.new_lot_id = False
+        self.lot_type = 'nothing'
+
     @api.multi
     @api.onchange('inventory_qty')
     def onchange_qty(self):
@@ -260,26 +268,26 @@ class wh_inventory_line(models.Model):
         self.difference_uos_qty = self.inventory_uos_qty - self.real_uos_qty
 
         if self.goods_id and self.goods_id.using_batch:
+            if self.goods_id.force_batch_one and self.difference_qty:
+                flag = self.difference_qty > 0 and 1 or -1
+                if abs(self.difference_qty) != 1:
+                    self.line_role_back()
+                    return {'warning': {
+                        'title': u'警告',
+                        'message': u'产品上设置了序号为1，此时一次只能盘亏或盘盈一个产品数量',
+                    }}
+
             if self.difference_qty > 0:
                 self.lot_type = 'in'
                 self.new_lot = self.new_lot or self.lot
+                self.new_lot_id = False
             elif self.difference_qty < 0:
                 self.lot_type = 'out'
                 self.new_lot = ''
             else:
                 self.lot_type = 'nothing'
+                self.new_lot_id = False
                 self.new_lot = ''
-
-            if self.goods_id.force_batch_one and self.difference_qty:
-                flag = self.difference_qty > 0 and 1 or -1
-                if abs(self.difference_qty) != 1:
-                    self.inventory_qty = self.real_qty
-                    self.inventory_uos_qty = self.inventory_uos_qty
-
-                    return {'warning': {
-                        'title': u'警告',
-                        'message': u'产品上设置了序号为1，此时一次只能盘亏或盘盈一个产品数量',
-                    }}
 
         return self.check_difference_identical()
 
@@ -297,8 +305,8 @@ class wh_inventory_line(models.Model):
             return {
                 'warehouse_id': wh_type == 'out' and inventory.warehouse_id.id or inventory_warehouse.id,
                 'warehouse_dest_id': wh_type == 'in' and inventory.warehouse_id.id or inventory_warehouse.id,
-                'lot': wh_type == 'in' and inventory.new_lot,
-                # 'lot_id': wh_type == 'in' and inventory.lot and inve
+                'lot': inventory.new_lot,
+                'lot_id': inventory.new_lot_id.id,
                 'goods_id': inventory.goods_id.id,
                 'attribute_id': inventory.attribute_id.id,
                 'uom_id': inventory.uom_id.id,
@@ -306,7 +314,7 @@ class wh_inventory_line(models.Model):
                 'goods_qty': abs(inventory.difference_qty),
                 'goods_uos_qty': abs(inventory.difference_uos_qty),
                 'price': safe_division(subtotal, matching_qty),
-                'subtotal': subtotal,
+                # 'subtotal': subtotal,
             }
 
 
