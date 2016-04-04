@@ -11,8 +11,8 @@ python:
 
 env:
   - VERSION="8.0" ODOO_REPO="OCA/OCB" LINT_CHECK="0"
-  - VERSION="9.0" ODOO_REPO="ODOO/ODOO" LINT_CHECK="0"
-  - VERSION="master" ODOO_REPO="ODOO/ODOO" LINT_CHECK="0"
+  - VERSION="9.0" ODOO_REPO="odoo/odoo" LINT_CHECK="0"
+  - VERSION="master" ODOO_REPO="odoo/odoo" LINT_CHECK="0"
 
 
 virtualenv:
