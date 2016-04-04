@@ -71,6 +71,9 @@
                                     <field name='inventory_qty' />
                                     <field name='inventory_uos_qty' />
                                     <field name='new_lot' attrs="{'readonly': [('lot_type', '!=', 'in')], 'required': [('lot_type', '=', 'in')]}" />
+
+                                    <field name='new_lot_id' attrs="{'readonly': [('lot_type', '!=', 'out')], 'required': [('lot_type', '=', 'out')]}" domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('lot', '=', lot)]" context="{'lot': True}" options="{'no_open': True, 'no_create': True}" />
+
                                     <field name='difference_qty' readonly='1' />
                                     <field name='difference_uos_qty' readonly='1' />
                                 </tree>
