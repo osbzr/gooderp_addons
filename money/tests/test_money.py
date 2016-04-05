@@ -6,13 +6,17 @@ from openerp.exceptions import except_orm
 class test_money(TransactionCase):
     def test_money_order(self):
         ''' 测试收付款  '''
-        
+        last_balance = self.env.ref('core.comm').balance
         # 余额不足不能付款
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
         # 先收款后付款
         self.env.ref('money.get_40000').money_order_done()
+        self.assertEqual(self.env.ref('core.comm').balance,
+                          last_balance + 40000)
         self.env.ref('money.pay_2000').money_order_done()
+        self.assertEqual(self.env.ref('core.comm').balance,
+                          last_balance + 38000)
         # 审核后不能删除
         with self.assertRaises(except_orm):
             self.env.ref('money.get_40000').unlink()
@@ -20,9 +24,14 @@ class test_money(TransactionCase):
         with self.assertRaises(except_orm):
             self.env.ref('money.get_40000').money_order_draft()
         # 反审核
+        self.env.ref('money.get_200').money_order_draft()
         self.env.ref('money.pay_2000').money_order_draft()
         self.env.ref('money.pay_2000').unlink()
-    
+        # onchange_date
+        self.env.ref('money.get_40000').onchange_date()
+        # onchange_partner_id
+        self.env.ref('money.get_40000').onchange_partner_id()
+
     def test_other_money_order(self):
         ''' 测试其他收入支出 '''
         self.env.ref('money.other_get_60').other_money_done()

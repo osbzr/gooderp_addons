@@ -101,12 +101,13 @@ class money_order(models.Model):
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
     @api.onchange('partner_id')
-    def _onchange_partner_id(self):
+    def onchange_partner_id(self):
         if not self.partner_id:
             return {}
 
         source_lines = []
         self.source_ids = []
+        money_invoice = self.env['money.invoice']
         if self.env.context.get('type') == 'get':
             money_invoice = self.env['money.invoice'].search([
                                     ('partner_id', '=', self.partner_id.id),

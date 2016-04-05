@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from openerp.tests.common import TransactionCase
-
+from openerp.exceptions import except_orm
 
 class test_invoice(TransactionCase):
 
@@ -41,11 +41,9 @@ class test_invoice(TransactionCase):
         self.assertEqual(invoice.state, 'done')
         # 客户的应收余额
         self.assertEqual(self.partner.receivable, 10.0)
-        '''
         # 已审核的发票应该不可删除
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(except_orm):
             invoice.unlink()
-        '''
         # 发票取消审核
         invoice.money_invoice_draft()
         # 客户的应收余额
