@@ -62,13 +62,11 @@
         <record id="adv_pay_2" model="money.order">
         	<field name="name">adv_pay_2</field>
             <field name="partner_id" ref="core.jd"/>
-            <field name="category_id" ref="money.core_category_sale"/>
             <field eval="500.0" name="amount"/>
             <field eval="0" name="reconciled"/>
             <field eval="500.0" name="to_reconcile"/>
         </record>
         <record id="adv_pay_line_2" model="advance.payment">
-        	<field name="category_id" ref="core.cat_consult"/>
             <field name="name" ref="adv_pay_2"/>
             <field eval="500.0" name="amount"/>
             <field eval="0" name="reconciled"/>
@@ -97,7 +95,6 @@
         	<field name="advance_payment_ids" eval="[(4,ref('adv_pay_line_2'))]"/>
         	<field name="receivable_source_ids" eval="[(4,ref('need_pay_line_2'))]"/>
         </record>
-
 
         <record id="get_invoice_1" model="money.invoice">
         	<field name="name">get_invoice_1</field>
