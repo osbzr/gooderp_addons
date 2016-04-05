@@ -123,7 +123,7 @@
             <field eval="0" name="reconciled"/>
             <field eval="600.0" name="to_reconcile"/>
         </record>
-        <record id="pay_line_1" model="source.order.line">
+        <record id="pay_order_line_2" model="source.order.line">
         	<field name="category_id" ref="core.cat_consult"/>
             <field name="name" ref="pay_invoice_1"/>
             <field eval="600.0" name="amount"/>
@@ -135,7 +135,7 @@
         	<field name="partner_id" ref="core.jd"/>
         	<field name="business_type">get_to_pay</field>
         	<field name="receivable_source_ids" eval="[(4,ref('get_1'))]"/>
-        	<field name="payable_source_ids" eval="[(4,ref('pay_line_1'))]"/>
+        	<field name="payable_source_ids" eval="[(4,ref('pay_order_line_2'))]"/>
         </record>
     </data>
 </openerp>
