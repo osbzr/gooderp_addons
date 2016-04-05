@@ -135,4 +135,55 @@
         	<field name="payable_source_ids" eval="[(4,ref('pay_order_line_2'))]"/>
         </record>
     </data>
+    
+    <data>
+    	<record id="bank_report_money_1" model="money.order">
+            <field name="date">2016-11-02</field>
+            <field name="name">GET/2016/0001</field>
+            <field name="partner_id" ref="core.yixun"/>
+            <field name="type">get</field>
+        </record>
+        <record id="money_order_line_1" model="money.order.line">
+            <field name="money_id" ref="bank_report_money_1"/>
+            <field name="bank_id" ref="core.comm"/>
+            <field name="amount">1000</field>
+            <field name="note">get zxy</field>
+        </record>
+
+        <record id="bank_report_other_1" model="other.money.order">
+        	<field name="bank_id" ref="core.comm"/>
+            <field name="date">2016-11-02</field>
+            <field name="name">OTHER_PAY/2016/0001</field>
+            <field name="partner_id" ref="core.lenovo"/>
+            <field name="total_amount">2000</field>
+            <field name="type">other_pay</field>
+        </record>
+        <record id="other_money_order_line_1" model="other.money.order.line">
+            <field name="other_money_id" ref="bank_report_other_1"/>
+            <field name="category_id" ref="money.core_category_sale"/>
+            <field name="amount">2000</field>
+            <field name="note">other pay zxy</field>
+        </record>
+
+        <record id="bank_report_other_2" model="other.money.order">
+        	<field name="bank_id" ref="core.comm"/>
+            <field name="date">2016-11-02</field>
+            <field name="name">OTHER_GET/2016/0001</field>
+            <field name="partner_id" ref="core.yixun"/>
+            <field name="total_amount">1000</field>
+            <field name="type">other_get</field>
+        </record>
+        
+        <record id="bank_report_transfer_1" model="money.transfer.order">
+            <field name="date">2016-11-02</field>
+            <field name="name">TR/2016/0001</field>
+            <field name="note">transfer order zxy</field>
+        </record>
+        <record id="transfer_order_line" model="money.transfer.order.line">
+            <field name="transfer_id" ref="bank_report_transfer_1"/>
+            <field name="out_bank_id" ref="core.comm"/>
+            <field name="in_bank_id" ref="core.alipay"/>
+            <field name="amount">1000</field>
+        </record>
+    </data>
 </openerp>
