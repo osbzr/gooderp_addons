@@ -32,12 +32,35 @@ class goods(models.Model):
 
             return self.env.cr.dictfetchall()
 
-    def get_cost(self):
-        # TODO 产品上需要一个字段来记录成本
-        return 1
+    def get_cost(self, warehouse=None, ignore=None):
+        # 如果没有历史的剩余数量，计算最后一条move的成本
+        # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
+        # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
+        self.ensure_one()
+        if warehouse:
+            domain = [
+                ('state', '=', 'done'),
+                ('goods_id', '=', self.id),
+                ('warehouse_dest_id', '=', warehouse.id)
+            ]
 
-    def get_suggested_cost_by_warehouse(self, warehouse, qty):
-        records, subtotal = self.get_matching_records(warehouse, qty, ignore_stock=True)
+            if ignore:
+                if isinstance(ignore, (long, int)):
+                    ignore = [ignore]
+
+                domain.append(('id', 'not in', ignore))
+
+            move = self.env['wh.move.line'].search(domain, limit=1, order='date, id')
+            if move:
+                return move.price
+
+        return self.cost
+
+    def get_suggested_cost_by_warehouse(self, warehouse, qty, current_move=None):
+        # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
+        # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
+        records, subtotal = self.get_matching_records(warehouse, qty, ignore_stock=True,
+                                                      ignore=[current_move.id])
 
         matching_qty = sum(record.get('qty') for record in records)
         if matching_qty:
@@ -45,7 +68,7 @@ class goods(models.Model):
             if matching_qty >= qty:
                 return subtotal, cost
         else:
-            cost = self.get_cost()
+            cost = self.get_cost(warehouse, ignore=[current_move.id])
         return cost * qty, cost
 
     def is_using_matching(self):
@@ -57,7 +80,9 @@ class goods(models.Model):
 
         return False
 
-    def get_matching_records(self, warehouse, qty, uos_qty=0, ignore_stock=False):
+    def get_matching_records(self, warehouse, qty, uos_qty=0, ignore_stock=False, ignore=None):
+        # @ignore_stock: 当参数指定为True的时候，此时忽略库存警告
+        # @ignore: 一个move_line列表，指定查询成本的时候跳过这些move
         matching_records = []
         for goods in self:
             domain = [
@@ -66,6 +91,11 @@ class goods(models.Model):
                 ('warehouse_dest_id', '=', warehouse.id),
                 ('goods_id', '=', goods.id)
             ]
+            if ignore:
+                if isinstance(ignore, (long, int)):
+                    ignore = [ignore]
+
+                domain.append(('id', 'not in', ignore))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
             lines = self.env['wh.move.line'].search(domain, order='date, id')
@@ -81,7 +111,9 @@ class goods(models.Model):
 
                 matching_records.append({'line_in_id': line.id,
                                          'qty': matching_qty, 'uos_qty': matching_uos_qty})
-                subtotal += matching_qty * line.get_real_price()
+                # subtotal += matching_qty * line.get_real_price()
+                # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+                subtotal += matching_qty * line.price
 
                 qty_to_go -= matching_qty
                 uos_qty_to_go -= matching_uos_qty

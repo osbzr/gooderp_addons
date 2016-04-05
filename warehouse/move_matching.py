@@ -63,6 +63,9 @@ class wh_move_line(models.Model):
 
     def get_matching_records_by_lot(self):
         for line in self:
+            if line.lot_id.state != 'done':
+                raise osv.except_osv(u'错误', u'批号%s还没有实际入库，请先审核该入库' % line.lot_id.move_id.name)
+
             if line.goods_qty > line.lot_id.qty_remaining:
                 raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name,))
 
@@ -89,7 +92,8 @@ class wh_move_line(models.Model):
                             line.id, matching.get('qty'), matching.get('uos_qty'))
 
                 line.price = safe_division(subtotal, line.goods_qty)
-                line.subtotal = subtotal
+                # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+                # line.subtotal = subtotal
 
         return super(wh_move_line, self).prev_action_done()
 

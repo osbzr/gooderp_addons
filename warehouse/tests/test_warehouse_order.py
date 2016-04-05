@@ -9,8 +9,9 @@ class TestWarehouseOrder(TransactionCase):
         super(TestWarehouseOrder, self).setUp()
 
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
-        self.others_in = self.browse_ref('warehouse.wh_in_whin1')
         self.overage_in_cable = self.browse_ref('warehouse.wh_move_line_14')
+        self.others_in = self.browse_ref('warehouse.wh_in_whin1')
+        self.others_in_cable = self.browse_ref('warehouse.wh_move_line_15')
         self.others_out = self.browse_ref('warehouse.wh_out_whout0')
         self.internal = self.browse_ref('warehouse.wh_internal_whint0')
 
@@ -31,13 +32,13 @@ class TestWarehouseOrder(TransactionCase):
     def test_approve(self):
 
         # 此时其他入库单的others_in的剩余数量应该为0
-        self.assertEqual(self.others_in.line_in_ids.qty_remaining, 0)
+        self.assertEqual(self.others_in_cable.qty_remaining, 0)
         # 此时盘盈入库单的overage_in的剩余数量应该为12000 - 120 + 48
         self.assertEqual(self.overage_in_cable.qty_remaining, 12000 - 120 + 48)
         # 此时调拨单上的剩余数量应该位120 - 12
         self.assertEqual(self.internal.line_out_ids.qty_remaining, 120 - 12)
 
-        # 所有审核后的单据状态都应该位done
+        # 所有审核后的单据状态都应该为done
         self.assertEqual(self.overage_in.state, 'done')
         self.assertEqual(self.others_in.state, 'done')
         self.assertEqual(self.others_out.state, 'done')
@@ -72,6 +73,12 @@ class TestWarehouseOrder(TransactionCase):
         self.internal.unlink()
         self.others_out.unlink()
 
+        # 删除后的单据应该不存在
+        self.assertTrue(not self.others_in.exists())
+        self.assertTrue(not self.overage_in.exists())
+        self.assertTrue(not self.internal.exists())
+        self.assertTrue(not self.others_out.exists())
+
     def test_cancel_approve(self):
 
         # 存在已经被匹配的出库时入库无法被取消
@@ -84,17 +91,36 @@ class TestWarehouseOrder(TransactionCase):
         # 出库单据反审核后剩余数量会恢复为120
         self.assertEqual(self.internal.line_out_ids.qty_remaining, 120)
 
-        self.assertEqual(self.others_in.line_in_ids.qty_remaining, 0)
+        self.assertEqual(self.others_in_cable.qty_remaining, 0)
         self.assertEqual(self.overage_in_cable.qty_remaining, 12000 - 120 + 48)
         self.internal.cancel_approved_order()
-        self.assertEqual(self.others_in.line_in_ids.qty_remaining, 48)
+        self.assertEqual(self.others_in_cable.qty_remaining, 48)
         self.assertEqual(self.overage_in_cable.qty_remaining, 12000)
 
         self.overage_in.cancel_approved_order()
         self.others_in.cancel_approved_order()
+
+        # 所有反审核后的单据状态都应该为draft
+        self.assertEqual(self.overage_in.state, 'draft')
+        self.assertEqual(self.others_in.state, 'draft')
+        self.assertEqual(self.others_out.state, 'draft')
+        self.assertEqual(self.internal.state, 'draft')
 
     def test_origin(self):
         self.assertEqual(self.others_in.origin, 'wh.in.others')
         self.assertEqual(self.others_out.origin, 'wh.out.others')
         self.assertEqual(self.internal.origin, 'wh.internal')
         self.assertEqual(self.overage_in.origin, 'wh.in.overage')
+
+    def test_create(self):
+        temp_out = self.env['wh.out'].create({'name': '/', 'type': 'others'})
+        temp_in = self.env['wh.in'].create({'name': '/', 'type': 'others'})
+        temp_internal = self.env['wh.internal'].create({'name': '/'})
+
+        self.assertNotEqual(temp_out.name, '/')
+        self.assertNotEqual(temp_in.name, '/')
+        self.assertNotEqual(temp_internal.name, '/')
+
+        self.assertEqual(temp_out.origin, 'wh.out.others')
+        self.assertEqual(temp_in.origin, 'wh.in.others')
+        self.assertEqual(temp_internal.origin, 'wh.internal')
