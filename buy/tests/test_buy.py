@@ -9,6 +9,8 @@ class test_buy(TransactionCase):
         
         # 审核采购订单
         order.buy_order_done()
+        order.buy_order_draft()
+        order.buy_order_done()
         
         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
         receipt.buy_receipt_done()
