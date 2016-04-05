@@ -158,9 +158,8 @@
             <field name="total_amount">2000</field>
             <field name="type">other_pay</field>
         </record>
-        <record id="money_order_line_1" model="other.money.order.line">
-            <field name="money_id" ref="bank_report_other_1"/>
-            <field name="bank_id" ref="core.comm"/>
+        <record id="other_money_order_line_1" model="other.money.order.line">
+            <field name="other_money_id" ref="bank_report_other_1"/>
             <field name="category_id" ref="money.core_category_sale"/>
             <field name="amount">2000</field>
             <field name="note">other pay zxy</field>
@@ -181,7 +180,7 @@
             <field name="note">transfer order zxy</field>
         </record>
         <record id="transfer_order_line" model="money.transfer.order.line">
-            <field name="money_id" ref="bank_report_transfer_1"/>
+            <field name="transfer_id" ref="bank_report_transfer_1"/>
             <field name="out_bank_id" ref="core.comm"/>
             <field name="in_bank_id" ref="core.alipay"/>
             <field name="amount">1000</field>
