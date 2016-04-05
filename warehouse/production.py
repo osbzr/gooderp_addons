@@ -27,7 +27,7 @@ class wh_assembly(models.Model):
             collects = []
             for parent in assembly.line_in_ids:
                 collects.append((parent, parent.goods_id.get_suggested_cost_by_warehouse(
-                    parent.warehouse_dest_id, parent.goods_qty)[0]))
+                    parent.warehouse_dest_id, parent.goods_qty, current_move=parent)[0]))
 
             amount_total, collect_parent_subtotal = sum(collect[1] for collect in collects), 0
             for parent, amount in islice(collects, 0, len(collects) - 1):
@@ -35,21 +35,24 @@ class wh_assembly(models.Model):
                 collect_parent_subtotal += parent_subtotal
                 parent.write({
                         'price': safe_division(parent_subtotal, parent.goods_qty),
-                        'subtotal': parent_subtotal,
+                        # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+                        # 'subtotal': parent_subtotal,
                     })
 
             # 最后一行数据使用总金额减去已经消耗的金额来计算
             last_parent_subtotal = subtotal - collect_parent_subtotal
             collects[-1][0].write({
                     'price': safe_division(last_parent_subtotal, collects[-1][0].goods_qty),
-                    'subtotal': last_parent_subtotal,
+                    # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+                    # 'subtotal': last_parent_subtotal,
                 })
 
         return True
 
     def update_parent_price(self):
         for assembly in self:
-            subtotal = sum(child.subtotal for child in assembly.line_out_ids) + assembly.fee
+            # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+            subtotal = sum(child.price * child.goods_qty for child in assembly.line_out_ids) + assembly.fee
 
             assembly.apportion_cost(subtotal)
 
@@ -188,7 +191,7 @@ class wh_disassembly(models.Model):
             collects = []
             for child in assembly.line_in_ids:
                 collects.append((child, child.goods_id.get_suggested_cost_by_warehouse(
-                    child.warehouse_dest_id, child.goods_qty)[0]))
+                    child.warehouse_dest_id, child.goods_qty, current_move=child)[0]))
 
             amount_total, collect_child_subtotal = sum(collect[1] for collect in collects), 0
             for child, amount in islice(collects, 0, len(collects) - 1):
@@ -196,21 +199,24 @@ class wh_disassembly(models.Model):
                 collect_child_subtotal += child_subtotal
                 child.write({
                         'price': safe_division(child_subtotal, child.goods_qty),
-                        'subtotal': child_subtotal,
+                        # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+                        # 'subtotal': child_subtotal,
                     })
 
             # 最后一行数据使用总金额减去已经消耗的金额来计算
             last_child_subtotal = subtotal - collect_child_subtotal
             collects[-1][0].write({
                     'price': safe_division(last_child_subtotal, collects[-1][0].goods_qty),
-                    'subtotal': last_child_subtotal,
+                    # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+                    # 'subtotal': last_child_subtotal,
                 })
 
         return True
 
     def update_child_price(self):
         for assembly in self:
-            subtotal = sum(child.subtotal for child in assembly.line_out_ids) + assembly.fee
+            # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
+            subtotal = sum(child.price * child.goods_qty for child in assembly.line_out_ids) + assembly.fee
 
             assembly.apportion_cost(subtotal)
         return True
