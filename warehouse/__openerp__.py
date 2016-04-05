@@ -51,7 +51,7 @@
     ],
     'demo': [
         'warehouse_demo.xml',
-             ],
+     ],
     'installable': True,
     "active": False,
 }

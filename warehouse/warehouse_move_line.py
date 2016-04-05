@@ -11,7 +11,7 @@ env = Environment(loader=PackageLoader('openerp.addons.warehouse', 'html'), auto
 
 class wh_move_line(models.Model):
     _name = 'wh.move.line'
-    
+
     _rec_name = 'note'
 
     MOVE_LINE_TYPE = [
@@ -106,7 +106,6 @@ class wh_move_line(models.Model):
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.type))
         elif self.move_id.origin == 'wh.internal':
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.env.context.get('internal_out', False)))
-        # elif self.move_id.origin in ('wh.out.losses', 'wh.out.others', 'wh.in.overage', 'wh.in.others'):
         else:
             return self.ORIGIN_EXPLAIN.get(self.move_id.origin)
 
