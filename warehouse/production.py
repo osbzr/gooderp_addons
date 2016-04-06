@@ -95,7 +95,7 @@ class wh_assembly(models.Model):
 
         return res
 
-    # @api.one
+    @api.one
     @api.onchange('bom_id')
     def onchange_bom(self):
         line_out_ids, line_in_ids = [], []
