@@ -6,7 +6,6 @@ class buy_summary_goods(models.TransientModel):
     _name = 'buy.summary.goods'
     _description = u'采购汇总表（按商品）'
 
-#     order_name = fields.Char(u'采购订单号')
     goods_categ_id = fields.Many2one('core.category', u'商品类别')
     goods_code = fields.Char(u'商品编码')
     goods_id = fields.Many2one('goods', u'商品名称')

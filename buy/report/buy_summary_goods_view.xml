@@ -6,7 +6,6 @@
             <field name="model">buy.summary.goods</field>
             <field name="arch" type="xml">
                 <tree string="采购汇总表（按商品）">
-                	<!-- <field name="order_name"/> -->
                 	<field name="goods_categ_id"/>
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
