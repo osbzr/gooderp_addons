@@ -40,4 +40,21 @@ class test_report(TransactionCase):
                     'to_date': '2016-11-03'})
         # 输出报表
         statement.confirm_other_money_statements()
+        # 测试其他收支单明细表方法中的'结束日期不能小于开始日期！'
+        statement_error_date = self.env['other.money.statements.report.wizard'].create(
+                    {'from_date': '2016-11-03',
+                     'to_date': '2016-11-01'})
+        # 输出报表，执行if
+        with self.assertRaises(except_orm):
+            statement_error_date.confirm_other_money_statements()
+        # 测试其他收支单明细表方法中的from_date的默认值
+        statement_date = self.env['other.money.statements.report.wizard'].create(
+                    {'to_date': '2016-11-03'})
+        # 判断from_date的值是否是公司启用日期
+        self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
+
+    def test_partner_statements_report(self):
+        ''' 测试业务伙伴对账单报表'''
+        # onchange_from_date
+        self.env.ref('money.partner_wizard_pay_400').onchange_from_date()
         

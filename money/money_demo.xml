@@ -186,4 +186,11 @@
             <field name="amount">1000</field>
         </record>
     </data>
+
+    <data>
+		<record id="partner_wizard_pay_400" model="partner.statements.report.wizard">
+            <field name="type">pay</field>
+            <field name="partner_id" ref="core.lenovo"/>
+        </record>
+    </data>
 </openerp>

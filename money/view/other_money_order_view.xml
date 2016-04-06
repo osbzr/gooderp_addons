@@ -25,7 +25,7 @@
                 <header>
 					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
 					<button name="other_money_draft" states="done" string="反审核" type="object"/>
-                	<button name="print_other_money_order" states="done" string="打印" type="object" class="oe_highlight"/>
+					<!-- <button name="print_other_money_order" states="done" string="打印" type="object" class="oe_highlight"/> -->
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>

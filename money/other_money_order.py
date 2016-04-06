@@ -74,7 +74,7 @@ class other_money_order(models.Model):
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
     @api.onchange('partner_id')
-    def _onchange_partner(self):
+    def onchange_partner(self):
         '''
         根据所选业务伙伴源单填充行
         '''
@@ -127,11 +127,11 @@ class other_money_order(models.Model):
             other.state = 'draft'
         return True
 
-    @api.multi
-    def print_other_money_order(self):
-        '''打印 其他收入/支出单'''
-        assert len(self._ids) == 1, '一次执行只能有一个id'
-        return self.env['report'].get_action('money.report_other_money_order')
+#     @api.multi
+#     def print_other_money_order(self):
+#         '''打印 其他收入/支出单'''
+#         assert len(self._ids) == 1, '一次执行只能有一个id'
+#         return self.env['report'].get_action('money.report_other_money_order')
 
 class other_money_order_line(models.Model):
     _name = 'other.money.order.line'
