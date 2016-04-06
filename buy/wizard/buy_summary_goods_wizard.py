@@ -39,14 +39,15 @@ class buy_summary_goods_wizard(models.TransientModel):
         if self.partner_id:
             domain.append(('move_id.partner_id', '=', self.partner_id.id))
 
-        index = i = 0
+        i = 0
         line_ids = []
         total_qty = total_qty_uos = total_price = total_amount = total_tax_amount = total_subtotal = 0
         qty = qty_uos = amount = price = tax_amount = subtotal = 0
         for line in self.env['wh.move.line'].search(domain, order='move_id'):
             line_ids.append(line)
-        for line_id in line_ids:
+        for line_id in line_ids:    # 外循环，line_ids是动态变化的
             line = self.env['wh.move.line'].search([('id', '=', line_id.id)])
+            # 先将当前行的数量、金额等累加
             qty = line.goods_qty
             qty_uos = line.goods_uos_qty
             amount = line.amount
@@ -61,17 +62,28 @@ class buy_summary_goods_wizard(models.TransientModel):
                 price = amount / qty
                 tax_amount = - line.tax_amount
                 subtotal = - line.subtotal
-            i += 1
-            length = len(line_ids)
-            for index in range(length - i):
-                index += i
-                if index == length-1:
-                    after = self.env['wh.move.line'].search([('id', '=', index)])
+            i += 1  # 当前是第 i 次外循环
+            length = len(line_ids)  # 当前的line是动态变化的，统计一个line后将其移除
+            index = 0   # 记录当前line是所有line中第几条数据
+            last_index = 0  # 记录上一次数据的index
+            deleted = False # 标记某行是否删除
+            for index in range(length - i + 1): # 内循环
+                length = len(line_ids)
+                if index == 0:
+                    index = i
                 else:
-                    after_id = line_ids[index:] and line_ids[index:][0]
-                    if not after_id:
-                        break
-                    after = self.env['wh.move.line'].search([('id', '=', after_id.id)])
+                    index = last_index + 1
+
+                if not deleted:
+                    last_index = index
+                else:
+                    index = last_index
+                    deleted = False
+
+                after_id = line_ids[index:] and line_ids[index:][0]
+                if not after_id:    # 如果是最后一条数据，则不去查找下一条
+                    break
+                after = self.env['wh.move.line'].search([('id', '=', after_id.id)])
                 if line.move_id.origin and 'return' in line.move_id.origin:
                     # 如果是退货
                     if (line.goods_id.id == after.goods_id.id
@@ -83,6 +95,12 @@ class buy_summary_goods_wizard(models.TransientModel):
                         price = amount / qty
                         tax_amount += (-1) * after.tax_amount
                         subtotal += (-1) * after.subtotal
+                        if index == length:
+                            del line_ids[index-1]
+                        else:
+                            del line_ids[index]
+                            deleted = True
+                            last_index = index
                 else:
                     # 如果是购货
                     if (line.goods_id.id == after.goods_id.id
@@ -94,7 +112,12 @@ class buy_summary_goods_wizard(models.TransientModel):
                         price = amount / qty
                         tax_amount += after.tax_amount
                         subtotal += after.subtotal
-                        del line_ids[index]
+                        if index == length:
+                            del line_ids[index-1]
+                        else:
+                            del line_ids[index]
+                            deleted = True
+                            last_index = index
             summary = self.env['buy.summary.goods'].create({
                     'order_name': line.move_id.name,
                     'goods_categ_id': line.goods_id.category_id.id,
