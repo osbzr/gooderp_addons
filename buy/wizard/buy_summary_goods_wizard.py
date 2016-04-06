@@ -136,12 +136,12 @@ class buy_summary_goods_wizard(models.TransientModel):
                 })
             res.append(summary.id)
 
-            total_qty += line.goods_qty
-            total_qty_uos += line.goods_uos_qty
-            total_amount += line.amount
-            total_price += total_amount / total_qty
-            total_tax_amount += line.tax_amount
-            total_subtotal += line.subtotal
+            total_qty += summary.qty
+            total_qty_uos += summary.qty_uos
+            total_amount += summary.amount
+            total_price = total_amount / total_qty
+            total_tax_amount += summary.tax_amount
+            total_subtotal += summary.subtotal
         sum_summary = self.env['buy.summary.goods'].create({
             'warehouse_dest': u'合计',
             'qty_uos': total_qty_uos,
