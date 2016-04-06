@@ -29,7 +29,7 @@
             <field name='uom_id' ref='core.uom_pc' />
             <field name='uos_id' ref='core.uom_pc' />
 			<field name="goods_id" ref="goods.mouse"/>
-            <field name='price' eval='80' />
+            <field name='price' eval='40' />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
 			<field eval="1.0" name="goods_qty"/>

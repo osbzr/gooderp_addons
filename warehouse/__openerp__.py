@@ -50,7 +50,7 @@
         'security/ir.model.access.csv',
     ],
     'demo': [
-        'warehouse_demo.xml',
+        'data/warehouse_demo.xml',
      ],
     'installable': True,
     "active": False,
