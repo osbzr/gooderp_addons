@@ -4,7 +4,6 @@ from openerp.osv import osv
 from utils import safe_division
 
 from openerp import models, fields
-from openerp import api
 
 
 class goods(models.Model):
@@ -60,7 +59,7 @@ class goods(models.Model):
         # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
         # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
         records, subtotal = self.get_matching_records(warehouse, qty, ignore_stock=True,
-                                                      ignore=[current_move.id])
+                                                      ignore=current_move and current_move.id)
 
         matching_qty = sum(record.get('qty') for record in records)
         if matching_qty:
@@ -68,7 +67,7 @@ class goods(models.Model):
             if matching_qty >= qty:
                 return subtotal, cost
         else:
-            cost = self.get_cost(warehouse, ignore=[current_move.id])
+            cost = self.get_cost(warehouse, ignore=current_move and current_move.id)
         return cost * qty, cost
 
     def is_using_matching(self):
