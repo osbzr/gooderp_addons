@@ -111,9 +111,12 @@ class TestProduction(TransactionCase):
         # 创建一个新的临时bom
         self.assembly.bom_id = self.env['wh.bom'].create({'name': 'temp', 'type': 'assembly'})
 
+        # 将当前的组装单保存的临时bom上去
         self.assembly.update_bom()
+        # 测试bom和组装单是否一致
         self._test_assembly_bom(self.assembly, self.assembly.bom_id)
 
+        # 删除掉明细行，防止onchange之后明细行上存在历史的数据(缓存)
         self.assembly.line_in_ids.unlink()
         self.assembly.line_out_ids.unlink()
 
@@ -122,7 +125,9 @@ class TestProduction(TransactionCase):
             'line_in_ids': False,
             'line_out_ids': False,
         }
+        # 使用onchange来触发bom的改变，由于相关的bug，只能使用这种方案
         results = self.assembly.onchange(assembly_values, 'bom_id', {'bom_id': 'true'})
+        # 测试使用bom后，明细行上和bom的是否一致
         self._test_assembly_bom_by_results(self.assembly, self.assembly.bom_id, results['value'])
 
         self.disassembly.update_bom()
