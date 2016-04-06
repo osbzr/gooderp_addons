@@ -48,7 +48,7 @@ class test_sell(TransactionCase):
 
         # 销售退货单的测试
         #
-        order_3.write({'is_return': True})
+        order_3.write({'type': "return"})
         order_3.sell_order_done()
 
     def test_sale_order_line_compute(self):
