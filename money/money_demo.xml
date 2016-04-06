@@ -59,6 +59,44 @@
         </record>
 
         <!--reconcile order-->
+        <!--business_type为adv_pay_to_get-->
+        <record id="adv_pay_2" model="money.order">
+        	<field name="name">adv_pay_2</field>
+            <field name="partner_id" ref="core.jd"/>
+            <field eval="500.0" name="amount"/>
+            <field eval="0" name="reconciled"/>
+            <field eval="500.0" name="to_reconcile"/>
+        </record>
+        <record id="adv_pay_line_2" model="advance.payment">
+            <field name="name" ref="adv_pay_2"/>
+            <field eval="500.0" name="amount"/>
+            <field eval="0" name="reconciled"/>
+            <field eval="500.0" name="to_reconcile"/>
+            <field eval="100.0" name="this_reconcile"/>
+        </record>
+        <record id="need_pay_invoice_2" model="money.invoice">
+        	<field name="name">invoice_test_2</field>
+            <field name="partner_id" ref="core.jd"/>
+            <field name="category_id" ref="money.core_category_sale"/>
+            <field eval="800.0" name="amount"/>
+            <field eval="0" name="reconciled"/>
+            <field eval="800.0" name="to_reconcile"/>
+        </record>
+        <record id="need_pay_line_2" model="source.order.line">
+        	<field name="category_id" ref="core.cat_consult"/>
+            <field name="name" ref="need_pay_invoice_2"/>
+            <field eval="600.0" name="amount"/>
+            <field eval="0" name="reconciled"/>
+            <field eval="600.0" name="to_reconcile"/>
+            <field eval="100.0" name="this_reconcile"/>
+        </record>
+        <record id="adv_pay_to_get_2" model="reconcile.order">
+        	<field name="partner_id" ref="core.jd"/>
+        	<field name="business_type">adv_pay_to_get</field>
+        	<field name="advance_payment_ids" eval="[(4,ref('adv_pay_line_2'))]"/>
+        	<field name="receivable_source_ids" eval="[(4,ref('need_pay_line_2'))]"/>
+        </record>
+        <!--business_type为adv_get_to_pay-->
         <record id="adv_pay_2" model="money.order">
         	<field name="name">adv_pay_2</field>
             <field name="partner_id" ref="core.jd"/>
@@ -137,17 +175,18 @@
     </data>
     
     <data>
-    	<record id="bank_report_money_1" model="money.order">
+    	<record id="bank_report_money_2" model="money.order">
             <field name="date">2016-11-02</field>
             <field name="name">GET/2016/0001</field>
             <field name="partner_id" ref="core.yixun"/>
             <field name="type">get</field>
+            <field name="state">done</field>
         </record>
-        <record id="money_order_line_1" model="money.order.line">
-            <field name="money_id" ref="bank_report_money_1"/>
+        <record id="money_order_line_2" model="money.order.line">
+            <field name="money_id" ref="bank_report_money_2"/>
             <field name="bank_id" ref="core.comm"/>
             <field name="amount">1000</field>
-            <field name="note">get zxy</field>
+            <field name="note">get</field>
         </record>
 
         <record id="bank_report_other_1" model="other.money.order">
@@ -184,13 +223,6 @@
             <field name="out_bank_id" ref="core.comm"/>
             <field name="in_bank_id" ref="core.alipay"/>
             <field name="amount">1000</field>
-        </record>
-    </data>
-
-    <data>
-		<record id="partner_wizard_pay_400" model="partner.statements.report.wizard">
-            <field name="type">pay</field>
-            <field name="partner_id" ref="core.lenovo"/>
         </record>
     </data>
 </openerp>

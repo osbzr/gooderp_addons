@@ -24,11 +24,10 @@ class test_report(TransactionCase):
         detail.button_ok()
         
         # 执行向导，正常输出
+        # 执行 else self._context.get('default_supplier')
         statement = self.env['partner.statements.report.wizard'].create(
                     {'partner_id': 
-                     self.env.ref('buy.buy_order_1').partner_id.id})
-        # 执行 else self._context.get('default_supplier')
-        self.env['partner.statements.report.wizard'].with_context(default_supplier=True)
+                     self.env.ref('buy.buy_order_1').partner_id.id}).with_context({'default_supplier': True})
         # 输出报表，正常输出
         statement.partner_statements_without_goods()
         statement.partner_statements_with_goods()
@@ -40,6 +39,7 @@ class test_report(TransactionCase):
         # 输出报表，执行if
         with self.assertRaises(except_orm):
             statement_error_date.partner_statements_without_goods()
+        with self.assertRaises(except_orm):
             statement_error_date.partner_statements_with_goods()
 
         # 测试业务伙伴对账单方法中的from_date的默认值是否是公司启用日期
@@ -47,4 +47,3 @@ class test_report(TransactionCase):
                     {'partner_id': self.env.ref('buy.buy_order_1').partner_id.id,
                      'to_date': '2016-11-03'})
         self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
-        
