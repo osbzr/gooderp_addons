@@ -48,6 +48,10 @@ class test_money(TransactionCase):
         self.env.ref('money.other_pay_9000').other_money_draft()
         # 未审核可以删除
         self.env.ref('money.other_pay_9000').unlink()
+        # onchange_date
+        self.env.ref('money.other_get_60').onchange_date()
+        # onchange_partner
+        self.env.ref('money.other_get_60').onchange_partner()
     
     def test_money_transfer_order(self):
         ''' 测试转账 '''
