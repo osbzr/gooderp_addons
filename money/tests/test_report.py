@@ -7,7 +7,7 @@ class test_report(TransactionCase):
         ''' 测试银行对账单报表 '''
         # 执行向导
         statement = self.env['bank.statements.report.wizard'].create(
-                    {'bank_id': self.env.ref('money.money_order_line_1').bank_id.id,
+                    {'bank_id': self.env.ref('money.money_order_line_2').bank_id.id,
                     'from_date': '2016-11-01',
                     'to_date': '2016-11-03'})
         statement_other = self.env['bank.statements.report.wizard'].create(
@@ -55,6 +55,14 @@ class test_report(TransactionCase):
 
     def test_partner_statements_report(self):
         ''' 测试业务伙伴对账单报表'''
-        # onchange_from_date
-        self.env.ref('money.partner_wizard_pay_400').onchange_from_date()
-        
+        statement = self.env['partner.statements.report.wizard'].create(
+                    {'partner_id': self.env.ref('core.yixun').id,
+                     'from_date': '2016-01-01',
+                     'to_date': '2016-03-10'})
+        statement_customer = self.env['partner.statements.report.wizard'].create(
+                    {'partner_id': self.env.ref('core.jd').id,
+                     'from_date': '2016-01-01',
+                     'to_date': '2016-03-10'})
+        # onchange_from_date 业务伙伴先改为供应商，再改为客户
+        statement.onchange_from_date()
+        statement_customer.onchange_from_date()

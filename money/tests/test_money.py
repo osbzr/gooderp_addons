@@ -40,19 +40,32 @@ class test_money(TransactionCase):
         #    self.env.ref('money.other_pay_9000').other_money_done()
         # 转出账户收一笔款
         self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.other_get_60').other_money_done()
         self.env.ref('money.other_pay_9000').other_money_done()
         # 审核状态不可删除
         with self.assertRaises(except_orm):
             self.env.ref('money.other_pay_9000').unlink()
         # 反审核
         self.env.ref('money.other_pay_9000').other_money_draft()
+        self.env.ref('money.other_get_60').other_money_draft()
         # 未审核可以删除
         self.env.ref('money.other_pay_9000').unlink()
         # onchange_date
         self.env.ref('money.other_get_60').onchange_date()
         # onchange_partner
         self.env.ref('money.other_get_60').onchange_partner()
-    
+        # 测试其他收支单金额<0,执行if报错
+        other = self.env['other.money.order'].create({
+                                                'partner_id': self.env.ref('core.jd').id,
+                                                'bank_id': self.env.ref('core.comm').id,
+                                                'type': 'other_get'})
+        self.env['other.money.order.line'].create({
+                                                'other_money_id': other.id,
+                                                'category_id': self.env.ref('money.core_category_sale').id,
+                                                'amount': -10.0})
+        with self.assertRaises(except_orm):
+            other.other_money_done()
+
     def test_money_transfer_order(self):
         ''' 测试转账 '''
         with self.assertRaises(except_orm):
