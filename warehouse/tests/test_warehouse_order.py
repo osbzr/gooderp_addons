@@ -106,6 +106,20 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(self.others_out.state, 'draft')
         self.assertEqual(self.internal.state, 'draft')
 
+        # 没有明细行的单据不可以被审核通过
+        with self.assertRaises(except_orm):
+            self.overage_in.line_in_ids.unlink()
+            self.overage_in.approve_order()
+
+        # 测试utils里面对于多重继承的时候报错
+        # 在with里面，with接收之后里面的代码会生效，没有回溯
+        with self.assertRaises(ValueError):
+            self.others_in._inherits = {
+                'wh.move': 'move_id',
+                'wh.out': 'out_id',
+            }
+            self.others_in.approve_order()
+
     def test_origin(self):
         self.assertEqual(self.others_in.origin, 'wh.in.others')
         self.assertEqual(self.others_out.origin, 'wh.out.others')

@@ -25,7 +25,7 @@ class wh_out(models.Model):
                                 store=True, readonly=True, digits_compute=dp.get_precision('Accounting'))
 
     @api.multi
-    @inherits()
+    @inherits(res_back=False)
     def approve_order(self):
         return True
 

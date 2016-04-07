@@ -8,6 +8,11 @@ class TestProduction(TransactionCase):
         super(TestProduction, self).setUp()
 
         self.assembly = self.browse_ref('warehouse.wh_assembly_ass0')
+        self.assembly_mutli = self.browse_ref('warehouse.wh_assembly_ass1')
+
+        self.assembly_mutli_keyboard_mouse_1 = self.browse_ref('warehouse.wh_move_line_ass2')
+        self.assembly_mutli_keyboard_mouse_2 = self.browse_ref('warehouse.wh_move_line_ass3')
+
         self.disassembly = self.browse_ref('warehouse.wh_disassembly_dis1')
         self.disassembly_bom = self.browse_ref('warehouse.wh_bom_0')
 
@@ -80,10 +85,28 @@ class TestProduction(TransactionCase):
         self.assertEqual(temp_disassembly.origin, 'wh.disassembly')
 
     def test_apportion(self):
+        self.assembly_mutli.fee = 0
+        self.assembly_mutli.approve_order()
+
+        # demo数据中成本为鼠标 40 * 2，键盘 80 * 2，所以成本应该为平摊为120
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_1.price, 120)
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_2.price, 120)
+
+        self.assembly_mutli.cancel_approved_order()
+        self.assembly_mutli.fee = 100
+        self.assembly_mutli.approve_order()
+
+        # 此时组装费用为100，成本增加了100，所以平摊成本增加50
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_1.price, 170)
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_2.price, 170)
+
+        # 取消掉当前的单据，防止其他单据的库存不足
+        self.assembly_mutli.cancel_approved_order()
+
         self.assembly.fee = 0
         self.assembly.approve_order()
 
-        # demo数据中入库的成本为鼠标 40 * 1，键盘 80 * 2, 所以成本应该位100
+        # demo数据中入库的成本为鼠标 40 * 1，键盘 80 * 2, 所以成本应该为100
         self.assertEqual(self.assembly.line_in_ids.price, 100)
 
         self.assembly.cancel_approved_order()
@@ -107,6 +130,41 @@ class TestProduction(TransactionCase):
         self.assertEqual(self.disassembly_mouse.price, 90)
         self.assertEqual(self.disassembly_keyboard.price, 180)
 
+    def test_wizard_bom(self):
+        self.assembly.bom_id = False
+        action = self.assembly.update_bom()
+
+        temp_action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'save.bom.memory',
+            'view_mode': 'form',
+            'target': 'new',
+        }
+
+        # 当bom_id不存在的时候，此时保存bom，会自动返回一个wizard
+        self.assertEqual(action, temp_action)
+        save_bom_memory = self.env['save.bom.memory'].with_context({
+            'active_model': self.assembly._name,
+            'active_ids': self.assembly.id
+        }).create({'name': 'temp'})
+
+        save_bom_memory.save_bom()
+        self._test_assembly_bom(self.assembly, self.assembly.bom_id)
+
+        self.disassembly.bom_id = False
+        action = self.disassembly.update_bom()
+
+        # 当bom_id不存在的时候，此时保存bom，会自动返回一个wizard
+        self.assertEqual(action, temp_action)
+        save_bom_memory = self.env['save.bom.memory'].with_context({
+            'active_model': self.disassembly._name,
+            'active_ids': self.disassembly.id
+        }).create({'name': 'temp'})
+
+        save_bom_memory.save_bom()
+
+        self._test_disassembly_bom(self.disassembly, self.disassembly.bom_id)
+
     def test_bom(self):
         # 创建一个新的临时bom
         self.assembly.bom_id = self.env['wh.bom'].create({'name': 'temp', 'type': 'assembly'})
@@ -119,6 +177,10 @@ class TestProduction(TransactionCase):
         # 删除掉明细行，防止onchange之后明细行上存在历史的数据(缓存)
         self.assembly.line_in_ids.unlink()
         self.assembly.line_out_ids.unlink()
+
+        # 当明细行没有值的时候，此时无法审核过去
+        with self.assertRaises(except_orm):
+            self.assembly.approve_order()
 
         assembly_values = {
             'bom_id': self.assembly.bom_id,
@@ -135,6 +197,10 @@ class TestProduction(TransactionCase):
 
         self.disassembly.line_in_ids.unlink()
         self.disassembly.line_out_ids.unlink()
+
+        # 当明细行没有值的时候，此时无法审核过去
+        with self.assertRaises(except_orm):
+            self.assembly.approve_order()
 
         disassembly_values = {
             'bom_id': self.disassembly.bom_id,
