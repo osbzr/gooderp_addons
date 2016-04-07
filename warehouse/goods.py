@@ -49,17 +49,17 @@ class goods(models.Model):
 
                 domain.append(('id', 'not in', ignore))
 
-            move = self.env['wh.move.line'].search(domain, limit=1, order='date, id')
+            move = self.env['wh.move.line'].search(domain, limit=1, order='date desc, id desc')
             if move:
                 return move.price
 
         return self.cost
 
-    def get_suggested_cost_by_warehouse(self, warehouse, qty, current_move=None):
+    def get_suggested_cost_by_warehouse(self, warehouse, qty, ignore_move=None):
         # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
         # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
         records, subtotal = self.get_matching_records(warehouse, qty, ignore_stock=True,
-                                                      ignore=current_move and current_move.id)
+                                                      ignore=ignore_move)
 
         matching_qty = sum(record.get('qty') for record in records)
         if matching_qty:
@@ -67,17 +67,15 @@ class goods(models.Model):
             if matching_qty >= qty:
                 return subtotal, cost
         else:
-            cost = self.get_cost(warehouse, ignore=current_move and current_move.id)
+            cost = self.get_cost(warehouse, ignore=ignore_move)
         return cost * qty, cost
 
     def is_using_matching(self):
         return True
 
     def is_using_batch(self):
-        for goods in self:
-            return goods.using_batch
-
-        return False
+        self.ensure_one()
+        return self.using_batch
 
     def get_matching_records(self, warehouse, qty, uos_qty=0, ignore_stock=False, ignore=None):
         # @ignore_stock: 当参数指定为True的时候，此时忽略库存警告
