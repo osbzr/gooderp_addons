@@ -13,13 +13,13 @@
                     <field name="attribute"/>
                     <field name="warehouse_dest"/>
                     <field name="uos"/>
-                    <field name="qty_uos"/>
+                    <field name="qty_uos" sum="辅助数量合计"/>
                     <field name="uom"/>
-                    <field name="qty"/>
+                    <field name="qty" sum="基本数量合计"/>
                     <field name="price"/>
-                    <field name="amount"/>
-                    <field name="tax_amount"/>
-                    <field name="subtotal"/>
+                    <field name="amount" sum="采购金额合计"/>
+                    <field name="tax_amount" sum="税额合计"/>
+                    <field name="subtotal" sum="价税合计的合计"/>
                 </tree>
             </field>
         </record>
