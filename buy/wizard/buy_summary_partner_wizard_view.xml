@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="buy_summary_partner_wizard_form" model="ir.ui.view">
+            <field name="name">buy.summary.partner.wizard.form</field>
+            <field name="model">buy.summary.partner.wizard</field>
+            <field name="arch" type="xml">
+                <form string="采购汇总表（按供应商）">
+                    <group>
+                        <group>
+                            <field name="date_start" required="1"/>
+                            <field name="date_end" required="1"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="goods_id"/>
+                        </group>
+                        <footer>
+                            <button name="button_ok" type="object" string="确定" class="oe_highlight"/>
+                            or
+                            <button string="取消" class="oe_link" special="cancel"/>
+                        </footer>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="buy_summary_partner_wizard_action" model="ir.actions.act_window">
+            <field name="name">采购汇总表（按供应商）</field>
+            <field name="res_model">buy.summary.partner.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="menu_buy_summary_partner" name="采购汇总表（按供应商）" action="buy_summary_partner_wizard_action"
+        	parent="menu_buy_report" sequence="4"/>
+    </data>
+</openerp>
