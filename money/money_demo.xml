@@ -5,16 +5,20 @@
             <field name="type">get</field>
             <field name="partner_id" ref="core.jd"/>
         </record>
-        <record id="get_200" model="money.order">
-            <field name="type">get</field>
-            <field name="partner_id" ref="core.jd"/>
-        </record>
         <record id="get_line_1" model="money.order.line">
             <field name="money_id" ref="get_40000"/>
             <field name="bank_id" ref="core.comm"/>
             <field eval="40000.0" name="amount"/>
         </record>
-        
+        <record id="get_200_1" model="money.order">
+            <field name="type">get</field>
+            <field name="partner_id" ref="core.jd"/>
+        </record>
+        <record id="get_line_200_1" model="money.order.line">
+            <field name="money_id" ref="get_200_1"/>
+            <field name="bank_id" ref="core.comm"/>
+            <field eval="200.0" name="amount"/>
+        </record>
         <record id="pay_2000" model="money.order">
             <field name="type">pay</field>
             <field name="partner_id" ref="core.lenovo"/>

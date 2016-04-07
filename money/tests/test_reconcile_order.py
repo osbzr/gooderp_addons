@@ -27,29 +27,27 @@ class test_reconcile_order(TransactionCase):
         # 新建adv_get_to_pay时，收款单、源单和核销单。    为了使用银行账户付款，先给银行账户收款
         bank_get = self.env['money.order'].create({'name': 'GET201601',
                                           'partner_id': self.env.ref('core.jd').id,
-                                          'category_id': self.env.ref('money.core_category_sale').id,
                                           'date': '2016-04-07',
                                           'line_ids': [(0, 0, {'bank_id': self.env.ref('core.comm').id, 'amount': 400})],
                                           'type': 'get'
                                           })
         bank_get.money_order_done()
         order_adv_get_to_pay = self.env['money.order'].create({'name': 'PAY201601',
-                                          'partner_id': self.env.ref('core.lenovo').id,
-                                          'category_id': self.env.ref('money.core_category_purchase').id,
+                                          'partner_id': self.env.ref('core.zt').id,
                                           'date': '2016-04-07',
                                           'line_ids': [(0, 0, {'bank_id': self.env.ref('core.comm').id, 'amount': 100})],
                                           'type': 'pay',
                                           })
         order_adv_get_to_pay.money_order_done()
         invoice_adv_get_to_pay = self.env['money.invoice'].create({'name': 'adv_get_to_pay_1',
-                                          'partner_id': self.env.ref('core.lenovo').id,
+                                          'partner_id': self.env.ref('core.zt').id,
                                           'category_id': self.env.ref('money.core_category_purchase').id,
                                           'date': '2016-04-07',
                                           'amount': 600.0,
                                           'reconciled': 0,
                                           'to_reconcile': 600.0})
         invoice_adv_get_to_pay.money_invoice_done()
-        reconcile_adv_get_to_pay = self.env['reconcile.order'].create({'partner_id': self.env.ref('core.lenovo').id,
+        reconcile_adv_get_to_pay = self.env['reconcile.order'].create({'partner_id': self.env.ref('core.zt').id,
                                             'business_type': 'adv_get_to_pay',
                                             'name': 'TO20160005',
                                             'note': 'zxy adv_get_to_pay'})
@@ -108,6 +106,34 @@ class test_reconcile_order(TransactionCase):
                 reconcile.onchange_partner_id()
                 self.assertEqual(reconcile.business_type, type_list[type])
 
+        # 转入转出客户相同，执行if
+        reconcile_pay_to_pay_partner_same = self.env['reconcile.order'].create({'partner_id': self.env.ref('core.jd').id,
+                                            'to_partner_id': self.env.ref('core.jd').id,
+                                            'business_type': 'pay_to_pay',
+                                            'name': 'TO20160009',
+                                            'note': 'ywp pay to pay'})
+        with self.assertRaises(except_orm):
+            reconcile_pay_to_pay_partner_same.reconcile_order_done()
+        # 执行循环payable_source_ids
+        reconcile_pay_to_pay.reconcile_order_done()
+        # 核销金额必须相同
+        reconcile_adv_get_to_pay.payable_source_ids.this_reconcile = 60.0
+        with self.assertRaises(except_orm):
+            reconcile_adv_get_to_pay.reconcile_order_done()
+        # 预收预付时，本次核销金额不能大于未核销金额
+        reconcile_adv_get_to_pay.advance_payment_ids.this_reconcile = 800.0
+        with self.assertRaises(except_orm):
+            reconcile_adv_get_to_pay.reconcile_order_done()
+        # 执行_get_or_pay里的business_type 'get_to_get'
+        reconcile_get_to_get.reconcile_order_done()
+        # 状态为‘done’,再次执行reconcile_order_done(),执行continue
+        reconcile_pay_to_pay_done = self.env['reconcile.order'].create({'partner_id': self.env.ref('core.jd').id,
+                                            'to_partner_id': self.env.ref('core.yixun').id,
+                                            'business_type': 'pay_to_pay',
+                                            'name': 'TO20160010',
+                                            'note': 'qq pay to pay',
+                                            'state': 'done'})
+        reconcile_pay_to_pay_done.reconcile_order_done()
         # 未审核的核销单可删除
         self.env.ref('money.get_to_pay_1').unlink()
         
