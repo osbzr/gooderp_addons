@@ -37,6 +37,7 @@ class test_invoice(TransactionCase):
             self.assertEqual(invoice.state, 'draft')
             # 发票审核
             invoice.money_invoice_done()
+            
         # 确认发票为已审核状态
         self.assertEqual(invoice.state, 'done')
         # 客户的应收余额
@@ -50,3 +51,12 @@ class test_invoice(TransactionCase):
         self.assertEqual(self.partner.receivable, 0.0)
         # 未审核的发票可以删除
         invoice.unlink()
+        # 执行money_invoice_draft()的if category_id.type == 'expense'
+        invoice_buy = self.env['money.invoice'].create({
+            'name':'buy_invoice',
+            'partner_id': self.env.ref('core.lenovo').id,
+            'category_id':self.env.ref('money.core_category_purchase').id,
+            'amount':10.0,
+            })
+        invoice_buy.money_invoice_done()
+        invoice_buy.money_invoice_draft()

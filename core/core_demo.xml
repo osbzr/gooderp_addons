@@ -73,6 +73,12 @@
             <field name="s_category_id" ref="supplier_category_1"/>
         </record>
         
+        <record id="zt" model="partner">
+             <field name="name">中通</field>
+              <field name="code">zt</field>
+            <field name="s_category_id" ref="supplier_category_1"/>
+        </record>
+
         <record id="alipay" model="bank.account">
             <field name="name">支付宝(1888888888)</field>
         </record>
