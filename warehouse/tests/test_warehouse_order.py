@@ -92,14 +92,14 @@ class TestWarehouseOrder(TransactionCase):
 
         # 取消后的单据可以被删除
         self.others_in.unlink()
-        self.others_in_2.unlink()
+        self.others_out_2.unlink()
         self.overage_in.unlink()
         self.internal.unlink()
         self.others_out.unlink()
 
         # 删除后的单据应该不存在
         self.assertTrue(not self.others_in.exists())
-        self.assertTrue(not self.others_in_2.exists())
+        self.assertTrue(not self.others_out_2.exists())
         self.assertTrue(not self.overage_in.exists())
         self.assertTrue(not self.internal.exists())
         self.assertTrue(not self.others_out.exists())
