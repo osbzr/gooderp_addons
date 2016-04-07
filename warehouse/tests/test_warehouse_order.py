@@ -10,15 +10,27 @@ class TestWarehouseOrder(TransactionCase):
 
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
         self.overage_in_cable = self.browse_ref('warehouse.wh_move_line_14')
+
         self.others_in = self.browse_ref('warehouse.wh_in_whin1')
         self.others_in_cable = self.browse_ref('warehouse.wh_move_line_15')
+        self.others_in_keyboard_mouse = self.browse_ref('warehouse.wh_move_line_16')
+
+        self.others_in_2 = self.browse_ref('warehouse.wh_in_whin3')
+        self.others_in_2_keyboard_mouse = self.browse_ref('warehouse.wh_move_line_keyboard_mouse_in_2')
+
+        self.others_in_keyboard_mouse = self.browse_ref('warehouse.wh_move_line_16')
+
         self.others_out = self.browse_ref('warehouse.wh_out_whout0')
+        self.others_out_2 = self.browse_ref('warehouse.wh_out_whout1')
+
         self.internal = self.browse_ref('warehouse.wh_internal_whint0')
 
         # 其他入库调拨网线48个到总仓
         self.others_in.approve_order()
         # 睡眠2秒，使得下一次入库的确认时间和上次入库不一致
         time.sleep(2)
+
+        self.others_in_2.approve_order()
 
         # 盘盈入库调拨网线12000个到总仓
         self.overage_in.approve_order()
@@ -29,6 +41,9 @@ class TestWarehouseOrder(TransactionCase):
         # 将12个网线从上海仓库发往其他仓库
         self.others_out.approve_order()
 
+        # 将24个键盘套装从总仓发往其他仓库
+        self.others_out_2.approve_order()
+
     def test_approve(self):
 
         # 此时其他入库单的others_in的剩余数量应该为0
@@ -38,11 +53,18 @@ class TestWarehouseOrder(TransactionCase):
         # 此时调拨单上的剩余数量应该位120 - 12
         self.assertEqual(self.internal.line_out_ids.qty_remaining, 120 - 12)
 
+        # 根据FIFO原则，应该先取先入库的产品，所以先取others_in的前24个键盘套装
+        self.assertEqual(self.others_in_keyboard_mouse.qty_remaining, 24)
+        self.assertEqual(self.others_in_2_keyboard_mouse.qty_remaining, 48)
+
         # 所有审核后的单据状态都应该为done
         self.assertEqual(self.overage_in.state, 'done')
         self.assertEqual(self.others_in.state, 'done')
+        self.assertEqual(self.others_in_2.state, 'done')
         self.assertEqual(self.others_out.state, 'done')
+        self.assertEqual(self.others_out_2.state, 'done')
         self.assertEqual(self.internal.state, 'done')
+
 
     def test_unlink(self):
 
@@ -63,18 +85,21 @@ class TestWarehouseOrder(TransactionCase):
             self.others_out.unlink()
 
         self.others_out.cancel_approved_order()
+        self.others_out_2.cancel_approved_order()
         self.internal.cancel_approved_order()
         self.overage_in.cancel_approved_order()
         self.others_in.cancel_approved_order()
 
         # 取消后的单据可以被删除
         self.others_in.unlink()
+        self.others_in_2.unlink()
         self.overage_in.unlink()
         self.internal.unlink()
         self.others_out.unlink()
 
         # 删除后的单据应该不存在
         self.assertTrue(not self.others_in.exists())
+        self.assertTrue(not self.others_in_2.exists())
         self.assertTrue(not self.overage_in.exists())
         self.assertTrue(not self.internal.exists())
         self.assertTrue(not self.others_out.exists())
@@ -84,6 +109,10 @@ class TestWarehouseOrder(TransactionCase):
         # 存在已经被匹配的出库时入库无法被取消
         with self.assertRaises(except_orm):
             self.others_in.cancel_approved_order()
+
+        # 取消键盘套装的出库，此时others_in的键盘套装数量回复到48
+        self.others_out_2.cancel_approved_order()
+        self.assertEqual(self.others_in_keyboard_mouse.qty_remaining, 48)
 
         # 出库单据审核后剩余数量需要减去出库数量12
         self.assertEqual(self.internal.line_out_ids.qty_remaining, 120 - 12)

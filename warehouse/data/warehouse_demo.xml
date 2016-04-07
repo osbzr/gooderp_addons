@@ -18,6 +18,26 @@
         </record>
     </data>
     <data noupdate="1">
+        <record id="wh_in_whin3" model="wh.in">
+			<field name="name">WH/IN/16040003</field>
+			<field name="type">others</field>
+			<field name="date">2016-04-02</field>
+		</record>
+        <record id="wh_move_line_keyboard_mouse_in_2" model="wh.move.line">
+			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+			<field eval="1.0" name="goods_uos_qty"/>
+			<field name="goods_id" ref="goods.keyboard_mouse" />
+			<field name="production_date">2016-04-02</field>
+			<field name="state">draft</field>
+            <field name='uom_id' ref='core.uom_set' />
+            <field name='uos_id' ref='core.uom_set' />
+	 		<field eval="48.0" name="goods_qty"/>
+			<field name="type">in</field>
+			<field eval="80.0" name="price"/>
+			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
+			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040003')]"/>
+		</record>
+
 		<record id="wh_in_whin0" model="wh.in">
 			<field name="name">WH/IN/16040002</field>
 			<field name="type">overage</field>
@@ -343,6 +363,25 @@
 			<field eval="1.0" name="price"/>
 			<field name="warehouse_id" ref="warehouse.sh_stock"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/OUT/16040001')]"/>
+		</record>
+
+        <record id="wh_out_whout1" model="wh.out">
+			<field name="name">WH/OUT/16040002</field>
+			<field name="type">others</field>
+			<field name="date">2016-04-02</field>
+		</record>
+		<record id="wh_move_line_out_2" model="wh.move.line">
+			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
+			<field eval="2.0" name="goods_uos_qty"/>
+			<field name="goods_id" ref="goods.keyboard_mouse"/>
+            <field name='uom_id' ref='core.uom_pc' />
+            <field name='uos_id' ref='core.uom_set' />
+			<field name="production_date">2016-04-02</field>
+			<field eval="24.0" name="goods_qty"/>
+			<field name="type">out</field>
+			<field eval="18.0" name="price"/>
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
+			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/OUT/16040002')]"/>
 		</record>
 	</data>
 </openerp>
