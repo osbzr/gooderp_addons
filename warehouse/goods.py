@@ -49,7 +49,7 @@ class goods(models.Model):
 
                 domain.append(('id', 'not in', ignore))
 
-            move = self.env['wh.move.line'].search(domain, limit=1, order='date, id')
+            move = self.env['wh.move.line'].search(domain, limit=1, order='date desc, id desc')
             if move:
                 return move.price
 
@@ -74,10 +74,8 @@ class goods(models.Model):
         return True
 
     def is_using_batch(self):
-        for goods in self:
-            return goods.using_batch
-
-        return False
+        self.ensure_one()
+        return self.using_batch
 
     def get_matching_records(self, warehouse, qty, uos_qty=0, ignore_stock=False, ignore=None):
         # @ignore_stock: 当参数指定为True的时候，此时忽略库存警告

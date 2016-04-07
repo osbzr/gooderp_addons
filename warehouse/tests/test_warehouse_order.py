@@ -5,6 +5,7 @@ import time
 
 
 class TestWarehouseOrder(TransactionCase):
+    ''' 测试仓库的其他出库单单据和调拨单 '''
     def setUp(self):
         super(TestWarehouseOrder, self).setUp()
 

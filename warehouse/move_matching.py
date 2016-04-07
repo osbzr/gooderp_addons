@@ -39,9 +39,10 @@ class wh_move_line(models.Model):
     matching_out_ids = fields.One2many('wh.move.matching', 'line_out_id', string=u'关联的出库')
 
     @api.multi
-    def copy(self):
+    def copy_data(self):
         # TODO 奇怪，返回值似乎被wrapper了
-        res = super(wh_move_line, self).copy()
+        self.ensure_one()
+        res = super(wh_move_line, self).copy_data()[0]
 
         if res.get('warehouse_id') and res.get('warehouse_dest_id') and res.get('goods_id'):
             warehouses = self.env['warehouse'].browse([res.get('warehouse_id'),
@@ -62,17 +63,16 @@ class wh_move_line(models.Model):
         self.uos_qty_remaining = self.goods_uos_qty - sum(match.uos_qty for match in self.matching_in_ids)
 
     def get_matching_records_by_lot(self):
-        for line in self:
-            if line.lot_id.state != 'done':
-                raise osv.except_osv(u'错误', u'批号%s还没有实际入库，请先审核该入库' % line.lot_id.move_id.name)
+        self.ensure_one()
+        if self.lot_id.state != 'done':
+            raise osv.except_osv(u'错误', u'批号%s还没有实际入库，请先审核该入库' % self.lot_id.move_id.name)
 
-            if line.goods_qty > line.lot_id.qty_remaining:
-                raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name,))
+        if self.goods_qty > self.lot_id.qty_remaining:
+            raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name,))
 
-            return [{'line_in_id': line.lot_id.id, 'qty': line.goods_qty, 'uos_qty': line.goods_uos_qty}], \
-                line.lot_id.price * line.goods_qty
+        return [{'line_in_id': self.lot_id.id, 'qty': self.goods_qty, 'uos_qty': self.goods_uos_qty}], \
+            self.lot_id.price * self.goods_qty
 
-        return []
 
     def prev_action_done(self):
         matching_obj = self.env['wh.move.matching']

@@ -308,7 +308,7 @@
             <field name='uos_id' ref='core.uom_set' />
 	 		<field eval="48.0" name="goods_qty"/>
 			<field name="type">in</field>
-			<field eval="80.0" name="price"/>
+			<field eval="120.0" name="price"/>
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040001')]"/>
 		</record>

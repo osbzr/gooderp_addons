@@ -4,6 +4,7 @@ from openerp.exceptions import except_orm
 
 
 class TestProduction(TransactionCase):
+    ''' 测试组装单和拆卸单 '''
     def setUp(self):
         super(TestProduction, self).setUp()
 
@@ -176,11 +177,11 @@ class TestProduction(TransactionCase):
 
         # 删除掉明细行，防止onchange之后明细行上存在历史的数据(缓存)
         self.assembly.line_in_ids.unlink()
-        self.assembly.line_out_ids.unlink()
-
-        # 当明细行没有值的时候，此时无法审核过去
+        # 当有一个明细行没有值的时候，此时无法通过明细行检测
         with self.assertRaises(except_orm):
-            self.assembly.approve_order()
+            self.assembly.check_parent_length()
+
+        self.assembly.line_out_ids.unlink()
 
         assembly_values = {
             'bom_id': self.assembly.bom_id,
@@ -196,11 +197,11 @@ class TestProduction(TransactionCase):
         self._test_disassembly_bom(self.disassembly, self.disassembly.bom_id)
 
         self.disassembly.line_in_ids.unlink()
-        self.disassembly.line_out_ids.unlink()
-
-        # 当明细行没有值的时候，此时无法审核过去
+        # 当有一个明细行没有值的时候，此时无法通过明细行检测
         with self.assertRaises(except_orm):
-            self.assembly.approve_order()
+            self.disassembly.check_parent_length()
+
+        self.disassembly.line_out_ids.unlink()
 
         disassembly_values = {
             'bom_id': self.disassembly.bom_id,
