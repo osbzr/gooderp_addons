@@ -40,7 +40,6 @@ class test_money(TransactionCase):
                                                 'amount': 200.0,
                                                 'reconciled': 0,
                                                 'to_reconcile': 200.0,
-                                                'this_reconcile': 200.0,
                                                 'date_due': '2016-09-07'})
         money = self.env['money.order'].create({'partner_id': self.env.ref('core.jd').id,
                                                 'name': 'GET/2016001',
