@@ -171,8 +171,8 @@ class wh_move_line(models.Model):
                 'date': False,
             })
 
-    def _get_subtotal_util(self, goods_qty, price):
-        return goods_qty * price
+    # def _get_subtotal_util(self, goods_qty, price):
+    #     return goods_qty * price
 
     @api.one
     def compute_lot_compatible(self):

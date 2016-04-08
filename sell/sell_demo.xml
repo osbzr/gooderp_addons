@@ -24,13 +24,13 @@
             <field eval="32.0" name="discount_amount"/>
             <field name="delivery_date">2016-03-02</field>
         </record>
-        <record id="goods.keyboard_mouse" model="goods">
+        <record id="goods.cable" model="goods">
            <field name="default_wh" ref="warehouse.hd_stock"/> 
         </record>
         <record id="sell_order_line_2_3" model="sell.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="warehouse_dest_id" ref="warehouse.warehouse_customer"/>
-            <field name="goods_id" ref="goods.keyboard_mouse"/>
+            <field name="goods_id" ref="goods.cable"/>
             <field name="order_id" ref="sell_order_2"/>
             <field eval="10" name="price"/>
             <field name="warehouse_id" ref="warehouse.hd_stock"/>
@@ -43,13 +43,13 @@
             <field eval="32.0" name="discount_amount"/>
             <field name="delivery_date">2016-03-02</field>
         </record>
-        <record id="goods.keyboard_mouse" model="goods">
+        <record id="goods.cable" model="goods">
            <field name="default_wh" ref="warehouse.hd_stock"/> 
         </record>
         <record id="sell_order_line_3" model="sell.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="warehouse_dest_id" ref="warehouse.warehouse_customer"/>
-            <field name="goods_id" ref="goods.keyboard_mouse"/>
+            <field name="goods_id" ref="goods.cable"/>
             <field name="order_id" ref="sell_order_3"/>
             <field eval="10" name="price"/>
             <field name="warehouse_id" ref="warehouse.hd_stock"/>
