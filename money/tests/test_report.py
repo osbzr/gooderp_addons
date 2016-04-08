@@ -62,7 +62,7 @@ class test_report(TransactionCase):
         statement_customer = self.env['partner.statements.report.wizard'].create(
                     {'partner_id': self.env.ref('core.jd').id,
                      'from_date': '2016-01-01',
-                     'to_date': '2016-03-10'})
+                     'to_date': '2016-03-10'}).with_context({'default_customer': True})
         # onchange_from_date 业务伙伴先改为供应商，再改为客户
         statement.onchange_from_date()
         statement_customer.onchange_from_date()
