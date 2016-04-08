@@ -23,7 +23,7 @@ class buy_payment_wizard(models.TransientModel):
     partner_id = fields.Many2one('partner', u'供应商')
     order_id = fields.Many2one('buy.receipt', u'采购单号')
 
-    '''@api.multi
+    @api.multi
     def button_ok(self):
         res = []
         if self.date_end < self.date_start:
@@ -40,35 +40,66 @@ class buy_payment_wizard(models.TransientModel):
             cond.append(('name', '=', self.order_id.id))
 
         for receipt in self.env['buy.receipt'].search(cond, order='partner_id'):
+            purchase_amount = receipt.discount_amount + receipt.amount
+            discount_amount = receipt.discount_amount
+            amount = receipt.amount
+            payment = receipt.payment
+            balance = receipt.debt
             if not receipt.is_return:
-                type = u'普通采购'
+                order_type = u'普通采购'
             elif receipt.is_return:
-                type = u'采购退回'
-            # FIXME: 付款
-            detail = self.env['buy.payment'].create({
+                order_type = u'采购退回'
+                purchase_amount = - purchase_amount
+                discount_amount = - discount_amount
+                amount = - amount
+                payment = - payment
+                balance = - balance
+            # 用查找到的入库单信息来创建一览表
+            payment = self.env['buy.payment'].create({
                     's_category': receipt.partner_id.s_category_id.id,
                     'partner_id': receipt.partner_id.id,
-                    'type': type,
+                    'type': order_type,
                     'date': receipt.date,
                     'order_name': receipt.name,
-                    'purchase_amount': receipt.discount_amount + receipt.amount,
-                    'discount_amount': receipt.discount_amount,
-                    'amount': receipt.amount,
-                    'payment': receipt.payment,
-                    'balance': receipt.debt,
+                    'purchase_amount': purchase_amount,
+                    'discount_amount': discount_amount,
+                    'amount': amount,
+                    'payment': payment,
+                    'balance': balance,
                     'note': receipt.note,
                 })
-            res.append(detail.id)
-            for source in self.env['money.order'].source_ids:
-                if source.name.id == receipt.id:
-                    detail = self.env['buy.payment'].create({
-                        'type': u'付款',
-                        'date': receipt.date,
-                        'order_name': receipt.name,
-                        'payment': receipt.payment,
-                        'note': receipt.note,
-                })
-            res.append(detail.id)
+            res.append(payment.id)
+
+            # 用查找到的入库单产生的付款单信息来创建一览表
+            payment = 0
+            for order in self.env['money.order'].search([]):
+                for source in order.source_ids:
+                    if source.name.name == receipt.name:
+                        payment2 = self.env['buy.payment'].create({
+                            'type': u'付款',
+                            'date': source.date,
+                            'order_name': source.money_id.name,
+                            'payment': source.this_reconcile,
+                            'balance': source.to_reconcile,
+                        })
+                        payment += source.this_reconcile
+                        res.append(payment2.id)
+
+            # 创建一览表的小计行
+            if amount == 0 and payment== 0:
+                payment_rate = 100
+            else:
+                payment_rate = (payment / amount) * 100
+            payment_total =  self.env['buy.payment'].create({
+                            'order_name': u'小计',
+                            'purchase_amount': purchase_amount,
+                            'discount_amount': discount_amount,
+                            'amount': amount,
+                            'payment': payment,
+                            'balance': amount - payment,
+                            'payment_rate': payment_rate,
+                        })
+            res.append(payment_total.id)
         view = self.env.ref('buy.buy_payment_tree')
         return {
             'name': u'采购付款一览表',
@@ -80,4 +111,4 @@ class buy_payment_wizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'domain': [('id', 'in', res)],
             'limit': 300,
-        }'''
+        }
