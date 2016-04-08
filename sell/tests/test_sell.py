@@ -19,6 +19,8 @@ class Test_sell(TransactionCase):
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
         self.others_warehouse_id = self.env.ref('warehouse.warehouse_others')
         self.goods = self.env.ref('goods.cable')
+        self.goods.default_wh = self.warehouse_id.id
+        self.partner = self.env.ref('core.lenovo')
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -84,7 +86,7 @@ class Test_sell(TransactionCase):
         }
         sell_order_line = self.env['sell.order.line']
         sell_order_line._default_warehouse_dest()
-  
+
         sell_order_line_default = sell_order_line.with_context({'warehouse_dest_type': u'customer'}).create(vals)
 
         # 测试 产品自动带出 默认值 的仓库
