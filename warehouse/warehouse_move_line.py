@@ -122,9 +122,9 @@ class wh_move_line(models.Model):
 
         return res
 
-    def get_real_price(self):
-        for line in self:
-            return safe_division(line.subtotal, line.goods_qty)
+    # def get_real_price(self):
+    #     self.ensure_one()
+    #     return safe_division(self.subtotal, self.goods_qty)
 
     @api.multi
     def name_get(self):
@@ -171,8 +171,8 @@ class wh_move_line(models.Model):
                 'date': False,
             })
 
-    def _get_subtotal_util(self, goods_qty, price):
-        return goods_qty * price
+    # def _get_subtotal_util(self, goods_qty, price):
+    #     return goods_qty * price
 
     @api.one
     def compute_lot_compatible(self):

@@ -124,7 +124,7 @@ class wh_inventory(models.Model):
     def generate_inventory(self):
         for inventory in self:
             out_line, in_line = [], []
-            for line in inventory.line_ids.filtered(lambda line: line.difference_qty + line.difference_uos_qty):
+            for line in inventory.line_ids.filtered(lambda line: line.difference_qty or line.difference_uos_qty):
                 if line.difference_qty <= 0 and line.difference_uos_qty <= 0:
                     out_line.append(line)
                 elif line.difference_qty >= 0 and line.difference_uos_qty >= 0:

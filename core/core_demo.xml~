@@ -1,0 +1,219 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="core_category_customer_one_level" model="core.category">
+            <field name="name">一级客户</field>
+            <field name="type">customer</field>
+        </record>
+        <record id="core_category_customer_two_level" model="core.category">
+            <field name="name">二级级客户</field>
+            <field name="type">customer</field>
+        </record>
+         <record id="core_category_customer_high_vip" model="core.category">
+            <field name="name">高级vip</field>
+            <field name="type">customer</field>
+        </record>
+
+        <record id="core_category_supplier" model="core.category">
+            <field name="name">供应商</field>
+            <field name="type">supplier</field>
+        </record>
+        <record id="core_category_goods" model="core.category">
+            <field name="name">库存产品</field>
+            <field name="type">goods</field>
+        </record>
+        <record id="core_category_goods_consumables" model="core.category">
+            <field name="name">消耗品</field>
+            <field name="type">goods</field>
+        </record>
+
+          <record id="core_category_income_sevice" model="core.category">
+            <field name="name">服务费</field>
+            <field name="type">income</field>
+        </record>
+        <record id="core_category_income_sale" model="core.category">
+            <field name="name">销售</field>
+            <field name="type">income</field>
+        </record>
+         <record id="core_category_expense_air_ticket" model="core.category">
+            <field name="name">飞机票</field>
+            <field name="type">expense</field>
+        </record>
+         <record id="core_category_expense_lunch" model="core.category">
+            <field name="name">午饭</field>
+            <field name="type">expense</field>
+        </record>
+
+
+         <record id="core_category_attribute_high" model="core.category">
+            <field name="name">高</field>
+            <field name="type">attribute</field>
+        </record>
+         <record id="core_category_attribute_big" model="core.category">
+            <field name="name">大</field>
+            <field name="type">attribute</field>
+        </record>
+         <record id="core_category_attribute_long" model="core.category">
+            <field name="name">长</field>
+            <field name="type">attribute</field>
+        </record>
+
+        <!-- 计量单位 -->
+         <record id="uom_bag" model="uom">
+            <field name="name">袋</field>
+        </record>
+         <record id="uom_container" model="uom">
+            <field name="name">集装箱</field>
+        </record>
+         <record id="uom_pcs" model="uom">
+            <field name="name">件</field>
+        </record>
+         <record id="uom_bottle" model="uom">
+            <field name="name">瓶</field>
+        </record>
+         <record id="uom_lot" model="uom">
+            <field name="name">批</field>
+        </record>
+         <record id="uom_kilogram" model="uom">
+            <field name="name">千克（公斤）</field>
+        </record>
+         <record id="uom_hour" model="uom">
+            <field name="name">小时</field>
+        </record>
+         <record id="uom_ton" model="uom">
+            <field name="name">吨</field>
+        </record>
+         <record id="uom_minute" model="uom">
+            <field name="name">分</field>
+        </record>
+
+         <record id="uom_second" model="uom">
+            <field name="name">秒</field>
+        </record>
+         <record id="uom_cubic" model="uom">
+            <field name="name">立方米</field>
+        </record>
+       <!--  银行汇票  银行本票 商业汇票 支票 信用卡  汇兑  委托收款  托收承付 信用证-->
+         <record id="settle_mode_bank_draft" model="settle.mode">
+            <field name="name">银行汇票</field>
+        </record>
+         <record id="settle_mode_bank_note" model="settle.mode">
+            <field name="name">银行本票</field>
+        </record>
+         <record id="settle_mode_commercial_bill" model="settle.mode">
+            <field name="name">商业汇票</field>
+        </record>
+         <record id="settle_mode_Check" model="settle.mode">
+            <field name="name">支票</field>
+        </record>
+         <record id="settle_credit" model="settle.mode">
+            <field name="name">信用卡</field>
+        </record>
+         <record id="settle_exchange" model="settle.mode">
+            <field name="name">汇兑</field>
+        </record>
+
+         <record id="settle_mode_consignment_collection" model="settle.mode">
+            <field name="name">委托收款</field>
+        </record>
+         <record id="settle_mode_collection" model="settle.mode">
+            <field name="name">托收承付</field>
+        </record>
+
+         <record id="settle_mode_letter_of_credit" model="settle.mode">
+            <field name="name">信用证</field>
+        </record>
+        <!-- partner -->
+        <record id="partner_level_one" model="partner">
+            <field name="name">judy001</field>
+            <field name="code">001</field>
+            <field name="c_category_id" eval="core_category_customer_one_level"/>
+        </record>
+
+        <record id="partner_two_level" model="partner">
+               <field name="name">judy002</field>
+               <field name="code">002</field>
+            <field name="c_category_id" eval="core_category_customer_two_level"/>
+        </record>
+
+        <record id="partner_high_vip" model="partner">
+               <field name="name">judy003</field>
+               <field name="code">003</field>
+            <field name="c_category_id" eval="core_category_customer_high_vip" />
+        </record>
+
+        <record id="partner_core_category_supplier_flower" model="partner">
+             <field name="name">flower001</field>
+              <field name="code">001</field>
+            <field name="s_category_id" eval="core_category_supplier"/>
+        </record>
+
+
+        <record id="warehouse_stock" model="warehouse">
+            <field name="name">公司默认仓库</field>
+            <field name="code">WH/001</field>
+            <field name='type'>stock</field>
+        </record>
+        <record id="bank_account_zhifu_bao" model="bank.account">
+            <field name="name">支付宝(1888888888)</field>
+            <field name="balance">2000</field>
+        </record>
+        <record id="bank_account_yinghang" model="bank.account">
+            <field name="name">交通银行(622262 8888888888888)</field>
+            <field name="balance">6000</field>
+        </record>
+
+      <!--   <record id="attribute_value_value_high_001" model="attribute.value.value">
+          　<field name="name">十分的高</field>
+           <field name="category_id" eval="core_category_attribute_high"/>
+      </record>
+      <record id="attribute_value_value_big_001" model="attribute.value.value">
+          <field name="name">十分的大</field>
+           <field name="category_id" eval="core_category_attribute_big"/>
+      </record>
+      
+      <record id="attribute_high_001" model="attribute">
+          <field name="value_id" eval="attribute_value_value_big_001"/>
+           <field name="category_id" eval="core_category_attribute_high"/>
+      </record>
+       -->
+
+     <record id="goods_test_data_001" model="goods">
+            <field name="code">goods001</field>
+            <field name="name">鼠标</field>
+            <field name="category_id" eval="core_category_goods_consumables"/>
+            <field name="default_wh" eval="warehouse_stock"/>
+            <field name="uom_id" eval="uom_lot"/>
+            <field name="uos_id" eval="uom_pcs"/>
+            <field name="using_batch">True</field>
+            <field name="cost">200</field>
+            <field name="conversion">0.22</field>
+        <!--     <field name="attribute" eval="[(4,0,ref('attribute_high_001'))]"/> -->
+       </record>
+
+        <record id="goods_test_data_002" model="goods">
+            <field name="code">goods002</field>
+            <field name="name">手机</field>
+            <field name="category_id" eval="core_category_goods_consumables"/>
+            <field name="default_wh" eval="warehouse_stock"/>
+            <field name="uom_id" eval="uom_lot"/>
+            <field name="uos_id" eval="uom_pcs"/>
+            <field name="using_batch">True</field>
+            <field name="force_batch_one">True</field>
+            <field name="cost">3000</field>
+            <field name="conversion">0.22</field>
+       </record>
+
+        <record id="goods_test_data_003" model="goods">
+            <field name="code">goods003</field>
+            <field name="name">键盘</field>
+            <field name="category_id" eval="core_category_goods_consumables"/>
+            <field name="default_wh" eval="warehouse_stock"/>
+            <field name="uom_id" eval="uom_lot"/>
+            <field name="uos_id" eval="uom_pcs"/>
+            <field name="using_batch">False</field>
+            <field name="cost">800</field>
+            <field name="conversion">0.88</field>
+       </record>
+    </data>
+</openerp>

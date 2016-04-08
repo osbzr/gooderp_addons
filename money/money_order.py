@@ -101,12 +101,13 @@ class money_order(models.Model):
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
     @api.onchange('partner_id')
-    def _onchange_partner_id(self):
+    def onchange_partner_id(self):
         if not self.partner_id:
             return {}
 
         source_lines = []
         self.source_ids = []
+        money_invoice = self.env['money.invoice']
         if self.env.context.get('type') == 'get':
             money_invoice = self.env['money.invoice'].search([
                                     ('partner_id', '=', self.partner_id.id),
@@ -199,9 +200,9 @@ class money_order(models.Model):
             order.state = 'draft'
         return True
 
-    @api.multi
-    def print_money_order(self):
-        return True
+#     @api.multi
+#     def print_money_order(self):
+#         return True
 
 
 
@@ -231,7 +232,7 @@ class money_invoice(models.Model):
     name = fields.Char(string=u'订单编号', copy=False,
                        readonly=True, required=True)
     category_id = fields.Many2one('core.category', string=u'类别', readonly=True)
-    date = fields.Date(string=u'单据日期', readonly=True)
+    date = fields.Date(string=u'单据日期', readonly=True, default=lambda self: fields.Date.context_today(self))
     amount = fields.Float(string=u'单据金额', readonly=True)
     reconciled = fields.Float(string=u'已核销金额', readonly=True)
     to_reconcile = fields.Float(string=u'未核销金额', readonly=True)
