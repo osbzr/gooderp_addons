@@ -106,7 +106,7 @@ class wh_move_line(models.Model):
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.type))
         elif self.move_id.origin == 'wh.internal':
             return self.ORIGIN_EXPLAIN.get((self.move_id.origin, self.env.context.get('internal_out', False)))
-        else:
+        elif self.move_id.origin in self.ORIGIN_EXPLAIN.keys():
             return self.ORIGIN_EXPLAIN.get(self.move_id.origin)
 
         return ''

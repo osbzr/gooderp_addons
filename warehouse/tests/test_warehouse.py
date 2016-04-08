@@ -37,10 +37,15 @@ class TestWarehouse(TransactionCase):
         self.assertEqual(self.sh_warehouse.get_stock_qty(), sh_real_results)
 
     def test_name_search(self):
+        # 使用name来搜索总仓
         result = self.env['warehouse'].name_search('总仓')
         real_result = [(self.hd_warehouse.id, '[%s]%s' % (
             self.hd_warehouse.code, self.hd_warehouse.name))]
 
+        self.assertEqual(result, real_result)
+
+        # 使用code来搜索总仓
+        result = self.env['warehouse'].name_search('000')
         self.assertEqual(result, real_result)
 
         with self.assertRaises(except_orm):
@@ -48,6 +53,7 @@ class TestWarehouse(TransactionCase):
 
         # 临时在warehouse的类型中添加一个error类型的错误，让它跳过类型检测的异常
         # 此时在数据库中找不到该类型的仓库，应该报错
-        self.env['warehouse'].WAREHOUSE_TYPE.append('error')
+        x = self.env['warehouse'].search([('type', '=', 'inventory')])
+        x.unlink()
         with self.assertRaises(except_orm):
-            self.env['warehouse'].get_warehouse_by_type('error')
+            self.env['warehouse'].get_warehouse_by_type('inventory')
