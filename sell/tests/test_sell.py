@@ -17,7 +17,9 @@ class Test_sell(TransactionCase):
         self.sell_order_line = self.env.ref('sell.sell_order_line_2_3')
         self.bank = self.env.ref('core.alipay')
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
-        self.goods = self.env.ref('goods.keyboard_mouse')
+        self.goods = self.env.ref('goods.cable')
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
 
     def test_sell(self):
         ''' 测试销售订单  '''
@@ -111,7 +113,7 @@ class Test_sell(TransactionCase):
         sell_delivery.receipt = -222
         sell_delivery.sell_delivery_done()
 
-        self.assertEqual(sell_delivery.amount, -22.23)
+        self.assertEqual(sell_delivery.amount, 913.77)
         self.assertEqual(sell_delivery.money_state, u'部分收款')
         # with self.assertRaises(except_orm):
         #     sell_delivery.receipt = -222
