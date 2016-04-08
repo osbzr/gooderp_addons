@@ -16,5 +16,5 @@ class buy_payment(models.TransientModel):
     amount = fields.Float(u'优惠后金额')
     payment = fields.Float(u'本次付款')
     balance = fields.Float(u'应付款余额')
-    payment_rate = fields.Float(u'付款率')
+    payment_rate = fields.Float(u'付款率(%)')
     note = fields.Char(u'备注')
