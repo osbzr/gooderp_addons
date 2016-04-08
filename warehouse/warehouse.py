@@ -63,13 +63,13 @@ class warehouse(models.Model):
     def name_get(self):
         res = []
         for warehouse in self:
-            res.append((warehouse.id, u'[{}]{}'.format(warehouse.code, warehouse.name)))
+            res.append((warehouse.id, u'[%s]%s' % (warehouse.code, warehouse.name)))
 
         return res
 
     def get_warehouse_by_type(self, _type):
         if not _type or _type not in map(lambda _type: _type[0], self.WAREHOUSE_TYPE):
-            raise ValueError(u'错误，仓库类型"%s"不在预先定义的type之中，请联系管理员' % _type)
+            raise osv.except_osv(u'错误', u'仓库类型"%s"不在预先定义的type之中，请联系管理员' % _type)
 
         warehouses = self.search([('type', '=', _type)], limit=1, order='id asc')
         if not warehouses:

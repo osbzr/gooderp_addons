@@ -81,6 +81,9 @@ class TestInventory(TransactionCase):
         for line in self.inventory.line_ids:
             self.assertEqual(line.goods_id.name, u'鼠标')
 
+        self.inventory.unlink()
+        self.assertTrue(not self.inventory.exists())
+
     def test_generate_inventory(self):
         for line in self.inventory.line_ids:
             if line.goods_id.name == u'键鼠套装':
@@ -127,6 +130,12 @@ class TestInventory(TransactionCase):
         mouse.inventory_uos_qty = mouse.real_uos_qty + 1
         mouse.onchange_uos_qty()
         self.assertEqual(mouse.goods_id.conversion_unit(mouse.inventory_uos_qty), mouse.inventory_qty)
+
+        # 盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致的时候，此时没法生成盘盈盘亏单据
+        mouse.difference_qty = -1
+        mouse.difference_uos_qty = 1
+        with self.assertRaises(except_orm):
+            self.inventory.generate_inventory()
 
         mouse.line_role_back()
         mouse.inventory_qty = mouse.real_qty + 1
