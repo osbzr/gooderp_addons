@@ -116,12 +116,38 @@ class test_money(TransactionCase):
             self.env.ref('money.transfer_300').money_transfer_done()
         # 转出账户收一笔款
         self.env.ref('money.get_40000').money_order_done()
+        # 审核
         self.env.ref('money.transfer_300').money_transfer_done()
+        # 已审核的转账单不能删除
         with self.assertRaises(except_orm):
             self.env.ref('money.transfer_300').unlink()
+        # 反审核
         self.env.ref('money.transfer_300').money_transfer_draft()
+        # 未审核的转账单可以删除
         self.env.ref('money.transfer_300').unlink()
-    
+        # 转入账户余额不足，不能反审核
+        self.env.ref('money.transfer_400').money_transfer_done()
+        self.env.ref('core.alipay').balance = self.env.ref('core.alipay').balance - 100
+        with self.assertRaises(except_orm):
+            self.env.ref('money.transfer_400').money_transfer_draft()
+        # line_ids不存在，则审核报错
+        transfer_order = self.env['money.transfer.order']
+        transfer_no_line = transfer_order.create({'note': 'no line'})
+        with self.assertRaises(except_orm):
+            transfer_no_line.money_transfer_done()
+        # 转出转入账户相同，则审核报错
+        transfer_same_account = transfer_order.create({'note': 'same account',
+                                                       'line_ids': [(0,0,{'out_bank_id':self.env.ref('core.alipay').id,
+                                                                        'in_bank_id':self.env.ref('core.alipay').id})]})
+        with self.assertRaises(except_orm):
+            transfer_same_account.money_transfer_done()
+        # 转出金额<0，则审核报错
+        transfer_amount_error = transfer_order.create({'note': 'error amount',
+                                                       'line_ids': [(0,0,{'out_bank_id':self.env.ref('core.alipay').id,
+                                                                        'in_bank_id':self.env.ref('core.comm').id,
+                                                                        'amount': -10.0})]})
+        with self.assertRaises(except_orm):
+            transfer_amount_error.money_transfer_done()
     def test_partner(self):
         ''' 客户对账单 和  银行帐'''
         self.env.ref('core.jd').partner_statements()

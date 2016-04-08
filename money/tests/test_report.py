@@ -34,6 +34,18 @@ class test_report(TransactionCase):
         statement.confirm_bank_statements()
         statement_transfer_out.confirm_bank_statements()
         statement_transfer_in.confirm_bank_statements()
+        # 测试现金银行对账单方法中的'结束日期不能小于开始日期！'
+        statement_date_error = self.env['bank.statements.report.wizard'].create(
+                    {'bank_id': self.env.ref('money.money_order_line_2').bank_id.id,
+                    'from_date': '2016-11-03',
+                    'to_date': '2016-11-02'})
+        with self.assertRaises(except_orm):
+            statement_date_error.confirm_bank_statements()
+        # 测试现金银行对账单方法中的from_date的默认值是否是公司启用日期
+        statement_date = self.env['bank.statements.report.wizard'].create(
+                    {'bank_id': self.env.ref('money.money_order_line_2').bank_id.id,
+                     'to_date': '2016-11-03'})
+        self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
         # 查看对账单明细
         statement_money = self.env['bank.statements.report'].search([])
         for money in statement_money:

@@ -54,12 +54,20 @@
         <record id="transfer_300" model="money.transfer.order">
             <field name="note"></field>
         </record>
-        
         <record id="transfer_line_1" model="money.transfer.order.line">
             <field name="transfer_id" ref="transfer_300"/>
             <field name="out_bank_id" ref="core.comm"/>
             <field name="in_bank_id" ref="core.alipay"/>
             <field eval="300.0" name="amount"/>
+        </record>
+        <record id="transfer_400" model="money.transfer.order">
+            <field name="note"></field>
+        </record>
+        <record id="transfer_line_2" model="money.transfer.order.line">
+            <field name="transfer_id" ref="transfer_400"/>
+            <field name="out_bank_id" ref="core.comm"/>
+            <field name="in_bank_id" ref="core.alipay"/>
+            <field eval="400.0" name="amount"/>
         </record>
 
         <!--reconcile order-->
