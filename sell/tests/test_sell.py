@@ -74,3 +74,21 @@ class test_sell(TransactionCase):
         sell_order_line.discount_rate = 20
         sell_order_line.onchange_discount_rate()
         self.assertEqual(sell_order_line.amount, 80)
+
+    def test_sell_done(self):
+        ''' 测试审核销货订单  '''
+        order = self.env.ref('sell.sell_order_1')
+
+        # 审核销货订单
+        order.sell_order_done()
+        with self.assertRaises(except_orm):
+            order.sell_order_done()
+
+    def test_sell_draft(self):
+        ''' 测试反审核销货订单  '''
+        order = self.env.ref('sell.sell_order_1')
+
+        # 反审核销货订单
+        order.sell_order_draft()
+        with self.assertRaises(except_orm):
+            order.sell_order_draft()
