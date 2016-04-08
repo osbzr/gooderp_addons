@@ -80,7 +80,7 @@ class other_money_order(models.Model):
         '''
         self.line_ids = []
         lines = []
-        for invoice in self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id), ('to_reconcile', '>', 0)]):
+        for invoice in self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id), ('to_reconcile', '!=', 0)]):
             lines.append((0, 0, {
                 'category_id':invoice.category_id.id,
                 'source_id':invoice.id,

@@ -177,10 +177,23 @@
             <field name="date">2016-11-02</field>
             <field name="name">OTHER_GET/2016/0001</field>
             <field name="partner_id" ref="core.yixun"/>
-            <field name="total_amount">1000</field>
             <field name="type">other_get</field>
         </record>
-        
+
+        <record id="bank_report_other_get_1" model="other.money.order">
+			<field name="bank_id" ref="core.comm"/>
+            <field name="date">2016-11-05</field>
+            <field name="name">OTHER_GET/20160001</field>
+            <field name="partner_id" ref="core.jd"/>
+            <field name="type">other_get</field>
+        </record>
+        <record id="other_money_order_line_get_1" model="other.money.order.line">
+            <field name="other_money_id" ref="bank_report_other_get_1"/>
+            <field name="category_id" ref="money.core_category_purchase"/>
+            <field name="amount">2000</field>
+            <field name="note">other get zxy</field>
+        </record>
+
         <record id="bank_report_transfer_1" model="money.transfer.order">
             <field name="date">2016-11-02</field>
             <field name="name">TR/2016/0001</field>

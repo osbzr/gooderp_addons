@@ -67,7 +67,6 @@ class test_money(TransactionCase):
         #    self.env.ref('money.other_pay_9000').other_money_done()
         # 转出账户收一笔款
         self.env.ref('money.get_40000').money_order_done()
-        self.env.ref('money.other_get_60').other_money_done()
         self.env.ref('money.other_pay_9000').other_money_done()
         # 审核状态不可删除
         with self.assertRaises(except_orm):
@@ -77,8 +76,25 @@ class test_money(TransactionCase):
         self.env.ref('money.other_get_60').other_money_draft()
         # 未审核可以删除
         self.env.ref('money.other_pay_9000').unlink()
-        # onchange_date
-        self.env.ref('money.other_get_60').onchange_date()
+        # onchange_date  同时执行create时的type=other_get
+        invoice = self.env['money.invoice'].create({'name':'invoice',
+                                                    'partner_id': self.env.ref('core.jd').id,
+                                                    'category_id':self.env.ref('money.core_category_sale').id,
+                                                    'amount': 10.0,
+                                                    'reconciled': 0})
+        other = self.env['other.money.order'].with_context({'type': 'other_get'}).create({'partner_id': self.env.ref('core.jd').id,
+                                                    'bank_id': self.env.ref('core.comm').id,
+                                                    'line_ids':[(0, 0, {'source_id': invoice.id,
+                                                                        'category_id': self.env.ref('money.core_category_sale').id,
+                                                                        'amount': 10.0})]})
+        other.onchange_date()
+        # 执行other_money_done中存在source_id的情况
+        with self.assertRaises(except_orm): # 执行amount大于源单的未核销金额时的if
+            other.other_money_done()
+        # 执行amount不大于源单的未核销金额
+        invoice.to_reconcile = 10.0
+        other.other_money_done()
+        other.other_money_draft()
         # onchange_partner
         self.env.ref('money.other_get_60').onchange_partner()
         # 测试其他收支单金额<0,执行if报错
