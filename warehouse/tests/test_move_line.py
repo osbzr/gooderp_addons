@@ -14,16 +14,34 @@ class TestMoveLine(TransactionCase):
         self.mouse_in_line = self.browse_ref('warehouse.wh_move_line_12')
         self.mouse_out_line = self.browse_ref('warehouse.wh_move_line_0')
 
+        self.cable_int_line = self.browse_ref('warehouse.wh_move_line_17')
+
         self.bj_warehouse = self.browse_ref('warehouse.bj_stock')
+        self.hd_warehouse = self.browse_ref('warehouse.hd_stock')
+
+        self.goods_mouse = self.browse_ref('goods.mouse')
+        self.goods_cable = self.browse_ref('goods.cable')
+
+    def test_origin_explain(self):
+        explain = self.mouse_in_line.get_origin_explain()
+        self.assertEqual(explain, u'盘盈')
+
+        explain = self.mouse_out_line.get_origin_explain()
+        self.assertEqual(explain, u'组装单子件')
+
+        explain = self.cable_int_line.get_origin_explain()
+        self.assertEqual(explain, u'调拨入库')
 
     def test_default(self):
         # 需找默认的仓库
+        self.assertEqual(self.env['wh.move.line']._get_default_warehouse(), False)
         others_warehouse = self.env['wh.move.line'].with_context({
             'warehouse_type': 'others'
         })._get_default_warehouse()
 
         self.assertEqual(others_warehouse.type, 'others')
 
+        self.assertEqual(self.env['wh.move.line']._get_default_warehouse_dest(), False)
         customer_warehouse = self.env['wh.move.line'].with_context({
             'warehouse_dest_type': 'customer'
         })._get_default_warehouse_dest()
@@ -49,6 +67,34 @@ class TestMoveLine(TransactionCase):
         lot_name = line.with_context({'lot': True}).name_get()
         real_lot_name = '%s-%s-%s' % (line.lot, line.warehouse_dest_id.name, line.qty_remaining)
         self.assertEqual(lot_name[0][1], real_lot_name)
+
+    def test_copy_data(self):
+        # 复制的时候，如果该明细行是出库行为，那么需要重新计算成本
+        results = self.mouse_out_line.copy_data()
+        _, price = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
+            self.mouse_out_line.warehouse_id, self.mouse_out_line.goods_qty)
+
+        self.assertEqual(results.get('price'), price)
+
+    def test_get_matching_records_by_lot(self):
+        # 批次号未审核的时候获取批次信息会报错
+        with self.assertRaises(except_orm):
+            self.mouse_out_line.get_matching_records_by_lot()
+
+        self.mouse_out_line.lot_id.action_done()
+
+        results, _ = self.mouse_out_line.get_matching_records_by_lot()
+        real_results = {
+            'line_in_id': self.mouse_out_line.lot_id.id,
+            'qty': self.mouse_out_line.goods_qty,
+            'uos_qty': self.mouse_out_line.goods_uos_qty,
+        }
+        self.assertEqual(results[0], real_results)
+
+        # 当前明细行的产品数量大于批次的数量的时候，会报错
+        self.mouse_out_line.goods_qty = self.mouse_out_line.lot_id.qty_remaining + 10
+        with self.assertRaises(except_orm):
+            self.mouse_out_line.get_matching_records_by_lot()
 
     def test_onchange(self):
         results = self.mouse_in_line.onchange_goods_id()
@@ -78,6 +124,15 @@ class TestMoveLine(TransactionCase):
         self.mouse_out_line.onchange_warehouse_id()
         self.assertTrue(not self.mouse_out_line.lot_id)
 
+        # 改变产品的时候，如果批号的产品和它不一致，那么批号也要被删除
+        self.mouse_out_line.lot_id = self.mouse_in_line
+        self.mouse_out_line.warehouse_id = self.hd_warehouse
+        self.mouse_out_line.goods_id = self.goods_cable
+        self.mouse_out_line.compute_lot_compatible()
+        self.assertTrue(not self.mouse_out_line.lot_id)
+
+        self.mouse_out_line.goods_id = self.goods_mouse
+
         self.keyboard_mouse_in_line.price = 0
         results = self.keyboard_mouse_out_line.with_context({
             'type': 'out',
@@ -96,7 +151,9 @@ class TestMoveLine(TransactionCase):
         self.mouse_in_line.action_done()
         self.mouse_out_line.lot_qty = 0
         self.mouse_out_line.lot_id = self.mouse_in_line
-        self.mouse_out_line.onchange_lot_id()
+        self.mouse_out_line.with_context({'type': 'internal'}).onchange_lot_id()
+        # 当传递type为internal的上下文值的时候，此时lot会设置为lot_id的lot
+        self.assertEqual(self.mouse_out_line.lot, self.mouse_out_line.lot_id.lot)
         self.assertEqual(self.mouse_out_line.lot_qty, self.mouse_out_line.lot_id.qty_remaining)
 
         self.mouse_in_line.discount_rate = 0

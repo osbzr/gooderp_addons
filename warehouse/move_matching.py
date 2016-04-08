@@ -50,8 +50,8 @@ class wh_move_line(models.Model):
 
             if warehouses[0].type == 'stock' and warehouses[1].type != 'stock':
                 goods = self.env['goods'].browse(res.get('goods_id'))
-                subtotal, price = goods.get_suggested_cost_by_warehouse(warehouses[0], res.get('goods_qty'))
-                res.update({'price': price, 'subtotal': subtotal})
+                _, price = goods.get_suggested_cost_by_warehouse(warehouses[0], res.get('goods_qty'))
+                res.update({'price': price})
 
         return res
 
