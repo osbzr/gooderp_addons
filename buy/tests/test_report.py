@@ -14,9 +14,40 @@ class test_report(TransactionCase):
     def test_report(self):
         ''' 测试采购报表 '''
         # 执行向导
-        track = self.env['buy.order.track.wizard'].create({})
+        track_obj = self.env['buy.order.track.wizard']
+        track = track_obj.create({})
         # 输出报表
         track.button_ok()
+        #执行向导，日期报错
+        track = track.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            track.button_ok()
+        #执行向导，指定商品
+        track = track.create({
+                              'goods_id':1,
+                             })
+        track.button_ok()
+        #执行向导，指定供应商
+        track = track.create({
+                              'partner_id':4,
+                             })
+        
+        order = self.env.ref('buy.buy_order_1')
+        order.line_ids.create({
+                               'order_id':order.id,
+                               'goods_id':3,
+                               'warehouse_dest_id':2,
+                               })
+        order.line_ids.create({
+                               'order_id':order.id,
+                               'goods_id':1,
+                               'warehouse_dest_id':2,
+                               })
+        track.button_ok()
+            
         
         # 执行向导
         detail = self.env['buy.order.detail.wizard'].create({})
