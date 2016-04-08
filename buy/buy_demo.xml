@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
+        <!--购货订单-->
         <record id="buy_order_1" model="buy.order">
             <field name="planned_date">2016-11-02</field>
             <field name="partner_id" ref="core.lenovo"/>
@@ -15,6 +16,12 @@
             <field name="warehouse_id" ref="warehouse.warehouse_supplier"/>
             <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
+        </record>
+        <!--退货单-->
+        <record id="buy_order_return_1" model="buy.receipt">
+            <field name="date_due">2016-11-02</field>
+            <field name="partner_id" ref="core.lenovo"/>
+            <field name="is_return">true</field>
         </record>
     </data>
 </openerp>
