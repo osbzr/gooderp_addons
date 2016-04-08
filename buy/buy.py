@@ -106,6 +106,8 @@ class buy_order(models.Model):
     @api.one
     def buy_order_done(self):
         '''审核购货订单'''
+        if self.state == 'done':
+            raise except_orm(u'错误', u'请不要重复审核！')
         if not self.line_ids:
             raise except_orm(u'错误', u'请输入产品明细行！')
         # TODO:采购预付款
@@ -116,6 +118,8 @@ class buy_order(models.Model):
     @api.one
     def buy_order_draft(self):
         '''反审核购货订单'''
+        if self.state == 'draft':
+            raise except_orm(u'错误', u'请不要重复反审核！')
         if self.goods_state != u'未入库':
             raise except_orm(u'错误', u'该购货订单已经收货，不能反审核！')
         else:
@@ -372,6 +376,8 @@ class buy_receipt(models.Model):
     @api.one
     def buy_receipt_done(self):
         '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
+        if self.state == 'done':
+            raise except_orm(u'错误', u'请不要重复审核！')
         if self.bank_account_id and not self.payment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')
         if not self.bank_account_id and self.payment:
