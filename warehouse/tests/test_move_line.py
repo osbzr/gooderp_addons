@@ -32,6 +32,10 @@ class TestMoveLine(TransactionCase):
         explain = self.cable_int_line.get_origin_explain()
         self.assertEqual(explain, u'调拨入库')
 
+        self.cable_int_line.move_id.origin = ''
+        explain = self.cable_int_line.get_origin_explain()
+        self.assertEqual(explain, '')
+
     def test_default(self):
         # 需找默认的仓库
         self.assertEqual(self.env['wh.move.line']._get_default_warehouse(), False)

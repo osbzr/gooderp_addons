@@ -326,7 +326,8 @@ class wh_out(models.Model):
     @api.multi
     def approve_order(self):
         res = super(wh_out, self).approve_order()
-        self.inventory_ids.check_done()
+        for order in self:
+            order.inventory_ids.check_done()
 
         return res
 
@@ -339,6 +340,7 @@ class wh_in(models.Model):
     @api.multi
     def approve_order(self):
         res = super(wh_in, self).approve_order()
-        self.inventory_ids.check_done()
+        for order in self:
+            order.inventory_ids.check_done()
 
         return res

@@ -43,7 +43,7 @@ class report_base(models.Model):
         return self.execute_sql(sql_type=sql_type)
 
     def check_valid_domain(self, domain):
-        if not isinstance(domain, list):
+        if not isinstance(domain, (list, tuple)):
             raise osv.except_osv(u'错误', u'不可识别的domain条件，请检查domain"%s"是否正确' % domain)
 
     def _get_next_domain(self, domains, index):
@@ -99,7 +99,6 @@ class report_base(models.Model):
                     return False
 
                 index = right_index
-
             else:
                 self.check_valid_domain(domain)
                 if not self._process_domain(result, domain):

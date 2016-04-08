@@ -63,12 +63,9 @@ class report_stock_transceive(models.Model):
         '''
 
     def get_context(self, sql_type='out', context=None):
-        if context.get('date_end'):
-            date_end = datetime.datetime.strptime(
-                context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
-            date_end = date_end.strftime('%Y-%m-%d')
-        else:
-            date_end = ''
+        date_end = datetime.datetime.strptime(
+            context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
+        date_end = date_end.strftime('%Y-%m-%d')
 
         return {
             'date_start': context.get('date_start') or '',
