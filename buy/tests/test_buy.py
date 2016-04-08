@@ -40,6 +40,7 @@ class test_buy(TransactionCase):
         order = self.env.ref('buy.buy_order_1')
 
         # 反审核采购订单
+        order.buy_order_done()
         order.buy_order_draft()
         with self.assertRaises(except_orm):
             order.buy_order_draft()
