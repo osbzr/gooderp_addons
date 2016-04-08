@@ -125,3 +125,21 @@ class Test_sell(TransactionCase):
         # 确认后改变 状态金额
 
         # self.assertEqual(sell_delivery.money_state, u'未收款')
+
+    def test_sell_done(self):
+        ''' 测试审核销货订单  '''
+        order = self.env.ref('sell.sell_order_1')
+
+        # 审核销货订单
+        order.sell_order_done()
+        with self.assertRaises(except_orm):
+            order.sell_order_done()
+
+    def test_sell_draft(self):
+        ''' 测试反审核销货订单  '''
+        order = self.env.ref('sell.sell_order_1')
+
+        # 反审核销货订单
+        order.sell_order_draft()
+        with self.assertRaises(except_orm):
+            order.sell_order_draft()
