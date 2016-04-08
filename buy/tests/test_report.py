@@ -13,7 +13,7 @@ class test_report(TransactionCase):
         
     def test_report(self):
         ''' 测试采购报表 '''
-        # 执行向导
+        # 执行采购订单跟踪表向导
         track_obj = self.env['buy.order.track.wizard']
         track = track_obj.create({})
         # 输出报表
@@ -49,10 +49,71 @@ class test_report(TransactionCase):
         track.button_ok()
             
         
-        # 执行向导
+        # 执行采购明细表向导
         detail = self.env['buy.order.detail.wizard'].create({})
         # 输出报表
         detail.button_ok()
+        #执行向导，日期报错
+        detail = detail.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            detail.button_ok()
+        #执行向导，指定商品
+        detail = detail.create({
+                              'goods_id':1,
+                             })
+        detail.button_ok()
+        #执行向导，指定供应商
+        detail = detail.create({
+                              'partner_id':4,
+                             })
+        detail.button_ok()
+        
+        # 执行采购汇总表（按商品）向导
+        goods = self.env['buy.summary.goods.wizard'].create({})
+        # 输出报表
+        goods.button_ok()
+        #执行向导，日期报错
+        goods = goods.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            goods.button_ok()
+        #执行向导，指定商品
+        goods = goods.create({
+                              'goods_id':1,
+                             })
+        goods.button_ok()
+        #执行向导，指定供应商
+        goods = goods.create({
+                              'partner_id':4,
+                             })
+        goods.button_ok()
+        
+        # 执行采购汇总表（按供应商）向导
+        partner = self.env['buy.summary.partner.wizard'].create({})
+        # 输出报表
+        partner.button_ok()
+        #执行向导，日期报错
+        partner = partner.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            partner.button_ok()
+        #执行向导，指定商品
+        partner = partner.create({
+                              'goods_id':1,
+                             })
+        partner.button_ok()
+        #执行向导，指定供应商
+        partner = partner.create({
+                              'partner_id':4,
+                             })
+        partner.button_ok()
         
         # 执行向导，正常输出
         # 执行 else self._context.get('default_supplier')
