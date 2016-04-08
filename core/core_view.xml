@@ -55,6 +55,10 @@
 
         <menuitem id='core_value_menu' action='core_value_action' parent='config_data_menu' sequence='900'/>
 
+        <record id="core_value_menu" model="ir.ui.menu">
+            <field name="create_tag">1</field>
+        </record>
+
         <!--系统参数-->
         <record id="company_form" model="ir.ui.view">
             <field name="name">company.form</field>
