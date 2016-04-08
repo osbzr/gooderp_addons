@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_buy_order,access_buy_order,model_buy_order,,1,1,1,1
 access_buy_order_line,access_buy_order_line,model_buy_order_line,,1,1,1,1
+access_buy_receipt,access_buy_receipt,model_buy_receipt,,1,1,1,1
+access_buy_summary_partner,access_buy_summary_partner,model_buy_summary_partner,,1,1,1,1
 access_supplier_statements_report,access_supplier_statements_report,model_supplier_statements_report,,1,0,0,0
