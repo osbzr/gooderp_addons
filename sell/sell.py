@@ -5,14 +5,15 @@ from openerp.exceptions import except_orm
 
 # 销货订单审核状态可选值
 SELL_ORDER_STATES = [
-        ('draft', u'未审核'),
-        ('done', u'已审核'),
-    ]
+    ('draft', u'未审核'),
+    ('done', u'已审核'),
+]
 
 # 字段只读状态
 READONLY_STATES = {
-        'done': [('readonly', True)],
-    }
+    'done': [('readonly', True)],
+}
+
 
 class sell_order(models.Model):
     _name = 'sell.order'
@@ -72,7 +73,6 @@ class sell_order(models.Model):
         if self.discount_rate:
             self.discount_amount = total * self.discount_rate * 0.01
 
-
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
@@ -119,19 +119,19 @@ class sell_order(models.Model):
             qty = line.quantity - line.quantity_out
             discount_amount = line.discount_amount
         return {
-                    'sell_line_id': line.id,
-                    'goods_id': line.goods_id.id,
-                    'attribute_id': line.attribute_id.id,
-                    'uom_id': line.uom_id.id,
-                    'warehouse_id': line.warehouse_id.id,
-                    'warehouse_dest_id': line.warehouse_dest_id.id,
-                    'goods_qty': qty,
-                    'price': line.price,
-                    'discount_rate': line.discount_rate,
-                    'discount_amount': discount_amount,
-                    'tax_rate': line.tax_rate,
-                    'note': line.note or '',
-                }
+            'sell_line_id': line.id,
+            'goods_id': line.goods_id.id,
+            'attribute_id': line.attribute_id.id,
+            'uom_id': line.uom_id.id,
+            'warehouse_id': line.warehouse_id.id,
+            'warehouse_dest_id': line.warehouse_dest_id.id,
+            'goods_qty': qty,
+            'price': line.price,
+            'discount_rate': line.discount_rate,
+            'discount_amount': discount_amount,
+            'tax_rate': line.tax_rate,
+            'note': line.note or '',
+        }
 
     @api.one
     def sell_generate_delivery(self):
@@ -154,16 +154,16 @@ class sell_order(models.Model):
         if not delivery_line:
             return {}
         delivery_id = self.env['sell.delivery'].create({
-                            'partner_id': self.partner_id.id,
-                            'staff_id': self.staff_id.id,
-                            'date': self.delivery_date,
-                            'order_id': self.id,
-                            'origin': 'sell.delivery',
-                            'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
-                            'note': self.note,
-                            'discount_rate': self.discount_rate,
-                            'discount_amount': self.discount_amount,
-                        })
+            'partner_id': self.partner_id.id,
+            'staff_id': self.staff_id.id,
+            'date': self.delivery_date,
+            'order_id': self.id,
+            'origin': 'sell.delivery',
+            'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
+            'note': self.note,
+            'discount_rate': self.discount_rate,
+            'discount_amount': self.discount_amount,
+        })
         view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_delivery_form')
         return {
             'name': u'销售发货单',
@@ -173,9 +173,10 @@ class sell_order(models.Model):
             'views': [(view_id, 'form')],
             'res_model': 'sell.delivery',
             'type': 'ir.actions.act_window',
-            'domain':[('id', '=', delivery_id)],
+            'domain': [('id', '=', delivery_id)],
             'target': 'current',
         }
+
 
 class sell_order_line(models.Model):
     _name = 'sell.order.line'
@@ -232,6 +233,7 @@ class sell_order_line(models.Model):
         if self.discount_rate:
             self.discount_amount = self.quantity * self.price * self.discount_rate * 0.01
 
+
 class sell_delivery(models.Model):
     _name = 'sell.delivery'
     _inherits = {'wh.move': 'sell_move_id'}
@@ -266,6 +268,7 @@ class sell_delivery(models.Model):
                     self.money_state = u'部分收款'
                 elif self.amount == self.receipt:
                     self.money_state = u'全部收款'
+
     @api.one
     @api.depends('state', 'amount', 'receipt')
     def _get_sell_return_state(self):
@@ -275,6 +278,7 @@ class sell_delivery(models.Model):
                 self.return_state = u'未退款'
             else:
                 if self.receipt == 0:
+                    print "+++++++++++++++++="
                     self.return_state = u'未退款'
                 elif self.amount > self.receipt:
                     self.return_state = u'部分退款'
@@ -297,9 +301,9 @@ class sell_delivery(models.Model):
     total_debt = fields.Float(u'总欠款', compute=_compute_all_amount, store=True, readonly=True, copy=False)
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', copy=False)
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
-                             help=u"销售发货单的收款状态", select=True, copy=False)
+                              help=u"销售发货单的收款状态", select=True, copy=False)
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
-                             help=u"销售退货单的退款状态", select=True, copy=False)
+                               help=u"销售退货单的退款状态", select=True, copy=False)
 
     @api.one
     @api.onchange('discount_rate')
@@ -352,33 +356,33 @@ class sell_delivery(models.Model):
             this_reconcile = - self.receipt
         categ = self.env.ref('money.core_category_sale')
         source_id = self.env['money.invoice'].create({
-                            'move_id': self.sell_move_id.id,
-                            'name': self.name,
-                            'partner_id': self.partner_id.id,
-                            'category_id': categ.id,
-                            'date': fields.Date.context_today(self),
-                            'amount': amount,
-                            'reconciled': 0,
-                            'to_reconcile': amount,
-                            'date_due': self.date_due,
-                            'state': 'draft',
-                        })
+            'move_id': self.sell_move_id.id,
+            'name': self.name,
+            'partner_id': self.partner_id.id,
+            'category_id': categ.id,
+            'date': fields.Date.context_today(self),
+            'amount': amount,
+            'reconciled': 0,
+            'to_reconcile': amount,
+            'date_due': self.date_due,
+            'state': 'draft',
+        })
         self.invoice_id = source_id.id
         # 销售费用产生源单
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
                 cost_id = self.env['money.invoice'].create({
-                            'move_id': self.sell_move_id.id,
-                            'name': self.name,
-                            'partner_id': line.partner_id.id,
-                            'category_id': line.category_id.id,
-                            'date': fields.Date.context_today(self),
-                            'amount': line.amount,
-                            'reconciled': 0.0,
-                            'to_reconcile': line.amount,
-                            'date_due': self.date_due,
-                            'state': 'draft',
-                        })
+                    'move_id': self.sell_move_id.id,
+                    'name': self.name,
+                    'partner_id': line.partner_id.id,
+                    'category_id': line.category_id.id,
+                    'date': fields.Date.context_today(self),
+                    'amount': line.amount,
+                    'reconciled': 0.0,
+                    'to_reconcile': line.amount,
+                    'date_due': self.date_due,
+                    'state': 'draft',
+                })
         # 生成收款单
         if self.receipt:
             money_lines = []
@@ -398,16 +402,16 @@ class sell_delivery(models.Model):
             })
             rec = self.with_context(type='get')
             money_order = rec.env['money.order'].create({
-                                'partner_id': self.partner_id.id,
-                                'date': fields.Date.context_today(self),
-                                'line_ids': [(0, 0, line) for line in money_lines],
-                                'source_ids': [(0, 0, line) for line in source_lines],
-                                'type': 'get',
-                                'amount': amount,
-                                'reconciled': this_reconcile,
-                                'to_reconcile': amount,
-                                'state': 'draft',
-                            })
+                'partner_id': self.partner_id.id,
+                'date': fields.Date.context_today(self),
+                'line_ids': [(0, 0, line) for line in money_lines],
+                'source_ids': [(0, 0, line) for line in source_lines],
+                'type': 'get',
+                'amount': amount,
+                'reconciled': this_reconcile,
+                'to_reconcile': amount,
+                'state': 'draft',
+            })
             money_order.money_order_done()
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.sell_move_id.approve_order()
@@ -417,12 +421,14 @@ class sell_delivery(models.Model):
 
         return True
 
+
 class sell_delivery_line(models.Model):
     _inherit = 'wh.move.line'
     _description = u'销售发货单行'
 
     sell_line_id = fields.Many2one('sell.order.line', u'销货单行')
     origin = fields.Char(u'源单号')
+
 
 class cost_line(models.Model):
     _inherit = 'cost.line'
