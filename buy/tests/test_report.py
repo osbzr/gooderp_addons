@@ -60,10 +60,10 @@ class test_report(TransactionCase):
         # 执行采购明细表向导
         detail = self.env['buy.order.detail.wizard'].create({})
         # 输出报表
-#         order = self.env.ref('buy.buy_order_2')
-#         order.buy_order_done()
-#         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
-#         receipt.buy_receipt_done()
+        order = self.env.ref('buy.buy_order_2')
+        order.buy_order_done()
+        receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
+        receipt.buy_receipt_done()
         vals = {'partner_id': self.partner.id, 'date_due': '2016-04-08',
                 'line_out_ids': [(0, 0, {'goods_id': self.goods.id,'warehouse_dest_id': self.env.ref("warehouse.warehouse_supplier").id,
                                         'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5,'type':'out'})]}
