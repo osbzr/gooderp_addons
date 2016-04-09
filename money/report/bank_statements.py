@@ -13,7 +13,7 @@ class bank_statements_report(models.Model):
         # 相邻的两条记录，bank_id不同，重新计算账户余额
         pre_record = self.search([('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
         if pre_record:
-            if pre_record.name != '期初余额':
+            if pre_record.name != u'期初余额':
                 before_balance = pre_record.balance
             else:
                 before_balance = pre_record.get

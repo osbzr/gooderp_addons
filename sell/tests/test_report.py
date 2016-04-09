@@ -25,9 +25,11 @@ class test_report(TransactionCase):
         # 输出报表
         detail.button_ok()
         '''
-        
-        # 执行向导，正常输出
-        # 执行 if条件self._context.get('default_customer')
+        self.env['go.live.order'].create({'partner_id':self.env.ref('core.jd').id, 'balance':20.0})
+        # _compute_balance，name == '期初余额'
+        live = self.env['customer.statements.report'].search([('name', '=', '期初余额')])
+        self.assertNotEqual(str(live.balance_amount), 'zxy11')
+
         self.env.ref('warehouse.wh_move_line_14').action_done()
         order = self.env['money.order'].create({'name': 'GET20160001',
                                           'partner_id': self.env.ref('core.jd').id,
@@ -60,7 +62,15 @@ class test_report(TransactionCase):
                     'to_date': '2016-11-01'}).with_context({'default_customer': True})
         # 输出报表，正常输出
         statement.partner_statements_without_goods()
+        # 查看客户对账单明细不带商品明细
+        customer_statement = self.env['customer.statements.report'].search([])
+        for record in customer_statement:
+            record.find_source_order()
         statement.partner_statements_with_goods()
+        # 查看客户对账单带商品明细
+        customer_statement_goods = self.env['customer.statements.report.with.goods'].search([])
+        for statement in customer_statement_goods:
+            statement.find_source_order()
         # 测试客户对账单方法中的'结束日期不能小于开始日期！'
         statement_error_date = self.env['partner.statements.report.wizard'].create(
                     {'partner_id': self.env.ref('sell.sell_order_1').partner_id.id,
