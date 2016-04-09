@@ -278,7 +278,6 @@ class sell_delivery(models.Model):
                 self.return_state = u'未退款'
             else:
                 if self.receipt == 0:
-                    print "+++++++++++++++++="
                     self.return_state = u'未退款'
                 elif self.amount > self.receipt:
                     self.return_state = u'部分退款'
