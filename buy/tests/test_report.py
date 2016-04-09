@@ -12,6 +12,10 @@ class test_report(TransactionCase):
         order.buy_order_done()
         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
         receipt.buy_receipt_done()
+        new_order = order.copy()
+        new_order.buy_order_done()
+        receipt = self.env['buy.receipt'].search([('order_id','=',new_order.id)])
+        receipt.buy_receipt_done()
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.partner = self.env.ref('core.lenovo')
@@ -78,6 +82,12 @@ class test_report(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             detail.button_ok()
+        # 测试相同产品数量合计
+        detail = detail.create({
+                             'date_start': '2016-01-01',
+                             'date_end': '2017-01-01',
+                             })
+        detail.button_ok()
         #执行向导，指定商品
         detail = detail.create({
                               'goods_id':1,
