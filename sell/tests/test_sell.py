@@ -182,6 +182,11 @@ class Test_sell(TransactionCase):
         with self.assertRaises(except_orm):
             self.sell_delivery.sell_delivery_done()
 
+    def test_done_twice(self):
+        self.sell_delivery.sell_delivery_done()
+        with self.assertRaises(except_orm):
+            self.sell_delivery.sell_delivery_done()
+
     def test_sale_usage_return(self):
         vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
