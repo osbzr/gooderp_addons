@@ -23,13 +23,15 @@ class test_money(TransactionCase):
         # 余额不足不能反审核
         with self.assertRaises(except_orm):
             self.env.ref('money.get_40000').money_order_draft()
-        # 反审核
-        self.env.ref('money.pay_2000').money_order_draft()
-        self.env.ref('money.pay_2000').unlink()
         # onchange_date
         self.env.ref('money.get_40000').onchange_date()
-        # onchange_partner_id
-        self.env.ref('money.get_40000').onchange_partner_id()
+        # onchange_partner_id 执行self.env.context.get('type') == 'get'
+        self.env.ref('money.get_40000').with_context({'type': 'get'}).onchange_partner_id()
+        # onchange_partner_id 执行self.env.context.get('type') == 'pay'
+        self.env.ref('money.pay_2000').money_order_draft()
+        self.env.ref('money.pay_2000').with_context({'type': 'pay'}).onchange_partner_id()
+        # 反审核
+        self.env.ref('money.pay_2000').unlink()
         # 当为收款退款时，执行账户余额减少
         self.env.ref('money.get_200_1').money_order_done()
         self.env.ref('money.get_200_1').money_order_draft()
@@ -41,7 +43,7 @@ class test_money(TransactionCase):
                                                 'reconciled': 0,
                                                 'to_reconcile': 200.0,
                                                 'date_due': '2016-09-07'})
-        money = self.env['money.order'].create({'partner_id': self.env.ref('core.jd').id,
+        money = self.env['money.order'].with_context({'type': 'get'}).create({'partner_id': self.env.ref('core.jd').id,
                                                 'name': 'GET/2016001',
                                                 'note': 'zxy note',
                                                 'line_ids': [(0, 0, {'bank_id':self.env.ref('core.comm').id,
@@ -55,9 +57,21 @@ class test_money(TransactionCase):
                                                                        'this_reconcile': 200.0,
                                                                        'date_due': '2016-09-07'})],
                                                 'type': 'get'})
-        
+#         money.onchange_partner_id()
         money.money_order_done()
         money.money_order_draft()
+        # advance_payment < 0, 执行'核销金额不能大于付款金额'
+        money_error_adv = self.env['money.order'].create({'partner_id': self.env.ref('core.jd').id,
+                                                'name': 'GET/20160021',
+                                                'line_ids': [(0, 0, {'bank_id':self.env.ref('core.comm').id,
+                                                                     'amount': -10.0, 'note': 'advance payment < 0'})],
+                                                'type': 'get'})
+        with self.assertRaises(except_orm):
+            money_error_adv.money_order_done()
+        # advance_payment < 0, 执行'本次核销金额不能大于未核销金额'
+        with self.assertRaises(except_orm):
+            money.source_ids.this_concile = 300.0
+            money.money_order_done()
 
     def test_other_money_order(self):
         ''' 测试其他收入支出 '''
@@ -95,6 +109,11 @@ class test_money(TransactionCase):
         invoice.to_reconcile = 10.0
         other.other_money_done()
         other.other_money_draft()
+        # onchange_date 执行type=other_pay
+        invoice.partner_id = self.env.ref('core.lenovo').id,
+        other = self.env['other.money.order'].with_context({'type': 'other_pay'}).create({'partner_id': self.env.ref('core.lenovo').id,
+                                                                                          'bank_id': self.env.ref('core.comm').id})
+        other.onchange_date()
         # onchange_partner
         self.env.ref('money.other_get_60').onchange_partner()
         # 测试其他收支单金额<0,执行if报错
