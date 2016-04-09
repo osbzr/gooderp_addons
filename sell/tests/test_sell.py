@@ -163,6 +163,9 @@ class Test_sell(TransactionCase):
         sell_delivery_obj._get_sell_return_state()
         self.assertEqual(sell_delivery_obj.return_state, u'未退款')
         sell_delivery_obj.state = 'done'
+        self.receipt = 0
+        sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(sell_delivery_obj.return_state, u'未退款')
         # 部分退款
         sell_delivery_obj.receipt = 20
 
@@ -179,9 +182,20 @@ class Test_sell(TransactionCase):
         with self.assertRaises(except_orm):
             self.sell_delivery.sell_delivery_done()
 
+    def test_sale_usage_return(self):
+        vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+                'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
+                                        'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})],
+                'cost_line_ids': [(0, 0, {'partner_id': self.partner.id,
+                                          'category_id': self.env.ref('core.cat_freight').id,
+                                          'amount': 50})]}
+
+        sell_delivery_obj = self.env['sell.delivery'].create(vals)
+        sell_delivery_obj.sell_delivery_done()
+
     def test_account_id_receipt(self):
-        self.receipt = 100000
-        self.amount = 10
+        self.sell_delivery.receipt = 100000
+        self.sell_delivery.amount = 10
         self.sell_delivery.bank_account_id = self.bank.id
         with self.assertRaises(except_orm):
             self.sell_delivery.sell_delivery_done()
