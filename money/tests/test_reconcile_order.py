@@ -78,7 +78,14 @@ class test_reconcile_order(TransactionCase):
                                             'to_partner_id': self.env.ref('core.yixun').id,
                                             'business_type': 'pay_to_pay',
                                             'name': 'TO20160007',
-                                            'note': 'zxy pay to pay'})
+                                            'note': 'zxy pay to pay',
+                                            'payable_source_ids': [(0, 0, {'name': invoice_pay_to_pay.id,
+                                                                       'category_id':self.env.ref('money.core_category_purchase').id,
+                                                                       'date': '2016-04-07',
+                                                                       'amount': 100.0,
+                                                                       'reconciled': 0,
+                                                                       'to_reconcile': 100.0,
+                                                                       'date_due': '2016-09-07'})]})
         for type in range(len(type_list)):
             if type == 0: # 执行 if# 预收冲应收
                 reconcile = self.env.ref('money.adv_pay_to_get_2')
@@ -114,7 +121,12 @@ class test_reconcile_order(TransactionCase):
                                             'note': 'ywp pay to pay'})
         with self.assertRaises(except_orm):
             reconcile_pay_to_pay_partner_same.reconcile_order_done()
+        # 执行_get_or_pay中的'核销金额不能大于未核销金额'
+        with self.assertRaises(except_orm):
+            reconcile_pay_to_pay.payable_source_ids.this_reconcile = 200.0
+            reconcile_pay_to_pay.reconcile_order_done()
         # 执行循环payable_source_ids
+        reconcile_pay_to_pay.payable_source_ids.this_reconcile = 100.0
         reconcile_pay_to_pay.reconcile_order_done()
         # 核销金额必须相同
         reconcile_adv_get_to_pay.payable_source_ids.this_reconcile = 60.0
