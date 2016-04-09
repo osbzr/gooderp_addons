@@ -5,7 +5,13 @@ from openerp.exceptions import except_orm
 class test_report(TransactionCase):
     def test_bank_report(self):
         ''' 测试银行对账单报表 '''
-        self.env['go.live.order'].create({'bank_id':self.env.ref('core.comm').id, 'balance':20.0})
+        self.env['go.live.order'].create({'bank_id': self.env.ref('core.comm').id, 'balance':20.0})
+        # _compute_balance，name == '期初余额'
+        go_live = self.env['bank.statements.report.wizard'].create({'bank_id': self.env.ref('core.comm').id,
+                                                                    'from_date': '2016-11-01', 'to_date': '2016-11-03'})
+        go_live.confirm_bank_statements()
+        live = self.env['bank.statements.report'].search([('name', '=', '期初余额')])
+        self.assertNotEqual(str(live.balance), 'zxy11')
         # 执行向导
         statement = self.env['bank.statements.report.wizard'].create(
                     {'bank_id': self.env.ref('money.money_order_line_2').bank_id.id,

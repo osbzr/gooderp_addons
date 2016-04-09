@@ -24,12 +24,16 @@ class test_money(TransactionCase):
         with self.assertRaises(except_orm):
             self.env.ref('money.get_40000').money_order_draft()
         # onchange_date
-        self.env.ref('money.get_40000').onchange_date()
+        self.env.ref('money.get_40000').with_context({'type': 'get'}).onchange_date()
         # onchange_partner_id 执行self.env.context.get('type') == 'get'
         self.env.ref('money.get_40000').with_context({'type': 'get'}).onchange_partner_id()
         # onchange_partner_id 执行self.env.context.get('type') == 'pay'
         self.env.ref('money.pay_2000').money_order_draft()
+        self.env.ref('money.pay_2000').with_context({'type': 'pay'}).onchange_date()
         self.env.ref('money.pay_2000').with_context({'type': 'pay'}).onchange_partner_id()
+        # onchange_partner_id 执行partner_id为空，return
+        self.partner_id = False
+        self.env['money.order'].onchange_partner_id()
         # 反审核
         self.env.ref('money.pay_2000').unlink()
         # 当为收款退款时，执行账户余额减少
@@ -57,7 +61,6 @@ class test_money(TransactionCase):
                                                                        'this_reconcile': 200.0,
                                                                        'date_due': '2016-09-07'})],
                                                 'type': 'get'})
-#         money.onchange_partner_id()
         money.money_order_done()
         money.money_order_draft()
         # advance_payment < 0, 执行'核销金额不能大于付款金额'
