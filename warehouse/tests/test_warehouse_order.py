@@ -66,7 +66,6 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(self.others_out_2.state, 'done')
         self.assertEqual(self.internal.state, 'done')
 
-
     def test_unlink(self):
 
         # 审核后的单据无法被取消

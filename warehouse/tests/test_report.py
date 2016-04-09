@@ -23,6 +23,15 @@ class TestReport(TransactionCase):
         self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({})
         self.collect_wizard = self.env['report.stock.transceive.collect.wizard'].create({})
 
+    def test_report_base(self):
+        report_base = self.env['report.base'].create({})
+
+        self.assertEqual(report_base.select_sql(), '')
+        self.assertEqual(report_base.from_sql(), '')
+        self.assertEqual(report_base.group_sql(), '')
+        self.assertEqual(report_base.order_sql(), '')
+        self.assertEqual(report_base.get_context(), {})
+
     def test_open_report(self):
         # 测试批号跟踪表的wizard
         self.assertEqual(self.track_wizard.onchange_date()[0], {})
@@ -83,7 +92,7 @@ class TestReport(TransactionCase):
             )
             self.assertTrue(result in real_results)
 
-        domain = ['|', ('lot', 'ilike', 'ms160301'), ('goods', '=', u'键盘')]
+        domain = ['|', '|', ('warehouse', '=', '总仓'), ('lot', 'ilike', 'ms160301'), ('goods', '=', u'键盘')]
         real_results = [
             (u'键盘', 'kb160000567', u'总仓', 600),
             (u'鼠标', 'ms160301', u'总仓', 1),
@@ -103,6 +112,21 @@ class TestReport(TransactionCase):
                 result.get('qty')
             )
             self.assertTrue(result in real_results)
+
+        # domain条件中不是列表或元祖的
+        with self.assertRaises(except_orm):
+            domain = ['domain']
+            lot_track.with_context(context).search_read(domain=domain)
+
+        # domain条件中长度不为3的
+        with self.assertRaises(except_orm):
+            domain = [('name', u'鼠标')]
+            lot_track.with_context(context).search_read(domain=domain)
+
+        # domain条件中使用不合法的操作符
+        with self.assertRaises(except_orm):
+            domain = [('name', u'等于', u'鼠标')]
+            lot_track.with_context(context).search_read(domain=domain)
 
     def test_lot_track_read_group(self):
         lot_track = self.env['report.lot.track'].create({})

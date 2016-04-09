@@ -29,10 +29,6 @@ class report_base(models.Model):
         return {}
 
     def execute_sql(self, sql_type='out'):
-        sql_text = (self.select_sql(sql_type) + self.from_sql(sql_type) + self.where_sql(
-            sql_type) + self.group_sql(sql_type) + self.order_sql(
-            sql_type)).format(**self.get_context(sql_type, context=self.env.context))
-
         self.env.cr.execute((self.select_sql(sql_type) + self.from_sql(sql_type) + self.where_sql(
             sql_type) + self.group_sql(sql_type) + self.order_sql(
             sql_type)).format(**self.get_context(sql_type, context=self.env.context)))
@@ -40,11 +36,11 @@ class report_base(models.Model):
         return self.env.cr.dictfetchall()
 
     def collect_data_by_sql(self, sql_type='out'):
-        return self.execute_sql(sql_type=sql_type)
+        pass
 
     def check_valid_domain(self, domain):
         if not isinstance(domain, (list, tuple)):
-            raise osv.except_osv(u'错误', u'不可识别的domain条件，请检查domain"%s"是否正确' % domain)
+            raise osv.except_osv(u'错误', u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
 
     def _get_next_domain(self, domains, index):
         domain = domains[index]
@@ -83,9 +79,9 @@ class report_base(models.Model):
                 if opto in compute_operator.iterkeys():
                     return compute_operator.get(opto)(result.get(field), value)
 
-                raise osv.except_osv(u'错误', u'暂时无法解析的domain条件%s，请联系管理员' % domain)
+                raise osv.except_osv(u'错误', u'暂时无法解析的domain条件%s，请联系管理员' % str(domain))
 
-        raise osv.except_osv(u'错误', u'不可识别的domain条件，请检查domain"%s"是否正确' % domain)
+        raise osv.except_osv(u'错误', u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
 
     def _compute_domain_util(self, result, domains):
         index = 0
