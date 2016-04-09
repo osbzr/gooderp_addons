@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from openerp.tests.common import TransactionCase
 from openerp.exceptions import except_orm
+from datetime import datetime
+ISODATEFORMAT = '%Y-%m-%d'
 
 class test_report(TransactionCase):
     def setUp(self):
@@ -10,6 +12,12 @@ class test_report(TransactionCase):
         order.buy_order_done()
         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
         receipt.buy_receipt_done()
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        self.partner = self.env.ref('core.lenovo')
+        self.warehouse_id = self.env.ref('warehouse.hd_stock')
+        self.others_warehouse_id = self.env.ref('warehouse.warehouse_others')
+        self.goods = self.env.ref('goods.cable')
         
     def test_report(self):
         ''' 测试采购报表 '''
@@ -52,7 +60,17 @@ class test_report(TransactionCase):
         # 执行采购明细表向导
         detail = self.env['buy.order.detail.wizard'].create({})
         # 输出报表
+#         order = self.env.ref('buy.buy_order_2')
+#         order.buy_order_done()
+#         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
+#         receipt.buy_receipt_done()
+        vals = {'partner_id': self.partner.id, 'date_due': '2016-04-08',
+                'line_out_ids': [(0, 0, {'goods_id': self.goods.id,'warehouse_dest_id': self.env.ref("warehouse.warehouse_supplier").id,
+                                        'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5,'type':'out'})]}
+        wh_move = self.env['buy.receipt'].with_context({'is_return': True,'hhhhh':'333',}).create(vals)
+        wh_move.buy_receipt_done()
         detail.button_ok()
+        
         #执行向导，日期报错
         detail = detail.create({
                              'date_start': '2016-11-01',
@@ -70,6 +88,8 @@ class test_report(TransactionCase):
                               'partner_id':4,
                              })
         detail.button_ok()
+        
+        
         
         # 执行采购汇总表（按商品）向导
         goods = self.env['buy.summary.goods.wizard'].create({})
@@ -114,6 +134,26 @@ class test_report(TransactionCase):
                               'partner_id':4,
                              })
         partner.button_ok()
+        
+        # 执行采购付款一览表向导-----
+        payment = self.env['buy.payment.wizard'].create({})
+        # 输出报表
+        payment.button_ok()
+        #执行向导，日期报错
+        payment = payment.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            payment.button_ok()
+        #执行向导，指定供应商类别,供应商,订单
+        payment = payment.create({
+                              's_category_id':1,
+                              'partner_id':4,
+                              'order_id':1,
+                             })
+        payment.button_ok()
+        
         
         # 执行向导，正常输出
         self.env['go.live.order'].create({'partner_id':self.env.ref('core.lenovo').id, 'balance':200.0})
