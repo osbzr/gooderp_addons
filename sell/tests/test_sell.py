@@ -23,6 +23,9 @@ class Test_sell(TransactionCase):
         self.partner = self.env.ref('core.lenovo')
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
+        self.order_2.sell_order_done()
+        self.sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
+        self.sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT)})
 
     def test_sell(self):
         ''' 测试销售订单  '''
@@ -42,11 +45,15 @@ class Test_sell(TransactionCase):
         # 正常的  审核销售订单
         # 正常审核后会生成 销售发货单
 
-        self.order_2.sell_order_done()
-        sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
-        sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT)})
+        self.sell_delivery.sell_delivery_done()
+        self.sell_delivery.receipt = 0
+        self.sell_delivery._get_sell_money_state()
+        self.sell_delivery.amount
+        self.assertEqual(self.sell_delivery.money_state, u'未收款')
+        self.sell_delivery.receipt = self.sell_delivery.amount
+        self.sell_delivery._get_sell_money_state()
+        self.assertEqual(self.sell_delivery.money_state, u'全部收款')
 
-        sell_delivery.sell_delivery_done()
         self.order_2.unlink()
 
         with self.assertRaises(except_orm):
@@ -110,7 +117,6 @@ class Test_sell(TransactionCase):
         self.assertEqual(self.sell_order_line.amount, 80)
 
     def test_sell_delivery(self):
-        self.order_2.sell_order_done()
         sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
         sell_delivery.discount_rate = 10
         sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT), 'bank_account_id': self.bank.id})
@@ -135,7 +141,7 @@ class Test_sell(TransactionCase):
         # self.assertEqual(sell_delivery.money_state, u'未收款')
 
     def test_sell_delievery_in(self):
-        vals = {'partner_id': self.partner.id, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+        vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
                                         'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})]}
 
@@ -144,7 +150,41 @@ class Test_sell(TransactionCase):
             sell_delivery_line_obj.discount_rate = 10
             sell_delivery_line_obj.onchange_discount_rate()
             self.assertEqual(sell_delivery_line_obj.discount_amount, 50)
-        sell_delivery_obj.sell_delivery_done()
+        # 退货单折扣率测试
+        sell_delivery_obj.discount_rate = 10
+        sell_delivery_obj.onchange_discount_rate()
+        self.assertEqual(sell_delivery_obj.discount_amount, 52.65)
+        #  结算账户 需要输入付款额 测试
+        sell_delivery_obj.bank_account_id = self.bank.id
+        self.receipt = False
+        with self.assertRaises(except_orm):
+            sell_delivery_obj.sell_delivery_done()
+        # 付款状态测试 未退款
+        sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(sell_delivery_obj.return_state, u'未退款')
+        sell_delivery_obj.state = 'done'
+        # 部分退款
+        sell_delivery_obj.receipt = 20
+
+        sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(sell_delivery_obj.return_state, u'部分退款')
+        #  全部退款
+        sell_delivery_obj.receipt = sell_delivery_obj.amount
+        sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(sell_delivery_obj.return_state, u'全部退款')
+
+    def test_no_account_id(self):
+        self.sell_delivery.bank_account_id = False
+        self.sell_delivery.receipt = 20
+        with self.assertRaises(except_orm):
+            self.sell_delivery.sell_delivery_done()
+
+    def test_account_id_receipt(self):
+        self.receipt = 100000
+        self.amount = 10
+        self.sell_delivery.bank_account_id = self.bank.id
+        with self.assertRaises(except_orm):
+            self.sell_delivery.sell_delivery_done()
 
     def test_sell_done(self):
         ''' 测试审核销货订单  '''
