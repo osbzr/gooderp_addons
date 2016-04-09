@@ -28,9 +28,11 @@ class TestReport(TransactionCase):
 
         self.assertEqual(report_base.select_sql(), '')
         self.assertEqual(report_base.from_sql(), '')
+        self.assertEqual(report_base.where_sql(), '')
         self.assertEqual(report_base.group_sql(), '')
         self.assertEqual(report_base.order_sql(), '')
         self.assertEqual(report_base.get_context(), {})
+        self.assertEqual(report_base.collect_data_by_sql(), [])
 
     def test_open_report(self):
         # 测试批号跟踪表的wizard
@@ -120,12 +122,12 @@ class TestReport(TransactionCase):
 
         # domain条件中长度不为3的
         with self.assertRaises(except_orm):
-            domain = [('name', u'鼠标')]
+            domain = [('goods', u'鼠标')]
             lot_track.with_context(context).search_read(domain=domain)
 
         # domain条件中使用不合法的操作符
         with self.assertRaises(except_orm):
-            domain = [('name', u'等于', u'鼠标')]
+            domain = [('goods', 'lg', u'鼠标')]
             lot_track.with_context(context).search_read(domain=domain)
 
     def test_lot_track_read_group(self):

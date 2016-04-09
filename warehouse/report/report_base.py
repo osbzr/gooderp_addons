@@ -36,7 +36,7 @@ class report_base(models.Model):
         return self.env.cr.dictfetchall()
 
     def collect_data_by_sql(self, sql_type='out'):
-        pass
+        return []
 
     def check_valid_domain(self, domain):
         if not isinstance(domain, (list, tuple)):
