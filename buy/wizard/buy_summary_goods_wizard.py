@@ -118,6 +118,7 @@ class buy_summary_goods_wizard(models.TransientModel):
                             del line_ids[index]
                             deleted = True
                             last_index = index
+                            print 'test covered line 120'
             summary = self.env['buy.summary.goods'].create({
                     'goods_categ_id': line.goods_id.category_id.id,
                     'goods_code': line.goods_id.code,
