@@ -56,7 +56,6 @@ class buy_payment_wizard(models.TransientModel):
                 balance = - balance
             # 用查找到的入库单信息来创建一览表
             payment = self.env['buy.payment'].create({
-                    's_category': receipt.partner_id.s_category_id.id,
                     'partner_id': receipt.partner_id.id,
                     'type': order_type,
                     'date': receipt.date,

@@ -119,7 +119,6 @@ class buy_summary_goods_wizard(models.TransientModel):
                             deleted = True
                             last_index = index
             summary = self.env['buy.summary.goods'].create({
-                    'order_name': line.move_id.name,
                     'goods_categ_id': line.goods_id.category_id.id,
                     'goods_code': line.goods_id.code,
                     'goods_id': line.goods_id.id,

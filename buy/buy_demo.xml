@@ -17,6 +17,22 @@
             <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
         </record>
+        <!-- 为验证报表可以合并相同产品的数量 -->
+        <record id="buy_order_1_same" model="buy.order">
+            <field name="planned_date">2016-11-02</field>
+            <field name="partner_id" ref="core.lenovo"/>
+            <field name="type">buy</field>
+        </record>
+        <record id="buy_order_line_1_same" model="buy.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.keyboard"/>
+            <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
+            <field name="order_id" ref="buy_order_1_same"/>
+            <field eval="50.0" name="price"/>
+            <field name="warehouse_id" ref="warehouse.warehouse_supplier"/>
+            <field name="attribute_id" ref="goods.keyboard_black"/>
+            <field eval="10.0" name="quantity"/>
+        </record>
         <!--购货订单copy1-->
         <record id="buy_order_2" model="buy.order">
             <field name="planned_date">2016-04-05</field>
@@ -38,6 +54,38 @@
             <field name="date_due">2016-11-02</field>
             <field name="partner_id" ref="core.lenovo"/>
             <field name="is_return">true</field>
+        </record>
+        <!--退货订单-->
+        <record id="buy_return_order_1" model="buy.order">
+            <field name="planned_date">2016-11-02</field>
+            <field name="partner_id" ref="core.lenovo"/>
+            <field name="type">return</field>
+        </record>
+        <record id="buy_return_order_line_1" model="buy.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.keyboard"/>
+            <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
+            <field name="order_id" ref="buy_return_order_1"/>
+            <field eval="50.0" name="price"/>
+            <field name="warehouse_id" ref="warehouse.warehouse_supplier"/>
+            <field name="attribute_id" ref="goods.keyboard_black"/>
+            <field eval="10.0" name="quantity"/>
+        </record>
+        <!-- 为验证报表可以合并相同产品的数量 -->
+        <record id="buy_return_order_1_same" model="buy.order">
+            <field name="planned_date">2016-11-02</field>
+            <field name="partner_id" ref="core.lenovo"/>
+            <field name="type">return</field>
+        </record>
+        <record id="buy_return_order_line_1_same" model="buy.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.keyboard"/>
+            <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
+            <field name="order_id" ref="buy_return_order_1_same"/>
+            <field eval="50.0" name="price"/>
+            <field name="warehouse_id" ref="warehouse.warehouse_supplier"/>
+            <field name="attribute_id" ref="goods.keyboard_black"/>
+            <field eval="10.0" name="quantity"/>
         </record>
     </data>
 </openerp>
