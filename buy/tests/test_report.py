@@ -19,7 +19,10 @@ class test_report(TransactionCase):
         order = self.env.ref('buy.buy_order_1_same')
         order.buy_order_done()
         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
+        # 测试分次收货
         receipt.line_in_ids[0].goods_qty = 1
+        # 验证金额为0的收货单付款比率为100%
+        receipt.line_in_ids[0].price = 0
         receipt.buy_receipt_done()
         receipt = self.env['buy.receipt'].search([('order_id','=',order.id),('state','=','draft')])
         receipt.buy_receipt_done()
