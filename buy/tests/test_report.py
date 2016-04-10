@@ -11,6 +11,9 @@ class test_report(TransactionCase):
         order = self.env.ref('buy.buy_order_1')
         order.buy_order_done()
         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
+        receipt.bank_account_id = self.env.ref('core.comm')
+        self.env.ref('money.get_40000').money_order_done()
+        receipt.payment = 2.0
         receipt.buy_receipt_done()
 
         order = self.env.ref('buy.buy_order_1_same')
