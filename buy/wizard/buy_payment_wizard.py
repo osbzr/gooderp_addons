@@ -73,6 +73,7 @@ class buy_payment_wizard(models.TransientModel):
             payment = 0
             for order in self.env['money.order'].search([]):
                 for source in order.source_ids:
+                    print '======',source.name.name,receipt.name
                     if source.name.name == receipt.name:
                         payment2 = self.env['buy.payment'].create({
                             'type': u'付款',

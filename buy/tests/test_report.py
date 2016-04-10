@@ -167,7 +167,10 @@ class test_report(TransactionCase):
         partner.button_ok()
         
         # 执行采购付款一览表向导-----
-        payment = self.env['buy.payment.wizard'].create({})
+        payment = self.env['buy.payment.wizard'].create({
+                            'date_start': '2016-01-01',
+                            'date_end': '2017-01-01',
+                                                         })
         # 输出报表
         payment.button_ok()
         #执行向导，日期报错
