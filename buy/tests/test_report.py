@@ -16,6 +16,9 @@ class test_report(TransactionCase):
         order = self.env.ref('buy.buy_order_1_same')
         order.buy_order_done()
         receipt = self.env['buy.receipt'].search([('order_id','=',order.id)])
+        receipt.line_in_ids[0].goods_qty = 1
+        receipt.buy_receipt_done()
+        receipt = self.env['buy.receipt'].search([('order_id','=',order.id),('state','=','draft')])
         receipt.buy_receipt_done()
 
         order = self.env.ref('buy.buy_return_order_1')
