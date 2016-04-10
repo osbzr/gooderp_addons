@@ -24,5 +24,9 @@ install:
 script:
   - travis_run_tests
 
+before_install:
+  - pip install codecov
+
 after_success:
   coveralls
+  - codecov
