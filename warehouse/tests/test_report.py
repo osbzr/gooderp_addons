@@ -94,7 +94,7 @@ class TestReport(TransactionCase):
             )
             self.assertTrue(result in real_results)
 
-        domain = ['|', '|', ('warehouse', '=', '总仓'), ('lot', 'ilike', 'ms160301'), ('goods', '=', u'键盘')]
+        domain = ['|', '|', ('lot', 'ilike', '301'), ('lot', '=', 'ms160301'), ('goods', '=', u'键盘')]
         real_results = [
             (u'键盘', 'kb160000567', u'总仓', 600),
             (u'鼠标', 'ms160301', u'总仓', 1),
