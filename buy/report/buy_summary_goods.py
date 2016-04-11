@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp import fields, models
+import datetime
 
 class buy_summary_goods(models.Model):
     _name = 'buy.summary.goods'
@@ -74,9 +75,12 @@ class buy_summary_goods(models.Model):
         '''
 
     def get_context(self, sql_type='out', context=None):
+        date_end = datetime.datetime.strptime(
+            context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
+        date_end = date_end.strftime('%Y-%m-%d')
         return {
             'date_start': context.get('date_start') or '',
-            'date_end': context.get('date_end') or '',
+            'date_end': date_end,
             'partner_id': context.get('partner_id') and context.get('partner_id')[0] or '',
             'goods_id': context.get('goods_id') and context.get('goods_id')[0] or '',
         }
