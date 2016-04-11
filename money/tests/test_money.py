@@ -7,16 +7,18 @@ class test_money(TransactionCase):
     def test_money_order(self):
         ''' 测试收付款  '''
         last_balance = self.env.ref('core.comm').balance
+        jd_receivable = self.env.ref('core.jd').receivable
+        lenovo_payable = self.env.ref('core.lenovo').payable
         # 余额不足不能付款
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
-        # 先收款后付款
+        # 先收款后付款。收款账户余额增加，业务伙伴应收款减少；付款账户余额减少，业务伙伴应付款减少
         self.env.ref('money.get_40000').money_order_done()
-        self.assertEqual(self.env.ref('core.comm').balance,
-                          last_balance + 40000)
+        self.assertEqual(self.env.ref('core.comm').balance, last_balance + 40000)
+        self.assertEqual(self.env.ref('core.jd').receivable, jd_receivable - 40000)
         self.env.ref('money.pay_2000').money_order_done()
-        self.assertEqual(self.env.ref('core.comm').balance,
-                          last_balance + 38000)
+        self.assertEqual(self.env.ref('core.comm').balance, last_balance + 40000 - 2000)
+        self.assertEqual(self.env.ref('core.lenovo').payable, lenovo_payable - 2000)
         # 审核后不能删除
         with self.assertRaises(except_orm):
             self.env.ref('money.get_40000').unlink()
@@ -31,14 +33,12 @@ class test_money(TransactionCase):
         self.env.ref('money.pay_2000').money_order_draft()
         self.env.ref('money.pay_2000').with_context({'type': 'pay'}).onchange_date()
         self.env.ref('money.pay_2000').with_context({'type': 'pay'}).onchange_partner_id()
+        # 反审核付款'money.pay_2000'，账户余额增加，业务伙伴应付款增加
+        self.assertEqual(self.env.ref('core.comm').balance, last_balance + 40000 - 2000 + 2000)
+        self.assertEqual(self.env.ref('core.lenovo').payable, lenovo_payable - 2000 + 2000)
         # onchange_partner_id 执行partner_id为空，return
         self.partner_id = False
         self.env['money.order'].onchange_partner_id()
-        # 反审核
-        self.env.ref('money.pay_2000').unlink()
-        # 当为收款退款时，执行账户余额减少
-        self.env.ref('money.get_200_1').money_order_done()
-        self.env.ref('money.get_200_1').money_order_draft()
         # 执行money_order_draft 遍历source_ids的操作
         invoice = self.env['money.invoice'].create({'partner_id': self.env.ref('core.jd').id,
                                                 'name': 'invoice/2016001',
@@ -64,17 +64,15 @@ class test_money(TransactionCase):
         money.money_order_done()
         money.money_order_draft()
         # advance_payment < 0, 执行'核销金额不能大于付款金额'
-        money_error_adv = self.env['money.order'].create({'partner_id': self.env.ref('core.jd').id,
-                                                'name': 'GET/20160021',
-                                                'line_ids': [(0, 0, {'bank_id':self.env.ref('core.comm').id,
-                                                                     'amount': -10.0, 'note': 'advance payment < 0'})],
-                                                'type': 'get'})
+        self.env.ref('money.pay_2000').line_ids.amount = -10.0
         with self.assertRaises(except_orm):
-            money_error_adv.money_order_done()
-        # advance_payment < 0, 执行'本次核销金额不能大于未核销金额'
+            self.env.ref('money.pay_2000').money_order_done()
+        # to_reconcile < this_concile, 执行'本次核销金额不能大于未核销金额'
         with self.assertRaises(except_orm):
             money.source_ids.this_concile = 300.0
             money.money_order_done()
+        # 未审核，可以删除
+        self.env.ref('money.pay_2000').unlink()
 
     def test_other_money_order(self):
         ''' 测试其他收入支出 '''
@@ -133,6 +131,7 @@ class test_money(TransactionCase):
 
     def test_money_transfer_order(self):
         ''' 测试转账 '''
+        comm_balance = self.env.ref('core.comm').balance
         with self.assertRaises(except_orm):
             # 转出账户余额不足
             self.env.ref('money.transfer_300').money_transfer_done()
@@ -140,13 +139,13 @@ class test_money(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         # 审核
         self.env.ref('money.transfer_300').money_transfer_done()
+        self.assertEqual(self.env.ref('core.comm').balance, comm_balance + 40000 - 300)
+        self.assertEqual(self.env.ref('core.alipay').balance, comm_balance + 300)
         # 已审核的转账单不能删除
         with self.assertRaises(except_orm):
             self.env.ref('money.transfer_300').unlink()
         # 反审核
         self.env.ref('money.transfer_300').money_transfer_draft()
-        # 未审核的转账单可以删除
-        self.env.ref('money.transfer_300').unlink()
         # 转入账户余额不足，不能反审核
         self.env.ref('money.transfer_400').money_transfer_done()
         self.env.ref('core.alipay').balance = self.env.ref('core.alipay').balance - 100
@@ -158,18 +157,18 @@ class test_money(TransactionCase):
         with self.assertRaises(except_orm):
             transfer_no_line.money_transfer_done()
         # 转出转入账户相同，则审核报错
-        transfer_same_account = transfer_order.create({'note': 'same account',
-                                                       'line_ids': [(0,0,{'out_bank_id':self.env.ref('core.alipay').id,
-                                                                        'in_bank_id':self.env.ref('core.alipay').id})]})
+        self.env.ref('money.transfer_300').line_ids.out_bank_id = self.env.ref('core.alipay').id
         with self.assertRaises(except_orm):
-            transfer_same_account.money_transfer_done()
+            self.env.ref('money.transfer_300').money_transfer_done()
         # 转出金额<0，则审核报错
-        transfer_amount_error = transfer_order.create({'note': 'error amount',
-                                                       'line_ids': [(0,0,{'out_bank_id':self.env.ref('core.alipay').id,
-                                                                        'in_bank_id':self.env.ref('core.comm').id,
-                                                                        'amount': -10.0})]})
+        self.env.ref('money.transfer_300').line_ids.out_bank_id = self.env.ref('core.comm').id
+        self.env.ref('money.transfer_300').line_ids.amount = -10.0
         with self.assertRaises(except_orm):
-            transfer_amount_error.money_transfer_done()
+            self.env.ref('money.transfer_300').money_transfer_done()
+        # 未审核的转账单可以删除
+        self.env.ref('money.transfer_300').line_ids.amount = 300
+        self.env.ref('money.transfer_300').unlink()
+
     def test_partner(self):
         ''' 客户对账单 和  银行帐'''
         self.env.ref('core.jd').partner_statements()
