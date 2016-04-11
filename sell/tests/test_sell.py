@@ -11,18 +11,27 @@ class Test_sell(TransactionCase):
     def setUp(self):
         super(Test_sell, self).setUp()
         self.order = self.env.ref('sell.sell_order_1')
-        self.warehouse_dest_id = self.env.ref('warehouse.warehouse_customer')
+
         self.order_2 = self.env.ref('sell.sell_order_2')
         self.order_3 = self.env.ref('sell.sell_order_3')
         self.sell_order_line = self.env.ref('sell.sell_order_line_2_3')
+        self.warehouse_dest_id = self.env.ref('warehouse.warehouse_customer')
         self.bank = self.env.ref('core.alipay')
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
         self.others_warehouse_id = self.env.ref('warehouse.warehouse_others')
         self.goods = self.env.ref('goods.cable')
         self.goods.default_wh = self.warehouse_id.id
         self.partner = self.env.ref('core.lenovo')
+        # 因为下面要用到 产品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
+
+        vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+                'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
+                                        'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})]}
+
+        self.sell_delivery_obj = self.env['sell.delivery'].create(vals)
+
         self.order_2.sell_order_done()
         self.sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
         self.sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT)})
@@ -86,7 +95,7 @@ class Test_sell(TransactionCase):
         self.order.unlink()
 
     def test_sale_order_line_compute(self):
-
+        """测试销售订单的on_change 和 计算字段"""
         vals = {
             'order_id': self.order_2.id,
             'goods_id': self.goods.id
@@ -117,6 +126,7 @@ class Test_sell(TransactionCase):
         self.assertEqual(self.sell_order_line.amount, 80)
 
     def test_sell_delivery(self):
+        """ 销售订单中 on_change 及计算字段"""
         sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
         sell_delivery.discount_rate = 10
         sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT), 'bank_account_id': self.bank.id})
@@ -141,53 +151,52 @@ class Test_sell(TransactionCase):
         # self.assertEqual(sell_delivery.money_state, u'未收款')
 
     def test_sell_delievery_in(self):
-        vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
-                'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
-                                        'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})]}
-
-        sell_delivery_obj = self.env['sell.delivery'].create(vals)
-        for sell_delivery_line_obj in sell_delivery_obj.line_in_ids:
+        """ 销售 退货单 的付款状态的测试"""
+        for sell_delivery_line_obj in self.sell_delivery_obj.line_in_ids:
             sell_delivery_line_obj.discount_rate = 10
             sell_delivery_line_obj.onchange_discount_rate()
             self.assertEqual(sell_delivery_line_obj.discount_amount, 50)
         # 退货单折扣率测试
-        sell_delivery_obj.discount_rate = 10
-        sell_delivery_obj.onchange_discount_rate()
-        self.assertEqual(sell_delivery_obj.discount_amount, 52.65)
+        self.sell_delivery_obj.discount_rate = 10
+        self.sell_delivery_obj.onchange_discount_rate()
+        self.assertEqual(self.sell_delivery_obj.discount_amount, 52.65)
         #  结算账户 需要输入付款额 测试
-        sell_delivery_obj.bank_account_id = self.bank.id
+        self.sell_delivery_obj.bank_account_id = self.bank.id
         self.receipt = False
         with self.assertRaises(except_orm):
-            sell_delivery_obj.sell_delivery_done()
+            self.sell_delivery_obj.sell_delivery_done()
         # 付款状态测试 未退款
-        sell_delivery_obj._get_sell_return_state()
-        self.assertEqual(sell_delivery_obj.return_state, u'未退款')
-        sell_delivery_obj.state = 'done'
+        self.sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(self.sell_delivery_obj.return_state, u'未退款')
+        self.sell_delivery_obj.state = 'done'
         self.receipt = 0
-        sell_delivery_obj._get_sell_return_state()
-        self.assertEqual(sell_delivery_obj.return_state, u'未退款')
+        self.sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(self.sell_delivery_obj.return_state, u'未退款')
         # 部分退款
-        sell_delivery_obj.receipt = 20
+        self.sell_delivery_obj.receipt = 20
 
-        sell_delivery_obj._get_sell_return_state()
-        self.assertEqual(sell_delivery_obj.return_state, u'部分退款')
+        self.sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(self.sell_delivery_obj.return_state, u'部分退款')
         #  全部退款
-        sell_delivery_obj.receipt = sell_delivery_obj.amount
-        sell_delivery_obj._get_sell_return_state()
-        self.assertEqual(sell_delivery_obj.return_state, u'全部退款')
+        self.sell_delivery_obj.receipt = self.sell_delivery_obj.amount
+        self.sell_delivery_obj._get_sell_return_state()
+        self.assertEqual(self.sell_delivery_obj.return_state, u'全部退款')
 
     def test_no_account_id(self):
+        """销售发货单付款账户审核时为空 测试"""
         self.sell_delivery.bank_account_id = False
         self.sell_delivery.receipt = 20
         with self.assertRaises(except_orm):
             self.sell_delivery.sell_delivery_done()
 
     def test_done_twice(self):
+        """销售发货单重复审核"""
         self.sell_delivery.sell_delivery_done()
         with self.assertRaises(except_orm):
             self.sell_delivery.sell_delivery_done()
 
     def test_sale_usage_return(self):
+        """测试销售退货单 审核流程"""
         vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
                                         'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})],
@@ -199,6 +208,7 @@ class Test_sell(TransactionCase):
         sell_delivery_obj.sell_delivery_done()
 
     def test_account_id_receipt(self):
+        ''' 发货单 本次收款金额 大于总金额  '''
         self.sell_delivery.receipt = 100000
         self.sell_delivery.amount = 10
         self.sell_delivery.bank_account_id = self.bank.id
