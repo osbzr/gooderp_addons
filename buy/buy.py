@@ -364,8 +364,12 @@ class buy_receipt(models.Model):
     @api.model
     def create(self, vals):
         '''创建采购入库单时生成有序编号'''
+        if not self.env.context.get('is_return'):
+            name = self._name
+        else:
+            name = 'buy.return'
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+            vals['name'] = self.env['ir.sequence'].get(name) or '/'
 
         vals.update({
             'origin': self.get_move_origin(vals)
