@@ -17,8 +17,6 @@ class goods(models.Model):
     def anti_conversion_unit(self, qty):
         self.ensure_one()
         return self.conversion and qty / self.conversion or 0
-        # return round(self.conversion and qty / self.conversion or 0,
-        #              self.env['decimal.precision'].precision_get('Goods Quantity'))
 
 
 class attribute(models.Model):
