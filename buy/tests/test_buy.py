@@ -128,8 +128,8 @@ class test_buy_order_line(TransactionCase):
             line.goods_id = self.env.ref('goods.cable')
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
-            self.assertTrue(line.warehouse_dest_id.id ==
-                            self.env.ref('warehouse.hd_stock').id)
+            wh_id = line.warehouse_dest_id.id
+            self.assertTrue(wh_id == self.env.ref('warehouse.hd_stock').id)
 
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''

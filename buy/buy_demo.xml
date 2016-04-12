@@ -39,6 +39,7 @@
             <field name="date_due">2016-02-22</field>
             <field name="partner_id" ref="core.lenovo"/>
             <field name="is_return">true</field>
+            <field name="origin">buy.receipt.return</field>
         </record>
         <record id="wh_move_line_0" model="wh.move.line">
             <field name="warehouse_dest_id" ref="warehouse.warehouse_supplier"/>
