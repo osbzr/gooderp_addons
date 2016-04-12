@@ -124,12 +124,15 @@ class test_buy_order_line(TransactionCase):
 
     def test_onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位和默认仓库'''
+        goods = self.env.ref('goods.cable')
+        goods.default_wh = self.env.ref('warehouse.hd_stock').id
         for line in self.order.line_ids:
-            line.goods_id = self.env.ref('goods.cable')
+            line.goods_id = goods
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
             wh_id = line.warehouse_dest_id.id
-            self.assertTrue(wh_id == self.env.ref('warehouse.hd_stock').id)
+            print '==============',wh_id,goods.default_wh
+            self.assertTrue(wh_id == goods.default_wh.id)
 
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
