@@ -118,13 +118,20 @@ class sell_order(models.Model):
         else:
             qty = line.quantity - line.quantity_out
             discount_amount = line.discount_amount
+        if self.type == 'sell':
+            warehouse_id = line.warehouse_id.id
+            warehouse_dest_id = line.warehouse_dest_id.id
+        # 如果退货，调换warehouse_dest_id，warehouse_id
+        elif self.type == 'return':
+            warehouse_id = line.warehouse_dest_id.id
+            warehouse_dest_id = line.warehouse_id.id
         return {
             'sell_line_id': line.id,
             'goods_id': line.goods_id.id,
             'attribute_id': line.attribute_id.id,
             'uom_id': line.uom_id.id,
-            'warehouse_id': line.warehouse_id.id,
-            'warehouse_dest_id': line.warehouse_dest_id.id,
+            'warehouse_id': warehouse_id,
+            'warehouse_dest_id': warehouse_dest_id,
             'goods_qty': qty,
             'price': line.price,
             'discount_rate': line.discount_rate,
@@ -153,20 +160,37 @@ class sell_order(models.Model):
 
         if not delivery_line:
             return {}
-        delivery_id = self.env['sell.delivery'].create({
-            'partner_id': self.partner_id.id,
-            'staff_id': self.staff_id.id,
-            'date': self.delivery_date,
-            'order_id': self.id,
-            'origin': 'sell.delivery',
-            'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
-            'note': self.note,
-            'discount_rate': self.discount_rate,
-            'discount_amount': self.discount_amount,
-        })
-        view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_delivery_form')
+        if self.type == 'sell':
+            delivery_id = self.env['sell.delivery'].create({
+                'partner_id': self.partner_id.id,
+                'staff_id': self.staff_id.id,
+                'date': self.delivery_date,
+                'order_id': self.id,
+                'origin': 'sell.delivery',
+                'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
+                'note': self.note,
+                'discount_rate': self.discount_rate,
+                'discount_amount': self.discount_amount,
+            })
+            view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_delivery_form')
+            name = u'销售发货单'
+        elif self.type == 'return':
+            rec = self.with_context(is_return=True)
+            delivery_id = rec.env['sell.delivery'].create({
+                'partner_id': self.partner_id.id,
+                'staff_id': self.staff_id.id,
+                'date': self.delivery_date,
+                'order_id': self.id,
+                'origin': 'sell.delivery',
+                'line_in_ids': [(0, 0, line[0]) for line in delivery_line],
+                'note': self.note,
+                'discount_rate': self.discount_rate,
+                'discount_amount': self.discount_amount,
+            })
+            view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_return_form')
+            name = u'销售退货单'
         return {
-            'name': u'销售发货单',
+            'name': name,
             'view_type': 'form',
             'view_mode': 'form',
             'view_id': False,
@@ -205,7 +229,7 @@ class sell_order_line(models.Model):
     goods_id = fields.Many2one('goods', u'商品')
     attribute_id = fields.Many2one('attribute', u'属性', domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位')
-    warehouse_id = fields.Many2one('warehouse', u'调出仓库')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库', default=_default_warehouse_dest)
     quantity = fields.Float(u'数量', default=1)
     quantity_out = fields.Float(u'已发货数量', copy=False)
@@ -347,7 +371,11 @@ class sell_delivery(models.Model):
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
 
         if self.order_id:
-            for line in self.line_out_ids:
+            if not self.is_return:
+                line_ids = self.line_out_ids
+            else:
+                line_ids = self.line_in_ids
+            for line in line_ids:
                 line.sell_line_id.quantity_out += line.goods_qty
 
         # 发库单/退货单 生成源单
