@@ -480,7 +480,10 @@ class reconcile_order(models.Model):
                                  order.partner_id,
                                  order.to_partner_id, order.name)
             for line in order.payable_source_ids:
-                order_reconcile += line.this_reconcile
+                if self.business_type == 'adv_get_to_pay':
+                    invoice_reconcile += line.this_reconcile
+                else:
+                    order_reconcile += line.this_reconcile
                 self._get_or_pay(line, order.business_type,
                                  order.partner_id,
                                  order.to_partner_id, order.name)
