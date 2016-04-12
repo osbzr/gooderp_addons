@@ -24,26 +24,13 @@ class buy_summary_partner_wizard(models.TransientModel):
 
     @api.multi
     def button_ok(self):
-        res = []
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
 
-        cond = [('date', '>=', self.date_start),
-                ('date', '<=', self.date_end)]
-        if self.goods_id:
-            cond.append(('goods', '=', self.goods_id.name))
-        if self.partner_id:
-            cond.append(('partner', '=', self.partner_id.name))
-
-        view = self.env.ref('buy.buy_summary_partner_tree')
         return {
             'name': u'采购汇总表（按供应商）',
-            'view_type': 'form',
             'view_mode': 'tree',
-            'view_id': False,
-            'views': [(view.id, 'tree')],
             'res_model': 'buy.summary.partner',
             'type': 'ir.actions.act_window',
-            'domain': cond,
-            'limit': 300,
+            'context': self.read(['date_start', 'date_end', 'partner_id', 'goods_id'])[0],
         }
