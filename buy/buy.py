@@ -370,7 +370,6 @@ class buy_receipt(models.Model):
         vals.update({
             'origin': self.get_move_origin(vals)
         })
-
         return super(buy_receipt, self).create(vals)
 
     @api.one
@@ -467,8 +466,6 @@ class buy_receipt(models.Model):
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id:
             return self.order_id.buy_generate_receipt()
-
-        return True
 
     @api.one
     def buy_share_cost(self):
