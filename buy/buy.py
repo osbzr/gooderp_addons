@@ -143,13 +143,20 @@ class buy_order(models.Model):
         else:
             qty = line.quantity - line.quantity_in
             discount_amount = line.discount_amount
+        if self.type == 'buy':
+            warehouse_id = line.warehouse_id.id
+            warehouse_dest_id = line.warehouse_dest_id.id
+        # 如果退货，调换warehouse_dest_id，warehouse_id
+        elif self.type == 'return':
+            warehouse_id = line.warehouse_dest_id.id
+            warehouse_dest_id = line.warehouse_id.id
         return {
                     'buy_line_id': line.id,
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
                     'uom_id': line.uom_id.id,
-                    'warehouse_id': line.warehouse_id.id,
-                    'warehouse_dest_id': line.warehouse_dest_id.id,
+                    'warehouse_id': warehouse_id,
+                    'warehouse_dest_id': warehouse_dest_id,
                     'goods_qty': qty,
                     'price': line.price,
                     'discount_rate': line.discount_rate,
@@ -179,20 +186,36 @@ class buy_order(models.Model):
 
         if not receipt_line:
             return {}
-        receipt_id = self.env['buy.receipt'].create({
+        if self.type == 'buy':
+            receipt_id = self.env['buy.receipt'].create({
+                                'partner_id': self.partner_id.id,
+                                'date': self.planned_date,
+                                'order_id': self.id,
+                                'line_in_ids': [
+                                    (0, 0, line[0]) for line in receipt_line],
+                                'origin': 'buy.receipt',
+                                'note': self.note,
+                                'discount_rate': self.discount_rate,
+                                'discount_amount': self.discount_amount,
+                            })
+            view_id = self.env.ref('buy.buy_receipt_form').id
+            name = u'采购入库单'
+        elif self.type == 'return':
+            rec = self.with_context(is_return=True)
+            receipt_id = rec.env['buy.receipt'].create({
                             'partner_id': self.partner_id.id,
                             'date': self.planned_date,
                             'order_id': self.id,
-                            'line_in_ids': [
+                            'line_out_ids': [
                                 (0, 0, line[0]) for line in receipt_line],
-                            'origin': 'buy.receipt',
                             'note': self.note,
                             'discount_rate': self.discount_rate,
                             'discount_amount': self.discount_amount,
                         })
-        view_id = self.env.ref('buy.buy_receipt_form').id
+            view_id = self.env.ref('buy.buy_return_form').id
+            name = u'采购退货单'
         return {
-            'name': u'采购入库单',
+            'name': name,
             'view_type': 'form',
             'view_mode': 'form',
             'view_id': False,
@@ -235,7 +258,7 @@ class buy_order_line(models.Model):
     uom_id = fields.Many2one('uom', u'单位')
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    default=_default_warehouse)
-    warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
     quantity = fields.Float(u'数量', default=1)
     quantity_in = fields.Float(u'已入库数量', copy=False)
     price = fields.Float(u'购货单价')
@@ -394,7 +417,11 @@ class buy_receipt(models.Model):
                 self.buy_share_cost()
 
         if self.order_id:
-            for line in self.line_in_ids:
+            if not self.is_return:
+                line_ids = self.line_in_ids
+            else:
+                line_ids = self.line_out_ids
+            for line in line_ids:
                 line.buy_line_id.quantity_in += line.goods_qty
 
         # 入库单/退货单 生成源单
