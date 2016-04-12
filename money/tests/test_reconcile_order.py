@@ -72,6 +72,15 @@ class test_reconcile_order(TransactionCase):
         reconcile = self.env.ref('money.reconcile_adv_pay_to_get')
         reconcile.partner_id = self.env.ref('core.jd').id
         reconcile.onchange_partner_id()
+        # 核销金额不能大于未核销金额
+        reconcile.advance_payment_ids.to_reconcile = 200.0
+        with self.assertRaises(except_orm):
+            reconcile.reconcile_order_done()
+        reconcile.receivable_source_ids.to_reconcile = 200.0
+        with self.assertRaises(except_orm):
+            reconcile.reconcile_order_done()
+        reconcile.advance_payment_ids.to_reconcile = 300.0
+        reconcile.receivable_source_ids.to_reconcile = 300.0
         reconcile.advance_payment_ids.this_reconcile = 300.0
         reconcile.receivable_source_ids.this_reconcile = 300.0
         reconcile.reconcile_order_done()
