@@ -26,12 +26,10 @@ class test_invoice(TransactionCase):
     def test_create_delete(self):
         '''测试发票创建和删除'''
         # 创建发票
-        invoice = self.env['money.invoice'].create({
-            'name':'new_test_invoice',
-            'partner_id':self.partner.id,
-            'category_id':self.env.ref('money.core_category_sale').id,
-            'amount':10.0,
-            })
+        invoice = self.env['money.invoice'].create({'name':'new_test_invoice',
+                                                    'partner_id':self.partner.id,
+                                                    'category_id':self.env.ref('money.core_category_sale').id,
+                                                    'amount':10.0})
         # 如果公司的 draft_invoice参数未设，发票自动审核
         if self.env.ref('base.main_company').draft_invoice:
             self.assertEqual(invoice.state, 'draft')
@@ -52,11 +50,9 @@ class test_invoice(TransactionCase):
         # 未审核的发票可以删除
         invoice.unlink()
         # 执行money_invoice_draft()的if category_id.type == 'expense'
-        invoice_buy = self.env['money.invoice'].create({
-            'name':'buy_invoice',
-            'partner_id': self.env.ref('core.lenovo').id,
-            'category_id':self.env.ref('money.core_category_purchase').id,
-            'amount':10.0,
-            })
+        invoice_buy = self.env['money.invoice'].create({'name':'buy_invoice',
+                                                        'partner_id': self.env.ref('core.lenovo').id,
+                                                        'category_id':self.env.ref('money.core_category_purchase').id,
+                                                        'amount':10.0})
         invoice_buy.money_invoice_done()
         invoice_buy.money_invoice_draft()
