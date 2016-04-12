@@ -30,7 +30,7 @@ class Test_sell(TransactionCase):
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
                                         'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})]}
 
-        self.sell_delivery_obj = self.env['sell.delivery'].create(vals)
+        self.sell_delivery_obj = self.env['sell.delivery'].with_context({'is_return': True}).create(vals)
 
         self.order_2.sell_order_done()
         self.sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
@@ -40,12 +40,14 @@ class Test_sell(TransactionCase):
         ''' 测试销售订单  '''
         # 正常销售订单
 
-        # receipt = self.env['sell.delivery'].search([('order_id', '=', order.id)])
-
         # 没有订单行的销售订单
         partner_objs = self.env.ref('core.jd')
         vals = {'partner_id': partner_objs.id}
         order_no_line = self.env['sell.order'].create(vals)
+        # 没有订单行的销售订单
+        with self.assertRaises(except_orm):
+            order_no_line.sell_order_done()
+
         self.order.sell_order_done()
         # 计算字段的测试
         self.assertEqual(self.order.amount, 151600.00)
@@ -63,14 +65,8 @@ class Test_sell(TransactionCase):
         self.sell_delivery._get_sell_money_state()
         self.assertEqual(self.sell_delivery.money_state, u'全部收款')
 
-        self.order_2.unlink()
-
-        with self.assertRaises(except_orm):
-            self.order_2.sell_order_draft()
-
-        # 没有订单行的销售订单
-        with self.assertRaises(except_orm):
-            order_no_line.sell_order_done()
+        # with self.assertRaises(except_orm):
+        #     self.order_2.sell_order_draft()
 
         for goods_state in [(u'未出库', 0), (u'部分出库', 1), (u'全部出库', 10000)]:
             self.order.line_ids.write({'quantity_out': goods_state[1]})
@@ -83,10 +79,10 @@ class Test_sell(TransactionCase):
                 self.order.sell_order_done()
                 self.order.sell_order_draft()
 
-        # 销售退货单的测试
-        #
-        self.order_3.write({'type': "return"})
-        self.order_3.sell_order_done()
+        # # 销售退货单的测试
+        # #
+        # self.order_3.write({'type': "return"})
+        # self.order_3.sell_order_done()
 
         # sell.order onchange test
         self.order.discount_rate = 10
