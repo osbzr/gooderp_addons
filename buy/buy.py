@@ -103,6 +103,14 @@ class buy_order(models.Model):
             vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
         return super(buy_order, self).create(vals)
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(buy_order, self).unlink()
+
     @api.one
     def buy_order_done(self):
         '''审核购货订单'''
@@ -398,6 +406,14 @@ class buy_receipt(models.Model):
             'origin': self.get_move_origin(vals)
         })
         return super(buy_receipt, self).create(vals)
+
+    @api.multi
+    def unlink(self):
+        for receipt in self:
+            if receipt.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(buy_receipt, self).unlink()
 
     @api.one
     def buy_receipt_done(self):

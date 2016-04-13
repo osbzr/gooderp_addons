@@ -93,7 +93,7 @@ class Test_sell(TransactionCase):
         self.order.discount_rate = 10
         self.order.onchange_discount_rate()
         self.assertEqual(self.order.discount_amount, 15163.2)
-        self.order.unlink()
+#         self.order.unlink()
 
     def test_sale_order_line_compute(self):
         """测试销售订单的on_change 和 计算字段"""
@@ -234,3 +234,19 @@ class Test_sell(TransactionCase):
         order.sell_order_draft()
         with self.assertRaises(except_orm):
             order.sell_order_draft()
+
+    def test_unlink(self):
+        '''测试删除已审核的销货订单'''
+        self.order.sell_order_done()
+        with self.assertRaises(except_orm):
+            self.order.unlink()
+        # 删除草稿状态的销货订单
+        self.order.copy()
+        self.order.sell_order_draft()
+        self.order.unlink()
+
+    def test_sell_delivery_unlink(self):
+        '''测试删除已审核的销售发货/退货单'''
+        self.sell_delivery.sell_delivery_done()
+        with self.assertRaises(except_orm):
+            self.sell_delivery.unlink()
