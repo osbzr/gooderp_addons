@@ -5,26 +5,13 @@ from openerp.exceptions import except_orm
 class test_supplier_statements(TransactionCase):
     '''测试供应商对账单'''
     def setUp(self):
+        '''供应商对账单向导及数据'''
         super(test_supplier_statements, self).setUp()
         # 业务伙伴对账单向导: else self._context.get('default_supplier')
         self.statement = self.env['partner.statements.report.wizard'].create({
                             'partner_id': self.env.ref('core.lenovo').id,
                             'from_date': '2016-01-01',
                             'to_date': '2016-11-01'}).with_context({'default_supplier': True})
-    def test_supplier_statements_wizard(self):
-        '''供应商对账单向导'''
-        # 测试'结束日期不能小于开始日期！'
-        self.statement.from_date = '2016-11-03'
-        with self.assertRaises(except_orm):
-            self.statement.partner_statements_without_goods()
-        with self.assertRaises(except_orm):
-            self.statement.partner_statements_with_goods()
-        # 测试from_date的默认值是否是公司启用日期
-        statement_date = self.env['partner.statements.report.wizard'].create({'partner_id': self.env.ref('core.lenovo').id,
-                                                                              'to_date': '2016-11-03'}).with_context({'default_supplier': True})
-        self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
-    def test_supplier_statements(self):
-        '''供应商对账单'''
         # 创建期初余额记录
         self.env['go.live.order'].create({'partner_id':self.env.ref('core.lenovo').id, 'balance':200.0})
         # 创建付款记录
@@ -39,6 +26,19 @@ class test_supplier_statements(TransactionCase):
         receipt.buy_receipt_done()
         invoice = self.env['money.invoice'].search([('name','=',receipt.name)])
         invoice.money_invoice_done()
+    def test_supplier_statements_wizard(self):
+        '''供应商对账单向导'''
+        # 测试'结束日期不能小于开始日期！'
+        self.statement.from_date = '2016-11-03'
+        with self.assertRaises(except_orm):
+            self.statement.partner_statements_without_goods()
+        with self.assertRaises(except_orm):
+            self.statement.partner_statements_with_goods()
+        # 测试from_date的默认值是否是公司启用日期
+        statement_date = self.env['partner.statements.report.wizard'].create({'partner_id': self.env.ref('core.lenovo').id,
+                                                                              'to_date': '2016-11-03'}).with_context({'default_supplier': True})
+        self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
+        
     def test_supplier_statements_find_source(self):
         '''查看供应商对账单明细'''
         # 查看不带商品明细源单
