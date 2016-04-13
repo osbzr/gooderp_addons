@@ -74,16 +74,16 @@ class test_money(TransactionCase):
                                                 'type': 'get'})
         money.money_order_done()
         money.money_order_draft()
+        # to_reconcile < this_concile, 执行'本次核销金额不能大于未核销金额'
+        money.source_ids.to_reconcile = 100.0
+        with self.assertRaises(except_orm):
+            money.money_order_done()
         self.partner_id = self.env.ref('core.jd')
         money.onchange_partner_id()
         # advance_payment < 0, 执行'核销金额不能大于付款金额'
         self.env.ref('money.pay_2000').line_ids.amount = -10.0
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
-        # to_reconcile < this_concile, 执行'本次核销金额不能大于未核销金额'
-        with self.assertRaises(except_orm):
-            money.source_ids.this_concile = 300.0
-            money.money_order_done()
 
     def test_other_money_order_unlink(self):
         '''测试其他收支单删除'''
