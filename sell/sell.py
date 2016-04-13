@@ -80,6 +80,14 @@ class sell_order(models.Model):
 
         return super(sell_order, self).create(vals)
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(sell_order, self).unlink()
+
     @api.one
     def sell_order_done(self):
         '''审核销货订单'''
@@ -357,6 +365,14 @@ class sell_delivery(models.Model):
         })
 
         return super(sell_delivery, self).create(vals)
+
+    @api.multi
+    def unlink(self):
+        for delivery in self:
+            if delivery.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(sell_delivery, self).unlink()
 
     @api.one
     def sell_delivery_done(self):
