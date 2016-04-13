@@ -42,6 +42,12 @@ class test_buy_order(TransactionCase):
         order_copy_1._get_buy_goods_state()
         self.assertTrue(order_copy_1.goods_state == u'部分入库')
 
+    def test_unlink(self):
+        '''测试删除已审核的采购订单'''
+        self.order.buy_order_done()
+        with self.assertRaises(except_orm):
+            self.order.unlink()
+
     def test_buy_order_done(self):
         '''采购订单审核'''
         # 正常审核
@@ -216,6 +222,12 @@ class test_buy_receipt(TransactionCase):
                                         }).create({
                                         })
         self.assertTrue(receipt.origin == 'buy.receipt.return')
+
+    def test_unlink(self):
+        '''测试删除已审核的采购入库/退货单'''
+        self.receipt.buy_receipt_done()
+        with self.assertRaises(except_orm):
+            self.receipt.unlink()
 
     def test_buy_receipt_done(self):
         '''测试审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
