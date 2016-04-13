@@ -91,7 +91,7 @@ class buy_order(models.Model):
     cancelled = fields.Boolean(u'已终止')
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
         total = sum(line.subtotal for line in self.line_ids)
         if self.discount_rate:
@@ -294,7 +294,7 @@ class buy_order_line(models.Model):
             self.warehouse_dest_id = self.goods_id.default_wh  # 取产品的默认仓库
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('quantity', 'price', 'discount_rate')
     def onchange_discount_rate(self):
         if self.discount_rate:
             self.discount_amount = (self.quantity * self.price 
@@ -376,7 +376,7 @@ class buy_receipt(models.Model):
                                help=u"采购退货单的退款状态", select=True, copy=False)
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
     def onchange_discount_rate(self):
         total = 0
         if self.line_in_ids:
