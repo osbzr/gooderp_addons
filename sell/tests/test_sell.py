@@ -240,6 +240,10 @@ class Test_sell(TransactionCase):
         self.order.sell_order_done()
         with self.assertRaises(except_orm):
             self.order.unlink()
+        # 删除草稿状态的销货订单
+        self.order.copy()
+        self.order.sell_order_draft()
+        self.order.unlink()
 
     def test_sell_delivery_unlink(self):
         '''测试删除已审核的销售发货/退货单'''

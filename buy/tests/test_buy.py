@@ -47,6 +47,10 @@ class test_buy_order(TransactionCase):
         self.order.buy_order_done()
         with self.assertRaises(except_orm):
             self.order.unlink()
+        # 删除草稿状态的采购订单
+        self.order.copy()
+        self.order.buy_order_draft()
+        self.order.unlink()
 
     def test_buy_order_done(self):
         '''采购订单审核'''
