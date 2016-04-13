@@ -82,6 +82,7 @@ class test_buy_order(TransactionCase):
 
     def test_buy_generate_receipt(self):
         '''测试采购订单生成入库单,批次管理拆分折扣金额'''
+        # 采购订单
         # 全部入库
         self.order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
@@ -97,6 +98,14 @@ class test_buy_order(TransactionCase):
         receipt = self.env['buy.receipt'].search(
                   [('order_id', '=', new_order.id)])
         self.assertTrue(len(receipt.line_in_ids) == 10)
+        # 退货订单
+        # 全部入库
+        return_receipt = self.env.ref('buy.buy_return_order_1')
+        return_receipt.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+                  [('order_id', '=', return_receipt.id)])
+        receipt.buy_receipt_done()
+        return_receipt.buy_generate_receipt()
 
 
 class test_buy_order_line(TransactionCase):
@@ -110,6 +119,9 @@ class test_buy_order_line(TransactionCase):
         self.order.line_ids.with_context({
              'warehouse_type': 'supplier'
              }).create({
+                       'order_id': self.order.id,
+                       })
+        self.order.line_ids.create({
                        'order_id': self.order.id,
                        })
 
@@ -131,7 +143,6 @@ class test_buy_order_line(TransactionCase):
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
             wh_id = line.warehouse_dest_id.id
-            print '==============',wh_id,goods.default_wh
             self.assertTrue(wh_id == goods.default_wh.id)
 
     def test_onchange_discount_rate(self):
@@ -175,7 +186,7 @@ class test_buy_receipt(TransactionCase):
 
     def test_get_buy_return_state(self):
         '''测试返回退款状态'''
-        self.return_receipt._get_buy_money_state()
+        self.return_receipt._get_buy_return_state()
         self.return_receipt.buy_receipt_done()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
         self.return_receipt._get_buy_money_state()
@@ -200,6 +211,11 @@ class test_buy_receipt(TransactionCase):
         receipt = self.env['buy.receipt'].create({
                                         })
         self.assertTrue(receipt.origin == 'buy.receipt.buy')
+        receipt = self.env['buy.receipt'].with_context({
+                                        'is_return': True
+                                        }).create({
+                                        })
+        self.assertTrue(receipt.origin == 'buy.receipt.return')
 
     def test_buy_receipt_done(self):
         '''测试审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
@@ -214,6 +230,11 @@ class test_buy_receipt(TransactionCase):
         # 结算账户不为空时，需要输入付款额！
         self.receipt.bank_account_id = bank_account
         self.receipt.payment = 0
+        with self.assertRaises(except_orm):
+            self.receipt.buy_receipt_done()
+        # 付款金额不能大于折后金额！
+        self.receipt.bank_account_id = bank_account
+        self.receipt.payment = 20000
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
         # 重复审核报错
