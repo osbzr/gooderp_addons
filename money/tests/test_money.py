@@ -142,14 +142,12 @@ class test_other_money_order(TransactionCase):
         # onchange_partner
         self.env.ref('money.other_get_60').onchange_partner()
         # 测试其他收支单金额<0,执行if报错
-        other = self.env['other.money.order'].create({
-                                                'partner_id': self.env.ref('core.jd').id,
-                                                'bank_id': self.env.ref('core.comm').id,
-                                                'type': 'other_get'})
-        self.env['other.money.order.line'].create({
-                                                'other_money_id': other.id,
-                                                'category_id': self.env.ref('money.core_category_sale').id,
-                                                'amount':-10.0})
+        other = self.env['other.money.order'].create({'partner_id': self.env.ref('core.jd').id,
+                                                      'bank_id': self.env.ref('core.comm').id,
+                                                      'type': 'other_get'})
+        self.env['other.money.order.line'].create({'other_money_id': other.id,
+                                                   'category_id': self.env.ref('money.core_category_sale').id,
+                                                   'amount':-10.0})
         with self.assertRaises(except_orm):
             other.other_money_done()
 
@@ -212,4 +210,3 @@ class test_go_live_order(TransactionCase):
         self.env['go.live.order'].create({'bank_id':self.env.ref('core.comm').id, 'balance':20.0})
         self.env['go.live.order'].create({'partner_id':self.env.ref('core.jd').id, 'receivable':100.0})
         self.env['go.live.order'].create({'partner_id':self.env.ref('core.lenovo').id, 'payable':200.0})
-    
