@@ -54,5 +54,22 @@
             <field eval="10" name="discount_amount"/>
             <field eval="10.0" name="quantity"/>
         </record>
+        <!--销售退货定单-->
+        <record id="sell_order_return" model="sell.order">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="type">return</field>
+            <field eval="32.0" name="discount_amount"/>
+            <field name="delivery_date">2016-03-02</field>
+        </record>
+        <record id="sell_order_return_line" model="sell.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+            <field name="goods_id" ref="goods.cable"/>
+            <field name="order_id" ref="sell_order_return"/>
+            <field eval="10" name="price"/>
+            <field name="warehouse_id" ref="warehouse.warehouse_customer"/>
+            <field eval="10" name="discount_amount"/>
+            <field eval="10.0" name="quantity"/>
+        </record>
     </data>
 </openerp>

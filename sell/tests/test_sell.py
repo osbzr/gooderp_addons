@@ -35,7 +35,12 @@ class Test_sell(TransactionCase):
         self.order_2.sell_order_done()
         self.sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
         self.sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT)})
-
+        # 销售退货订单审核，退货出库单审核
+        return_receipt = self.env.ref('sell.sell_order_return')
+        return_receipt.sell_order_done()
+        receipt = self.env['sell.delivery'].search(
+                  [('order_id', '=', return_receipt.id)])
+        receipt.sell_delivery_done()
     def test_sell(self):
         ''' 测试销售订单  '''
         # 正常销售订单
