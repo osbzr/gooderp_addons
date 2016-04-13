@@ -3,7 +3,7 @@
 from openerp.tests.common import TransactionCase
 from openerp.exceptions import except_orm
 
-class test_money(TransactionCase):
+class test_money_order(TransactionCase):
     '''测试收付款'''
     def test_money_order_unlink(self):
         '''测试收付款单删除'''
@@ -85,23 +85,36 @@ class test_money(TransactionCase):
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
 
+class test_other_money_order(TransactionCase):
+    '''测试其他收支单'''
     def test_other_money_order_unlink(self):
         '''测试其他收支单删除'''
-        self.env.ref('money.other_pay_9000').other_money_done()
+        self.env.ref('money.other_get_60').other_money_done()
         # 审核状态不可删除
         with self.assertRaises(except_orm):
-            self.env.ref('money.other_pay_9000').unlink()
+            self.env.ref('money.other_get_60').unlink()
         # 未审核可以删除
-        self.env.ref('money.other_get_60').unlink()
+        self.env.ref('money.other_pay_9000').unlink()
+    def test_other_money_order_draft(self):
+        ''' 测试其他收入支出反审核'''
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.other_pay_1000').other_money_done()
+        self.env.ref('money.other_get_60').other_money_done()
+        # 反审核
+        self.env.ref('money.other_pay_1000').other_money_draft()
+        # 反审核：收款退款余额不足，不能付款
+        self.env.ref('money.other_get_60').line_ids.amount = 45000
+        with self.assertRaises(except_orm):
+            self.env.ref('money.other_get_60').other_money_draft()
     def test_other_money_order(self):
         ''' 测试其他收入支出 '''
         self.env.ref('money.other_get_60').other_money_done()
-        # 转出账户收一笔款
+        # 审核：余额不足，不能付款
+        with self.assertRaises(except_orm):
+            self.env.ref('money.other_pay_9000').other_money_done()
+        # 审核：转出账户收一笔款
         self.env.ref('money.get_40000').money_order_done()
-        self.env.ref('money.other_pay_9000').other_money_done()
-        # 反审核
-        self.env.ref('money.other_pay_9000').other_money_draft()
-        self.env.ref('money.other_get_60').other_money_draft()
+        self.env.ref('money.other_pay_1000').other_money_done()
         # onchange_date  同时执行create时的type=other_get
         invoice = self.env['money.invoice'].create({'name':'invoice',
                                                     'partner_id': self.env.ref('core.jd').id,
@@ -140,6 +153,8 @@ class test_money(TransactionCase):
         with self.assertRaises(except_orm):
             other.other_money_done()
 
+class test_money_transfer_order(TransactionCase):
+    '''测试其他资金转账单'''
     def test_money_transfer_order_unlink(self):
         '''测试资金转账单删除'''
         self.env.ref('money.get_40000').money_order_done()
@@ -149,8 +164,18 @@ class test_money(TransactionCase):
             self.env.ref('money.transfer_300').unlink()
         # 未审核的转账单可以删除
         self.env.ref('money.transfer_400').unlink()
+    def test_money_transfer_order_draft(self):
+        '''测试资金转账单反审核'''
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.transfer_300').money_transfer_done()
+        # 反审核
+        self.env.ref('money.transfer_300').money_transfer_draft()
+        # 转入账户余额不足，不能反审核
+        self.env.ref('core.alipay').balance = self.env.ref('core.alipay').balance - 100
+        with self.assertRaises(except_orm):
+            self.env.ref('money.transfer_400').money_transfer_draft()
     def test_money_transfer_order(self):
-        ''' 测试转账 '''
+        ''' 测试转账单审核 '''
         comm_balance = self.env.ref('core.comm').balance
         money_transfer_300 = self.env.ref('money.transfer_300')
         with self.assertRaises(except_orm):
@@ -162,13 +187,6 @@ class test_money(TransactionCase):
         money_transfer_300.money_transfer_done()
         self.assertEqual(self.env.ref('core.comm').balance, comm_balance + 40000 - 300)
         self.assertEqual(self.env.ref('core.alipay').balance, comm_balance + 300)
-        # 反审核
-        self.env.ref('money.transfer_300').money_transfer_draft()
-        # 转入账户余额不足，不能反审核
-        money_transfer_300.money_transfer_done()
-        self.env.ref('core.alipay').balance = self.env.ref('core.alipay').balance - 100
-        with self.assertRaises(except_orm):
-            self.env.ref('money.transfer_400').money_transfer_draft()
         # line_ids不存在，则审核报错
         transfer_order = self.env['money.transfer.order']
         transfer_no_line = transfer_order.create({'note': 'no line'})
@@ -183,12 +201,12 @@ class test_money(TransactionCase):
         money_transfer_300.line_ids.amount = -10.0
         with self.assertRaises(except_orm):
             money_transfer_300.money_transfer_done()
-
+class test_partner(TransactionCase):
     def test_partner(self):
         ''' 客户对账单 和  银行帐'''
         self.env.ref('core.jd').partner_statements()
         self.env.ref('core.comm').bank_statements()
-    
+class test_go_live_order(TransactionCase):
     def test_go_live_order(self):
         '''期初余额'''
         self.env['go.live.order'].create({'bank_id':self.env.ref('core.comm').id, 'balance':20.0})
