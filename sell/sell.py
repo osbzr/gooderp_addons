@@ -67,11 +67,11 @@ class sell_order(models.Model):
     cancelled = fields.Boolean(u'已终止')
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
+        '''当优惠率或销货订单行发生变化时，单据优惠金额发生变化'''
         total = sum(line.subtotal for line in self.line_ids)
-        if self.discount_rate:
-            self.discount_amount = total * self.discount_rate * 0.01
+        self.discount_amount = total * self.discount_rate * 0.01
 
     @api.model
     def create(self, vals):
@@ -260,10 +260,10 @@ class sell_order_line(models.Model):
             self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('quantity', 'price', 'discount_rate')
     def onchange_discount_rate(self):
-        if self.discount_rate:
-            self.discount_amount = self.quantity * self.price * self.discount_rate * 0.01
+        '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
+        self.discount_amount = self.quantity * self.price * self.discount_rate * 0.01
 
 
 class sell_delivery(models.Model):
@@ -284,7 +284,7 @@ class sell_delivery(models.Model):
             total = sum(line.subtotal for line in self.line_in_ids)  # 退货时优惠前总金额
         self.amount = total - self.discount_amount
         self.debt = self.amount - self.receipt + self.partner_cost
-        self.total_debt = self.partner_id.receivable
+        self.total_debt = self.partner_id.receivable + self.debt    # 本次欠款变化时，总欠款应该变化
 
     @api.one
     @api.depends('state', 'amount', 'receipt')
@@ -337,15 +337,15 @@ class sell_delivery(models.Model):
                                help=u"销售退货单的退款状态", select=True, copy=False)
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
     def onchange_discount_rate(self):
+        '''当优惠率或订单行发生变化时，单据优惠金额发生变化'''
         total = 0
         if self.line_out_ids:
             total = sum(line.subtotal for line in self.line_out_ids)  # 发货时优惠前总金额
         elif self.line_in_ids:
             total = sum(line.subtotal for line in self.line_in_ids)  # 退货时优惠前总金额
-        if self.discount_rate:
-            self.discount_amount = total * self.discount_rate * 0.01
+        self.discount_amount = total * self.discount_rate * 0.01
 
     def get_move_origin(self, vals):
         return self._name + (self.env.context.get('is_return') and '.return' or '.sell')

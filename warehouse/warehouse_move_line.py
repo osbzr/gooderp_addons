@@ -259,10 +259,10 @@ class wh_move_line(models.Model):
     #         and self._get_subtotal_util(self.goods_qty, self.price) or 0
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('goods_qty', 'price', 'discount_rate')
     def onchange_discount_rate(self):
-        if self.discount_rate:
-            self.discount_amount = self.goods_qty * self.price * self.discount_rate * 0.01
+        '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
+        self.discount_amount = self.goods_qty * self.price * self.discount_rate * 0.01
 
     @api.multi
     def unlink(self):
