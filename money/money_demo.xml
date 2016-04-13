@@ -33,6 +33,15 @@
             <field eval="60.0" name="amount"/>
         </record>
         <!-- 其他付款单 -->
+        <record id="other_pay_1000" model="other.money.order">
+            <field name="type">other_pay</field>
+            <field name="bank_id" ref="core.comm"/>
+        </record>
+        <record id="other_pay_line_2" model="other.money.order.line">
+            <field name="other_money_id" ref="other_pay_1000"/>
+            <field name="category_id" ref="core.cat_consult"/>
+            <field eval="1000.0" name="amount"/>
+        </record>
         <record id="other_pay_9000" model="other.money.order">
             <field name="type">other_pay</field>
             <field name="bank_id" ref="core.alipay"/>
