@@ -229,17 +229,23 @@ class test_buy_receipt(TransactionCase):
 
     def test_unlink(self):
         '''测试删除采购入库/退货单'''
-        # 反审核购货订单，测试删除buy_receipt时是否可以删除关联的wh.move.line记录
-        move = self.env['wh.move'].search(
-               [('id', '=', self.receipt.buy_move_id.id)])
-        self.order.buy_order_draft()
-        self.assertTrue(not move)
-        self.assertTrue(not move.line_in_ids)
-
         # 测试是否可以删除已审核的单据
         self.receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.receipt.unlink()
+
+        # 反审核购货订单，测试删除buy_receipt时是否可以删除关联的wh.move.line记录
+        order = self.order.copy()
+        order.buy_order_done()
+
+        receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', order.id)])
+        move_id = receipt.buy_move_id.id
+        order.buy_order_draft()
+        move = self.env['wh.move'].search(
+               [('id', '=', move_id)])
+        self.assertTrue(not move)
+        self.assertTrue(not move.line_in_ids)
 
     def test_buy_receipt_done(self):
         '''测试审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
