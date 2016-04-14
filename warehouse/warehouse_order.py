@@ -21,7 +21,7 @@ class wh_out(models.Model):
 
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
     type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others')
-    amount_total = fields.Float(compute='_get_amount_total', string=u'合计金额',
+    amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
                                 store=True, readonly=True, digits_compute=dp.get_precision('Accounting'))
 
     @api.multi
@@ -40,9 +40,9 @@ class wh_out(models.Model):
         return super(wh_out, self).unlink()
 
     @api.one
-    @api.depends('line_out_ids.subtotal')
+    @api.depends('line_out_ids.cost')
     def _get_amount_total(self):
-        self.amount_total = sum(line.subtotal for line in self.line_out_ids)
+        self.amount_total = sum(line.cost for line in self.line_out_ids)
 
     def get_move_origin(self, vals):
         return self._name + '.' + vals.get('type')
@@ -69,7 +69,7 @@ class wh_in(models.Model):
 
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
     type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others')
-    amount_total = fields.Float(compute='_get_amount_total', string=u'合计金额',
+    amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
                                 store=True, readonly=True, digits_compute=dp.get_precision('Accounting'))
 
     @api.multi
@@ -88,9 +88,9 @@ class wh_in(models.Model):
         return super(wh_in, self).unlink()
 
     @api.one
-    @api.depends('line_in_ids.subtotal')
+    @api.depends('line_in_ids.cost')
     def _get_amount_total(self):
-        self.amount_total = sum(line.subtotal for line in self.line_in_ids)
+        self.amount_total = sum(line.cost for line in self.line_in_ids)
 
     def get_move_origin(self, vals):
         return self._name + '.' + vals.get('type')
@@ -111,7 +111,7 @@ class wh_internal(osv.osv):
     }
 
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
-    amount_total = fields.Float(compute='_get_amount_total', string=u'合计金额',
+    amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
                                 store=True, readonly=True, digits_compute=dp.get_precision('Accounting'))
 
     @api.multi
@@ -130,9 +130,9 @@ class wh_internal(osv.osv):
         return super(wh_internal, self).unlink()
 
     @api.one
-    @api.depends('line_out_ids.subtotal')
+    @api.depends('line_out_ids.cost')
     def _get_amount_total(self):
-        self.amount_total = sum(line.subtotal for line in self.line_out_ids)
+        self.amount_total = sum(line.cost for line in self.line_out_ids)
 
     @api.model
     @create_name

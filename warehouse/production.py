@@ -19,7 +19,7 @@ class wh_assembly(models.Model):
     bom_id = fields.Many2one('wh.bom', u'模板', domain=[('type', '=', 'assembly')], context={'type': 'assembly'})
     fee = fields.Float(u'组装费用', digits_compute=dp.get_precision('Accounting'))
 
-    def apportion_cost(self, subtotal):
+    def apportion_cost(self, cost):
         for assembly in self:
             if not assembly.line_in_ids:
                 continue
@@ -30,32 +30,29 @@ class wh_assembly(models.Model):
                 collects.append((parent, parent.goods_id.get_suggested_cost_by_warehouse(
                     parent.warehouse_dest_id, parent.goods_qty, ignore_move=ignore_move)[0]))
 
-            amount_total, collect_parent_subtotal = sum(collect[1] for collect in collects), 0
+            amount_total, collect_parent_cost = sum(collect[1] for collect in collects), 0
             for parent, amount in islice(collects, 0, len(collects) - 1):
-                parent_subtotal = safe_division(amount, amount_total) * subtotal
-                collect_parent_subtotal += parent_subtotal
+                parent_cost = safe_division(amount, amount_total) * cost
+                collect_parent_cost += parent_cost
                 parent.write({
-                        'price': safe_division(parent_subtotal, parent.goods_qty),
-                        # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-                        # 'subtotal': parent_subtotal,
+                        'cost_unit': safe_division(parent_cost, parent.goods_qty),
+                        'cost': parent_cost,
                     })
 
             # 最后一行数据使用总金额减去已经消耗的金额来计算
-            last_parent_subtotal = subtotal - collect_parent_subtotal
+            last_parent_cost = cost - collect_parent_cost
             collects[-1][0].write({
-                    'price': safe_division(last_parent_subtotal, collects[-1][0].goods_qty),
-                    # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-                    # 'subtotal': last_parent_subtotal,
+                    'cost_unit': safe_division(last_parent_cost, collects[-1][0].goods_qty),
+                    'cost': last_parent_cost,
                 })
 
         return True
 
-    def update_parent_price(self):
+    def update_parent_cost(self):
         for assembly in self:
-            # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-            subtotal = sum(child.price * child.goods_qty for child in assembly.line_out_ids) + assembly.fee
+            cost = sum(child.cost for child in assembly.line_out_ids) + assembly.fee
 
-            assembly.apportion_cost(subtotal)
+            assembly.apportion_cost(cost)
 
         return True
 
@@ -68,7 +65,7 @@ class wh_assembly(models.Model):
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
-        return self.update_parent_price()
+        return self.update_parent_cost()
 
     @api.multi
     @inherits()
@@ -85,14 +82,14 @@ class wh_assembly(models.Model):
     @create_origin
     def create(self, vals):
         self = super(wh_assembly, self).create(vals)
-        self.update_parent_price()
+        self.update_parent_cost()
 
         return self
 
     @api.multi
     def write(self, vals):
         res = super(wh_assembly, self).write(vals)
-        self.update_parent_price()
+        self.update_parent_cost()
 
         return res
 
@@ -113,7 +110,7 @@ class wh_assembly(models.Model):
             } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
-                subtotal, price = line.goods_id.get_suggested_cost_by_warehouse(warehouse_id[0], line.goods_qty)
+                cost, cost_unit = line.goods_id.get_suggested_cost_by_warehouse(warehouse_id[0], line.goods_qty)
 
                 line_out_ids.append({
                         'goods_id': line.goods_id,
@@ -121,8 +118,8 @@ class wh_assembly(models.Model):
                         'warehouse_dest_id': self.env['warehouse'].get_warehouse_by_type('production'),
                         'uom_id': line.goods_id.uom_id,
                         'goods_qty': line.goods_qty,
-                        'price': price,
-                        'subtotal': subtotal,
+                        'cost_unit': cost_unit,
+                        'cost': cost,
                     })
 
             self.line_in_ids = False
@@ -189,7 +186,7 @@ class wh_disassembly(models.Model):
     bom_id = fields.Many2one('wh.bom', u'模板', domain=[('type', '=', 'disassembly')], context={'type': 'disassembly'})
     fee = fields.Float(u'拆卸费用', digits_compute=dp.get_precision('Accounting'))
 
-    def apportion_cost(self, subtotal):
+    def apportion_cost(self, cost):
         for assembly in self:
             if not assembly.line_in_ids:
                 continue
@@ -200,32 +197,29 @@ class wh_disassembly(models.Model):
                 collects.append((child, child.goods_id.get_suggested_cost_by_warehouse(
                     child.warehouse_dest_id, child.goods_qty, ignore_move=ignore_move)[0]))
 
-            amount_total, collect_child_subtotal = sum(collect[1] for collect in collects), 0
+            amount_total, collect_child_cost = sum(collect[1] for collect in collects), 0
             for child, amount in islice(collects, 0, len(collects) - 1):
-                child_subtotal = safe_division(amount, amount_total) * subtotal
-                collect_child_subtotal += child_subtotal
+                child_cost = safe_division(amount, amount_total) * cost
+                collect_child_cost += child_cost
                 child.write({
-                        'price': safe_division(child_subtotal, child.goods_qty),
-                        # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-                        # 'subtotal': child_subtotal,
+                        'cost_unit': safe_division(child_cost, child.goods_qty),
+                        'cost': child_cost,
                     })
 
             # 最后一行数据使用总金额减去已经消耗的金额来计算
-            last_child_subtotal = subtotal - collect_child_subtotal
+            last_child_cost = cost - collect_child_cost
             collects[-1][0].write({
-                    'price': safe_division(last_child_subtotal, collects[-1][0].goods_qty),
-                    # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-                    # 'subtotal': last_child_subtotal,
+                    'cost_unit': safe_division(last_child_cost, collects[-1][0].goods_qty),
+                    'cost': last_child_cost,
                 })
 
         return True
 
-    def update_child_price(self):
+    def update_child_cost(self):
         for assembly in self:
-            # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-            subtotal = sum(child.price * child.goods_qty for child in assembly.line_out_ids) + assembly.fee
+            cost = sum(child.cost for child in assembly.line_out_ids) + assembly.fee
 
-            assembly.apportion_cost(subtotal)
+            assembly.apportion_cost(cost)
         return True
 
     @api.one
@@ -237,7 +231,7 @@ class wh_disassembly(models.Model):
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
-        return self.update_child_price()
+        return self.update_child_cost()
 
     @api.multi
     @inherits()
@@ -254,14 +248,14 @@ class wh_disassembly(models.Model):
     @create_origin
     def create(self, vals):
         self = super(wh_disassembly, self).create(vals)
-        self.update_child_price()
+        self.update_child_cost()
 
         return self
 
     @api.multi
     def write(self, vals):
         res = super(wh_disassembly, self).write(vals)
-        self.update_child_price()
+        self.update_child_cost()
 
         return res
 
@@ -274,7 +268,7 @@ class wh_disassembly(models.Model):
         if self.bom_id:
             line_out_ids = []
             for line in self.bom_id.line_parent_ids:
-                subtotal, price = line.goods_id.get_suggested_cost_by_warehouse(
+                cost, cost_unit = line.goods_id.get_suggested_cost_by_warehouse(
                     warehouse_id, line.goods_qty)
                 line_out_ids.append({
                         'goods_id': line.goods_id,
@@ -282,8 +276,8 @@ class wh_disassembly(models.Model):
                         'warehouse_dest_id': warehouse_id,
                         'uom_id': line.goods_id.uom_id,
                         'goods_qty': line.goods_qty,
-                        'price': price,
-                        'subtotal': subtotal,
+                        'cost_unit': cost_unit,
+                        'cost': cost,
                     })
 
             line_in_ids = [{

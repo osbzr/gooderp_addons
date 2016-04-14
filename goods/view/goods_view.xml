@@ -30,8 +30,8 @@
                                 <field name='category_id'/>
                             </group>
                             <group>
-                                <field name='uom_id' />
-                                <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                                <field name='uom_id' required='1' />
+                                <field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
                                 <field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" groups='goods.auxiliary_unit_groups' />
                             </group>
                         </group>

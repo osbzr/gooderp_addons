@@ -63,14 +63,14 @@
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='组合件' />
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='组合件数量' />
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='组合件单位' />
-                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'price'}" string='组合件单位成本' />
-                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'subtotal'}" string='组合件成本' />
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='组合件单位成本' />
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost'}" string='组合件成本' />
 
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='子件' />
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='子件数量' />
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='子件单位' />
-                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'price'}" string='子件单位成本' />
-                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'subtotal'}" string='子件成本' />
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='子件单位成本' />
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本' />
                     <field name='state' />
                 </tree>
             </field>
@@ -94,9 +94,8 @@
 
                     <field name='warehouse_id' invisible='1' />
                     <field name='warehouse_dest_id' string='仓库' required='1' />
-                    <field name='price' string='入库单位成本' readonly='1' />
-                    <field name='tax_rate' />
-                    <field name='subtotal' string='入库金额' readonly='1' sum='1' />
+                    <field name='cost_unit' string='入库单位成本' readonly='1' />
+                    <field name='cost' string='入库金额' readonly='1' sum='1' />
                     <field name='note' string='备注' />
                 </tree>
             </field>
@@ -178,14 +177,14 @@
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='组合件' />
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='组合件数量' />
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='组合件单位' />
-                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'price'}" string='组合件单位成本' />
-                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'subtotal'}" string='组合件成本' />
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='组合件单位成本' />
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost'}" string='组合件成本' />
 
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='子件' />
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='子件数量' />
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='子件单位' />
-                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'price'}" string='子件单位成本' />
-                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'subtotal'}" string='子件成本' />
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='子件单位成本' />
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本' />
                     <field name='state' />
                 </tree>
             </field>

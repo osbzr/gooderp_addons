@@ -300,7 +300,7 @@ class wh_inventory_line(models.Model):
         inventory_warehouse = self.env['warehouse'].get_warehouse_by_type('inventory')
         for inventory in self:
 
-            subtotal, matching_qty = inventory.goods_id.get_suggested_cost_by_warehouse(
+            cost, cost_unit = inventory.goods_id.get_suggested_cost_by_warehouse(
                 inventory.warehouse_id, abs(inventory.difference_qty))
             return {
                 'warehouse_id': wh_type == 'out' and inventory.warehouse_id.id or inventory_warehouse.id,
@@ -313,8 +313,8 @@ class wh_inventory_line(models.Model):
                 'uos_id': inventory.uos_id.id,
                 'goods_qty': abs(inventory.difference_qty),
                 'goods_uos_qty': abs(inventory.difference_uos_qty),
-                'price': safe_division(subtotal, matching_qty),
-                # 'subtotal': subtotal,
+                'cost_unit': cost_unit,
+                'cost': cost,
             }
 
 

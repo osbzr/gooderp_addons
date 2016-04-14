@@ -24,7 +24,7 @@ class TestInventory(TransactionCase):
             'warehouse_dest_id': self.sh_warehouse.id,
             'goods_qty': 1,
             'goods_uos_qty': self.goods_mouse.anti_conversion_unit(1),
-            'price': 30,
+            'cost_unit': 30,
             'lot': 'MOUSE0001',
         })
 
@@ -39,7 +39,7 @@ class TestInventory(TransactionCase):
             'warehouse_dest_id': self.sh_warehouse.id,
             'goods_qty': 0,
             'goods_uos_qty': 1,
-            'price': 30,
+            'cost_unit': 30,
             'lot': 'MOUSE0002',
         })
 

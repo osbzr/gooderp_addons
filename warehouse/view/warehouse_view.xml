@@ -52,9 +52,8 @@
                     <field name='lot' />
                     <field name='qty_remaining' />
                     <field name='uos_qty_remaining' groups='goods.auxiliary_unit_groups' />
-                    <field name='price' />
-                    <field name='tax_rate' />
-                    <field name='subtotal' sum='1' />
+                    <field name='cost_unit' />
+                    <field name='cost' sum='1' />
                     <field name='state' />
                     <field name='note' />
                     <field name='type' />
@@ -82,9 +81,8 @@
                     <field name='warehouse_id' string='仓库' required='1' />
 
                     <field name='warehouse_dest_id' invisible='1' />
-                    <field name='price' string='出库单位成本' readonly='1' />
-                    <field name='tax_rate' />
-                    <field name='subtotal' string='出库成本' readonly='1' sum='1' />
+                    <field name='cost_unit' string='出库单位成本' readonly='1' />
+                    <field name='cost' string='出库成本' readonly='1' sum='1' />
                     <field name='note' string='备注' />
                 </tree>
             </field>
@@ -108,9 +106,8 @@
 
                     <field name='warehouse_id' invisible='1' />
                     <field name='warehouse_dest_id' string='仓库' required='1' />
-                    <field name='price' string='入库单价' />
-                    <field name='tax_rate' />
-                    <field name='subtotal' string='入库金额' sum='1' readonly='1' />
+                    <field name='cost_unit' string='入库单价' />
+                    <field name='cost' string='入库金额' sum='1' readonly='1' />
                     <field name='note' string='备注' />
                 </tree>
             </field>

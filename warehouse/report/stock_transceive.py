@@ -28,11 +28,11 @@ class report_stock_transceive(models.Model):
                uom.name as uom,
                wh.name as warehouse,
                sum(case when line.date < '{date_start}' THEN line.goods_qty ELSE 0 END) as goods_qty_begain,
-               sum(case when line.date < '{date_start}' THEN line.subtotal ELSE 0 END) as cost_begain,
+               sum(case when line.date < '{date_start}' THEN line.cost ELSE 0 END) as cost_begain,
                sum(case when line.date < '{date_end}' THEN line.goods_qty ELSE 0 END) as goods_qty_end,
-               sum(case when line.date < '{date_end}' THEN line.subtotal ELSE 0 END) as cost_end,
+               sum(case when line.date < '{date_end}' THEN line.cost ELSE 0 END) as cost_end,
                sum(case when line.date < '{date_end}' AND line.date >= '{date_start}' THEN line.goods_qty ELSE 0 END) as goods_qty,
-               sum(case when line.date < '{date_end}' AND line.date >= '{date_start}' THEN line.subtotal ELSE 0 END) as cost
+               sum(case when line.date < '{date_end}' AND line.date >= '{date_start}' THEN line.cost ELSE 0 END) as cost
         '''
 
     def from_sql(self, sql_type='out'):

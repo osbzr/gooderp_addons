@@ -87,7 +87,7 @@ class report_stock_transceive_collect(models.Model):
                     result[origin + '_cost'] = 0
 
                 result[origin + '_qty'] += line.goods_qty
-                result[origin + '_cost'] += line.subtotal
+                result[origin + '_cost'] += line.cost
 
     def select_sql(self, sql_type='out'):
         select = super(report_stock_transceive_collect, self).select_sql(sql_type=sql_type)

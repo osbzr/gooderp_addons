@@ -9,8 +9,8 @@ from openerp import models, fields, api
 class wh_move_matching(models.Model):
     _name = 'wh.move.matching'
 
-    line_in_id = fields.Many2one('wh.move.line', u'出库', ondelete='set null', required=True, index=True)
-    line_out_id = fields.Many2one('wh.move.line', u'入库', ondelete='set null', required=True, index=True)
+    line_in_id = fields.Many2one('wh.move.line', u'入库', ondelete='set null', required=True, index=True)
+    line_out_id = fields.Many2one('wh.move.line', u'出库', ondelete='set null', required=True, index=True)
     qty = fields.Float(u'数量', digits_compute=dp.get_precision('Goods Quantity'), required=True)
     uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Goods Quantity'), required=True)
 
@@ -50,8 +50,8 @@ class wh_move_line(models.Model):
 
             if warehouses[0].type == 'stock' and warehouses[1].type != 'stock':
                 goods = self.env['goods'].browse(res.get('goods_id'))
-                _, price = goods.get_suggested_cost_by_warehouse(warehouses[0], res.get('goods_qty'))
-                res.update({'price': price})
+                cost, cost_unit = goods.get_suggested_cost_by_warehouse(warehouses[0], res.get('goods_qty'))
+                res.update({'cost': cost, 'cost_unit': cost_unit})
 
         return res
 
@@ -71,29 +71,27 @@ class wh_move_line(models.Model):
             raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name,))
 
         return [{'line_in_id': self.lot_id.id, 'qty': self.goods_qty, 'uos_qty': self.goods_uos_qty}], \
-            self.lot_id.price * self.goods_qty
-
+            self.lot_id.get_real_cost_unit() * self.goods_qty
 
     def prev_action_done(self):
         matching_obj = self.env['wh.move.matching']
         for line in self:
             if line.warehouse_id.type == 'stock' and line.goods_id.is_using_matching():
                 if line.goods_id.is_using_batch():
-                    matching_records, subtotal = line.get_matching_records_by_lot()
+                    matching_records, cost = line.get_matching_records_by_lot()
                     for matching in matching_records:
                         matching_obj.create_matching(matching.get('line_in_id'),
                             line.id, matching.get('qty'), matching.get('uos_qty'))
                 else:
-                    matching_records, subtotal = line.goods_id.get_matching_records(
+                    matching_records, cost = line.goods_id.get_matching_records(
                         line.warehouse_id, line.goods_qty, line.goods_uos_qty)
 
                     for matching in matching_records:
                         matching_obj.create_matching(matching.get('line_in_id'),
                             line.id, matching.get('qty'), matching.get('uos_qty'))
 
-                line.price = safe_division(subtotal, line.goods_qty)
-                # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-                # line.subtotal = subtotal
+                line.cost_unit = safe_division(cost, line.goods_qty)
+                line.cost = cost
 
         return super(wh_move_line, self).prev_action_done()
 

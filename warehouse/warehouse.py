@@ -28,7 +28,7 @@ class warehouse(models.Model):
         for warehouse in self:
             self.env.cr.execute('''
                 SELECT sum(line.qty_remaining) as qty,
-                       sum(line.qty_remaining * (line.subtotal / line.goods_qty)) as subtotal,
+                       sum(line.qty_remaining * (line.cost / line.goods_qty)) as cost,
                        goods.name as goods
                 FROM wh_move_line line
                 LEFT JOIN warehouse wh ON line.warehouse_dest_id = wh.id
