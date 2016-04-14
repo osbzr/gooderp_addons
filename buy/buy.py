@@ -412,6 +412,9 @@ class buy_receipt(models.Model):
         for receipt in self:
             if receipt.state == 'done':
                 raise except_orm(u'错误', u'不能删除已审核的单据')
+#             move = self.env['wh.move'].search([('id', '=', receipt.buy_move_id.id)])
+#             if move:
+#                 move.unlink()
 
         return super(buy_receipt, self).unlink()
 
