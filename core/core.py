@@ -81,9 +81,9 @@ class goods(models.Model):
 
 class goods_price(models.Model):
     _name = 'goods.price'
-    goods_id = fields.Many2one('goods', ondelete='restrict', string=u'商品')
+    goods_id = fields.Many2one('goods', ondelete='cascade', string=u'商品')
     category_id = fields.Many2one('core.category', u'客户类别',
-                                  ondelete='restrict',
+                                  ondelete='cascade',
                                   domain=[('type', '=', 'customer')],
                                   context={'type':'customer'})
     price = fields.Float(u'价格')

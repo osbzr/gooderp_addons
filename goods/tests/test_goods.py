@@ -14,3 +14,9 @@ class test_goods(TransactionCase):
         ''' 单位转化，12根网线1捆  '''
         res2 = self.env.ref('goods.cable').anti_conversion_unit(12)
         self.assertEqual(res2, 1)
+
+    def test_unlink(self):
+        ''' 删除商品其对应属性也删除  '''
+        self.env.ref('goods.keyboard').unlink()
+        with self.assertRaises(ValueError):
+            self.env.ref('goods.attribute_value_white')
