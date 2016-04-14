@@ -166,6 +166,7 @@ class buy_order(models.Model):
                     'warehouse_id': warehouse_id,
                     'warehouse_dest_id': warehouse_dest_id,
                     'goods_qty': qty,
+                    'cost_unit': line.price,
                     'price': line.price,
                     'discount_rate': line.discount_rate,
                     'discount_amount': discount_amount,
