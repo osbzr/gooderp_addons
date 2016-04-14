@@ -250,3 +250,12 @@ class Test_sell(TransactionCase):
         self.sell_delivery.sell_delivery_done()
         with self.assertRaises(except_orm):
             self.sell_delivery.unlink()
+
+        # 删除销售发货单时，测试能否删除发货单行
+        sell_delivery = self.sell_delivery.copy()
+        move_id = sell_delivery.sell_move_id.id
+        sell_delivery.unlink()
+        move = self.env['wh.move'].search(
+               [('id', '=', move_id)])
+        self.assertTrue(not move)
+        self.assertTrue(not move.line_out_ids)
