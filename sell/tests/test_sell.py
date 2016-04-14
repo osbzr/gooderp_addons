@@ -246,7 +246,8 @@ class Test_sell(TransactionCase):
         self.order.unlink()
 
     def test_sell_delivery_unlink(self):
-        '''测试删除已审核的销售发货/退货单'''
+        '''测试删除销售发货/退货单'''
+        # 测试是否可以删除已审核的单据
         self.sell_delivery.sell_delivery_done()
         with self.assertRaises(except_orm):
             self.sell_delivery.unlink()
