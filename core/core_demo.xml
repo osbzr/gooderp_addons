@@ -85,6 +85,9 @@
         <record id="comm" model="bank.account">
             <field name="name">交通银行(622262 8888888888888)</field>
         </record>
-        
+
+        <record id="lili" model="staff">
+        	<field name="name">丽丽</field>
+        </record>
     </data>
 </openerp>
