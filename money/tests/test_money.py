@@ -201,8 +201,9 @@ class test_money_transfer_order(TransactionCase):
             money_transfer_300.money_transfer_done()
 class test_partner(TransactionCase):
     def test_partner(self):
-        ''' 客户对账单 和  银行帐'''
+        ''' 客户、供应商对账单 和  银行帐'''
         self.env.ref('core.jd').partner_statements()
+        self.env.ref('core.lenovo').partner_statements()
         self.env.ref('core.comm').bank_statements()
 class test_go_live_order(TransactionCase):
     def test_go_live_order(self):

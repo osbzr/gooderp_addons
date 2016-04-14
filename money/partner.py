@@ -10,6 +10,11 @@ class partner(models.Model):
     def partner_statements(self):
         self.ensure_one()
         view = self.env.ref('money.partner_statements_report_wizard_form')
+        ctx = {'default_partner_id': self.id}
+        if self.c_category_id.type == 'customer':
+            ctx.update({'default_customer': True})
+        else:
+            ctx.update({'default_supplier': True})
 
         return {
             'name': u'业务伙伴对账单向导',
@@ -19,7 +24,7 @@ class partner(models.Model):
             'views': [(view.id, 'form')],
             'res_model': 'partner.statements.report.wizard',
             'type': 'ir.actions.act_window',
-            'context': {'default_partner_id': self.id},
+            'context': ctx,
             'target': 'new',
         }
 
