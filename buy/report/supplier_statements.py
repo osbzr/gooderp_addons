@@ -116,7 +116,7 @@ class supplier_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，两种情况：收付款单、采购入库单
+        # 查看源单，三情况：收付款单、采购退货单、采购入库单
         money = self.env['money.order'].search([('name', '=', self.name)])
         # 付款单
         if money:
@@ -133,21 +133,34 @@ class supplier_statements_report(models.Model):
                 'context': {'type': 'pay'}
             }
 
-        # 采购入库单
+        # 采购退货单、入库单
         buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        view = self.env.ref('buy.buy_receipt_form')
-
-        return {
-            'name': u'采购入库单',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': False,
-            'views': [(view.id, 'form')],
-            'res_model': 'buy.receipt',
-            'type': 'ir.actions.act_window',
-            'res_id': buy.id,
-            'context': {'type': 'pay'}
-        }
+        if buy.is_return:
+            view = self.env.ref('buy.buy_return_form')
+            return {
+                'name': u'采购退货单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'buy.receipt',
+                'type': 'ir.actions.act_window',
+                'res_id': buy.id,
+                'context': {'type': 'pay'}
+            }
+        else:
+            view = self.env.ref('buy.buy_receipt_form')
+            return {
+                'name': u'采购入库单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'buy.receipt',
+                'type': 'ir.actions.act_window',
+                'res_id': buy.id,
+                'context': {'type': 'pay'}
+            }
 
 class supplier_statements_report_with_goods(models.TransientModel):
     _name = "supplier.statements.report.with.goods"
@@ -177,7 +190,7 @@ class supplier_statements_report_with_goods(models.TransientModel):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，两种情况：付款单、采购入库单
+        # 三情况：收付款单、采购退货单、采购入库单
         money = self.env['money.order'].search([('name', '=', self.name)])
         if money:  # 付款单
             view = self.env.ref('money.money_order_form')
@@ -193,19 +206,33 @@ class supplier_statements_report_with_goods(models.TransientModel):
                 'context': {'type': 'pay'}
             }
 
-        # 采购入库单
+        # 采购退货单、入库单
         buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        view = self.env.ref('buy.buy_receipt_form')
-        return {
-            'name': u'采购入库单',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': False,
-            'views': [(view.id, 'form')],
-            'res_model': 'buy.receipt',
-            'type': 'ir.actions.act_window',
-            'res_id': buy.id,
-            'context': {'type': 'pay'}
-        }
+        if buy.is_return:
+            view = self.env.ref('buy.buy_return_form')
+            return {
+                'name': u'采购退货单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'buy.receipt',
+                'type': 'ir.actions.act_window',
+                'res_id': buy.id,
+                'context': {'type': 'pay'}
+            }
+        else:
+            view = self.env.ref('buy.buy_receipt_form')
+            return {
+                'name': u'采购入库单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'buy.receipt',
+                'type': 'ir.actions.act_window',
+                'res_id': buy.id,
+                'context': {'type': 'pay'}
+            }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
