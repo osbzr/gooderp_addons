@@ -67,11 +67,11 @@ class sell_order(models.Model):
     cancelled = fields.Boolean(u'已终止')
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
+        '''当优惠率或销货订单行发生变化时，单据优惠金额发生变化'''
         total = sum(line.subtotal for line in self.line_ids)
-        if self.discount_rate:
-            self.discount_amount = total * self.discount_rate * 0.01
+        self.discount_amount = total * self.discount_rate * 0.01
 
     @api.model
     def create(self, vals):
@@ -79,6 +79,14 @@ class sell_order(models.Model):
             vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
 
         return super(sell_order, self).create(vals)
+
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(sell_order, self).unlink()
 
     @api.one
     def sell_order_done(self):
@@ -118,13 +126,20 @@ class sell_order(models.Model):
         else:
             qty = line.quantity - line.quantity_out
             discount_amount = line.discount_amount
+        if self.type == 'sell':
+            warehouse_id = line.warehouse_id.id
+            warehouse_dest_id = line.warehouse_dest_id.id
+        # 如果退货，调换warehouse_dest_id，warehouse_id
+        elif self.type == 'return':
+            warehouse_id = line.warehouse_dest_id.id
+            warehouse_dest_id = line.warehouse_id.id
         return {
             'sell_line_id': line.id,
             'goods_id': line.goods_id.id,
             'attribute_id': line.attribute_id.id,
             'uom_id': line.uom_id.id,
-            'warehouse_id': line.warehouse_id.id,
-            'warehouse_dest_id': line.warehouse_dest_id.id,
+            'warehouse_id': warehouse_id,
+            'warehouse_dest_id': warehouse_dest_id,
             'goods_qty': qty,
             'price': line.price,
             'discount_rate': line.discount_rate,
@@ -153,20 +168,37 @@ class sell_order(models.Model):
 
         if not delivery_line:
             return {}
-        delivery_id = self.env['sell.delivery'].create({
-            'partner_id': self.partner_id.id,
-            'staff_id': self.staff_id.id,
-            'date': self.delivery_date,
-            'order_id': self.id,
-            'origin': 'sell.delivery',
-            'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
-            'note': self.note,
-            'discount_rate': self.discount_rate,
-            'discount_amount': self.discount_amount,
-        })
-        view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_delivery_form')
+        if self.type == 'sell':
+            delivery_id = self.env['sell.delivery'].create({
+                'partner_id': self.partner_id.id,
+                'staff_id': self.staff_id.id,
+                'date': self.delivery_date,
+                'order_id': self.id,
+                'origin': 'sell.delivery',
+                'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
+                'note': self.note,
+                'discount_rate': self.discount_rate,
+                'discount_amount': self.discount_amount,
+            })
+            view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_delivery_form')
+            name = u'销售发货单'
+        elif self.type == 'return':
+            rec = self.with_context(is_return=True)
+            delivery_id = rec.env['sell.delivery'].create({
+                'partner_id': self.partner_id.id,
+                'staff_id': self.staff_id.id,
+                'date': self.delivery_date,
+                'order_id': self.id,
+                'origin': 'sell.delivery',
+                'line_in_ids': [(0, 0, line[0]) for line in delivery_line],
+                'note': self.note,
+                'discount_rate': self.discount_rate,
+                'discount_amount': self.discount_amount,
+            })
+            view_id = self.env['ir.model.data'].xmlid_to_res_id('sell.sell_return_form')
+            name = u'销售退货单'
         return {
-            'name': u'销售发货单',
+            'name': name,
             'view_type': 'form',
             'view_mode': 'form',
             'view_id': False,
@@ -205,7 +237,7 @@ class sell_order_line(models.Model):
     goods_id = fields.Many2one('goods', u'商品')
     attribute_id = fields.Many2one('attribute', u'属性', domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位')
-    warehouse_id = fields.Many2one('warehouse', u'调出仓库')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库', default=_default_warehouse_dest)
     quantity = fields.Float(u'数量', default=1)
     quantity_out = fields.Float(u'已发货数量', copy=False)
@@ -228,10 +260,10 @@ class sell_order_line(models.Model):
             self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('quantity', 'price', 'discount_rate')
     def onchange_discount_rate(self):
-        if self.discount_rate:
-            self.discount_amount = self.quantity * self.price * self.discount_rate * 0.01
+        '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
+        self.discount_amount = self.quantity * self.price * self.discount_rate * 0.01
 
 
 class sell_delivery(models.Model):
@@ -252,7 +284,7 @@ class sell_delivery(models.Model):
             total = sum(line.subtotal for line in self.line_in_ids)  # 退货时优惠前总金额
         self.amount = total - self.discount_amount
         self.debt = self.amount - self.receipt + self.partner_cost
-        self.total_debt = self.partner_id.receivable
+        self.total_debt = self.partner_id.receivable + self.debt    # 本次欠款变化时，总欠款应该变化
 
     @api.one
     @api.depends('state', 'amount', 'receipt')
@@ -305,15 +337,15 @@ class sell_delivery(models.Model):
                                help=u"销售退货单的退款状态", select=True, copy=False)
 
     @api.one
-    @api.onchange('discount_rate')
+    @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
     def onchange_discount_rate(self):
+        '''当优惠率或订单行发生变化时，单据优惠金额发生变化'''
         total = 0
         if self.line_out_ids:
             total = sum(line.subtotal for line in self.line_out_ids)  # 发货时优惠前总金额
         elif self.line_in_ids:
             total = sum(line.subtotal for line in self.line_in_ids)  # 退货时优惠前总金额
-        if self.discount_rate:
-            self.discount_amount = total * self.discount_rate * 0.01
+        self.discount_amount = total * self.discount_rate * 0.01
 
     def get_move_origin(self, vals):
         return self._name + (self.env.context.get('is_return') and '.return' or '.sell')
@@ -321,14 +353,26 @@ class sell_delivery(models.Model):
     @api.model
     def create(self, vals):
         '''创建销售发货单时生成有序编号'''
+        if not self.env.context.get('is_return'):
+            name = self._name
+        else:
+            name = 'sell.return'
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+            vals['name'] = self.env['ir.sequence'].get(name) or '/'
 
         vals.update({
             'origin': self.get_move_origin(vals),
         })
 
         return super(sell_delivery, self).create(vals)
+
+    @api.multi
+    def unlink(self):
+        for delivery in self:
+            if delivery.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(sell_delivery, self).unlink()
 
     @api.one
     def sell_delivery_done(self):
@@ -343,7 +387,11 @@ class sell_delivery(models.Model):
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
 
         if self.order_id:
-            for line in self.line_out_ids:
+            if not self.is_return:
+                line_ids = self.line_out_ids
+            else:
+                line_ids = self.line_in_ids
+            for line in line_ids:
                 line.sell_line_id.quantity_out += line.goods_qty
 
         # 发库单/退货单 生成源单

@@ -57,7 +57,7 @@
                     </field>
                     <label string="选择源单"/>
                     <field name="source_ids">
-                    	<tree string="Source Order Lines" editable="bottom">
+						<tree string="Source Order Lines" create="false">
                     		<field name="name" readonly='1'/>
                     		<field name="category_id" readonly='1'/>
                             <field name="date" readonly='1'/>

@@ -29,7 +29,7 @@
                 <tree string="Customer Statements Report">
 					<field name="date"/>
                     <field name="name"/>
-                    <button name="find_source_order" type="object" string="查看源单" class="oe_highlight" icon="terp-stock_zoom" attrs="{'invisible':[('name','=','期初余额')]}"/>
+                    <button name="find_source_order" type="object" string="查看源单" class="oe_highlight" icon="terp-stock_zoom" attrs="{'invisible':['|',('name','=','期初余额'),('goods_name','!=',False)]}"/>
                     <field name="note"/>
                     <field name="goods_code"/>
                     <field name="goods_name"/>

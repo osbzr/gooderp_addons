@@ -35,9 +35,9 @@ class money_order(models.Model):
     @api.model
     def create(self, values):
         # 创建单据时，根据订单类型的不同，生成不同的单据编号
-        if values.get('type') == 'pay':
+        if self._context.get('type') == 'pay':
             values.update({'name': self.env['ir.sequence'].get('pay.order')})
-        if values.get('type') == 'get':
+        else:
             values.update({'name': self.env['ir.sequence'].get('get.order')})
 
         return super(money_order, self).create(values)
@@ -480,7 +480,10 @@ class reconcile_order(models.Model):
                                  order.partner_id,
                                  order.to_partner_id, order.name)
             for line in order.payable_source_ids:
-                order_reconcile += line.this_reconcile
+                if self.business_type == 'adv_get_to_pay':
+                    invoice_reconcile += line.this_reconcile
+                else:
+                    order_reconcile += line.this_reconcile
                 self._get_or_pay(line, order.business_type,
                                  order.partner_id,
                                  order.to_partner_id, order.name)

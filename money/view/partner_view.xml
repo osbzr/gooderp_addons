@@ -1,38 +1,14 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-		<!--继承客户 tree，添加"查看对账单"按钮-->
-    	<record id="customer_tree_inherit" model="ir.ui.view">
-            <field name="name">customer.tree.inherit</field>
-            <field name="model">partner</field>
-            <field name='inherit_id' ref='core.customer_tree' />
-            <field name="arch" type="xml">
-                <field name="name" position="after">
-                    <button name="partner_statements" type="object" string="查看对账单" class="oe_highlight"/>
-				</field>
-            </field>
-        </record>
-
-		<!--继承供应商 tree，添加"查看对账单"按钮-->
-    	<record id="vendor_tree_inherit" model="ir.ui.view">
-            <field name="name">vendor.tree.inherit</field>
-            <field name="model">partner</field>
-            <field name='inherit_id' ref='core.vendor_tree' />
-            <field name="arch" type="xml">
-                <field name="name" position="after">
-                    <button name="partner_statements" type="object" string="查看对账单" class="oe_highlight"/>
-				</field>
-            </field>
-        </record>
-
-        <!--继承账户 tree，添加"查看对账单"按钮-->
+        <!--继承账户 tree，添加"查看现金银行报表"按钮-->
 		<record id="bank_account_tree_inherit" model="ir.ui.view">
             <field name="name">bank.account.tree.inherit</field>
             <field name="model">bank.account</field>
             <field name='inherit_id' ref='core.bank_account_tree' />
             <field name="arch" type="xml">
-                <field name="name" position="after">
-                    <button name="bank_statements" type="object" string="查看对账单" class="oe_highlight"/>
+                <field name="balance" position="after">
+                    <button name="bank_statements" type="object" string="查看现金银行报表" icon="terp-stock_zoom" class="oe_highlight"/>
 				</field>
             </field>
         </record>

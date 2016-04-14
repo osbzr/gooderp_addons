@@ -1,6 +1,18 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+		<!--继承供应商 tree，添加"查看对账单"按钮-->
+		<record id="vendor_tree_inherit" model="ir.ui.view">
+            <field name="name">vendor.tree.inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.vendor_tree' />
+            <field name="arch" type="xml">
+                <field name="payable" position="after">
+                    <button name="partner_statements" type="object" string="查看对账单" icon="terp-stock_zoom" class="oe_highlight"/>
+				</field>
+            </field>
+        </record>
+
         <!-- 供应商对账单向导 action -->
 		<record id='supplier_statements_report_wizard_action' model='ir.actions.act_window'>
             <field name='name'>供应商对账单向导</field>

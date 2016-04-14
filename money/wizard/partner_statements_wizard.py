@@ -68,20 +68,36 @@ class partner_statements_report_wizard(models.TransientModel):
 
                 # 生成带商品明细的对账单记录
                 if report.move_id:
-                    for line in report.move_id.line_out_ids:
-                        res_ids.append(self.env['customer.statements.report.with.goods'].create({
-                                'goods_code': line.goods_id.code,
-                                'goods_name': line.goods_id.name,
-                                'attribute_id': line.attribute_id.id,
-                                'uom_id': line.uom_id.id,
-                                'quantity': line.goods_qty,
-                                'price': line.price,
-                                'discount_amount': line.discount_amount,
-                                'without_tax_amount': line.amount,
-                                'tax_amount': line.tax_amount,
-                                'order_amount': line.subtotal,
-                                'balance_amount': report.balance_amount
-                                }).id)
+                    if report.amount < 0: # 销售退货单
+                        for line in report.move_id.line_in_ids:
+                            res_ids.append(self.env['customer.statements.report.with.goods'].create({
+                                    'goods_code': line.goods_id.code,
+                                    'goods_name': line.goods_id.name,
+                                    'attribute_id': line.attribute_id.id,
+                                    'uom_id': line.uom_id.id,
+                                    'quantity': line.goods_qty,
+                                    'price': line.price,
+                                    'discount_amount': line.discount_amount,
+                                    'without_tax_amount': line.amount,
+                                    'tax_amount': line.tax_amount,
+                                    'order_amount': line.subtotal,
+                                    'balance_amount': report.balance_amount
+                                    }).id)
+                    else:
+                        for line in report.move_id.line_out_ids: # 销售发货单
+                            res_ids.append(self.env['customer.statements.report.with.goods'].create({
+                                    'goods_code': line.goods_id.code,
+                                    'goods_name': line.goods_id.name,
+                                    'attribute_id': line.attribute_id.id,
+                                    'uom_id': line.uom_id.id,
+                                    'quantity': line.goods_qty,
+                                    'price': line.price,
+                                    'discount_amount': line.discount_amount,
+                                    'without_tax_amount': line.amount,
+                                    'tax_amount': line.tax_amount,
+                                    'order_amount': line.subtotal,
+                                    'balance_amount': report.balance_amount
+                                    }).id)
 
             view = self.env.ref('sell.customer_statements_report_with_goods_tree')
 
@@ -116,20 +132,36 @@ class partner_statements_report_wizard(models.TransientModel):
 
                 # 生成带商品明细的对账单记录
                 if report.move_id:
-                    for line in report.move_id.line_in_ids:
-                        res_ids.append(self.env['supplier.statements.report.with.goods'].create({
-                                'goods_code': line.goods_id.code,
-                                'goods_name': line.goods_id.name,
-                                'attribute_id': line.attribute_id.id,
-                                'uom_id': line.uom_id.id,
-                                'quantity': line.goods_qty,
-                                'price': line.price,
-                                'discount_amount': line.discount_amount,
-                                'without_tax_amount': line.amount,
-                                'tax_amount': line.tax_amount,
-                                'order_amount': line.subtotal,
-                                'balance_amount': report.balance_amount
-                                }).id)
+                    if report.amount < 0: # 采购退货单
+                        for line in report.move_id.line_out_ids:
+                            res_ids.append(self.env['supplier.statements.report.with.goods'].create({
+                                    'goods_code': line.goods_id.code,
+                                    'goods_name': line.goods_id.name,
+                                    'attribute_id': line.attribute_id.id,
+                                    'uom_id': line.uom_id.id,
+                                    'quantity': line.goods_qty,
+                                    'price': line.price,
+                                    'discount_amount': line.discount_amount,
+                                    'without_tax_amount': line.amount,
+                                    'tax_amount': line.tax_amount,
+                                    'order_amount': line.subtotal,
+                                    'balance_amount': report.balance_amount
+                                    }).id)
+                    else: # 采购入库单
+                        for line in report.move_id.line_in_ids:
+                            res_ids.append(self.env['supplier.statements.report.with.goods'].create({
+                                    'goods_code': line.goods_id.code,
+                                    'goods_name': line.goods_id.name,
+                                    'attribute_id': line.attribute_id.id,
+                                    'uom_id': line.uom_id.id,
+                                    'quantity': line.goods_qty,
+                                    'price': line.price,
+                                    'discount_amount': line.discount_amount,
+                                    'without_tax_amount': line.amount,
+                                    'tax_amount': line.tax_amount,
+                                    'order_amount': line.subtotal,
+                                    'balance_amount': report.balance_amount
+                                    }).id)
 
             view = self.env.ref('buy.supplier_statements_report_with_goods_tree')
 

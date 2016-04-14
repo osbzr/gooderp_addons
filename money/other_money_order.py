@@ -104,6 +104,8 @@ class other_money_order(models.Model):
                         other.partner_id.payable -= line.amount
             # 根据单据类型更新账户余额
             if other.type == 'other_pay':
+                if other.bank_id.balance < other.total_amount:
+                    raise except_orm(u'错误', u'账户余额不足')
                 other.bank_id.balance -= other.total_amount
             else:
                 other.bank_id.balance += other.total_amount
@@ -123,6 +125,8 @@ class other_money_order(models.Model):
             if other.type == 'other_pay':
                 other.bank_id.balance += other.total_amount
             else:
+                if other.bank_id.balance < other.total_amount:
+                    raise except_orm(u'错误', u'账户余额不足')
                 other.bank_id.balance -= other.total_amount
             other.state = 'draft'
         return True
