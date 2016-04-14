@@ -268,8 +268,6 @@ class test_buy_receipt(TransactionCase):
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
         # 重复审核报错
-        self.receipt.bank_account_id = bank_account
-        self.receipt.payment = 100
         self.receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()

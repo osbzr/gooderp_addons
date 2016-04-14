@@ -100,7 +100,7 @@ class wh_move_line(models.Model):
 #     subtotal = fields.Float(u'金额', digits_compute=dp.get_precision('Accounting'))
     note = fields.Text(u'备注')
     cost_unit = fields.Float(u'单位成本', digits_compute=dp.get_precision('Accounting'))
-    cost = fields.Float(u'单位成本', compute='_compute_cost', inverse='_inverse_cost',
+    cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
                         digits_compute=dp.get_precision('Accounting'), store=True)
 
     @api.one
