@@ -2,6 +2,7 @@
 
 from openerp import models, api
 
+
 class partner(models.Model):
     _inherit = 'partner'
     _description = u'查看业务伙伴对账单'
@@ -27,6 +28,7 @@ class partner(models.Model):
             'context': ctx,
             'target': 'new',
         }
+
 
 class bank_account(models.Model):
     _inherit = 'bank.account'
