@@ -137,19 +137,11 @@ class Test_sell(TransactionCase):
         self.assertEqual(sell_delivery.discount_amount, 10.53)
         self.assertEqual(sell_delivery.amount, 94.77)
 
-        sell_delivery.amount = 94.8
         # 销售发货单 的确认
-        sell_delivery.receipt = -222
+        sell_delivery.receipt = 22
         sell_delivery.sell_delivery_done()
 
-        self.assertEqual(sell_delivery.amount, 913.77)
         self.assertEqual(sell_delivery.money_state, u'部分收款')
-        # with self.assertRaises(except_orm):
-        #     sell_delivery.receipt = -222
-        #     sell_delivery.sell_delivery_done()
-        # 确认后改变 状态金额
-
-        # self.assertEqual(sell_delivery.money_state, u'未收款')
 
     def test_sell_delievery_in(self):
         """ 销售 退货单 的付款状态的测试"""
