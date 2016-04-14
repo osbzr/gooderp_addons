@@ -31,7 +31,7 @@ class report_stock_balance(models.Model):
                        wh.name as warehouse,
                        sum(line.qty_remaining) as goods_qty,
                        sum(line.uos_qty_remaining) as goods_uos_qty,
-                       sum(line.subtotal) as cost
+                       sum(line.cost) as cost
 
                 FROM wh_move_line line
                 LEFT JOIN warehouse wh ON line.warehouse_dest_id = wh.id

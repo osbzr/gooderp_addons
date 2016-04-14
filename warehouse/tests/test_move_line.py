@@ -75,10 +75,10 @@ class TestMoveLine(TransactionCase):
     def test_copy_data(self):
         # 复制的时候，如果该明细行是出库行为，那么需要重新计算成本
         results = self.mouse_out_line.copy_data()
-        _, price = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
+        _, cost_unit = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
             self.mouse_out_line.warehouse_id, self.mouse_out_line.goods_qty)
 
-        self.assertEqual(results.get('price'), price)
+        self.assertEqual(results.get('cost_unit'), cost_unit)
 
     def test_get_matching_records_by_lot(self):
         # 批次号未审核的时候获取批次信息会报错
@@ -137,15 +137,15 @@ class TestMoveLine(TransactionCase):
 
         self.mouse_out_line.goods_id = self.goods_mouse
 
-        self.keyboard_mouse_in_line.price = 0
+        self.keyboard_mouse_in_line.cost_unit = 0
         results = self.keyboard_mouse_out_line.with_context({
             'type': 'out',
         }).onchange_goods_qty()
 
         # 出库的单据，数量改变的时候，成本应该跟着改变
-        _, price = self.keyboard_mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
+        _, cost_unit = self.keyboard_mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
             self.keyboard_mouse_out_line.warehouse_id, self.keyboard_mouse_out_line.goods_qty)
-        self.assertEqual(self.keyboard_mouse_out_line.price, price)
+        self.assertEqual(self.keyboard_mouse_out_line.cost_unit, cost_unit)
 
         self.keyboard_mouse_out_line.goods_uos_qty = 10
         temp_goods_qty = self.keyboard_mouse_out_line.goods_id.conversion_unit(10)
@@ -164,6 +164,7 @@ class TestMoveLine(TransactionCase):
         self.mouse_in_line.onchange_discount_rate()
         self.assertEqual(self.mouse_in_line.discount_amount, 0)
 
+        self.mouse_in_line.price = 100
         self.mouse_in_line.discount_rate = 100
         self.mouse_in_line.onchange_discount_rate()
         self.assertEqual(self.mouse_in_line.discount_amount,

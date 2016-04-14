@@ -90,16 +90,16 @@ class TestProduction(TransactionCase):
         self.assembly_mutli.approve_order()
 
         # demo数据中成本为鼠标 40 * 2，键盘 80 * 2，所以成本应该为平摊为120
-        self.assertEqual(self.assembly_mutli_keyboard_mouse_1.price, 120)
-        self.assertEqual(self.assembly_mutli_keyboard_mouse_2.price, 120)
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_1.cost_unit, 120)
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_2.cost_unit, 120)
 
         self.assembly_mutli.cancel_approved_order()
         self.assembly_mutli.fee = 100
         self.assembly_mutli.approve_order()
 
         # 此时组装费用为100，成本增加了100，所以平摊成本增加50
-        self.assertEqual(self.assembly_mutli_keyboard_mouse_1.price, 170)
-        self.assertEqual(self.assembly_mutli_keyboard_mouse_2.price, 170)
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_1.cost_unit, 170)
+        self.assertEqual(self.assembly_mutli_keyboard_mouse_2.cost_unit, 170)
 
         # 取消掉当前的单据，防止其他单据的库存不足
         self.assembly_mutli.cancel_approved_order()
@@ -108,28 +108,28 @@ class TestProduction(TransactionCase):
         self.assembly.approve_order()
 
         # demo数据中入库的成本为鼠标 40 * 1，键盘 80 * 2, 所以成本应该为100
-        self.assertEqual(self.assembly.line_in_ids.price, 100)
+        self.assertEqual(self.assembly.line_in_ids.cost_unit, 100)
 
         self.assembly.cancel_approved_order()
         self.assembly.fee = 100
         self.assembly.approve_order()
 
         # 指定组装费用位100，此时成本应该位150
-        self.assertEqual(self.assembly.line_in_ids.price, 150)
+        self.assertEqual(self.assembly.line_in_ids.cost_unit, 150)
 
         self.disassembly.approve_order()
 
         # 170的成本被拆分成鼠标 * 1(成本40) + 键盘 * 1（成本80）,所以此时应该均分为50 + 100
-        self.assertEqual(self.disassembly_mouse.price, 50)
-        self.assertEqual(self.disassembly_keyboard.price, 100)
+        self.assertEqual(self.disassembly_mouse.cost_unit, 50)
+        self.assertEqual(self.disassembly_keyboard.cost_unit, 100)
 
         self.disassembly.cancel_approved_order()
         self.disassembly.fee = 120
 
         self.disassembly.approve_order()
         # 指定拆卸费用位120，此时平分270，此时应该位 90 + 180
-        self.assertEqual(self.disassembly_mouse.price, 90)
-        self.assertEqual(self.disassembly_keyboard.price, 180)
+        self.assertEqual(self.disassembly_mouse.cost_unit, 90)
+        self.assertEqual(self.disassembly_keyboard.cost_unit, 180)
 
     def test_wizard_bom(self):
         self.assembly.bom_id = False

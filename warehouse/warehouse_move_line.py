@@ -99,6 +99,18 @@ class wh_move_line(models.Model):
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, store=True, readonly=True)
 #     subtotal = fields.Float(u'金额', digits_compute=dp.get_precision('Accounting'))
     note = fields.Text(u'备注')
+    cost_unit = fields.Float(u'单位成本', digits_compute=dp.get_precision('Accounting'))
+    cost = fields.Float(u'单位成本', compute='_compute_cost', inverse='_inverse_cost',
+                        digits_compute=dp.get_precision('Accounting'), store=True)
+
+    @api.one
+    @api.depends('cost_unit', 'goods_qty')
+    def _compute_cost(self):
+        self.cost = self.cost_unit * self.goods_qty
+
+    @api.one
+    def _inverse_cost(self):
+        self.cost_unit = safe_division(self.cost, self.goods_qty)
 
     def get_origin_explain(self):
         self.ensure_one()
@@ -122,9 +134,9 @@ class wh_move_line(models.Model):
 
         return res
 
-    # def get_real_price(self):
-    #     self.ensure_one()
-    #     return safe_division(self.subtotal, self.goods_qty)
+    def get_real_cost_unit(self):
+        self.ensure_one()
+        return safe_division(self.cost, self.goods_qty)
 
     @api.multi
     def name_get(self):
@@ -171,9 +183,6 @@ class wh_move_line(models.Model):
                 'date': False,
             })
 
-    # def _get_subtotal_util(self, goods_qty, price):
-    #     return goods_qty * price
-
     @api.one
     def compute_lot_compatible(self):
         if self.warehouse_id and self.lot_id and self.lot_id.warehouse_dest_id != self.warehouse_id:
@@ -194,10 +203,10 @@ class wh_move_line(models.Model):
     @api.one
     def compute_suggested_cost(self):
         if self.env.context.get('type') == 'out' and self.goods_id and self.warehouse_id and self.goods_qty:
-            subtotal, price = self.goods_id.get_suggested_cost_by_warehouse(self.warehouse_id, self.goods_qty)
+            cost, cost_unit = self.goods_id.get_suggested_cost_by_warehouse(self.warehouse_id, self.goods_qty)
 
-            self.price = price
-            # self.subtotal = subtotal
+            self.cost_unit = cost_unit
+            self.cost = cost
 
     @api.multi
     @api.onchange('goods_id')
@@ -252,11 +261,10 @@ class wh_move_line(models.Model):
             if self.env.context.get('type') == 'internal':
                 self.lot = self.lot_id.lot
 
-    # @api.one
-    # @api.onchange('price')
-    # def onchange_price(self):
-    #     self.subtotal = self.price and self.price \
-    #         and self._get_subtotal_util(self.goods_qty, self.price) or 0
+    @api.one
+    @api.onchange('cost_unit')
+    def onchange_cost_unit(self):
+        self.cost = self.cost_unit * self.goods_qty
 
     @api.one
     @api.onchange('goods_qty', 'price', 'discount_rate')

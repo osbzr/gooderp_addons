@@ -16,7 +16,7 @@ class goods(models.Model):
         for goods in self:
             self.env.cr.execute('''
                 SELECT sum(line.qty_remaining) as qty,
-                       sum(line.qty_remaining * (line.subtotal / line.goods_qty)) as subtotal,
+                       sum(line.qty_remaining * (line.cost / line.goods_qty)) as cost,
                        wh.name as warehouse
                 FROM wh_move_line line
                 LEFT JOIN warehouse wh ON line.warehouse_dest_id = wh.id
@@ -31,7 +31,7 @@ class goods(models.Model):
 
             return self.env.cr.dictfetchall()
 
-    def get_cost(self, warehouse=None, ignore=None):
+    def _get_cost(self, warehouse=None, ignore=None):
         # 如果没有历史的剩余数量，计算最后一条move的成本
         # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
         # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
@@ -51,24 +51,24 @@ class goods(models.Model):
 
             move = self.env['wh.move.line'].search(domain, limit=1, order='date desc, id desc')
             if move:
-                return move.price
+                return move.cost_unit
 
         return self.cost
 
     def get_suggested_cost_by_warehouse(self, warehouse, qty, ignore_move=None):
         # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
         # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
-        records, subtotal = self.get_matching_records(warehouse, qty, ignore_stock=True,
-                                                      ignore=ignore_move)
+        records, cost = self.get_matching_records(warehouse, qty, ignore_stock=True,
+                                                 ignore=ignore_move)
 
         matching_qty = sum(record.get('qty') for record in records)
         if matching_qty:
-            cost = safe_division(subtotal, matching_qty)
+            cost_unit = safe_division(cost, matching_qty)
             if matching_qty >= qty:
-                return subtotal, cost
+                return cost, cost_unit
         else:
-            cost = self.get_cost(warehouse, ignore=ignore_move)
-        return cost * qty, cost
+            cost_unit = self._get_cost(warehouse, ignore=ignore_move)
+        return cost_unit * qty, cost_unit
 
     def is_using_matching(self):
         return True
@@ -97,7 +97,7 @@ class goods(models.Model):
             # TODO @zzx需要在大量数据的情况下评估一下速度
             lines = self.env['wh.move.line'].search(domain, order='date, id')
 
-            qty_to_go, uos_qty_to_go, subtotal = qty, uos_qty, 0
+            qty_to_go, uos_qty_to_go, cost = qty, uos_qty, 0
             for line in lines:
                 if qty_to_go <= 0 and uos_qty_to_go <= 0:
                     break
@@ -108,14 +108,12 @@ class goods(models.Model):
 
                 matching_records.append({'line_in_id': line.id,
                                          'qty': matching_qty, 'uos_qty': matching_uos_qty})
-                # subtotal += matching_qty * line.get_real_price()
-                # TODO @zzx 需要考虑一下将subtotal变成计算下字段之后的影响
-                subtotal += matching_qty * line.price
 
+                cost += matching_qty * line.get_real_cost_unit()
                 qty_to_go -= matching_qty
                 uos_qty_to_go -= matching_uos_qty
             else:
                 if not ignore_stock and qty_to_go > 0:
                     raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (goods.name,))
 
-            return matching_records, subtotal
+            return matching_records, cost

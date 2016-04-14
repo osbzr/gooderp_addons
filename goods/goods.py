@@ -10,6 +10,11 @@ class goods(models.Model):
     force_batch_one = fields.Boolean(u'每批号数量为1')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
 
+    @api.one
+    @api.onchange('uom_id')
+    def onchange_uom(self):
+        self.uos_id = self.uom_id
+
     def conversion_unit(self, qty):
         self.ensure_one()
         return self.conversion * qty

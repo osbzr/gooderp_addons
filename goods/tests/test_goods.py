@@ -15,6 +15,15 @@ class test_goods(TransactionCase):
         res2 = self.env.ref('goods.cable').anti_conversion_unit(12)
         self.assertEqual(res2, 1)
 
+    def test_uom(self):
+        cable = self.browse_ref('goods.cable')
+        uom_pc = self.browse_ref('core.uom_pc')
+
+        cable.uom_id = uom_pc
+        cable.onchange_uom()
+
+        self.assertEqual(cable.uos_id, cable.uom_id)
+
     def test_unlink(self):
         ''' 删除商品其对应属性也删除  '''
         self.env.ref('goods.keyboard').unlink()

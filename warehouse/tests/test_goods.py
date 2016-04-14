@@ -31,37 +31,37 @@ class TestGoods(TransactionCase):
 
         real_keyboard_mouse_results = {
             'warehouse': u'总仓',
-            'subtotal': self.others_in_keyboard_mouse.subtotal + self.others_in_2_keyboard_mouse.subtotal,
+            'cost': self.others_in_keyboard_mouse.cost + self.others_in_2_keyboard_mouse.cost,
             'qty': self.others_in_keyboard_mouse.goods_qty + self.others_in_2_keyboard_mouse.goods_qty,
         }
 
         real_cable_results = {
             'warehouse': u'总仓',
             'qty': self.others_in_cable.goods_qty,
-            'subtotal': self.others_in_cable.subtotal,
+            'cost': self.others_in_cable.cost,
         }
 
         self.assertEqual(real_keyboard_mouse_results, keyboard_mouse_results[0])
         self.assertEqual(real_cable_results, cable_results[0])
 
     def test_cost(self):
-        # 使用get_cost来获取最后一次历史成本
-        cost = self.goods_cable.get_cost(self.hd_warehouse)
+        # 使用_get_cost来获取最后一次历史成本
+        cost = self.goods_cable._get_cost(self.hd_warehouse)
 
         # 应该等于最后一次入库的成本
-        self.assertEqual(cost, self.others_in_cable.price)
+        self.assertEqual(cost, self.others_in_cable.cost_unit)
 
         # 忽略掉最后一次入库的行为，此时成本应该去产品的默认成本
-        cost = self.goods_cable.get_cost(self.hd_warehouse, ignore=self.others_in_cable.id)
+        cost = self.goods_cable._get_cost(self.hd_warehouse, ignore=self.others_in_cable.id)
         self.assertEqual(cost, self.goods_cable.cost)
 
-        # 使用get_cost来获取最后一次历史成本
-        cost = self.goods_keyboard_mouse.get_cost(self.hd_warehouse)
-        self.assertEqual(cost, self.others_in_2_keyboard_mouse.price)
+        # 使用_get_cost来获取最后一次历史成本
+        cost = self.goods_keyboard_mouse._get_cost(self.hd_warehouse)
+        self.assertEqual(cost, self.others_in_2_keyboard_mouse.cost_unit)
 
         # 忽略掉最后一次入库的成本，所以等于上一次入库的成本
-        cost = self.goods_keyboard_mouse.get_cost(self.hd_warehouse, ignore=self.others_in_2_keyboard_mouse.id)
-        self.assertEqual(cost, self.others_in_keyboard_mouse.price)
+        cost = self.goods_keyboard_mouse._get_cost(self.hd_warehouse, ignore=self.others_in_2_keyboard_mouse.id)
+        self.assertEqual(cost, self.others_in_keyboard_mouse.cost_unit)
 
         # 使用FIFO来获取成本的函数
         # 48 * 120的键盘套装先入库，48 * 80的键盘套装后入库
