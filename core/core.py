@@ -53,9 +53,11 @@ class partner(models.Model):
     code = fields.Char(u'编号')
     name = fields.Char(u'名称')
     c_category_id = fields.Many2one('core.category', u'客户类别',
+                                    ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
                                     context={'type': 'customer'})
     s_category_id = fields.Many2one('core.category', u'供应商类别',
+                                    ondelete='restrict',
                                     domain=[('type', '=', 'supplier')],
                                     context={'type': 'supplier'})
     receivable = fields.Float(u'应收余额', readonly=True)
@@ -67,10 +69,11 @@ class goods(models.Model):
     code = fields.Char(u'编号')
     name = fields.Char(u'名称')
     category_id = fields.Many2one('core.category', u'产品类别',
+                                  ondelete='restrict',
                                   domain=[('type', '=', 'goods')],
                                   context={'type': 'goods'})
-    uom_id = fields.Many2one('uom', u'计量单位')
-    uos_id = fields.Many2one('uom', u'辅助单位')
+    uom_id = fields.Many2one('uom', ondelete='restrict', string=u'计量单位')
+    uos_id = fields.Many2one('uom', ondelete='restrict', string=u'辅助单位')
     conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
     cost = fields.Float(u'成本')
     price_ids = fields.One2many('goods.price', 'goods_id', u'价格清单')
@@ -78,10 +81,11 @@ class goods(models.Model):
 
 class goods_price(models.Model):
     _name = 'goods.price'
-    goods_id = fields.Many2one('goods', '商品')
+    goods_id = fields.Many2one('goods', ondelete='cascade', string=u'商品')
     category_id = fields.Many2one('core.category', u'客户类别',
-                                       domain=[('type', '=', 'customer')],
-                                       context={'type':'customer'})
+                                  ondelete='cascade',
+                                  domain=[('type', '=', 'customer')],
+                                  context={'type':'customer'})
     price = fields.Float(u'价格')
 
 
