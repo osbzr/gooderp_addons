@@ -429,7 +429,7 @@ class buy_receipt(models.Model):
 
         if (sum(cost_line.amount for cost_line in self.cost_line_ids) !=
                 sum(line.share_cost for line in self.line_in_ids)):
-            raise except_orm(u'警告！', u'采购费用还没分摊！')
+            raise except_orm(u'警告！', u'采购费用还未分摊或分摊不正确！')
 
         if self.order_id:
             if not self.is_return:

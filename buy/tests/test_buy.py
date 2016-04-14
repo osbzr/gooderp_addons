@@ -267,6 +267,10 @@ class test_buy_receipt(TransactionCase):
                           'buy_id': receipt.id,
                           'partner_id': 4,
                           'amount': 100, })
-        receipt.buy_receipt_done()
+        # 测试分摊之前审核是否会弹出警告
+        with self.assertRaises(except_orm):
+            self.receipt.buy_receipt_done()
+        # 测试分摊之后金额是否相等
+        receipt.buy_share_cost()
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
