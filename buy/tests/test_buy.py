@@ -269,8 +269,9 @@ class test_buy_receipt(TransactionCase):
                           'amount': 100, })
         # 测试分摊之前审核是否会弹出警告
         with self.assertRaises(except_orm):
-            self.receipt.buy_receipt_done()
-        # 测试分摊之后金额是否相等
+            receipt.buy_receipt_done()
+        # 测试分摊之后金额是否相等，然后审核，测试采购费用是否产生源单
         receipt.buy_share_cost()
+        receipt.buy_receipt_done()
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
