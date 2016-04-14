@@ -371,6 +371,9 @@ class sell_delivery(models.Model):
         for delivery in self:
             if delivery.state == 'done':
                 raise except_orm(u'错误', u'不能删除已审核的单据')
+            move = self.env['wh.move'].search([('id', '=', delivery.sell_move_id.id)])
+            if move:
+                move.unlink()
 
         return super(sell_delivery, self).unlink()
 

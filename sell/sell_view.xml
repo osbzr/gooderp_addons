@@ -387,7 +387,7 @@
 
     	<!--根菜单-->
         <menuitem id='sell_menu' name='销货'/>
-    	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu'/>
+    	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>
     	<menuitem id='sell_order_menu' name='销货订单' action='sell_order_action'
     		parent='sell_order_menu_root' sequence='1'/>
     	<menuitem id='sell_delivery_menu' name='销售发货单' action='sell_delivery_action'

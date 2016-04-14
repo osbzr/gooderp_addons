@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<record id="sell_order_track_tree" model="ir.ui.view">
+            <field name="name">sell.order.track.tree</field>
+            <field name="model">sell.order.track</field>
+            <field name="arch" type="xml">
+                <tree string="销售订单跟踪表">
+                	<field name="goods_code"/>
+                    <field name="goods_id"/>
+                    <field name="attribute"/>
+                    <field name="uom"/>
+                    <field name="date"/>
+                    <field name="order_name"/>
+                    <field name="staff_id"/>
+                    <field name="partner_id"/>
+                    <field name="goods_state"/>
+                    <field name="qty"/>
+                    <field name="amount"/>
+                    <field name="qty_not_out"/>
+                    <field name="delivery_date"/>
+                    <field name="wh_out_date"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>
