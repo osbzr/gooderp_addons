@@ -264,7 +264,7 @@ class test_buy_receipt(TransactionCase):
             self.receipt.buy_receipt_done()
         # 付款金额不能大于折后金额！
         self.receipt.bank_account_id = bank_account
-        self.receipt.payment = 20000
+        self.receipt.payment = 200
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
         # 重复审核报错
