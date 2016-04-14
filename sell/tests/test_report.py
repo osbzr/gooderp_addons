@@ -25,64 +25,59 @@ class test_report(TransactionCase):
         # 输出报表
         detail.button_ok()
         '''
+class test_customer_statements(TransactionCase):
+    '''测试客户对账单'''
+    def setUp(self):
+        '''客户账单向导及数据'''
+        super(test_customer_statements, self).setUp()
+        # 业务伙伴对账单向导: self._context.get('default_customer')
+        self.statement = self.env['partner.statements.report.wizard'].create(
+                    {'partner_id': self.env.ref('core.jd').id,
+                    'from_date': '2016-01-01',
+                    'to_date': '2016-11-01'}).with_context({'default_customer': True})
+        # 创建期初余额记录
         self.env['go.live.order'].create({'partner_id':self.env.ref('core.jd').id, 'balance':20.0})
-        # _compute_balance，name == '期初余额'
-        live = self.env['customer.statements.report'].search([('name', '=', '期初余额')])
-        self.assertNotEqual(str(live.balance_amount), 'zxy11')
-
+        # 创建收款记录
+        money_get = self.env.ref('money.get_40000')
+        money_get.money_order_done()
+        # 创建销售出货单记录
+        self.env.ref('warehouse.wh_move_line_14').goods_uos_qty = 200
         self.env.ref('warehouse.wh_move_line_14').action_done()
-        order = self.env['money.order'].create({'name': 'GET20160001',
-                                          'partner_id': self.env.ref('core.jd').id,
-                                          'date': '2016-04-07',
-                                          'line_ids': [(0, 0, {'bank_id': self.env.ref('core.comm').id, 'amount': 400})],
-                                          'type': 'get'
-                                          })
-        order.money_order_done()
-        sell_order = self.env['sell.order'].create({'name': 'SELL20160001',
-                                               'date': '2016-04-07',
-                                               'partner_id': self.env.ref('core.jd').id,
-                                               'line_ids': [(0, 0, {
-                                                               'goods_id': self.env.ref('goods.cable').id,
-                                                               'uom_id': self.env.ref('core.uom_pc').id,
-                                                               'warehouse_id': self.env.ref('warehouse.hd_stock').id,
-                                                               'warehouse_dest_id': self.env.ref('warehouse.warehouse_customer').id,
-                                                               'quantity': 1,
-                                                               'price': 60.0,
-                                                               'discount_amount': 60.0})],
-                                               'type': 'sell',
-                                          })
+        sell_order = self.env.ref('sell.sell_order_2')
         sell_order.sell_order_done()
         receipt = self.env['sell.delivery'].search([('order_id','=',sell_order.id)])
         receipt.sell_delivery_done()
         invoice = self.env['money.invoice'].search([('name','=',receipt.name)])
         invoice.money_invoice_done()
-        statement = self.env['partner.statements.report.wizard'].create(
-                    {'partner_id': order.partner_id.id,
-                    'from_date': '2016-01-01',
-                    'to_date': '2016-11-01'}).with_context({'default_customer': True})
-        # 输出报表，正常输出
-        statement.partner_statements_without_goods()
+        # 创建销售退货单记录
+        sell_return = self.env.ref('sell.sell_order_return')
+        sell_return.sell_order_done()
+        receipt_return = self.env['sell.delivery'].search([('order_id','=',sell_return.id)])
+        receipt_return.sell_delivery_done()
+        invoice_return = self.env['money.invoice'].search([('name','=',receipt_return.name)])
+        invoice_return.money_invoice_done()
+    def test_supplier_statements_wizard(self):
+        '''客户对账单向导'''
+        # 测试客户对账单方法中的'结束日期不能小于开始日期！'
+        self.statement.from_date = '2016-11-03'
+        with self.assertRaises(except_orm):
+            self.statement.partner_statements_without_goods()
+        with self.assertRaises(except_orm):
+            self.statement.partner_statements_with_goods()
+        # 测试客户对账单方法中的from_date的默认值是否是公司启用日期
+        statement_date = self.env['partner.statements.report.wizard'].create({'partner_id': self.env.ref('sell.sell_order_1').partner_id.id,
+                                                                              'to_date': '2016-11-03'})
+        self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
+    def test_supplier_statements_find_source(self):
+        '''查看客户对账单明细'''
         # 查看客户对账单明细不带商品明细
+        self.statement.partner_statements_without_goods()
         customer_statement = self.env['customer.statements.report'].search([])
         for record in customer_statement:
             record.find_source_order()
-        statement.partner_statements_with_goods()
         # 查看客户对账单带商品明细
+        self.statement.partner_statements_with_goods()
         customer_statement_goods = self.env['customer.statements.report.with.goods'].search([])
         for statement in customer_statement_goods:
+            self.assertNotEqual(str(statement.balance_amount), 'kaihe11')
             statement.find_source_order()
-        # 测试客户对账单方法中的'结束日期不能小于开始日期！'
-        statement_error_date = self.env['partner.statements.report.wizard'].create(
-                    {'partner_id': self.env.ref('sell.sell_order_1').partner_id.id,
-                     'from_date': '2016-11-03',
-                     'to_date': '2016-11-01'})
-        # 输出报表，执行if
-        with self.assertRaises(except_orm):
-            statement_error_date.partner_statements_without_goods()
-        with self.assertRaises(except_orm):
-            statement_error_date.partner_statements_with_goods()
-        # 测试客户对账单方法中的from_date的默认值是否是公司启用日期
-        statement_date = self.env['partner.statements.report.wizard'].create(
-                    {'partner_id': self.env.ref('sell.sell_order_1').partner_id.id,
-                     'to_date': '2016-11-03'})
-        self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
