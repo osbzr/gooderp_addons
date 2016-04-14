@@ -176,7 +176,7 @@
 		                            <field name="tax_amount" sum="合计税额"/>
 		                            <field name="subtotal" sum="价税合计的合计"/>
 		                            <field name="note"/>
-		                            <field name="share_cost" readonly="1"/>
+		                            <field name="share_cost"/>
 		                        </tree>
 		                    </field>
 		                </page>
