@@ -121,7 +121,7 @@ class customer_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，两种情况：收款单、销售发货单
+        # 查看源单，三种情况：收款单、销售退货单、销售发货单
         money = self.env['money.order'].search([('name', '=', self.name)])
         # 收款单
         if money:
@@ -138,20 +138,33 @@ class customer_statements_report(models.Model):
                 'context': {'type': 'get'}
             }
 
-        # 销售发货单
+        # 销售退货单、发货单
         delivery = self.env['sell.delivery'].search([('name', '=', self.name)])
-        view = self.env.ref('sell.sell_delivery_form')
-
-        return {
-            'name': u'销售发货单',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': False,
-            'views': [(view.id, 'form')],
-            'res_model': 'sell.delivery',
-            'type': 'ir.actions.act_window',
-            'res_id': delivery.id,
-            'context': {'type': 'get'}
+        if delivery.is_return:
+            view = self.env.ref('sell.sell_return_form')
+            return {
+                'name': u'销售退货单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'sell.delivery',
+                'type': 'ir.actions.act_window',
+                'res_id': delivery.id,
+                'context': {'type': 'get'}
+                }
+        else:
+            view = self.env.ref('sell.sell_delivery_form')
+            return {
+                'name': u'销售发货单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'sell.delivery',
+                'type': 'ir.actions.act_window',
+                'res_id': delivery.id,
+                'context': {'type': 'get'}
         }
 
 class customer_statements_report_with_goods(models.TransientModel):
@@ -182,7 +195,7 @@ class customer_statements_report_with_goods(models.TransientModel):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，两种情况：收款单、销售发货单
+        # 查看源单，三种情况：收款单、销售退货单、销售发货单
         money = self.env['money.order'].search([('name', '=', self.name)])
         if money:  # 收款单
             view = self.env.ref('money.money_order_form')
@@ -198,19 +211,33 @@ class customer_statements_report_with_goods(models.TransientModel):
                 'context': {'type': 'get'}
             }
 
-        # 销售发货单
+        # 销售退货单、发货单
         delivery = self.env['sell.delivery'].search([('name', '=', self.name)])
-        view = self.env.ref('sell.sell_delivery_form')
-        return {
-            'name': u'销售发货单',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': False,
-            'views': [(view.id, 'form')],
-            'res_model': 'sell.delivery',
-            'type': 'ir.actions.act_window',
-            'res_id': delivery.id,
-            'context': {'type': 'get'}
-        }
+        if delivery.is_return:
+            view = self.env.ref('sell.sell_return_form')
+            return {
+                'name': u'销售退货单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'sell.delivery',
+                'type': 'ir.actions.act_window',
+                'res_id': delivery.id,
+                'context': {'type': 'get'}
+                }
+        else:
+            view = self.env.ref('sell.sell_delivery_form')
+            return {
+                'name': u'销售发货单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'sell.delivery',
+                'type': 'ir.actions.act_window',
+                'res_id': delivery.id,
+                'context': {'type': 'get'}
+            }
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

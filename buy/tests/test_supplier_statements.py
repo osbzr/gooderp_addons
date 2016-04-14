@@ -19,13 +19,20 @@ class test_supplier_statements(TransactionCase):
         money_get.money_order_done()
         money_order = self.env.ref('money.pay_2000')
         money_order.money_order_done()
-        buy_order = self.env.ref('buy.buy_order_1')
-        self.env.ref('buy.buy_order_1').buy_order_done()
         # 创建采购入库单记录
+        buy_order = self.env.ref('buy.buy_order_1')
+        buy_order.buy_order_done()
         receipt = self.env['buy.receipt'].search([('order_id','=',buy_order.id)])
         receipt.buy_receipt_done()
         invoice = self.env['money.invoice'].search([('name','=',receipt.name)])
         invoice.money_invoice_done()
+        # 创建采购退货单记录
+        buy_return = self.env.ref('buy.buy_return_order_1')
+        buy_return.buy_order_done()
+        receipt_return = self.env['buy.receipt'].search([('order_id','=',buy_return.id)])
+        receipt_return.buy_receipt_done()
+        invoice_return = self.env['money.invoice'].search([('name','=',receipt_return.name)])
+        invoice_return.money_invoice_done()
     def test_supplier_statements_wizard(self):
         '''供应商对账单向导'''
         # 测试'结束日期不能小于开始日期！'
