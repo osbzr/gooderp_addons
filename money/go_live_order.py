@@ -2,6 +2,7 @@
 
 from openerp import fields, models, api
 
+
 class go_live_order(models.Model):
     _name = 'go.live.order'
     _description = u'期初余额表'
@@ -28,7 +29,8 @@ class go_live_order(models.Model):
     partner_id = fields.Many2one('partner', string=u'业务伙伴')
     bank_id = fields.Many2one('bank.account', string=u'账户')
     name = fields.Char(string=u'编号', copy=False, readonly=True, default='/')
-    date = fields.Date(string=u'日期', default=_get_company_start_date, readonly=True, required=True)
+    date = fields.Date(string=u'日期', default=_get_company_start_date,
+                                      readonly=True, required=True)
     receivable = fields.Float(u'应收余额')
     payable = fields.Float(u'应付余额')
     balance = fields.Float(u'期初余额')

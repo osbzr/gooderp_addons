@@ -24,7 +24,7 @@
         'view/go_live_order_view.xml',
         'view/partner_view.xml',
         ],
-    'demo':[
+    'demo': [
         'money_demo.xml',
             ],
 }

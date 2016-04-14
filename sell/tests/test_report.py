@@ -56,7 +56,7 @@ class test_customer_statements(TransactionCase):
         receipt_return.sell_delivery_done()
         invoice_return = self.env['money.invoice'].search([('name','=',receipt_return.name)])
         invoice_return.money_invoice_done()
-    def test_supplier_statements_wizard(self):
+    def test_customer_statements_wizard(self):
         '''客户对账单向导'''
         # 测试客户对账单方法中的'结束日期不能小于开始日期！'
         self.statement.from_date = '2016-11-03'
@@ -68,7 +68,7 @@ class test_customer_statements(TransactionCase):
         statement_date = self.env['partner.statements.report.wizard'].create({'partner_id': self.env.ref('sell.sell_order_1').partner_id.id,
                                                                               'to_date': '2016-11-03'})
         self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
-    def test_supplier_statements_find_source(self):
+    def test_customer_statements_find_source(self):
         '''查看客户对账单明细'''
         # 查看客户对账单明细不带商品明细
         self.statement.partner_statements_without_goods()
