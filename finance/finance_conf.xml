@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!--会计根菜单-->
+        <menuitem id='finance_menu' name='会计'/>
+
+        <menuitem id='finance_setting_menu' name='配置' parent='finance_menu' sequence='10'/>
+        
+        <!--凭证字-->
+        <record id="document_word_tree" model="ir.ui.view">
+            <field name="name">document.word.tree</field>
+            <field name="model">document.word</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="凭证字">
+                    <field name="name"/>
+                    <field name="print_title"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="document_word_action" model="ir.actions.act_window">
+            <field name="name">凭证字</field>
+            <field name="res_model">document.word</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='document_word_menu' action='document_word_action' parent='finance_setting_menu' sequence='10'/>
+        
+        <!--会计科目-->
+        <record id="finance_account_tree" model="ir.ui.view">
+            <field name="name">finance.account.tree</field>
+            <field name="model">finance.account</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="科目">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="category"/>
+                    <field name="balance_directions"/>
+                    <field name="auxiliary_financing"/>
+                    <field name="state" widget='boolean_clickable'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="finance_account_action" model="ir.actions.act_window">
+            <field name="name">会计科目</field>
+            <field name="res_model">finance.account</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='finance_account_menu' action='finance_account_action' parent='finance_setting_menu' sequence='15'/>
+
+        <!--辅助核算-->
+        <record id="auxiliary_financing_tree" model="ir.ui.view">
+            <field name="name">auxiliary.financing.tree</field>
+            <field name="model">auxiliary.financing</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="辅助核算">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="auxiliary_financing_action" model="ir.actions.act_window">
+            <field name="name">辅助核算</field>
+            <field name="res_model">auxiliary.financing</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='25'/>
+
+        <!--可选值-->
+        <record id="finance_category_tree" model="ir.ui.view">
+            <field name="name">finance.category.tree</field>
+            <field name="model">finance.category</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="可选值">
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="finance_category_action" model="ir.actions.act_window">
+            <field name="name">可选值</field>
+            <field name="res_model">finance.category</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='finance_category_menu' action='finance_category_action' parent='finance_setting_menu' sequence='30'/>
+        
+
+        <!--会计期间-->
+        <record id="period_tree" model="ir.ui.view">
+            <field name="name">finance.period.tree</field>
+            <field name="model">finance.period</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" delete='false' string="会计期间">
+                    <field name="name"/>
+                    <field name="year"/>
+                    <field name="month"/>
+                    <field name="is_closed"/>
+                </tree>
+            </field>
+        </record>
+        <record id="period_action" model="ir.actions.act_window">
+            <field name="name">会计期间</field>
+            <field name="res_model">finance.period</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+        <menuitem id='period_menu' action='period_action' parent='finance_setting_menu' sequence='10'/>
+    </data>
+</openerp>

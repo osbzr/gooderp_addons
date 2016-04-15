@@ -145,7 +145,7 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.subtotal == 117)
 
     def test_onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位和默认仓库'''
+        '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本'''
         goods = self.env.ref('goods.cable')
         goods.default_wh = self.env.ref('warehouse.hd_stock').id
         for line in self.order.line_ids:
@@ -154,6 +154,13 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.uom_id.name == u'件')
             wh_id = line.warehouse_dest_id.id
             self.assertTrue(wh_id == goods.default_wh.id)
+
+            # 测试价格是否是商品的成本
+            self.assertTrue(line.price == goods.cost)
+            # 测试不设置商品的成本时是否弹出警告
+            goods.cost = 0.0
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()
 
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
@@ -185,6 +192,7 @@ class test_buy_receipt(TransactionCase):
         '''测试返回付款状态'''
         self.receipt._get_buy_money_state()
         self.receipt.buy_receipt_done()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.receipt.money_state == u'未付款')
         self.receipt._get_buy_money_state()
         self.receipt.payment = self.receipt.amount - 1
@@ -198,6 +206,7 @@ class test_buy_receipt(TransactionCase):
         '''测试返回退款状态'''
         self.return_receipt._get_buy_return_state()
         self.return_receipt.buy_receipt_done()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
         self.return_receipt._get_buy_money_state()
         self.return_receipt.payment = self.return_receipt.amount - 1
@@ -268,8 +277,8 @@ class test_buy_receipt(TransactionCase):
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
         # 重复审核报错
-        self.receipt.bank_account_id = bank_account
-        self.receipt.payment = 100
+        self.receipt.bank_account_id = None
+        self.receipt.payment = 0
         self.receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()

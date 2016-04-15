@@ -21,6 +21,7 @@
 from openerp.exceptions import except_orm
 from openerp import fields, models, api
 
+
 class money_transfer_order(models.Model):
     _name = 'money.transfer.order'
     _description = u'资金转账单'
@@ -43,11 +44,17 @@ class money_transfer_order(models.Model):
     state = fields.Selection([
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
-                           ], string=u'状态', readonly=True, default='draft', copy=False)
+                           ], string=u'状态', readonly=True,
+                             default='draft', copy=False)
     name = fields.Char(string=u'单据编号', copy=False, default='/')
-    date = fields.Date(string=u'单据日期', default=lambda self: fields.Date.context_today(self), readonly=True, states={'draft': [('readonly', False)]})
-    note = fields.Text(string=u'备注', readonly=True, states={'draft': [('readonly', False)]})
-    line_ids = fields.One2many('money.transfer.order.line', 'transfer_id', string=u'资金转账单行', readonly=True, states={'draft': [('readonly', False)]})
+    date = fields.Date(string=u'单据日期', readonly=True,
+                       default=lambda self: fields.Date.context_today(self),
+                       states={'draft': [('readonly', False)]})
+    note = fields.Text(string=u'备注', readonly=True,
+                       states={'draft': [('readonly', False)]})
+    line_ids = fields.One2many('money.transfer.order.line', 'transfer_id',
+                               string=u'资金转账单行', readonly=True,
+                               states={'draft': [('readonly', False)]})
 
     @api.multi
     def money_transfer_done(self):
@@ -81,12 +88,14 @@ class money_transfer_order(models.Model):
             transfer.state = 'draft'
         return True
 
+
 class money_transfer_order_line(models.Model):
     _name = 'money.transfer.order.line'
     _description = u'资金转账单明细'
 
     transfer_id = fields.Many2one('money.transfer.order', string=u'资金转账单')
-    out_bank_id = fields.Many2one('bank.account', string=u'转出账户', required=True)
+    out_bank_id = fields.Many2one('bank.account',
+                                  string=u'转出账户', required=True)
     in_bank_id = fields.Many2one('bank.account', string=u'转入账户', required=True)
     amount = fields.Float(string=u'金额')
     mode_id = fields.Many2one('settle.mode', string=u'结算方式')

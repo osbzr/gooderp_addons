@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from openerp import fields, models, api, tools
 
+
 class bank_statements_report(models.Model):
     _name = "bank.statements.report"
     _description = u"现金银行报表"
@@ -26,7 +27,8 @@ class bank_statements_report(models.Model):
     name = fields.Char(string=u'单据编号', readonly=True)
     get = fields.Float(string=u'收入', readonly=True)
     pay = fields.Float(string=u'支出', readonly=True)
-    balance = fields.Float(string=u'账户余额', compute='_compute_balance', readonly=True)
+    balance = fields.Float(string=u'账户余额',
+                           compute='_compute_balance', readonly=True)
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
     note = fields.Char(string=u'备注', readonly=True)
 

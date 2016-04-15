@@ -121,7 +121,7 @@ class Test_sell(TransactionCase):
         # 折扣率 on_change 变化
         self.sell_order_line.discount_rate = 20
         # 通过onchange来改变 goods_id
-        self.sell_order_line.onchange_goods_id()
+#         self.sell_order_line.onchange_goods_id()
         self.sell_order_line.onchange_discount_rate()
 
         self.assertEqual(self.sell_order_line.amount, 80)
@@ -137,19 +137,11 @@ class Test_sell(TransactionCase):
         self.assertEqual(sell_delivery.discount_amount, 10.53)
         self.assertEqual(sell_delivery.amount, 94.77)
 
-        sell_delivery.amount = 94.8
         # 销售发货单 的确认
-        sell_delivery.receipt = -222
+        sell_delivery.receipt = 22
         sell_delivery.sell_delivery_done()
 
-        self.assertEqual(sell_delivery.amount, 913.77)
         self.assertEqual(sell_delivery.money_state, u'部分收款')
-        # with self.assertRaises(except_orm):
-        #     sell_delivery.receipt = -222
-        #     sell_delivery.sell_delivery_done()
-        # 确认后改变 状态金额
-
-        # self.assertEqual(sell_delivery.money_state, u'未收款')
 
     def test_sell_delievery_in(self):
         """ 销售 退货单 的付款状态的测试"""
@@ -246,7 +238,39 @@ class Test_sell(TransactionCase):
         self.order.unlink()
 
     def test_sell_delivery_unlink(self):
-        '''测试删除已审核的销售发货/退货单'''
+        '''测试删除销售发货/退货单'''
+        # 测试是否可以删除已审核的单据
         self.sell_delivery.sell_delivery_done()
         with self.assertRaises(except_orm):
             self.sell_delivery.unlink()
+
+        # 删除销售发货单时，测试能否删除发货单行
+        sell_delivery = self.sell_delivery.copy()
+        move_id = sell_delivery.sell_move_id.id
+        sell_delivery.unlink()
+        move = self.env['wh.move'].search(
+               [('id', '=', move_id)])
+        self.assertTrue(not move)
+        self.assertTrue(not move.line_out_ids)
+
+    def test_onchange_goods_id(self):
+        '''当销货订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
+        goods = self.env.ref('goods.keyboard')
+        goods.default_wh = self.env.ref('warehouse.hd_stock').id
+        c_category_id = self.order.partner_id.c_category_id
+        price_ids = self.env['goods.price'].search(
+                                [('goods_id', '=', goods.id),
+                                 ('category_id', '=', c_category_id.id)])
+        for line in self.order.line_ids:
+            line.goods_id = goods
+            line.onchange_goods_id()
+            self.assertTrue(line.uom_id.name == u'件')
+            wh_id = line.warehouse_id.id
+            self.assertTrue(wh_id == goods.default_wh.id)
+
+            # 测试价格是否是商品价格清单中的价格
+            self.assertTrue(line.price == price_ids.price)
+            # 测试不设置订单客户的客户类别时是否弹出警告
+            self.order.partner_id.c_category_id = False
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()

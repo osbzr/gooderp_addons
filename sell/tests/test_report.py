@@ -81,3 +81,117 @@ class test_customer_statements(TransactionCase):
         for statement in customer_statement_goods:
             self.assertNotEqual(str(statement.balance_amount), 'kaihe11')
             statement.find_source_order()
+
+
+class test_track_wizard(TransactionCase):
+    '''测试销售订单跟踪表向导'''
+
+    def setUp(self):
+        ''' 准备报表数据 '''
+        super(test_track_wizard, self).setUp()
+        # 补足产品网线的数量
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+
+        self.order = self.env.ref('sell.sell_order_2')
+        order_2 = self.order.copy()
+        order_2.sell_order_done()
+        # 分批出库
+        delivery_2 = self.env['sell.delivery'].search(
+                    [('order_id', '=', order_2.id)])
+        for line in delivery_2.line_out_ids:
+            line.goods_qty = 5
+        delivery_2.sell_delivery_done()
+        delivery_3 = self.env['sell.delivery'].search(
+                    [('order_id', '=', order_2.id), ('state', '=', 'draft')])
+        delivery_3.sell_delivery_done()
+
+        # 销货订单产生退货单
+        sell_return = self.env.ref('sell.sell_order_return')
+        sell_return.sell_order_done()
+
+        self.track_obj = self.env['sell.order.track.wizard']
+        self.track = self.track_obj.create({})
+
+    def test_button_ok(self):
+        '''测试销售订单跟踪表确认按钮'''
+        # 日期报错
+        track = self.track_obj.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            track.button_ok()
+        # 按产品搜索
+        self.track.goods_id = 1
+        self.track.button_ok()
+        # 按客户搜索
+        self.track.goods_id = False
+        self.track.partner_id = self.env.ref('core.yixun').id
+        self.track.button_ok()
+        # 按销售员搜索
+        self.track.goods_id = False
+        self.track.partner_id = False
+        self.track.staff_id = self.env.ref('core.lili').id
+        self.track.button_ok()
+        # 按日期搜索
+        self.track.goods_id = False
+        self.track.partner_id = False
+        self.track.staff_id = False
+        self.track.button_ok()
+
+
+class test_detail_wizard(TransactionCase):
+    '''测试销售订单明细表向导'''
+ 
+    def setUp(self):
+        ''' 准备报表数据 '''
+        super(test_detail_wizard, self).setUp()
+        # 补足产品网线的数量
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        # 复制一张销货订单并审核
+        self.order = self.env.ref('sell.sell_order_2')
+        order_2 = self.order.copy()
+        order_2.sell_order_done()
+
+        # 审核出库单
+        delivery_2 = self.env['sell.delivery'].search(
+                    [('order_id', '=', order_2.id)])
+        delivery_2.sell_delivery_done()
+ 
+        # 销货订单产生退货单，并审核退货单
+        sell_return = self.env.ref('sell.sell_order_return')
+        sell_return.sell_order_done()
+        delivery_return = self.env['sell.delivery'].search(
+                    [('order_id', '=', sell_return.id)])
+        delivery_return.sell_delivery_done()
+ 
+        self.detail_obj = self.env['sell.order.detail.wizard']
+        self.detail = self.detail_obj.create({})
+
+    def test_button_ok(self):
+        '''测试销售订单明细表确认按钮'''
+        detail = self.detail_obj.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            detail.button_ok()
+        # 按产品搜索
+        self.detail.goods_id = 1
+        self.detail.button_ok()
+        # 按客户搜索
+        self.detail.goods_id = False
+        self.detail.partner_id = self.env.ref('core.yixun').id
+        self.detail.button_ok()
+        # 按销售员搜索
+        self.detail.goods_id = False
+        self.detail.partner_id = False
+        self.detail.staff_id = self.env.ref('core.lili').id
+        self.detail.button_ok()
+        # 按日期搜索
+        self.detail.goods_id = False
+        self.detail.partner_id = False
+        self.detail.staff_id = False
+        self.detail.button_ok()

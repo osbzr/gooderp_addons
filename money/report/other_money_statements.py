@@ -2,6 +2,7 @@
 
 from openerp import fields, models, api, tools
 
+
 class other_money_statements_report(models.Model):
     _name = "other.money.statements.report"
     _description = u"其他收支明细表"
@@ -10,7 +11,8 @@ class other_money_statements_report(models.Model):
     date = fields.Date(string=u'日期', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     type = fields.Char(string=u'类别', readonly=True)
-    category_id = fields.Many2one('core.category', string=u'收支项目', readonly=True)
+    category_id = fields.Many2one('core.category',
+                                  string=u'收支项目', readonly=True)
     get = fields.Float(string=u'收入', readonly=True)
     pay = fields.Float(string=u'支出', readonly=True)
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)

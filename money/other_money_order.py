@@ -57,14 +57,24 @@ class other_money_order(models.Model):
     state = fields.Selection([
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
-                           ], string=u'状态', readonly=True, default='draft', copy=False)
-    partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True, states={'draft': [('readonly', False)]})
-    date = fields.Date(string=u'单据日期', default=lambda self: fields.Date.context_today(self), readonly=True, states={'draft': [('readonly', False)]})
+                           ], string=u'状态', readonly=True,
+                             default='draft', copy=False)
+    partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True,
+                                 states={'draft': [('readonly', False)]})
+    date = fields.Date(string=u'单据日期', readonly=True,
+                       default=lambda self: fields.Date.context_today(self),
+                       states={'draft': [('readonly', False)]})
     name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/')
-    total_amount = fields.Float(string=u'金额', compute='_compute_total_amount', store=True, readonly=True)
-    bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True, readonly=True, states={'draft': [('readonly', False)]})
-    line_ids = fields.One2many('other.money.order.line', 'other_money_id', string=u'收支单行', readonly=True, states={'draft': [('readonly', False)]})
-    type = fields.Selection(TYPE_SELECTION, string=u'类型', default=lambda self: self._context.get('type'), readonly=True, states={'draft': [('readonly', False)]})
+    total_amount = fields.Float(string=u'金额', compute='_compute_total_amount',
+                                store=True, readonly=True)
+    bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True,
+                              readonly=True, states={'draft': [('readonly', False)]})
+    line_ids = fields.One2many('other.money.order.line', 'other_money_id',
+                               string=u'收支单行', readonly=True,
+                               states={'draft': [('readonly', False)]})
+    type = fields.Selection(TYPE_SELECTION, string=u'类型', readonly=True,
+                            default=lambda self: self._context.get('type'),
+                            states={'draft': [('readonly', False)]})
 
     @api.onchange('date')
     def onchange_date(self):
@@ -82,9 +92,9 @@ class other_money_order(models.Model):
         lines = []
         for invoice in self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id), ('to_reconcile', '!=', 0)]):
             lines.append((0, 0, {
-                'category_id':invoice.category_id.id,
-                'source_id':invoice.id,
-                'amount':invoice.to_reconcile,
+                'category_id': invoice.category_id.id,
+                'source_id': invoice.id,
+                'amount': invoice.to_reconcile,
                                    }))
         self.line_ids = lines
 

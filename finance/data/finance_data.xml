@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--可选值-->
+        <record id='finance_category_1' model='finance.category'>
+            <field name='name'>流动资产</field>
+            <field name='type'>finance_account</field>
+        </record>
+        <record id='finance_category_2' model='finance.category'>
+            <field name='name'>非流动资产</field>
+            <field name='type'>finance_account</field>
+        </record>
+        <record id='finance_category_3' model='finance.category'>
+            <field name='name'>客户</field>
+            <field name='type'>auxiliary_financing</field>
+        </record>
+        <record id='finance_category_4' model='finance.category'>
+            <field name='name'>供应商</field>
+            <field name='type'>auxiliary_financing</field>
+        </record>
+        <record id='finance_category_5' model='finance.category'>
+            <field name='name'>职员</field>
+            <field name='type'>auxiliary_financing</field>
+        </record>
+        <record id='finance_category_6' model='finance.category'>
+            <field name='name'>项目</field>
+            <field name='type'>auxiliary_financing</field>
+        </record>
+        <record id='finance_category_7' model='finance.category'>
+            <field name='name'>部门</field>
+            <field name='type'>auxiliary_financing</field>
+        </record>
+        <record id='finance_category_8' model='finance.category'>
+            <field name='name'>存货</field>
+            <field name='type'>auxiliary_financing</field>
+        </record>
+        
+        <!--凭证字-->
+        <record id='document_word_1' model='document.word'>
+            <field name='name'>记</field>
+            <field name='print_title'>记账凭证</field>
+        </record>
+        
+        <!--科目-->
+        <record id='finance_account_1' model='finance.account'>
+            <field name='code'>1001</field>
+            <field name='name'>库存现金</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_2' model='finance.account'>
+            <field name='code'>1002</field>
+            <field name='name'>银行存款</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_3' model='finance.account'>
+            <field name='code'>1012</field>
+            <field name='name'>其他货币资金</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_4' model='finance.account'>
+            <field name='code'>1101</field>
+            <field name='name'>短期投资</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_5' model='finance.account'>
+            <field name='code'>1121</field>
+            <field name='name'>应收票据</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_6' model='finance.account'>
+            <field name='code'>1122</field>
+            <field name='name'>应收账款</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_7' model='finance.account'>
+            <field name='code'>1123</field>
+            <field name='name'>预付账款</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_8' model='finance.account'>
+            <field name='code'>1131</field>
+            <field name='name'>应收股利</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_8' model='finance.account'>
+            <field name='code'>1132</field>
+            <field name='name'>应收利息</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_9' model='finance.account'>
+            <field name='code'>1221</field>
+            <field name='name'>其他应收款</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_10' model='finance.account'>
+            <field name='code'>1401</field>
+            <field name='name'>材料采购</field>
+            <field name='category' ref = 'finance.finance_category_1'/>
+            <field name='balance_directions'>in</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_11' model='finance.account'>
+            <field name='code'>1602</field>
+            <field name='name'>累计折旧</field>
+            <field name='category' ref = 'finance.finance_category_2'/>
+            <field name='balance_directions'>out</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_12' model='finance.account'>
+            <field name='code'>1622</field>
+            <field name='name'>生产性生物资产累计折旧</field>
+            <field name='category' ref = 'finance.finance_category_2'/>
+            <field name='balance_directions'>out</field>
+            <field name='state'>1</field>
+        </record>
+        <record id='finance_account_13' model='finance.account'>
+            <field name='code'>1702</field>
+            <field name='name'>累计摊销</field>
+            <field name='category' ref = 'finance.finance_category_2'/>
+            <field name='balance_directions'>out</field>
+            <field name='state'>1</field>
+        </record>
+    </data>
+</openerp>
