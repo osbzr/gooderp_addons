@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--示例demo-->
+        <!--新建会计期间-->
+        <record id='period_201604' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>4</field>
+        </record>
+        <!--新建凭证-->
+        <record id='voucher_1' model='voucher'>
+            <field name='number'>FV0002</field>
+            <field name='document_word_id' ref='finance.document_word_1'/>
+        </record>
+        <record id='voucher_line_1' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_1'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_1'/>
+            <field name='debit'>100</field>
+        </record>
+        <record id='voucher_line_2' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_1'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_11'/>
+            <field name='credit'>100</field>
+        </record>
+    </data>
+</openerp>
