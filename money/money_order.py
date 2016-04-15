@@ -493,7 +493,7 @@ class reconcile_order(models.Model):
             if self.business_type in ['adv_pay_to_get',
                                       'adv_get_to_pay', 'get_to_pay']:
                 if order_reconcile != invoice_reconcile:
-                    raise except_orm(u'错误', u'核销金额必须相同')
+                    raise except_orm(u'错误', u'核销金额必须相同, %s 不等于 %s' % (order_reconcile, invoice_reconcile))
 
             order.state = 'done'
         return True
