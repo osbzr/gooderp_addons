@@ -95,7 +95,7 @@ class finance_period(models.Model):
     @api.depends('year', 'month')
     def _compute_name(self):
         if self.year and self.month:
-            self.name = '%s年 第%s期' % (self.year, self.month)
+            self.name = u'%s年 第%s期' % (self.year, self.month)
     @api.multi
     def get_period(self, date):
         if date:
@@ -146,9 +146,7 @@ class auxiliary_financing(models.Model):
     _name = 'auxiliary.financing'
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
-    type = fields.Many2one('finance.category', u'分类',
-                            domain=[('type', '=', 'auxiliary_financing')],
-                            context={'type': 'auxiliary_financing'})
+    type = fields.Selection(u'分类',)
 
 
 class currency_category(models.Model):
