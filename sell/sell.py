@@ -326,7 +326,7 @@ class sell_delivery(models.Model):
 
     sell_move_id = fields.Many2one('wh.move', u'发货单', required=True, ondelete='cascade')
     is_return = fields.Boolean(u'是否退货', default=lambda self: self.env.context.get('is_return'))
-    staff_id = fields.Many2one('res.users', u'销售员')
+    staff_id = fields.Many2one('staff', u'销售员')
     order_id = fields.Many2one('sell.order', u'源单号', copy=False)
     invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False)
     date_due = fields.Date(u'到期日期', copy=False)
