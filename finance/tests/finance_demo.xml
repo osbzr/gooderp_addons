@@ -24,5 +24,18 @@
             <field name='account_id' ref='finance.finance_account_11'/>
             <field name='credit'>100</field>
         </record>
+        <!--科目-->
+        <record id='finance_account_1' model='finance.account'>
+            <field name='auxiliary_financing'>partner</field>
+        </record>
+        <record id='finance_account_2' model='finance.account'>
+            <field name='auxiliary_financing'>supplier</field>
+        </record>
+        <record id='finance_account_3' model='finance.account'>
+            <field name='auxiliary_financing'>goods</field>
+        </record>
+        <record id='finance_account_4' model='finance.account'>
+            <field name='auxiliary_financing'>member</field>
+        </record>
     </data>
 </openerp>
