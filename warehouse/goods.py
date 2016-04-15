@@ -55,11 +55,14 @@ class goods(models.Model):
 
         return self.cost
 
-    def get_suggested_cost_by_warehouse(self, warehouse, qty, ignore_move=None):
+    def get_suggested_cost_by_warehouse(self, warehouse, qty, lot_id=None, ignore_move=None):
         # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
         # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
-        records, cost = self.get_matching_records(warehouse, qty, ignore_stock=True,
-                                                 ignore=ignore_move)
+        if lot_id:
+            records, cost = self.get_matching_records_by_lot(lot_id, qty, suggested=True)
+        else:
+            records, cost = self.get_matching_records(
+                warehouse, qty, ignore_stock=True, ignore=ignore_move)
 
         matching_qty = sum(record.get('qty') for record in records)
         if matching_qty:
@@ -76,6 +79,20 @@ class goods(models.Model):
     def is_using_batch(self):
         self.ensure_one()
         return self.using_batch
+
+    def get_matching_records_by_lot(self, lot_id, qty, uos_qty=0, suggested=False):
+        self.ensure_one()
+        if not lot_id:
+            raise osv.except_osv(u'错误', u'批号没有被指定，无法获得成本')
+
+        if not suggested and lot_id.state != 'done':
+            raise osv.except_osv(u'错误', u'批号%s还没有实际入库，请先审核该入库' % lot_id.move_id.name)
+
+        if qty > lot_id.qty_remaining:
+            raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.name,))
+
+        return [{'line_in_id': lot_id.id, 'qty': qty, 'uos_qty': uos_qty}], \
+            lot_id.get_real_cost_unit() * qty
 
     def get_matching_records(self, warehouse, qty, uos_qty=0, ignore_stock=False, ignore=None):
         # @ignore_stock: 当参数指定为True的时候，此时忽略库存警告

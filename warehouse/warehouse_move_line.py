@@ -203,7 +203,8 @@ class wh_move_line(models.Model):
     @api.one
     def compute_suggested_cost(self):
         if self.env.context.get('type') == 'out' and self.goods_id and self.warehouse_id and self.goods_qty:
-            cost, cost_unit = self.goods_id.get_suggested_cost_by_warehouse(self.warehouse_id, self.goods_qty)
+            cost, cost_unit = self.goods_id.get_suggested_cost_by_warehouse(
+                self.warehouse_id, self.goods_qty, self.lot_id)
 
             self.cost_unit = cost_unit
             self.cost = cost
@@ -260,11 +261,6 @@ class wh_move_line(models.Model):
 
             if self.env.context.get('type') == 'internal':
                 self.lot = self.lot_id.lot
-
-    @api.one
-    @api.onchange('cost_unit')
-    def onchange_cost_unit(self):
-        self.cost = self.cost_unit * self.goods_qty
 
     @api.one
     @api.onchange('goods_qty', 'price', 'discount_rate')

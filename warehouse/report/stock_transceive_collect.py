@@ -17,7 +17,7 @@ class report_stock_transceive_collect(models.Model):
         'wh.out.losses': 'losses_out',
         'wh.in.overage': 'overage_in',
 
-        'buy.receipt.sell': u'purchase_in',
+        'buy.receipt.buy': u'purchase_in',
         'buy.receipt.return': u'purchase_out',
         'sell.delivery.sell': u'sale_out',
         'sell.delivery.return': u'sale_in',

@@ -83,11 +83,19 @@ class TestMoveLine(TransactionCase):
     def test_get_matching_records_by_lot(self):
         # 批次号未审核的时候获取批次信息会报错
         with self.assertRaises(except_orm):
-            self.mouse_out_line.get_matching_records_by_lot()
+            self.mouse_out_line.goods_id.get_matching_records_by_lot(
+                self.mouse_out_line.lot_id, self.mouse_out_line.goods_qty)
+
+        # 批次号不存在的时候应该报错
+        with self.assertRaises(except_orm):
+            self.mouse_out_line.goods_id.get_matching_records_by_lot(False, 0)
 
         self.mouse_out_line.lot_id.action_done()
 
-        results, _ = self.mouse_out_line.get_matching_records_by_lot()
+        results, _ = self.mouse_out_line.goods_id.get_matching_records_by_lot(
+            self.mouse_out_line.lot_id, self.mouse_out_line.goods_qty,
+            self.mouse_out_line.goods_uos_qty)
+
         real_results = {
             'line_in_id': self.mouse_out_line.lot_id.id,
             'qty': self.mouse_out_line.goods_qty,
@@ -96,9 +104,10 @@ class TestMoveLine(TransactionCase):
         self.assertEqual(results[0], real_results)
 
         # 当前明细行的产品数量大于批次的数量的时候，会报错
-        self.mouse_out_line.goods_qty = self.mouse_out_line.lot_id.qty_remaining + 10
         with self.assertRaises(except_orm):
-            self.mouse_out_line.get_matching_records_by_lot()
+            self.mouse_out_line.goods_id.get_matching_records_by_lot(
+                self.mouse_out_line.lot_id,
+                self.mouse_out_line.lot_id.qty_remaining + 10)
 
     def test_onchange(self):
         results = self.mouse_in_line.onchange_goods_id()
