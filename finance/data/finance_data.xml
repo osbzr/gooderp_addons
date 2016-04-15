@@ -140,12 +140,5 @@
             <field name='balance_directions'>out</field>
             <field name='state'>1</field>
         </record>
-        
-        <!--币别-->
-        <record id='currency_category_1' model='currency.category'>
-            <field name='code'>RMB</field>
-            <field name='name'>人民币</field>
-            <field name='rate'>1</field>
-        </record>
     </data>
 </openerp>

@@ -55,29 +55,6 @@
 
         <menuitem id='finance_account_menu' action='finance_account_action' parent='finance_setting_menu' sequence='15'/>
 
-        <!--币别-->
-        <record id="currency_category_tree" model="ir.ui.view">
-            <field name="name">currency.category.tree</field>
-            <field name="model">currency.category</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="币别">
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="rate"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="currency_category_action" model="ir.actions.act_window">
-            <field name="name">币别</field>
-            <field name="res_model">currency.category</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <menuitem id='currency_category_menu' action='currency_category_action' parent='finance_setting_menu' sequence='20'/>
-
         <!--辅助核算-->
         <record id="auxiliary_financing_tree" model="ir.ui.view">
             <field name="name">auxiliary.financing.tree</field>

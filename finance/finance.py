@@ -28,17 +28,6 @@ MOUTH_SELECTION=[('1',u'01'),
                  ]
 
 
-class voucher_line(models.Model):
-    '''凭证明细'''
-    _name = 'voucher.line'
-    
-    voucher_id = fields.Many2one('voucher',u'对应凭证')
-    name = fields.Char(u'摘要', required=True)
-    account_id = fields.Many2one('finance.account', u'会计科目', ondelete='restrict', required=True)
-    debit = fields.Float(u'借方金额', digits_compute=dp.get_precision(u'金额'))
-    credit = fields.Float(u'贷方金额', digits_compute=dp.get_precision(u'金额'))
-
-
 class voucher(models.Model):
     '''新建凭证'''
     _name = 'voucher'
@@ -81,6 +70,18 @@ class voucher(models.Model):
                 raise ValidationError(u'单行凭证行借和贷不能同时为0')
             if line.debit * line.credit != 0:
                 raise ValidationError(u'单行凭证行不能同时输入借和贷')
+
+
+class voucher_line(models.Model):
+    '''凭证明细'''
+    _name = 'voucher.line'
+    
+    voucher_id = fields.Many2one('voucher',u'对应凭证')
+    name = fields.Char(u'摘要', required=True)
+    account_id = fields.Many2one('finance.account', u'会计科目', ondelete='restrict', required=True)
+    debit = fields.Float(u'借方金额', digits_compute=dp.get_precision(u'金额'))
+    credit = fields.Float(u'贷方金额', digits_compute=dp.get_precision(u'金额'))
+
 
 class finance_period(models.Model):
     '''会计期间'''
@@ -149,11 +150,3 @@ class auxiliary_financing(models.Model):
     type = fields.Many2one('finance.category', u'分类',
                             domain=[('type', '=', 'auxiliary_financing')],
                             context={'type': 'auxiliary_financing'})
-
-
-class currency_category(models.Model):
-    '''币别'''
-    _name = 'currency.category'
-    code = fields.Char(u'编码')
-    name = fields.Char(u'名称')
-    rate = fields.Float(u'汇率')
