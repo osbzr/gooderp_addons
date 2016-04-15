@@ -80,14 +80,18 @@ class TestGoods(TransactionCase):
         self.assertEqual(suggested_cost, 24 * 120)
 
         # 忽略掉第一次48 * 120入库的行为，所以获取到的单位成本永远是80
-        suggested_cost, _ = suggested_cost_func(self.hd_warehouse, 96, self.others_in_keyboard_mouse.id)
+        suggested_cost, _ = suggested_cost_func(
+            self.hd_warehouse, 96, ignore_move=self.others_in_keyboard_mouse.id)
         self.assertEqual(suggested_cost, 96 * 80)
 
-        suggested_cost, _ = suggested_cost_func(self.hd_warehouse, 72, self.others_in_keyboard_mouse.id)
+        suggested_cost, _ = suggested_cost_func(
+            self.hd_warehouse, 72, ignore_move=self.others_in_keyboard_mouse.id)
         self.assertEqual(suggested_cost, 72 * 80)
 
-        suggested_cost, _ = suggested_cost_func(self.hd_warehouse, 48, self.others_in_keyboard_mouse.id)
+        suggested_cost, _ = suggested_cost_func(
+            self.hd_warehouse, 48, ignore_move=self.others_in_keyboard_mouse.id)
         self.assertEqual(suggested_cost, 48 * 80)
 
-        suggested_cost, _ = suggested_cost_func(self.hd_warehouse, 24, self.others_in_keyboard_mouse.id)
+        suggested_cost, _ = suggested_cost_func(
+            self.hd_warehouse, 24, ignore_move=self.others_in_keyboard_mouse.id)
         self.assertEqual(suggested_cost, 24 * 80)

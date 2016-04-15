@@ -13,6 +13,7 @@ class report_stock_balance(models.Model):
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
     lot = fields.Char(u'批号')
+    attribute_id = fields.Many2one('attribute', u'属性')
     warehouse = fields.Char(u'仓库')
     goods_qty = fields.Float('数量', digits_compute=dp.get_precision('Goods Quantity'))
     goods_uos_qty = fields.Float('辅助单位数量', digits_compute=dp.get_precision('Goods Quantity'))
@@ -26,6 +27,7 @@ class report_stock_balance(models.Model):
                 SELECT min(line.id) as id,
                        goods.name as goods,
                        line.lot as lot,
+                       line.attribute_id as attribute_id,
                        uom.name as uom,
                        uos.name as uos,
                        wh.name as warehouse,
@@ -43,7 +45,7 @@ class report_stock_balance(models.Model):
                   AND wh.type = 'stock'
                   AND line.state = 'done'
 
-                GROUP BY wh.name, line.lot, goods.name, uom.name, uos.name
+                GROUP BY wh.name, line.lot, line.attribute_id, goods.name, uom.name, uos.name
 
                 ORDER BY goods.name, wh.name, goods_qty asc
             )

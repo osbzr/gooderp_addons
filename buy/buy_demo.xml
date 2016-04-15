@@ -50,7 +50,6 @@
             <field eval="0.3" name="price"/>
             <field name="warehouse_id" ref="warehouse.hd_stock"/>
             <field model="wh.move" name="move_id" search="[('name', '=', u'WH_IN_RETURN_1604110001')]"/>
-            <field name="attribute_id" ref="goods.keyboard_black"/>
         </record>
         <!--退货订单无法生成退货单-->
         <!--退货订单-->
@@ -82,7 +81,6 @@
             <field name="order_id" ref="buy_return_order_1_same"/>
             <field eval="50.0" name="price"/>
             <field name="warehouse_id" ref="warehouse.sh_stock"/>
-            <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
         </record>
     </data>

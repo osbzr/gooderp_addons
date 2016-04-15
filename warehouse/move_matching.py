@@ -50,8 +50,12 @@ class wh_move_line(models.Model):
 
             if warehouses[0].type == 'stock' and warehouses[1].type != 'stock':
                 goods = self.env['goods'].browse(res.get('goods_id'))
-                cost, cost_unit = goods.get_suggested_cost_by_warehouse(warehouses[0], res.get('goods_qty'))
-                res.update({'cost': cost, 'cost_unit': cost_unit})
+                attribute = res.get('attribute_id') and \
+                    self.env['attribute'].browse(res.get('attribute_id')) or False
+
+                cost, cost_unit = goods.get_suggested_cost_by_warehouse(
+                    warehouses[0], res.get('goods_qty'), attribute=attribute)
+                res.update({'cost': cost, 'cost_unit': cost_unit, 'lot_id': False})
 
         return res
 
@@ -62,29 +66,20 @@ class wh_move_line(models.Model):
         self.qty_remaining = self.goods_qty - sum(match.qty for match in self.matching_in_ids)
         self.uos_qty_remaining = self.goods_uos_qty - sum(match.uos_qty for match in self.matching_in_ids)
 
-    def get_matching_records_by_lot(self):
-        self.ensure_one()
-        if self.lot_id.state != 'done':
-            raise osv.except_osv(u'错误', u'批号%s还没有实际入库，请先审核该入库' % self.lot_id.move_id.name)
-
-        if self.goods_qty > self.lot_id.qty_remaining:
-            raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.goods_id.name,))
-
-        return [{'line_in_id': self.lot_id.id, 'qty': self.goods_qty, 'uos_qty': self.goods_uos_qty}], \
-            self.lot_id.get_real_cost_unit() * self.goods_qty
-
     def prev_action_done(self):
         matching_obj = self.env['wh.move.matching']
         for line in self:
             if line.warehouse_id.type == 'stock' and line.goods_id.is_using_matching():
                 if line.goods_id.is_using_batch():
-                    matching_records, cost = line.get_matching_records_by_lot()
+                    matching_records, cost = line.goods_id.get_matching_records_by_lot(
+                        self.lot_id, self.goods_qty, self.goods_uos_qty)
                     for matching in matching_records:
                         matching_obj.create_matching(matching.get('line_in_id'),
                             line.id, matching.get('qty'), matching.get('uos_qty'))
                 else:
                     matching_records, cost = line.goods_id.get_matching_records(
-                        line.warehouse_id, line.goods_qty, line.goods_uos_qty)
+                        line.warehouse_id, line.goods_qty,
+                        uos_qty=line.goods_uos_qty, attribute=line.attribute_id)
 
                     for matching in matching_records:
                         matching_obj.create_matching(matching.get('line_in_id'),

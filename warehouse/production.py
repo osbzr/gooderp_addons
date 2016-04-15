@@ -28,7 +28,8 @@ class wh_assembly(models.Model):
             ignore_move = [line.id for line in assembly.line_in_ids]
             for parent in assembly.line_in_ids:
                 collects.append((parent, parent.goods_id.get_suggested_cost_by_warehouse(
-                    parent.warehouse_dest_id, parent.goods_qty, ignore_move=ignore_move)[0]))
+                    parent.warehouse_dest_id, parent.goods_qty, lot_id=parent.lot_id,
+                    attribute=parent.attribute_id, ignore_move=ignore_move)[0]))
 
             amount_total, collect_parent_cost = sum(collect[1] for collect in collects), 0
             for parent, amount in islice(collects, 0, len(collects) - 1):
@@ -110,7 +111,8 @@ class wh_assembly(models.Model):
             } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
-                cost, cost_unit = line.goods_id.get_suggested_cost_by_warehouse(warehouse_id[0], line.goods_qty)
+                cost, cost_unit = line.goods_id.get_suggested_cost_by_warehouse(
+                    warehouse_id[0], line.goods_qty)
 
                 line_out_ids.append({
                         'goods_id': line.goods_id,
@@ -195,7 +197,8 @@ class wh_disassembly(models.Model):
             ignore_move = [line.id for line in assembly.line_in_ids]
             for child in assembly.line_in_ids:
                 collects.append((child, child.goods_id.get_suggested_cost_by_warehouse(
-                    child.warehouse_dest_id, child.goods_qty, ignore_move=ignore_move)[0]))
+                    child.warehouse_dest_id, child.goods_qty, lot_id=child.lot_id,
+                    attribute=child.attribute_id, ignore_move=ignore_move)[0]))
 
             amount_total, collect_child_cost = sum(collect[1] for collect in collects), 0
             for child, amount in islice(collects, 0, len(collects) - 1):

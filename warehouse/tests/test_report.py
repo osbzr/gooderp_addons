@@ -16,7 +16,7 @@ class TestReport(TransactionCase):
         # 键盘    总仓  kb160000567 600   入库
         # 鼠标    总仓  ms160301    1     入库
         # 鼠标    总仓  ms160302    1     入库
-        self.env['wh.in'].search([]).approve_order()
+        self.env['wh.in'].search([('name', '!=', 'WH/IN/16040004')]).approve_order()
         self.env['wh.internal'].search([]).approve_order()
 
         self.track_wizard = self.env['report.lot.track.wizard'].create({})
