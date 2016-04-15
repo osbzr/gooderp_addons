@@ -127,6 +127,18 @@ class TestMoveLine(TransactionCase):
         out_iphone.action_cancel()
         out_iphone.attribute_id = black_iphone.attribute_id
 
+        real_domain = [
+            ('goods_id', '=', out_iphone.goods_id.id),
+            ('state', '=', 'done'),
+            ('lot', '!=', False),
+            ('qty_remaining', '>', 0),
+            ('warehouse_dest_id', '=', out_iphone.warehouse_id.id),
+            ('attribute_id', '=', black_iphone.attribute_id.id)
+        ]
+
+        domain = out_iphone.onchange_attribute_id().get('domain')
+
+        self.assertEqual(real_domain, domain.get('lot_id'))
         out_iphone.action_done()
         self.assertEqual(out_iphone.cost_unit, black_iphone.cost_unit)
 
