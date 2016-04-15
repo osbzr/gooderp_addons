@@ -109,6 +109,27 @@ class TestMoveLine(TransactionCase):
                 self.mouse_out_line.lot_id,
                 self.mouse_out_line.lot_id.qty_remaining + 10)
 
+    def test_attribute(self):
+        attribute_in = self.browse_ref('warehouse.wh_in_wh_in_attribute')
+
+        white_iphone = self.browse_ref('warehouse.wh_move_line_iphone_in_1')
+        black_iphone = self.browse_ref('warehouse.wh_move_line_iphone_in_2')
+
+        out_iphone = self.browse_ref('warehouse.wh_move_line_iphone_out')
+
+        attribute_in.approve_order()
+
+        # 指定属性的时候，出库成本会寻找和自己属性一致的入库行
+        out_iphone.attribute_id = white_iphone.attribute_id
+        out_iphone.action_done()
+        self.assertEqual(out_iphone.cost_unit, white_iphone.cost_unit)
+
+        out_iphone.action_cancel()
+        out_iphone.attribute_id = black_iphone.attribute_id
+
+        out_iphone.action_done()
+        self.assertEqual(out_iphone.cost_unit, black_iphone.cost_unit)
+
     def test_onchange(self):
         results = self.mouse_in_line.onchange_goods_id()
         real_domain = [

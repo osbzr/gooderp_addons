@@ -66,12 +66,17 @@ class wh_move_line(models.Model):
         self.tax_amount = tax_amt
         self.subtotal = amount + tax_amt
 
+    @api.one
+    @api.depends('goods_id')
+    def _compute_using_attribute(self):
+        self.using_attribute = self.goods_id.attribute_ids and True or False
+
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade')
     date = fields.Datetime(u'完成日期', copy=False)
     type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),)
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft')
     goods_id = fields.Many2one('goods', string=u'产品', required=True, index=True)
-    using_attribute = fields.Boolean(u'使用属性')
+    using_attribute = fields.Boolean(compute='_compute_using_attribute', string=u'使用属性')
     attribute_id = fields.Many2one('attribute', u'属性')
     using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理')
     force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
@@ -198,13 +203,16 @@ class wh_move_line(models.Model):
         if self.warehouse_id:
             lot_domain.append(('warehouse_dest_id', '=', self.warehouse_id.id))
 
+        if self.attribute_id:
+            lot_domain.append(('attribute_id', '=', self.attribute_id.id))
+
         return lot_domain
 
     @api.one
     def compute_suggested_cost(self):
         if self.env.context.get('type') == 'out' and self.goods_id and self.warehouse_id and self.goods_qty:
             cost, cost_unit = self.goods_id.get_suggested_cost_by_warehouse(
-                self.warehouse_id, self.goods_qty, self.lot_id)
+                self.warehouse_id, self.goods_qty, self.lot_id, self.attribute_id)
 
             self.cost_unit = cost_unit
             self.cost = cost
@@ -215,7 +223,6 @@ class wh_move_line(models.Model):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.uos_id = self.goods_id.uos_id
-            self.using_attribute = self.goods_id.attribute_ids
             self.attribute_id = False
             if self.goods_id.using_batch and self.goods_id.force_batch_one:
                 self.goods_qty = 1
@@ -237,6 +244,12 @@ class wh_move_line(models.Model):
         self.compute_lot_domain()
         self.compute_lot_compatible()
 
+        return {'domain': {'lot_id': self.compute_lot_domain()}}
+
+    @api.multi
+    @api.onchange('attribute_id')
+    def onchange_attribute_id(self):
+        self.compute_suggested_cost()
         return {'domain': {'lot_id': self.compute_lot_domain()}}
 
     @api.one

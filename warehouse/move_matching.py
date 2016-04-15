@@ -50,7 +50,11 @@ class wh_move_line(models.Model):
 
             if warehouses[0].type == 'stock' and warehouses[1].type != 'stock':
                 goods = self.env['goods'].browse(res.get('goods_id'))
-                cost, cost_unit = goods.get_suggested_cost_by_warehouse(warehouses[0], res.get('goods_qty'))
+                attribute = res.get('attribute_id') and \
+                    self.env['attribute'].browse(res.get('attribute_id')) or False
+
+                cost, cost_unit = goods.get_suggested_cost_by_warehouse(
+                    warehouses[0], res.get('goods_qty'), attribute=attribute)
                 res.update({'cost': cost, 'cost_unit': cost_unit, 'lot_id': False})
 
         return res
@@ -74,7 +78,8 @@ class wh_move_line(models.Model):
                             line.id, matching.get('qty'), matching.get('uos_qty'))
                 else:
                     matching_records, cost = line.goods_id.get_matching_records(
-                        line.warehouse_id, line.goods_qty, line.goods_uos_qty)
+                        line.warehouse_id, line.goods_qty,
+                        uos_qty=line.goods_uos_qty, attribute=line.attribute_id)
 
                     for matching in matching_records:
                         matching_obj.create_matching(matching.get('line_in_id'),

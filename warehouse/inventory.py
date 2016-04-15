@@ -301,7 +301,9 @@ class wh_inventory_line(models.Model):
         for inventory in self:
 
             cost, cost_unit = inventory.goods_id.get_suggested_cost_by_warehouse(
-                inventory.warehouse_id, abs(inventory.difference_qty), lot_id=inventory.new_lot_id)
+                inventory.warehouse_id, abs(inventory.difference_qty),
+                lot_id=inventory.new_lot_id, attribute=inventory.attribute_id)
+
             return {
                 'warehouse_id': wh_type == 'out' and inventory.warehouse_id.id or inventory_warehouse.id,
                 'warehouse_dest_id': wh_type == 'in' and inventory.warehouse_id.id or inventory_warehouse.id,

@@ -1,6 +1,6 @@
 <openerp>
     <data>
-        
+
         <record id="attribute_color" model="core.category">
             <field name="name">颜色</field>
             <field name="type">attribute</field>
@@ -9,17 +9,17 @@
             <field name="name">尺码</field>
             <field name="type">attribute</field>
         </record>
-        
+
         <record id="black" model="attribute.value.value">
             <field name="name">黑</field>
             <field name="category_id" ref="attribute_color" />
         </record>
-        
+
         <record id="white" model="attribute.value.value">
             <field name="name">白</field>
             <field name="category_id" ref="attribute_color" />
         </record>
-        
+
         <!-- 管理批号的产品 -->
         <record id="mouse" model="goods">
             <field name="code">001</field>
@@ -43,7 +43,7 @@
             <field name="cost">0.30</field>
             <field name="conversion">12</field>
        </record>
-        
+
         <!--多属性的产品-->
         <record id="keyboard" model="goods">
             <field name="code">003</field>
@@ -55,7 +55,36 @@
             <field name="using_batch">True</field>
             <field name="cost">800</field>
        </record>
-       
+
+       <!-- 多属性无批次的产品 -->
+       <record id="iphone" model="goods">
+           <field name="code">005</field>
+           <field name="name">iPhone</field>
+           <field name="category_id" ref="core.goods_category_1"/>
+           <field name="uom_id" ref="core.uom_pc"/>
+           <field name="uos_id" ref="core.uom_pc"/>
+           <field name="conversion">1</field>
+           <field name="cost">5000</field>
+      </record>
+
+      <record id="iphone_white" model="attribute">
+          <field name="goods_id" ref="goods.iphone"/>
+      </record>
+
+      <record id="iphone_value_white" model="attribute.value">
+          <field name="attribute_id" ref="goods.iphone_white"/>
+          <field name="value_id" ref="goods.white"/>
+          <field name="category_id" ref="goods.attribute_color"/>
+      </record>
+      <record id="iphone_black" model="attribute">
+          <field name="goods_id" ref="goods.iphone"/>
+      </record>
+      <record id="iphone_value_black" model="attribute.value">
+          <field name="attribute_id" ref="goods.iphone_black"/>
+          <field name="value_id" ref="goods.black"/>
+          <field name="category_id" ref="goods.attribute_color"/>
+      </record>
+
        <!--套装产品-->
         <record id="keyboard_mouse" model="goods">
             <field name="code">004</field>
@@ -66,7 +95,7 @@
             <field name="conversion">1</field>
             <field name="cost">4000</field>
        </record>
-       
+
        <record id="keyboard_white" model="attribute">
             <field name="goods_id" ref="goods.keyboard"/>
         </record>
@@ -83,19 +112,19 @@
             <field name="value_id" ref="goods.black"/>
             <field name="category_id" ref="goods.attribute_color"/>
         </record>
-        
+
         <record id="goods_price_0" model="goods.price">
             <field name="goods_id" ref="goods.keyboard"/>
             <field eval="2000.0" name="price"/>
             <field name="category_id" ref="core.customer_category_1"/>
         </record>
-        
+
         <record id="goods_price_1" model="goods.price">
             <field name="goods_id" ref="goods.keyboard"/>
             <field eval="1500.0" name="price"/>
             <field name="category_id" ref="core.customer_category_2"/>
         </record>
-        
+
         <record id="goods_price_2" model="goods.price">
             <field name="goods_id" ref="goods.keyboard"/>
             <field eval="1200.0" name="price"/>

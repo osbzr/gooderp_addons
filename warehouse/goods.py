@@ -55,14 +55,15 @@ class goods(models.Model):
 
         return self.cost
 
-    def get_suggested_cost_by_warehouse(self, warehouse, qty, lot_id=None, ignore_move=None):
+    def get_suggested_cost_by_warehouse(
+            self, warehouse, qty, lot_id=None, attribute=None, ignore_move=None):
         # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
         # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
         if lot_id:
             records, cost = self.get_matching_records_by_lot(lot_id, qty, suggested=True)
         else:
             records, cost = self.get_matching_records(
-                warehouse, qty, ignore_stock=True, ignore=ignore_move)
+                warehouse, qty, attribute=attribute, ignore_stock=True, ignore=ignore_move)
 
         matching_qty = sum(record.get('qty') for record in records)
         if matching_qty:
@@ -94,7 +95,8 @@ class goods(models.Model):
         return [{'line_in_id': lot_id.id, 'qty': qty, 'uos_qty': uos_qty}], \
             lot_id.get_real_cost_unit() * qty
 
-    def get_matching_records(self, warehouse, qty, uos_qty=0, ignore_stock=False, ignore=None):
+    def get_matching_records(self, warehouse, qty, uos_qty=0,
+                             attribute=None, ignore_stock=False, ignore=None):
         # @ignore_stock: 当参数指定为True的时候，此时忽略库存警告
         # @ignore: 一个move_line列表，指定查询成本的时候跳过这些move
         matching_records = []
@@ -110,6 +112,9 @@ class goods(models.Model):
                     ignore = [ignore]
 
                 domain.append(('id', 'not in', ignore))
+
+            if attribute:
+                domain.append(('attribute_id', '=', attribute.id))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
             lines = self.env['wh.move.line'].search(domain, order='date, id')
