@@ -146,7 +146,9 @@ class auxiliary_financing(models.Model):
     _name = 'auxiliary.financing'
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
-    type = fields.Selection(u'分类',)
+    type = fields.Many2one('finance.category', u'分类',
+                            domain=[('type', '=', 'auxiliary_financing')],
+                            context={'type': 'auxiliary_financing'})
 
 
 class currency_category(models.Model):

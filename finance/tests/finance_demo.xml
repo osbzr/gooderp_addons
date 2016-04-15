@@ -9,7 +9,7 @@
         </record>
         <!--新建凭证-->
         <record id='voucher_1' model='voucher'>
-            <field name='number'>FV0002</field>
+            <field name='name'>FV0002</field>
             <field name='document_word_id' ref='finance.document_word_1'/>
         </record>
         <record id='voucher_line_1' model='voucher.line'>
