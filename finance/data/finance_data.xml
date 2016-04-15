@@ -10,30 +10,6 @@
             <field name='name'>非流动资产</field>
             <field name='type'>finance_account</field>
         </record>
-        <record id='finance_category_3' model='finance.category'>
-            <field name='name'>客户</field>
-            <field name='type'>auxiliary_financing</field>
-        </record>
-        <record id='finance_category_4' model='finance.category'>
-            <field name='name'>供应商</field>
-            <field name='type'>auxiliary_financing</field>
-        </record>
-        <record id='finance_category_5' model='finance.category'>
-            <field name='name'>职员</field>
-            <field name='type'>auxiliary_financing</field>
-        </record>
-        <record id='finance_category_6' model='finance.category'>
-            <field name='name'>项目</field>
-            <field name='type'>auxiliary_financing</field>
-        </record>
-        <record id='finance_category_7' model='finance.category'>
-            <field name='name'>部门</field>
-            <field name='type'>auxiliary_financing</field>
-        </record>
-        <record id='finance_category_8' model='finance.category'>
-            <field name='name'>存货</field>
-            <field name='type'>auxiliary_financing</field>
-        </record>
         
         <!--凭证字-->
         <record id='document_word_1' model='document.word'>

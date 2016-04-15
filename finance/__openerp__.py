@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['base', 'decimal_precision'],
+    'depends': ['base', 'decimal_precision','core'],
     'demo': [
              'tests/finance_demo.xml',
         ],
