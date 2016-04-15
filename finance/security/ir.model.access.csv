@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_voucher,access_voucher,model_voucher,,1,1,1,1
+access_voucher_line,access_voucher_line,model_voucher_line,,1,1,1,1
+access_finance_period,access_finance_period,model_finance_period,,1,1,1,1
+access_document_word,access_document_word,model_document_word,,1,1,1,1
+access_finance_account,access_finance_account,model_finance_account,,1,1,1,1
+access_finance_category,access_finance_category,model_finance_category,,1,1,1,1
+access_auxiliary_financing,access_auxiliary_financing,model_auxiliary_financing,,1,1,1,1
