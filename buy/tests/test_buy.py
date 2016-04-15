@@ -298,3 +298,4 @@ class test_buy_receipt(TransactionCase):
         receipt.buy_receipt_done()
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
+            self.assertTrue(line.using_attribute)
