@@ -192,6 +192,7 @@ class test_buy_receipt(TransactionCase):
         '''测试返回付款状态'''
         self.receipt._get_buy_money_state()
         self.receipt.buy_receipt_done()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.receipt.money_state == u'未付款')
         self.receipt._get_buy_money_state()
         self.receipt.payment = self.receipt.amount - 1
@@ -205,6 +206,7 @@ class test_buy_receipt(TransactionCase):
         '''测试返回退款状态'''
         self.return_receipt._get_buy_return_state()
         self.return_receipt.buy_receipt_done()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
         self.return_receipt._get_buy_money_state()
         self.return_receipt.payment = self.return_receipt.amount - 1
