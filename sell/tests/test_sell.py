@@ -121,7 +121,7 @@ class Test_sell(TransactionCase):
         # 折扣率 on_change 变化
         self.sell_order_line.discount_rate = 20
         # 通过onchange来改变 goods_id
-        self.sell_order_line.onchange_goods_id()
+#         self.sell_order_line.onchange_goods_id()
         self.sell_order_line.onchange_discount_rate()
 
         self.assertEqual(self.sell_order_line.amount, 80)
@@ -252,3 +252,25 @@ class Test_sell(TransactionCase):
                [('id', '=', move_id)])
         self.assertTrue(not move)
         self.assertTrue(not move.line_out_ids)
+
+    def test_onchange_goods_id(self):
+        '''当销货订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
+        goods = self.env.ref('goods.keyboard')
+        goods.default_wh = self.env.ref('warehouse.hd_stock').id
+        c_category_id = self.order.partner_id.c_category_id
+        price_ids = self.env['goods.price'].search(
+                                [('goods_id', '=', goods.id),
+                                 ('category_id', '=', c_category_id.id)])
+        for line in self.order.line_ids:
+            line.goods_id = goods
+            line.onchange_goods_id()
+            self.assertTrue(line.uom_id.name == u'件')
+            wh_id = line.warehouse_id.id
+            self.assertTrue(wh_id == goods.default_wh.id)
+
+            # 测试价格是否是商品价格清单中的价格
+            self.assertTrue(line.price == price_ids.price)
+            # 测试不设置订单客户的客户类别时是否弹出警告
+            self.order.partner_id.c_category_id = False
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()

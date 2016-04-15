@@ -289,10 +289,13 @@ class buy_order_line(models.Model):
     @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位和默认仓库'''
+        '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本价'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.warehouse_dest_id = self.goods_id.default_wh  # 取产品的默认仓库
+            if not self.goods_id.cost:
+                raise except_orm(u'错误', u'请先设置商品的成本！')
+            self.price = self.goods_id.cost
 
     @api.one
     @api.onchange('quantity', 'price', 'discount_rate')
@@ -387,7 +390,8 @@ class buy_receipt(models.Model):
         elif self.line_out_ids:
             # 退货时优惠前总金额
             total = sum(line.subtotal for line in self.line_out_ids)
-        self.discount_amount = total * self.discount_rate * 0.01
+        if self.discount_rate:
+            self.discount_amount = total * self.discount_rate * 0.01
 
     def get_move_origin(self, vals):
         return self._name + (self.env.context.get('is_return') and
