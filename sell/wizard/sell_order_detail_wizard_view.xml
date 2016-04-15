@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="sell_order_detail_wizard_form" model="ir.ui.view">
+            <field name="name">sell.order.detail.wizard.form</field>
+            <field name="model">sell.order.detail.wizard</field>
+            <field name="arch" type="xml">
+                <form string="销售明细表">
+                    <group>
+                        <group>
+                            <field name="date_start" required="1"/>
+                            <field name="date_end" required="1"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="goods_id"/>
+                            <field name='staff_id'/>
+                        </group>
+                        <footer>
+                            <button name="button_ok" type="object" string="确定" class="oe_highlight"/>
+                            or
+                            <button string="取消" class="oe_link" special="cancel"/>
+                        </footer>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="sell_order_detail_wizard_action" model="ir.actions.act_window">
+            <field name="name">销售明细表</field>
+            <field name="res_model">sell.order.detail.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="menu_sell_order_detail" name="销售明细表" action="sell_order_detail_wizard_action"
+        	parent="menu_sell_report" sequence="2"/>
+    </data>
+</openerp>

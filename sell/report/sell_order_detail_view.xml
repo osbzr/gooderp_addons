@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<record id="sell_order_detail_tree" model="ir.ui.view">
+            <field name="name">sell.order.detail.tree</field>
+            <field name="model">sell.order.detail</field>
+            <field name="arch" type="xml">
+                <tree string="销售明细表">
+                	<field name="date"/>
+                	<field name="order_name"/>
+                	<field name="type"/>
+                	<field name="staff_id"/>
+                	<field name="partner_id"/>
+                	<field name="goods_code"/>
+                    <field name="goods_id"/>
+                    <field name="attribute"/>
+                    <field name="uom"/>
+                    <field name="warehouse_dest"/>
+                    <field name="qty"/>
+                    <field name="price"/>
+                    <field name="amount"/>
+                    <field name="tax_amount"/>
+                    <field name="subtotal"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>
