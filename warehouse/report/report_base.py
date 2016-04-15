@@ -151,9 +151,19 @@ class report_base(models.Model):
     def _compute_limit_and_offset(self, result, limit, offset):
         return result[offset:limit + offset]
 
+    def update_result_none_to_false(self, result):
+        for val in result:
+            for key, value in val.iteritems():
+                if value is None:
+                    val[key] = False
+
+        return result
+
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=80, order=None):
         result = self.collect_data_by_sql(sql_type='out')
+
+        result = self.update_result_none_to_false(result)
 
         result = self._compute_domain(result, domain)
         result = self._compute_order(result, order)

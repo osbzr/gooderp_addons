@@ -9,6 +9,7 @@
                     <field name='goods' />
                     <field name='uom' />
                     <field name='uos' />
+                    <field name='attribute_id' />
                     <field name='lot' />
                     <field name='uos_qty' />
                     <field name='qty' />

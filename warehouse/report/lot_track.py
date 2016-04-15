@@ -13,6 +13,7 @@ class report_lot_track(models.Model):
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
     lot = fields.Char(u'批号')
+    attribute_id = fields.Many2one('attribute', u'属性')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')
     uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Goods Quantity'))
@@ -34,6 +35,7 @@ class report_lot_track(models.Model):
                 uom.name as uom,
                 uos.name as uos,
                 %s.lot as lot,
+                line.attribute_id as attribute_id,
                 '%s' as type,
                 wh.name as warehouse,
                 line.date as date,

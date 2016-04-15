@@ -13,6 +13,7 @@ class report_lot_status(models.Model):
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
     lot = fields.Char(u'批号')
+    attribute_id = fields.Many2one('attribute', u'属性')
     status = fields.Char(u'状态')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')
@@ -29,6 +30,7 @@ class report_lot_status(models.Model):
                         uom.name as uom,
                         uos.name as uos,
                         line.lot as lot,
+                        line.attribute_id as attribute_id,
                         '在库' as status,
                         wh.name as warehouse,
                         max(line.date) as date,
@@ -44,8 +46,9 @@ class report_lot_status(models.Model):
                 WHERE line.lot IS NOT NULL
                   AND line.qty_remaining > 0
                   AND wh.type = 'stock'
+                  AND line.state = 'done'
 
-                GROUP BY goods, uom, uos, lot, warehouse
+                GROUP BY goods, uom, uos, lot, attribute_id, warehouse
 
                 ORDER BY goods, lot, warehouse
             )

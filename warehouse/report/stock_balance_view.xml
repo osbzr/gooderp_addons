@@ -8,6 +8,7 @@
                 <tree string='商品库存余额表'>
                     <field name='goods' />
                     <field name='lot' />
+                    <field name='attribute_id' />
                     <field name='uom' />
                     <field name='uos' />
                     <field name='warehouse' />
