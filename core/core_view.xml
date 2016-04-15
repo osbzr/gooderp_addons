@@ -69,7 +69,7 @@
                     <field name="name"/>
                     <field name="street"/>
                     <field name="phone"/>
-                    <field name="fax"/>
+                    <field name="fax" string="手机"/>
                     <field name="zip"/>
                     <field name="start_date"/>
                     <field name="currency_id"/>
