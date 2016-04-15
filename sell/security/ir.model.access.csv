@@ -3,3 +3,4 @@ access_sell_order,access_sell_order,model_sell_order,,1,1,1,1
 access_sell_order_line,access_sell_order_line,model_sell_order_line,,1,1,1,1
 access_sell_delivery,access_sell_delivery,model_sell_delivery,,1,1,1,1
 access_customer_statements_report,access_customer_statements_report,model_customer_statements_report,,1,1,1,1
+access_sell_summary_goods,access_sell_summary_goods,model_sell_summary_goods,,1,1,1,1
