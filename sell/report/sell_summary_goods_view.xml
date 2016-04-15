@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<record id="sell_summary_goods_tree" model="ir.ui.view">
+            <field name="name">sell.summary.goods.tree</field>
+            <field name="model">sell.summary.goods</field>
+            <field name="arch" type="xml">
+                <tree string="销售汇总表（按商品）">
+                	<field name="goods_categ"/>
+                	<field name="goods_code"/>
+                    <field name="goods"/>
+                    <field name="attribute"/>
+                    <field name="warehouse"/>
+                    <field name="uos"/>
+                    <field name="qty_uos"/>
+                    <field name="uom"/>
+                    <field name="qty"/>
+                    <field name="price"/>
+                    <field name="amount"/>
+                    <field name="tax_amount"/>
+                    <field name="subtotal"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>

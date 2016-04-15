@@ -143,7 +143,7 @@ class test_track_wizard(TransactionCase):
 
 class test_detail_wizard(TransactionCase):
     '''测试销售订单明细表向导'''
- 
+
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_detail_wizard, self).setUp()
@@ -159,14 +159,14 @@ class test_detail_wizard(TransactionCase):
         delivery_2 = self.env['sell.delivery'].search(
                     [('order_id', '=', order_2.id)])
         delivery_2.sell_delivery_done()
- 
+
         # 销货订单产生退货单，并审核退货单
         sell_return = self.env.ref('sell.sell_order_return')
         sell_return.sell_order_done()
         delivery_return = self.env['sell.delivery'].search(
                     [('order_id', '=', sell_return.id)])
         delivery_return.sell_delivery_done()
- 
+
         self.detail_obj = self.env['sell.order.detail.wizard']
         self.detail = self.detail_obj.create({})
 
@@ -195,3 +195,46 @@ class test_detail_wizard(TransactionCase):
         self.detail.partner_id = False
         self.detail.staff_id = False
         self.detail.button_ok()
+
+
+class test_goods_wizard(TransactionCase):
+    '''测试销售汇总表（按商品）向导'''
+
+    def setUp(self):
+        ''' 准备报表数据 '''
+        super(test_goods_wizard, self).setUp()
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        self.order = self.env.ref('sell.sell_order_2')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.delivery.sell_delivery_done()
+        self.goods_obj = self.env['sell.summary.goods.wizard']
+        self.goods = self.goods_obj.create({})
+
+    def test_button_ok(self):
+        '''销售汇总表（按商品）向导确认按钮'''
+        # 日期报错
+        goods = self.goods_obj.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            goods.button_ok()
+
+    def test_goods_report(self):
+        '''测试销售汇总表（按商品）报表'''
+        summary_goods = self.env['sell.summary.goods'].create({})
+        context = self.goods.button_ok().get('context')
+        results = summary_goods.with_context(context).search_read(domain=[])
+        new_goods_wizard = self.goods.copy()
+        new_goods_wizard.goods_id = 3
+        new_goods_wizard.partner_id = 3
+        goods_categ_id = self.env.ref('core.goods_category_1')
+        new_goods_wizard.goods_categ_id = goods_categ_id.id
+        new_context = new_goods_wizard.button_ok().get('context')
+        new_results = summary_goods.with_context(new_context).search_read(
+                                                                  domain=[])
+        self.assertEqual(len(results), 1)
+        self.assertEqual(len(new_results), 0)
