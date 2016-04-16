@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    OpenERP, Open Source Management Solution    
-#    Copyright (C) 2014 上海开阖软件有限公司 (http://www.osbzr.com). 
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2014 上海开阖软件有限公司 (http://www.osbzr.com).
 #    All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,12 @@
 #
 ##############################################################################
 {
-    'name':'GOODERP 销售模块',
-    'author':'jeff@osbzr.com,jacky@osbzr.com',
+    'name': 'GOODERP 销售模块',
+    'author': 'jeff@osbzr.com,jacky@osbzr.com',
     'website': 'https://www.osbzr.com',
     'description': '''gooderp销售实例，通过安装gooderp模块展示openerp的销售流程''',
-    'depends':['mail', 'core', 'warehouse', 'money'],
-    'data':[
+    'depends': ['mail', 'core', 'warehouse', 'money'],
+    'data': [
             'sell_view.xml',
             'sell_data.xml',
             'report/customer_statements_view.xml',
