@@ -94,6 +94,4 @@ class buy_summary_goods(models.Model):
 
     def collect_data_by_sql(self, sql_type='out'):
         collection = self.execute_sql(sql_type='out')
-
         return collection
-
