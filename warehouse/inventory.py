@@ -28,8 +28,10 @@ class wh_inventory(models.Model):
     uos_not_zero = fields.Boolean(u'辅助数量不为0')
     out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False)
     in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False)
-    state = fields.Selection(INVENTORY_STATE, u'状态', copy=False, default='draft')
-    line_ids = fields.One2many('wh.inventory.line', 'inventory_id', u'明细', copy=False)
+    state = fields.Selection(
+        INVENTORY_STATE, u'状态', copy=False, default='draft')
+    line_ids = fields.One2many(
+        'wh.inventory.line', 'inventory_id', u'明细', copy=False)
     note = fields.Text(u'备注')
 
     @api.multi
@@ -55,7 +57,8 @@ class wh_inventory(models.Model):
     def delete_confirmed_wh(self):
         for inventory in self:
             if inventory.state == 'confirmed':
-                if (inventory.out_id and inventory.out_id.state == 'done') or (inventory.in_id and inventory.in_id.state == 'done'):
+                if (inventory.out_id and inventory.out_id.state == 'done') \
+                  or (inventory.in_id and inventory.in_id.state == 'done'):
                     raise osv.except_osv(u'错误', u'请先反审核掉相关的盘盈盘亏单据')
                 else:
                     inventory.out_id.unlink()
@@ -66,8 +69,8 @@ class wh_inventory(models.Model):
     def check_done(self):
         for inventory in self:
             if inventory.state == 'confirmed' and \
-                (not inventory.out_id or inventory.out_id.state == 'done') and \
-                    (not inventory.in_id or inventory.in_id.state == 'done'):
+              (not inventory.out_id or inventory.out_id.state == 'done') and \
+              (not inventory.in_id or inventory.in_id.state == 'done'):
                 self.state = 'done'
                 return True
 
@@ -103,7 +106,8 @@ class wh_inventory(models.Model):
         }
 
         for line in out_line:
-            out_vals['line_out_ids'].append([0, False, line.get_move_line(wh_type='out')])
+            out_vals['line_out_ids'].append(
+                [0, False, line.get_move_line(wh_type='out')])
 
         out_id = self.env['wh.out'].create(out_vals)
         inventory.out_id = out_id
@@ -115,7 +119,8 @@ class wh_inventory(models.Model):
         }
 
         for line in in_line:
-            in_vals['line_in_ids'].append([0, False, line.get_move_line(wh_type='in')])
+            in_vals['line_in_ids'].append(
+                [0, False, line.get_move_line(wh_type='in')])
 
         in_id = self.env['wh.in'].create(in_vals)
         inventory.in_id = in_id
@@ -124,14 +129,17 @@ class wh_inventory(models.Model):
     def generate_inventory(self):
         for inventory in self:
             out_line, in_line = [], []
-            for line in inventory.line_ids.filtered(lambda line: line.difference_qty or line.difference_uos_qty):
+            for line in inventory.line_ids.filtered(
+              lambda line: line.difference_qty or line.difference_uos_qty):
                 if line.difference_qty <= 0 and line.difference_uos_qty <= 0:
                     out_line.append(line)
                 elif line.difference_qty >= 0 and line.difference_uos_qty >= 0:
                     in_line.append(line)
                 else:
-                    raise osv.except_osv(u'错误',
-                        u'产品"%s"行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致' % line.goods_id.name)
+                    raise osv.except_osv(
+                        u'错误',
+                        u'产品"%s"行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏\
+                        方向不一致' % line.goods_id.name)
 
             if out_line:
                 self.create_losses_out(inventory, out_line)
@@ -147,7 +155,8 @@ class wh_inventory(models.Model):
     def get_line_detail(self, uos_zero=False):
         for inventory in self:
             if uos_zero:
-                remaining_text = '(line.qty_remaining > 0 OR line.uos_qty_remaining > 0)'
+                remaining_text = '(line.qty_remaining > 0 \
+                    OR line.uos_qty_remaining > 0)'
             else:
                 remaining_text = 'line.qty_remaining > 0'
 
@@ -172,7 +181,8 @@ class wh_inventory(models.Model):
                   AND line.state = 'done'
                   %s
 
-                GROUP BY wh.id, line.lot, line.attribute_id, goods.id, uom.id, uos.id
+                GROUP BY
+                  wh.id, line.lot, line.attribute_id, goods.id, uom.id, uos.id
             '''.format(remaining_text)
 
             extra_text = ''
@@ -180,7 +190,8 @@ class wh_inventory(models.Model):
                 extra_text += ' AND wh.id = %s' % inventory.warehouse_id.id
 
             if inventory.goods:
-                extra_text += " AND goods.name ILIKE '%%%s%%' " % inventory.goods
+                extra_text += " AND goods.name ILIKE '%%%s%%' " \
+                    % inventory.goods
 
             inventory.env.cr.execute(sql_text % extra_text)
             return inventory.env.cr.dictfetchall()
@@ -226,20 +237,28 @@ class wh_inventory_line(models.Model):
     warehouse_id = fields.Many2one('warehouse', u'仓库')
     goods_id = fields.Many2one('goods', u'产品')
     attribute_id = fields.Many2one('attribute', u'属性')
-    using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理')
-    force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
+    using_batch = fields.Boolean(
+        related='goods_id.using_batch', string=u'批号管理')
+    force_batch_one = fields.Boolean(
+        related='goods_id.force_batch_one', string=u'每批号数量为1')
     lot = fields.Char(u'批号')
     new_lot = fields.Char(u'盘盈批号')
     new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号')
     lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing')
     uom_id = fields.Many2one('uom', u'单位')
     uos_id = fields.Many2one('uom', u'辅助单位')
-    real_qty = fields.Float(u'系统库存', digits_compute=dp.get_precision('Goods Quantity'))
-    real_uos_qty = fields.Float(u'系统辅助单位库存', digits_compute=dp.get_precision('Goods Quantity'))
-    inventory_qty = fields.Float(u'盘点库存', digits_compute=dp.get_precision('Goods Quantity'))
-    inventory_uos_qty = fields.Float(u'盘点辅助单位库存', digits_compute=dp.get_precision('Goods Quantity'))
-    difference_qty = fields.Float(u'盘盈盘亏', digits_compute=dp.get_precision('Goods Quantity'))
-    difference_uos_qty = fields.Float(u'辅助单位盘盈盘亏', digits_compute=dp.get_precision('Goods Quantity'))
+    real_qty = fields.Float(
+        u'系统库存', digits_compute=dp.get_precision('Goods Quantity'))
+    real_uos_qty = fields.Float(
+        u'系统辅助单位库存', digits_compute=dp.get_precision('Goods Quantity'))
+    inventory_qty = fields.Float(
+        u'盘点库存', digits_compute=dp.get_precision('Goods Quantity'))
+    inventory_uos_qty = fields.Float(
+        u'盘点辅助单位库存', digits_compute=dp.get_precision('Goods Quantity'))
+    difference_qty = fields.Float(
+        u'盘盈盘亏', digits_compute=dp.get_precision('Goods Quantity'))
+    difference_uos_qty = fields.Float(
+        u'辅助单位盘盈盘亏', digits_compute=dp.get_precision('Goods Quantity'))
 
     def check_difference_identical(self):
         if self.difference_qty * self.difference_uos_qty < 0:
@@ -294,19 +313,26 @@ class wh_inventory_line(models.Model):
     @api.one
     @api.onchange('inventory_uos_qty')
     def onchange_uos_qty(self):
-        self.inventory_qty = self.goods_id.conversion_unit(self.inventory_uos_qty)
+        self.inventory_qty = self.goods_id.conversion_unit(
+            self.inventory_uos_qty)
 
     def get_move_line(self, wh_type='in', context=None):
-        inventory_warehouse = self.env['warehouse'].get_warehouse_by_type('inventory')
+        inventory_warehouse = self.env['warehouse'] \
+            .get_warehouse_by_type('inventory')
         for inventory in self:
-
-            cost, cost_unit = inventory.goods_id.get_suggested_cost_by_warehouse(
-                inventory.warehouse_id, abs(inventory.difference_qty),
-                lot_id=inventory.new_lot_id, attribute=inventory.attribute_id)
+            cost, cost_unit = inventory.goods_id. \
+                get_suggested_cost_by_warehouse(
+                    inventory.warehouse_id, abs(inventory.difference_qty),
+                    lot_id=inventory.new_lot_id,
+                    attribute=inventory.attribute_id)
 
             return {
-                'warehouse_id': wh_type == 'out' and inventory.warehouse_id.id or inventory_warehouse.id,
-                'warehouse_dest_id': wh_type == 'in' and inventory.warehouse_id.id or inventory_warehouse.id,
+                'warehouse_id':
+                    wh_type == 'out' and inventory.warehouse_id.id or
+                    inventory_warehouse.id,
+                'warehouse_dest_id':
+                    wh_type == 'in' and inventory.warehouse_id.id or
+                    inventory_warehouse.id,
                 'lot': inventory.new_lot,
                 'lot_id': inventory.new_lot_id.id,
                 'goods_id': inventory.goods_id.id,
