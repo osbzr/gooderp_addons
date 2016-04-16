@@ -40,29 +40,30 @@ class buy_order_detail_wizard(models.TransientModel):
             domain.append(('move_id.partner_id', '=', self.partner_id.id))
 
         order_type = ''
-        total_qty = total_price = total_amount = total_tax_amount = total_subtotal =0
+        total_qty = total_price = total_amount = 0
+        total_tax_amount = total_subtotal = 0
         for line in self.env['wh.move.line'].search(domain, order='move_id'):
             if line.move_id.origin and 'return' in line.move_id.origin:
                 order_type = '退货'
             else:
                 order_type = '购货'
             detail = self.env['buy.order.detail'].create({
-                    'date': line.move_id.date,
-                    'order_name': line.move_id.name,
-                    'type': order_type,
-                    'partner_id': line.move_id.partner_id.id,
-                    'goods_code': line.goods_id.code,
-                    'goods_id': line.goods_id.id,
-                    'attribute': line.attribute_id.name,
-                    'uom': line.uom_id.name,
-                    'warehouse_dest': line.warehouse_dest_id.name,
-                    'qty': line.goods_qty,
-                    'price': line.price,
-                    'amount': line.amount,
-                    'tax_amount': line.tax_amount,
-                    'subtotal': line.subtotal,
-                    'note': line.note,
-                })
+                'date': line.move_id.date,
+                'order_name': line.move_id.name,
+                'type': order_type,
+                'partner_id': line.move_id.partner_id.id,
+                'goods_code': line.goods_id.code,
+                'goods_id': line.goods_id.id,
+                'attribute': line.attribute_id.name,
+                'uom': line.uom_id.name,
+                'warehouse_dest': line.warehouse_dest_id.name,
+                'qty': line.goods_qty,
+                'price': line.price,
+                'amount': line.amount,
+                'tax_amount': line.tax_amount,
+                'subtotal': line.subtotal,
+                'note': line.note,
+            })
             res.append(detail.id)
 
             total_qty += line.goods_qty

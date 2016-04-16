@@ -33,13 +33,15 @@ class buy_payment_wizard(models.TransientModel):
                 ('date', '<=', self.date_end),
                 ('state', '=', 'done')]
         if self.s_category_id:
-            cond.append(('partner_id.s_category_id', '=', self.s_category_id.id))
+            cond.append(
+                ('partner_id.s_category_id', '=', self.s_category_id.id)
+            )
         if self.partner_id:
             cond.append(('partner_id', '=', self.partner_id.id))
         if self.order_id:
             cond.append(('name', '=', self.order_id.id))
-
-        for receipt in self.env['buy.receipt'].search(cond, order='partner_id'):
+        objReceipt = self.env['buy.receipt']
+        for receipt in objReceipt.search(cond, order='partner_id'):
             purchase_amount = receipt.discount_amount + receipt.amount
             discount_amount = receipt.discount_amount
             amount = receipt.amount
@@ -56,17 +58,17 @@ class buy_payment_wizard(models.TransientModel):
                 balance = - balance
             # 用查找到的入库单信息来创建一览表
             payment = self.env['buy.payment'].create({
-                    'partner_id': receipt.partner_id.id,
-                    'type': order_type,
-                    'date': receipt.date,
-                    'order_name': receipt.name,
-                    'purchase_amount': purchase_amount,
-                    'discount_amount': discount_amount,
-                    'amount': amount,
-                    'payment': payment,
-                    'balance': balance,
-                    'note': receipt.note,
-                })
+                'partner_id': receipt.partner_id.id,
+                'type': order_type,
+                'date': receipt.date,
+                'order_name': receipt.name,
+                'purchase_amount': purchase_amount,
+                'discount_amount': discount_amount,
+                'amount': amount,
+                'payment': payment,
+                'balance': balance,
+                'note': receipt.note,
+            })
             res.append(payment.id)
 
             # 用查找到的入库单产生的付款单信息来创建一览表
@@ -85,19 +87,19 @@ class buy_payment_wizard(models.TransientModel):
                         res.append(payment2.id)
 
             # 创建一览表的小计行
-            if amount == 0 and payment== 0:
+            if amount == 0 and payment == 0:
                 payment_rate = 100
             else:
                 payment_rate = (payment / amount) * 100
-            payment_total =  self.env['buy.payment'].create({
-                            'order_name': u'小计',
-                            'purchase_amount': purchase_amount,
-                            'discount_amount': discount_amount,
-                            'amount': amount,
-                            'payment': payment,
-                            'balance': amount - payment,
-                            'payment_rate': payment_rate,
-                        })
+            payment_total = self.env['buy.payment'].create({
+                'order_name': u'小计',
+                'purchase_amount': purchase_amount,
+                'discount_amount': discount_amount,
+                'amount': amount,
+                'payment': payment,
+                'balance': amount - payment,
+                'payment_rate': payment_rate,
+            })
             res.append(payment_total.id)
         view = self.env.ref('buy.buy_payment_tree')
         return {

@@ -2,6 +2,7 @@
 
 from openerp import fields, models
 
+
 class buy_payment(models.TransientModel):
     _name = 'buy.payment'
     _description = u'采购付款一览表'

@@ -3,6 +3,7 @@
 from openerp import fields, models
 import datetime
 
+
 class buy_summary_partner(models.Model):
     _name = 'buy.summary.partner'
     _inherit = 'report.base'
@@ -49,7 +50,8 @@ class buy_summary_partner(models.Model):
         FROM wh_move_line AS wml
             LEFT JOIN wh_move wm ON wml.move_id = wm.id
             LEFT JOIN partner ON wm.partner_id = partner.id
-            LEFT JOIN core_category AS s_categ ON partner.s_category_id = s_categ.id
+            LEFT JOIN core_category AS s_categ
+                 ON partner.s_category_id = s_categ.id
             LEFT JOIN goods ON wml.goods_id = goods.id
             LEFT JOIN attribute AS attr ON wml.attribute_id = attr.id
             LEFT JOIN warehouse AS wh ON wml.warehouse_dest_id = wh.id
@@ -74,7 +76,8 @@ class buy_summary_partner(models.Model):
 
     def order_sql(self, sql_type='out'):
         return '''
-        GROUP BY s_category,partner,goods_code,goods,attribute,warehouse_dest,uos,uom
+        GROUP BY s_category,partner,goods_code,goods,
+                 attribute,warehouse_dest,uos,uom
         ORDER BY partner,goods_code,attribute,warehouse_dest
         '''
 
@@ -85,8 +88,10 @@ class buy_summary_partner(models.Model):
         return {
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
-            'partner_id': context.get('partner_id') and context.get('partner_id')[0] or '',
-            'goods_id': context.get('goods_id') and context.get('goods_id')[0] or '',
+            'partner_id': context.get('partner_id') and
+            context.get('partner_id')[0] or '',
+            'goods_id': context.get('goods_id') and
+            context.get('goods_id')[0] or '',
         }
 
     def _compute_order(self, result, order):
