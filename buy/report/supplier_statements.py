@@ -1,25 +1,7 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
-#    OpenERP, Open Source Management Solution
-#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
 
 from openerp import fields, models, api, tools
+
 
 class supplier_statements_report(models.Model):
     _name = "supplier.statements.report"
@@ -30,7 +12,10 @@ class supplier_statements_report(models.Model):
     @api.one
     @api.depends('amount', 'pay_amount', 'partner_id')
     def _compute_balance_amount(self):
-        pre_record = self.search([('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
+        pre_record = self.search([
+            ('id', '=', self.id - 1),
+            ('partner_id', '=', self.partner_id.id)
+        ])
         # 相邻的两条记录，partner不同，应收款余额重新计算
         if pre_record:
             if pre_record.name != u'期初余额':
@@ -48,7 +33,11 @@ class supplier_statements_report(models.Model):
     benefit_amount = fields.Float(string=u'优惠金额', readonly=True)
     amount = fields.Float(string=u'应付金额', readonly=True)
     pay_amount = fields.Float(string=u'实际付款金额', readonly=True)
-    balance_amount = fields.Float(string=u'应付款余额', compute='_compute_balance_amount', readonly=True)
+    balance_amount = fields.Float(
+        string=u'应付款余额',
+        compute='_compute_balance_amount',
+        readonly=True
+    )
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
@@ -161,6 +150,7 @@ class supplier_statements_report(models.Model):
                 'res_id': buy.id,
                 'context': {'type': 'pay'}
             }
+
 
 class supplier_statements_report_with_goods(models.TransientModel):
     _name = "supplier.statements.report.with.goods"

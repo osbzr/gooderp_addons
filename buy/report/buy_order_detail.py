@@ -2,6 +2,7 @@
 
 from openerp import fields, models
 
+
 class buy_order_detail(models.TransientModel):
     _name = 'buy.order.detail'
     _description = u'采购明细表'
@@ -17,7 +18,7 @@ class buy_order_detail(models.TransientModel):
     warehouse_dest = fields.Char(u'仓库')
     qty = fields.Float(u'数量')
     price = fields.Float(u'单价')
-    amount = fields.Float(u'采购金额') # 商品的购货金额
+    amount = fields.Float(u'采购金额')  # 商品的购货金额
     tax_amount = fields.Float(u'税额')
     subtotal = fields.Float(u'价税合计')
     note = fields.Char(u'备注')

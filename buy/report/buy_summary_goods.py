@@ -3,6 +3,7 @@
 from openerp import fields, models
 import datetime
 
+
 class buy_summary_goods(models.Model):
     _name = 'buy.summary.goods'
     _inherit = 'report.base'
@@ -81,8 +82,10 @@ class buy_summary_goods(models.Model):
         return {
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
-            'partner_id': context.get('partner_id') and context.get('partner_id')[0] or '',
-            'goods_id': context.get('goods_id') and context.get('goods_id')[0] or '',
+            'partner_id': context.get('partner_id') and
+            context.get('partner_id')[0] or '',
+            'goods_id': context.get('goods_id') and
+            context.get('goods_id')[0] or '',
         }
 
     def _compute_order(self, result, order):
