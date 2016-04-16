@@ -21,7 +21,7 @@ class sell_summary_goods_wizard(models.TransientModel):
     date_end = fields.Date(u'结束日期', default=_default_date_end)
     partner_id = fields.Many2one('partner', u'客户')
     goods_id = fields.Many2one('goods', u'商品')
-    goods_categ_id = fields.Many2one('core.cetegory', u'商品类别')
+    goods_categ_id = fields.Many2one('core.category', u'商品类别')
 
     @api.multi
     def button_ok(self):
