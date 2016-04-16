@@ -26,11 +26,11 @@ class buy_summary_partner_wizard(models.TransientModel):
     def button_ok(self):
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
-
+        read_fields = ['date_start', 'date_end', 'partner_id', 'goods_id']
         return {
             'name': u'采购汇总表（按供应商）',
             'view_mode': 'tree',
             'res_model': 'buy.summary.partner',
             'type': 'ir.actions.act_window',
-            'context': self.read(['date_start', 'date_end', 'partner_id', 'goods_id'])[0],
+            'context': self.read(read_fields)[0],
         }
