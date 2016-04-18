@@ -315,3 +315,63 @@ class test_partner_wizard(TransactionCase):
         new_context = new_partner_wizard.button_ok().get('context')
         new_results = summary_partner.with_context(new_context).search_read(
                                                                   domain=[])
+
+
+class test_staff_wizard(TransactionCase):
+    '''测试销售汇总表（按销售人员）向导'''
+
+    def setUp(self):
+        ''' 准备报表数据 '''
+        super(test_staff_wizard, self).setUp()
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        self.order = self.env.ref('sell.sell_order_2')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.delivery.sell_delivery_done()
+        self.staff_wizard_obj = self.env['sell.summary.staff.wizard']
+        self.staff_wizard = self.staff_wizard_obj.create({})
+
+    def test_button_ok(self):
+        '''销售汇总表（按销售人员）向导确认按钮'''
+        # 日期报错
+        staff_wizard = self.staff_wizard_obj.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            staff_wizard.button_ok()
+        # 按销售人员搜索
+        self.staff_wizard.staff_id = self.env.ref('core.lili').id
+        self.staff_wizard.button_ok()
+        # 按商品搜索
+        self.staff_wizard.staff_id = False
+        self.staff_wizard.goods_id = self.env.ref('goods.cable').id
+        self.staff_wizard.button_ok()
+        # 按商品类别搜索
+        self.staff_wizard.staff_id = False
+        self.staff_wizard.goods_id = False
+        self.staff_wizard.goods_categ_id = \
+            self.env.ref('core.goods_category_1').id
+        self.staff_wizard.button_ok()
+        # 按日期搜索
+        self.staff_wizard.staff_id = False
+        self.staff_wizard.goods_id = False
+        self.staff_wizard.goods_categ_id = False
+        self.staff_wizard.button_ok()
+
+    def test_staff_report(self):
+        '''测试销售汇总表（按销售人员）报表'''
+        summary_staff = self.env['sell.summary.staff'].create({})
+        context = self.staff_wizard.button_ok().get('context')
+        results = summary_staff.with_context(context).search_read(domain=[])
+
+        new_staff_wizard = self.staff_wizard.copy()
+        new_staff_wizard.staff_id = self.env.ref('core.lili').id
+        new_staff_wizard.goods_id = self.env.ref('goods.cable').id
+        new_staff_wizard.goods_categ_id = \
+            self.env.ref('core.goods_category_1').id
+        new_context = new_staff_wizard.button_ok().get('context')
+        new_results = summary_staff.with_context(new_context).search_read(
+                                                                  domain=[])
