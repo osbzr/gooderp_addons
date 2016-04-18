@@ -12,4 +12,5 @@ class test_core(TransactionCase):
             self.env.ref('core.customer_category_1').unlink()
 
     def test_res_currency(self):
+        """测试阿拉伯数字转换称中文大写数字的方法"""
         self.env['res.currency'].rmb_upper(10000000)
