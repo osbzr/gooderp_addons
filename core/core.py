@@ -63,7 +63,6 @@ class partner(models.Model):
     receivable = fields.Float(u'应收余额', readonly=True)
     payable = fields.Float(u'应付余额', readonly=True)
 
-
 class goods(models.Model):
     _name = 'goods'
     code = fields.Char(u'编号')
