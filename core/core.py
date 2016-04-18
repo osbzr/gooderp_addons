@@ -63,14 +63,6 @@ class partner(models.Model):
     receivable = fields.Float(u'应收余额', readonly=True)
     payable = fields.Float(u'应付余额', readonly=True)
 
-    @api.onchange('partner_address')
-    def onchange_partner_id(self):
-        if not self.partner_address:
-            return {}
-#         self.city_id = self.partner_address.city_id
-#         self.county_id = self.partner_address.county_id
-#         self.province_id = self.partner_address.province_id
-
 class goods(models.Model):
     _name = 'goods'
     code = fields.Char(u'编号')
