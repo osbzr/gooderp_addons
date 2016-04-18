@@ -62,7 +62,19 @@ class partner(models.Model):
                                     context={'type': 'supplier'})
     receivable = fields.Float(u'应收余额', readonly=True)
     payable = fields.Float(u'应付余额', readonly=True)
+    partner_address = fields.Many2one('res.partner', u'业务伙伴地址')
+    city_id = fields.Many2one('all.city', u'市')
+    county_id = fields.Many2one('all.county', u'县')
+    province_id = fields.Many2one('country.state', u'省',
+                                  domain="[('country_id.name','=','中国')]")
 
+    @api.onchange('partner_address')
+    def onchange_partner_id(self):
+        if not self.partner_address:
+            return {}
+#         self.city_id = self.partner_address.city_id
+#         self.county_id = self.partner_address.county_id
+#         self.province_id = self.partner_address.province_id
 
 class goods(models.Model):
     _name = 'goods'

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="partner_address_form" model="ir.ui.view">
+            <field name='name'>partner.address.form</field>
+            <field name='model'>res.partner</field>
+            <field eval="0" name="priority"/>
+            <field name="arch" type="xml">
+                <form string="PARTNER ADDRESS FORM">
+	                <sheet>
+	                    <group>
+	                        <group>
+	                            <field name="address"/>
+	                            <field name="mobile"/>
+	                            <field name="contact_people"/>
+	                            <field name="province_id"/>
+	                            <field name="county_id"/>
+	                        </group>
+	                        <group>
+	                            <field name="phone"/>
+	                            <field name="zip"/>
+	                            <field name="is_default_add"/>
+	                            <field name="city_id"/>
+	                        </group>
+	                    </group>
+	                    <label for="detail_address" />
+	                    <field name="detail_address"/>
+	                </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>
