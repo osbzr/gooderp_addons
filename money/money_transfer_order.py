@@ -19,6 +19,7 @@
 ##############################################################################
 
 from openerp.exceptions import except_orm
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models, api
 
 
@@ -97,7 +98,8 @@ class money_transfer_order_line(models.Model):
     out_bank_id = fields.Many2one('bank.account',
                                   string=u'转出账户', required=True)
     in_bank_id = fields.Many2one('bank.account', string=u'转入账户', required=True)
-    amount = fields.Float(string=u'金额')
+    amount = fields.Float(string=u'金额',
+                          digits_compute=dp.get_precision('Amount'))
     mode_id = fields.Many2one('settle.mode', string=u'结算方式')
     number = fields.Char(string=u'结算号')
     note = fields.Char(string=u'备注')

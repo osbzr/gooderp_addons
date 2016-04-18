@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp import fields, models, api
-
+import openerp.addons.decimal_precision as dp
 
 class go_live_order(models.Model):
     _name = 'go.live.order'
@@ -31,9 +31,12 @@ class go_live_order(models.Model):
     name = fields.Char(string=u'编号', copy=False, readonly=True, default='/')
     date = fields.Date(string=u'日期', default=_get_company_start_date,
                                       readonly=True, required=True)
-    receivable = fields.Float(u'应收余额')
-    payable = fields.Float(u'应付余额')
-    balance = fields.Float(u'期初余额')
+    receivable = fields.Float(u'应收余额',
+                              digits_compute=dp.get_precision('Amount'))
+    payable = fields.Float(u'应付余额',
+                           digits_compute=dp.get_precision('Amount'))
+    balance = fields.Float(u'期初余额',
+                           digits_compute=dp.get_precision('Amount'))
 
     _sql_constraints = [
         ('partner_uniq', 'unique(partner_id)', u'业务伙伴必须唯一!'),
