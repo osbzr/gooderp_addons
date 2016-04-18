@@ -20,6 +20,7 @@
 ##############################################################################
 
 from openerp.exceptions import except_orm
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models, api
 
 

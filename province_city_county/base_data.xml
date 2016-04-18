@@ -177,27 +177,5 @@
             <field name="code">澳</field>
             <field name="country_id" ref="cn"/>
         </record>
-        
-        		<record id="province_tree" model="ir.ui.view">
-            <field name="name">列表</field>
-            <field name="model">country.state</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="供应商">
-                    <field name="name"/>
-                    <field name="code"/>
-                    <field name="country_id"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="province_action" model="ir.actions.act_window">
-            <field name="name">sheng</field>
-            <field name="res_model">country.state</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="province_tree" />
-        </record>
-        <menuitem id='pro_menu' action='province_action' parent='core.master_data_menu' sequence='20'/>
     </data>
 </openerp>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+    	<!--业务伙伴地址form-->
         <record id="partner_address_form" model="ir.ui.view">
             <field name='name'>partner.address.form</field>
             <field name='model'>res.partner</field>
@@ -27,6 +28,42 @@
 	                    <field name="detail_address"/>
 	                </sheet>
                 </form>
+            </field>
+        </record>
+
+		<!--继承客户form,添加地址信息-->
+        <record id="customer_address_form_inherit" model="ir.ui.view">
+            <field name="name">customer_address_form_inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.customer_address_form' />
+            <field name="arch" type="xml">
+                <field name="code" position="after">
+					<field name="partner_address"/>
+                    <label for="province_id" string="地址"/>
+                    <div class="address_format">
+                         <field name="province_id" style="width: 40%"/>
+                         <field name="city_id" placeholder="市" style="width: 30%"/>
+                         <field name="county_id" placeholder="县" style="width: 30%"/>
+                    </div>
+				</field>
+            </field>
+        </record>
+
+		<!--继承供应商form,添加地址信息-->
+        <record id="supplier_address_form_inherit" model="ir.ui.view">
+            <field name="name">supplier_address_form_inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.supplier_address_form' />
+            <field name="arch" type="xml">
+                <field name="code" position="after">
+					<field name="partner_address"/>
+                    <label for="province_id" string="地址"/>
+                    <div class="address_format">
+                         <field name="province_id" style="width: 40%"/>
+                         <field name="city_id" placeholder="市" style="width: 30%"/>
+                         <field name="county_id" placeholder="县" style="width: 30%"/>
+                    </div>
+				</field>
             </field>
         </record>
     </data>

@@ -10,6 +10,7 @@
         'all.city.csv',
         'all.county.csv',
         'partner_address.xml',
+        'security/ir.model.access.csv'
     ],
     'installable': True,
 }

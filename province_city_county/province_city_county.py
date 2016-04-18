@@ -10,6 +10,7 @@ class Country(models.Model):
     
 class CountryState(models.Model):
     _name = 'country.state'
+    _description = u'省'
 
     country_id = fields.Many2one('country', u'国家')
     name = fields.Char(u'省名')
@@ -20,6 +21,7 @@ class CountryState(models.Model):
 class all_city(models.Model):
     _name = 'all.city'
     _rec_name = 'city_name'
+    _description = u'市'
     city_name = fields.Char(u'市')
     country_ids = fields.One2many('all.county', 'city_id', u'县')
     province_id = fields.Many2one('country.state', u'省',
@@ -29,6 +31,7 @@ class all_city(models.Model):
 class all_county(models.Model):
     _name = 'all.county'
     _rec_name = 'county_name'
+    _description = u'县'
 
     city_id = fields.Many2one('all.city', u'城市名称')
     county_name = fields.Char(u'县名称')
@@ -37,6 +40,7 @@ class all_county(models.Model):
 
 class province_city_county(models.Model):
     _name = 'province.city.county'
+    _description = u'省市县'
 
 #     @api.onchange('county_id','city_id','province_id')
 #     def onchange_province(self):
@@ -134,3 +138,13 @@ class res_partner(models.Model):
     contact_people = fields.Char(string=u'联系人')
     is_default_add = fields.Boolean(string=u'是否默认地址', default=False)
     detail_address = fields.Char(string=u'详细地址')
+
+class partner(models.Model):
+    _inherit = 'partner'
+    _description = u'业务伙伴'
+
+    partner_address = fields.Many2one('res.partner', u'业务伙伴地址')
+    city_id = fields.Many2one('all.city', u'市')
+    county_id = fields.Many2one('all.county', u'县')
+    province_id = fields.Many2one('country.state', u'省',
+                                  domain="[('country_id.name','=','中国')]")

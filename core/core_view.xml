@@ -150,13 +150,6 @@
                     <group>
                         <group>
                             <field name="code"/>
-                            <field name="partner_address"/>
-                            <label for="province_id" string="地址"/>
-                            <div class="address_format">
-                                 <field name="province_id" style="width: 40%"/>
-                                 <field name="city_id" placeholder="市" style="width: 30%"/>
-                                 <field name="county_id" placeholder="县" style="width: 30%"/>
-                            </div>
                         </group>
                         <group>
 							<field name="c_category_id" required="1"/>
@@ -219,12 +212,6 @@
                     <group>
                         <group>
                             <field name="code"/>
-                            <label for="province_id" string="地址"/>
-                            <div class="address_format">
-                                 <field name="province_id" style="width: 40%"/>
-                                 <field name="city_id" placeholder="市" style="width: 30%"/>
-                                 <field name="county_id" placeholder="县" style="width: 30%"/>
-                            </div>
                         </group>
                         <group>
 							<field name="s_category_id"/>
