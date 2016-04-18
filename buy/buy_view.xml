@@ -44,7 +44,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required="1"/>
+                            <field name="partner_id" required="1" domain="[('s_category_id', '!=', False)]"/>
                             <field name="date" required="1"/>
                         </group>
                         <group>
@@ -141,7 +141,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                         </group>
@@ -183,7 +184,7 @@
 		                <page string="采购费用行">
 		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 		                		<tree string="Cost Lines" editable="bottom">
-		                			<field name="partner_id"/>
+		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
 			                		<field name="category_id"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>
@@ -265,7 +266,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                         </group>
@@ -308,7 +310,7 @@
 		                <page string="采购费用行">
 		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 		                		<tree string="Cost Lines" editable="bottom">
-		                			<field name="partner_id"/>
+		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
 			                		<field name="category_id"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>
