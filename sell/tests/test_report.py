@@ -210,31 +210,108 @@ class test_goods_wizard(TransactionCase):
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
         self.delivery.sell_delivery_done()
-        self.goods_obj = self.env['sell.summary.goods.wizard']
-        self.goods = self.goods_obj.create({})
+        self.goods_wizard_obj = self.env['sell.summary.goods.wizard']
+        self.goods_wizard = self.goods_wizard_obj.create({})
 
     def test_button_ok(self):
         '''销售汇总表（按商品）向导确认按钮'''
         # 日期报错
-        goods = self.goods_obj.create({
+        goods_wizard = self.goods_wizard_obj.create({
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
         with self.assertRaises(except_orm):
-            goods.button_ok()
+            goods_wizard.button_ok()
+        # 按商品搜索
+        self.goods_wizard.goods_id = 1
+        self.goods_wizard.button_ok()
+        # 按客户搜索
+        self.goods_wizard.goods_id = False
+        self.goods_wizard.partner_id = self.env.ref('core.jd').id
+        self.goods_wizard.button_ok()
+        # 按商品类别搜索
+        self.goods_wizard.goods_id = False
+        self.goods_wizard.partner_id = False
+        self.goods_wizard.goods_categ_id = \
+            self.env.ref('core.goods_category_1').id
+        self.goods_wizard.button_ok()
+        # 按日期搜索
+        self.goods_wizard.goods_id = False
+        self.goods_wizard.partner_id = False
+        self.goods_wizard.goods_categ_id = False
+        self.goods_wizard.button_ok()
 
     def test_goods_report(self):
         '''测试销售汇总表（按商品）报表'''
         summary_goods = self.env['sell.summary.goods'].create({})
-        context = self.goods.button_ok().get('context')
+        context = self.goods_wizard.button_ok().get('context')
         results = summary_goods.with_context(context).search_read(domain=[])
-        new_goods_wizard = self.goods.copy()
+        new_goods_wizard = self.goods_wizard.copy()
         new_goods_wizard.goods_id = 3
         new_goods_wizard.partner_id = 3
-        goods_categ_id = self.env.ref('core.goods_category_1')
-        new_goods_wizard.goods_categ_id = goods_categ_id.id
+        new_goods_wizard.goods_categ_id = \
+            self.env.ref('core.goods_category_1').id
         new_context = new_goods_wizard.button_ok().get('context')
         new_results = summary_goods.with_context(new_context).search_read(
                                                                   domain=[])
         self.assertEqual(len(results), 1)
         self.assertEqual(len(new_results), 0)
+
+
+class test_partner_wizard(TransactionCase):
+    '''测试销售汇总表（按客户）向导'''
+
+    def setUp(self):
+        ''' 准备报表数据 '''
+        super(test_partner_wizard, self).setUp()
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        self.order = self.env.ref('sell.sell_order_2')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.delivery.sell_delivery_done()
+        self.partner_wizard_obj = self.env['sell.summary.partner.wizard']
+        self.partner_wizard = self.partner_wizard_obj.create({})
+
+    def test_button_ok(self):
+        '''销售汇总表（按客户）向导确认按钮'''
+        # 日期报错
+        partner_wizard = self.partner_wizard_obj.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            partner_wizard.button_ok()
+        # 按商品搜索
+        self.partner_wizard.goods_id = 1
+        self.partner_wizard.button_ok()
+        # 按客户搜索
+        self.partner_wizard.goods_id = False
+        self.partner_wizard.partner_id = self.env.ref('core.jd').id
+        self.partner_wizard.button_ok()
+        # 按客户类别搜索
+        self.partner_wizard.goods_id = False
+        self.partner_wizard.partner_id = False
+        self.partner_wizard.c_category_id = \
+            self.env.ref('core.customer_category_1').id
+        self.partner_wizard.button_ok()
+        # 按日期搜索
+        self.partner_wizard.goods_id = False
+        self.partner_wizard.partner_id = False
+        self.partner_wizard.c_category_id = False
+        self.partner_wizard.button_ok()
+
+    def test_partner_report(self):
+        '''测试销售汇总表（按客户）报表'''
+        summary_partner = self.env['sell.summary.partner'].create({})
+        context = self.partner_wizard.button_ok().get('context')
+        results = summary_partner.with_context(context).search_read(domain=[])
+        new_partner_wizard = self.partner_wizard.copy()
+        new_partner_wizard.goods_id = 3
+        new_partner_wizard.partner_id = self.env.ref('core.jd').id
+        c_category_id = self.env.ref('core.customer_category_1')    # 客户类别:一级客户
+        new_partner_wizard.c_category_id = c_category_id.id
+        new_context = new_partner_wizard.button_ok().get('context')
+        new_results = summary_partner.with_context(new_context).search_read(
+                                                                  domain=[])

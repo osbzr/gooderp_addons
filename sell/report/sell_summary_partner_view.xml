@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<record id="sell_summary_partner_tree" model="ir.ui.view">
+            <field name="name">sell.summary.partner.tree</field>
+            <field name="model">sell.summary.partner</field>
+            <field name="arch" type="xml">
+                <tree string="销售汇总表（按客户）">
+                	<field name="c_category"/>
+                	<field name="partner"/>
+                	<field name="goods_code"/>
+                    <field name="goods"/>
+                    <field name="attribute"/>
+                    <field name="warehouse"/>
+                    <field name="uos"/>
+                    <field name="qty_uos" sum="辅助数量合计"/>
+                    <field name="uom"/>
+                    <field name="qty" sum="基本数量合计"/>
+                    <field name="price"/>
+                    <field name="amount" sum="销售收入合计"/>
+                    <field name="tax_amount" sum="税额合计"/>
+                    <field name="subtotal" sum="价税合计的合计"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>
