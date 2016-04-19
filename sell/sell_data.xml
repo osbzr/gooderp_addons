@@ -36,5 +36,17 @@
             <field name="prefix">OUT/RETURN/</field>
             <field name="padding">5</field>
         </record>
+        <!--添加管理销售订单组-->
+        <record id='sell_groups' model='res.groups'>
+            <field name='name'>管理销售订单</field>
+        </record>
+        <!--添加管理销售订单行上的折扣组-->
+        <record id='sell_line_discount_groups' model='res.groups'>
+            <field name='name'>管理销售行上的折扣</field>
+        </record>
+        <!--添加管理销售订单的折扣组-->
+        <record id='sell_discount_groups' model='res.groups'>
+            <field name='name'>管理销售单的折扣</field>
+        </record>
     </data>
 </openerp>

@@ -30,5 +30,13 @@
             <field name='code'>others</field>
             <field name='type'>others</field>
         </record>
+        <!--添加管理组装拆卸组-->
+        <record id='assembly_groups' model='res.groups'>
+            <field name='name'>管理组装拆卸</field>
+        </record>
+        <!--添加管理其它出库单审核组-->
+        <record id='other_out_picking_groups' model='res.groups'>
+            <field name='name'>其它出库单审核</field>
+        </record>
     </data>
 </openerp>

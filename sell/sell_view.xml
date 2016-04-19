@@ -64,8 +64,8 @@
                  						<field name="quantity_out" readonly="1" sum="合计已发货数量"/>
 				 						<field name='price'/>
 				 						<field name="price_taxed"/>
-				 						<field name='discount_rate'/>
-                 						<field name='discount_amount' sum='折扣额合计' />
+										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
+										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
 				 						<field name='amount' sum='金额合计'/>
 				 						<field name='tax_rate'/>
                  						<field name='tax_amount' sum='税额合计'/>
@@ -76,8 +76,8 @@
 				 				<field name="note" placeholder="暂无备注信息"/>
 				 				<group>
                         			<group col="6" colspan="6">
-                            			<field name="discount_rate"/>
-                            			<field name="discount_amount"/>
+										<field name="discount_rate" groups='sell.sell_discount_groups'/>
+										<field name="discount_amount" groups='sell.sell_discount_groups'/>
                             			<field name="amount"/>
                         			</group>
                     			</group>
@@ -165,14 +165,15 @@
 			                            <field name='lot_qty' invisible='1'/>
 	                    				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
 	                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]"
-	                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"/>
+	                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
+	                    					groups='goods.batch_groups'/>
 				 						<field name='warehouse_id' required='1'/>
 				 						<field name='warehouse_dest_id' invisible='1'/>
 		         						<field name='goods_qty' sum='数量合计'/>
 				 						<field name='price'/>
 				 						<field name="price_taxed"/>
-				 						<field name='discount_rate'/>
-		         						<field name='discount_amount' sum='折扣额合计'/>
+										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
+										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
 				 						<field name='amount' string='销售金额' sum='金额合计'/>
 				 						<field name='tax_rate'/>
 		         						<field name='tax_amount' sum='税额合计'/>
@@ -196,8 +197,8 @@
 		 				<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
 		 				<group>
                 			<group>
-                    			<field name="discount_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
-                    			<field name="discount_amount"/>
+								<field name="discount_rate" groups='sell.sell_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+								<field name="discount_amount" groups='sell.sell_discount_groups'/>
                     			<field name="amount"/>
                     			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
                     			<field name="create_uid" readonly="1" string="制单人"/>
@@ -280,14 +281,15 @@
 				 						<field name='uom_id'/>
 				 						<field name='using_batch' invisible='1'/>
 					                    <field name='force_batch_one' invisible='1'/>
-					                    <field name='lot' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
+					                    <field name='lot' groups='goods.batch_groups'
+					                    	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
 				 						<field name='warehouse_id' invisible='1'/>
 				 						<field name='warehouse_dest_id' required='1'/>
 		         						<field name='goods_qty' sum='数量合计'/>
 				 						<field name='price'/>
 				 						<field name="price_taxed"/>
-				 						<field name='discount_rate'/>
-		         						<field name='discount_amount' sum='折扣额合计'/>
+										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
+										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
 				 						<field name='amount' string='销售金额' sum='金额合计'/>
 				 						<field name='tax_rate'/>
 		         						<field name='tax_amount' sum='税额合计'/>
@@ -311,8 +313,8 @@
 		 				<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
 		 				<group>
                 			<group>
-                    			<field name="discount_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
-                    			<field name="discount_amount"/>
+								<field name="discount_rate" groups='sell.sell_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+								<field name="discount_amount" groups='sell.sell_discount_groups'/>
                     			<field name="amount"/>
                     			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
                     			<field name="create_uid" readonly="1" string="制单人"/>
@@ -388,12 +390,12 @@
         </record>
 
     	<!--根菜单-->
-        <menuitem id='sell_menu' name='销货'/>
+        <menuitem id='sell_menu' name='销货' groups='sell.sell_groups'/>
     	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>
     	<menuitem id='sell_order_menu' name='销货订单' action='sell_order_action'
-    		parent='sell_order_menu_root' sequence='1'/>
+			parent='sell_order_menu_root' sequence='1'/>
     	<menuitem id='sell_delivery_menu' name='销售发货单' action='sell_delivery_action'
-    		parent='sell_order_menu_root' sequence='2'/>
+			parent='sell_order_menu_root' sequence='2'/>
 		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"
             parent="sell_order_menu_root" sequence="3"/>
     </data>

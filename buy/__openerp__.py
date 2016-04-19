@@ -9,8 +9,8 @@
     'version': '8.0.0.1',
     'depends': ['core', 'mail', 'warehouse', 'money'],
     'data': [
-        'buy_view.xml',
         'buy_data.xml',
+        'buy_view.xml',
         'wizard/buy_order_track_wizard_view.xml',
         'wizard/buy_order_detail_wizard_view.xml',
         'wizard/buy_summary_goods_wizard_view.xml',

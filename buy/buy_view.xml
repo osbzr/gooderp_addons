@@ -2,7 +2,7 @@
 <openerp>
     <data>
     	<!-- 根菜单 -->
-        <menuitem id="menu_buy_root" name="采购"/>
+        <menuitem id="menu_buy_root" name="采购" groups='buy.buy_groups'/>
 
         <menuitem id="menu_buy_manage" name="采购" parent="menu_buy_root" sequence="1"/>
 
@@ -65,8 +65,8 @@
                             <field name="quantity_in" readonly="1" sum="合计已入库数量"/>
                             <field name="price"/>
                             <field name="price_taxed"/>
-                            <field name="discount_rate"/>
-                            <field name="discount_amount" sum="合计折扣额"/>
+                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+                            <field name="discount_amount" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
                             <field name="amount" sum="合计金额"/>
                             <field name="tax_rate"/>
                             <field name="tax_amount" sum="合计税额"/>
@@ -78,8 +78,8 @@
                     <field name="note" placeholder="暂无备注信息"/>
                     <group>
                         <group col="6" colspan="6">
-                            <field name="discount_rate"/>
-                            <field name="discount_amount"/>
+                            <field name="discount_rate" groups='buy.buy_discount_groups'/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                         </group>
                     </group>
@@ -164,14 +164,15 @@
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
 				                    <field name='force_batch_one' invisible='1'/>
-				                    <field name='lot' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
+				                    <field name='lot' groups='goods.batch_groups'
+											attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
 		                            <field name="warehouse_id" invisible="1"/>
 		                            <field name="warehouse_dest_id" required="1"/>
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="price"/>
 		                            <field name="price_taxed"/>
-		                            <field name="discount_rate"/>
-		                            <field name="discount_amount" readonly="0" sum="合计折扣额"/>
+		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+		                            <field name="discount_amount" groups='buy.buy_line_discount_groups' readonly="0" sum="合计折扣额"/>
 		                            <field name="amount" string="购货金额" sum="合计金额"/>
 		                            <field name="tax_rate"/>
 		                            <field name="tax_amount" sum="合计税额"/>
@@ -196,8 +197,8 @@
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
                         <group col="8" colspan="8">
-                            <field name="discount_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="discount_amount"/>
+                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                             <field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
                         </group>
@@ -291,14 +292,15 @@
 		                            <field name='lot_qty' invisible='1'/>
                     				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
                     					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]"
-                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"/>
+                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
+                    					groups='goods.batch_groups'/>
 		                            <field name="warehouse_id" required="1"/>
 		                            <field name="warehouse_dest_id" invisible="1"/>
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="price"/>
 		                            <field name="price_taxed"/>
-		                            <field name="discount_rate"/>
-		                            <field name="discount_amount" readonly="0" sum="合计折扣额"/>
+		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+		                            <field name="discount_amount" readonly="0" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
 		                            <field name="amount" string="购货金额" sum="合计金额"/>
 		                            <field name="tax_rate"/>
 		                            <field name="tax_amount" sum="合计税额"/>
@@ -321,8 +323,8 @@
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
                         <group col="8" colspan="8">
-                            <field name="discount_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="discount_amount"/>
+                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                             <field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
                         </group>

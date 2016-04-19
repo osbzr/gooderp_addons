@@ -9,8 +9,8 @@
         <menuitem id='wh_inventory_menu' action='wh_inventory_action' name='盘点单' parent='warehouse_order' sequence='2' />
         <menuitem id='wh_in_menu' action='wh_in_action' name='其他入库单' parent='warehouse_order' sequence='3' />
         <menuitem id='wh_out_menu' action='wh_out_action' name='其他出库单' parent='warehouse_order' sequence='4' />
-        <menuitem id='wh_assembly_menu' action='wh_assembly_action' parent='warehouse_order' sequence='5' />
-        <menuitem id='wh_disassembly_menu' action='wh_disassembly_action' parent='warehouse_order' sequence='6' />
+        <menuitem id='wh_assembly_menu' action='wh_assembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='5' />
+        <menuitem id='wh_disassembly_menu' action='wh_disassembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='6' />
 
         <!-- 仓库 -->
         <menuitem id='warehouse_menu' name='仓库' action='warehouse_action' parent='core.master_data_menu' sequence='40'/>

@@ -91,7 +91,7 @@
               </p>
             </field>
         </record>
-		<!-- 核销单单menu -->
+		<!-- 核销单menu -->
 		<menuitem id="menu_reconcile_action" action="reconcile_action" parent="menu_money_manage" sequence="4"/>
 	</data>
 </openerp>

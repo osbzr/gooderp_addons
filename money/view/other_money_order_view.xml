@@ -101,8 +101,8 @@
             </field>
         </record>
 		<!-- 其他收款单menu、其他付款单menu -->
-        <menuitem id="menu_other_money_receipt_action" action="other_money_receipt_action" parent="menu_money_manage" sequence="5"/>
-        <menuitem id="menu_other_money_payment_action" action="other_money_payment_action" parent="menu_money_manage" sequence="6"/>
+        <menuitem id="menu_other_money_receipt_action" action="other_money_receipt_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="5"/>
+        <menuitem id="menu_other_money_payment_action" action="other_money_payment_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="6"/>
 	</data>
 </openerp>
 	

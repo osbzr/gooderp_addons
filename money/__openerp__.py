@@ -9,12 +9,12 @@
     'version': '8.0.0.1',
     'depends': ['core', 'base'],
     'data': [
+        'data/money_data.xml',
         'view/money_order_view.xml',
         'view/other_money_order_view.xml',
         'view/money_transfer_order_view.xml',
         'view/reconcile_order_view.xml',
         'data/money_sequence.xml',
-        'data/money_data.xml',
         'wizard/partner_statements_wizard_view.xml',
         'report/bank_statements_view.xml',
         'wizard/bank_statements_wizard_view.xml',
