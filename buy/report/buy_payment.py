@@ -16,7 +16,7 @@ class buy_payment(models.TransientModel):
     purchase_amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))
     discount_amount = fields.Float(u'优惠金额', digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(u'优惠后金额', digits_compute=dp.get_precision('Amount'))
-    payment = fields.Float(u'本次付款', digits_compute=dp.get_precision('Amount'))
+    payment = fields.Float(u'已付款', digits_compute=dp.get_precision('Amount'))
     balance = fields.Float(u'应付款余额', digits_compute=dp.get_precision('Amount'))
     payment_rate = fields.Float(u'付款率(%)')
     note = fields.Char(u'备注')

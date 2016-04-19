@@ -43,12 +43,22 @@ class sell_receipt_wizard(models.TransientModel):
         if self.staff_id:
             cond.append(('staff_id', '=', self.staff_id.id))
         delivery_obj = self.env['sell.delivery']
+        count = sum_receipt_rate = 0
         for delivery in delivery_obj.search(cond, order='partner_id'):
             sell_amount = delivery.discount_amount + delivery.amount
             discount_amount = delivery.discount_amount
             amount = delivery.amount
-            receipt = delivery.receipt
-            balance = delivery.debt
+            partner_cost = delivery.partner_cost
+            # 用查找到的发货单信息来创建一览表
+            receipt = balance = 0
+            for order in self.env['money.order'].search(
+                        [('state', '=', 'done')], order='name'):
+                for source in order.source_ids:
+                    if source.name.name == delivery.name:
+                        receipt += source.this_reconcile
+                        balance = source.to_reconcile
+
+            # 如果是退货则金额均取反
             if not delivery.is_return:
                 order_type = u'普通销售'
             elif delivery.is_return:
@@ -56,9 +66,12 @@ class sell_receipt_wizard(models.TransientModel):
                 sell_amount = - sell_amount
                 discount_amount = - discount_amount
                 amount = - amount
-                receipt = - receipt
-                balance = - balance
-            # 用查找到的发货单信息来创建一览表
+                partner_cost = - partner_cost
+            # 计算回款率
+            if (amount + partner_cost) == 0 and receipt == 0:
+                receipt_rate = 100
+            else:
+                receipt_rate = (receipt / (amount + partner_cost)) * 100
             line = self.env['sell.receipt'].create({
                 'c_category_id': delivery.partner_id.c_category_id.id,
                 'partner_id': delivery.partner_id.id,
@@ -69,43 +82,26 @@ class sell_receipt_wizard(models.TransientModel):
                 'sell_amount': sell_amount,
                 'discount_amount': discount_amount,
                 'amount': amount,
+                'partner_cost': partner_cost,
                 'receipt': receipt,
                 'balance': balance,
+                'receipt_rate': receipt_rate,
                 'note': delivery.note,
             })
             res.append(line.id)
+            count += 1
+            sum_receipt_rate += line.receipt_rate
 
-            # 用查找到的发货单产生的收款单信息来创建一览表
-            receipt = 0
-            for order in self.env['money.order'].search([]):
-                for source in order.source_ids:
-                    if source.name.name == delivery.name:
-                        # 创建收款单行line2
-                        line2 = self.env['sell.receipt'].create({
-                            'type': u'收款',
-                            'date': source.date,
-                            'order_name': source.money_id.name,
-                            'receipt': source.this_reconcile,
-                            'balance': source.to_reconcile,
-                        })
-                        receipt += source.this_reconcile
-                        res.append(line2.id)
-
-            # 创建一览表的小计行
-            if amount == 0 and receipt == 0:
-                receipt_rate = 100
-            else:
-                receipt_rate = (receipt / amount) * 100
-            line_subtotal = self.env['sell.receipt'].create({
-                'order_name': u'小计',
-                'sell_amount': sell_amount,
-                'discount_amount': discount_amount,
-                'amount': amount,
-                'receipt': receipt,
-                'balance': amount - receipt,
-                'receipt_rate': receipt_rate,
-            })
-            res.append(line_subtotal.id)
+        # 创建一览表的合计行
+        if sum_receipt_rate == 0 and count == 0:
+            receipt_rate = 100
+        else:
+            receipt_rate = sum_receipt_rate / count
+        line_total = self.env['sell.receipt'].create({
+            'order_name': u'平均回款率',
+            'receipt_rate': receipt_rate,
+        })
+        res.append(line_total.id)
         return {
             'name': u'销售收款一览表',
             'view_mode': 'tree',
