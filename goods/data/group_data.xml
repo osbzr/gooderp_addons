@@ -4,5 +4,8 @@
         <record id='auxiliary_unit_groups' model='res.groups'>
             <field name='name'>辅助单位</field>
         </record>
+        <record id='batch_groups' model='res.groups'>
+            <field name='name'>管理批号</field>
+        </record>
     </data>
 </openerp>

@@ -134,7 +134,7 @@
             <field name="view_mode">tree</field>
         </record>
 
-        <menuitem id='settle_mode_menu' action='settle_mode_action' parent='config_data_menu' sequence='30'/>
+        <menuitem id='settle_mode_menu' action='settle_mode_action' parent='config_data_menu' groups='core.settle_mode_groups' sequence='30'/>
         <!--客户 form-->
         <record id="customer_address_form" model="ir.ui.view">
             <field name="name">customer.address.form</field>

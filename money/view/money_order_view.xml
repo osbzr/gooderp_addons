@@ -2,7 +2,7 @@
 <openerp>
     <data>
     	<!-- 根菜单 -->
-        <menuitem id="menu_money_root" name="资金"/>
+        <menuitem id="menu_money_root" name="资金" groups='money.reconcile_groups'/>
         <menuitem id="menu_money_manage" name="资金" parent="menu_money_root" sequence="1"/>
 
 		<!--收款单tree-->
@@ -50,8 +50,8 @@
                     	<tree string="Money Order Lines" editable="bottom">
                     		<field name="bank_id"/>
                             <field name="amount" sum="合计"/>       		
-                            <field name="mode_id"/>
-                            <field name="number"/>
+                            <field name="mode_id" groups='core.settle_mode_groups'/>
+                            <field name="number" groups='core.settle_mode_groups'/>
                             <field name="note"/>
                        </tree>
                     </field>

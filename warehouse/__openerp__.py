@@ -29,6 +29,7 @@
     "description": """
     """,
     "data": [
+        'data/warehouse_data.xml',
         'wizard/save_bom_view.xml',
         'wizard/stock_transceive_wizard_view.xml',
         'wizard/lot_track_wizard_view.xml',
@@ -45,7 +46,6 @@
         'report/lot_track_view.xml',
         'action/warehouse_action.xml',
         'menu/warehouse_menu.xml',
-        'data/warehouse_data.xml',
         'data/sequence.xml',
         'security/ir.model.access.csv',
     ],

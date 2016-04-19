@@ -147,7 +147,8 @@
             <field name='arch' type='xml'>
                 <form string='出库单'>
                     <header>
-                        <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
+                        <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft'
+																	groups='warehouse.other_out_picking_groups'/>
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>

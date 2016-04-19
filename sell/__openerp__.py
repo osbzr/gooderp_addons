@@ -26,8 +26,8 @@
     'description': '''gooderp销售实例，通过安装gooderp模块展示openerp的销售流程''',
     'depends': ['mail', 'core', 'warehouse', 'money'],
     'data': [
-            'sell_view.xml',
             'sell_data.xml',
+            'sell_view.xml',
             'report/customer_statements_view.xml',
             'report/sell_order_track_view.xml',
             'report/sell_order_detail_view.xml',
