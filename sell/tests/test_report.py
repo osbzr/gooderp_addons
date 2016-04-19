@@ -375,3 +375,68 @@ class test_staff_wizard(TransactionCase):
         new_context = new_staff_wizard.button_ok().get('context')
         new_results = summary_staff.with_context(new_context).search_read(
                                                                   domain=[])
+
+
+class test_receipt_wizard(TransactionCase):
+    '''测试销售收款一览表向导'''
+
+    def setUp(self):
+        ''' 准备报表数据 '''
+        super(test_receipt_wizard, self).setUp()
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+
+        # 销货订单产生发货单，并审核发货单产生收款单
+        self.order = self.env.ref('sell.sell_order_2')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.delivery.bank_account_id = self.env.ref('core.comm')
+        self.env.ref('money.get_40000').money_order_done()
+        self.delivery.receipt = 2.0
+        self.delivery.sell_delivery_done()
+
+        # 销货订单产生发货单，并审核发货单，优惠后金额和本次收款均为0
+        new_delivery = self.delivery.copy()
+        new_delivery.discount_amount = (new_delivery.amount
+                                        + new_delivery.discount_amount)
+        new_delivery.receipt = 0
+        new_delivery.bank_account_id = False
+        new_delivery.sell_delivery_done()
+
+        # 销货订单产生退货单，并审核退货单
+        self.order_return = self.env.ref('sell.sell_order_return')
+        self.order_return.sell_order_done()
+        self.delivery_return = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order_return.id)])
+        self.delivery_return.sell_delivery_done()
+        self.receipt_wizard_obj = self.env['sell.receipt.wizard']
+        self.receipt_wizard = self.receipt_wizard_obj.create({})
+
+    def test_button_ok(self):
+        '''测试销售收款一览表确认按钮'''
+        # 日期报错
+        receipt_wizard = self.receipt_wizard_obj.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            receipt_wizard.button_ok()
+        # 按客户类别搜索
+        self.receipt_wizard.c_category_id = \
+            self.env.ref('core.customer_category_1').id
+        self.receipt_wizard.button_ok()
+        # 按客户搜索
+        self.receipt_wizard.c_category_id = False
+        self.receipt_wizard.partner_id = self.env.ref('core.jd').id
+        self.receipt_wizard.button_ok()
+        # 按销售员搜索
+        self.receipt_wizard.c_category_id = False
+        self.receipt_wizard.partner_id = False
+        self.receipt_wizard.staff_id = self.env.ref('core.lili').id
+        self.receipt_wizard.button_ok()
+        # 按日期搜索
+        self.receipt_wizard.c_category_id = False
+        self.receipt_wizard.partner_id = False
+        self.receipt_wizard.order_id = False
+        self.receipt_wizard.button_ok()

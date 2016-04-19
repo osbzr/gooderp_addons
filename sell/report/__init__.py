@@ -5,3 +5,4 @@ import sell_order_detail
 import sell_summary_goods
 import sell_summary_partner
 import sell_summary_staff
+import sell_receipt
