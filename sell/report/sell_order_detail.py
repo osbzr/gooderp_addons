@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models
 
 class sell_order_detail(models.TransientModel):
@@ -16,9 +17,9 @@ class sell_order_detail(models.TransientModel):
     attribute = fields.Char(u'属性')
     uom = fields.Char(u'单位')
     warehouse_dest = fields.Char(u'仓库')
-    qty = fields.Float(u'数量')
-    price = fields.Float(u'单价')
-    amount = fields.Float(u'销售收入')
-    tax_amount = fields.Float(u'税额')
-    subtotal = fields.Float(u'价税合计')
+    qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
+    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
+    amount = fields.Float(u'销售收入', digits_compute=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')

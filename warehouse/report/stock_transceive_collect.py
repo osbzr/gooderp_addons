@@ -31,47 +31,47 @@ class report_stock_transceive_collect(models.Model):
 
     NEED_TUPLE_ORIGIN_MAP = ['wh.internal', 'wh.assembly', 'wh.disassembly']
 
-    internal_in_qty = fields.Float(u'调拨入库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    internal_in_cost = fields.Float(u'调拨入库成本', digits_compute=dp.get_precision('Accounting'))
+    internal_in_qty = fields.Float(u'调拨入库数量', digits_compute=dp.get_precision('Quantity'))
+    internal_in_cost = fields.Float(u'调拨入库成本', digits_compute=dp.get_precision('Amount'))
 
-    purchase_in_qty = fields.Float(u'普通采购数量', digits_compute=dp.get_precision('Goods Quantity'))
-    purchase_in_cost = fields.Float(u'普通采购成本', digits_compute=dp.get_precision('Accounting'))
+    purchase_in_qty = fields.Float(u'普通采购数量', digits_compute=dp.get_precision('Quantity'))
+    purchase_in_cost = fields.Float(u'普通采购成本', digits_compute=dp.get_precision('Amount'))
 
-    sale_in_qty = fields.Float(u'销售退回数量', digits_compute=dp.get_precision('Goods Quantity'))
-    sale_in_cost = fields.Float(u'销售退回成本', digits_compute=dp.get_precision('Accounting'))
+    sale_in_qty = fields.Float(u'销售退回数量', digits_compute=dp.get_precision('Quantity'))
+    sale_in_cost = fields.Float(u'销售退回成本', digits_compute=dp.get_precision('Amount'))
 
-    others_in_qty = fields.Float(u'其他入库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    others_in_cost = fields.Float(u'其他入库成本', digits_compute=dp.get_precision('Accounting'))
+    others_in_qty = fields.Float(u'其他入库数量', digits_compute=dp.get_precision('Quantity'))
+    others_in_cost = fields.Float(u'其他入库成本', digits_compute=dp.get_precision('Amount'))
 
-    overage_in_qty = fields.Float(u'盘盈数量', digits_compute=dp.get_precision('Goods Quantity'))
-    overage_in_cost = fields.Float(u'盘盈成本', digits_compute=dp.get_precision('Accounting'))
+    overage_in_qty = fields.Float(u'盘盈数量', digits_compute=dp.get_precision('Quantity'))
+    overage_in_cost = fields.Float(u'盘盈成本', digits_compute=dp.get_precision('Amount'))
 
-    assembly_in_qty = fields.Float(u'组装单入库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    assembly_in_cost = fields.Float(u'组装单入库成本', digits_compute=dp.get_precision('Accounting'))
+    assembly_in_qty = fields.Float(u'组装单入库数量', digits_compute=dp.get_precision('Quantity'))
+    assembly_in_cost = fields.Float(u'组装单入库成本', digits_compute=dp.get_precision('Amount'))
 
-    disassembly_in_qty = fields.Float(u'拆卸单入库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    disassembly_in_cost = fields.Float(u'拆卸单入库成本', digits_compute=dp.get_precision('Accounting'))
+    disassembly_in_qty = fields.Float(u'拆卸单入库数量', digits_compute=dp.get_precision('Quantity'))
+    disassembly_in_cost = fields.Float(u'拆卸单入库成本', digits_compute=dp.get_precision('Amount'))
 
-    internal_out_qty = fields.Float(u'调拨出库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    internal_out_cost = fields.Float(u'调拨出库成本', digits_compute=dp.get_precision('Accounting'))
+    internal_out_qty = fields.Float(u'调拨出库数量', digits_compute=dp.get_precision('Quantity'))
+    internal_out_cost = fields.Float(u'调拨出库成本', digits_compute=dp.get_precision('Amount'))
 
-    purchase_out_qty = fields.Float(u'采购退回数量', digits_compute=dp.get_precision('Goods Quantity'))
-    purchase_out_cost = fields.Float(u'采购退回成本', digits_compute=dp.get_precision('Accounting'))
+    purchase_out_qty = fields.Float(u'采购退回数量', digits_compute=dp.get_precision('Quantity'))
+    purchase_out_cost = fields.Float(u'采购退回成本', digits_compute=dp.get_precision('Amount'))
 
-    sale_out_qty = fields.Float(u'普通销售购量', digits_compute=dp.get_precision('Goods Quantity'))
-    sale_out_cost = fields.Float(u'普通销售购本', digits_compute=dp.get_precision('Accounting'))
+    sale_out_qty = fields.Float(u'普通销售购量', digits_compute=dp.get_precision('Quantity'))
+    sale_out_cost = fields.Float(u'普通销售购本', digits_compute=dp.get_precision('Amount'))
 
-    others_out_qty = fields.Float(u'其他出库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    others_out_cost = fields.Float(u'其他出库成本', digits_compute=dp.get_precision('Accounting'))
+    others_out_qty = fields.Float(u'其他出库数量', digits_compute=dp.get_precision('Quantity'))
+    others_out_cost = fields.Float(u'其他出库成本', digits_compute=dp.get_precision('Amount'))
 
-    losses_out_qty = fields.Float(u'盘亏数量', digits_compute=dp.get_precision('Goods Quantity'))
-    losses_out_cost = fields.Float(u'盘亏成本', digits_compute=dp.get_precision('Accounting'))
+    losses_out_qty = fields.Float(u'盘亏数量', digits_compute=dp.get_precision('Quantity'))
+    losses_out_cost = fields.Float(u'盘亏成本', digits_compute=dp.get_precision('Amount'))
 
-    assembly_out_qty = fields.Float(u'组装单出库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    assembly_out_cost = fields.Float(u'组装单出库成本', digits_compute=dp.get_precision('Accounting'))
+    assembly_out_qty = fields.Float(u'组装单出库数量', digits_compute=dp.get_precision('Quantity'))
+    assembly_out_cost = fields.Float(u'组装单出库成本', digits_compute=dp.get_precision('Amount'))
 
-    disassembly_out_qty = fields.Float(u'拆卸单出库数量', digits_compute=dp.get_precision('Goods Quantity'))
-    disassembly_out_cost = fields.Float(u'拆卸单出库成本', digits_compute=dp.get_precision('Accounting'))
+    disassembly_out_qty = fields.Float(u'拆卸单出库数量', digits_compute=dp.get_precision('Quantity'))
+    disassembly_out_cost = fields.Float(u'拆卸单出库成本', digits_compute=dp.get_precision('Amount'))
 
     def compute_specific_data(self, res):
         line_obj = self.env['wh.move.line']

@@ -83,8 +83,8 @@ class wh_move_line(models.Model):
     lot = fields.Char(u'批号')
     lot_id = fields.Many2one('wh.move.line', u'批号')
     lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'批号数量',
-                           digits_compute=dp.get_precision('Goods Quantity'))
-    lot_uos_qty = fields.Float(u'批号辅助数量', digits_compute=dp.get_precision('Goods Quantity'))
+                           digits_compute=dp.get_precision('Quantity'))
+    lot_uos_qty = fields.Float(u'批号辅助数量', digits_compute=dp.get_precision('Quantity'))
     production_date = fields.Date(u'生产日期', default=fields.Date.context_today)
     shelf_life = fields.Integer(u'保质期(天)')
     valid_date = fields.Date(u'有效期至')
@@ -92,21 +92,25 @@ class wh_move_line(models.Model):
     uos_id = fields.Many2one('uom', string=u'辅助单位', readonly=True)
     warehouse_id = fields.Many2one('warehouse', string=u'调出仓库', required=True, default=_get_default_warehouse)
     warehouse_dest_id = fields.Many2one('warehouse', string=u'调入仓库', required=True, default=_get_default_warehouse_dest)
-    goods_qty = fields.Float(u'数量', digits_compute=dp.get_precision('Goods Quantity'), default=1)
-    goods_uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Goods Quantity'), default=1)
-    price = fields.Float(u'单价', digits_compute=dp.get_precision('Accounting'))
-    price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount, store=True, readonly=True)
+    goods_qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'), default=1)
+    goods_uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'), default=1)
+    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
+    price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount, store=True, readonly=True,
+                               digits_compute=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
-    discount_amount = fields.Float(u'折扣额')
+    discount_amount = fields.Float(u'折扣额',
+                                   digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(compute=_compute_all_amount, store=True, readonly=True)
     tax_rate = fields.Float(u'税率(%)', default=17.0)
-    tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, readonly=True)
-    subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, store=True, readonly=True)
-#     subtotal = fields.Float(u'金额', digits_compute=dp.get_precision('Accounting'))
+    tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, store=True, readonly=True,
+                            digits_compute=dp.get_precision('Amount'))
+#     subtotal = fields.Float(u'金额', digits_compute=dp.get_precision('Amount'))
     note = fields.Text(u'备注')
-    cost_unit = fields.Float(u'单位成本', digits_compute=dp.get_precision('Accounting'))
+    cost_unit = fields.Float(u'单位成本', digits_compute=dp.get_precision('Amount'))
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
-                        digits_compute=dp.get_precision('Accounting'), store=True)
+                        digits_compute=dp.get_precision('Amount'), store=True)
 
     @api.one
     @api.depends('cost_unit', 'goods_qty')

@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from openerp import fields, models, api
+import openerp.addons.decimal_precision as dp
 from openerp.exceptions import except_orm
 
 # 销货订单审核状态可选值
@@ -59,9 +60,11 @@ class sell_order(models.Model):
     note = fields.Text(u'备注')
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES, 
-                                   track_visibility='always')
+                                   track_visibility='always',
+                                   digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(string=u'优惠后金额', store=True, readonly=True,
-                          compute='_compute_amount', track_visibility='always')
+                        compute='_compute_amount', track_visibility='always',
+                        digits_compute=dp.get_precision('Amount'))
     approve_uid = fields.Many2one('res.users', u'审核人', copy=False)
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态', readonly=True,
                              help=u"销货订单的审核状态", select=True, 
@@ -253,20 +256,27 @@ class sell_order_line(models.Model):
     warehouse_id = fields.Many2one('warehouse', u'仓库')
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库', 
                                         default=_default_warehouse_dest)
-    quantity = fields.Float(u'数量', default=1)
-    quantity_out = fields.Float(u'已发货数量', copy=False)
-    price = fields.Float(u'销售单价')
+    quantity = fields.Float(u'数量', default=1,
+                            digits_compute=dp.get_precision('Quantity'))
+    quantity_out = fields.Float(u'已发货数量', copy=False,
+                                digits_compute=dp.get_precision('Quantity'))
+    price = fields.Float(u'销售单价',
+                         digits_compute=dp.get_precision('Amount'))
     price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount, 
-                               store=True, readonly=True)
+                               store=True, readonly=True,
+                               digits_compute=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额')
     amount = fields.Float(u'金额', compute=_compute_all_amount, 
-                          store=True, readonly=True)
+                          store=True, readonly=True,
+                          digits_compute=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)', default=17.0)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, 
-                              readonly=True)
+                              readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, 
-                            store=True, readonly=True)
+                            store=True, readonly=True,
+                            digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
     @api.one
@@ -356,16 +366,22 @@ class sell_delivery(models.Model):
     invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False)
     date_due = fields.Date(u'到期日期', copy=False)
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
-    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES)
+    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
+                            digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount, 
-                          store=True, readonly=True)
-    partner_cost = fields.Float(u'客户承担费用')
-    receipt = fields.Float(u'本次收款', states=READONLY_STATES)
+                          store=True, readonly=True,
+                          digits_compute=dp.get_precision('Amount'))
+    partner_cost = fields.Float(u'客户承担费用',
+                        digits_compute=dp.get_precision('Amount'))
+    receipt = fields.Float(u'本次收款', states=READONLY_STATES,
+                           digits_compute=dp.get_precision('Amount'))
     bank_account_id = fields.Many2one('bank.account', u'结算账户')
     debt = fields.Float(u'本次欠款', compute=_compute_all_amount, 
-                        store=True, readonly=True, copy=False)
+                        store=True, readonly=True, copy=False,
+                        digits_compute=dp.get_precision('Amount'))
     total_debt = fields.Float(u'总欠款', compute=_compute_all_amount, 
-                              store=True, readonly=True, copy=False)
+                              store=True, readonly=True, copy=False,
+                              digits_compute=dp.get_precision('Amount'))
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', 
                                     copy=False)
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
