@@ -20,6 +20,7 @@
 ##############################################################################
 
 from openerp import fields, models, api
+import openerp.addons.decimal_precision as dp
 from openerp.exceptions import except_orm
 
 # 购货订单审核状态可选值
@@ -76,11 +77,14 @@ class buy_order(models.Model):
     line_ids = fields.One2many('buy.order.line', 'order_id', u'购货订单行',
                                states=READONLY_STATES, copy=True)
     note = fields.Text(u'备注')
-    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
+    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
+                                 digits_compute=dp.get_precision('Amount'))
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
-                                   track_visibility='always')
+                                   track_visibility='always',
+                                   digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(u'优惠后金额', store=True, readonly=True,
-                          compute='_compute_amount', track_visibility='always')
+                          compute='_compute_amount', track_visibility='always',
+                          digits_compute=dp.get_precision('Amount'))
     approve_uid = fields.Many2one('res.users', u'审核人', copy=False)
     state = fields.Selection(BUY_ORDER_STATES, u'审核状态', readonly=True,
                              help=u"购货订单的审核状态", select=True, copy=False,
@@ -268,20 +272,28 @@ class buy_order_line(models.Model):
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    default=_default_warehouse)
     warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
-    quantity = fields.Float(u'数量', default=1)
-    quantity_in = fields.Float(u'已入库数量', copy=False)
-    price = fields.Float(u'购货单价')
+    quantity = fields.Float(u'数量', default=1,
+                            digits_compute=dp.get_precision('Quantity'))
+    quantity_in = fields.Float(u'已入库数量', copy=False,
+                               digits_compute=dp.get_precision('Quantity'))
+    price = fields.Float(u'购货单价',
+                         digits_compute=dp.get_precision('Amount'))
     price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount,
-                               store=True, readonly=True)
+                               store=True, readonly=True,
+                               digits_compute=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
-    discount_amount = fields.Float(u'折扣额')
+    discount_amount = fields.Float(u'折扣额',
+                                   digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(u'金额', compute=_compute_all_amount,
-                          store=True, readonly=True)
+                          store=True, readonly=True,
+                          digits_compute=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)', default=17.0)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
-                              store=True, readonly=True)
+                              store=True, readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
-                            store=True, readonly=True)
+                            store=True, readonly=True,
+                            digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
     # TODO:放到单独模块中 sell_to_buy many2one 到sell.order
     origin = fields.Char(u'销售单号')
@@ -366,13 +378,17 @@ class buy_receipt(models.Model):
     invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False)
     date_due = fields.Date(u'到期日期', copy=False)
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
-    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES)
+    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
+                                   digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
-                          store=True, readonly=True)
-    payment = fields.Float(u'本次付款', states=READONLY_STATES)
+                          store=True, readonly=True,
+                          digits_compute=dp.get_precision('Amount'))
+    payment = fields.Float(u'本次付款', states=READONLY_STATES,
+                           digits_compute=dp.get_precision('Amount'))
     bank_account_id = fields.Many2one('bank.account', u'结算账户')
     debt = fields.Float(u'本次欠款', compute=_compute_all_amount,
-                        store=True, readonly=True, copy=False)
+                        store=True, readonly=True, copy=False,
+                        digits_compute=dp.get_precision('Amount'))
     cost_line_ids = fields.One2many('cost.line', 'buy_id', u'采购费用', copy=False)
     money_state = fields.Char(u'付款状态', compute=_get_buy_money_state,
                               help=u"采购入库单的付款状态", select=True, copy=False)
@@ -541,7 +557,8 @@ class buy_receipt_line(models.Model):
     _description = u"采购入库明细"
 
     buy_line_id = fields.Many2one('buy.order.line', u'购货单行')
-    share_cost = fields.Float(u'采购费用')
+    share_cost = fields.Float(u'采购费用',
+                              digits_compute=dp.get_precision('Amount'))
 
 
 class cost_line(models.Model):

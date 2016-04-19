@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models, api, tools
 
 
@@ -13,8 +14,10 @@ class other_money_statements_report(models.Model):
     type = fields.Char(string=u'类别', readonly=True)
     category_id = fields.Many2one('core.category',
                                   string=u'收支项目', readonly=True)
-    get = fields.Float(string=u'收入', readonly=True)
-    pay = fields.Float(string=u'支出', readonly=True)
+    get = fields.Float(string=u'收入', readonly=True,
+                       digits_compute=dp.get_precision('Amount'))
+    pay = fields.Float(string=u'支出', readonly=True,
+                       digits_compute=dp.get_precision('Amount'))
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
     note = fields.Char(string=u'备注', readonly=True)
 

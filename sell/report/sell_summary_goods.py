@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp import fields, models
+import openerp.addons.decimal_precision as dp
 import datetime
 
 class sell_summary_goods(models.Model):
@@ -14,13 +15,13 @@ class sell_summary_goods(models.Model):
     attribute = fields.Char(u'属性')
     warehouse = fields.Char(u'仓库')
     uos = fields.Char(u'辅助单位')
-    qty_uos = fields.Float(u'辅助数量')
+    qty_uos = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'))
     uom = fields.Char(u'基本单位')
-    qty = fields.Float(u'基本数量')
-    price = fields.Float(u'单价')
-    amount = fields.Float(u'销售收入')
-    tax_amount = fields.Float(u'税额')
-    subtotal = fields.Float(u'价税合计')
+    qty = fields.Float(u'基本数量', digits_compute=dp.get_precision('Quantity'))
+    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
+    amount = fields.Float(u'销售收入', digits_compute=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''

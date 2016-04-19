@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import openerp.addons.decimal_precision as dp
 from openerp import models, fields, api
 
 CORE_CATEGORY_TYPE = [('customer', u'客户'),
@@ -60,8 +61,10 @@ class partner(models.Model):
                                     ondelete='restrict',
                                     domain=[('type', '=', 'supplier')],
                                     context={'type': 'supplier'})
-    receivable = fields.Float(u'应收余额', readonly=True)
-    payable = fields.Float(u'应付余额', readonly=True)
+    receivable = fields.Float(u'应收余额', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
+    payable = fields.Float(u'应付余额', readonly=True,
+                           digits_compute=dp.get_precision('Amount'))
 
 class goods(models.Model):
     _name = 'goods'
@@ -74,7 +77,8 @@ class goods(models.Model):
     uom_id = fields.Many2one('uom', ondelete='restrict', string=u'计量单位')
     uos_id = fields.Many2one('uom', ondelete='restrict', string=u'辅助单位')
     conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
-    cost = fields.Float(u'成本')
+    cost = fields.Float(u'成本',
+                        digits_compute=dp.get_precision('Amount'))
     price_ids = fields.One2many('goods.price', 'goods_id', u'价格清单')
 
 
@@ -85,7 +89,8 @@ class goods_price(models.Model):
                                   ondelete='cascade',
                                   domain=[('type', '=', 'customer')],
                                   context={'type': 'customer'})
-    price = fields.Float(u'价格')
+    price = fields.Float(u'价格',
+                         digits_compute=dp.get_precision('Amount'))
 
 
 class warehouse(models.Model):
@@ -101,7 +106,8 @@ class staff(models.Model):
 class bank_account(models.Model):
     _name = 'bank.account'
     name = fields.Char(u'名称')
-    balance = fields.Float(u'余额', readonly=True)
+    balance = fields.Float(u'余额', readonly=True,
+                           digits_compute=dp.get_precision('Amount'))
 
 
 class res_currency(models.Model):
