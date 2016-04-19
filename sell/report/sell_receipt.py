@@ -19,7 +19,7 @@ class sell_receipt(models.TransientModel):
                                    digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(u'优惠后金额', digits_compute=dp.get_precision('Amount'))
     partner_cost = fields.Float(u'客户承担费用', digits_compute=dp.get_precision('Amount'))
-    receipt = fields.Float(u'本次收款', digits_compute=dp.get_precision('Amount'))
+    receipt = fields.Float(u'已收款', digits_compute=dp.get_precision('Amount'))
     balance = fields.Float(u'应收款余额', digits_compute=dp.get_precision('Amount'))
     receipt_rate = fields.Float(u'回款率(%)')
     note = fields.Char(u'备注')
