@@ -67,7 +67,6 @@ class sell_receipt_wizard(models.TransientModel):
                 discount_amount = - discount_amount
                 amount = - amount
                 partner_cost = - partner_cost
-                receipt = - receipt
             # 计算回款率
             if (amount + partner_cost) == 0 and receipt == 0:
                 receipt_rate = 100

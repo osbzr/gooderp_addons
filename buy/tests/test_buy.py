@@ -192,7 +192,7 @@ class test_buy_receipt(TransactionCase):
         '''测试返回付款状态'''
         self.receipt._get_buy_money_state()
         self.receipt.buy_receipt_done()
-        self.return_receipt._get_buy_return_state()
+        self.receipt._get_buy_money_state()
         self.assertTrue(self.receipt.money_state == u'未付款')
         self.receipt._get_buy_money_state()
         self.receipt.payment = self.receipt.amount - 1
@@ -208,12 +208,12 @@ class test_buy_receipt(TransactionCase):
         self.return_receipt.buy_receipt_done()
         self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
-        self.return_receipt._get_buy_money_state()
+        self.return_receipt._get_buy_return_state()
         self.return_receipt.payment = self.return_receipt.amount - 1
-        self.return_receipt._get_buy_money_state()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'部分退款')
         self.return_receipt.payment = self.return_receipt.amount
-        self.return_receipt._get_buy_money_state()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'全部退款')
 
     def test_onchange_discount_rate(self):
@@ -276,12 +276,13 @@ class test_buy_receipt(TransactionCase):
         self.receipt.payment = 20000
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
-        # 重复审核报错
+        # 重复审核入库单报错
         self.receipt.bank_account_id = None
         self.receipt.payment = 0
         self.receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
+        # 重复审核退货单报错
         self.return_receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.return_receipt.buy_receipt_done()
