@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="main_1" model="financial.home">
+            <field name="action" ref="buy.buy_receipt_action"/>
+            <field name="menu" ref="buy.menu_buy_receipt"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one">采购入库单</field>
+       </record>
+
+        <record id="main_2" model="financial.home">
+            <field name="action" ref="sell.sell_delivery_action"/>
+            <field name="menu" ref="sell.sell_delivery_menu"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one" >销售发货单</field>
+       </record>
+       <record id="main_3" model="financial.home">
+            <field name="action" ref="warehouse.wh_move_line_action"/>
+            <field name="menu" ref="warehouse.wh_move_line_menu"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one" >库存调拨 </field>
+       </record>
+       <record id="main_4" model="financial.home">
+            <field name="action" ref="warehouse.wh_inventory_action"/>
+            <field name="menu" ref="warehouse.wh_inventory_menu"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one" >盘点单</field>
+       </record>
+
+        <record id="main_5" model="financial.home">
+            <field name="action" ref="warehouse.wh_in_action"/>
+            <field name="menu" ref="warehouse.wh_in_menu"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one" >其他入库</field>
+       </record>
+
+        <record id="main_6" model="financial.home">
+            <field name="action" ref="money.reconcile_action"/>
+            <field name="menu" ref="money.menu_reconcile_action"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one" >核销单 </field>
+       </record>
+        <record id="main_7" model="financial.home">
+            <field name="action" ref="base.action_partner_form"/>
+            <field name="menu" ref="base.menu_partner_form"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one" >客户 </field>
+       </record>
+		<record id="main_8" model="financial.home">
+            <field name="action" ref="warehouse.report_stock_balance_action"/>
+            <field name="menu" ref="warehouse.report_stock_balance_menu"/>
+            <field name="menu_type">main</field>
+            <field name="domain" ></field>
+            <field name="note_one" >库存余额表</field>
+       </record>
+
+
+        <record id="top_2" model="financial.home">
+		    <field name="action" ref="money.bank_statements_report_wizard_action"/>
+		    <field name="menu_type">top</field>
+		    <field name="domain" ></field>
+		    <field name="note_one" >银行现金余额表</field>
+		</record>
+
+        <record id="top_3" model="financial.home">
+		    <field name="action" ref="buy.buy_summary_goods_wizard_action"/>
+		    <field name="menu_type">top</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >采购汇总表（按商品）</field>
+		</record>
+
+        <record id="top_4" model="financial.home">
+		    <field name="action" ref="sell.customer_statements_report_wizard_action"/>
+		    <field name="menu_type">top</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >客户对账单</field>
+		</record>
+        <record id="top_5" model="financial.home">
+		    <field name="action" ref="sell.sell_summary_goods_wizard_action"/>
+		    <field name="menu_type">top</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >销售汇总表（按商品）</field>
+		</record>
+
+		<record id="left_1" model="financial.home">
+		    <field name="action" ref="goods.goods_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >产品管理</field>
+		</record>
+
+		<record id="left_2" model="financial.home">
+		    <field name="action" ref="core.customer_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[('c_category_id','!=',False)]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >客户管理</field>
+		</record>
+		<record id="left_3" model="financial.home">
+		    <field name="action" ref="core.vendor_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[('s_category_id','!=',False)]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >供应商管理</field>
+		</record>
+		<record id="left_4" model="financial.home">
+		    <field name="action" ref="sell.sell_order_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >销售记录</field>
+		</record>
+		<record id="left_5" model="financial.home">
+		    <field name="action" ref="buy.buy_order_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >购货记录</field>
+		</record>
+		<record id="left_6" model="financial.home">
+		    <field name="action" ref="money.money_receipt_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >收款记录</field>
+		</record>
+		<record id="left_7" model="financial.home">
+		    <field name="action" ref="money.money_payment_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[('type','=','pay')]</field>
+		    <field name="context" >{'type':'pay'}</field>
+		    <field name="note_one" >付款记录</field>
+		</record>
+		<record id="left_8" model="financial.home">
+		    <field name="action" ref="warehouse.wh_move_line_action"/>
+		    <field name="menu_type">left</field>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >调拨记录</field>
+		</record>
+
+    </data>
+</openerp>

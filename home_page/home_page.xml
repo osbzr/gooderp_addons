@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <template id="assets_backend" name="petstore_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/home_page/static/src/css/home_page.css"/>
+                <script type="text/javascript" src="/home_page/static/src/js/home_page.js"/>
+            </xpath>
+        </template>
+
+        <menuitem id="main_home_menu" name="Pet Store" />
+
+        <menuitem id="home_page_menu_two" name="Pet Store"
+            parent="main_home_menu" />
+
+        <record id="action_home_page" model="ir.actions.client">
+            <field name="name">首页</field>
+            <field name="tag">home_page.homepage</field>
+        </record>
+        <menuitem id="home_page_menu" name="Home Page" parent="home_page_menu_two"
+            action="action_home_page" sequence='10'/>
+
+        <record model="ir.ui.view" id="financial_home_tree">
+            <field name="name">financial_home_tree</field>
+            <field name="model">financial.home</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="会计首页设置">
+                    <field name="sequence"/>
+                    <field name="action"/>
+                    <field name="image"  widget="image" />
+                    <field name="menu_type"/> 
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="financial_home_form">
+            <field name="name">financial_home_tree</field>
+            <field name="model">financial.home</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="会计首页设置">
+                    <group>
+                        <field name="sequence" invisible="1"/>
+                        <field name="action" atts="{'required':[('menu_type','=','main')]}"/>
+                        <field name="image"  widget="image" atts="{'required':[('menu_type','=','main')]}"/>
+                        <field name="menu_type" required='1'/>
+
+                        <field name="domain" atts="{'required':[('menu_type','in',('top','left')]}"/> 
+                        <field name="compute_field_one" atts="{'required':[('menu_type','=','top')]}"/> 
+                        <field name="note_one" atts="{'required':[('menu_type','=','main')]}"/> 
+
+                        <field name="compute_field_two"/> 
+                        <field name="note_two"/> 
+                        <field name="compute_type" /> 
+                        <field name="context" atts="{'required':[('menu_type','in',('top','left'))]}"/>
+
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="financial_home_action">
+            <field name="name">financial_home</field>
+            <field name="res_model">financial.home</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="financial_home_action_mnue" name="设置主页元素" parent="home_page_menu_two"
+            action="financial_home_action" sequence='20'/>
+    </data>
+</openerp>
