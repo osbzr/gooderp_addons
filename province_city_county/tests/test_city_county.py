@@ -52,7 +52,9 @@ class test_city_county(TransactionCase):
         # 存在市不存在省，存在县，县属于市
         partner.province_id = False
         county = self.env['all.county'].search([('county_name', '=', u'平山县')])
+        city = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
         partner.county_id = county.id
+        partner.city_id = city.id
         partner.onchange_city()
         # 存在市存在省
         province = self.env['country.state'].search([('name', '=', u'河北省')])
