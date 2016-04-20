@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
+    <data noupdate="1">
         <record id='settle_mode_groups' model='res.groups'>
             <field name='name'>管理结算方式</field>
+        </record>
+        <record id='decimal_quantity' model="decimal.precision">
+            <field name="name">Quantity</field>
+            <field name="digits" eval="1"/>
+        </record>
+        <record id='decimal_amount' model="decimal.precision">
+            <field name="name">Amount</field>
+            <field name="digits" eval="2"/>
         </record>
     </data>
 </openerp>
