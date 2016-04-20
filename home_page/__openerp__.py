@@ -10,6 +10,7 @@
     'data': [
         "home_page.xml",
         "home_data.xml",
+        'security/ir.model.access.csv',
     ],
     'depends': ['base', 'buy', 'warehouse'],
     'qweb': ['static/src/xml/*.xml'],

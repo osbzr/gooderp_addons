@@ -8,24 +8,24 @@
             </xpath>
         </template>
 
-        <menuitem id="main_home_menu" name="Pet Store" />
+        <menuitem id="main_home_menu" name="首页" />
 
-        <menuitem id="home_page_menu_two" name="Pet Store"
+        <menuitem id="home_page_menu_two" name="首页"
             parent="main_home_menu" />
 
         <record id="action_home_page" model="ir.actions.client">
             <field name="name">首页</field>
             <field name="tag">home_page.homepage</field>
         </record>
-        <menuitem id="home_page_menu" name="Home Page" parent="home_page_menu_two"
+        <menuitem id="home_page_menu" name="首页" parent="home_page_menu_two"
             action="action_home_page" sequence='10'/>
 
         <record model="ir.ui.view" id="financial_home_tree">
             <field name="name">financial_home_tree</field>
-            <field name="model">financial.home</field>
+            <field name="model">home.page</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree string="会计首页设置">
+                <tree string="首页设置">
                     <field name="sequence"/>
                     <field name="action"/>
                     <field name="image"  widget="image" />
@@ -34,11 +34,11 @@
             </field>
         </record>
         <record model="ir.ui.view" id="financial_home_form">
-            <field name="name">financial_home_tree</field>
-            <field name="model">financial.home</field>
+            <field name="name">financial_home_form</field>
+            <field name="model">home.page</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="会计首页设置">
+                <form string="首页设置">
                     <group>
                         <field name="sequence" invisible="1"/>
                         <field name="action" atts="{'required':[('menu_type','=','main')]}"/>
@@ -61,7 +61,7 @@
 
         <record model="ir.actions.act_window" id="financial_home_action">
             <field name="name">financial_home</field>
-            <field name="res_model">financial.home</field>
+            <field name="res_model">home.page</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>

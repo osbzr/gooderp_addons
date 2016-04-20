@@ -9,7 +9,7 @@ openerp.home_page = function(instance, local) {
             var self=this
             self.$el.append("<div><div class='outter_div'></div>\
                 <div class='top_div' ></div><div class='left_div'></div></div>")
-            new instance.web.Model("financial.home").call("get_action_url").then(function(result){
+            new instance.web.Model("home.page").call("get_action_url").then(function(result){
                 var index=0
                 var center_main_table="<div class='center_class'><table border='1' cellpadding='3' class='oe_table_main'></table></div>"
                 self.$el.find('.outter_div').append(center_main_table);
@@ -22,7 +22,7 @@ openerp.home_page = function(instance, local) {
                         if (result_one===undefined){
                             result_one=[0,0,0,0,'web/binary/company_logo?db=hahh&company=1']
                         }else{
-                            result_one[4]="/web/binary/image?model=financial.home&id="+result_one[4]+"&field=image" 
+                            result_one[4]="/web/binary/image?model=home.page&id="+result_one[4]+"&field=image" 
                         }
                         var center_html_str="<td ><img class='oe_img oe_main_link_"+index+"' id='"+index+"' height='200' \
                          width='200' src='"+result_one[4]+"' alt='暂无快捷菜单链接' />\
@@ -35,9 +35,10 @@ openerp.home_page = function(instance, local) {
                                  self.do_action({
                                     type: 'ir.actions.act_window',
                                     res_model: (self.result_main[this.id])[2],
-                                    view_mode: 'tree',
+                                    view_mode: 'list',
+                                    name:self.result_main[this.id][7],
                                     view_type: self.result_main[this.id][1],
-                                    views: [[false, 'list'],[false, 'form']],
+                                    views: [[self.result_main[this.id][6], 'list'],[false, 'form']],
                                     domain:self.result_main[this.id][3],
                                     context:self.result_main[this.id][5],
                                     target: 'current',
@@ -56,12 +57,13 @@ openerp.home_page = function(instance, local) {
                              self.do_action({
                                 type: 'ir.actions.act_window',
                                 res_model: (self.result_top[this.id])[2],
-                                view_mode: 'form',
+                                view_mode: 'list',
                                 view_type: self.result_top[this.id][1],
-                                views: [[false, 'form']],
+                                views: [[self.result_top[this.id][5], 'list'],[false, 'form']],
                                 domain:self.result_top[this.id][3],
                                 context:self.result_top[this.id][4],
-                                target: 'new',
+                                name:self.result_top[this.id][6],
+                                target: 'current',
                             });
                         });
                     }
@@ -75,9 +77,10 @@ openerp.home_page = function(instance, local) {
                              self.do_action({
                                 type: 'ir.actions.act_window',
                                 res_model: (self.result_quick[this.id])[2],
-                                view_mode: 'tree',
+                                view_mode: 'list',
+                                name:self.result_quick[this.id][6],
                                 view_type: self.result_quick[this.id][1],
-                                views: [[false, 'list'],[false, 'form']],
+                                views: [[self.result_quick[this.id][5], 'list'],[false, 'form']],
                                 domain:self.result_quick[this.id][3],
                                 context:self.result_quick[this.id][4],
                                 target: 'current',

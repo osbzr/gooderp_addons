@@ -2,8 +2,8 @@
 from openerp import api, fields, models
 
 
-class financial_home(models.Model):
-    _name = "financial.home"
+class home_page(models.Model):
+    _name = "home.page"
     _rec_name = "action"
 
     sequence = fields.Integer(u'序列')
@@ -22,11 +22,13 @@ class financial_home(models.Model):
     def get_action_url(self):
         action_url_lsit = {'main': [], 'top': [], 'left': []}
 
-        action_list = self.env['financial.home'].search([(1, '=', 1)], order='sequence')
+        action_list = self.env['home.page'].search([(1, '=', 1)], order='sequence')
         for action in action_list:
             if action:
                 if action.menu_type == 'main':
-                    action_url_lsit['main'].append([action.note_one, action.action.view_mode, action.action.res_model, action.action.domain, action.action.id, action.action.context])
+                    action_url_lsit['main'].append([action.note_one, action.action.view_mode, action.action.res_model,
+                                                    action.action.domain, action.action.id, action.action.context,
+                                                    action.action.view_id.id, action.action.name])
                 elif action.menu_type == 'top':
                     note = ""
                     res_model_objs = self.env[action.action.res_model].search(eval(action.domain or '[]'))
@@ -46,7 +48,9 @@ class financial_home(models.Model):
                     else:
                         note = "%s  %s" % (action.note_one, sum([1 for res_model_obj in res_model_objs]))
 
-                    action_url_lsit['top'].append([note, action.action.view_mode, action.action.res_model, action.domain, action.context])
+                    action_url_lsit['top'].append([note, action.action.view_mode, action.action.res_model, action.domain,
+                                                   action.context, action.action.view_id.id, action.action.name])
                 else:
-                    action_url_lsit['left'].append([action.note_one, action.action.view_mode, action.action.res_model, action.domain, action.context])
+                    action_url_lsit['left'].append([action.note_one, action.action.view_mode, action.action.res_model,
+                                                    action.domain, action.context, action.action.view_id.id, action.action.name])
         return action_url_lsit
