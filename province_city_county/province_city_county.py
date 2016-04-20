@@ -83,13 +83,11 @@ class province_city_county(models.Model):
                 domain_dict.update({'city_id': [('province_id', '=', province.id)]})
                 if self.county_id:
                     if self.county_id.city_id.id == self.city_id.id:
-                        print "aa self.county_id.city_id.id == self.city_id.id:"
                         if province.id != self.province_id.id:
                             self.province_id = province.id
                             return {'domain': domain_dict}
                         return {'domain': domain_dict}
                     else:
-                        print "aa self.county_id.city_id.id != self.city_id.id:"
                         if province.id != self.province_id.id:
                             self.province_id = province.id
                             self.county_id = ''
