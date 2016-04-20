@@ -44,7 +44,12 @@ class test_city_county(TransactionCase):
         # 存在市不存在省，不存在县
         partner.county_id = False
         partner.onchange_city()
-        # 存在市不存在省，存在县
+        # 存在市存在省存在县，但县不属于市
+        partner.province_id = False
+        county = self.env['all.county'].search([('county_name', '=', u'承德县')])
+        partner.county_id = county.id
+        partner.onchange_city()
+        # 存在市不存在省，存在县，县属于市
         partner.province_id = False
         county = self.env['all.county'].search([('county_name', '=', u'平山县')])
         partner.county_id = county.id
@@ -53,17 +58,55 @@ class test_city_county(TransactionCase):
         province = self.env['country.state'].search([('name', '=', u'河北省')])
         partner.province = province.id
         partner.onchange_city()
+        # 存在市存在省存在县，县属于市
+        county = self.env['all.county'].search([('county_name', '=', u'平山县')])
+        partner.county_id = city.id
+        partner.onchange_province()
+        # 存在市存在省存在县，县属于市，但省与  市所在的省相同
+        province = self.env['country.state'].search([('name', '=', u'河北省')])
+        city = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
+        county = self.env['all.county'].search([('county_name', '=', u'平山县')])
+        partner.city_id = city.id
+        partner.province_id = province.id
+        partner.county_id = county.id
+        partner.onchange_city()
+        # 存在市存在省存在县，县属于市，但省与  市所在的省不同
+        province = self.env['country.state'].search([('name', '=', u'四川省')])
+        partner.province_id = province.id
+        partner.onchange_city()
         # 存在市存在省存在县，但县不属于市
         county = self.env['all.county'].search([('county_name', '=', u'承德县')])
         partner.county_id = county.id
         partner.province_id = province.id
         partner.onchange_city()
-        # 存在市存在省存在县，县属于市
-        county = self.env['all.county'].search([('county_name', '=', u'平山县')])
-        partner.county_id = county.id
-        partner.onchange_province()
-        # 存在市存在省存在县，县属于市，但省与市所在的省不同
+        # 存在市存在省存在县，县不属于市，省与  市所在的省不同
         province = self.env['country.state'].search([('name', '=', u'四川省')])
+        city = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
+        county = self.env['all.county'].search([('county_name', '=', u'承德县')])
+        partner.city_id = city.id
+        partner.county_id = county.id
+        partner.province_id = province.id
+        partner.onchange_city()
+        # 存在市存在省存在县，县不属于市，但省与  市所在的省相同
+        province = self.env['country.state'].search([('name', '=', u'河北省')])
+        city = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
+        county = self.env['all.county'].search([('county_name', '=', u'承德县')])
+        partner.city_id = city.id
+        partner.province_id = province.id
+        partner.county_id = county.id
+        partner.onchange_city()
+        # 存在市存在省不存在县，省与  市所在的省不同
+        city = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
+        province = self.env['country.state'].search([('name', '=', u'山西省')])
+        partner.city_id = city.id
+        partner.county_id = False
+        partner.province_id = province.id
+        partner.onchange_city()
+        # 存在市存在省不存在县，省与  市所在的省相同
+        city = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
+        province = self.env['country.state'].search([('name', '=', u'河北省')])
+        partner.city_id = city.id
+        partner.county_id = False
         partner.province_id = province.id
         partner.onchange_city()
 
