@@ -38,5 +38,9 @@
         <record id='other_out_picking_groups' model='res.groups'>
             <field name='name'>其它出库单审核</field>
         </record>
+        <!--添加管理多个仓库组-->
+        <record id='multi_warehouse_groups' model='res.groups'>
+            <field name='name'>管理多个仓库</field>
+        </record>
     </data>
 </openerp>

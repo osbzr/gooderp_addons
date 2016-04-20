@@ -48,5 +48,9 @@
         <record id='sell_discount_groups' model='res.groups'>
             <field name='name'>管理销售单的折扣</field>
         </record>
+        <!--添加管理销项税组-->
+        <record id='out_tax_groups' model='res.groups'>
+            <field name='name'>管理销项税</field>
+        </record>
     </data>
 </openerp>

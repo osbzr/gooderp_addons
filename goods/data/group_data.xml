@@ -7,5 +7,11 @@
         <record id='batch_groups' model='res.groups'>
             <field name='name'>管理批号</field>
         </record>
+        <record id='batch_serial_groups' model='res.groups'>
+            <field name='name'>管理序列号</field>
+        </record>
+        <record id='multi_attrs_groups' model='res.groups'>
+            <field name='name'>管理多属性</field>
+        </record>
     </data>
 </openerp>
