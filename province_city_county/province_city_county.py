@@ -42,89 +42,82 @@ class province_city_county(models.Model):
     _name = 'province.city.county'
     _description = u'省市县'
 
-#     @api.onchange('county_id','city_id','province_id')
-#     def onchange_province(self):
-#         # 为地址填写时方便，当选定省时 ，市区的列表里面只有所选省的
-#         if self.province_id:
-#             if self.city_id:
-#                 city = self.env['all.city'].search([('id', '=', self.city_id.id)])
-#                 if city.province_id.id == self.province_id.id:
-#                     if self.county_id:
-#                         county = self.env['all.county'].search([('id', '=', self.county_id.id)])
-#                         if county.city_id.id == self.city_id.id:
-#                             return{}
-#                     return {'domain': {'city_id': [('province_id', '=', self.province_id.id)]},
-#                             'value': {'county_id': ''}}
-#                 else:
-#                     return {'domain': {'city_id': [('province_id', '=', self.province_id.id)]},
-#                             'value': {'city_id': ''}}
-#             else:
-#                 return {'domain': {'city_id': [('province_id', '=', self.province_id.id)]}}
-#         else:
-#             return {'domain': {'city_id': [], 'county_id': []},
-#                     'value': {'county_id': '', 'city_id': ''}}
-#             
-#     @api.onchange('county_id','city_id','province_id')
-#     def onchange_county(self):
-#         # 选定了一个区县，自动填充其所属的省和市
-#         if self.county_id:
-#             try:
-#                 county_obj = self.env['all.county'].search([('id', '=', self.county_id.id)])
-#                 city_obj = self.env['all.city'].search([('id', '=', self.city_id.id)])
-#                 return {'domain': {'county_id': [('city_id', '=', self.city_id.id)]},
-#                         'value': {'city_id': county_obj[0].city_id.id,
-#                                   'province_id': city_obj[0].province_id.id}}
-#             except Exception:
-#                 raise except_orm(u'错误', u"无法根据所选区县填充省和市")
-# 
-#     @api.onchange('county_id','city_id','province_id')
-#     def onchange_city(self):
-#         # 为地址填写时方便，当选定市时 ，县区的列表里面只有所选市的
-#         if self.city_id:
-#             city_obj = self.env['all.city'].search([('id', '=', self.city_id.id)])
-#             province_id = city_obj[0].province_id
-#             if not self.province_id:
-#                 if self.county_id:
-#                     county_obj = self.env['all.county'].search([('id', '=', self.county_id.id)])
-#                     if county_obj[0].city_id.id == self.city_id.id:
-#                         return {'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
-#                     return {'value': {'county_id': "", 'province_id': province_id.id},
-#                             'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
-#                 return {'value': {'province_id': province_id.id},
-#                         'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
-#             else:
-#                 if self.county_id:
-#                     county_obj = self.env['all.county'].search([('id', '=', self.county_id.id)])
-#                     if county_obj.city_id.id == self.city_id.id:
-#                         if province_id.id != self.province_id.id:
-#                             return {'domain': {'county_id': [('city_id', '=', self.city_id.id)],
-#                                                'city_id': [('province_id', '=', province_id.id)]},
-#                                     'value': {'province_id': province_id}}
-#                         return {'domain': {'county_id': [('city_id', '=', self.city_id.id)],
-#                                            'city_id': [('province_id', '=', province_id.id)]}}
-#                     else:
-#                         if province_id.id != self.province_id.id:
-#                             return {'domain': {'county_id': [('city_id', '=', self.city_id.id)],
-#                                                'city_id': [('province_id', '=', province_id.id)]},
-#                                     'value': {'province_id': province_id.id, 'county_id': ""}}
-#                         return {'domain': {'county_id': [('city_id', '=', self.city_id.id)],
-#                                            'city_id': [('province_id', '=', province_id.id)]},
-#                                 'value': {'county_id': ""}}
-#                 else:
-#                     if province_id.id != self.province_id.id:
-#                         return {'domain': {'county_id': [('city_id', '=', self.city_id.id)],
-#                                            'city_id': [('province_id', '=', province_id.id)]},
-#                                 'value': {'province_id': province_id.id}}
-#                     return {'domain': {'county_id': [('city_id', '=', self.city_id.id)],
-#                                        'city_id': [('province_id', '=', province_id.id)]}}
-#         else:
-#             return {'domain': {'county_id': []}, 'value': {'county_id': ""}}
+    @api.onchange('province_id')
+    def onchange_province(self):
+        # 为地址填写时方便，当选定省时 ，市区的列表里面只有所选省的
+        domain_dict = {'city_id': [('province_id', '=', self.province_id.id)]}
+        if self.province_id:
+            if self.city_id:
+                if self.city_id.province_id.id == self.province_id.id:
+                    if self.county_id:
+                        if self.county_id.city_id.id == self.city_id.id:
+                            return{}
+                    self.county_id = ''
+                    return {'domain': domain_dict}
+                else:
+                    self.city_id = ''
+                    return {'domain': domain_dict}
+            else:
+                return {'domain': domain_dict}
+        else:
+            self.city_id = ''
+            self.county_id = ''
+            return {'domain': {'city_id': [], 'county_id': []}}
+
+    @api.onchange('city_id')
+    def onchange_city(self):
+        # 为地址填写时方便，当选定市时 ，县区的列表里面只有所选市的
+        domain_dict = {'county_id': [('city_id', '=', self.city_id.id)]}
+        if self.city_id:
+            province = self.city_id.province_id
+            if not self.province_id:
+                if self.county_id:
+                    if self.county_id.city_id.id == self.city_id.id:
+                        return {'domain': domain_dict}
+                    self.city_id = ''
+                    self.province_id = province.id
+                    return {'domain': domain_dict}
+                self.province_id = province.id
+                return {'domain': domain_dict}
+            else:
+                domain_dict.update({'city_id': [('province_id', '=', province.id)]})
+                if self.county_id:
+                    if self.county_id.city_id.id == self.city_id.id:
+                        print "aa self.county_id.city_id.id == self.city_id.id:"
+                        if province.id != self.province_id.id:
+                            self.province_id = province.id
+                            return {'domain': domain_dict}
+                        return {'domain': domain_dict}
+                    else:
+                        print "aa self.county_id.city_id.id != self.city_id.id:"
+                        if province.id != self.province_id.id:
+                            self.province_id = province.id
+                            self.county_id = ''
+                            return {'domain': domain_dict}
+                        self.county_id = ''
+                        return {'domain': domain_dict}
+                else:
+                    if province.id != self.province_id.id:
+                        self.province_id = province.id
+                        return {'domain': domain_dict}
+                    return {'domain': domain_dict}
+        else:
+            self.county_id = ''
+            return {'domain': {'county_id': []}}
+
+
+    @api.onchange('county_id')
+    def onchange_county(self):
+        # 选定了一个区县，自动填充其所属的省和市
+        if self.county_id:
+            self.city_id = self.county_id.city_id.id
+            self.province_id = self.city_id.province_id.id
+            return {'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
 
     city_id = fields.Many2one('all.city', u'市')
     county_id = fields.Many2one('all.county', u'县')
     province_id = fields.Many2one('country.state', u'省',
                                   domain="[('country_id.name','=','中国')]")
-
 
 class res_partner(models.Model):
     _name = 'res.partner'
@@ -144,9 +137,10 @@ class partner(models.Model):
     _description = u'业务伙伴'
 
     partner_address = fields.Many2one('res.partner', u'业务伙伴地址')
-    city_id = fields.Many2one('all.city', u'市')
-    county_id = fields.Many2one('all.county', u'县')
+    city_id = fields.Many2one('all.city', u'市', readonly=True)
+    county_id = fields.Many2one('all.county', u'县', readonly=True)
     province_id = fields.Many2one('country.state', u'省',
+                                  readonly=True,
                                   domain="[('country_id.name','=','中国')]")
 
     @api.onchange('partner_address')
