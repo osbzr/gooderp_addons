@@ -8,4 +8,4 @@ class test_invoice(TransactionCase):
         pass
 
     def test_home_page(self):
-        self.env['financial.home'].get_action_url()
+        self.env['home.page'].get_action_url()
