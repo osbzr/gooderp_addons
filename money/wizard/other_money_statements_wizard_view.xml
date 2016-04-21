@@ -35,7 +35,9 @@
         </record>
 
 		<!-- 其他收支明细表向导 menu-->
-        <menuitem id="report_other_money_statements_action" name="其他收支明细表" action="other_money_statements_report_wizard_action" parent="menu_money_report" sequence="4"/>
+        <menuitem id="report_other_money_statements_action" name="其他收支明细表"
+			action="other_money_statements_report_wizard_action" parent="menu_money_report"
+			groups='money.other_get_pay_groups' sequence="4"/>
 	</data>
 </openerp>
 	

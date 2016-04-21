@@ -535,7 +535,6 @@ class sell_delivery_line(models.Model):
     _description = u'销售发货单行'
 
     sell_line_id = fields.Many2one('sell.order.line', u'销货单行')
-    origin = fields.Char(u'源单号')
 
 
 class cost_line(models.Model):

@@ -87,13 +87,14 @@
                     <field name='using_batch' invisible='1' />
                     <field name='force_batch_one' invisible='1' />
                     <field name='using_attribute' invisible='1' />
-                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]" attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}" />
+                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]" attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                    	groups='goods.multi_attrs_groups' />
                     <field name='lot' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
                     <field name='goods_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
                     <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1' />
 
                     <field name='warehouse_id' invisible='1' />
-                    <field name='warehouse_dest_id' string='仓库' required='1' />
+                    <field name='warehouse_dest_id' string='仓库' required='1' groups='warehouse.multi_warehouse_groups' />
                     <field name='cost_unit' string='入库单位成本' readonly='1' />
                     <field name='cost' string='入库金额' readonly='1' sum='1' />
                     <field name='note' string='备注' />

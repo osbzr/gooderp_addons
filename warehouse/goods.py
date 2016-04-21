@@ -3,13 +3,18 @@
 from openerp.osv import osv
 from utils import safe_division
 
-from openerp import models, fields
+from openerp import models, fields, api
 
 
 class goods(models.Model):
     _inherit = 'goods'
 
-    default_wh = fields.Many2one('warehouse', u'默认库位')
+    @api.model
+    def _get_default_wh(self):
+        return self.env.ref('warehouse.warehouse_general')
+
+    default_wh = fields.Many2one('warehouse', u'默认库位', required=True,
+                                 default=_get_default_wh)
 
     # 使用SQL来取得指定产品情况下的库存数量
     def get_stock_qty(self):

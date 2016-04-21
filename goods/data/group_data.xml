@@ -9,6 +9,7 @@
         </record>
         <record id='batch_serial_groups' model='res.groups'>
             <field name='name'>管理序列号</field>
+            <field name='implied_ids' eval="[(4,ref('goods.batch_groups'))]"/>
         </record>
         <record id='multi_attrs_groups' model='res.groups'>
             <field name='name'>管理多属性</field>

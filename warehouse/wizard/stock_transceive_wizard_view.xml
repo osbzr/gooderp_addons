@@ -16,7 +16,7 @@
                             <field name='goods' />
                         </group>
                         <group>
-                            <field name='warehouse' />
+                            <field name='warehouse' groups='warehouse.multi_warehouse_groups' />
                         </group>
                     </group>
                     <footer>

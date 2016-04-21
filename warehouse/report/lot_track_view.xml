@@ -8,13 +8,13 @@
                 <tree string='批号状态表'>
                     <field name='goods' />
                     <field name='uom' />
-                    <field name='uos' />
-                    <field name='lot' />
-                    <field name='attribute_id' />
-                    <field name='uos_qty' />
+                    <field name='uos' groups='goods.auxiliary_unit_groups' />
+                    <field name='lot' groups='goods.batch_groups' />
+                    <field name='attribute_id' groups='goods.multi_attrs_groups' />
+                    <field name='uos_qty' groups='goods.auxiliary_unit_groups' />
                     <field name='qty' />
                     <field name='date' />
-                    <field name='warehouse' />
+                    <field name='warehouse' groups='warehouse.multi_warehouse_groups' />
                     <field name='origin' />
                 </tree>
             </field>
@@ -26,12 +26,12 @@
             <field name='arch' type='xml'>
                 <search string='批号状态表' >
                     <field name='goods' string='产品' filter_domain="[('goods', 'ilike', self)]" />
-                    <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" />
+                    <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" groups='warehouse.multi_warehouse_groups' />
                     <field name='uom' string='单位' filter_domain="[('uom', 'ilike', self)]" />
 
                     <group expand="0" string="Group By">
                         <filter string="产品" context="{'group_by':'goods'}"/>
-                        <filter string="仓库" context="{'group_by': 'warehouse'}"/>
+                        <filter string="仓库" context="{'group_by': 'warehouse'}" groups='warehouse.multi_warehouse_groups'/>
                         <filter string="单位" context="{'group_by': 'uom'}"/>
                     </group>
                 </search>
@@ -43,9 +43,9 @@
             <field name='model'>report.lot.track</field>
             <field name='arch' type='xml'>
                 <graph type='pivot'>
-                    <field name='lot' type='row' />
+                    <field name='lot' type='row' groups='goods.batch_groups' />
                     <field name='goods' type='row' />
-                    <field name='warehouse' type='col' />
+                    <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='qty' type='measure' />
                 </graph>
             </field>

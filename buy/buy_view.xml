@@ -159,10 +159,8 @@
 		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_type':'supplier','type':'in'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'
-		                            	context="{'default_partner':parent.partner_id,
-		                            			  'default_is_return':parent.is_return}"/>
-		                            <field name="attribute_id" domain="[('goods_id', '=', goods_id)]"/>
+		                            <field name="goods_id" required='1'/>
+		                            <field name="attribute_id" domain="[('goods_id', '=', goods_id)]" groups='goods.multi_attrs_groups'/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
 				                    <field name='force_batch_one' invisible='1'/>
@@ -288,10 +286,8 @@
 		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_dest_type':'supplier','type':'out'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'
-		                            	context="{'default_partner':parent.partner_id,
-		                            			  'default_is_return':parent.is_return}"/>
-		                            <field name="attribute_id"/>
+		                            <field name="goods_id" required='1'/>
+		                            <field name="attribute_id" groups='goods.multi_attrs_groups'/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
 		                            <field name='lot_qty' invisible='1'/>

@@ -10,16 +10,16 @@
                 	<field name="partner"/>
                 	<field name="goods_code"/>
                     <field name="goods"/>
-                    <field name="attribute"/>
-                    <field name="warehouse"/>
-                    <field name="uos"/>
-                    <field name="qty_uos" sum="辅助数量合计"/>
+                    <field name="attribute" groups='goods.multi_attrs_groups'/>
+                    <field name="warehouse" groups='warehouse.multi_warehouse_groups'/>
+                    <field name="uos" groups='goods.auxiliary_unit_groups'/>
+                    <field name="qty_uos" sum="辅助数量合计" groups='goods.auxiliary_unit_groups'/>
                     <field name="uom"/>
                     <field name="qty" sum="基本数量合计"/>
                     <field name="price"/>
                     <field name="amount" sum="销售收入合计"/>
-                    <field name="tax_amount" sum="税额合计"/>
-                    <field name="subtotal" sum="价税合计的合计"/>
+                    <field name="tax_amount" sum="税额合计" groups='sell.out_tax_groups'/>
+                    <field name="subtotal" sum="价税合计的合计" groups='sell.out_tax_groups'/>
                 </tree>
             </field>
         </record>
