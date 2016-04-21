@@ -235,50 +235,6 @@ class wh_move_line(models.Model):
                 self.goods_qty = self.goods_id.conversion_unit(
                     self.goods_uos_qty)
 
-            partner_id = self.env.context.get('default_partner')
-            partner = self.env['partner'].search([('id', '=', partner_id)])
-            is_return = self.env.context.get('default_is_return')
-            if self.type == 'in':
-                print '1111111111111111111'
-                self.warehouse_dest_id = self.goods_id.default_wh  # 取产品的默认仓库
-                if not self.goods_id.cost:
-                    print '22222222222222222'
-                    raise osv.except_osv(u'错误', u'请先设置商品的成本！')
-                self.price = self.goods_id.cost
-                # 如果是销售退货单行
-                if is_return:
-                    print '333333333333333333'
-                    matched = False # 在商品的价格清单中是否找到匹配的价格
-                    for line in self.goods_id.price_ids:
-                        if partner.c_category_id == line.category_id:
-                            print '4444444444444444444444'
-                            self.price = line.price
-                            matched = True
-                    if not matched:
-                        print '555555555555555555'
-                        raise osv.except_osv(u'错误', u'请先设置商品的价格清单或客户类别！')
-            elif self.type == 'out':
-                print '66666666666666666666'
-                self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
-                matched = False # 在商品的价格清单中是否找到匹配的价格
-                for line in self.goods_id.price_ids:
-                    if partner.c_category_id == line.category_id:
-                        print '777777777777777777777'
-                        self.price = line.price
-                        matched = True
-                # 如果是采购退货单行
-                if is_return:
-                    print '888888888888888888888888'
-                    if not self.goods_id.cost:
-                        print '999999999999999999999999'
-                        raise osv.except_osv(u'错误', u'请先设置商品的成本！')
-                    self.price = self.goods_id.cost
-                    matched = True
-
-                if not matched:
-                    print '00000000000000000000'
-                    raise osv.except_osv(u'错误', u'请先设置商品的价格清单或客户类别！')
-
         self.compute_suggested_cost()
         self.compute_lot_compatible()
 

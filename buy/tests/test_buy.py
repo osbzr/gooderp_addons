@@ -103,7 +103,7 @@ class test_buy_order(TransactionCase):
         # 批次管理拆分订单行
         new_order = self.order.copy()
         for line in new_order.line_ids:
-            line.goods_id = 1
+            line.goods_id = self.env.ref('goods.mouse').id
             new_order.buy_generate_receipt()
         receipt = self.env['buy.receipt'].search(
                   [('order_id', '=', new_order.id)])
@@ -300,3 +300,65 @@ class test_buy_receipt(TransactionCase):
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
+
+
+class test_wh_move_line(TransactionCase):
+
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_wh_move_line, self).setUp()
+        self.order = self.env.ref('buy.buy_order_1')
+        self.order.buy_order_done()
+        self.receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', self.order.id)])
+        self.return_receipt = self.env.ref('buy.buy_receipt_return_1')
+
+        self.sell_return = self.browse_ref('sell.sell_order_return')
+        self.sell_return.sell_order_done()
+        self.delivery_return = self.env['sell.delivery'].search(
+                  [('order_id', '=', self.sell_return.id)])
+
+        self.sell_order = self.env.ref('sell.sell_order_1')
+        self.sell_order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                        [('order_id', '=', self.sell_order.id)])
+
+        self.goods_mouse = self.browse_ref('goods.mouse')
+        self.goods_cable = self.browse_ref('goods.cable')
+        self.goods_keyboard = self.browse_ref('goods.keyboard')
+
+    def test_onchange_goods_id(self):
+        '''测试商品的onchange,是否会带出默认库位和单价'''
+        # 入库单行：修改鼠标成本为0，测试是否报错
+        self.goods_mouse.cost = 0.0
+        for line in self.receipt.line_in_ids:
+            line.goods_id = self.goods_mouse.id
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()
+
+        # 销售退货单行
+        for line in self.delivery_return.line_in_ids:
+            # 在商品鼠标的价格清单中没有找到匹配的价格
+            with self.assertRaises(except_orm):
+                line.with_context({'default_is_return': True,
+                    'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+            # 在商品键盘的价格清单中找到匹配的价格
+            line.goods_id = self.goods_keyboard.id
+            line.with_context({'default_is_return': True,
+                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+
+        # 发货单行：
+        for line in self.delivery.line_out_ids:
+            line.goods_id = self.goods_keyboard.id
+            line.with_context({'default_is_return': False,
+                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+            line.goods_id = self.goods_cable.id
+            with self.assertRaises(except_orm):
+                line.with_context({'default_is_return': False,
+                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+        # 采购退货单行
+        for line in self.return_receipt.line_out_ids:
+            line.goods_id.cost = 0.0
+            with self.assertRaises(except_orm):
+                line.with_context({'default_is_return': True,
+                    'default_partner': self.delivery.partner_id.id}).onchange_goods_id()

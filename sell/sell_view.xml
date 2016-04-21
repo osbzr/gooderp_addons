@@ -159,7 +159,9 @@
 		    					<field name='line_out_ids' attrs="{'readonly': [('state','!=','draft')]}"
 		    						context="{'warehouse_dest_type': 'customer','type':'out'}">
 		         					<tree string='销售发货单行' editable='bottom'>
-		         						<field name='goods_id'/>
+		         						<field name='goods_id'
+		         							context="{'default_partner':parent.partner_id,
+		         									  'default_is_return':parent.is_return}"/>
 		         						<field name='attribute_id' domain="[('goods_id', '=', goods_id)]" groups='goods.multi_attrs_groups'/>
 				 						<field name='uom_id'/>
 				 						<field name='using_batch' invisible='1'/>
@@ -180,7 +182,6 @@
 		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
 				 						<field name='note'/>
-				 						<field name='origin'/>
 				 						<field name="type" invisible="1"/>
 				 					</tree>
 				 				</field>
@@ -279,7 +280,9 @@
 		    					<field name='line_in_ids' attrs="{'readonly': [('state','!=','draft')]}"
 		    						context="{'warehouse_type': 'customer','type':'in'}">
 		         					<tree string='销售退货单行' editable='bottom'>
-		         						<field name='goods_id'/>
+		         						<field name='goods_id'
+		         							context="{'default_partner':parent.partner_id,
+		         									  'default_is_return':parent.is_return}"/>
 		         						<field name='attribute_id' groups='goods.multi_attrs_groups'/>
 				 						<field name='uom_id'/>
 				 						<field name='using_batch' invisible='1'/>
@@ -298,7 +301,6 @@
 		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
 				 						<field name='note'/>
-				 						<field name='origin'/>
 				 						<field name="type" invisible="1"/>
 				 					</tree>
 				 				</field>

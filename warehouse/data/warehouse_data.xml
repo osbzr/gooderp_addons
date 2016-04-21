@@ -26,7 +26,7 @@
         </record>
 
 		<record id="warehouse_general" model="warehouse">
-            <field name="name">总仓库</field>
+            <field name="name">主仓库</field>
             <field name="code">General</field>
             <field name='type'>stock</field>
         </record>

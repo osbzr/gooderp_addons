@@ -57,7 +57,7 @@
                     <field name="line_ids" context="{'warehouse_type': 'supplier'}">
                     	<tree string="购货订单行" editable="bottom">
                             <field name="goods_id" required='1'/>
-                            <field name="attribute_id"/>
+                            <field name="attribute_id" groups='goods.multi_attrs_groups'/>
                             <field name="uom_id"/>
                             <field name='warehouse_id' invisible='1'/>
                             <field name='warehouse_dest_id' required='1' groups='warehouse.multi_warehouse_groups'/>
@@ -72,7 +72,7 @@
                             <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
                             <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
                             <field name="note"/>
-                            <field name="origin"/>
+                            <field name="origin" invisible="1"/>
                         </tree>
                     </field>
                     <field name="note" placeholder="暂无备注信息"/>
@@ -159,7 +159,9 @@
 		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_type':'supplier','type':'in'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'/>
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
 		                            <field name="attribute_id" domain="[('goods_id', '=', goods_id)]" groups='goods.multi_attrs_groups'/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
@@ -286,7 +288,9 @@
 		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_dest_type':'supplier','type':'out'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'/>
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
 		                            <field name="attribute_id" groups='goods.multi_attrs_groups'/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>

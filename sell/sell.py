@@ -530,7 +530,7 @@ class sell_delivery(models.Model):
         return True
 
 
-class sell_delivery_line(models.Model):
+class wh_move_line(models.Model):
     _inherit = 'wh.move.line'
     _description = u'销售发货单行'
 
