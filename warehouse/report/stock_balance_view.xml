@@ -7,12 +7,12 @@
             <field name='arch' type='xml'>
                 <tree string='商品库存余额表'>
                     <field name='goods' />
-                    <field name='lot' />
-                    <field name='attribute_id' />
+                    <field name='lot' groups='goods.batch_groups' />
+                    <field name='attribute_id' groups='goods.multi_attrs_groups' />
                     <field name='uom' />
-                    <field name='uos' />
-                    <field name='warehouse' />
-                    <field name='goods_uos_qty' />
+                    <field name='uos' groups='goods.auxiliary_unit_groups' />
+                    <field name='warehouse' groups='warehouse.multi_warehouse_groups' />
+                    <field name='goods_uos_qty' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' />
                     <field name='cost' />
                 </tree>
@@ -25,10 +25,10 @@
             <field name='arch' type='xml'>
                 <graph type='pivot'>
                     <field name='goods' type='row' />
-                    <field name='lot' type='row' />
-                    <field name='warehouse' type='col' />
+                    <field name='lot' type='row' groups='goods.batch_groups' />
+                    <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='goods_qty' type='measure' />
-                    <field name='goods_uos_qty' type='measure' />
+                    <field name='goods_uos_qty' type='measure' groups='goods.auxiliary_unit_groups' />
                     <field name='cost' type='measure' />
                 </graph>
             </field>
@@ -40,17 +40,17 @@
             <field name='arch' type='xml'>
                 <search string='商品库存余额表' >
                     <field name='goods' string='产品' filter_domain="[('goods', 'ilike', self)]" />
-                    <field name='lot' string='批号' filter_domain="[('lot', 'ilike', self)]" />
-                    <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" />
+                    <field name='lot' string='批号' filter_domain="[('lot', 'ilike', self)]" groups='goods.batch_groups' />
+                    <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" groups='warehouse.multi_warehouse_groups' />
                     <field name='uom' string='单位' filter_domain="[('uom', 'ilike', self)]" />
-                    <field name='uos' string='辅助单位' filter_domain="[('uos', 'ilike', self)]" />
+                    <field name='uos' string='辅助单位' filter_domain="[('uos', 'ilike', self)]" groups='goods.auxiliary_unit_groups' />
 
                     <group expand="0" string="Group By">
                         <filter string="产品" context="{'group_by':'goods'}"/>
-                        <filter string="批号" context="{'group_by': 'lot'}"/>
-                        <filter string="仓库" context="{'group_by': 'warehouse'}"/>
+                        <filter string="批号" context="{'group_by': 'lot'}" groups='goods.batch_groups'/>
+                        <filter string="仓库" context="{'group_by': 'warehouse'}" groups='warehouse.multi_warehouse_groups'/>
                         <filter string="单位" context="{'group_by': 'uom'}"/>
-                        <filter string="辅助单位" context="{'group_by': 'uos'}"/>
+                        <filter string="辅助单位" context="{'group_by': 'uos'}" groups='goods.auxiliary_unit_groups'/>
                     </group>
                 </search>
             </field>

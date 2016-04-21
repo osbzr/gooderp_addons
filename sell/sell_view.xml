@@ -56,7 +56,7 @@
             					<field name='line_ids' context="{'warehouse_dest_type': 'customer'}">
                  					<tree string='销货订单行' editable='bottom'>
                  						<field name='goods_id'/>
-                 						<field name='attribute_id'/>
+                 						<field name='attribute_id' groups='goods.multi_attrs_groups'/>
 				 						<field name='uom_id'/>
 				 						<field name='warehouse_id' required='1' groups='warehouse.multi_warehouse_groups'/>
 				 						<field name='warehouse_dest_id' invisible='1'/>
@@ -159,7 +159,7 @@
 		    						context="{'warehouse_dest_type': 'customer','type':'out'}">
 		         					<tree string='销售发货单行' editable='bottom'>
 		         						<field name='goods_id'/>
-		         						<field name='attribute_id' domain="[('goods_id', '=', goods_id)]"/>
+		         						<field name='attribute_id' domain="[('goods_id', '=', goods_id)]" groups='goods.multi_attrs_groups'/>
 				 						<field name='uom_id'/>
 				 						<field name='using_batch' invisible='1'/>
 			                            <field name='lot_qty' invisible='1'/>
@@ -277,7 +277,7 @@
 		    						context="{'warehouse_type': 'customer','type':'in'}">
 		         					<tree string='销售退货单行' editable='bottom'>
 		         						<field name='goods_id'/>
-		         						<field name='attribute_id'/>
+		         						<field name='attribute_id' groups='goods.multi_attrs_groups'/>
 				 						<field name='uom_id'/>
 				 						<field name='using_batch' invisible='1'/>
 					                    <field name='force_batch_one' invisible='1'/>
@@ -390,10 +390,11 @@
         </record>
 
     	<!--根菜单-->
-        <menuitem id='sell_menu' name='销货' groups='sell.sell_groups'/>
+        <menuitem id='sell_menu' name='销货'/>
     	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>
     	<menuitem id='sell_order_menu' name='销货订单' action='sell_order_action'
-			parent='sell_order_menu_root' sequence='1'/>
+			parent='sell_order_menu_root' sequence='1'
+			groups='sell.sell_groups'/>
     	<menuitem id='sell_delivery_menu' name='销售发货单' action='sell_delivery_action'
 			parent='sell_order_menu_root' sequence='2'/>
 		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"

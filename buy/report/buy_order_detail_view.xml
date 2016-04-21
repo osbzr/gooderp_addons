@@ -12,14 +12,14 @@
                 	<field name="partner_id"/>
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
-                    <field name="attribute"/>
+                    <field name="attribute" groups='goods.multi_attrs_groups'/>
                     <field name="uom"/>
-                    <field name="warehouse_dest"/>
+                    <field name="warehouse_dest" groups='warehouse.multi_warehouse_groups'/>
                     <field name="qty"/>
                     <field name="price"/>
                     <field name="amount"/>
-                    <field name="tax_amount"/>
-                    <field name="subtotal"/>
+                    <field name="tax_amount" groups='buy.in_tax_groups'/>
+                    <field name="subtotal" groups='buy.in_tax_groups'/>
                     <field name="note"/>
                 </tree>
             </field>

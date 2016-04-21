@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['base','web_menu_create',],
+    'depends': ['base','web_menu_create','decimal_precision'],
     'demo': [
         'core_demo.xml',
         ],

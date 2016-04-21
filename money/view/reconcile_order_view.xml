@@ -92,7 +92,9 @@
             </field>
         </record>
 		<!-- 核销单menu -->
-		<menuitem id="menu_reconcile_action" action="reconcile_action" parent="menu_money_manage" sequence="4"/>
+		<menuitem id="menu_reconcile_action" action="reconcile_action"
+		parent="menu_money_manage" sequence="4"
+		groups='money.reconcile_groups'/>
 	</data>
 </openerp>
 	
