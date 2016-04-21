@@ -39,8 +39,9 @@
                                <group>
                                    <group>
                                        <field name='using_batch' />
-                                       <field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}" />
-                                       <field name='attribute_ids'/>
+                                       <field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
+                                       	groups='goods.batch_serial_groups' />
+                                       <field name='attribute_ids' groups='goods.multi_attrs_groups'/>
                                    </group>
                                    <group>
                                        <field name='cost'/>

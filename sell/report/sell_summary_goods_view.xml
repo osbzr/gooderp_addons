@@ -9,16 +9,16 @@
                 	<field name="goods_categ"/>
                 	<field name="goods_code"/>
                     <field name="goods"/>
-                    <field name="attribute"/>
-                    <field name="warehouse"/>
-                    <field name="uos"/>
-                    <field name="qty_uos"/>
+                    <field name="attribute" groups='goods.multi_attrs_groups'/>
+                    <field name="warehouse" groups='warehouse.multi_warehouse_groups'/>
+                    <field name="uos" groups='goods.auxiliary_unit_groups'/>
+                    <field name="qty_uos" groups='goods.auxiliary_unit_groups'/>
                     <field name="uom"/>
                     <field name="qty"/>
                     <field name="price"/>
                     <field name="amount"/>
-                    <field name="tax_amount"/>
-                    <field name="subtotal"/>
+                    <field name="tax_amount" groups='sell.out_tax_groups'/>
+                    <field name="subtotal" groups='sell.out_tax_groups'/>
                 </tree>
             </field>
         </record>
