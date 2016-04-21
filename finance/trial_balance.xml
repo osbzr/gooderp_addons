@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record id="trial_balance_tree" model="ir.ui.view">
+            <field name="name">trial.balance.form</field>
+            <field name="model">trial.balance</field>
+            <field name="arch" type="xml">
+                <tree string="科目余额表" create="false" edit='false'>
+                	<field name="period_id"/>
+                    <field name="subject_code"/>
+                    <field name="subject_name_id"/>
+                    <field name="initial_balance_debit" sum="合计"/>
+                    <field name="initial_balance_credit" sum="合计"/>
+                    <field name="current_occurrence_debit" sum="合计"/>
+                    <field name="current_occurrence_credit" sum="合计"/>
+                    <field name="cumulative_occurrence_debit" sum="合计"/>
+                    <field name="cumulative_occurrence_credit" sum="合计"/>
+                    <field name="ending_balance_debit" sum="合计"/>
+                    <field name="ending_balance_credit" sum="合计"/>
+          		</tree>
+            </field>
+        </record>
+
+        <record id="trial_balance_search" model="ir.ui.view">
+            <field name="name">trial.balance.form</field>
+            <field name="model">trial.balance</field>
+            <field name="arch" type="xml">
+                 <search>
+                    <group expand="0" string="分组">
+                        <filter string="会计区间" domain="[]" context="{'group_by':'period_id'}"/>
+                        <filter string="科目" domain="[]" context="{'group_by':'subject_name_id'}"/>
+                    </group>
+                 </search>
+            </field>
+        </record>
+
+	    <record id="trial_balance_action" model="ir.actions.act_window">
+            <field name="name">科目余额表</field>
+            <field name="res_model">trial.balance</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+ 
+
+        <record id="create_trial_balance_wizard_form" model="ir.ui.view">
+            <field name="name">create.trial.balance.wizard.form</field>
+            <field name="model">create.trial.balance.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group><field name="period_id" option="{'no_open':True,'no_create':True}"/></group>
+					<button name="create_trial_balance" string="查看科目余额表" type="object" class="oe_highlight"/>
+                    或者 
+                    <button string="取消" class="oe_link" special="cancel"/>
+            	</form>
+            </field>
+        </record>
+      <menuitem id='trial_balance_menu' action='trial_balance_action' parent='voucher_books_menu' sequence='20'/>
+
+      <act_window id="create_trial_balance_wizard_action"
+        name='查看科目余额表'
+        res_model="create.trial.balance.wizard"
+        multi="True"
+        view_type="form"
+        view_mode="form"
+        target="new" />
+
+	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='30'/>
+    </data>
+</openerp>

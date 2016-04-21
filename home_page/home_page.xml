@@ -60,7 +60,7 @@
         </record>
 
         <record model="ir.actions.act_window" id="financial_home_action">
-            <field name="name">financial_home</field>
+            <field name="name">设置主页元素</field>
             <field name="res_model">home.page</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>

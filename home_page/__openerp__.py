@@ -12,7 +12,7 @@
         "home_data.xml",
         'security/ir.model.access.csv',
     ],
-    'depends': ['base', 'buy', 'warehouse'],
+    'depends': ['base', 'buy', 'warehouse', 'sell'],
     'demo': ['test_demo.xml'],
     'qweb': ['static/src/xml/*.xml'],
     'application': True,

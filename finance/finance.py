@@ -55,7 +55,7 @@ class voucher(models.Model):
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
-        required=True, compute='_compute_period_id', ondelete='restrict')
+        compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
     amount_text = fields.Char(u'总计', compute='_compute_amount', store=True)
 
@@ -134,7 +134,7 @@ class finance_period(models.Model):
     name = fields.Char(
         u'会计期间',
         compute='_compute_name', readonly=True, store=True)
-    is_closed = fields.Boolean(u'已结账', readonly=True)
+    is_closed = fields.Boolean(u'已结账')
     year = fields.Char(u'会计年度', required=True)
     month = fields.Selection(MOUTH_SELECTION, string=u'会计月份', required=True)
 
@@ -148,9 +148,9 @@ class finance_period(models.Model):
     def get_period(self, date):
         if date:
             period_id = self.search([
-                            ('year', '=', date[0:4]),
-                            ('month', '=', int(date[5:7]))
-                            ])
+                ('year', '=', date[0:4]),
+                ('month', '=', int(date[5:7]))
+            ])
             if period_id:
                 return period_id
             else:
@@ -203,7 +203,7 @@ class auxiliary_financing(models.Model):
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
     type = fields.Selection([
-                             ('member', u'个人'),
-                             ('project', u'项目'),
-                             ('department', u'部门'),
-                             ], u'分类')
+        ('member', u'个人'),
+        ('project', u'项目'),
+        ('department', u'部门'),
+    ], u'分类')
