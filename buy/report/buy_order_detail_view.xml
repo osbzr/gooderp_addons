@@ -15,11 +15,11 @@
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
                     <field name="uom"/>
                     <field name="warehouse_dest" groups='warehouse.multi_warehouse_groups'/>
-                    <field name="qty"/>
+                    <field name="qty" sum="数量合计"/>
                     <field name="price"/>
-                    <field name="amount"/>
-                    <field name="tax_amount" groups='buy.in_tax_groups'/>
-                    <field name="subtotal" groups='buy.in_tax_groups'/>
+                    <field name="amount" sum="采购金额合计"/>
+                    <field name="tax_amount" sum="税额合计" groups='buy.in_tax_groups'/>
+                    <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
                     <field name="note"/>
                 </tree>
             </field>

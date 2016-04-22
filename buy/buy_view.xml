@@ -2,7 +2,7 @@
 <openerp>
     <data>
     	<!-- 根菜单 -->
-        <menuitem id="menu_buy_root" name="采购"/>
+        <menuitem id="menu_buy_root" name="采购" groups='buy.buy_groups'/>
 
         <menuitem id="menu_buy_manage" name="采购" parent="menu_buy_root" sequence="1"/>
 
@@ -72,7 +72,7 @@
                             <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
                             <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
                             <field name="note"/>
-                            <field name="origin"/>
+                            <field name="origin" invisible="1"/>
                         </tree>
                     </field>
                     <field name="note" placeholder="暂无备注信息"/>
@@ -159,7 +159,9 @@
 		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_type':'supplier','type':'in'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'/>
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
 		                            <field name="attribute_id" domain="[('goods_id', '=', goods_id)]" groups='goods.multi_attrs_groups'/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
@@ -179,6 +181,7 @@
 		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
 		                            <field name="note"/>
 		                            <field name="share_cost"/>
+		                            <field name="type" invisible="1"/>
 		                        </tree>
 		                    </field>
 		                </page>
@@ -285,7 +288,9 @@
 		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_dest_type':'supplier','type':'out'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'/>
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
 		                            <field name="attribute_id" groups='goods.multi_attrs_groups'/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
@@ -306,6 +311,7 @@
 		                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
 		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
 		                            <field name="note"/>
+		                            <field name="type" invisible="1"/>
 		                        </tree>
 		                    </field>
 		                </page>
@@ -407,8 +413,7 @@
         </record>
 
         <menuitem id="menu_buy_order" action="buy_order_action"
-            parent="menu_buy_manage" sequence="1"
-            groups='buy.buy_groups'/>
+            parent="menu_buy_manage" sequence="1"/>
         <menuitem id="menu_buy_receipt" action="buy_receipt_action"
             parent="menu_buy_manage" sequence="2"/>
         <menuitem id="menu_buy_return" action="buy_return_action"

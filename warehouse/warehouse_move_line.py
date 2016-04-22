@@ -106,7 +106,6 @@ class wh_move_line(models.Model):
                               digits_compute=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, store=True, readonly=True,
                             digits_compute=dp.get_precision('Amount'))
-#     subtotal = fields.Float(u'金额', digits_compute=dp.get_precision('Amount'))
     note = fields.Text(u'备注')
     cost_unit = fields.Float(u'单位成本', digits_compute=dp.get_precision('Amount'))
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
