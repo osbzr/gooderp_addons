@@ -143,8 +143,8 @@ class report_stock_transceive(models.Model):
                     (sql_type == 'in' and record.get('goods_qty', 0) or 0),
                 'cost_in': value.get('cost_in', 0) +
                     (sql_type == 'in' and record.get('cost', 0) or 0),
-                'ids_lists': str(set(value.get('ids_lists', []) +
-                    record.get('ids_lists', []))),
+#                 'ids_lists': str(set(value.get('ids_lists', []) +
+#                     record.get('ids_lists', []))),
             })
 
     def compute_history_stock_by_collect(self, res, records, sql_type='out'):
