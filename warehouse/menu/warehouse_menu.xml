@@ -26,7 +26,6 @@
         <menuitem id='report_parent' name='报表' parent='warehouse_root' sequence='3' />
         <menuitem id='report_stock_balance_menu' action='report_stock_balance_action' parent='report_parent' sequence='1' />
         <menuitem id='report_stock_transceive_wizard_menu' action='report_stock_transceive_wizard_action' parent='report_parent' sequence='2' />
-        <menuitem id='report_stock_transceive_collect_wizard_menu' action='report_stock_transceive_collect_wizard_action' parent='report_parent' sequence='3' />
         <menuitem id='report_lot_status_menu' action='report_lot_status_action' parent='report_parent' sequence='4'
         	 groups='goods.batch_groups' />
         <menuitem id='report_lot_track_wizard_menu' action='report_lot_track_wizard_action' parent='report_parent' sequence='5'
