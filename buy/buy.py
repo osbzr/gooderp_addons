@@ -567,7 +567,6 @@ class wh_move_line(models.Model):
             partner_id = self.env.context.get('default_partner')
             partner = self.env['partner'].search([('id', '=', partner_id)])
             is_return = self.env.context.get('default_is_return')
-            print 'is_return:',is_return,partner_id
             if self.type == 'in':
                 self.warehouse_dest_id = self.goods_id.default_wh  # 取产品的默认仓库
                 if not self.goods_id.cost:
@@ -586,7 +585,6 @@ class wh_move_line(models.Model):
                 self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
                 matched = False # 在商品的价格清单中是否找到匹配的价格
                 for line in self.goods_id.price_ids:
-                    print '类别：',partner.name,partner.c_category_id.name, line.category_id.name
                     if partner.c_category_id == line.category_id:
                         self.price = line.price
                         matched = True
