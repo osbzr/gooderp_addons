@@ -52,16 +52,18 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                     ('date', '>=', self.from_date),
                                                                     ('date', '<=', self.to_date)])
             for report in reports:
-                # 生成不带商品明细的对账单记录
+                # 生成带商品明细的对账单记录
                 res_ids.append(self.env['customer.statements.report.with.goods'].create({
                         'partner_id': report.partner_id.id,
                         'name': report.name,
                         'date': report.date,
+                        'done_date': report.done_date,
                         'order_amount': report.sale_amount,
                         'benefit_amount': report.benefit_amount,
                         'fee': report.fee,
                         'amount': report.amount,
                         'pay_amount': report.pay_amount,
+                        'discount_money': report.discount_money,
                         'balance_amount': report.balance_amount,
                         'note': report.note,
                         'move_id': report.move_id.id}).id)
@@ -117,15 +119,17 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                     ('date', '>=', self.from_date),
                                                                     ('date', '<=', self.to_date)])
             for report in reports:
-                # 生成不带商品明细的对账单记录
+                # 生成带商品明细的对账单记录
                 res_ids.append(self.env['supplier.statements.report.with.goods'].create({
                         'partner_id': report.partner_id.id,
                         'name': report.name,
                         'date': report.date,
+                        'done_date': report.done_date,
                         'order_amount': report.purchase_amount,
                         'benefit_amount': report.benefit_amount,
                         'amount': report.amount,
                         'pay_amount': report.pay_amount,
+                        'discount_money': report.discount_money,
                         'balance_amount': report.balance_amount,
                         'note': report.note,
                         'move_id': report.move_id.id}).id)

@@ -91,7 +91,7 @@ class money_order(models.Model):
     amount = fields.Float(string=u'总金额', compute='_compute_advance_payment',
                           digits_compute=dp.get_precision('Amount'),
                           store=True, readonly=True)
-    advance_payment = fields.Float(string=u'本次预收款',
+    advance_payment = fields.Float(string=u'本次预收/付款',
                                    compute='_compute_advance_payment',
                                    digits_compute=dp.get_precision('Amount'),
                                    store=True, readonly=True)
@@ -151,7 +151,7 @@ class money_order(models.Model):
             total = 0
             for line in order.line_ids:
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
-                    if line.bank_id.balance < line.amount:
+                    if line.bank_id.balance < abs(line.amount):
                         raise except_orm(u'错误', u'账户余额不足')
                     line.bank_id.balance -= line.amount
                 else:  # 收款账号余额增加, 退款账号余额减少
