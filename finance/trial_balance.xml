@@ -70,16 +70,63 @@
         view_type="form"
         view_mode="form"
         target="new" 
-        context="{'create_trial_balance':True}"/>
+        />
 
+        <record id="create_vouchers_summary_wizard_form" model="ir.ui.view">
+            <field name="name">create.vouchers.summary.wizard.form</field>
+            <field name="model">create.vouchers.summary.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="period_begin_id" options="{'no_open':True,'no_create':True}" required="True"/>
+                            <field name="subject_name_id" options="{'no_open':True,'no_create':True}"/>
+                            
+                        </group>
+                         <group>
+                            <field name="period_end_id" options="{'no_open':True,'no_create':True}" required="True"/>
+                         </group>
+                    </group>
+
+                    <button name="create_vouchers_summary"  string="查看科目余额表" type="object" class="oe_highlight"/>
+                    或者 
+                    <button string="取消" class="oe_link" special="cancel"/>
+                </form>
+            </field>
+        </record>
       <act_window id="create_vouchers_summary_wizard_action"
         name='查看凭证汇总表'
-        res_model="create.trial.balance.wizard"
+        res_model="create.vouchers.summary.wizard"
         multi="True"
         view_type="form"
         view_mode="form"
         target="new" 
         context="{'create_vouchers_summary':True}"/>
+
+        <record id="vouchers_summary_tree" model="ir.ui.view">
+            <field name="name">trial.balance.form</field>
+            <field name="model">vouchers.summary</field>
+            <field name="arch" type="xml">
+                <tree string="科目余额表" create="false" edit='false'>
+                    <field name="date"/>
+                    <field name="subject_name_id"/>
+                    <field name="voucher_id"/>
+                    <field name="summary"/>
+                    <field name="debit"/>
+                    <field name="credit" />
+                     <field name="direction"/>
+                    <field name="balance"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="vouchers_summary_action" model="ir.actions.act_window">
+            <field name="name">科目余额表</field>
+            <field name="res_model">vouchers.summary</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
      <menuitem id='create_vouchers_summary_menu' action='create_vouchers_summary_wizard_action' parent='voucher_books_menu' sequence='50'/>
 	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='30'/>
     </data>
