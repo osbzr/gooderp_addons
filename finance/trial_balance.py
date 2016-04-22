@@ -35,6 +35,15 @@ class CreateTrialBalanceWizard(models.TransientModel):
         return self.env['finance.period'].search([('year', '=', year), ('month', '=', month)])
 
     @api.multi
+    def get_period_balance(self, period_id):
+        """取出本期发生额"""
+        sql = ''' select vol.account_id as account_id,sum(vol.debit) as debit,  sum(vol.credit) as credit  from voucher as vo left join voucher_line as vol
+            on vo.id = vol.voucher_id where vo.period_id=%s
+                 group by vol.account_id'''
+        self.env.cr.execute(sql, (period_id,))
+        return self.env.cr.dictfetchall()
+
+    @api.multi
     def create_trial_balance(self):
         """ \
             生成科目余额表 \
@@ -53,12 +62,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
             if not last_period.is_closed:
                 raise except_orm(u'错误', u'前一期间未结账，无法取到期初余额')
             period_id = self.period_id.id
-            """取出本期发生额"""
-            sql = ''' select vol.account_id as account_id,sum(vol.debit) as debit,  sum(vol.credit) as credit  from voucher as vo left join voucher_line as vol
-                on vo.id = vol.voucher_id where vo.period_id=%s
-                     group by vol.account_id'''
-            self.env.cr.execute(sql, (period_id,))
-            current_occurrence_dic_list = self.env.cr.dictfetchall()
+            current_occurrence_dic_list = self.get_period_balance(period_id)
             trial_balance_dict = {}
             """把本期发生额的数量填写到  准备好的dict 中 """
             for current_occurrence in current_occurrence_dic_list:
@@ -119,10 +123,14 @@ class CreateTrialBalanceWizard(models.TransientModel):
         return {}
 
 
-class VouchersSummary(models.Model):
+class VouchersSummary(models.TransientModel):
     _name = 'vouchers.summary'
-    period_id = fields.Many2one('finance.period', string='会计区间')
-    subject_code = fields.Char(u'科目编码')
+    date = fields.Date(u'日期')
     subject_name_id = fields.Many2one('finance.account', string='科目名称')
+    period_id = fields.Many2one('finance.period', string='会计区间')
+    voucher_id = fields.Many2one('voucher', u'凭证字号')
+    summary = fields.Char(u'摘要')
+    direction = fields.Char(u'方向')
     debit = fields.Float(u'借方金额')
     credit = fields.Float(u'贷方金额')
+    balance = fields.Float(u'余额')

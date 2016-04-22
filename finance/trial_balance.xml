@@ -53,13 +53,9 @@
                         <group>
                             <field name="period_id" options="{'no_open':True,'no_create':True}"/>
                         </group>
-                        <group>
-                            
-                        </group>
                     </group>
 
-					<button name="create_trial_balance" invisible="not context.get('create_trial_balance')" string="查看科目余额表" type="object" class="oe_highlight"/>
-                    <button name="create_vouchers_summary" invisible="not context.get('create_vouchers_summary')" string="查看凭证汇总表" type="object" class="oe_highlight"/>
+					<button name="create_trial_balance"  string="查看科目余额表" type="object" class="oe_highlight"/>
                     或者 
                     <button string="取消" class="oe_link" special="cancel"/>
             	</form>
