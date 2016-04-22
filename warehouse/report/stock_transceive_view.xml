@@ -6,19 +6,22 @@
             <field name='model'>report.stock.transceive</field>
             <field name='arch' type='xml'>
                 <tree string='商品收发明细表'>
+					<field name='warehouse' groups='warehouse.multi_warehouse_groups' />
                     <field name='goods' />
-                    <field name='uom' />
-                    <field name='warehouse' groups='warehouse.multi_warehouse_groups' />
-                    <field name='goods_qty_begain' />
-                    <field name='cost_begain' />
+                    <field name='attribute' groups='goods.multi_attrs_groups' />
 
+                    <field name='goods_qty_begain' />
                     <field name='goods_qty_out' />
                     <field name='goods_qty_in' />
                     <field name='goods_qty_end' />
-    
+
+                    <field name='uom' />
+
+					<field name='cost_begain' />
                     <field name='cost_out' />
                     <field name='cost_in' />
                     <field name='cost_end' />
+                    <!-- <button name="find_source_order" type="object" string="查看库存调拨明细" icon="terp-stock_zoom" class="oe_highlight"/> -->
                 </tree>
             </field>
         </record>
@@ -34,6 +37,7 @@
 
                     <group expand="0" string="Group By">
                         <filter string="产品" context="{'group_by':'goods'}"/>
+                        <filter string="属性" context="{'group_by': 'attribute'}" groups='goods.multi_attrs_groups'/>
                         <filter string="仓库" context="{'group_by': 'warehouse'}" groups='warehouse.multi_warehouse_groups'/>
                         <filter string="单位" context="{'group_by': 'uom'}"/>
                     </group>
