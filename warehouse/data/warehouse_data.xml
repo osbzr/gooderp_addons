@@ -25,12 +25,6 @@
             <field name='type'>production</field>
         </record>
 
-		<record id="warehouse_general" model="warehouse">
-            <field name="name">主仓库</field>
-            <field name="code">General</field>
-            <field name='type'>stock</field>
-        </record>
-
         <record id='warehouse_others' model='warehouse'>
             <field name='name'>其他仓库</field>
             <field name='code'>others</field>

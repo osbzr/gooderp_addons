@@ -11,7 +11,7 @@ class goods(models.Model):
 
     @api.model
     def _get_default_wh(self):
-        return self.env.ref('warehouse.warehouse_general')
+        return self.env.ref('core.warehouse_general')
 
     default_wh = fields.Many2one('warehouse', u'默认库位', required=True,
                                  default=_get_default_wh)
