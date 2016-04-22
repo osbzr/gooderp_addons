@@ -123,7 +123,7 @@ class test_track_wizard(TransactionCase):
         with self.assertRaises(except_orm):
             track.button_ok()
         # 按产品搜索
-        self.track.goods_id = 1
+        self.track.goods_id = self.env.ref('goods.mouse').id
         self.track.button_ok()
         # 按客户搜索
         self.track.goods_id = False
@@ -179,7 +179,7 @@ class test_detail_wizard(TransactionCase):
         with self.assertRaises(except_orm):
             detail.button_ok()
         # 按产品搜索
-        self.detail.goods_id = 1
+        self.detail.goods_id = self.env.ref('goods.mouse').id
         self.detail.button_ok()
         # 按客户搜索
         self.detail.goods_id = False
@@ -223,7 +223,7 @@ class test_goods_wizard(TransactionCase):
         with self.assertRaises(except_orm):
             goods_wizard.button_ok()
         # 按商品搜索
-        self.goods_wizard.goods_id = 1
+        self.goods_wizard.goods_id = self.env.ref('goods.mouse').id
         self.goods_wizard.button_ok()
         # 按客户搜索
         self.goods_wizard.goods_id = False
@@ -247,8 +247,8 @@ class test_goods_wizard(TransactionCase):
         context = self.goods_wizard.button_ok().get('context')
         results = summary_goods.with_context(context).search_read(domain=[])
         new_goods_wizard = self.goods_wizard.copy()
-        new_goods_wizard.goods_id = 3
-        new_goods_wizard.partner_id = 3
+        new_goods_wizard.goods_id = self.env.ref('goods.mouse').id
+        new_goods_wizard.partner_id = self.env.ref('core.jd').id
         new_goods_wizard.goods_categ_id = \
             self.env.ref('core.goods_category_1').id
         new_context = new_goods_wizard.button_ok().get('context')
@@ -284,7 +284,7 @@ class test_partner_wizard(TransactionCase):
         with self.assertRaises(except_orm):
             partner_wizard.button_ok()
         # 按商品搜索
-        self.partner_wizard.goods_id = 1
+        self.partner_wizard.goods_id = self.env.ref('goods.mouse').id
         self.partner_wizard.button_ok()
         # 按客户搜索
         self.partner_wizard.goods_id = False
@@ -308,7 +308,7 @@ class test_partner_wizard(TransactionCase):
         context = self.partner_wizard.button_ok().get('context')
         results = summary_partner.with_context(context).search_read(domain=[])
         new_partner_wizard = self.partner_wizard.copy()
-        new_partner_wizard.goods_id = 3
+        new_partner_wizard.goods_id = self.env.ref('goods.mouse').id
         new_partner_wizard.partner_id = self.env.ref('core.jd').id
         c_category_id = self.env.ref('core.customer_category_1')    # 客户类别:一级客户
         new_partner_wizard.c_category_id = c_category_id.id

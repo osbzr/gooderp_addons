@@ -552,13 +552,54 @@ class buy_receipt(models.Model):
         return True
 
 
-class buy_receipt_line(models.Model):
+class wh_move_line(models.Model):
     _inherit = 'wh.move.line'
     _description = u"采购入库明细"
 
     buy_line_id = fields.Many2one('buy.order.line', u'购货单行')
     share_cost = fields.Float(u'采购费用',
                               digits_compute=dp.get_precision('Amount'))
+
+    @api.multi
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        if self.goods_id:
+            partner_id = self.env.context.get('default_partner')
+            partner = self.env['partner'].search([('id', '=', partner_id)])
+            is_return = self.env.context.get('default_is_return')
+            if self.type == 'in':
+                self.warehouse_dest_id = self.goods_id.default_wh  # 取产品的默认仓库
+                if not self.goods_id.cost:
+                    raise except_orm(u'错误', u'请先设置商品的成本！')
+                self.price = self.goods_id.cost
+                # 如果是销售退货单行
+                if is_return:
+                    matched = False # 在商品的价格清单中是否找到匹配的价格
+                    for line in self.goods_id.price_ids:
+                        if partner.c_category_id == line.category_id:
+                            self.price = line.price
+                            matched = True
+                    if not matched:
+                        raise except_orm(u'错误', u'请先设置商品的价格清单或客户类别！')
+            elif self.type == 'out':
+                self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
+                matched = False # 在商品的价格清单中是否找到匹配的价格
+                for line in self.goods_id.price_ids:
+                    if partner.c_category_id == line.category_id:
+                        self.price = line.price
+                        matched = True
+                # 如果是采购退货单行
+                if is_return:
+                    if not self.goods_id.cost:
+                        raise except_orm(u'错误', u'请先设置商品的成本！')
+                    self.price = self.goods_id.cost
+                    matched = True
+
+                if not matched:
+                    raise except_orm(u'错误', u'请先设置商品的价格清单或客户类别！')
+
+        return super(wh_move_line,self).onchange_goods_id()
+
 
 
 class cost_line(models.Model):

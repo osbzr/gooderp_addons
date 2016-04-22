@@ -103,7 +103,7 @@ class test_buy_order(TransactionCase):
         # 批次管理拆分订单行
         new_order = self.order.copy()
         for line in new_order.line_ids:
-            line.goods_id = 1
+            line.goods_id = self.env.ref('goods.mouse').id
             new_order.buy_generate_receipt()
         receipt = self.env['buy.receipt'].search(
                   [('order_id', '=', new_order.id)])
@@ -300,3 +300,36 @@ class test_buy_receipt(TransactionCase):
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
+
+
+class test_wh_move_line(TransactionCase):
+
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_wh_move_line, self).setUp()
+        self.order = self.env.ref('buy.buy_order_1')
+        self.order.buy_order_done()
+        self.receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', self.order.id)])
+        self.return_receipt = self.env.ref('buy.buy_receipt_return_1')
+
+        self.goods_mouse = self.browse_ref('goods.mouse')
+
+    def test_onchange_goods_id(self):
+        '''测试采购模块中商品的onchange,是否会带出默认库位和单价'''
+        # 入库单行：修改鼠标成本为0，测试是否报错
+        self.goods_mouse.cost = 0.0
+        for line in self.receipt.line_in_ids:
+            line.goods_id = self.goods_mouse.id
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()
+
+        # 采购退货单行
+        for line in self.return_receipt.line_out_ids:
+            line.goods_id.cost = 0.0
+            with self.assertRaises(except_orm):
+                line.with_context({'default_is_return': True,
+                    'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
+            line.goods_id.cost = 1.0
+            line.with_context({'default_is_return': True,
+                'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()

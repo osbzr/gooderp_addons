@@ -40,11 +40,11 @@ class test_detail_wizard(TransactionCase):
         with self.assertRaises(except_orm):
             detail.button_ok()
         # 按产品搜索
-        self.detail.goods_id = 1
+        self.detail.goods_id = self.env.ref('goods.mouse').id
         self.detail.button_ok()
         # 按供应商搜索
         self.detail.goods_id = False
-        self.detail.partner_id = self.env.ref('core.yixun').id
+        self.detail.partner_id = self.env.ref('core.lenovo').id
         self.detail.button_ok()
         # 按日期搜索
         self.detail.goods_id = False
@@ -63,7 +63,7 @@ class test_track_wizard(TransactionCase):
         self.order = self.env.ref('buy.buy_order_1')
         order_2 = self.order.copy()
         for line in order_2.line_ids:
-            line.goods_id = 4
+            line.goods_id = self.env.ref('goods.mouse').id
         order_2.buy_order_done()
         receipt_2 = self.env['buy.receipt'].search(
                     [('order_id', '=', order_2.id)])
@@ -95,11 +95,11 @@ class test_track_wizard(TransactionCase):
         with self.assertRaises(except_orm):
             track.button_ok()
         # 按产品搜索
-        self.track.goods_id = 1
+        self.track.goods_id = self.env.ref('goods.mouse').id
         self.track.button_ok()
         # 按供应商搜索
         self.track.goods_id = False
-        self.track.partner_id = self.env.ref('core.yixun').id
+        self.track.partner_id = self.env.ref('core.lenovo').id
         self.track.button_ok()
         # 按日期搜索
         self.track.goods_id = False
@@ -146,7 +146,7 @@ class test_payment_wizard(TransactionCase):
         # 按供应商类别,供应商，采购单号搜索
         s_category_id = self.env.ref('core.supplier_category_1').id
         self.payment.s_category_id = s_category_id
-        self.payment.partner_id = self.env.ref('core.yixun').id
+        self.payment.partner_id = self.env.ref('core.lenovo').id
         self.payment.order_id = self.env.ref('buy.buy_order_1').id
         self.payment.button_ok()
         # 按日期搜索
@@ -193,8 +193,8 @@ class test_goods_wizard(TransactionCase):
         context = self.goods.button_ok().get('context')
         results = summary_goods.with_context(context).search_read(domain=[])
         new_goods_wizard = self.goods.copy()
-        new_goods_wizard.goods_id = 3
-        new_goods_wizard.partner_id = 3
+        new_goods_wizard.goods_id = self.env.ref('goods.mouse').id
+        new_goods_wizard.partner_id = self.env.ref('core.lenovo').id
         new_context = new_goods_wizard.button_ok().get('context')
         new_results = summary_goods.with_context(new_context).search_read(
                                                                   domain=[])
@@ -239,8 +239,8 @@ class test_partner_wizard(TransactionCase):
         context = self.partner.button_ok().get('context')
         results = summary_partner.with_context(context).search_read(domain=[])
         new_partner_wizard = self.partner.copy()
-        new_partner_wizard.goods_id = 3
-        new_partner_wizard.partner_id = 3
+        new_partner_wizard.goods_id = self.env.ref('goods.mouse').id
+        new_partner_wizard.partner_id = self.env.ref('core.lenovo').id
         new_context = new_partner_wizard.button_ok().get('context')
         new_results = summary_partner.with_context(new_context).search_read(
                                                                     domain=[])

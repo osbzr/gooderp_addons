@@ -12,5 +12,10 @@
             <field name="name">Amount</field>
             <field name="digits" eval="2"/>
         </record>
+        <record id="warehouse_general" model="warehouse">
+            <field name="name">主仓库</field>
+            <field name="code">General</field>
+            <field name='type'>stock</field>
+        </record>
     </data>
 </openerp>
