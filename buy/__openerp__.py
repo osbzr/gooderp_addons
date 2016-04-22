@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['core', 'mail', 'warehouse', 'money', 'sell'],
+    'depends': ['core', 'mail', 'warehouse', 'money'],
     'data': [
         'buy_data.xml',
         'buy_view.xml',
