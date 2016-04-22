@@ -362,3 +362,6 @@ class test_wh_move_line(TransactionCase):
             with self.assertRaises(except_orm):
                 line.with_context({'default_is_return': True,
                     'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+            line.goods_id.cost = 1.0
+            line.with_context({'default_is_return': True,
+                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
