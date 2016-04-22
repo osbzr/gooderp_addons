@@ -25,11 +25,12 @@ class supplier_statements_report(models.Model):
                 before_balance = pre_record.amount
         else:
             before_balance = 0
-        self.balance_amount += before_balance + self.amount - self.pay_amount
+        self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     date = fields.Date(string=u'单据日期', readonly=True)
+    done_date = fields.Datetime(string=u'完成日期', readonly=True)
     purchase_amount = fields.Float(string=u'采购金额', readonly=True,
                                    digits_compute=dp.get_precision('Amount'))
     benefit_amount = fields.Float(string=u'优惠金额', readonly=True,
@@ -37,6 +38,8 @@ class supplier_statements_report(models.Model):
     amount = fields.Float(string=u'应付金额', readonly=True,
                           digits_compute=dp.get_precision('Amount'))
     pay_amount = fields.Float(string=u'实际付款金额', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
+    discount_money = fields.Float(string=u'付款折扣', readonly=True,
                               digits_compute=dp.get_precision('Amount'))
     balance_amount = fields.Float(
         string=u'应付款余额',
@@ -52,14 +55,16 @@ class supplier_statements_report(models.Model):
         tools.drop_view_if_exists(cr, 'supplier_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW supplier_statements_report AS (
-            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id,date) AS id,
+            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id,done_date) AS id,
                     partner_id,
                     name,
                     date,
+                    done_date,
                     purchase_amount,
                     benefit_amount,
                     amount,
                     pay_amount,
+                    discount_money,
                     balance_amount,
                     note,
                     move_id
@@ -67,10 +72,12 @@ class supplier_statements_report(models.Model):
                 (SELECT go.partner_id AS partner_id,
                         '期初余额' AS name,
                         go.date AS date,
+                        go.write_date AS done_date,
                         0 AS purchase_amount,
                         0 AS benefit_amount,
                         go.payable AS amount,
                         0 AS pay_amount,
+                        0 AS discount_money,
                         0 AS balance_amount,
                         Null AS note,
                         0 AS move_id
@@ -82,10 +89,12 @@ class supplier_statements_report(models.Model):
                 SELECT m.partner_id,
                         m.name,
                         m.date,
+                        m.write_date AS done_date,
                         0 AS purchase_amount,
                         0 AS benefit_amount,
                         0 AS amount,
                         m.amount AS pay_amount,
+                        m.discount_amount AS discount_money,
                         0 AS balance_amount,
                         m.note,
                         NULL AS move_id
@@ -95,10 +104,12 @@ class supplier_statements_report(models.Model):
                 SELECT  mi.partner_id,
                         mi.name,
                         mi.date,
+                        mi.create_date AS done_date,
                         br.amount + br.discount_amount AS purchase_amount,
                         br.discount_amount AS benefit_amount,
                         mi.amount,
                         0 AS pay_amount,
+                        0 AS discount_money,
                         0 AS balance_amount,
                         Null AS note,
                         mi.move_id
@@ -165,6 +176,7 @@ class supplier_statements_report_with_goods(models.TransientModel):
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     date = fields.Date(string=u'单据日期', readonly=True)
+    done_date = fields.Date(string=u'完成日期', readonly=True)
     category_id = fields.Many2one('core.category', u'商品类别')
     goods_code = fields.Char(u'商品编号')
     goods_name = fields.Char(u'商品名称')
@@ -189,6 +201,8 @@ class supplier_statements_report_with_goods(models.TransientModel):
     amount = fields.Float(string=u'应付金额', readonly=True,
                           digits_compute=dp.get_precision('Amount'))
     pay_amount = fields.Float(string=u'实际付款金额', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
+    discount_money = fields.Float(string=u'付款折扣', readonly=True,
                               digits_compute=dp.get_precision('Amount'))
     balance_amount = fields.Float(string=u'应付款余额', readonly=True,
                                   digits_compute=dp.get_precision('Amount'))
