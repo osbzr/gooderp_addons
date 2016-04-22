@@ -217,6 +217,18 @@ class Test_sell(TransactionCase):
         with self.assertRaises(except_orm):
             order.sell_order_done()
 
+        # 未填数量或单价应报错
+        order.sell_order_draft()
+        for line in order.line_ids:
+            line.quantity = 0
+        with self.assertRaises(except_orm):
+            order.sell_order_done()
+        for line in order.line_ids:
+            line.quantity = 1
+            line.price = 0
+        with self.assertRaises(except_orm):
+            order.sell_order_done()
+
     def test_sell_draft(self):
         ''' 测试反审核销货订单  '''
         order = self.env.ref('sell.sell_order_1')
@@ -274,6 +286,37 @@ class Test_sell(TransactionCase):
             self.order.partner_id.c_category_id = False
             with self.assertRaises(except_orm):
                 line.onchange_goods_id()
+
+
+class test_sell_delivery(TransactionCase):
+
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_sell_delivery, self).setUp()
+        self.order = self.env.ref('sell.sell_order_1')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.return_order = self.env.ref('sell.sell_order_return')
+        self.return_order.sell_order_done()
+        self.return_delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.return_order.id)])
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+
+    def test_sell_delivery_done(self):
+        '''测试审核发货单/退货单'''
+        # 发货单审核时未填数量或单价应报错
+        for line in self.delivery.line_out_ids:
+            line.goods_qty = 0
+        with self.assertRaises(except_orm):
+            self.delivery.sell_delivery_done()
+        # 销售退货单审核时未填数量或单价应报错
+        for line in self.return_delivery.line_in_ids:
+            line.goods_qty = 1
+            line.price = 0
+        with self.assertRaises(except_orm):
+            self.return_delivery.sell_delivery_done()
 
 
 class test_wh_move_line(TransactionCase):

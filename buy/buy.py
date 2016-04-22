@@ -122,6 +122,9 @@ class buy_order(models.Model):
             raise except_orm(u'错误', u'请不要重复审核！')
         if not self.line_ids:
             raise except_orm(u'错误', u'请输入产品明细行！')
+        for line in self.line_ids:
+            if line.quantity == 0 or line.price == 0:
+                raise except_orm(u'错误', u'请输入产品数量或单价！')
         # TODO:采购预付款
         self.buy_generate_receipt()
         self.state = 'done'
@@ -446,6 +449,12 @@ class buy_receipt(models.Model):
         '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
+        for line in self.line_in_ids:
+            if line.goods_qty == 0 or line.price == 0:
+                raise except_orm(u'错误', u'请输入产品数量或单价！')
+        for line in self.line_out_ids:
+            if line.goods_qty == 0 or line.price == 0:
+                raise except_orm(u'错误', u'请输入产品数量或单价！')
         if self.bank_account_id and not self.payment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')
         if not self.bank_account_id and self.payment:
