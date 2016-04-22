@@ -57,7 +57,7 @@
                     <field name="line_ids" context="{'warehouse_type': 'supplier'}">
                     	<tree string="购货订单行" editable="bottom">
                             <field name="goods_id" required='1'/>
-                            <field name="attribute_id" groups='goods.multi_attrs_groups'/>
+                            <field name="attribute_id"/>
                             <field name="uom_id"/>
                             <field name='warehouse_id' invisible='1'/>
                             <field name='warehouse_dest_id' required='1' groups='warehouse.multi_warehouse_groups'/>

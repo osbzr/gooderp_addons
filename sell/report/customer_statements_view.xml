@@ -16,6 +16,7 @@
                     <field name="note"/>
                     <field name="amount"/>
                     <field name="pay_amount"/>
+                    <field name="discount_money"/>
                     <field name="balance_amount"/>
                 </tree>
             </field>
@@ -45,6 +46,7 @@
                     <field name="fee"/>
                     <field name="amount"/>
                     <field name="pay_amount"/>
+                    <field name="discount_money"/>
                     <field name="balance_amount"/>
                 </tree>
             </field>
