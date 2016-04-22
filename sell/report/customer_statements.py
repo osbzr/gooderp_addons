@@ -40,11 +40,12 @@ class customer_statements_report(models.Model):
                 before_balance = pre_record.amount
         else:
             before_balance = 0
-        self.balance_amount += before_balance + self.amount - self.pay_amount
+        self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     date = fields.Date(string=u'单据日期', readonly=True)
+    done_date = fields.Datetime(string=u'完成日期', readonly=True)
     sale_amount = fields.Float(string=u'销售金额', readonly=True, 
                                digits_compute=dp.get_precision('Amount'))
     benefit_amount = fields.Float(string=u'优惠金额', readonly=True,
@@ -53,11 +54,13 @@ class customer_statements_report(models.Model):
                        digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(string=u'应收金额', readonly=True,
                           digits_compute=dp.get_precision('Amount'))
-    pay_amount = fields.Float(string=u'付款金额', readonly=True,
+    pay_amount = fields.Float(string=u'实际收款金额', readonly=True,
                               digits_compute=dp.get_precision('Amount'))
     balance_amount = fields.Float(string=u'应收款余额',
                                   compute='_compute_balance_amount',
                                   digits_compute=dp.get_precision('Amount'))
+    discount_money = fields.Float(string=u'收款折扣', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
@@ -66,15 +69,17 @@ class customer_statements_report(models.Model):
         tools.drop_view_if_exists(cr, 'customer_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW customer_statements_report AS (
-            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id,date) AS id,
+            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id,done_date) AS id,
                     partner_id,
                     name,
                     date,
+                    done_date,
                     sale_amount,
                     benefit_amount,
                     fee,
                     amount,
                     pay_amount,
+                    discount_money,
                     balance_amount,
                     note,
                     move_id
@@ -82,11 +87,13 @@ class customer_statements_report(models.Model):
                 (SELECT go.partner_id AS partner_id,
                         '期初余额' AS name,
                         go.date AS date,
+                        go.write_date AS done_date,
                         0 AS sale_amount,
                         0 AS benefit_amount,
                         0 AS fee,
                         go.receivable AS amount,
                         0 AS pay_amount,
+                        0 as discount_money,
                         0 AS balance_amount,
                         Null AS note,
                         0 AS move_id
@@ -98,11 +105,13 @@ class customer_statements_report(models.Model):
                 SELECT m.partner_id,
                         m.name,
                         m.date,
+                        m.write_date AS done_date,
                         0 AS sale_amount,
                         0 AS benefit_amount,
                         0 AS fee,
                         0 AS amount,
                         m.amount AS pay_amount,
+                        m.discount_amount as discount_money,
                         0 AS balance_amount,
                         m.note,
                         0 AS move_id
@@ -112,11 +121,13 @@ class customer_statements_report(models.Model):
                 SELECT  mi.partner_id,
                         mi.name,
                         mi.date,
+                        mi.create_date AS done_date,
                         sd.amount + sd.discount_amount AS sale_amount,
                         sd.discount_amount AS benefit_amount,
                         sd.partner_cost AS fee,
                         mi.amount,
                         0 AS pay_amount,
+                        0 as discount_money,
                         0 AS balance_amount,
                         Null AS note,
                         mi.move_id
@@ -182,6 +193,7 @@ class customer_statements_report_with_goods(models.TransientModel):
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     date = fields.Date(string=u'单据日期', readonly=True)
+    done_date = fields.Datetime(string=u'完成日期', readonly=True)
     category_id = fields.Many2one('core.category', u'商品类别')
     goods_code = fields.Char(u'商品编号')
     goods_name = fields.Char(u'商品名称')
@@ -196,7 +208,9 @@ class customer_statements_report_with_goods(models.TransientModel):
     benefit_amount = fields.Float(string=u'优惠金额', digits_compute=dp.get_precision('Amount'))
     fee = fields.Float(string=u'客户承担费用', digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(string=u'应收金额', digits_compute=dp.get_precision('Amount'))
-    pay_amount = fields.Float(string=u'付款金额', digits_compute=dp.get_precision('Amount'))
+    pay_amount = fields.Float(string=u'实际收款金额', digits_compute=dp.get_precision('Amount'))
+    discount_money = fields.Float(string=u'收款折扣', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
     balance_amount = fields.Float(string=u'应收款余额', digits_compute=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)

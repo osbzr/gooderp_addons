@@ -46,6 +46,7 @@
                             <field name="date"/>
                         </group>
                     </group>
+                    <label string="收/付款行"/>
                     <field name="line_ids">
                     	<tree string="Money Order Lines" editable="bottom">
                     		<field name="bank_id"/>
@@ -55,9 +56,9 @@
                             <field name="note"/>
                        </tree>
                     </field>
-                    <label string="选择源单" groups='money.reconcile_groups'/>
+                    <label string="核销行" groups='money.reconcile_groups'/>
                     <field name="source_ids" groups='money.reconcile_groups'>
-						<tree string="Source Order Lines" create="false">
+						<tree string="Source Order Lines" create="false" editable="bottom">
                     		<field name="name" readonly='1'/>
                     		<field name="category_id" readonly='1'/>
                             <field name="date" readonly='1'/>
