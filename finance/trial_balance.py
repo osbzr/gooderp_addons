@@ -10,14 +10,14 @@ class TrialBalance(models.Model):
     period_id = fields.Many2one('finance.period', string='会计期间')
     subject_code = fields.Char(u'科目编码')
     subject_name_id = fields.Many2one('finance.account', string='科目名称')
-    initial_balance_debit = fields.Float(u'期初余额(贷方)')
-    initial_balance_credit = fields.Float(u'期初余额(借方)')
-    current_occurrence_debit = fields.Float(u'本期发生额(贷方)')
-    current_occurrence_credit = fields.Float(u'本期发生额(借方)')
-    ending_balance_debit = fields.Float(u'期末余额(贷方)')
-    ending_balance_credit = fields.Float(u'期末余额(借方)')
-    cumulative_occurrence_debit = fields.Float(u'本年累计发生额(贷方)')
-    cumulative_occurrence_credit = fields.Float(u'本年累计发生额(借方)')
+    initial_balance_debit = fields.Float(u'期初余额', child_string=" 借方")
+    initial_balance_credit = fields.Float(u'期初余额(贷方)', child_string="贷方")
+    current_occurrence_debit = fields.Float(u'本期发生额', child_string="借方")
+    current_occurrence_credit = fields.Float(u'本期发生额(贷方)', child_string="贷方")
+    ending_balance_debit = fields.Float(u'期末余额', child_string="借方")
+    ending_balance_credit = fields.Float(u'期末余额(贷方)', child_string="贷方")
+    cumulative_occurrence_debit = fields.Float(u'本年累计发生额', child_string="借方")
+    cumulative_occurrence_credit = fields.Float(u'本年累计发生额(贷方)', child_string="贷方")
 
 
 class CreateTrialBalanceWizard(models.TransientModel):
@@ -112,3 +112,17 @@ class CreateTrialBalanceWizard(models.TransientModel):
             'views': [(view_id, 'tree')],
             'domain': [('id', 'in', trial_balance_ids)],
         }
+
+    @api.multi
+    def create_vouchers_summary(self):
+
+        return {}
+
+
+class VouchersSummary(models.Model):
+    _name = 'vouchers.summary'
+    period_id = fields.Many2one('finance.period', string='会计区间')
+    subject_code = fields.Char(u'科目编码')
+    subject_name_id = fields.Many2one('finance.account', string='科目名称')
+    debit = fields.Float(u'借方金额')
+    credit = fields.Float(u'贷方金额')

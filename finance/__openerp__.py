@@ -18,4 +18,7 @@
         'finance_view.xml',
         'trial_balance.xml'
     ],
+    'qweb': [
+        "static/src/xml/*.xml",
+    ],
 }

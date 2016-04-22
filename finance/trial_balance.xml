@@ -10,14 +10,14 @@
                 	<field name="period_id"/>
                     <field name="subject_code"/>
                     <field name="subject_name_id"/>
-                    <field name="initial_balance_debit" sum="合计"/>
-                    <field name="initial_balance_credit" sum="合计"/>
-                    <field name="current_occurrence_debit" sum="合计"/>
-                    <field name="current_occurrence_credit" sum="合计"/>
-                    <field name="cumulative_occurrence_debit" sum="合计"/>
-                    <field name="cumulative_occurrence_credit" sum="合计"/>
-                    <field name="ending_balance_debit" sum="合计"/>
-                    <field name="ending_balance_credit" sum="合计"/>
+                    <field name="initial_balance_debit" sum="合计"  merge="False" child_name='借方'/>
+                    <field name="initial_balance_credit" sum="合计"  merge="True" child_name='贷方'/>
+                    <field name="current_occurrence_debit" sum="合计"  merge="False" child_name='借方'/>
+                    <field name="current_occurrence_credit" sum="合计" merge="True" child_name='贷方'/>
+                    <field name="cumulative_occurrence_debit" sum="合计"  merge="False" child_name='借方'/>
+                    <field name="cumulative_occurrence_credit" sum="合计" merge="True" child_name='贷方'/>
+                    <field name="ending_balance_debit" sum="合计"  merge="False" child_name='借方'/>
+                    <field name="ending_balance_credit" sum="合计" merge="True" child_name='贷方'/>
           		</tree>
             </field>
         </record>
@@ -49,8 +49,17 @@
             <field name="model">create.trial.balance.wizard</field>
             <field name="arch" type="xml">
             	<form>
-            		<group><field name="period_id" option="{'no_open':True,'no_create':True}"/></group>
-					<button name="create_trial_balance" string="查看科目余额表" type="object" class="oe_highlight"/>
+            		<group>
+                        <group>
+                            <field name="period_id" options="{'no_open':True,'no_create':True}"/>
+                        </group>
+                        <group>
+                            
+                        </group>
+                    </group>
+
+					<button name="create_trial_balance" invisible="not context.get('create_trial_balance')" string="查看科目余额表" type="object" class="oe_highlight"/>
+                    <button name="create_vouchers_summary" invisible="not context.get('create_vouchers_summary')" string="查看凭证汇总表" type="object" class="oe_highlight"/>
                     或者 
                     <button string="取消" class="oe_link" special="cancel"/>
             	</form>
@@ -64,8 +73,18 @@
         multi="True"
         view_type="form"
         view_mode="form"
-        target="new" />
+        target="new" 
+        context="{'create_trial_balance':True}"/>
 
+      <act_window id="create_vouchers_summary_wizard_action"
+        name='查看凭证汇总表'
+        res_model="create.trial.balance.wizard"
+        multi="True"
+        view_type="form"
+        view_mode="form"
+        target="new" 
+        context="{'create_vouchers_summary':True}"/>
+     <menuitem id='create_vouchers_summary_menu' action='create_vouchers_summary_wizard_action' parent='voucher_books_menu' sequence='50'/>
 	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='30'/>
     </data>
 </openerp>
