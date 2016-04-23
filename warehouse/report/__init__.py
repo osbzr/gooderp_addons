@@ -4,4 +4,3 @@ import stock_balance
 import stock_transceive
 import lot_status
 import lot_track
-import stock_transceive_collect

@@ -21,7 +21,6 @@ class TestReport(TransactionCase):
 
         self.track_wizard = self.env['report.lot.track.wizard'].create({})
         self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({})
-        self.collect_wizard = self.env['report.stock.transceive.collect.wizard'].create({})
 
     def test_report_base(self):
         report_base = self.env['report.base'].create({})
@@ -60,19 +59,6 @@ class TestReport(TransactionCase):
 
         self.assertEqual(results, real_results)
         self.assertEqual(self.transceive_wizard.open_report().get('res_model'), 'report.stock.transceive')
-
-        # 测试商品收发汇总表的wizard
-        self.assertEqual(self.collect_wizard.onchange_date()[0], {})
-
-        self.collect_wizard.date_end = '1999-09-09'
-        results = self.collect_wizard.onchange_date()[0]
-        real_results = {'warning': {
-            'title': u'错误',
-            'message': u'结束日期不可以小于开始日期'
-        }, 'value': {'date_end': self.collect_wizard.date_start}}
-
-        self.assertEqual(results, real_results)
-        self.assertEqual(self.collect_wizard.open_report().get('res_model'), 'report.stock.transceive.collect')
 
     def test_lot_track_search_read(self):
         lot_track = self.env['report.lot.track'].create({})
@@ -184,30 +170,5 @@ class TestReport(TransactionCase):
                 result.get('warehouse'),
                 result.get('goods_qty_out'),
                 result.get('goods_qty_in'),
-            )
-            self.assertTrue(result in real_results)
-
-    def test_stock_transceive_collect_search_read(self):
-        stock_transceive = self.env['report.stock.transceive.collect'].create({})
-        context = self.collect_wizard.open_report().get('context')
-
-        real_results = [
-            # 产品 仓库 其他入库数量 调拨入库数量 盘盈数量 调拨出库数量
-            (u'键盘', u'总仓', 0, 0, 600, 0),
-            (u'鼠标', u'总仓', 0, 0, 2, 0),
-            (u'网线', u'总仓', 48, 0, 12000, 120),
-            (u'网线', u'上海仓', 0, 120, 0, 0),
-            (u'键鼠套装', u'总仓', 96, 0, 0, 0),
-        ]
-        results = stock_transceive.with_context(context).search_read(domain=[])
-        self.assertEqual(len(results), len(real_results))
-        for result in results:
-            result = (
-                result.get('goods'),
-                result.get('warehouse'),
-                result.get('others_in_qty') or 0,
-                result.get('internal_in_qty') or 0,
-                result.get('overage_in_qty') or 0,
-                result.get('internal_out_qty') or 0,
             )
             self.assertTrue(result in real_results)

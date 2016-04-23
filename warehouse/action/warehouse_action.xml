@@ -118,15 +118,5 @@
             <field name='view_id' ref='report_lot_track_wizard_form' />
         </record>
 
-        <!-- 商品收发汇总表 -->
-        <record id='report_stock_transceive_collect_wizard_action' model='ir.actions.act_window' >
-            <field name='name'>商品收发汇总表</field>
-            <field name='res_model'>report.stock.transceive.collect.wizard</field>
-            <field name='view_mode'>form</field>
-            <field name='target'>new</field>
-            <field name='view_id' ref='report_stock_transceive_collect_wizard_form' />
-        </record>
-
-
     </data>
 </openerp>
