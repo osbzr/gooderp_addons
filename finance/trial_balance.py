@@ -93,7 +93,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 trial_balance_dict[current_occurrence.get('account_id')] = account_dict
 
             """ 结合上一期间的 数据 填写  trial_balance_dict(余额表 记录生成dict)   """
-            print trial_balance_dict
             for trial_balance in self.env['trial.balance'].search([('period_id', '=', last_period.id)]):
                 initial_balance_credit = trial_balance.ending_balance_credit or 0
                 initial_balance_debit = trial_balance.ending_balance_debit or 0

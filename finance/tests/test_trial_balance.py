@@ -37,7 +37,7 @@ class test_trial_balance(TransactionCase):
                                                                                     'period_end_id': self.period_now.id, 'subject_name_id': subject_name_id_4.id})
 
     def test_creare_trial_balance(self):
-        '''凭证号默认值'''
+        '''创建科目余额表'''
 
         self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_first_year)
         self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_last_year)
@@ -53,7 +53,7 @@ class test_trial_balance(TransactionCase):
             self.trial_balance_wizard_period_last_year.create_trial_balance()
 
     def test_create_vouchers_summary(self):
-
+        """测试创建明细帐"""
         self.period_2016__01_03.create_vouchers_summary()
         self.period_last.is_closed = True
 
@@ -65,7 +65,8 @@ class test_trial_balance(TransactionCase):
         self.period_2016__01_03.period_end_id = self.period_201511.id
         self.period_2016__01_03.onchange_period()
         self.period_2016__01_03.period_begin_id = self.period_201511.id
-        self.period_2016__01_03.create_vouchers_summary()
+        with self.assertRaises(except_orm):
+            self.period_2016__01_03.create_vouchers_summary()
         self.period_last.is_closed = False
         self.period_2016_11_03.create_vouchers_summary()
         #   22 24
