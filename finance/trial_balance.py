@@ -3,6 +3,7 @@
 from openerp import models, fields, api
 from openerp.exceptions import except_orm
 from datetime import datetime
+import calendar
 
 ISODATEFORMAT = '%Y-%m-%d'
 ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
@@ -14,14 +15,14 @@ class TrialBalance(models.Model):
     period_id = fields.Many2one('finance.period', string='会计期间')
     subject_code = fields.Char(u'科目编码')
     subject_name_id = fields.Many2one('finance.account', string='科目名称')
-    initial_balance_debit = fields.Float(u'期初余额', child_string=" 借方")
-    initial_balance_credit = fields.Float(u'期初余额(贷方)', child_string="贷方")
-    current_occurrence_debit = fields.Float(u'本期发生额', child_string="借方")
-    current_occurrence_credit = fields.Float(u'本期发生额(贷方)', child_string="贷方")
-    ending_balance_debit = fields.Float(u'期末余额', child_string="借方")
-    ending_balance_credit = fields.Float(u'期末余额(贷方)', child_string="贷方")
-    cumulative_occurrence_debit = fields.Float(u'本年累计发生额', child_string="借方")
-    cumulative_occurrence_credit = fields.Float(u'本年累计发生额(贷方)', child_string="贷方")
+    initial_balance_debit = fields.Float(u'期初余额', child_string=" 借方", default=0)
+    initial_balance_credit = fields.Float(u'期初余额(贷方)', child_string="贷方", default=0)
+    current_occurrence_debit = fields.Float(u'本期发生额', child_string="借方", default=0)
+    current_occurrence_credit = fields.Float(u'本期发生额(贷方)', child_string="贷方", default=0)
+    ending_balance_debit = fields.Float(u'期末余额', child_string="借方", default=0)
+    ending_balance_credit = fields.Float(u'期末余额(贷方)', child_string="贷方", default=0)
+    cumulative_occurrence_debit = fields.Float(u'本年累计发生额', child_string="借方", default=0)
+    cumulative_occurrence_credit = fields.Float(u'本年累计发生额(贷方)', child_string="贷方", default=0)
 
 
 class CreateTrialBalanceWizard(models.TransientModel):
@@ -30,25 +31,23 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
     @api.multi
     def compute_last_period_id(self, period_id):
-        if period_id.month == 1:
+        if int(period_id.month) == 1:
             year = int(period_id.year) - 1
             month = 12
         else:
             year = period_id.year
             month = int(period_id.month) - 1
-        print year, month
-        return self.env['finance.period'].search([('year', '=', year), ('month', '=', month)])
+        return self.env['finance.period'].search([('year', '=', str(year)), ('month', '=', str(month))])
 
     @api.multi
     def compute_next_period_id(self, period_id):
-        if period_id.month == 12:
+        if int(period_id.month) == 12:
             year = int(period_id.year) + 1
             month = 1
         else:
             year = period_id.year
             month = int(period_id.month) + 1
-        print year, month
-        return self.env['finance.period'].search([('year', '=', year), ('month', '=', month)])
+        return self.env['finance.period'].search([('year', '=', str(year)), ('month', '=', str(month))])
 
     @api.multi
     def get_period_balance(self, period_id):
@@ -85,29 +84,30 @@ class CreateTrialBalanceWizard(models.TransientModel):
             """把本期发生额的数量填写到  准备好的dict 中 """
             for current_occurrence in current_occurrence_dic_list:
                 account = self.env['finance.account'].browse(current_occurrence.get('account_id'))
-
-                account_dict = {'period_id': period_id, 'current_occurrence_debit': current_occurrence.get('debit'),
-                                'current_occurrence_credit': current_occurrence.get('credit'), 'subject_code': account.code,
+                account_dict = {'period_id': period_id, 'current_occurrence_debit': current_occurrence.get('debit', 0),
+                                'current_occurrence_credit': current_occurrence.get('credit') or 0, 'subject_code': account.code,
                                 'initial_balance_credit': 0, 'initial_balance_debit': 0,
-                                'ending_balance_credit': current_occurrence.get('credit'), 'ending_balance_debit': current_occurrence.get('debit'),
-                                'cumulative_occurrence_credit': current_occurrence.get('credit'), 'cumulative_occurrence_debit': current_occurrence.get('debit'),
+                                'ending_balance_credit': current_occurrence.get('credit', 0) or 0, 'ending_balance_debit': current_occurrence.get('debit', 0) or 0,
+                                'cumulative_occurrence_credit': current_occurrence.get('credit', 0) or 0, 'cumulative_occurrence_debit': current_occurrence.get('debit', 0) or 0,
                                 'subject_name_id': current_occurrence.get('account_id')}
                 trial_balance_dict[current_occurrence.get('account_id')] = account_dict
+
             """ 结合上一期间的 数据 填写  trial_balance_dict(余额表 记录生成dict)   """
+            print trial_balance_dict
             for trial_balance in self.env['trial.balance'].search([('period_id', '=', last_period.id)]):
-                initial_balance_credit = trial_balance.ending_balance_credit
-                initial_balance_debit = trial_balance.ending_balance_debit
+                initial_balance_credit = trial_balance.ending_balance_credit or 0
+                initial_balance_debit = trial_balance.ending_balance_debit or 0
                 subject_name_id = trial_balance.subject_name_id.id
                 if subject_name_id in trial_balance_dict:
-                    ending_balance_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit') + initial_balance_credit
-                    ending_balance_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit') + initial_balance_debit
-                    cumulative_occurrence_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit') + trial_balance.cumulative_occurrence_credit
-                    cumulative_occurrence_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit') + trial_balance.cumulative_occurrence_debit
+                    ending_balance_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) + initial_balance_credit
+                    ending_balance_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) + initial_balance_debit
+                    cumulative_occurrence_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) + trial_balance.cumulative_occurrence_credit
+                    cumulative_occurrence_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) + trial_balance.cumulative_occurrence_debit
                 else:
                     ending_balance_credit = initial_balance_credit
                     ending_balance_debit = initial_balance_debit
-                    cumulative_occurrence_credit = trial_balance.cumulative_occurrence_credit
-                    cumulative_occurrence_debit = trial_balance.cumulative_occurrence_debit
+                    cumulative_occurrence_credit = trial_balance.cumulative_occurrence_credit or 0
+                    cumulative_occurrence_debit = trial_balance.cumulative_occurrence_debit or 0
 
                 subject_code = trial_balance.subject_code
                 trial_balance_dict[subject_name_id] = {
@@ -142,10 +142,18 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     period_end_id = fields.Many2one('finance.period', string='结束期间')
     subject_name_id = fields.Many2one('finance.account', string='科目名称')
 
-    @api.multi
-    def get_last_period_vouchers_summary(self, period):
+    @api.one
+    @api.onchange('period_begin_id', 'period_end_id')
+    def onchange_period(self):
+        '''当优惠率或购货订单行发生变化时，单据优惠金额发生变化'''
 
-        return period
+        if self.period_end_id and self.period_begin_id and  \
+                not (self.period_begin_id.year <= self.period_end_id.year and self.period_begin_id.month <= self.period_end_id.month):
+            self.period_end_id = self.period_begin_id
+            return {'warning': {
+                'title': u'警告',
+                'message': u'结束期间必须大于等于开始期间!',
+            }}
 
     @api.multi
     def get_initial_balance(self, period, subject_name):
@@ -158,7 +166,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             initial_balance_credit = 0
             initial_balance_debit = 0
         now_period = self.env['create.trial.balance.wizard'].compute_next_period_id(period)
-        print "+++++", period, "--------"
         direction_tuple = self.judgment_lending(initial_balance_credit, initial_balance_debit)
         vals_dict.update({
             'date': '%s-%s-01' % (now_period.year, now_period.month),
@@ -181,26 +188,28 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             balance = 0
         return (direction, balance)
 
-    @api.multi
-    def get_ending_balance(self, period, subject_name):
-        vals_dict = {}
-        trial_balance_obj = self.env['trial.balance'].search([('period_id', '=', period.id), ('subject_name_id', '=', subject_name)])
-        if trial_balance_obj:
-            ending_balance_credit = trial_balance_obj.ending_balance_credit
-            ending_balance_debit = trial_balance_obj.ending_balance_debit
-        else:
-            ending_balance_credit = 0
-            ending_balance_debit = 0
+    # @api.multi
+    # def get_ending_balance(self, period, subject_name):
+    #     vals_dict = {}
+    #     trial_balance_obj = self.env['trial.balance'].search([('period_id', '=', period.id), ('subject_name_id', '=', subject_name)])
+    #     if trial_balance_obj:
+    #         print "====19"
+    #         ending_balance_credit = trial_balance_obj.ending_balance_credit
+    #         ending_balance_debit = trial_balance_obj.ending_balance_debit
+    #     else:
+    #         print "====20"
+    #         ending_balance_credit = 0
+    #         ending_balance_debit = 0
 
-        direction_tuple = self.judgment_lending(ending_balance_credit, ending_balance_debit)
-        vals_dict.update({
-            'date': '%s-%s-01' % (period.year, period.month),
-            'direction': direction_tuple[0],
-            'balance': direction_tuple[1],
-            'debit': ending_balance_debit,
-            'credit': ending_balance_credit,
-            'summary': u'期末余额'})
-        return vals_dict
+    #     direction_tuple = self.judgment_lending(ending_balance_credit, ending_balance_debit)
+    #     vals_dict.update({
+    #         'date': '%s-%s-01' % (period.year, period.month),
+    #         'direction': direction_tuple[0],
+    #         'balance': direction_tuple[1],
+    #         'debit': ending_balance_debit,
+    #         'credit': ending_balance_credit,
+    #         'summary': u'期末余额'})
+    #     return vals_dict
 
     @api.multi
     def get_year_balance(self, period, subject_name):
@@ -209,19 +218,33 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         if trial_balance_obj:
             cumulative_occurrence_credit = trial_balance_obj.cumulative_occurrence_credit
             cumulative_occurrence_debit = trial_balance_obj.cumulative_occurrence_debit
+            current_occurrence_credit = trial_balance_obj.current_occurrence_credit
+            current_occurrence_debit = trial_balance_obj.current_occurrence_debit
         else:
+            print "====22"
             cumulative_occurrence_credit = 0
             cumulative_occurrence_debit = 0
+            current_occurrence_credit = 0
+            current_occurrence_debit = 0
 
         direction_tuple = self.judgment_lending(cumulative_occurrence_credit, cumulative_occurrence_debit)
+        direction_tuple_period = self.judgment_lending(current_occurrence_credit, current_occurrence_debit)
+        period_vals = {
+            'date': '%s-%s-%s' % (period.year, period.month, (calendar.monthrange(int(period.year), int(period.month)))[1]),
+            'period_id': period.id,
+            'direction': direction_tuple_period[0],
+            'credit': current_occurrence_credit,
+            'debit': current_occurrence_debit,
+            'balance': direction_tuple_period[1],
+            'summary': '本期合计'}
         vals_dict.update({
-            'date': '%s-%s-01' % (period.year, period.month),
+            'date': '%s-%s-%s' % (period.year, period.month, (calendar.monthrange(int(period.year), int(period.month)))[1]),
             'direction': direction_tuple[0],
             'balance': direction_tuple[1],
             'debit': cumulative_occurrence_debit,
             'credit': cumulative_occurrence_credit,
             'summary': u'本年累计发生额'})
-        return vals_dict
+        return [period_vals, vals_dict]
 
     @api.multi
     def get_current_occurrence_amount(self, period, subject_name):
@@ -238,17 +261,44 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         return sql_results
 
     @api.multi
-    def get_unclose_year_balance(self, initial_balance, period, subject_name):
-        sql = ''' select  sum(vol.debit)as debit,sum(vol.credit) as credit
+    def get_unclose_year_balance(self, initial_balance_new, period, subject_name):
+        current_occurrence = {}
+        sql = ''' select  sum(COALESCE(vol.debit,0)) as debit,sum(COALESCE(vol.credit,0)) as credit
          from voucher as vo left join voucher_line as vol
             on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id=%s
                  group by vol.account_id'''
         self.env.cr.execute(sql, (period.id, subject_name.id))
         sql_results = self.env.cr.dictfetchall()
-        year_balance_debit = sql_results[0].get('debit') + initial_balance.get('debit', 0)
-        year_balance_credit = sql_results[0].get('credit') + initial_balance.get('credit', 0)
+        current_credit = 0
+        current_debit = 0
+        if sql_results:
+            current_credit = sql_results[0].get('credit', 0)
+            current_debit = sql_results[0].get('debit', 0)
+            if initial_balance_new.get('direction') == '借':
+                print "====24"
+                year_balance_debit = sql_results[0].get('debit', 0) + initial_balance_new.get('balance', 0)
+                year_balance_credit = sql_results[0].get('credit', 0)
+            else:
+                year_balance_debit = sql_results[0].get('debit', 0)
+                year_balance_credit = sql_results[0].get('credit', 0) + initial_balance_new.get('balance', 0)
+        else:
+            if initial_balance_new.get('direction') == '借':
+                year_balance_debit = initial_balance_new.get('balance', 0)
+                year_balance_credit = 0
+            else:
+                year_balance_debit = 0
+                year_balance_credit = initial_balance_new.get('balance', 0)
         direction_tuple = self.judgment_lending(year_balance_credit, year_balance_debit)
-        initial_balance.update({
+        direction_tuple_current = self.judgment_lending(current_credit, current_debit)
+        current_occurrence.update({
+            'date': (datetime.now()).strftime(ISODATEFORMAT),
+            'direction': direction_tuple_current[0],
+            'balance': direction_tuple_current[1],
+            'debit': current_debit,
+            'credit': current_credit,
+            'summary': u'本期发生额'
+        })
+        initial_balance_new.update({
             'date': (datetime.now()).strftime(ISODATEFORMAT),
             'direction': direction_tuple[0],
             'balance': direction_tuple[1],
@@ -256,7 +306,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'credit': year_balance_credit,
             'summary': u'本年累计发生额'
         })
-        return initial_balance
+        return [current_occurrence, initial_balance_new]
 
     @api.multi
     def create_vouchers_summary(self):
@@ -270,8 +320,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         local_currcy_period = self.period_begin_id
         vouchers_summary_ids = []
         break_flag = True
-        create_vals = []
         while (break_flag):
+            create_vals = []
             initial_balance = self.get_initial_balance(local_last_period, self.subject_name_id.id)
             create_vals.append(initial_balance)
             occurrence_amount = self.get_current_occurrence_amount(local_currcy_period, self.subject_name_id)
@@ -279,16 +329,14 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             if local_currcy_period.id != self.period_end_id.id:
                 cumulative_year_occurrence = self.get_year_balance(local_currcy_period, self.subject_name_id)
             else:
-                cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance, local_currcy_period, self.subject_name_id)
-            create_vals.append(cumulative_year_occurrence)
+                cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(), local_currcy_period, self.subject_name_id)
+            create_vals += cumulative_year_occurrence
             if local_currcy_period.id == self.period_end_id.id:
                 break_flag = False
             local_currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(local_currcy_period)
             local_last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(local_currcy_period)
-
-        print create_vals
-        for vals in create_vals:
-            vouchers_summary_ids.append(self.env['vouchers.summary'].create(vals).id)
+            for vals in create_vals:
+                vouchers_summary_ids.append((self.env['vouchers.summary'].create(vals)).id)
         view_id = self.env.ref('finance.vouchers_summary_tree').id
         return {
             'type': 'ir.actions.act_window',
