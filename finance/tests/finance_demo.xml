@@ -3,6 +3,28 @@
     <data>
         <!--示例demo-->
         <!--新建会计期间-->
+        <record id='period_201511' model='finance.period'>
+            <field name='year'>2015</field>
+            <field name='month'>11</field>
+        </record>
+        <record id='period_201512' model='finance.period'>
+            <field name='year'>2015</field>
+            <field name='month'>12</field>
+        </record>
+        <record id='period_201601' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>1</field>
+            <field name="is_closed">True</field>
+        </record>
+        <record id='period_201602' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>2</field>
+            <field name="is_closed">True</field>
+        </record>
+        <record id='period_201603' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>3</field>
+        </record>
         <record id='period_201604' model='finance.period'>
             <field name='year'>2016</field>
             <field name='month'>4</field>
@@ -24,6 +46,51 @@
             <field name='account_id' ref='finance.finance_account_11'/>
             <field name='credit'>100</field>
         </record>
+
+        <record id='voucher_555' model='voucher'>
+            <field name='name'>FV0003</field>
+            <field name='document_word_id' ref='finance.document_word_1'/>
+            <field name='date' >2016-03-08</field> 
+        </record>
+        <record id='voucher_line_2_1' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_1'/>
+            <field name='debit'>100</field>
+        </record>
+        <record id='voucher_line_2_2' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_4'/>
+            <field name='credit'>100</field>
+        </record>
+        <record id='voucher_line_2_3' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_4'/>
+            <field name='debit'>10000</field>
+        </record>
+        <record id='voucher_line_2_4' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_1'/>
+            <field name='credit'>10000</field>
+        </record>
+
+        <record id='voucher_line_2_4' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_1'/>
+            <field name='debit'>10000</field>
+        </record>
+
+        <record id='voucher_line_2_5' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_1'/>
+            <field name='credit'>10000</field>
+        </record>
+
         <!--科目-->
         <record id='finance_account_1' model='finance.account'>
             <field name='auxiliary_financing'>partner</field>
