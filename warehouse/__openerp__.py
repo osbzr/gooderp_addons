@@ -50,6 +50,9 @@
     'demo': [
         'data/warehouse_demo.xml',
      ],
+     'qweb': [
+        'data/copy_move_line.xml',
+    ],
     'installable': True,
     "active": False,
 }
