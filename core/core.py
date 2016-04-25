@@ -4,16 +4,17 @@ import openerp.addons.decimal_precision as dp
 from openerp import models, fields, api
 
 # 单据自动编号，避免在所有单据对象上重载
-# 假设：name字段为单据的编号字段, 默认值为/
 
 create_original = models.BaseModel.create
 
-@openerp.api.model
-@openerp.api.retunrs('self', lambda value: value.id)
+@api.model
+@api.returns('self', lambda value: value.id)
 def create(self, vals):
-    record_id = create_orginal(self, vals)
-    if values.get('name') == '/':
-            values.update({'name': self.env['ir.sequence'].get(self._name)})
+    if not self._name.split('.')[0] == 'mail' and not vals.get('name'):
+        next_name = self.env['ir.sequence'].get(self._name)
+        if next_name:
+            vals.update({'name': next_name})
+    record_id = create_original(self, vals)
     return record_id
 
 models.BaseModel.create = create
