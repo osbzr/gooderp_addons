@@ -37,18 +37,22 @@
         <!--添加管理销售订单组-->
         <record id='sell_groups' model='res.groups'>
             <field name='name'>管理销售订单</field>
+            <field name='category_id' ref="core.gooderp"/>
         </record>
         <!--添加管理销售订单行上的折扣组-->
         <record id='sell_line_discount_groups' model='res.groups'>
             <field name='name'>管理销售行上的折扣</field>
+            <field name='category_id' ref="core.gooderp"/>
         </record>
         <!--添加管理销售订单的折扣组-->
         <record id='sell_discount_groups' model='res.groups'>
             <field name='name'>管理销售单的折扣</field>
+            <field name='category_id' ref="core.gooderp"/>
         </record>
         <!--添加管理销项税组-->
         <record id='out_tax_groups' model='res.groups'>
             <field name='name'>管理销项税</field>
+            <field name='category_id' ref="core.gooderp"/>
         </record>
     </data>
 </openerp>

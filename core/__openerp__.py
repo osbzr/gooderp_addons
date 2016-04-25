@@ -12,6 +12,7 @@
         'core_demo.xml',
         ],
     'data': [
+        'security/groups.xml',
         'core_data.xml',
         'core_view.xml',
         'security/ir.model.access.csv',
