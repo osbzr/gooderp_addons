@@ -60,8 +60,13 @@ class test_buy_order(TransactionCase):
         # 重复审核报错
         with self.assertRaises(except_orm):
             self.order.buy_order_done()
-        # 没有订单行时审核报错
+        # 未填数量应报错
         self.order.buy_order_draft()
+        for line in self.order.line_ids:
+            line.quantity = 0
+        with self.assertRaises(except_orm):
+            self.order.buy_order_done()
+        # 没有订单行时审核报错
         for line in self.order.line_ids:
             line.unlink()
         with self.assertRaises(except_orm):
@@ -276,13 +281,27 @@ class test_buy_receipt(TransactionCase):
         self.receipt.payment = 20000
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
+        # 入库单审核时未填数量应报错
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 0
+        with self.assertRaises(except_orm):
+            self.receipt.buy_receipt_done()
+        # 采购退货单审核时未填数量应报错
+        for line in self.return_receipt.line_out_ids:
+            line.goods_qty = 0
+        with self.assertRaises(except_orm):
+            self.return_receipt.buy_receipt_done()
         # 重复审核入库单报错
         self.receipt.bank_account_id = None
         self.receipt.payment = 0
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 1
         self.receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
         # 重复审核退货单报错
+        for line in self.return_receipt.line_out_ids:
+            line.goods_qty = 1
         self.return_receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.return_receipt.buy_receipt_done()

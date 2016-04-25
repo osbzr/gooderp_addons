@@ -102,6 +102,9 @@ class sell_order(models.Model):
             raise except_orm(u'错误', u'请不要重复审核！')
         if not self.line_ids:
             raise except_orm(u'错误', u'请输入产品明细行！')
+        for line in self.line_ids:
+            if line.quantity == 0:
+                raise except_orm(u'错误', u'请输入产品数量！')
         # TODO:销售预收款
         self.sell_generate_delivery()
         self.state = 'done'
@@ -440,6 +443,12 @@ class sell_delivery(models.Model):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成源单和收款单'''
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
+        for line in self.line_in_ids:
+            if line.goods_qty == 0:
+                raise except_orm(u'错误', u'请输入产品数量！')
+        for line in self.line_out_ids:
+            if line.goods_qty == 0:
+                raise except_orm(u'错误', u'请输入产品数量！')
         if self.bank_account_id and not self.receipt:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')
         if not self.bank_account_id and self.receipt:
