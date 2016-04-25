@@ -3,6 +3,24 @@
 import openerp.addons.decimal_precision as dp
 from openerp import models, fields, api
 
+# 单据自动编号，避免在所有单据对象上重载
+
+create_original = models.BaseModel.create
+
+@api.model
+@api.returns('self', lambda value: value.id)
+def create(self, vals):
+    if not self._name.split('.')[0] == 'mail' and not vals.get('name'):
+        next_name = self.env['ir.sequence'].get(self._name)
+        if next_name:
+            vals.update({'name': next_name})
+    record_id = create_original(self, vals)
+    return record_id
+
+models.BaseModel.create = create
+
+# 分类的类别
+
 CORE_CATEGORY_TYPE = [('customer', u'客户'),
                       ('supplier', u'供应商'),
                       ('goods', u'商品'),
@@ -12,6 +30,8 @@ CORE_CATEGORY_TYPE = [('customer', u'客户'),
                       ('other_get', u'其他收入'),
                       ('attribute', u'属性'),
                       ('goods', u'产品')]
+# 成本计算方法，已实现 先入先出
+
 CORE_COST_METHOD = [('average', u'移动平均法'),
                     ('fifo', u'先进先出法'),
                     ]

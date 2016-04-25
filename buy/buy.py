@@ -70,7 +70,6 @@ class buy_order(models.Model):
                         default=lambda self: fields.Date.context_today(self),
                         select=True, copy=False, help=u"订单的要求交货日期")
     name = fields.Char(u'单据编号', select=True, copy=False,
-                       default='/',
                        help=u"购货订单的唯一编号，当创建时它会自动生成下一个编号。")
     type = fields.Selection([('buy', u'购货'), ('return', u'退货')], u'类型',
                             default='buy', states=READONLY_STATES)
@@ -101,11 +100,6 @@ class buy_order(models.Model):
         total = sum(line.subtotal for line in self.line_ids)
         self.discount_amount = total * self.discount_rate * 0.01
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
-        return super(buy_order, self).create(vals)
 
     @api.multi
     def unlink(self):
