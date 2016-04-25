@@ -110,6 +110,13 @@ class test_track_wizard(TransactionCase):
         self.track.partner_id = False
         self.track.button_ok()
 
+    def test_view_detail(self):
+        '''查看明细按钮'''
+        self.track.button_ok()
+        goods_id = self.env.ref('goods.cable').id
+        track_line = self.env['buy.order.track'].search([('goods_id', '=', goods_id)])
+        track_line[0].view_detail()
+
 
 class test_payment_wizard(TransactionCase):
     '''测试采购付款一览表向导'''
