@@ -68,6 +68,8 @@ class money_transfer_order(models.Model):
             for line in transfer.line_ids:
                 if line.amount < 0:
                     raise except_orm('错误', '转账金额必须大于0')
+                if line.amount == 0:
+                    raise except_orm('错误', '转账金额不能为0')
                 if line.out_bank_id.balance < line.amount:
                     raise except_orm('错误', '转出账户余额不足')
                 else:
