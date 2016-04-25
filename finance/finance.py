@@ -32,13 +32,6 @@ class voucher(models.Model):
     '''新建凭证'''
     _name = 'voucher'
 
-    @api.model
-    def _default_name(self):
-        last_id = self.search([])[-1]
-        id = str(last_id.id + 1)
-        name = 'FV' + '/' + id
-        return name
-
     @api.one
     @api.depends('date')
     def _compute_period_id(self):
@@ -50,7 +43,7 @@ class voucher(models.Model):
     date = fields.Date(
         u'凭证日期', required=True,
         default=datetime.now().strftime('%Y-%m-%d'))
-    name = fields.Char(u'凭证号', required=True, default=_default_name)
+    name = fields.Char(u'凭证号')
     att_count = fields.Integer(u'附单据', default=1)
     period_id = fields.Many2one(
         'finance.period',
@@ -58,6 +51,19 @@ class voucher(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
     amount_text = fields.Char(u'总计', compute='_compute_amount', store=True)
+    state = fields.Selection([('draft',u'草稿'),
+                              ('done',u'已审核')],u'状态',default='draft')
+    @api.one
+    def voucher_done(self):
+        if self.state == 'done':
+            raise except_orm(u'错误', u'请不要重复审核！')
+        self.state='done'
+
+    @api.one
+    def voucher_draft(self):
+        if self.state == 'draft':
+            raise except_orm(u'错误', u'请不要重复反审核！')
+        self.state='draft'
 
     @api.one
     @api.depends('line_ids')

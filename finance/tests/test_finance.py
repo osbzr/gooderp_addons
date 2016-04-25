@@ -9,6 +9,18 @@ class test_voucher(TransactionCase):
         '''凭证号默认值'''
         self.env['voucher'].create({
                      })
+    
+    def test_approve(self):
+        '''测试审核反审核报错'''
+        voucher = self.env.ref('finance.voucher_1')
+        voucher.voucher_done()
+        self.assertTrue(voucher.state == 'done')
+        with self.assertRaises(except_orm):
+            voucher.voucher_done()
+        voucher.voucher_draft()
+        self.assertTrue(voucher.state == 'draft')
+        with self.assertRaises(except_orm):
+            voucher.voucher_draft()
 
     def test_compute(self):
         '''新建凭证时计算字段加载'''
