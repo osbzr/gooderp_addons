@@ -217,15 +217,10 @@ class Test_sell(TransactionCase):
         with self.assertRaises(except_orm):
             order.sell_order_done()
 
-        # 未填数量或单价应报错
+        # 未填数量应报错
         order.sell_order_draft()
         for line in order.line_ids:
             line.quantity = 0
-        with self.assertRaises(except_orm):
-            order.sell_order_done()
-        for line in order.line_ids:
-            line.quantity = 1
-            line.price = 0
         with self.assertRaises(except_orm):
             order.sell_order_done()
 
@@ -306,15 +301,14 @@ class test_sell_delivery(TransactionCase):
 
     def test_sell_delivery_done(self):
         '''测试审核发货单/退货单'''
-        # 发货单审核时未填数量或单价应报错
+        # 发货单审核时未填数量应报错
         for line in self.delivery.line_out_ids:
             line.goods_qty = 0
         with self.assertRaises(except_orm):
             self.delivery.sell_delivery_done()
-        # 销售退货单审核时未填数量或单价应报错
+        # 销售退货单审核时未填数量应报错
         for line in self.return_delivery.line_in_ids:
-            line.goods_qty = 1
-            line.price = 0
+            line.goods_qty = 0
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
 
