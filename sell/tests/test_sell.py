@@ -283,6 +283,20 @@ class Test_sell(TransactionCase):
                 line.onchange_goods_id()
 
 
+class test_sell_order_line(TransactionCase):
+
+    def setUp(self):
+        super(test_sell_order_line, self).setUp()
+        self.order = self.env.ref('sell.sell_order_1')
+
+    def test_compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        for line in self.order.line_ids:
+            self.assertTrue(not line.using_attribute)
+            line.goods_id = self.env.ref('goods.keyboard')
+            self.assertTrue(line.using_attribute)
+
+
 class test_sell_delivery(TransactionCase):
 
     def setUp(self):

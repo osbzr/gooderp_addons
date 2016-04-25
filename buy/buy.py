@@ -241,6 +241,12 @@ class buy_order_line(models.Model):
     _name = 'buy.order.line'
     _description = u'购货订单明细'
 
+    @api.one
+    @api.depends('goods_id')
+    def _compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        self.using_attribute = self.goods_id.attribute_ids and True or False
+
     @api.model
     def _default_warehouse(self):
         context = self._context or {}
@@ -263,6 +269,7 @@ class buy_order_line(models.Model):
     order_id = fields.Many2one('buy.order', u'订单编号', select=True,
                                required=True, ondelete='cascade')
     goods_id = fields.Many2one('goods', u'商品')
+    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
     attribute_id = fields.Many2one('attribute', u'属性',
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位')

@@ -129,6 +129,13 @@ class test_buy_order_line(TransactionCase):
         super(test_buy_order_line, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
 
+    def test_compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        for line in self.order.line_ids:
+            self.assertTrue(line.using_attribute)
+            line.goods_id = self.env.ref('goods.mouse')
+            self.assertTrue(not line.using_attribute)
+
     def test_default_warehouse(self):
         '''新建订单行调出仓库默认值'''
         self.order.line_ids.with_context({
