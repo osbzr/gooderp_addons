@@ -16,8 +16,7 @@
                         t-attf-class="oe_list_header_#{column.widget or column.type} #{((options.sortable and column.tag !== 'button') ? 'oe_sortable' : null)}"><div>
                         <t t-if="column.tag !== 'button'"  ><t t-esc="column.string"/></t>
                     </div></th>
-                     <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' " t-att-data-id="column.id"   rowspan="1" colspan="2" align='center' 
-                        t-attf-class="#{column.widget or column.type} #{((options.sortable and column.tag !== 'button') ? 'oe_sortable' : null)}"><div>
+                     <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' " t-att-data-id="column.id"   rowspan="1" colspan="2" style='text-align:center;'><div>
                         <t t-if="column.tag !== 'button'"  ><t t-esc="column.string"/></t>
                     </div></th>
                 </t>
