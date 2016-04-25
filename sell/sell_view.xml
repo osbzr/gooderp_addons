@@ -85,6 +85,14 @@
                         			</group>
                     			</group>
                     			<group>
+                        			<group>
+										<field name="pre_receipt"/>
+                        			</group>
+                        			<group>
+                            			<field name="bank_account_id"/>
+                        			</group>
+                    			</group>
+                    			<group>
                         			<group col="8" colspan="2">
                             			<field name="create_uid" readonly="1" string="制单人"/>
                             			<field name="approve_uid" readonly="1"/>

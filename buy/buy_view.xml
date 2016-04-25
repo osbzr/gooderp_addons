@@ -88,10 +88,12 @@
                     </group>
                     <group>
                         <group>
+                        	<field name="prepayment"/>
                             <field name="create_uid" readonly="1" string="制单人"/>
                             <field name="approve_uid" readonly="1"/>
                         </group>
                     	<group>
+                    		<field name="bank_account_id"/>
                             <field name="create_date" readonly="1" string="录单时间"/>
                             <field name="write_date" readonly="1" string="最后修改时间"/>
                         </group>
