@@ -1,6 +1,7 @@
 <openerp>
     <data>
         <record id="top_9" model="home.page">
+        	<field name="sequence">1000000</field>
 		    <field name="action" ref="sell.sell_order_action"/>
 		    <field name="menu_type">top</field>
 		    <field name="domain" >[]</field>
@@ -9,6 +10,7 @@
 		    <field name="note_two" >折扣金额</field>
 		</record>
 		<record id="top_10" model="home.page">
+			<field name="sequence">100000</field>
 		    <field name="action" ref="sell.sell_order_action"/>
 		    <field name="menu_type">top</field>
 		    <field name="domain" >[]</field>

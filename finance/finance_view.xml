@@ -104,6 +104,7 @@
                             ('voucher_id.date','&lt;=',(context_today()).strftime('%%Y-%%m-%%d'))]"/>
                     <group expand="0" string="分组">
                         <filter string="会计凭证" domain="[]" context="{'group_by':'voucher_id'}"/>
+                        <filter string="会计区间" domain="[]" context="{'group_by':'period_id'}"/>
                         <filter string="会计科目" domain="[]" context="{'group_by':'account_id'}"/>
                     </group>
                 </search>

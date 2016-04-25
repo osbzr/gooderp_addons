@@ -51,7 +51,7 @@ openerp.home_page = function(instance, local) {
                 self.result_top=result['top']
                 for(var i=0;i< 5;i++){
                     if (self.result_top[i]!==undefined){
-                        var left_html_str = $("<p class='oe_p oe_top_link_"+i+"' id='"+i+"'>"+self.result_top[i][0]+"</p>");
+                        var left_html_str = $("<a><p class='oe_p oe_top_link_"+i+"' id='"+i+"'>"+self.result_top[i][0]+"</p></a>");
                         self.$el.find('.top_div').append(left_html_str);
                         self.$(".oe_top_link_"+i+"").click(function() {
                              self.do_action({
@@ -71,7 +71,7 @@ openerp.home_page = function(instance, local) {
                 self.result_quick=result['left']
                 for(var i=0;i< 8;i++){
                     if (self.result_quick[i]!==undefined){
-                        var left_html_str = $("<p class='oe_p oe_quick_link_"+i+"' id='"+i+"'>"+self.result_quick[i][0]+"</p>");
+                        var left_html_str = $("<a><p class='oe_p oe_quick_link_"+i+"' id='"+i+"'>"+self.result_quick[i][0]+"</p></a>");
                         self.$el.find('.top_div').append(left_html_str);
                         self.$(".oe_quick_link_"+i+"").click(function() {
                              self.do_action({

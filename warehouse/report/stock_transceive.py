@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import openerp.addons.decimal_precision as dp
-from openerp import models, fields
+from openerp import models, fields, api
 import datetime
 
 
@@ -10,6 +10,8 @@ class report_stock_transceive(models.Model):
     _inherit = 'report.base'
 
     goods = fields.Char(u'产品')
+    attribute = fields.Char(u'属性')
+    id_lists = fields.Text(u'wh_move_line id列表')
     uom = fields.Char(u'单位')
     warehouse = fields.Char(u'仓库')
     goods_qty_begain = fields.Float(
@@ -33,6 +35,8 @@ class report_stock_transceive(models.Model):
         return '''
         SELECT min(line.id) as id,
                 goods.name as goods,
+                att.name as attribute,
+                array_agg(line.id) as id_lists,
                 uom.name as uom,
                 wh.name as warehouse,
                 sum(case when
@@ -63,6 +67,7 @@ class report_stock_transceive(models.Model):
         return '''
         FROM wh_move_line line
             LEFT JOIN goods goods ON line.goods_id = goods.id
+            LEFT JOIN attribute att ON line.attribute_id = att.id
             LEFT JOIN uom uom ON line.uom_id = uom.id
             LEFT JOIN warehouse wh ON line.%s = wh.id
         ''' % (sql_type == 'out' and 'warehouse_id' or 'warehouse_dest_id')
@@ -78,7 +83,7 @@ class report_stock_transceive(models.Model):
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY goods.name, uom.name, wh.name
+        GROUP BY goods.name, att.name, uom.name, wh.name
         '''
 
     def order_sql(self, sql_type='out'):
@@ -102,13 +107,15 @@ class report_stock_transceive(models.Model):
         return (
             record.get('goods'),
             record.get('uom'),
-            record.get('warehouse'))
+            record.get('warehouse'),
+            record.get('attribute'))
 
     def unzip_record_key(self, key):
         return {
             'goods': key[0],
             'uom': key[1],
             'warehouse': key[2],
+            'attribute': key[3],
         }
 
     def get_default_value_by_record(self, record, sql_type='out'):
@@ -136,6 +143,8 @@ class report_stock_transceive(models.Model):
                     (sql_type == 'in' and record.get('goods_qty', 0) or 0),
                 'cost_in': value.get('cost_in', 0) +
                     (sql_type == 'in' and record.get('cost', 0) or 0),
+#                 'ids_lists': str(set(value.get('ids_lists', []) +
+#                     record.get('ids_lists', []))),
             })
 
     def compute_history_stock_by_collect(self, res, records, sql_type='out'):
@@ -164,3 +173,18 @@ class report_stock_transceive(models.Model):
             result.append(value)
 
         return result
+
+#     @api.multi
+#     def find_source_order(self):
+#         # 查看库存调拨明细
+#         wh_move_line = self.env['wh.move.line'].search([('id', '=', self.id)])
+#  
+#         view = self.env.ref('warehouse.wh_move_line_tree')
+#  
+#         return {
+#             'view_mode': 'tree',
+#             'views': [(view.id, 'tree')],
+#             'res_model': 'wh.move.line',
+#             'type': 'ir.actions.act_window',
+#         }
+#         return True

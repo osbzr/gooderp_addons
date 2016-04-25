@@ -22,7 +22,7 @@ class home_page(models.Model):
     def get_action_url(self):
         action_url_lsit = {'main': [], 'top': [], 'left': []}
 
-        action_list = self.env['home.page'].search([(1, '=', 1)], order='sequence')
+        action_list = self.env['home.page'].search([(1, '=', 1), ('sequence', '!=', 0)], order='sequence')
         for action in action_list:
             if action:
                 if action.menu_type == 'main':
@@ -51,6 +51,8 @@ class home_page(models.Model):
                     action_url_lsit['top'].append([note, action.action.view_mode, action.action.res_model, action.domain,
                                                    action.context, action.action.view_id.id, action.action.name])
                 else:
-                    action_url_lsit['left'].append([action.note_one, action.action.view_mode, action.action.res_model,
+                    res_model_objs = self.env[action.action.res_model].search(eval(action.domain or '[]'))
+                    action_url_lsit['left'].append(["%s  %s" % (action.note_one, sum([1 for res_model_obj in res_model_objs])),
+                                                    action.action.view_mode, action.action.res_model,
                                                     action.domain, action.context, action.action.view_id.id, action.action.name])
         return action_url_lsit
