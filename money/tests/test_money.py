@@ -245,6 +245,11 @@ class test_money_transfer_order(TransactionCase):
         money_transfer_300.line_ids.amount = -10.0
         with self.assertRaises(except_orm):
             money_transfer_300.money_transfer_done()
+        # 转出金额=0，则审核报错
+        money_transfer_300.line_ids.out_bank_id = self.env.ref('core.comm').id
+        money_transfer_300.line_ids.amount = 0
+        with self.assertRaises(except_orm):
+            money_transfer_300.money_transfer_done()
 
 
 class test_partner(TransactionCase):
