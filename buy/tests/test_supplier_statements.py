@@ -25,6 +25,7 @@ class test_supplier_statements(TransactionCase):
         money_order.money_order_done()
         # 创建采购入库单记录
         buy_order = self.env.ref('buy.buy_order_1')
+        buy_order.bank_account_id = False
         buy_order.buy_order_done()
         objReceipt = self.env['buy.receipt']
         receipt = objReceipt.search([('order_id', '=', buy_order.id)])
@@ -34,6 +35,7 @@ class test_supplier_statements(TransactionCase):
         invoice.money_invoice_done()
         # 创建采购退货单记录
         buy_return = self.env.ref('buy.buy_return_order_1')
+        buy_return.bank_account_id = False
         buy_return.buy_order_done()
         receipt_return = objReceipt.search([('order_id', '=', buy_return.id)])
         receipt_return.buy_receipt_done()
