@@ -7,7 +7,10 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['base','web_menu_create','decimal_precision'],
+    'depends': ['base',
+                'web_menu_create',
+                'decimal_precision',
+                'web_readonly_bypass'],
     'demo': [
         'core_demo.xml',
         ],
