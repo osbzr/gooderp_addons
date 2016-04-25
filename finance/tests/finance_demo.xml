@@ -32,6 +32,7 @@
         <!--新建凭证-->
         <record id='voucher_1' model='voucher'>
             <field name='name'>FV0002</field>
+            <field name='state'>draft</field>
             <field name='document_word_id' ref='finance.document_word_1'/>
         </record>
         <record id='voucher_line_1' model='voucher.line'>
@@ -49,6 +50,7 @@
 
         <record id='voucher_555' model='voucher'>
             <field name='name'>FV0003</field>
+            <field name='state'>draft</field>
             <field name='document_word_id' ref='finance.document_word_1'/>
             <field name='date' >2016-03-08</field> 
         </record>
