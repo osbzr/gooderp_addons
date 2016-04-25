@@ -58,7 +58,7 @@
                             </tree>
                         </field>
                         <group>
-                            <field name="amount_text"/>
+                            <field name="amount_text" widget='num_to_china'/>
                         </group>
                     </sheet>
                 </form>
@@ -90,7 +90,7 @@
         <menuitem id='voucher_menu' action='voucher_action' parent='voucher_home_menu' sequence='10'/>
 
         <!--账簿菜单-->
-        <menuitem id='voucher_books_menu' name='账簿' parent='finance_menu' sequence='5'/>
+        <menuitem id='voucher_books_menu' name='账簿' parent='finance_menu' sequence='10'/>
 
         <!--账簿搜索及过滤-->
         <record id="view_voucher_line_search_filter" model="ir.ui.view">
