@@ -11,7 +11,7 @@ class report_stock_transceive(models.Model):
 
     goods = fields.Char(u'产品')
     attribute = fields.Char(u'属性')
-    id_lists = fields.Text(u'wh_move_line id列表')
+    id_lists = fields.Text(u'库存调拨id列表')
     uom = fields.Char(u'单位')
     warehouse = fields.Char(u'仓库')
     goods_qty_begain = fields.Float(
@@ -125,6 +125,7 @@ class report_stock_transceive(models.Model):
 
     def update_record_value(self, value, record, sql_type='out'):
         tag = sql_type == 'out' and -1 or 1
+
         value.update({
                 'goods_qty_begain': value.get('goods_qty_begain', 0) +
                     (tag * record.get('goods_qty_begain', 0)),
@@ -143,8 +144,8 @@ class report_stock_transceive(models.Model):
                     (sql_type == 'in' and record.get('goods_qty', 0) or 0),
                 'cost_in': value.get('cost_in', 0) +
                     (sql_type == 'in' and record.get('cost', 0) or 0),
-#                 'ids_lists': str(set(value.get('ids_lists', []) +
-#                     record.get('ids_lists', []))),
+                'id_lists': value.get('id_lists', []) +
+                    record.get('id_lists', []),
             })
 
     def compute_history_stock_by_collect(self, res, records, sql_type='out'):
@@ -174,17 +175,22 @@ class report_stock_transceive(models.Model):
 
         return result
 
-#     @api.multi
-#     def find_source_order(self):
-#         # 查看库存调拨明细
-#         wh_move_line = self.env['wh.move.line'].search([('id', '=', self.id)])
-#  
-#         view = self.env.ref('warehouse.wh_move_line_tree')
-#  
-#         return {
-#             'view_mode': 'tree',
-#             'views': [(view.id, 'tree')],
-#             'res_model': 'wh.move.line',
-#             'type': 'ir.actions.act_window',
-#         }
-#         return True
+    @api.multi
+    def find_source_move_line(self):
+        # 查看库存调拨明细
+        move_line_ids = []
+        # 获得'report.stock.transceive'记录集
+        move_line_lists = self.get_data_from_cache(sql_type='out')
+
+        for line in move_line_lists:
+            if line.get('id') == self.id:
+                move_line_ids = line.get('id_lists')
+
+        view = self.env.ref('warehouse.wh_move_line_tree')
+        return {
+            'view_mode': 'tree',
+            'views': [(view.id, 'tree')],
+            'res_model': 'wh.move.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', move_line_ids)]
+        }
