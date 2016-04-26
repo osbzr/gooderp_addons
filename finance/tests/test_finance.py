@@ -4,11 +4,6 @@ from openerp.exceptions import except_orm, ValidationError
 
 
 class test_voucher(TransactionCase):
-
-#    def test_default(self):
-#        '''凭证号默认值'''
-#        self.env['voucher'].create({
-#                     })
    
     def test_approve(self):
         '''测试审核反审核报错'''
@@ -44,13 +39,12 @@ class test_voucher(TransactionCase):
         voucher = self.env.ref('finance.voucher_1')
         self.assertTrue(voucher.period_id.display_name == u'2016年 第1期')
         self.assertTrue(voucher.amount_text == '50000.0')
+        voucher.unlink()
     
     def test_check_balance(self):
         '''检查凭证借贷方合计平衡'''
         with self.assertRaises(ValidationError):
             self.env['voucher'].create({
-#            'document_word_id':self.env.ref('finance.document_word_1').id,
-#            'name':u'FV002734',
             'line_ids':[(0,0,{
                              'account_id':self.env.ref('finance.account_cash').id,
                              'name':u'借贷方不平',
@@ -63,15 +57,11 @@ class test_voucher(TransactionCase):
         # 没有凭证行
         with self.assertRaises(ValidationError):
             self.env['voucher'].create({
-#            'document_word_id':self.env.ref('finance.document_word_1').id,
-#            'name':u'FV002734',
             'line_ids': False
             })
         # 检查借贷方都为0
         with self.assertRaises(ValidationError):
             self.env['voucher'].create({
-#            'document_word_id':self.env.ref('finance.document_word_1').id,
-#            'name':u'FV002734',
             'line_ids':[(0,0,{
                              'account_id':self.env.ref('finance.account_cash').id,
                              'name':u'借贷方全为0',
@@ -79,8 +69,6 @@ class test_voucher(TransactionCase):
             })
         with self.assertRaises(ValidationError):
             self.env['voucher'].create({
-#            'document_word_id':self.env.ref('finance.document_word_1').id,
-#            'name':u'FV002734',
             'line_ids':[(0,0,{
                              'account_id':self.env.ref('finance.account_cash').id,
                              'name':u'借贷方同时输入',
@@ -113,7 +101,7 @@ class test_period(TransactionCase):
             line.account_id = self.env.ref('finance.account_wage').id
             line.onchange_account_id()
         #这么写覆盖到了，但是这什么逻辑=。=
-#        self.env['voucher.line'].onchange_account_id()
+        self.env['voucher.line'].onchange_account_id()
                                                     
 
         
