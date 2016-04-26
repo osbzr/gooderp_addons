@@ -168,13 +168,13 @@ class report_base(models.Model):
         return result
 
     def get_data_from_cache(self, sql_type='out'):
-        if self._cache_env != (request.session_id, self.env.uid, self.env.context) \
+        if self._cache_env != (self.env.uid, self.env.context) \
                 or not self._cache_record or self._cache_time + self._expired_time < time.time():
 
             self.__class__._cache_record = self.update_result_none_to_false(
                 self.collect_data_by_sql(sql_type))
             self.__class__._cache_time = time.time()
-            self.__class__._cache_env = (request.session_id, self.env.uid, self.env.context)
+            self.__class__._cache_env = (self.env.uid, self.env.context)
 
         return self._cache_record
 
