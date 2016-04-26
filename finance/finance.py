@@ -128,7 +128,6 @@ class voucher_line(models.Model):
                 'goods_id': [('name', '=', False)],
                 'auxiliary_id': [('name', '=', False)]}}
         if not self.account_id:
-            print '111111111111'    # TODO FIXME  此处不应有输出.
             return res
         if not self.account_id.auxiliary_financing:
             return res
