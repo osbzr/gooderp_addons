@@ -37,7 +37,7 @@
                 <tree editable="TOP" string="科目">
                     <field name="code"/>
                     <field name="name"/>
-                    <field name="category"/>
+                    <field name="costs_types"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
                     <field name="state" widget='boolean_clickable'/>
