@@ -8,6 +8,7 @@
                 <tree string="销售明细表">
                 	<field name="date"/>
                 	<field name="order_name"/>
+                	<button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"/>
                 	<field name="type"/>
                 	<field name="staff_id"/>
                 	<field name="partner_id"/>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import openerp.addons.decimal_precision as dp
-from openerp import fields, models
+from openerp import fields, models, api
 
 
 class sell_receipt(models.TransientModel):
@@ -23,3 +23,24 @@ class sell_receipt(models.TransientModel):
     balance = fields.Float(u'应收款余额', digits_compute=dp.get_precision('Amount'))
     receipt_rate = fields.Float(u'回款率(%)')
     note = fields.Char(u'备注')
+
+    @api.multi
+    def view_detail(self):
+        '''销售收款一览表查看明细按钮'''
+        order = self.env['sell.delivery'].search([('name', '=', self.order_name)])
+        if order:
+            if not order.is_return:
+                view = self.env.ref('sell.sell_delivery_form')
+            else:
+                view = self.env.ref('sell.sell_return_form')
+            
+            return {
+                'name': u'销售发货单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'sell.delivery',
+                'type': 'ir.actions.act_window',
+                'res_id': order.id,
+            }

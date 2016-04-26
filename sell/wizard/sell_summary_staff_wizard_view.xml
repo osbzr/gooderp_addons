@@ -14,7 +14,7 @@
                         <group>
                             <field name="staff_id"/>
                             <field name="goods_id"/>
-                            <field name="goods_categ_id"/>
+                            <field name="goods_categ_id" domain="[('type', '=', 'goods')]"/>
                         </group>
                         <footer>
                             <button name="button_ok" type="object" string="确定" class="oe_highlight"/>

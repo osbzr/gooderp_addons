@@ -187,6 +187,18 @@ class test_payment_wizard(TransactionCase):
         self.payment.order_id = False
         self.payment.button_ok()
 
+    def test_view_detail(self):
+        '''查看明细按钮'''
+        self.payment.button_ok()
+        payment_line = self.env['buy.payment'].search(
+                                [('order_name', '=', self.receipt.name)])
+        for line in payment_line:
+            line.view_detail()
+        payment_line2 = self.env['buy.payment'].search(
+                                [('order_name', '=', self.receipt_return.name)])
+        for line in payment_line2:
+            line.view_detail()
+
 
 class test_goods_wizard(TransactionCase):
     '''测试采购汇总表（按商品）向导'''
