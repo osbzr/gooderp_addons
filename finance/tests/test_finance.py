@@ -9,6 +9,32 @@ class test_voucher(TransactionCase):
         '''凭证号默认值'''
         self.env['voucher'].create({
                      })
+    
+    def test_approve(self):
+        '''测试审核反审核报错'''
+        voucher = self.env.ref('finance.voucher_1')
+        #正常审批
+        voucher.voucher_done()
+        self.assertTrue(voucher.state == 'done')
+        #重复审批
+        with self.assertRaises(except_orm):
+            voucher.voucher_done()
+        #正常反审批
+        voucher.voucher_draft()
+        self.assertTrue(voucher.state == 'draft')
+        #重复反审批
+        with self.assertRaises(except_orm):
+            voucher.voucher_draft()
+        #会计期间重复时的审批
+        voucher.period_id.is_closed = True
+        with self.assertRaises(except_orm):
+            voucher.voucher_done()
+        #会计期间重复时的反审批
+        voucher.period_id.is_closed = False
+        voucher.voucher_done()
+        voucher.period_id.is_closed = True
+        with self.assertRaises(except_orm):
+            voucher.voucher_draft()
 
     def test_compute(self):
         '''新建凭证时计算字段加载'''

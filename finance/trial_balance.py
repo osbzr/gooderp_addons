@@ -293,7 +293,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             current_credit = sql_results[0].get('credit', 0)
             current_debit = sql_results[0].get('debit', 0)
             if initial_balance_new.get('direction') == '借':
-                print "====24"
                 year_balance_debit = sql_results[0].get('debit', 0) + initial_balance_new.get('balance', 0)
                 year_balance_credit = sql_results[0].get('credit', 0)
             else:

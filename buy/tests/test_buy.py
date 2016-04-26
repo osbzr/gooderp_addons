@@ -8,6 +8,7 @@ class test_buy_order(TransactionCase):
     def setUp(self):
         super(test_buy_order, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
 
     def test_onchange_discount_rate(self):
         ''' 优惠率改变时，改变优惠金额，优惠后金额也改变'''
@@ -66,6 +67,28 @@ class test_buy_order(TransactionCase):
             line.quantity = 0
         with self.assertRaises(except_orm):
             self.order.buy_order_done()
+
+        # 输入预付款和结算账户
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        self.order.prepayment = 50.0
+        self.order.bank_account_id = bank_account
+        for line in self.order.line_ids:
+            line.quantity = 1
+        self.order.buy_order_done()
+
+        # 预付款不为空时，请选择结算账户
+        self.order.buy_order_draft()
+        self.order.bank_account_id = False
+        self.order.prepayment = 50.0
+        with self.assertRaises(except_orm):
+            self.order.buy_order_done()
+        # 结算账户不为空时，需要输入预付款！
+        self.order.bank_account_id = bank_account
+        self.order.prepayment = 0
+        with self.assertRaises(except_orm):
+            self.order.buy_order_done()
+
         # 没有订单行时审核报错
         for line in self.order.line_ids:
             line.unlink()
@@ -129,6 +152,13 @@ class test_buy_order_line(TransactionCase):
         super(test_buy_order_line, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
 
+    def test_compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        for line in self.order.line_ids:
+            self.assertTrue(line.using_attribute)
+            line.goods_id = self.env.ref('goods.mouse')
+            self.assertTrue(not line.using_attribute)
+
     def test_default_warehouse(self):
         '''新建订单行调出仓库默认值'''
         self.order.line_ids.with_context({
@@ -181,6 +211,7 @@ class test_buy_receipt(TransactionCase):
     def setUp(self):
         super(test_buy_receipt, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
@@ -327,6 +358,7 @@ class test_wh_move_line(TransactionCase):
         '''准备基本数据'''
         super(test_wh_move_line, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])

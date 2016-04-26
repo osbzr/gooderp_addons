@@ -29,15 +29,20 @@
             <field name="model">voucher</field>
             <field name="arch" type="xml">
                 <form string="会计凭证">
+	                <header>
+	                	<button name='voucher_done' states="draft" string="审核" type="object" class="oe_highlight"/>
+	                	<button name='voucher_draft' states="done" string="反审核" type="object"/>
+	                    <field name="state" widget="statusbar" readonly="1"/>
+	                </header>
                     <sheet>
                         <group>
                             <group>
-                                <field name="date"/>
-                                <field name="period_id"/>
-                            </group>
-                            <group>
                                 <field name="document_word_id" readonly='1' style="width: 1%%"/>
                                 <field name="name" readonly='1' style="width: 1%%"/>
+                            </group>
+                            <group>
+                                <field name="date"/>
+                                <field name="period_id"/>
                                 <field name="att_count"/>
                             </group>
                         </group>
@@ -53,7 +58,7 @@
                             </tree>
                         </field>
                         <group>
-                            <field name="amount_text"/>
+                            <field name="amount_text" widget='num_to_china'/>
                         </group>
                     </sheet>
                 </form>
@@ -85,7 +90,7 @@
         <menuitem id='voucher_menu' action='voucher_action' parent='voucher_home_menu' sequence='10'/>
 
         <!--账簿菜单-->
-        <menuitem id='voucher_books_menu' name='账簿' parent='finance_menu' sequence='5'/>
+        <menuitem id='voucher_books_menu' name='账簿' parent='finance_menu' sequence='10'/>
 
         <!--账簿搜索及过滤-->
         <record id="view_voucher_line_search_filter" model="ir.ui.view">

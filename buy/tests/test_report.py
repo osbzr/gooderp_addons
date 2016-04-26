@@ -12,6 +12,7 @@ class test_detail_wizard(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
@@ -25,6 +26,7 @@ class test_detail_wizard(TransactionCase):
         self.detail = self.detail_obj.create({})
         # 退货订单审核生成退货单，退货单审核
         return_order = self.env.ref('buy.buy_return_order_1')
+        return_order.bank_account_id = False
         return_order.buy_order_done()
         return_receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', return_order.id)])
@@ -64,6 +66,7 @@ class test_track_wizard(TransactionCase):
         order_2 = self.order.copy()
         for line in order_2.line_ids:
             line.goods_id = self.env.ref('goods.mouse').id
+        order_2.bank_account_id = False
         order_2.buy_order_done()
         receipt_2 = self.env['buy.receipt'].search(
                     [('order_id', '=', order_2.id)])
@@ -73,6 +76,7 @@ class test_track_wizard(TransactionCase):
         receipt_3 = self.env['buy.receipt'].search(
                     [('order_id', '=', order_2.id), ('state', '=', 'draft')])
         receipt_3.buy_receipt_done()
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
@@ -106,6 +110,13 @@ class test_track_wizard(TransactionCase):
         self.track.partner_id = False
         self.track.button_ok()
 
+    def test_view_detail(self):
+        '''查看明细按钮'''
+        self.track.button_ok()
+        goods_id = self.env.ref('goods.cable').id
+        track_line = self.env['buy.order.track'].search([('goods_id', '=', goods_id)])
+        track_line[0].view_detail()
+
 
 class test_payment_wizard(TransactionCase):
     '''测试采购付款一览表向导'''
@@ -116,6 +127,7 @@ class test_payment_wizard(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
@@ -164,6 +176,7 @@ class test_goods_wizard(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
@@ -210,6 +223,7 @@ class test_partner_wizard(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])

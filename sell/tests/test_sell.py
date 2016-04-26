@@ -208,22 +208,6 @@ class Test_sell(TransactionCase):
         with self.assertRaises(except_orm):
             self.sell_delivery.sell_delivery_done()
 
-    def test_sell_done(self):
-        ''' 测试审核销货订单  '''
-        order = self.env.ref('sell.sell_order_1')
-
-        # 审核销货订单
-        order.sell_order_done()
-        with self.assertRaises(except_orm):
-            order.sell_order_done()
-
-        # 未填数量应报错
-        order.sell_order_draft()
-        for line in order.line_ids:
-            line.quantity = 0
-        with self.assertRaises(except_orm):
-            order.sell_order_done()
-
     def test_sell_draft(self):
         ''' 测试反审核销货订单  '''
         order = self.env.ref('sell.sell_order_1')
@@ -281,6 +265,69 @@ class Test_sell(TransactionCase):
             self.order.partner_id.c_category_id = False
             with self.assertRaises(except_orm):
                 line.onchange_goods_id()
+
+
+class test_sell_order(TransactionCase):
+
+    def setUp(self):
+        super(test_sell_order, self).setUp()
+        self.order = self.env.ref('sell.sell_order_1')
+#         self.order.bank_account_id = False
+
+    def test_sell_order_done(self):
+        '''测试审核销货订单'''
+        # 审核销货订单
+        self.order.sell_order_done()
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+        # 未填数量应报错
+        self.order.sell_order_draft()
+        for line in self.order.line_ids:
+            line.quantity = 0
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+        # 输入预收款和结算账户
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        self.order.pre_receipt = 50.0
+        self.order.bank_account_id = bank_account
+        for line in self.order.line_ids:
+            line.quantity = 1
+        self.order.sell_order_done()
+
+        # 预收款不为空时，请选择结算账户！
+        self.order.sell_order_draft()
+        self.order.bank_account_id = False
+        self.order.pre_receipt = 50.0
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+        # 结算账户不为空时，需要输入预收款！
+        self.order.bank_account_id = bank_account
+        self.order.pre_receipt = 0
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+        # 没有订单行时审核报错
+        for line in self.order.line_ids:
+            line.unlink()
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+
+class test_sell_order_line(TransactionCase):
+
+    def setUp(self):
+        super(test_sell_order_line, self).setUp()
+        self.order = self.env.ref('sell.sell_order_1')
+
+    def test_compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        for line in self.order.line_ids:
+            self.assertTrue(not line.using_attribute)
+            line.goods_id = self.env.ref('goods.keyboard')
+            self.assertTrue(line.using_attribute)
 
 
 class test_sell_delivery(TransactionCase):

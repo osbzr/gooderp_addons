@@ -27,6 +27,7 @@
     'depends': ['mail', 'core', 'warehouse', 'money'],
     'data': [
             'sell_data.xml',
+            'security/groups.xml',
             'sell_view.xml',
             'report/customer_statements_view.xml',
             'report/sell_order_track_view.xml',

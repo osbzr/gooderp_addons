@@ -29,7 +29,7 @@
     "description": """
     """,
     "data": [
-        'data/group_data.xml',
+        'security/groups.xml',
         'view/goods_view.xml',
         'action/goods_action.xml',
         'menu/goods_menu.xml',
