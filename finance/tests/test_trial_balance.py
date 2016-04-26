@@ -51,7 +51,8 @@ class test_trial_balance(TransactionCase):
                                                                     'current_occurrence_balance_formula': '1602~1121'})
         self.balance_sheet_3 = self.env['profit.statement'].create({'balance': '营业税金及附加', 'line_num': '3', 'cumulative_occurrence_balance_formula': '1622~1702',
                                                                     'current_occurrence_balance_formula': ''})
-        self.balance_sheet_wizard = self.env['create.balance.sheet.wizard'].create({'period_id': subject_name_id_4.id})
+        self.balance_sheet_wizard = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_now.id})
+        self.balance_sheet_wizard_last = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_last.id})
 
     def test_creare_trial_balance(self):
         '''创建科目余额表'''
@@ -90,8 +91,12 @@ class test_trial_balance(TransactionCase):
 
     def test_creare_balance_sheet(self):
         """测试 创建资产负债表"""
+        self.balance_sheet_wizard_last.create_balance_sheet()
+        self.period_last.is_closed = True
         self.balance_sheet_wizard.create_balance_sheet()
 
     def test_create_profit_statement(self):
         """测试 创建利润表"""
+        self.balance_sheet_wizard_last.create_balance_sheet()
+        self.period_last.is_closed = True
         self.balance_sheet_wizard.create_profit_statement()

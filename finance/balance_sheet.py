@@ -39,10 +39,8 @@ class create_balance_sheet_wizard(models.TransientModel):
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
-                    print "--------2"
                     subject_vals.append(trial_balance[compute_field_list[0]] - trial_balance[compute_field_list[1]])
                 elif trial_balance.subject_name_id.balance_directions == 'out':
-                    print "--------1"
                     subject_vals.append(trial_balance[compute_field_list[1]] - trial_balance[compute_field_list[0]])
             return sum(subject_vals)
 
@@ -109,10 +107,8 @@ class create_balance_sheet_wizard(models.TransientModel):
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
-                    print "--------4"
                     subject_vals.append(trial_balance[compute_field_list[0]])
                 elif trial_balance.subject_name_id.balance_directions == 'out':
-                    print "---3"
                     subject_vals.append(trial_balance[compute_field_list[1]])
             return sum(subject_vals)
         else:
