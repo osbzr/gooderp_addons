@@ -2,7 +2,7 @@
 <openerp>
     <data>
     	<!-- 根菜单 -->
-        <menuitem id="menu_buy_root" name="采购" groups='core.group_buy'/>
+        <menuitem id="menu_buy_root" name="采购" groups='group_buy'/>
 
         <menuitem id="menu_buy_manage" name="采购" parent="menu_buy_root" sequence="1"/>
 
@@ -49,7 +49,7 @@
                         </group>
                         <group>
                         	<field name="planned_date" required="1"/>
-                            <field name="name" required="1" readonly="1"/>
+                            <field name="name" readonly="1" invisible="1"/>
                             <field name="type" widget="radio"/>
                             <field name="goods_state" readonly="1"/>
                         </group>
@@ -57,7 +57,10 @@
                     <field name="line_ids" context="{'warehouse_type': 'supplier'}">
                     	<tree string="购货订单行" editable="bottom">
                             <field name="goods_id" required='1'/>
-                            <field name="attribute_id" groups='goods.multi_attrs_groups'/>
+                            <field name='using_attribute' invisible='1'/>
+                            <field name="attribute_id"
+                            	groups='goods.multi_attrs_groups'
+                            	attrs="{'required': [('using_attribute','=', True)]}"/>
                             <field name="uom_id"/>
                             <field name='warehouse_id' invisible='1'/>
                             <field name='warehouse_dest_id' required='1' groups='warehouse.multi_warehouse_groups'/>
@@ -85,10 +88,12 @@
                     </group>
                     <group>
                         <group>
+                        	<field name="prepayment"/>
                             <field name="create_uid" readonly="1" string="制单人"/>
                             <field name="approve_uid" readonly="1"/>
                         </group>
                     	<group>
+                    		<field name="bank_account_id"/>
                             <field name="create_date" readonly="1" string="录单时间"/>
                             <field name="write_date" readonly="1" string="最后修改时间"/>
                         </group>
@@ -162,7 +167,11 @@
 		                            <field name="goods_id" required='1'
 		                            	context="{'default_partner':parent.partner_id,
 		         								  'default_is_return':parent.is_return}"/>
-		                            <field name="attribute_id" domain="[('goods_id', '=', goods_id)]" groups='goods.multi_attrs_groups'/>
+		         					<field name='using_attribute' invisible='1'/>
+		                            <field name="attribute_id"
+		                            	domain="[('goods_id', '=', goods_id)]"
+		                            	groups='goods.multi_attrs_groups'
+		                            	attrs="{'required': [('using_attribute','=', True)]}"/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
 				                    <field name='force_batch_one' invisible='1'/>
@@ -291,7 +300,11 @@
 		                            <field name="goods_id" required='1'
 		                            	context="{'default_partner':parent.partner_id,
 		         								  'default_is_return':parent.is_return}"/>
-		                            <field name="attribute_id" groups='goods.multi_attrs_groups'/>
+		                            <field name='using_attribute' invisible='1'/>
+		                            <field name="attribute_id"
+		                            	domain="[('goods_id', '=', goods_id)]"
+		                            	groups='goods.multi_attrs_groups'
+		                            	attrs="{'required': [('using_attribute','=', True)]}"/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
 		                            <field name='lot_qty' invisible='1'/>

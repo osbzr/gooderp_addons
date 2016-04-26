@@ -90,9 +90,26 @@
             <field name='voucher_id' ref='finance.voucher_555'/>
             <field name='name'>示例凭证行</field>
             <field name='account_id' ref='finance.finance_account_1'/>
-            <field name='credit'>10000</field>
+            <field name='credit'>10000</field>  
         </record>
-
+        <record id='voucher_line_2_6' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.finance_account_11'/>
+            <field name='debit'>2222</field> 
+        </record>
+        <record id='voucher_line_2_7' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.document_word_1'/>
+            <field name='credit'>1111</field> 
+        </record>
+        <record id='voucher_line_2_8' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_555'/>
+            <field name='name'>示例凭证行</field>
+            <field name='account_id' ref='finance.document_word_1'/>
+            <field name='credit'>1111</field> 
+        </record>
         <!--科目-->
         <record id='finance_account_1' model='finance.account'>
             <field name='auxiliary_financing'>partner</field>

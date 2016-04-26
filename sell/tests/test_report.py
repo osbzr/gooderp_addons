@@ -114,7 +114,7 @@ class test_track_wizard(TransactionCase):
         self.track = self.track_obj.create({})
 
     def test_button_ok(self):
-        '''测试销售订单跟踪表确认按钮'''
+        '''测试销售订单跟踪表  确认按钮'''
         # 日期报错
         track = self.track_obj.create({
                              'date_start': '2016-11-01',
@@ -139,6 +139,13 @@ class test_track_wizard(TransactionCase):
         self.track.partner_id = False
         self.track.staff_id = False
         self.track.button_ok()
+
+    def test_view_detail(self):
+        '''测试销售订单跟踪表  查看明细按钮'''
+        self.track.button_ok()
+        goods_id = self.env.ref('goods.cable').id
+        track_line = self.env['sell.order.track'].search([('goods_id', '=', goods_id)])
+        track_line[0].view_detail()
 
 
 class test_detail_wizard(TransactionCase):
@@ -171,7 +178,7 @@ class test_detail_wizard(TransactionCase):
         self.detail = self.detail_obj.create({})
 
     def test_button_ok(self):
-        '''测试销售订单明细表确认按钮'''
+        '''测试销售订单明细表  确认按钮'''
         detail = self.detail_obj.create({
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
@@ -195,6 +202,15 @@ class test_detail_wizard(TransactionCase):
         self.detail.partner_id = False
         self.detail.staff_id = False
         self.detail.button_ok()
+
+    def test_view_detail(self):
+        '''测试销售订单明细表  查看明细按钮'''
+        self.detail.button_ok()
+        goods_id = self.env.ref('goods.cable').id
+        detail_line = self.env['sell.order.detail'].search(
+                                [('goods_id', '=', goods_id)])
+        for line in detail_line:
+            line.view_detail()
 
 
 class test_goods_wizard(TransactionCase):
@@ -414,7 +430,7 @@ class test_receipt_wizard(TransactionCase):
         self.receipt_wizard = self.receipt_wizard_obj.create({})
 
     def test_button_ok(self):
-        '''测试销售收款一览表确认按钮'''
+        '''测试销售收款一览表  确认按钮'''
         # 日期报错
         receipt_wizard = self.receipt_wizard_obj.create({
                              'date_start': '2016-11-01',
@@ -440,3 +456,15 @@ class test_receipt_wizard(TransactionCase):
         self.receipt_wizard.partner_id = False
         self.receipt_wizard.order_id = False
         self.receipt_wizard.button_ok()
+
+    def test_view_detail(self):
+        '''测试销售收款一览表  查看明细按钮'''
+        self.receipt_wizard.button_ok()
+        receipt_line = self.env['sell.receipt'].search(
+                                [('order_name', '=', self.delivery.name)])
+        for line in receipt_line:
+            line.view_detail()
+        receipt_line2 = self.env['sell.receipt'].search(
+                                [('order_name', '=', self.delivery_return.name)])
+        for line in receipt_line2:
+            line.view_detail()

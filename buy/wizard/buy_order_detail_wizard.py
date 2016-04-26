@@ -20,7 +20,8 @@ class buy_order_detail_wizard(models.TransientModel):
     date_start = fields.Date(u'开始日期', default=_default_date_start)
     date_end = fields.Date(u'结束日期', default=_default_date_end)
     partner_id = fields.Many2one('partner', u'供应商')
-    goods_id = fields.Many2one('goods', u'产品')
+    goods_id = fields.Many2one('goods', u'商品')
+    order_id = fields.Many2one('buy.receipt', u'单据编号')
 
     @api.multi
     def button_ok(self):
@@ -38,6 +39,10 @@ class buy_order_detail_wizard(models.TransientModel):
             domain.append(('goods_id', '=', self.goods_id.id))
         if self.partner_id:
             domain.append(('move_id.partner_id', '=', self.partner_id.id))
+        if self.order_id:
+            buy_receipt = self.env['buy.receipt'].search(
+                                [('id', '=', self.order_id.id)])
+            domain.append(('move_id.id', '=', buy_receipt.buy_move_id.id))
 
         order_type = ''
         for line in self.env['wh.move.line'].search(domain, order='move_id'):

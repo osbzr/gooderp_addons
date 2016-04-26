@@ -30,6 +30,7 @@
     """,
     "data": [
         'data/warehouse_data.xml',
+        'security/groups.xml',
         'wizard/save_bom_view.xml',
         'wizard/stock_transceive_wizard_view.xml',
         'wizard/lot_track_wizard_view.xml',
@@ -50,6 +51,9 @@
     'demo': [
         'data/warehouse_demo.xml',
      ],
+     'qweb': [
+        'data/copy_move_line.xml',
+    ],
     'installable': True,
     "active": False,
 }

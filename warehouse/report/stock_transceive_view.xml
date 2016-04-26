@@ -21,7 +21,7 @@
                     <field name='cost_out' />
                     <field name='cost_in' />
                     <field name='cost_end' />
-                    <!-- <button name="find_source_order" type="object" string="查看库存调拨明细" icon="terp-stock_zoom" class="oe_highlight"/> -->
+                    <button name="find_source_move_line" type="object" string="查看库存调拨明细" icon="terp-stock_zoom" class="oe_highlight"/>
                 </tree>
             </field>
         </record>

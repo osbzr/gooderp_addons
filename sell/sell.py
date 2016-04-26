@@ -65,6 +65,9 @@ class sell_order(models.Model):
     amount = fields.Float(string=u'优惠后金额', store=True, readonly=True,
                         compute='_compute_amount', track_visibility='always',
                         digits_compute=dp.get_precision('Amount'))
+    pre_receipt = fields.Float(u'预收款', states=READONLY_STATES,
+                           digits_compute=dp.get_precision('Amount'))
+    bank_account_id = fields.Many2one('bank.account', u'结算账户')
     approve_uid = fields.Many2one('res.users', u'审核人', copy=False)
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态', readonly=True,
                              help=u"销货订单的审核状态", select=True, 
@@ -96,6 +99,37 @@ class sell_order(models.Model):
         return super(sell_order, self).unlink()
 
     @api.one
+    def generate_receipt_order(self):
+        '''由销货订单生成收款单'''
+        # 入库单/退货单
+        if self.type == 'sell':
+            amount = self.amount
+            this_reconcile = self.pre_receipt
+        else:
+            amount = - self.amount
+            this_reconcile = - self.pre_receipt
+        if self.pre_receipt:
+            money_lines = []
+            money_lines.append({
+                'bank_id': self.bank_account_id.id,
+                'amount': this_reconcile,
+            })
+
+            rec = self.with_context(type='get')
+            money_order = rec.env['money.order'].create({
+                                'partner_id': self.partner_id.id,
+                                'date': fields.Date.context_today(self),
+                                'line_ids':
+                                [(0, 0, line) for line in money_lines],
+                                'type': 'get',
+                                'amount': amount,
+                                'reconciled': this_reconcile,
+                                'to_reconcile': amount,
+                                'state': 'draft',
+                            })
+            money_order.money_order_done()
+
+    @api.one
     def sell_order_done(self):
         '''审核销货订单'''
         if self.state == 'done':
@@ -105,7 +139,12 @@ class sell_order(models.Model):
         for line in self.line_ids:
             if line.quantity == 0:
                 raise except_orm(u'错误', u'请输入产品数量！')
-        # TODO:销售预收款
+        if self.bank_account_id and not self.pre_receipt:
+            raise except_orm(u'警告！', u'结算账户不为空时，需要输入预付款！')
+        if not self.bank_account_id and self.pre_receipt:
+            raise except_orm(u'警告！', u'预付款不为空时，请选择结算账户！')
+        # 销售预收款生成收款单
+        self.generate_receipt_order()
         self.sell_generate_delivery()
         self.state = 'done'
         self.approve_uid = self._uid
@@ -230,6 +269,12 @@ class sell_order_line(models.Model):
     _name = 'sell.order.line'
     _description = u'销货订单明细'
 
+    @api.one
+    @api.depends('goods_id')
+    def _compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        self.using_attribute = self.goods_id.attribute_ids and True or False
+
     @api.model
     def _default_warehouse_dest(self):
         context = self._context or {}
@@ -253,6 +298,7 @@ class sell_order_line(models.Model):
     order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
                                required=True, ondelete='cascade')
     goods_id = fields.Many2one('goods', u'商品')
+    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
     attribute_id = fields.Many2one('attribute', u'属性', 
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位')

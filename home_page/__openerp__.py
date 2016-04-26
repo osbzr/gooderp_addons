@@ -8,6 +8,7 @@
 
         """,
     'data': [
+        'security/groups.xml',
         "home_page.xml",
         "home_data.xml",
         'security/ir.model.access.csv',
