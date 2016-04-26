@@ -99,12 +99,10 @@ class test_period(TransactionCase):
                 period_obj.get_period('2100-06-20')
             
     def test_onchange_account_id(self):
-        '''科目为空时的onchange'''
+        '''凭证行的科目变更影响到其他字段的可选值'''
         voucher = self.env.ref('finance.voucher_1')
         for line in voucher.line_ids:
             line.account_id = self.env.ref('finance.account_cash').id
-            line.onchange_account_id()
-            line.account_id = None
             line.onchange_account_id()
             line.account_id = self.env.ref('finance.account_goods').id
             line.onchange_account_id()
