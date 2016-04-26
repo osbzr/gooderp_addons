@@ -30,7 +30,7 @@ class buy_summary_partner(models.Model):
         return '''
         SELECT MIN(wml.id) as id,
                MIN(wml.date) AS date,
-               s_categ.name AS s_category,
+               c_categ.name AS s_category,
                partner.name AS partner,
                goods.code AS goods_code,
                goods.name AS goods,
@@ -51,8 +51,8 @@ class buy_summary_partner(models.Model):
         FROM wh_move_line AS wml
             LEFT JOIN wh_move wm ON wml.move_id = wm.id
             LEFT JOIN partner ON wm.partner_id = partner.id
-            LEFT JOIN core_category AS s_categ
-                 ON partner.s_category_id = s_categ.id
+            LEFT JOIN core_category AS c_categ
+                 ON partner.s_category_id = c_categ.id
             LEFT JOIN goods ON wml.goods_id = goods.id
             LEFT JOIN attribute AS attr ON wml.attribute_id = attr.id
             LEFT JOIN warehouse AS wh ON wml.warehouse_dest_id = wh.id
@@ -66,6 +66,8 @@ class buy_summary_partner(models.Model):
             extra += 'AND partner.id = {partner_id}'
         if self.env.context.get('goods_id'):
             extra += 'AND goods.id = {goods_id}'
+        if self.env.context.get('s_category_id'):
+            extra += 'AND c_categ.id = {s_category_id}'
 
         return '''
         WHERE wml.state = 'done'
@@ -93,6 +95,8 @@ class buy_summary_partner(models.Model):
             context.get('partner_id')[0] or '',
             'goods_id': context.get('goods_id') and
             context.get('goods_id')[0] or '',
+            's_category_id': context.get('s_category_id') and
+            context.get('s_category_id')[0] or '',
         }
 
     def _compute_order(self, result, order):

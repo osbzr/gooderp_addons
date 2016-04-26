@@ -61,6 +61,8 @@ class buy_summary_goods(models.Model):
             extra += 'AND partner.id = {partner_id}'
         if self.env.context.get('goods_id'):
             extra += 'AND goods.id = {goods_id}'
+        if self.env.context.get('goods_categ_id'):
+            extra += 'AND categ.id = {goods_categ_id}'
 
         return '''
         WHERE wml.state = 'done'
@@ -70,9 +72,13 @@ class buy_summary_goods(models.Model):
           %s
         ''' % extra
 
-    def order_sql(self, sql_type='out'):
+    def group_sql(self, sql_type='out'):
         return '''
         GROUP BY goods_categ,goods_code,goods,attribute,warehouse_dest,uos,uom
+        '''
+
+    def order_sql(self, sql_type='out'):
+        return '''
         ORDER BY goods_code,goods,attribute,warehouse_dest
         '''
 
@@ -87,6 +93,8 @@ class buy_summary_goods(models.Model):
             context.get('partner_id')[0] or '',
             'goods_id': context.get('goods_id') and
             context.get('goods_id')[0] or '',
+            'goods_categ_id': context.get('goods_categ_id') and
+            context.get('goods_categ_id')[0] or '',
         }
 
     def _compute_order(self, result, order):
