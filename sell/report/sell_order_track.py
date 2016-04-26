@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import openerp.addons.decimal_precision as dp
-from openerp import fields, models
+from openerp import fields, models, api
 
 class sell_order_track(models.TransientModel):
     _name = 'sell.order.track'
@@ -22,3 +22,20 @@ class sell_order_track(models.TransientModel):
     delivery_date = fields.Date(u'要求交货日期')
     wh_out_date = fields.Date(u'出库日期')
     note = fields.Char(u'备注')
+
+    @api.multi
+    def view_detail(self):
+        '''查看明细按钮'''
+        order = self.env['sell.order'].search([('name', '=', self.order_name)])
+        if order:
+            view = self.env.ref('sell.sell_order_form')
+            return {
+                'name': u'销货订单',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'sell.order',
+                'type': 'ir.actions.act_window',
+                'res_id': order.id,
+            }
