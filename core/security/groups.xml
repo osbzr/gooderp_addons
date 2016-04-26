@@ -2,13 +2,12 @@
 <openerp>
 	<data noupdate="0">
 		<!--category-->
- 		<record model="ir.module.category" id="gooderp">
-            <field name="name">Gooderp</field>
-        </record>
-
+		<record model="ir.module.category" id="Gooderp">
+			<field name="name">Gooderp</field>
+		</record>
 		<record id='settle_mode_groups' model='res.groups'>
-            <field name='name'>管理结算方式</field>
-            <field name='category_id' ref="gooderp"/>
-        </record>
+			<field name='name'>管理结算方式</field>
+			<field name='category_id' ref="Gooderp"/>
+		</record>
 	</data>
 </openerp>

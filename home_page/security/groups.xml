@@ -3,7 +3,7 @@
 	<data noupdate="0">
 		<record id="group_all_manager" model="res.groups">
 			<field name='name'>总经理</field>
-			<field name='category_id' ref="core.gooderp"/> 
+			<field name='category_id' ref="core.Gooderp"/>
 		</record>
 	</data>
 </openerp>
