@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models
+
 
 class buy_payment(models.TransientModel):
     _name = 'buy.payment'
@@ -11,10 +13,10 @@ class buy_payment(models.TransientModel):
     type = fields.Char(u'业务类别')
     date = fields.Date(u'单据日期')
     order_name = fields.Char(u'单据编号')
-    purchase_amount = fields.Float(u'采购金额')
-    discount_amount = fields.Float(u'优惠金额')
-    amount = fields.Float(u'优惠后金额')
-    payment = fields.Float(u'本次付款')
-    balance = fields.Float(u'应付款余额')
+    purchase_amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))
+    discount_amount = fields.Float(u'优惠金额', digits_compute=dp.get_precision('Amount'))
+    amount = fields.Float(u'优惠后金额', digits_compute=dp.get_precision('Amount'))
+    payment = fields.Float(u'已付款', digits_compute=dp.get_precision('Amount'))
+    balance = fields.Float(u'应付款余额', digits_compute=dp.get_precision('Amount'))
     payment_rate = fields.Float(u'付款率(%)')
     note = fields.Char(u'备注')

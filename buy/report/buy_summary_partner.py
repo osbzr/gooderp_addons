@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models
 import datetime
+
 
 class buy_summary_partner(models.Model):
     _name = 'buy.summary.partner'
@@ -16,19 +18,19 @@ class buy_summary_partner(models.Model):
     attribute = fields.Char(u'属性')
     warehouse_dest = fields.Char(u'仓库')
     uos = fields.Char(u'辅助单位')
-    qty_uos = fields.Float(u'辅助数量')
+    qty_uos = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'))
     uom = fields.Char(u'基本单位')
-    qty = fields.Float(u'基本数量')
-    price = fields.Float(u'单价')
-    amount = fields.Float(u'采购金额')
-    tax_amount = fields.Float(u'税额')
-    subtotal = fields.Float(u'价税合计')
+    qty = fields.Float(u'基本数量', digits_compute=dp.get_precision('Quantity'))
+    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
+    amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
         SELECT MIN(wml.id) as id,
                MIN(wml.date) AS date,
-               s_categ.name AS s_category,
+               c_categ.name AS s_category,
                partner.name AS partner,
                goods.code AS goods_code,
                goods.name AS goods,
@@ -49,7 +51,8 @@ class buy_summary_partner(models.Model):
         FROM wh_move_line AS wml
             LEFT JOIN wh_move wm ON wml.move_id = wm.id
             LEFT JOIN partner ON wm.partner_id = partner.id
-            LEFT JOIN core_category AS s_categ ON partner.s_category_id = s_categ.id
+            LEFT JOIN core_category AS c_categ
+                 ON partner.s_category_id = c_categ.id
             LEFT JOIN goods ON wml.goods_id = goods.id
             LEFT JOIN attribute AS attr ON wml.attribute_id = attr.id
             LEFT JOIN warehouse AS wh ON wml.warehouse_dest_id = wh.id
@@ -63,6 +66,8 @@ class buy_summary_partner(models.Model):
             extra += 'AND partner.id = {partner_id}'
         if self.env.context.get('goods_id'):
             extra += 'AND goods.id = {goods_id}'
+        if self.env.context.get('s_category_id'):
+            extra += 'AND c_categ.id = {s_category_id}'
 
         return '''
         WHERE wml.state = 'done'
@@ -74,7 +79,8 @@ class buy_summary_partner(models.Model):
 
     def order_sql(self, sql_type='out'):
         return '''
-        GROUP BY s_category,partner,goods_code,goods,attribute,warehouse_dest,uos,uom
+        GROUP BY s_category,partner,goods_code,goods,
+                 attribute,warehouse_dest,uos,uom
         ORDER BY partner,goods_code,attribute,warehouse_dest
         '''
 
@@ -85,8 +91,12 @@ class buy_summary_partner(models.Model):
         return {
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
-            'partner_id': context.get('partner_id') and context.get('partner_id')[0] or '',
-            'goods_id': context.get('goods_id') and context.get('goods_id')[0] or '',
+            'partner_id': context.get('partner_id') and
+            context.get('partner_id')[0] or '',
+            'goods_id': context.get('goods_id') and
+            context.get('goods_id')[0] or '',
+            's_category_id': context.get('s_category_id') and
+            context.get('s_category_id')[0] or '',
         }
 
     def _compute_order(self, result, order):

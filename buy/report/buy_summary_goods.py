@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models
 import datetime
+
 
 class buy_summary_goods(models.Model):
     _name = 'buy.summary.goods'
@@ -14,13 +16,13 @@ class buy_summary_goods(models.Model):
     attribute = fields.Char(u'属性')
     warehouse_dest = fields.Char(u'仓库')
     uos = fields.Char(u'辅助单位')
-    qty_uos = fields.Float(u'辅助数量')
+    qty_uos = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'))
     uom = fields.Char(u'基本单位')
-    qty = fields.Float(u'基本数量')
-    price = fields.Float(u'单价')
-    amount = fields.Float(u'采购金额')
-    tax_amount = fields.Float(u'税额')
-    subtotal = fields.Float(u'价税合计')
+    qty = fields.Float(u'基本数量', digits_compute=dp.get_precision('Quantity'))
+    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
+    amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
@@ -59,6 +61,8 @@ class buy_summary_goods(models.Model):
             extra += 'AND partner.id = {partner_id}'
         if self.env.context.get('goods_id'):
             extra += 'AND goods.id = {goods_id}'
+        if self.env.context.get('goods_categ_id'):
+            extra += 'AND categ.id = {goods_categ_id}'
 
         return '''
         WHERE wml.state = 'done'
@@ -68,9 +72,13 @@ class buy_summary_goods(models.Model):
           %s
         ''' % extra
 
-    def order_sql(self, sql_type='out'):
+    def group_sql(self, sql_type='out'):
         return '''
         GROUP BY goods_categ,goods_code,goods,attribute,warehouse_dest,uos,uom
+        '''
+
+    def order_sql(self, sql_type='out'):
+        return '''
         ORDER BY goods_code,goods,attribute,warehouse_dest
         '''
 
@@ -81,8 +89,12 @@ class buy_summary_goods(models.Model):
         return {
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
-            'partner_id': context.get('partner_id') and context.get('partner_id')[0] or '',
-            'goods_id': context.get('goods_id') and context.get('goods_id')[0] or '',
+            'partner_id': context.get('partner_id') and
+            context.get('partner_id')[0] or '',
+            'goods_id': context.get('goods_id') and
+            context.get('goods_id')[0] or '',
+            'goods_categ_id': context.get('goods_categ_id') and
+            context.get('goods_categ_id')[0] or '',
         }
 
     def _compute_order(self, result, order):
@@ -91,6 +103,4 @@ class buy_summary_goods(models.Model):
 
     def collect_data_by_sql(self, sql_type='out'):
         collection = self.execute_sql(sql_type='out')
-
         return collection
-

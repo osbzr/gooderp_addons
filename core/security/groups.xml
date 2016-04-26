@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="0">
+		<!--category-->
+		<record model="ir.module.category" id="Gooderp">
+			<field name="name">Gooderp</field>
+		</record>
+		<record id='settle_mode_groups' model='res.groups'>
+			<field name='name'>管理结算方式</field>
+			<field name='category_id' ref="Gooderp"/>
+		</record>
+	</data>
+</openerp>

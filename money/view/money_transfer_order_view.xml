@@ -41,8 +41,8 @@
                     		<field name="out_bank_id"/>
                     		<field name="in_bank_id"/>
                             <field name="amount" sum="合计"/>
-                            <field name="mode_id"/>
-                            <field name="number"/>
+                            <field name="mode_id" groups='core.settle_mode_groups'/>
+                            <field name="number" groups='core.settle_mode_groups'/>
                             <field name="note"/>
                        </tree>
                     </field>

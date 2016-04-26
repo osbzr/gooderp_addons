@@ -2,7 +2,7 @@
 <openerp>
     <data>
     	<!-- 根菜单 -->
-        <menuitem id="menu_buy_root" name="采购"/>
+        <menuitem id="menu_buy_root" name="采购" groups='group_buy'/>
 
         <menuitem id="menu_buy_manage" name="采购" parent="menu_buy_root" sequence="1"/>
 
@@ -44,7 +44,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required="1"/>
+                            <field name="partner_id" required="1" domain="[('s_category_id', '!=', False)]"/>
                             <field name="date" required="1"/>
                         </group>
                         <group>
@@ -57,38 +57,43 @@
                     <field name="line_ids" context="{'warehouse_type': 'supplier'}">
                     	<tree string="购货订单行" editable="bottom">
                             <field name="goods_id" required='1'/>
-                            <field name="attribute_id"/>
+                            <field name='using_attribute' invisible='1'/>
+                            <field name="attribute_id"
+                            	groups='goods.multi_attrs_groups'
+                            	attrs="{'required': [('using_attribute','=', True)]}"/>
                             <field name="uom_id"/>
                             <field name='warehouse_id' invisible='1'/>
-                            <field name='warehouse_dest_id' required='1'/>
+                            <field name='warehouse_dest_id' required='1' groups='warehouse.multi_warehouse_groups'/>
                             <field name="quantity" sum="合计数量"/>
                             <field name="quantity_in" readonly="1" sum="合计已入库数量"/>
                             <field name="price"/>
-                            <field name="price_taxed"/>
-                            <field name="discount_rate"/>
-                            <field name="discount_amount" sum="合计折扣额"/>
+                            <field name="price_taxed" groups='buy.in_tax_groups'/>
+                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+                            <field name="discount_amount" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
                             <field name="amount" sum="合计金额"/>
-                            <field name="tax_rate"/>
-                            <field name="tax_amount" sum="合计税额"/>
-                            <field name="subtotal" sum="价税合计的合计"/>
+                            <field name="tax_rate" groups='buy.in_tax_groups'/>
+                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
                             <field name="note"/>
-                            <field name="origin"/>
+                            <field name="origin" invisible="1"/>
                         </tree>
                     </field>
                     <field name="note" placeholder="暂无备注信息"/>
                     <group>
                         <group col="6" colspan="6">
-                            <field name="discount_rate"/>
-                            <field name="discount_amount"/>
+                            <field name="discount_rate" groups='buy.buy_discount_groups'/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                         </group>
                     </group>
                     <group>
                         <group>
+                        	<field name="prepayment"/>
                             <field name="create_uid" readonly="1" string="制单人"/>
                             <field name="approve_uid" readonly="1"/>
                         </group>
                     	<group>
+                    		<field name="bank_account_id"/>
                             <field name="create_date" readonly="1" string="录单时间"/>
                             <field name="write_date" readonly="1" string="最后修改时间"/>
                         </group>
@@ -141,7 +146,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                         </group>
@@ -158,32 +164,40 @@
 		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_type':'supplier','type':'in'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'/>
-		                            <field name="attribute_id" domain="[('goods_id', '=', goods_id)]"/>
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
+		         					<field name='using_attribute' invisible='1'/>
+		                            <field name="attribute_id"
+		                            	domain="[('goods_id', '=', goods_id)]"
+		                            	groups='goods.multi_attrs_groups'
+		                            	attrs="{'required': [('using_attribute','=', True)]}"/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
 				                    <field name='force_batch_one' invisible='1'/>
-				                    <field name='lot' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
+				                    <field name='lot' groups='goods.batch_groups'
+											attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
 		                            <field name="warehouse_id" invisible="1"/>
-		                            <field name="warehouse_dest_id" required="1"/>
+		                            <field name="warehouse_dest_id" required="1" groups='warehouse.multi_warehouse_groups'/>
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="price"/>
-		                            <field name="price_taxed"/>
-		                            <field name="discount_rate"/>
-		                            <field name="discount_amount" readonly="0" sum="合计折扣额"/>
+		                            <field name="price_taxed" groups='buy.in_tax_groups'/>
+		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+		                            <field name="discount_amount" groups='buy.buy_line_discount_groups' readonly="0" sum="合计折扣额"/>
 		                            <field name="amount" string="购货金额" sum="合计金额"/>
-		                            <field name="tax_rate"/>
-		                            <field name="tax_amount" sum="合计税额"/>
-		                            <field name="subtotal" sum="价税合计的合计"/>
+		                            <field name="tax_rate" groups='buy.in_tax_groups'/>
+		                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
 		                            <field name="note"/>
 		                            <field name="share_cost"/>
+		                            <field name="type" invisible="1"/>
 		                        </tree>
 		                    </field>
 		                </page>
 		                <page string="采购费用行">
 		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 		                		<tree string="Cost Lines" editable="bottom">
-		                			<field name="partner_id"/>
+		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
 			                		<field name="category_id"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>
@@ -195,8 +209,8 @@
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
                         <group col="8" colspan="8">
-                            <field name="discount_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="discount_amount"/>
+                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                             <field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
                         </group>
@@ -265,7 +279,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                         </group>
@@ -282,33 +297,41 @@
 		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{'warehouse_dest_type':'supplier','type':'out'}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'/>
-		                            <field name="attribute_id"/>
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
+		                            <field name='using_attribute' invisible='1'/>
+		                            <field name="attribute_id"
+		                            	domain="[('goods_id', '=', goods_id)]"
+		                            	groups='goods.multi_attrs_groups'
+		                            	attrs="{'required': [('using_attribute','=', True)]}"/>
 		                            <field name="uom_id"/>
 		                            <field name='using_batch' invisible='1'/>
 		                            <field name='lot_qty' invisible='1'/>
                     				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
                     					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]"
-                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"/>
-		                            <field name="warehouse_id" required="1"/>
+                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
+                    					groups='goods.batch_groups'/>
+		                            <field name="warehouse_id" required="1" groups='warehouse.multi_warehouse_groups'/>
 		                            <field name="warehouse_dest_id" invisible="1"/>
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="price"/>
-		                            <field name="price_taxed"/>
-		                            <field name="discount_rate"/>
-		                            <field name="discount_amount" readonly="0" sum="合计折扣额"/>
+		                            <field name="price_taxed" groups='buy.in_tax_groups'/>
+		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+		                            <field name="discount_amount" readonly="0" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
 		                            <field name="amount" string="购货金额" sum="合计金额"/>
-		                            <field name="tax_rate"/>
-		                            <field name="tax_amount" sum="合计税额"/>
-		                            <field name="subtotal" sum="价税合计的合计"/>
+		                            <field name="tax_rate" groups='buy.in_tax_groups'/>
+		                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
 		                            <field name="note"/>
+		                            <field name="type" invisible="1"/>
 		                        </tree>
 		                    </field>
 		                </page>
 		                <page string="采购费用行">
 		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 		                		<tree string="Cost Lines" editable="bottom">
-		                			<field name="partner_id"/>
+		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
 			                		<field name="category_id"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>
@@ -319,8 +342,8 @@
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
                         <group col="8" colspan="8">
-                            <field name="discount_rate" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="discount_amount"/>
+                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                             <field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
                         </group>
@@ -403,7 +426,8 @@
         </record>
 
         <menuitem id="menu_buy_order" action="buy_order_action"
-            parent="menu_buy_manage" sequence="1"/>
+            parent="menu_buy_manage" sequence="1"
+            groups='buy.buy_groups'/>
         <menuitem id="menu_buy_receipt" action="buy_receipt_action"
             parent="menu_buy_manage" sequence="2"/>
         <menuitem id="menu_buy_return" action="buy_return_action"

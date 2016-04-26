@@ -12,8 +12,6 @@
             <field name="prefix">SO</field>
             <field name="padding">5</field>
         </record>
-    </data>
-    <data>
 		<!-- 销售发货单序列号 -->
         <record id="seq_type_sell_delivery" model="ir.sequence.type">
             <field name="name">Sell Delivery</field>

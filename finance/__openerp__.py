@@ -7,14 +7,19 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['base', 'decimal_precision'],
+    'depends': ['base', 'decimal_precision', 'core', 'num_to_china'],
     'demo': [
-             'tests/finance_demo.xml',
-        ],
+        'tests/finance_demo.xml',
+    ],
     'data': [
+        'security/groups.xml',
         'security/ir.model.access.csv',
         'data/finance_data.xml',
         'finance_conf.xml',
         'finance_view.xml',
-        ],
+        'trial_balance.xml'
+    ],
+    'qweb': [
+        "static/src/xml/*.xml",
+    ],
 }

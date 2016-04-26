@@ -20,6 +20,7 @@
 ##############################################################################
 
 from openerp.exceptions import except_orm
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models, api
 
 
@@ -77,7 +78,8 @@ class money_order(models.Model):
     name = fields.Char(string=u'单据编号', copy=False, readonly=True)
     note = fields.Text(string=u'备注')
     discount_amount = fields.Float(string=u'整单折扣', readonly=True,
-                                   states={'draft': [('readonly', False)]})
+                                   states={'draft': [('readonly', False)]},
+                                   digits_compute=dp.get_precision('Amount'))
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收付款单行', readonly=True,
                                states={'draft': [('readonly', False)]})
@@ -87,12 +89,16 @@ class money_order(models.Model):
     type = fields.Selection(TYPE_SELECTION, string=u'类型',
                             default=lambda self: self._context.get('type'))
     amount = fields.Float(string=u'总金额', compute='_compute_advance_payment',
+                          digits_compute=dp.get_precision('Amount'),
                           store=True, readonly=True)
-    advance_payment = fields.Float(string=u'本次预收款',
+    advance_payment = fields.Float(string=u'本次预收/付款',
                                    compute='_compute_advance_payment',
+                                   digits_compute=dp.get_precision('Amount'),
                                    store=True, readonly=True)
-    to_reconcile = fields.Float(string=u'未核销预收款')
-    reconciled = fields.Float(string=u'已核销预收款')
+    to_reconcile = fields.Float(string=u'未核销预收款',
+                                digits_compute=dp.get_precision('Amount'))
+    reconciled = fields.Float(string=u'已核销预收款',
+                              digits_compute=dp.get_precision('Amount'))
 
     @api.onchange('date')
     def onchange_date(self):
@@ -145,7 +151,7 @@ class money_order(models.Model):
             total = 0
             for line in order.line_ids:
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
-                    if line.bank_id.balance < line.amount:
+                    if line.bank_id.balance < abs(line.amount):
                         raise except_orm(u'错误', u'账户余额不足')
                     line.bank_id.balance -= line.amount
                 else:  # 收款账号余额增加, 退款账号余额减少
@@ -212,7 +218,8 @@ class money_order_line(models.Model):
 
     money_id = fields.Many2one('money.order', string=u'收付款单')
     bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True)
-    amount = fields.Float(string=u'金额')
+    amount = fields.Float(string=u'金额',
+                          digits_compute=dp.get_precision('Amount'))
     mode_id = fields.Many2one('settle.mode', string=u'结算方式')
     number = fields.Char(string=u'结算号')
     note = fields.Char(string=u'备注')
@@ -234,9 +241,12 @@ class money_invoice(models.Model):
     category_id = fields.Many2one('core.category', string=u'类别', readonly=True)
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self))
-    amount = fields.Float(string=u'单据金额', readonly=True)
-    reconciled = fields.Float(string=u'已核销金额', readonly=True)
-    to_reconcile = fields.Float(string=u'未核销金额', readonly=True)
+    amount = fields.Float(string=u'单据金额', readonly=True,
+                          digits_compute=dp.get_precision('Amount'))
+    reconciled = fields.Float(string=u'已核销金额', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
+    to_reconcile = fields.Float(string=u'未核销金额', readonly=True,
+                                digits_compute=dp.get_precision('Amount'))
     date_due = fields.Date(string=u'到期日')
 
     @api.multi
@@ -286,10 +296,14 @@ class source_order_line(models.Model):
                            copy=False, required=True)
     category_id = fields.Many2one('core.category', string=u'类别', required=True)
     date = fields.Date(string=u'单据日期')
-    amount = fields.Float(string=u'单据金额')
-    reconciled = fields.Float(string=u'已核销金额')
-    to_reconcile = fields.Float(string=u'未核销金额')
-    this_reconcile = fields.Float(string=u'本次核销金额')
+    amount = fields.Float(string=u'单据金额',
+                        digits_compute=dp.get_precision('Amount'))
+    reconciled = fields.Float(string=u'已核销金额',
+                        digits_compute=dp.get_precision('Amount'))
+    to_reconcile = fields.Float(string=u'未核销金额',
+                        digits_compute=dp.get_precision('Amount'))
+    this_reconcile = fields.Float(string=u'本次核销金额',
+                        digits_compute=dp.get_precision('Amount'))
     date_due = fields.Date(string=u'到期日')
 
 
@@ -507,10 +521,14 @@ class advance_payment(models.Model):
     name = fields.Many2one('money.order', string=u'预付款单编号',
                            copy=False, required=True)
     date = fields.Date(string=u'单据日期')
-    amount = fields.Float(string=u'单据金额')
-    reconciled = fields.Float(string=u'已核销金额')
-    to_reconcile = fields.Float(string=u'未核销金额')
-    this_reconcile = fields.Float(string=u'本次核销金额')
+    amount = fields.Float(string=u'单据金额',
+                        digits_compute=dp.get_precision('Amount'))
+    reconciled = fields.Float(string=u'已核销金额',
+                        digits_compute=dp.get_precision('Amount'))
+    to_reconcile = fields.Float(string=u'未核销金额',
+                        digits_compute=dp.get_precision('Amount'))
+    this_reconcile = fields.Float(string=u'本次核销金额',
+                        digits_compute=dp.get_precision('Amount'))
 
 
 class cost_line(models.Model):
@@ -520,5 +538,6 @@ class cost_line(models.Model):
     partner_id = fields.Many2one('partner', u'供应商')
     category_id = fields.Many2one('core.category', u'类别',
                                   domain="[('type', '=', 'other_pay')]")
-    amount = fields.Float(u'金额')
+    amount = fields.Float(u'金额',
+                          digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')

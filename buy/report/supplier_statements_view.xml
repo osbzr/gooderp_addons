@@ -11,10 +11,11 @@
                     <field name="name"/>
                     <button name="find_source_order" type="object" string="查看源单" icon="terp-stock_zoom" attrs="{'invisible':[('name','=','期初余额')]}" class="oe_highlight"/>
                     <field name="purchase_amount"/>
-                    <field name="benefit_amount"/>
+                    <field name="benefit_amount" groups='buy.buy_discount_groups'/>
                     <field name="note"/>
                     <field name="amount"/>
                     <field name="pay_amount"/>
+                    <field name="discount_money"/>
                     <field name="balance_amount"/>
                 </tree>
             </field>
@@ -32,17 +33,18 @@
                     <field name="note"/>
                     <field name="goods_code"/>
                     <field name="goods_name"/>
-                    <field name="attribute_id"/>
+                    <field name="attribute_id" groups='goods.multi_attrs_groups'/>
                     <field name="uom_id"/>
                     <field name="quantity"/>
                     <field name="price"/>
-                    <field name="discount_amount"/>
-                    <field name="without_tax_amount"/>
-                    <field name="tax_amount"/>
+                    <field name="discount_amount" groups='buy.buy_line_discount_groups'/>
+                    <field name="without_tax_amount" groups='buy.in_tax_groups'/>
+                    <field name="tax_amount" groups='buy.in_tax_groups'/>
                     <field name="order_amount"/>
-                    <field name="benefit_amount"/>
+                    <field name="benefit_amount" groups='buy.buy_discount_groups'/>
                     <field name="amount"/>
                     <field name="pay_amount"/>
+                    <field name="discount_money"/>
                     <field name="balance_amount"/>
                 </tree>
             </field>

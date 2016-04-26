@@ -8,6 +8,7 @@ class test_buy_order(TransactionCase):
     def setUp(self):
         super(test_buy_order, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
 
     def test_onchange_discount_rate(self):
         ''' 优惠率改变时，改变优惠金额，优惠后金额也改变'''
@@ -60,8 +61,35 @@ class test_buy_order(TransactionCase):
         # 重复审核报错
         with self.assertRaises(except_orm):
             self.order.buy_order_done()
-        # 没有订单行时审核报错
+        # 未填数量应报错
         self.order.buy_order_draft()
+        for line in self.order.line_ids:
+            line.quantity = 0
+        with self.assertRaises(except_orm):
+            self.order.buy_order_done()
+
+        # 输入预付款和结算账户
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        self.order.prepayment = 50.0
+        self.order.bank_account_id = bank_account
+        for line in self.order.line_ids:
+            line.quantity = 1
+        self.order.buy_order_done()
+
+        # 预付款不为空时，请选择结算账户
+        self.order.buy_order_draft()
+        self.order.bank_account_id = False
+        self.order.prepayment = 50.0
+        with self.assertRaises(except_orm):
+            self.order.buy_order_done()
+        # 结算账户不为空时，需要输入预付款！
+        self.order.bank_account_id = bank_account
+        self.order.prepayment = 0
+        with self.assertRaises(except_orm):
+            self.order.buy_order_done()
+
+        # 没有订单行时审核报错
         for line in self.order.line_ids:
             line.unlink()
         with self.assertRaises(except_orm):
@@ -103,7 +131,7 @@ class test_buy_order(TransactionCase):
         # 批次管理拆分订单行
         new_order = self.order.copy()
         for line in new_order.line_ids:
-            line.goods_id = 1
+            line.goods_id = self.env.ref('goods.mouse').id
             new_order.buy_generate_receipt()
         receipt = self.env['buy.receipt'].search(
                   [('order_id', '=', new_order.id)])
@@ -123,6 +151,13 @@ class test_buy_order_line(TransactionCase):
     def setUp(self):
         super(test_buy_order_line, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+
+    def test_compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        for line in self.order.line_ids:
+            self.assertTrue(line.using_attribute)
+            line.goods_id = self.env.ref('goods.mouse')
+            self.assertTrue(not line.using_attribute)
 
     def test_default_warehouse(self):
         '''新建订单行调出仓库默认值'''
@@ -176,6 +211,7 @@ class test_buy_receipt(TransactionCase):
     def setUp(self):
         super(test_buy_receipt, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
@@ -192,7 +228,7 @@ class test_buy_receipt(TransactionCase):
         '''测试返回付款状态'''
         self.receipt._get_buy_money_state()
         self.receipt.buy_receipt_done()
-        self.return_receipt._get_buy_return_state()
+        self.receipt._get_buy_money_state()
         self.assertTrue(self.receipt.money_state == u'未付款')
         self.receipt._get_buy_money_state()
         self.receipt.payment = self.receipt.amount - 1
@@ -208,12 +244,12 @@ class test_buy_receipt(TransactionCase):
         self.return_receipt.buy_receipt_done()
         self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
-        self.return_receipt._get_buy_money_state()
+        self.return_receipt._get_buy_return_state()
         self.return_receipt.payment = self.return_receipt.amount - 1
-        self.return_receipt._get_buy_money_state()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'部分退款')
         self.return_receipt.payment = self.return_receipt.amount
-        self.return_receipt._get_buy_money_state()
+        self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'全部退款')
 
     def test_onchange_discount_rate(self):
@@ -276,12 +312,27 @@ class test_buy_receipt(TransactionCase):
         self.receipt.payment = 20000
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
-        # 重复审核报错
+        # 入库单审核时未填数量应报错
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 0
+        with self.assertRaises(except_orm):
+            self.receipt.buy_receipt_done()
+        # 采购退货单审核时未填数量应报错
+        for line in self.return_receipt.line_out_ids:
+            line.goods_qty = 0
+        with self.assertRaises(except_orm):
+            self.return_receipt.buy_receipt_done()
+        # 重复审核入库单报错
         self.receipt.bank_account_id = None
         self.receipt.payment = 0
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 1
         self.receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.receipt.buy_receipt_done()
+        # 重复审核退货单报错
+        for line in self.return_receipt.line_out_ids:
+            line.goods_qty = 1
         self.return_receipt.buy_receipt_done()
         with self.assertRaises(except_orm):
             self.return_receipt.buy_receipt_done()
@@ -298,3 +349,38 @@ class test_buy_receipt(TransactionCase):
         receipt.buy_receipt_done()
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
+            self.assertTrue(line.using_attribute)
+
+
+class test_wh_move_line(TransactionCase):
+
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_wh_move_line, self).setUp()
+        self.order = self.env.ref('buy.buy_order_1')
+        self.order.bank_account_id = False
+        self.order.buy_order_done()
+        self.receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', self.order.id)])
+        self.return_receipt = self.env.ref('buy.buy_receipt_return_1')
+
+        self.goods_mouse = self.browse_ref('goods.mouse')
+
+    def test_onchange_goods_id(self):
+        '''测试采购模块中商品的onchange,是否会带出默认库位和单价'''
+        # 入库单行：修改鼠标成本为0，测试是否报错
+        self.goods_mouse.cost = 0.0
+        for line in self.receipt.line_in_ids:
+            line.goods_id = self.goods_mouse.id
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()
+
+        # 采购退货单行
+        for line in self.return_receipt.line_out_ids:
+            line.goods_id.cost = 0.0
+            with self.assertRaises(except_orm):
+                line.with_context({'default_is_return': True,
+                    'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
+            line.goods_id.cost = 1.0
+            line.with_context({'default_is_return': True,
+                'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()

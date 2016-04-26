@@ -19,6 +19,7 @@
 ##############################################################################
 
 from openerp.exceptions import except_orm
+import openerp.addons.decimal_precision as dp
 from openerp import fields, models, api
 
 class other_money_order(models.Model):
@@ -66,7 +67,8 @@ class other_money_order(models.Model):
                        states={'draft': [('readonly', False)]})
     name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/')
     total_amount = fields.Float(string=u'金额', compute='_compute_total_amount',
-                                store=True, readonly=True)
+                                store=True, readonly=True,
+                                digits_compute=dp.get_precision('Amount'))
     bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True,
                               readonly=True, states={'draft': [('readonly', False)]})
     line_ids = fields.One2many('other.money.order.line', 'other_money_id',
@@ -152,7 +154,9 @@ class other_money_order_line(models.Model):
     _description = u'其他收支单明细'
 
     other_money_id = fields.Many2one('other.money.order', string=u'其他收支')
-    category_id = fields.Many2one('core.category', u'类别', domain="[('type', '=', context.get('type'))]")
+    category_id = fields.Many2one('core.category', u'类别',
+                        domain="[('type', '=', context.get('type'))]")
     source_id = fields.Many2one('money.invoice', string=u'源单')
-    amount = fields.Float(string=u'金额')
+    amount = fields.Float(string=u'金额',
+                        digits_compute=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注')

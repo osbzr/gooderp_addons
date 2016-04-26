@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="0">
+		<record id='auxiliary_unit_groups' model='res.groups'>
+			<field name='name'>辅助单位</field>
+			<field name='category_id' ref="core.Gooderp"/>
+		</record>
+		<record id='batch_groups' model='res.groups'>
+			<field name='name'>管理批号</field>
+			<field name='category_id' ref="core.Gooderp"/>
+		</record>
+		<record id='batch_serial_groups' model='res.groups'>
+			<field name='name'>管理序列号</field>
+			<field name='implied_ids' eval="[(4,ref('goods.batch_groups'))]"/>
+			<field name='category_id' ref="core.Gooderp"/>
+		</record>
+		<record id='multi_attrs_groups' model='res.groups'>
+			<field name='name'>管理多属性</field>
+			<field name='category_id' ref="core.Gooderp"/>
+		</record>
+	</data>
+</openerp>

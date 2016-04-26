@@ -20,7 +20,8 @@ class buy_order_detail_wizard(models.TransientModel):
     date_start = fields.Date(u'开始日期', default=_default_date_start)
     date_end = fields.Date(u'结束日期', default=_default_date_end)
     partner_id = fields.Many2one('partner', u'供应商')
-    goods_id = fields.Many2one('goods', u'产品')
+    goods_id = fields.Many2one('goods', u'商品')
+    order_id = fields.Many2one('buy.receipt', u'单据编号')
 
     @api.multi
     def button_ok(self):
@@ -38,47 +39,35 @@ class buy_order_detail_wizard(models.TransientModel):
             domain.append(('goods_id', '=', self.goods_id.id))
         if self.partner_id:
             domain.append(('move_id.partner_id', '=', self.partner_id.id))
+        if self.order_id:
+            buy_receipt = self.env['buy.receipt'].search(
+                                [('id', '=', self.order_id.id)])
+            domain.append(('move_id.id', '=', buy_receipt.buy_move_id.id))
 
         order_type = ''
-        total_qty = total_price = total_amount = total_tax_amount = total_subtotal =0
         for line in self.env['wh.move.line'].search(domain, order='move_id'):
             if line.move_id.origin and 'return' in line.move_id.origin:
                 order_type = '退货'
             else:
                 order_type = '购货'
             detail = self.env['buy.order.detail'].create({
-                    'date': line.move_id.date,
-                    'order_name': line.move_id.name,
-                    'type': order_type,
-                    'partner_id': line.move_id.partner_id.id,
-                    'goods_code': line.goods_id.code,
-                    'goods_id': line.goods_id.id,
-                    'attribute': line.attribute_id.name,
-                    'uom': line.uom_id.name,
-                    'warehouse_dest': line.warehouse_dest_id.name,
-                    'qty': line.goods_qty,
-                    'price': line.price,
-                    'amount': line.amount,
-                    'tax_amount': line.tax_amount,
-                    'subtotal': line.subtotal,
-                    'note': line.note,
-                })
+                'date': line.move_id.date,
+                'order_name': line.move_id.name,
+                'type': order_type,
+                'partner_id': line.move_id.partner_id.id,
+                'goods_code': line.goods_id.code,
+                'goods_id': line.goods_id.id,
+                'attribute': line.attribute_id.name,
+                'uom': line.uom_id.name,
+                'warehouse_dest': line.warehouse_dest_id.name,
+                'qty': line.goods_qty,
+                'price': line.price,
+                'amount': line.amount,
+                'tax_amount': line.tax_amount,
+                'subtotal': line.subtotal,
+                'note': line.note,
+            })
             res.append(detail.id)
-
-            total_qty += line.goods_qty
-            total_price += line.price
-            total_amount += line.amount
-            total_tax_amount += line.tax_amount
-            total_subtotal += line.subtotal
-        sum_detail = self.env['buy.order.detail'].create({
-            'warehouse_dest': u'合计',
-            'qty': total_qty,
-            'price': total_price,
-            'amount': total_amount,
-            'tax_amount': total_tax_amount,
-            'subtotal': total_subtotal,
-        })
-        res.append(sum_detail.id)
 
         view = self.env.ref('buy.buy_order_detail_tree')
         return {

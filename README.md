@@ -1,5 +1,7 @@
 [![在线试用](./try-now.png)](http://gooderp.osbzr.net/login?db=gooderp&login=admin&key=good)
 [![Join the chat at https://gitter.im/osbzr/gooderp](https://badges.gitter.im/osbzr/gooderp.svg)](https://gitter.im/osbzr/gooderp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![License: AGPL-3](https://img.shields.io/badge/licence-AGPL--3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 [![Build Status](https://travis-ci.org/osbzr/gooderp_addons.svg?branch=master)](https://travis-ci.org/osbzr/gooderp_addons)
 [![Coverage Status](https://coveralls.io/repos/github/osbzr/gooderp_addons/badge.svg?branch=master)](https://coveralls.io/github/osbzr/gooderp_addons?branch=master)
 [![Issue Count](https://codeclimate.com/github/osbzr/gooderp_addons/badges/issue_count.svg)](https://codeclimate.com/github/osbzr/gooderp_addons)

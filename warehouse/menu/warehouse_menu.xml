@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem id='warehouse_root' name='仓库' />
+        <menuitem id='warehouse_root' name='仓库' groups='group_warehouse' />
 
         <!-- 出入库单据 -->
         <menuitem id='warehouse_order' name='操作' parent='warehouse_root' sequence='1' />
-        <menuitem id='wh_internal_menu' action='wh_internal_action' name='调拨单' parent='warehouse_order' sequence='1' />
+        <menuitem id='wh_internal_menu' action='wh_internal_action' name='调拨单' parent='warehouse_order' sequence='1' groups='warehouse.multi_warehouse_groups' />
         <menuitem id='wh_inventory_menu' action='wh_inventory_action' name='盘点单' parent='warehouse_order' sequence='2' />
         <menuitem id='wh_in_menu' action='wh_in_action' name='其他入库单' parent='warehouse_order' sequence='3' />
         <menuitem id='wh_out_menu' action='wh_out_action' name='其他出库单' parent='warehouse_order' sequence='4' />
-        <menuitem id='wh_assembly_menu' action='wh_assembly_action' parent='warehouse_order' sequence='5' />
-        <menuitem id='wh_disassembly_menu' action='wh_disassembly_action' parent='warehouse_order' sequence='6' />
+        <menuitem id='wh_assembly_menu' action='wh_assembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='5' />
+        <menuitem id='wh_disassembly_menu' action='wh_disassembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='6' />
 
         <!-- 仓库 -->
-        <menuitem id='warehouse_menu' name='仓库' action='warehouse_action' parent='core.master_data_menu' sequence='40'/>
+        <menuitem id='warehouse_menu' name='仓库' action='warehouse_action' parent='core.master_data_menu' groups='warehouse.multi_warehouse_groups' sequence='40'/>
 
         <!-- 设置 -->
         <menuitem id='warehouse_setting' name='设置' parent='warehouse_root' sequence='4' />
@@ -26,9 +26,10 @@
         <menuitem id='report_parent' name='报表' parent='warehouse_root' sequence='3' />
         <menuitem id='report_stock_balance_menu' action='report_stock_balance_action' parent='report_parent' sequence='1' />
         <menuitem id='report_stock_transceive_wizard_menu' action='report_stock_transceive_wizard_action' parent='report_parent' sequence='2' />
-        <menuitem id='report_stock_transceive_collect_wizard_menu' action='report_stock_transceive_collect_wizard_action' parent='report_parent' sequence='3' />
-        <menuitem id='report_lot_status_menu' action='report_lot_status_action' parent='report_parent' sequence='4' />
-        <menuitem id='report_lot_track_wizard_menu' action='report_lot_track_wizard_action' parent='report_parent' sequence='5' />
+        <menuitem id='report_lot_status_menu' action='report_lot_status_action' parent='report_parent' sequence='4'
+        	 groups='goods.batch_groups' />
+        <menuitem id='report_lot_track_wizard_menu' action='report_lot_track_wizard_action' parent='report_parent' sequence='5'
+        	 groups='goods.batch_groups' />
 
     </data>
 </openerp>

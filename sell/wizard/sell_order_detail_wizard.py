@@ -41,7 +41,6 @@ class sell_order_detail_wizard(models.TransientModel):
             domain.append(('move_id.partner_id', '=', self.partner_id.id))
 
         order_type = ''
-        total_qty = total_price = total_amount = total_tax_amount = total_subtotal = 0
         for line in self.env['wh.move.line'].search(domain, order='move_id'):
             if line.move_id.origin and 'return' in line.move_id.origin:
                 order_type = u'退货'
@@ -70,21 +69,6 @@ class sell_order_detail_wizard(models.TransientModel):
                     'note': line.note,
                 })
             res.append(detail.id)
-
-            total_qty += line.goods_qty
-            total_price += line.price
-            total_amount += line.amount
-            total_tax_amount += line.tax_amount
-            total_subtotal += line.subtotal
-        sum_detail = self.env['sell.order.detail'].create({
-            'warehouse_dest': u'合计',
-            'qty': total_qty,
-            'price': total_price,
-            'amount': total_amount,
-            'tax_amount': total_tax_amount,
-            'subtotal': total_subtotal,
-        })
-        res.append(sum_detail.id)
 
         view = self.env.ref('sell.sell_order_detail_tree')
         cond = [('id', 'in', res)]

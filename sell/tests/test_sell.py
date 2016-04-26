@@ -208,15 +208,6 @@ class Test_sell(TransactionCase):
         with self.assertRaises(except_orm):
             self.sell_delivery.sell_delivery_done()
 
-    def test_sell_done(self):
-        ''' 测试审核销货订单  '''
-        order = self.env.ref('sell.sell_order_1')
-
-        # 审核销货订单
-        order.sell_order_done()
-        with self.assertRaises(except_orm):
-            order.sell_order_done()
-
     def test_sell_draft(self):
         ''' 测试反审核销货订单  '''
         order = self.env.ref('sell.sell_order_1')
@@ -274,3 +265,138 @@ class Test_sell(TransactionCase):
             self.order.partner_id.c_category_id = False
             with self.assertRaises(except_orm):
                 line.onchange_goods_id()
+
+
+class test_sell_order(TransactionCase):
+
+    def setUp(self):
+        super(test_sell_order, self).setUp()
+        self.order = self.env.ref('sell.sell_order_1')
+#         self.order.bank_account_id = False
+
+    def test_sell_order_done(self):
+        '''测试审核销货订单'''
+        # 审核销货订单
+        self.order.sell_order_done()
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+        # 未填数量应报错
+        self.order.sell_order_draft()
+        for line in self.order.line_ids:
+            line.quantity = 0
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+        # 输入预收款和结算账户
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        self.order.pre_receipt = 50.0
+        self.order.bank_account_id = bank_account
+        for line in self.order.line_ids:
+            line.quantity = 1
+        self.order.sell_order_done()
+
+        # 预收款不为空时，请选择结算账户！
+        self.order.sell_order_draft()
+        self.order.bank_account_id = False
+        self.order.pre_receipt = 50.0
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+        # 结算账户不为空时，需要输入预收款！
+        self.order.bank_account_id = bank_account
+        self.order.pre_receipt = 0
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+        # 没有订单行时审核报错
+        for line in self.order.line_ids:
+            line.unlink()
+        with self.assertRaises(except_orm):
+            self.order.sell_order_done()
+
+
+class test_sell_order_line(TransactionCase):
+
+    def setUp(self):
+        super(test_sell_order_line, self).setUp()
+        self.order = self.env.ref('sell.sell_order_1')
+
+    def test_compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        for line in self.order.line_ids:
+            self.assertTrue(not line.using_attribute)
+            line.goods_id = self.env.ref('goods.keyboard')
+            self.assertTrue(line.using_attribute)
+
+
+class test_sell_delivery(TransactionCase):
+
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_sell_delivery, self).setUp()
+        self.order = self.env.ref('sell.sell_order_1')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.return_order = self.env.ref('sell.sell_order_return')
+        self.return_order.sell_order_done()
+        self.return_delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.return_order.id)])
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+
+    def test_sell_delivery_done(self):
+        '''测试审核发货单/退货单'''
+        # 发货单审核时未填数量应报错
+        for line in self.delivery.line_out_ids:
+            line.goods_qty = 0
+        with self.assertRaises(except_orm):
+            self.delivery.sell_delivery_done()
+        # 销售退货单审核时未填数量应报错
+        for line in self.return_delivery.line_in_ids:
+            line.goods_qty = 0
+        with self.assertRaises(except_orm):
+            self.return_delivery.sell_delivery_done()
+
+
+class test_wh_move_line(TransactionCase):
+
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_wh_move_line, self).setUp()
+        self.sell_return = self.browse_ref('sell.sell_order_return')
+        self.sell_return.sell_order_done()
+        self.delivery_return = self.env['sell.delivery'].search(
+                  [('order_id', '=', self.sell_return.id)])
+
+        self.sell_order = self.env.ref('sell.sell_order_1')
+        self.sell_order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                        [('order_id', '=', self.sell_order.id)])
+
+        self.goods_cable = self.browse_ref('goods.cable')
+        self.goods_keyboard = self.browse_ref('goods.keyboard')
+
+    def test_onchange_goods_id(self):
+        '''测试销售模块中商品的onchange,是否会带出默认库位和单价'''
+        # 销售退货单行
+        for line in self.delivery_return.line_in_ids:
+            # 在商品鼠标的价格清单中没有找到匹配的价格
+            with self.assertRaises(except_orm):
+                line.with_context({'default_is_return': True,
+                    'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
+            # 在商品键盘的价格清单中找到匹配的价格
+            line.goods_id = self.goods_keyboard.id
+            line.with_context({'default_is_return': True,
+                'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
+
+        # 发货单行：
+        for line in self.delivery.line_out_ids:
+            line.goods_id = self.goods_keyboard.id
+            line.with_context({'default_is_return': False,
+                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+            line.goods_id = self.goods_cable.id
+            with self.assertRaises(except_orm):
+                line.with_context({'default_is_return': False,
+                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()

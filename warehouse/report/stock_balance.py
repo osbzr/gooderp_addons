@@ -15,9 +15,9 @@ class report_stock_balance(models.Model):
     lot = fields.Char(u'批号')
     attribute_id = fields.Many2one('attribute', u'属性')
     warehouse = fields.Char(u'仓库')
-    goods_qty = fields.Float('数量', digits_compute=dp.get_precision('Goods Quantity'))
-    goods_uos_qty = fields.Float('辅助单位数量', digits_compute=dp.get_precision('Goods Quantity'))
-    cost = fields.Float(u'成本', digits_compute=dp.get_precision('Accounting'))
+    goods_qty = fields.Float('数量', digits_compute=dp.get_precision('Quantity'))
+    goods_uos_qty = fields.Float('辅助单位数量', digits_compute=dp.get_precision('Quantity'))
+    cost = fields.Float(u'成本', digits_compute=dp.get_precision('Amount'))
 
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'report_stock_balance')
