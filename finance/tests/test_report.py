@@ -5,7 +5,7 @@ from openerp.exceptions import except_orm
 
 class test_report(TransactionCase):
     
-    def setUP(self):
+    def setUp(self):
         super(test_report, self).setUp()
         # 审核2015年12月和2016年1月的会计凭证
         self.env.ref('finance.voucher_12').voucher_done()
