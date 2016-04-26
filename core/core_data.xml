@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data noupdate="1">
-        <record id='settle_mode_groups' model='res.groups'>
-            <field name='name'>管理结算方式</field>
-            <field name='category_id' ref="gooderp"/>
-        </record>
         <record id='decimal_quantity' model="decimal.precision">
             <field name="name">Quantity</field>
             <field name="digits" eval="1"/>

@@ -10,6 +10,7 @@
     'depends': ['core', 'mail', 'warehouse', 'money'],
     'data': [
         'buy_data.xml',
+        'security/groups.xml',
         'buy_view.xml',
         'wizard/buy_order_track_wizard_view.xml',
         'wizard/buy_order_detail_wizard_view.xml',
