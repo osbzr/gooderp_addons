@@ -20,89 +20,84 @@
         </record>
         
         <!--科目-->
-        <record id='finance_account_1' model='finance.account'>
+        <record id='account_cash' model='finance.account'>
             <field name='code'>1001</field>
             <field name='name'>库存现金</field>
             <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
         </record>
-        <record id='finance_account_2' model='finance.account'>
-            <field name='code'>1002</field>
-            <field name='name'>银行存款</field>
+        <record id='account_bank' model='finance.account'>
+            <field name='code'>100201</field>
+            <field name='name'>银行存款-基本户</field>
             <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
         </record>
-        <record id='finance_account_3' model='finance.account'>
-            <field name='code'>1012</field>
-            <field name='name'>其他货币资金</field>
-            <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
-        </record>
-        <record id='finance_account_4' model='finance.account'>
-            <field name='code'>1101</field>
-            <field name='name'>短期投资</field>
-            <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
-        </record>
-        <record id='finance_account_5' model='finance.account'>
-            <field name='code'>1121</field>
-            <field name='name'>应收票据</field>
-            <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
-        </record>
-        <record id='finance_account_6' model='finance.account'>
+        <record id='account_ar' model='finance.account'>
             <field name='code'>1122</field>
             <field name='name'>应收账款</field>
             <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
+            <field name='auxiliary_financing'>partner</field>
         </record>
-        <record id='finance_account_7' model='finance.account'>
-            <field name='code'>1123</field>
-            <field name='name'>预付账款</field>
+        <record id='account_goods' model='finance.account'>
+            <field name='code'>1406</field>
+            <field name='name'>库存商品</field>
             <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
+            <field name='auxiliary_financing'>goods</field>
         </record>
-        <record id='finance_account_8' model='finance.account'>
-            <field name='code'>1131</field>
-            <field name='name'>应收股利</field>
-            <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
-        </record>
-        <record id='finance_account_8' model='finance.account'>
-            <field name='code'>1132</field>
-            <field name='name'>应收利息</field>
-            <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
-        </record>
-        <record id='finance_account_9' model='finance.account'>
-            <field name='code'>1221</field>
-            <field name='name'>其他应收款</field>
-            <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
-        </record>
-        <record id='finance_account_10' model='finance.account'>
-            <field name='code'>1401</field>
-            <field name='name'>材料采购</field>
-            <field name='balance_directions'>in</field>
-            <field name='state'>1</field>
-        </record>
-        <record id='finance_account_11' model='finance.account'>
-            <field name='code'>1602</field>
-            <field name='name'>累计折旧</field>
+        <record id='account_ap' model='finance.account'>
+            <field name='code'>2202</field>
+            <field name='name'>应付账款</field>
             <field name='balance_directions'>out</field>
-            <field name='state'>1</field>
+            <field name='auxiliary_financing'>supplier</field>
         </record>
-        <record id='finance_account_12' model='finance.account'>
-            <field name='code'>1622</field>
-            <field name='name'>生产性生物资产累计折旧</field>
+        <record id='account_wage' model='finance.account'>
+            <field name='code'>2211</field>
+            <field name='name'>应付职工薪酬</field>
             <field name='balance_directions'>out</field>
-            <field name='state'>1</field>
+            <field name='auxiliary_financing'>member</field>
         </record>
-        <record id='finance_account_13' model='finance.account'>
-            <field name='code'>1702</field>
-            <field name='name'>累计摊销</field>
+        <record id='account_fund' model='finance.account'>
+            <field name='code'>4001</field>
+            <field name='name'>实收资本</field>
             <field name='balance_directions'>out</field>
-            <field name='state'>1</field>
+        </record>
+        <record id='account_profit' model='finance.account'>
+            <field name='code'>4103</field>
+            <field name='name'>本年利润</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id='account_remain' model='finance.account'>
+            <field name='code'>410403</field>
+            <field name='name'>利润分配-未分配利润</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id='account_income' model='finance.account'>
+            <field name='code'>6001</field>
+            <field name='name'>主营业务收入</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id='account_cost' model='finance.account'>
+            <field name='code'>6401</field>
+            <field name='name'>主营业务成本</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale' model='finance.account'>
+            <field name='code'>660101</field>
+            <field name='name'>销售费用-差旅费</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='finance_expense_admin' model='finance.account'>
+            <field name='code'>660201</field>
+            <field name='name'>管理费用-工资</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='finance_expense_fee' model='finance.account'>
+            <field name='code'>6603</field>
+            <field name='name'>财务费用</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_tax' model='finance.account'>
+            <field name='code'>6801</field>
+            <field name='name'>所得税</field>
+            <field name='balance_directions'>in</field>
         </record>
     </data>
 </openerp>
