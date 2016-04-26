@@ -120,9 +120,15 @@ class test_track_wizard(TransactionCase):
         self.track.goods_id = False
         self.track.partner_id = self.env.ref('core.lenovo').id
         self.track.button_ok()
+        # 按订单号搜索
+        self.track.goods_id = False
+        self.track.partner_id = False
+        self.track.order_id = self.order.id
+        self.track.button_ok()
         # 按日期搜索
         self.track.goods_id = False
         self.track.partner_id = False
+        self.track.order_id = False
         self.track.button_ok()
 
     def test_view_detail(self):

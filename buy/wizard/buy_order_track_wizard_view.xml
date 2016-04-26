@@ -14,6 +14,7 @@
                         <group>
                             <field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
                             <field name="goods_id"/>
+                            <field name="order_id"/>
                         </group>
                         <footer>
                             <button name="button_ok" type="object" string="确定" class="oe_highlight"/>

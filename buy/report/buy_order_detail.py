@@ -27,7 +27,7 @@ class buy_order_detail(models.TransientModel):
     @api.multi
     def view_detail(self):
         '''查看明细按钮'''
-        order = self.env['buy.receipt'].search([('name', '=', self.order_name), ('state', '=', 'done')])
+        order = self.env['buy.receipt'].search([('name', '=', self.order_name)])
         if order:
             if not order.is_return:
                 view = self.env.ref('buy.buy_receipt_form')
