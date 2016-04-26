@@ -19,7 +19,6 @@
         'wizard/checkout_wizard.xml',
         'finance_view.xml',
         'company.xml',
-        'trial_balance.xml'
         'trial_balance.xml',
         'balance_sheet.xml'
     ],
