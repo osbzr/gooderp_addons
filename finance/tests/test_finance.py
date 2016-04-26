@@ -16,6 +16,9 @@ class test_voucher(TransactionCase):
         #正常审批
         voucher.voucher_done()
         self.assertTrue(voucher.state == 'done')
+        #已审批的凭证不可以删除
+        with self.assertRaises(except_orm):
+            voucher.unlink()
         #重复审批
         with self.assertRaises(except_orm):
             voucher.voucher_done()
@@ -101,14 +104,16 @@ class test_period(TransactionCase):
         for line in voucher.line_ids:
             line.account_id = self.env.ref('finance.account_cash').id
             line.onchange_account_id()
-#            line.account_id = self.env.ref('finance.finance_account_2').id
-#            line.onchange_account_id()
-#            line.account_id = self.env.ref('finance.finance_account_3').id
-#            line.onchange_account_id()
-#            line.account_id = self.env.ref('finance.finance_account_4').id
-#            line.onchange_account_id()
-#            line.account_id = self.env.ref('finance.finance_account_5').id
-#            line.onchange_account_id()
+            line.account_id = None
+            line.onchange_account_id()
+            line.account_id = self.env.ref('finance.account_goods').id
+            line.onchange_account_id()
+            line.account_id = self.env.ref('finance.account_ar').id
+            line.onchange_account_id()
+            line.account_id = self.env.ref('finance.account_ap').id
+            line.onchange_account_id()
+            line.account_id = self.env.ref('finance.account_wage').id
+            line.onchange_account_id()
         #这么写覆盖到了，但是这什么逻辑=。=
 #        self.env['voucher.line'].onchange_account_id()
                                                     
