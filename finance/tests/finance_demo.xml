@@ -28,7 +28,7 @@
         <record id='voucher_line_12_credit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_12'/>
             <field name='name'>股东投资</field>
-            <field name='account_id' ref='finance.finance_account_bank'/>
+            <field name='account_id' ref='finance.account_bank'/>
             <field name='credit'>1000000</field>
         </record>
         <!-- 2016 年1月的凭证-->
@@ -53,7 +53,7 @@
         <record id='voucher_line_2_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_2'/>
             <field name='name'>发货</field>
-            <field name='account_id' ref='finance.finance_cost'/>
+            <field name='account_id' ref='finance.account_cost'/>
             <field name='debit'>10000</field>
         </record>
         <record id='voucher_line_2_credit' model='voucher.line'>
