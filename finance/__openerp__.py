@@ -16,7 +16,8 @@
         'data/finance_data.xml',
         'finance_conf.xml',
         'finance_view.xml',
-        'trial_balance.xml'
+        'trial_balance.xml',
+        'balance_sheet.xml'
     ],
     'qweb': [
         "static/src/xml/*.xml",
