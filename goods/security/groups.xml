@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
-        <record id='auxiliary_unit_groups' model='res.groups'>
+	<data noupdate="0">
+		<record id='auxiliary_unit_groups' model='res.groups'>
             <field name='name'>辅助单位</field>
             <field name='category_id' ref="core.gooderp"/>
         </record>
@@ -18,5 +18,5 @@
             <field name='name'>管理多属性</field>
             <field name='category_id' ref="core.gooderp"/>
         </record>
-    </data>
+	</data>
 </openerp>
