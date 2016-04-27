@@ -4,6 +4,7 @@
 #    Copyright (C) 2012 Domsense srl (<http://www.domsense.com>)
 #    Copyright (C) 2012-2013:
 #        Agile Business Group sagl (<http://www.agilebg.com>)
+#    Copyright (C) 2016 开阖有限公司 (<http://www.osbzr.com>)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as published
@@ -76,6 +77,8 @@ class ExcelExportView(ExcelExport,):
 
     def setOutCell(self, outSheet, col, row, value):
         """ Change cell value without changing formatting. """
+        # 本方法来自 葡萄皮的数据空间[http://biotopiblog.sinaapp.com]
+        # 链接http://biotopiblog.sinaapp.com/2014/06/python读写excel如何保留原有格式/
         def _getOutCell(outSheet, colIndex, rowIndex):
             """ HACK: Extract the internal xlwt cell representation. """
             # row = outSheet._Worksheet__rows.get(rowIndex)
