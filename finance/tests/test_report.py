@@ -103,6 +103,10 @@ class test_checkout_wizard(TransactionCase):
         wizard.date='2014-12-28'
         wizard.onchange_period_id()
         wizard.button_checkout()
+        #重复反结账
+        wizard.button_counter_checkout()
+        with self.assertRaises(except_orm):
+            wizard.button_counter_checkout()
 
 
 
