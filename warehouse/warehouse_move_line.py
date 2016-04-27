@@ -82,7 +82,7 @@ class wh_move_line(models.Model):
     using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理')
     force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
     lot = fields.Char(u'批号')
-    lot_id = fields.Many2one('wh.move.line', u'批号', ondelete='restrict')
+    lot_id = fields.Many2one('wh.move.line', u'批号')
     lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'批号数量',
                            digits_compute=dp.get_precision('Quantity'))
     lot_uos_qty = fields.Float(u'批号辅助数量',

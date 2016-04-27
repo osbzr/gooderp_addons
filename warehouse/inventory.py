@@ -23,14 +23,11 @@ class wh_inventory(models.Model):
 
     date = fields.Date(u'日期', default=fields.Date.context_today)
     name = fields.Char(u'名称', copy=False, default='/')
-    warehouse_id = fields.Many2one('warehouse', u'仓库',
-                                   ondelete='restrict')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
     goods = fields.Char(u'产品')
     uos_not_zero = fields.Boolean(u'辅助数量不为0')
-    out_id = fields.Many2one('wh.out', u'盘亏单据',
-                             copy=False, ondelete='cascade')
-    in_id = fields.Many2one('wh.in', u'盘盈单据',
-                            copy=False, ondelete='cascade')
+    out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False)
+    in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False)
     state = fields.Selection(
         INVENTORY_STATE, u'状态', copy=False, default='draft')
     line_ids = fields.One2many(
