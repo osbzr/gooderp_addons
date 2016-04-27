@@ -31,6 +31,7 @@
     ],
     'data': [
         'view/web_export_view.xml',
+        'security/ir.model.access.csv',
     ],
     'qweb': [
         'static/src/xml/web_export_view_template.xml',

@@ -51,7 +51,6 @@ class test_report(TransactionCase):
         with self.assertRaises(except_orm):
             report.create_profit_statement()
 
-
 class test_checkout_wizard(TransactionCase):
     
     def setUp(self):
@@ -107,7 +106,3 @@ class test_checkout_wizard(TransactionCase):
         wizard.button_counter_checkout()
         with self.assertRaises(except_orm):
             wizard.button_counter_checkout()
-
-
-
-

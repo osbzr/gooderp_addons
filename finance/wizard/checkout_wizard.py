@@ -4,7 +4,6 @@ from datetime import date
 from openerp import models, fields, api
 from openerp.exceptions import except_orm
 
-
 class checkout_wizard(models.TransientModel):
     '''月末结账的向导'''
     _name = 'checkout.wizard'
