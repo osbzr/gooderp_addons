@@ -4,7 +4,7 @@
 
 		<record id="group_accountant" model="res.groups">
 			<field name='name'>会计</field>
-			<field name='category_id' ref="core.gooderp"/> 
+			<field name='category_id' ref="core.Gooderp"/>
 		</record>
 
 	</data>

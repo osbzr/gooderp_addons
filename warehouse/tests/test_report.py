@@ -164,6 +164,7 @@ class TestReport(TransactionCase):
         ]
         results = stock_transceive.with_context(context).search_read(domain=[])
         self.assertEqual(len(results), len(real_results))
+
         for result in results:
             result = (
                 result.get('goods'),
@@ -172,3 +173,5 @@ class TestReport(TransactionCase):
                 result.get('goods_qty_in'),
             )
             self.assertTrue(result in real_results)
+
+        stock_transceive.with_context(context).find_source_move_line()

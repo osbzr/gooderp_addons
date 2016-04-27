@@ -95,7 +95,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
             for current_occurrence in current_occurrence_dic_list:
                 account = self.env['finance.account'].browse(current_occurrence.get('account_id'))
                 ending_balance_result = self.compute_ending_balance(current_occurrence.get('credit', 0) or 0, current_occurrence.get('debit', 0) or 0)
-                account_dict = {'period_id': period_id, 'current_occurrence_debit': current_occurrence.get('debit', 0),
+                account_dict = {'period_id': period_id, 'current_occurrence_debit': current_occurrence.get('debit', 0) or 0,
                                 'current_occurrence_credit': current_occurrence.get('credit') or 0, 'subject_code': account.code,
                                 'initial_balance_credit': 0, 'initial_balance_debit': 0,
                                 'ending_balance_credit': ending_balance_result[0], 'ending_balance_debit': ending_balance_result[1],
@@ -397,6 +397,9 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             local_currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(local_currcy_period)
             local_last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(local_currcy_period)
             for vals in create_vals:
+                del vals['date']
+                if vals.get('voucher_id'):
+                    del vals['date']
                 vouchers_summary_ids.append((self.env['general.ledger.account'].create(vals)).id)
         view_id = self.env.ref('finance.vouchers_summary_tree').id
         view_id = self.env.ref('finance.general_ledger_account_tree').id

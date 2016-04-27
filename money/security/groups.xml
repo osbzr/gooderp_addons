@@ -4,17 +4,17 @@
 		<!--添加出纳组-->
 		<record id="group_cashier" model="res.groups">
 			<field name='name'>出纳</field>
-			<field name='category_id' ref="core.gooderp"/> 
+			<field name='category_id' ref="core.Gooderp"/>
 		</record>
-        <!--添加管理核销组-->
-        <record id='reconcile_groups' model='res.groups'>
-            <field name='name'>管理核销</field>
-            <field name='category_id' ref="core.gooderp"/>
-        </record>
-        <!--添加管理其他收入支出组-->
-        <record id='other_get_pay_groups' model='res.groups'>
-            <field name='name'>管理其他收入支出</field>
-            <field name='category_id' ref="core.gooderp"/>
-        </record>
+		<!--添加管理核销组-->
+		<record id='reconcile_groups' model='res.groups'>
+			<field name='name'>管理核销</field>
+			<field name='category_id' ref="core.Gooderp"/>
+		</record>
+		<!--添加管理其他收入支出组-->
+		<record id='other_get_pay_groups' model='res.groups'>
+			<field name='name'>管理其他收入支出</field>
+			<field name='category_id' ref="core.Gooderp"/>
+		</record>
 	</data>
 </openerp>
