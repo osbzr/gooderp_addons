@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
 
 from openerp.osv import osv
+from openerp.http import request
 import itertools
 import operator
+import time
+import pickle
 from openerp import models, api
 
 
 class report_base(models.Model):
     _name = 'report.base'
     _description = u'使用search_read来直接生成数据的基本类，其他类可以直接异名继承当前类来重用搜索、过滤、分组等函数'
+
+    _expired_time = 60
+    _cache_record = False
+    _cache_env = False
+    _cache_time = False
 
     def select_sql(self, sql_type='out'):
         return ''
@@ -159,11 +167,20 @@ class report_base(models.Model):
 
         return result
 
+    def get_data_from_cache(self, sql_type='out'):
+        if self._cache_env != (self.env.uid, self.env.context) \
+                or not self._cache_record or self._cache_time + self._expired_time < time.time():
+
+            self.__class__._cache_record = self.update_result_none_to_false(
+                self.collect_data_by_sql(sql_type))
+            self.__class__._cache_time = time.time()
+            self.__class__._cache_env = (self.env.uid, self.env.context)
+
+        return self._cache_record
+
     @api.model
     def search_read(self, domain=None, fields=None, offset=0, limit=80, order=None):
-        result = self.collect_data_by_sql(sql_type='out')
-
-        result = self.update_result_none_to_false(result)
+        result = self.get_data_from_cache(sql_type='out')
 
         result = self._compute_domain(result, domain)
         result = self._compute_order(result, order)
