@@ -37,7 +37,7 @@ class test_voucher(TransactionCase):
     def test_compute(self):
         '''新建凭证时计算字段加载'''
         voucher = self.env.ref('finance.voucher_1')
-        self.assertTrue(voucher.period_id.display_name == u'2016年 第1期')
+        self.assertTrue(voucher.period_id.name == u'2016年 第1期')
         self.assertTrue(voucher.amount_text == '50000.0')
         voucher.unlink()
     
