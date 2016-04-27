@@ -74,6 +74,8 @@ class report_base(models.Model):
                 'like': lambda field, value: str(value) in str(field),
                 'not ilike': lambda field, value: str(value).lower() not in str(field).lower(),
                 'not like': lambda field, value: str(value) not in str(field),
+                'in': lambda field, value: field in value,
+                'not in': lambda field, value: field not in value,
                 '=': operator.eq,
                 '!=': operator.ne,
                 '>': operator.gt,
