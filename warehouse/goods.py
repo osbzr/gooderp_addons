@@ -13,7 +13,8 @@ class goods(models.Model):
     def _get_default_wh(self):
         return self.env.ref('core.warehouse_general')
 
-    default_wh = fields.Many2one('warehouse', u'默认库位', required=True,
+    default_wh = fields.Many2one('warehouse', u'默认库位',
+                                 required=True, ondelete='restrict',
                                  default=_get_default_wh)
 
     # 使用SQL来取得指定产品情况下的库存数量

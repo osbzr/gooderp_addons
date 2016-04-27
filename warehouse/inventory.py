@@ -23,11 +23,14 @@ class wh_inventory(models.Model):
 
     date = fields.Date(u'日期', default=fields.Date.context_today)
     name = fields.Char(u'名称', copy=False, default='/')
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
+    warehouse_id = fields.Many2one('warehouse', u'仓库',
+                                   ondelete='restrict')
     goods = fields.Char(u'产品')
     uos_not_zero = fields.Boolean(u'辅助数量不为0')
-    out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False)
-    in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False)
+    out_id = fields.Many2one('wh.out', u'盘亏单据',
+                             copy=False, ondelete='cascade')
+    in_id = fields.Many2one('wh.in', u'盘盈单据',
+                            copy=False, ondelete='cascade')
     state = fields.Selection(
         INVENTORY_STATE, u'状态', copy=False, default='draft')
     line_ids = fields.One2many(
@@ -234,19 +237,20 @@ class wh_inventory_line(models.Model):
     ]
 
     inventory_id = fields.Many2one('wh.inventory', u'盘点', ondelete='cascade')
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
-    goods_id = fields.Many2one('goods', u'产品')
-    attribute_id = fields.Many2one('attribute', u'属性')
+    warehouse_id = fields.Many2one('warehouse', u'仓库', ondelete='restrict')
+    goods_id = fields.Many2one('goods', u'产品', ondelete='restrict')
+    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
     using_batch = fields.Boolean(
         related='goods_id.using_batch', string=u'批号管理')
     force_batch_one = fields.Boolean(
         related='goods_id.force_batch_one', string=u'每批号数量为1')
     lot = fields.Char(u'批号')
     new_lot = fields.Char(u'盘盈批号')
-    new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号')
+    new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号',
+                                ondelete='restrict')
     lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing')
-    uom_id = fields.Many2one('uom', u'单位')
-    uos_id = fields.Many2one('uom', u'辅助单位')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
+    uos_id = fields.Many2one('uom', u'辅助单位', ondelete='restrict')
     real_qty = fields.Float(
         u'系统库存', digits_compute=dp.get_precision('Quantity'))
     real_uos_qty = fields.Float(

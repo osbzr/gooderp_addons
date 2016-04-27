@@ -20,7 +20,7 @@ class wh_assembly(models.Model):
         'wh.move', u'移库单', required=True, index=True, ondelete='cascade')
     bom_id = fields.Many2one(
         'wh.bom', u'模板', domain=[('type', '=', 'assembly')],
-        context={'type': 'assembly'})
+        context={'type': 'assembly'}, ondelete='restrict')
     fee = fields.Float(
         u'组装费用', digits_compute=dp.get_precision('Amount'))
 
@@ -206,7 +206,7 @@ class wh_disassembly(models.Model):
         'wh.move', u'移库单', required=True, index=True, ondelete='cascade')
     bom_id = fields.Many2one(
         'wh.bom', u'模板', domain=[('type', '=', 'disassembly')],
-        context={'type': 'disassembly'})
+        context={'type': 'disassembly'}, ondelete='restrict')
     fee = fields.Float(
         u'拆卸费用', digits_compute=dp.get_precision('Amount'))
 
@@ -400,10 +400,10 @@ class wh_bom_line(osv.osv):
         ('child', u'子间'),
     ]
 
-    bom_id = fields.Many2one('wh.bom', u'模板')
+    bom_id = fields.Many2one('wh.bom', u'模板', ondelete='cascade')
     type = fields.Selection(
         BOM_LINE_TYPE, u'类型',
         default=lambda self: self.env.context.get('type'))
-    goods_id = fields.Many2one('goods', u'产品', default=1)
+    goods_id = fields.Many2one('goods', u'产品', default=1, ondelete='restrict')
     goods_qty = fields.Float(
         u'数量', digits_compute=dp.get_precision('Quantity'))
