@@ -2,6 +2,7 @@
 
 import openerp.addons.decimal_precision as dp
 from openerp import fields, models, api
+import datetime
 
 
 class sell_summary_staff(models.Model):
@@ -71,7 +72,7 @@ class sell_summary_staff(models.Model):
         return '''
         WHERE wml.state = 'done'
           AND wml.date >= '{date_start}'
-          AND wml.date <= '{date_end}'
+          AND wml.date < '{date_end}'
           AND wm.origin like 'sell.delivery%%'
           %s
         ''' % extra
@@ -87,9 +88,12 @@ class sell_summary_staff(models.Model):
         '''
 
     def get_context(self, sql_type='out', context=None):
+        date_end = datetime.datetime.strptime(
+            context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
+        date_end = date_end.strftime('%Y-%m-%d')
         return {
             'date_start': context.get('date_start') or '',
-            'date_end': context.get('date_end') or '',
+            'date_end': date_end,
             'staff_id': context.get('staff_id') and
             context.get('staff_id')[0] or '',
             'goods_id': context.get('goods_id') and
@@ -109,7 +113,7 @@ class sell_summary_staff(models.Model):
 
     @api.multi
     def view_detail(self):
-        '''销售汇总表（按客户）查看明细按钮'''
+        '''销售汇总表（按销售人员）查看明细按钮'''
         line_ids = []
         res = []
         move_lines = []
