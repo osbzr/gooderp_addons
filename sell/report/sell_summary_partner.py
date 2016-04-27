@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import openerp.addons.decimal_precision as dp
-from openerp import fields, models
+from openerp import fields, models, api
+import datetime
 
 
 class sell_summary_partner(models.Model):
@@ -9,6 +10,7 @@ class sell_summary_partner(models.Model):
     _inherit = 'report.base'
     _description = u'销售汇总表（按客户）'
 
+    id_lists = fields.Text(u'移动明细行id列表')
     c_category = fields.Char(u'客户类别')
     partner = fields.Char(u'客户')
     goods_code = fields.Char(u'商品编码')
@@ -27,6 +29,7 @@ class sell_summary_partner(models.Model):
     def select_sql(self, sql_type='out'):
         return '''
         SELECT MIN(wml.id) as id,
+               array_agg(wml.id) AS id_lists,
                c_categ.name AS c_category,
                partner.name AS partner,
                goods.code AS goods_code,
@@ -69,7 +72,7 @@ class sell_summary_partner(models.Model):
         return '''
         WHERE wml.state = 'done'
           AND wml.date >= '{date_start}'
-          AND wml.date <= '{date_end}'
+          AND wml.date < '{date_end}'
           AND wm.origin like 'sell.delivery%%'
           %s
         ''' % extra
@@ -85,9 +88,12 @@ class sell_summary_partner(models.Model):
         '''
 
     def get_context(self, sql_type='out', context=None):
+        date_end = datetime.datetime.strptime(
+            context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
+        date_end = date_end.strftime('%Y-%m-%d')
         return {
             'date_start': context.get('date_start') or '',
-            'date_end': context.get('date_end') or '',
+            'date_end': date_end,
             'partner_id': context.get('partner_id') and
             context.get('partner_id')[0] or '',
             'goods_id': context.get('goods_id') and
@@ -104,3 +110,30 @@ class sell_summary_partner(models.Model):
         collection = self.execute_sql(sql_type='out')
 
         return collection
+
+    @api.multi
+    def view_detail(self):
+        '''销售汇总表（按客户）查看明细按钮'''
+        line_ids = []
+        res = []
+        move_lines = []
+        result = self.get_data_from_cache()
+        for line in result:
+            if line.get('id') == self.id:
+                line_ids = line.get('id_lists')
+                move_lines = self.env['wh.move.line'].search(
+                        [('id', 'in', line_ids)])
+
+        for move_line in move_lines:
+            detail = self.env['sell.order.detail'].search(
+                [('order_name', '=', move_line.move_id.name)])
+            res.append(detail.id)
+
+        return {
+            'name': u'销售明细表',
+            'view_mode': 'tree',
+            'view_id': False,
+            'res_model': 'sell.order.detail',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', res)],
+        }
