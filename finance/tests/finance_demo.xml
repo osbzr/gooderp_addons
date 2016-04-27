@@ -110,6 +110,7 @@
         </record>
         <record id='finance_account_2' model='finance.account'>
             <field name='auxiliary_financing'>supplier</field>
+        </record>
         <!-- 2016年2月的凭证-->
         <record id='voucher_4' model='voucher'>
             <field name='date'>2016-02-10</field> 
