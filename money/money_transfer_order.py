@@ -96,12 +96,15 @@ class money_transfer_order_line(models.Model):
     _name = 'money.transfer.order.line'
     _description = u'资金转账单明细'
 
-    transfer_id = fields.Many2one('money.transfer.order', string=u'资金转账单')
-    out_bank_id = fields.Many2one('bank.account',
-                                  string=u'转出账户', required=True)
-    in_bank_id = fields.Many2one('bank.account', string=u'转入账户', required=True)
+    transfer_id = fields.Many2one('money.transfer.order',
+                                  string=u'资金转账单', ondelete='cascade')
+    out_bank_id = fields.Many2one('bank.account', string=u'转出账户',
+                                  required=True, ondelete='restrict')
+    in_bank_id = fields.Many2one('bank.account', string=u'转入账户',
+                                 required=True, ondelete='restrict')
     amount = fields.Float(string=u'金额',
                           digits_compute=dp.get_precision('Amount'))
-    mode_id = fields.Many2one('settle.mode', string=u'结算方式')
+    mode_id = fields.Many2one('settle.mode', string=u'结算方式',
+                              ondelete='restrict')
     number = fields.Char(string=u'结算号')
     note = fields.Char(string=u'备注')

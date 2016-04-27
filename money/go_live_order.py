@@ -26,8 +26,10 @@ class go_live_order(models.Model):
     def _get_company_start_date(self):
         return self.env.user.company_id.start_date
 
-    partner_id = fields.Many2one('partner', string=u'业务伙伴')
-    bank_id = fields.Many2one('bank.account', string=u'账户')
+    partner_id = fields.Many2one('partner',
+                              string=u'业务伙伴', ondelete='restrict')
+    bank_id = fields.Many2one('bank.account',
+                              string=u'账户', ondelete='restrict')
     name = fields.Char(string=u'编号', copy=False, readonly=True, default='/')
     date = fields.Date(string=u'日期', default=_get_company_start_date,
                                       readonly=True, required=True)
