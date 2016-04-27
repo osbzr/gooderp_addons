@@ -7,3 +7,5 @@ access_finance_account,access_finance_account,model_finance_account,,1,1,1,1
 access_finance_category,access_finance_category,model_finance_category,,1,1,1,1
 access_auxiliary_financing,access_auxiliary_financing,model_auxiliary_financing,,1,1,1,1
 access_trial_balance,access_trial_balance,model_trial_balance,,1,1,1,1
+access_balance_sheet,access_balance_sheet,model_balance_sheet,,1,1,1,1
+access_profit_statement,access_profit_statement,model_profit_statement,,1,1,1,1

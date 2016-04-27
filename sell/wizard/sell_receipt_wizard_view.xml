@@ -12,7 +12,9 @@
                             <field name="date_end" required="1"/>
                         </group>
                         <group>
-                        	<field name="c_category_id"/>
+                        	<field name="c_category_id"
+                        		domain="[('type', '=', 'customer')]"
+                        		context="{'type': 'customer'}"/>
                             <field name="partner_id" domain="[('c_category_id', '!=', False)]"/>
                             <field name="staff_id"/>
                         </group>
