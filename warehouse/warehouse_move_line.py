@@ -239,7 +239,7 @@ class wh_move_line(models.Model):
                     self.goods_qty)
             else:
                 self.goods_qty = self.goods_id.conversion_unit(
-                    self.goods_uos_qty)
+                    self.goods_uos_qty or 1)
 
         self.compute_suggested_cost()
         self.compute_lot_compatible()
