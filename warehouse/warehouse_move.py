@@ -15,9 +15,10 @@ class wh_move(models.Model):
     origin = fields.Char(u'源单类型', required=True)
     name = fields.Char(u'单据编号', copy=False, default='/')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft')
-    partner_id = fields.Many2one('partner', u'业务伙伴')
+    partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict')
     date = fields.Date(u'单据日期', copy=False, default=fields.Date.context_today)
-    approve_uid = fields.Many2one('res.users', u'审核人', copy=False)
+    approve_uid = fields.Many2one('res.users', u'审核人',
+                                  copy=False, ondelete='restrict')
     approve_date = fields.Datetime(u'审核日期', copy=False)
     line_out_ids = fields.One2many('wh.move.line', 'move_id', u'明细', domain=[('type', '=', 'out')], context={'type': 'out'}, copy=True)
     line_in_ids = fields.One2many('wh.move.line', 'move_id', u'明细', domain=[('type', '=', 'in')], context={'type': 'in'}, copy=True)

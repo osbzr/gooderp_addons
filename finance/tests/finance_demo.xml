@@ -2,6 +2,10 @@
 <openerp>
     <data>
         <!--会计期间-->
+        <record id='period_201412' model='finance.period'>
+            <field name='year'>2014</field>
+            <field name='month'>12</field>
+        </record>
         <record id='period_201512' model='finance.period'>
             <field name='year'>2015</field>
             <field name='month'>12</field>
@@ -30,6 +34,34 @@
             <field name='name'>股东投资</field>
             <field name='account_id' ref='finance.account_bank'/>
             <field name='credit'>1000000</field>
+        </record>
+        <!-- 2015年12月的收入凭证 -->
+        <record id='voucher_12_1' model='voucher'>
+            <field name='date'>2015-12-10</field>
+        </record>
+        <record id='voucher_12_1_credit' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_12_1'/>
+            <field name='name'>主营业务收入</field>
+            <field name='account_id' ref='finance.account_income'/>
+            <field name='credit'>10000</field>
+        </record>
+        <record id='voucher_12_1_debit' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_12_1'/>
+            <field name='name'>主营业务收入</field>
+            <field name='account_id' ref='finance.account_bank'/>
+            <field name='debit'>10000</field>
+        </record>
+        <record id='voucher_12_2_debit' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_12_1'/>
+            <field name='name'>费用</field>
+            <field name='account_id' ref='finance.account_expense_sale'/>
+            <field name='debit'>5000</field>
+        </record>
+        <record id='voucher_12_2_credit' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_12_1'/>
+            <field name='name'>费用</field>
+            <field name='account_id' ref='finance.account_bank'/>
+            <field name='credit'>5000</field>
         </record>
         <!-- 2016 年1月的凭证-->
         <record id='voucher_1' model='voucher'>
@@ -110,11 +142,42 @@
             <field name='account_id' ref='finance.account_ap'/>
             <field name='debit'>15000</field>
         </record>
+        <!-- 2016年2月的凭证-->
+        <record id='voucher_4' model='voucher'>
+            <field name='date'>2016-02-10</field> 
+        </record>
+        <record id='voucher_line_4_debit' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_4'/>
+            <field name='name'>开发票</field>
+            <field name='account_id' ref='finance.account_ap'/>
+            <field name='debit'>15000</field>
+        </record>
         <record id='voucher_line_4_credit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_4'/>
             <field name='name'>开发票</field>
             <field name='account_id' ref='finance.account_income'/>
             <field name='credit'>15000</field>  
+        </record>
+        <!-- 2014年12月的凭证-->
+        <record id='voucher_14_12' model='voucher'>
+            <field name='date'>2014-12-10</field> 
+        </record>
+        <record id='voucher_line_14_12_debit' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_14_12'/>
+            <field name='name'>开发票</field>
+            <field name='account_id' ref='finance.account_ap'/>
+            <field name='debit'>15000</field>
+        </record>
+        <record id='voucher_line_14_12_credit' model='voucher.line'>
+            <field name='voucher_id' ref='finance.voucher_14_12'/>
+            <field name='name'>开发票</field>
+            <field name='account_id' ref='finance.account_income'/>
+            <field name='credit'>15000</field>  
+        </record>
+		<!--公司添加利润科目-->
+        <record id="base.main_company" model="res.company">
+            <field name="profit_account" ref='finance.account_profit'/>
+            <field name="remain_account" ref='finance.account_remain'/>
         </record>
 
     </data>

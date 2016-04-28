@@ -5,6 +5,7 @@
 		<record id="group_cashier" model="res.groups">
 			<field name='name'>出纳</field>
 			<field name='category_id' ref="core.Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理核销组-->
 		<record id='reconcile_groups' model='res.groups'>

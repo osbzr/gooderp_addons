@@ -70,7 +70,7 @@ class money_order(models.Model):
                           ], string=u'状态', readonly=True,
                              default='draft', copy=False)
     partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True,
-                                 readonly=True,
+                                 readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]})
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
@@ -216,11 +216,14 @@ class money_order_line(models.Model):
     _name = 'money.order.line'
     _description = u'收付款单明细'
 
-    money_id = fields.Many2one('money.order', string=u'收付款单')
-    bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True)
+    money_id = fields.Many2one('money.order', string=u'收付款单',
+                               ondelete='cascade')
+    bank_id = fields.Many2one('bank.account', string=u'结算账户',
+                              required=True, ondelete='restrict')
     amount = fields.Float(string=u'金额',
                           digits_compute=dp.get_precision('Amount'))
-    mode_id = fields.Many2one('settle.mode', string=u'结算方式')
+    mode_id = fields.Many2one('settle.mode', string=u'结算方式',
+                              ondelete='restrict')
     number = fields.Char(string=u'结算号')
     note = fields.Char(string=u'备注')
 
@@ -235,10 +238,12 @@ class money_invoice(models.Model):
                           ], string=u'状态', readonly=True,
                           default='draft', copy=False)
     partner_id = fields.Many2one('partner', string=u'业务伙伴',
-                                 required=True, readonly=True)
+                                 required=True, readonly=True,
+                                 ondelete='restrict')
     name = fields.Char(string=u'订单编号', copy=False,
                        readonly=True, required=True)
-    category_id = fields.Many2one('core.category', string=u'类别', readonly=True)
+    category_id = fields.Many2one('core.category', string=u'类别',
+                                  readonly=True, ondelete='restrict')
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self))
     amount = fields.Float(string=u'单据金额', readonly=True,
@@ -287,14 +292,17 @@ class source_order_line(models.Model):
     _name = 'source.order.line'
     _description = u'源单明细'
 
-    money_id = fields.Many2one('money.order', string=u'收付款单')  # 收付款单上的源单明细
+    money_id = fields.Many2one('money.order', string=u'收付款单',
+                               ondelete='cascade')  # 收付款单上的源单明细
     receivable_reconcile_id = fields.Many2one('reconcile.order',
-                                              string=u'核销单')  # 核销单上的应收源单明细
+                            string=u'核销单', ondelete='cascade') # 核销单上的应收源单明细
     payable_reconcile_id = fields.Many2one('reconcile.order',
-                                           string=u'核销单')  # 核销单上的应付源单明细
+                            string=u'核销单', ondelete='cascade') # 核销单上的应付源单明细
     name = fields.Many2one('money.invoice', string=u'源单编号',
-                           copy=False, required=True)
-    category_id = fields.Many2one('core.category', string=u'类别', required=True)
+                           copy=False, required=True,
+                           ondelete='cascade')
+    category_id = fields.Many2one('core.category', string=u'类别',
+                                  required=True, ondelete='restrict')
     date = fields.Date(string=u'单据日期')
     amount = fields.Float(string=u'单据金额',
                         digits_compute=dp.get_precision('Amount'))
@@ -341,9 +349,10 @@ class reconcile_order(models.Model):
                           ], string=u'状态', readonly=True,
                           default='draft', copy=False)
     partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True,
-                                 readonly=True,
+                                 readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]})
-    to_partner_id = fields.Many2one('partner', string=u'转入往来单位', readonly=True,
+    to_partner_id = fields.Many2one('partner', string=u'转入往来单位',
+                                    readonly=True, ondelete='restrict',
                                     states={'draft': [('readonly', False)]})
     advance_payment_ids = fields.One2many(
                             'advance.payment', 'pay_reconcile_id',
@@ -507,7 +516,8 @@ class reconcile_order(models.Model):
             if self.business_type in ['adv_pay_to_get',
                                       'adv_get_to_pay', 'get_to_pay']:
                 if order_reconcile != invoice_reconcile:
-                    raise except_orm(u'错误', u'核销金额必须相同, %s 不等于 %s' % (order_reconcile, invoice_reconcile))
+                    raise except_orm(u'错误', u'核销金额必须相同, %s 不等于 %s'
+                                     % (order_reconcile, invoice_reconcile))
 
             order.state = 'done'
         return True
@@ -517,9 +527,10 @@ class advance_payment(models.Model):
     _name = 'advance.payment'
     _description = u'核销单预收付款行'
 
-    pay_reconcile_id = fields.Many2one('reconcile.order', string=u'核销单')
+    pay_reconcile_id = fields.Many2one('reconcile.order',
+                            string=u'核销单', ondelete='cascade')
     name = fields.Many2one('money.order', string=u'预付款单编号',
-                           copy=False, required=True)
+                    copy=False, required=True, ondelete='cascade')
     date = fields.Date(string=u'单据日期')
     amount = fields.Float(string=u'单据金额',
                         digits_compute=dp.get_precision('Amount'))
@@ -535,8 +546,9 @@ class cost_line(models.Model):
     _name = 'cost.line'
     _description = u"采购销售费用"
 
-    partner_id = fields.Many2one('partner', u'供应商')
+    partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict')
     category_id = fields.Many2one('core.category', u'类别',
+                                  ondelete='restrict',
                                   domain="[('type', '=', 'other_pay')]")
     amount = fields.Float(u'金额',
                           digits_compute=dp.get_precision('Amount'))
