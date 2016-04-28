@@ -217,6 +217,8 @@
 				 						<field name='warehouse_id' required='1' groups='warehouse.multi_warehouse_groups'/>
 				 						<field name='warehouse_dest_id' invisible='1'/>
 		         						<field name='goods_qty' sum='数量合计'/>
+		         						<field name='goods_uos_qty' sum='辅助数量合计'
+		         							groups='goods.auxiliary_unit_groups'/>
 				 						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
@@ -366,6 +368,8 @@
 				 						<field name='warehouse_id' invisible='1'/>
 				 						<field name='warehouse_dest_id' required='1' groups='warehouse.multi_warehouse_groups'/>
 		         						<field name='goods_qty' sum='数量合计'/>
+		         						<field name='goods_uos_qty' sum='辅助数量合计'
+		         							groups='goods.auxiliary_unit_groups'/>
 				 						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
