@@ -5,7 +5,7 @@
             <field name="name">sell.summary.staff.tree</field>
             <field name="model">sell.summary.staff</field>
             <field name="arch" type="xml">
-                <tree string="销售汇总表（按销售人员）">
+                <tree string="销售汇总表（按销售人员）" create="false">
                 	<field name="staff"/>
                 	<field name="goods_code"/>
                     <field name="goods"/>
