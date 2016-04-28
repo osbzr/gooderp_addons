@@ -2,9 +2,19 @@
 <openerp>
     <data>
         <!--会计期间-->
+        <record id='period_201411' model='finance.period'>
+            <field name='year'>2014</field>
+            <field name='month'>11</field>
+            <field name='is_closed'>True</field>
+        </record>
         <record id='period_201412' model='finance.period'>
             <field name='year'>2014</field>
             <field name='month'>12</field>
+        </record>
+        <record id='period_201511' model='finance.period'>
+            <field name='year'>2015</field>
+            <field name='month'>11</field>
+            <field name='is_closed'>True</field>
         </record>
         <record id='period_201512' model='finance.period'>
             <field name='year'>2015</field>

@@ -24,11 +24,27 @@ class test_report(TransactionCase):
 
     def test_trail_balance(self):
         ''' 测试科目余额表 '''
+        #上一期间未结账报错
         report = self.env['create.trial.balance.wizard'].create(
             {'period_id': self.period_id}
                     )
         with self.assertRaises(except_orm):
             report.create_trial_balance()
+        #上一期间不存在报错
+        report_1511 = self.env['create.trial.balance.wizard'].create(
+            {'period_id': self.env.ref('finance.period_201511').id}
+                    )
+        report_1511.period_id.is_closed = False
+        with self.assertRaises(except_orm):
+            report_1511.create_trial_balance()
+        report_1511.period_id.is_closed = True
+        # 结转2015年12月的期间
+        month_end = self.env['checkout.wizard'].create(
+                       {'date':'2015-12-31',
+                        'period_id':self.env.ref('finance.period_201512').id})
+        month_end.button_checkout()
+        #正常流程
+        report.create_trial_balance()
 
     def test_vouchers_summary(self):
         ''' 测试总账和明细账'''
@@ -37,10 +53,42 @@ class test_report(TransactionCase):
              'period_end_id': self.period_id,
              'subject_name_id': self.env.ref('finance.account_fund').id}
                     )
+        #会计期间相同时报错
+        report.period_end_id = self.env.ref('finance.period_201602')
+        report.onchange_period()
+        #上一期间不存在报错
+        new_report = report.copy()
+        new_report.period_begin_id = new_report.period_end_id = self.env.ref('finance.period_201511')
+        with self.assertRaises(except_orm):
+            new_report.create_vouchers_summary()
+        with self.assertRaises(except_orm):
+            new_report.create_general_ledger_account()
+        #上一期间未结账报错
         with self.assertRaises(except_orm):
             report.create_vouchers_summary()
         with self.assertRaises(except_orm):
             report.create_general_ledger_account()
+        #正常流程
+        report.period_end_id = self.period_id
+        # 结转2015年12月的期间
+        month_end = self.env['checkout.wizard'].create(
+                       {'date':'2015-12-31',
+                        'period_id':self.env.ref('finance.period_201512').id})
+        month_end.button_checkout()
+        report.create_vouchers_summary()
+        report.create_general_ledger_account()
+        
+        report.period_end_id = self.env.ref('finance.period_201602')
+        report.create_vouchers_summary()
+        report.create_general_ledger_account()
+        #没有生成科目余额表的情况
+        trial_balance_obj = self.env['trial.balance'].search([
+                ('period_id', '=', self.env.ref('finance.period_201512').id), 
+                ('subject_name_id', '=', report.subject_name_id.id)])
+        trial_balance_obj.unlink()
+        report.create_vouchers_summary()
+        report.create_general_ledger_account()
+        
 
     def test_balance_sheet(self):
         ''' 测试资产负债表 '''

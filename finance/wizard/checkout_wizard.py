@@ -128,6 +128,11 @@ class checkout_wizard(models.TransientModel):
                            }
                     year_account = voucher_obj.create(value)
                     year_account.voucher_done()
+                #生成科目余额表
+                trial_wizard = self.env['create.trial.balance.wizard'].create({
+                        'period_id':self.period_id.id,
+                                                                })
+                trial_wizard.create_trial_balance()
                 #关闭会计期间
                 self.period_id.is_closed = True
                 #如果下一个会计期间没有，则创建。
