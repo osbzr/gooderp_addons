@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<openerp>
+    <data>
+        <template id="assets_backend" name="web_export_view assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/web_export_view/static/src/js/web_export_view.js"></script>
+            </xpath>
+        </template>
+       
+         <record id="report_template_tree" model="ir.ui.view">
+            <field name="name">report_template</field>
+            <field name="model">report.template</field>
+            <field name="arch" type="xml">
+                <tree string="报表模板" editable='bottom'>
+                    <field name="model"/>
+                    <field name="file_address"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="report_template_action" model="ir.actions.act_window">
+            <field name="name">报表模板</field>
+            <field name="res_model">report.template</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+         <menuitem id='report_template_action_menu' action='report_template_action' parent='base.menu_config' sequence='10'/>
+    </data>
+</openerp>

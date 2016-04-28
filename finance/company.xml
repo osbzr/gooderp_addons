@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
             	<field name='draft_invoice' position='after'>
             		<field name='profit_account'/>
-            		<field name='no_profit_account'/>
+            		<field name='remain_account'/>
             	</field>
             </field>
         </record>
