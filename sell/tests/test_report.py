@@ -273,6 +273,15 @@ class test_goods_wizard(TransactionCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(len(new_results), 0)
 
+    def test_view_detail(self):
+        '''销售汇总表（按商品）  查看明细按钮'''
+        summary_goods = self.env['sell.summary.goods'].create({})
+        context = self.goods_wizard.button_ok().get('context')
+        results = summary_goods.with_context(context).search_read(domain=[])
+        for line in results:
+            summary_line = summary_goods.browse(line['id'])
+            summary_line.with_context(context).view_detail()
+
 
 class test_partner_wizard(TransactionCase):
     '''测试销售汇总表（按客户）向导'''
@@ -331,6 +340,15 @@ class test_partner_wizard(TransactionCase):
         new_context = new_partner_wizard.button_ok().get('context')
         new_results = summary_partner.with_context(new_context).search_read(
                                                                   domain=[])
+
+    def test_view_detail(self):
+        '''销售汇总表（按客户）  查看明细按钮'''
+        summary_partner = self.env['sell.summary.partner'].create({})
+        context = self.partner_wizard.button_ok().get('context')
+        results = summary_partner.with_context(context).search_read(domain=[])
+        for line in results:
+            summary_line = summary_partner.browse(line['id'])
+            summary_line.with_context(context).view_detail()
 
 
 class test_staff_wizard(TransactionCase):
@@ -391,6 +409,15 @@ class test_staff_wizard(TransactionCase):
         new_context = new_staff_wizard.button_ok().get('context')
         new_results = summary_staff.with_context(new_context).search_read(
                                                                   domain=[])
+
+    def test_view_detail(self):
+        '''销售汇总表（按销售人员）  查看明细按钮'''
+        summary_staff = self.env['sell.summary.staff'].create({})
+        context = self.staff_wizard.button_ok().get('context')
+        results = summary_staff.with_context(context).search_read(domain=[])
+        for line in results:
+            summary_line = summary_staff.browse(line['id'])
+            summary_line.with_context(context).view_detail()
 
 
 class test_receipt_wizard(TransactionCase):

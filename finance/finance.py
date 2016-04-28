@@ -233,5 +233,5 @@ class res_company(models.Model):
     _inherit = 'res.company'
 
     profit_account = fields.Many2one('finance.account',u'本年利润科目')
-    no_profit_account = fields.Many2one('finance.account',u'未分配利润科目')
+    remain_account = fields.Many2one('finance.account',u'未分配利润科目')
 

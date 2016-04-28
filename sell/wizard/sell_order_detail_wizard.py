@@ -29,6 +29,10 @@ class sell_order_detail_wizard(models.TransientModel):
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
 
+        # 先查找销售明细表，若有数据则清空
+        for detail in self.env['sell.order.detail'].search([]):
+            detail.unlink()
+
         domain = [('move_id.date', '>=', self.date_start),
                   ('move_id.date', '<=', self.date_end),
                   ('move_id.origin', 'like', 'sell.delivery'),

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import fields, models
+from openerp import fields, models, api
 import openerp.addons.decimal_precision as dp
 import datetime
 
@@ -9,6 +9,7 @@ class sell_summary_goods(models.Model):
     _inherit = 'report.base'
     _description = u'销售汇总表（按商品）'
 
+    id_lists = fields.Text(u'移动明细行id列表')
     goods_categ = fields.Char(u'商品类别')
     goods_code = fields.Char(u'商品编码')
     goods = fields.Char(u'商品名称')
@@ -26,6 +27,7 @@ class sell_summary_goods(models.Model):
     def select_sql(self, sql_type='out'):
         return '''
         SELECT MIN(wml.id) as id,
+                array_agg(wml.id) AS id_lists,
                 categ.name AS goods_categ,
                 goods.code AS goods_code,
                 goods.name AS goods,
@@ -102,3 +104,29 @@ class sell_summary_goods(models.Model):
 
         return collection
 
+    @api.multi
+    def view_detail(self):
+        '''销售汇总表（按商品）查看明细按钮'''
+        line_ids = []
+        res = []
+        move_lines = []
+        result = self.get_data_from_cache()
+        for line in result:
+            if line.get('id') == self.id:
+                line_ids = line.get('id_lists')
+                move_lines = self.env['wh.move.line'].search(
+                        [('id', 'in', line_ids)])
+
+        for move_line in move_lines:
+            detail = self.env['sell.order.detail'].search(
+                [('order_name', '=', move_line.move_id.name)])
+            res.append(detail.id)
+
+        return {
+            'name': u'销售明细表',
+            'view_mode': 'tree',
+            'view_id': False,
+            'res_model': 'sell.order.detail',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', res)],
+        }
