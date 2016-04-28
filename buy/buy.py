@@ -95,7 +95,7 @@ class buy_order(models.Model):
                              help=u"购货订单的审核状态", select=True, copy=False,
                              default='draft')
     goods_state = fields.Char(u'收货状态', compute=_get_buy_goods_state,
-                              default=u'未入库',
+                              default=u'未入库', store=True,
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
 
@@ -441,9 +441,9 @@ class buy_receipt(models.Model):
                         store=True, readonly=True, copy=False,
                         digits_compute=dp.get_precision('Amount'))
     cost_line_ids = fields.One2many('cost.line', 'buy_id', u'采购费用', copy=False)
-    money_state = fields.Char(u'付款状态', compute=_get_buy_money_state,
+    money_state = fields.Char(u'付款状态', compute=_get_buy_money_state, store=True,
                               help=u"采购入库单的付款状态", select=True, copy=False)
-    return_state = fields.Char(u'退款状态', compute=_get_buy_return_state,
+    return_state = fields.Char(u'退款状态', compute=_get_buy_return_state, store=True,
                                help=u"采购退货单的退款状态", select=True, copy=False)
 
     @api.one

@@ -76,7 +76,7 @@ class sell_order(models.Model):
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态', readonly=True,
                              help=u"销货订单的审核状态", select=True, 
                              copy=False, default='draft')
-    goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
+    goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state, store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
 
@@ -442,9 +442,9 @@ class sell_delivery(models.Model):
                               digits_compute=dp.get_precision('Amount'))
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', 
                                     copy=False)
-    money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
+    money_state = fields.Char(u'收款状态', compute=_get_sell_money_state, store=True,
                               help=u"销售发货单的收款状态", select=True, copy=False)
-    return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
+    return_state = fields.Char(u'退款状态', compute=_get_sell_return_state, store=True,
                                help=u"销售退货单的退款状态", select=True, copy=False)
 
     @api.one

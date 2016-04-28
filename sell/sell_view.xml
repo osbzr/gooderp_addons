@@ -110,7 +110,36 @@
             	</form>
         	</field> 
     	</record>
-    	
+
+    	<record id="sell_order_search" model="ir.ui.view">
+            <field name="name">sell.order.search</field>
+            <field name="model">sell.order</field>
+            <field name="arch" type="xml">
+                <search string="销货订单">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="goods_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not out" string="未出库" domain="[('goods_state','=',u'未出库')]"/>
+                    <filter name="part out" string="部分出库" domain="[('goods_state','=',u'部分出库')]"/>
+                    <filter name="all out" string="全部出库" domain="[('goods_state','=',u'全部出库')]"/>
+                    <separator/>
+                    <filter name="sell" string="销货" domain="[('type','=','sell')]"/>
+                    <filter name="return" string="退货" domain="[('type','=','return')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
+                        <filter string="要求交货日期" icon="terp-go-month" domain="[]" context="{'group_by':'delivery_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
     	<!--销售订单发货单tree视图-->
     	<record id='sell_delivery_tree' model='ir.ui.view'>
         	<field name='name'>sell.delivery.tree</field>
@@ -236,6 +265,32 @@
         	</field> 
     	</record>
 
+		<record id="sell_delivery_search" model="ir.ui.view">
+            <field name="name">sell.delivery.search</field>
+            <field name="model">sell.delivery</field>
+            <field name="arch" type="xml">
+                <search string="销售发货单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="money_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not paid" string="未收款" domain="[('money_state','=',u'未收款')]"/>
+                    <filter name="part paid" string="部分收款" domain="[('money_state','=',u'部分收款')]"/>
+                    <filter name="all paid" string="全部收款" domain="[('money_state','=',u'全部收款')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
+                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
     	<!--销售退货单tree视图-->
     	<record id='sell_return_tree' model='ir.ui.view'>
         	<field name='name'>sell.return.tree</field>
@@ -359,6 +414,32 @@
         	</field> 
     	</record>
 
+		<record id="sell_return_search" model="ir.ui.view">
+            <field name="name">sell.return.search</field>
+            <field name="model">sell.delivery</field>
+            <field name="arch" type="xml">
+                <search string="销售退货单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="return_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
+                    <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
+                    <filter name="all refund" string="全部退款" domain="[('return_state','=',u'全部退款')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
+                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
     	<!--销货订单，销售发货单action-->
     	<record id='sell_order_action' model='ir.actions.act_window'>
         	<field name='name'>销货订单</field>
@@ -381,6 +462,7 @@
         	<field name="context">{'is_return':False}</field>
         	<field name="domain">[('is_return','=',False)]</field>
         	<field name='view_id' ref='sell_delivery_tree'/>
+        	<field name="search_view_id" ref="sell_delivery_search"/>
         	<field name="help" type="html">
                <p class="oe_view_nocontent_create">
                 	 点击创建销售发货单
@@ -394,6 +476,7 @@
             <field name="view_mode">tree,form</field>
             <field name="context">{'is_return':True}</field>
             <field name="domain">[('is_return','=',True)]</field>
+            <field name="search_view_id" ref="sell_return_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建销售退货单
