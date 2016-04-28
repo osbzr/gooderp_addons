@@ -155,7 +155,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     @api.one
     @api.onchange('period_begin_id', 'period_end_id')
     def onchange_period(self):
-        '''当优惠率或购货订单行发生变化时，单据优惠金额发生变化'''
+        '''结束期间大于起始期间报错'''
 
         if self.period_end_id and self.period_begin_id and  \
                 not (self.period_begin_id.year <= self.period_end_id.year and self.period_begin_id.month <= self.period_end_id.month):
