@@ -95,13 +95,6 @@
             <field name='credit'>10000</field>
         </record>
 
-        <!--科目-->
-        <record id='finance_account_1' model='finance.account'>
-            <field name='auxiliary_financing'>partner</field>
-        </record>
-        <record id='finance_account_2' model='finance.account'>
-            <field name='auxiliary_financing'>supplier</field>
-        </record>
         <!-- 2016年2月的凭证-->
         <record id='voucher_4' model='voucher'>
             <field name='date'>2016-01-10</field> 
