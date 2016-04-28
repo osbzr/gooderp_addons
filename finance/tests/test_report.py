@@ -112,7 +112,7 @@ class test_report(TransactionCase):
         for balance_sheet_obj in balance_sheet_objs:
             balance_sheet_obj.cumulative_occurrence_balance_formula = ''
         report.create_profit_statement()
-        
+
 
 class test_checkout_wizard(TransactionCase):
     

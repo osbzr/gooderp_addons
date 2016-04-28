@@ -1,0 +1,43 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 7.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-10-21 11:59+0000\n"
+"PO-Revision-Date: 2013-10-21 11:59+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: web_export_view
+#. openerp-web
+#: code:addons/web_export_view/static/xml/web_advanced_export.xml:7
+#, python-format
+msgid "Export Current View"
+msgstr ""
+
+#. module: web_export_view
+#. openerp-web
+#: code:addons/web_export_view/static/xml/web_advanced_export.xml:9
+#, python-format
+msgid "Excel"
+msgstr ""
+
+#. module: web_export_view
+#. openerp-web
+#: code:addons/web_export_view/static/src/js/web_advanced_export.js:81
+#, python-format
+msgid "True"
+msgstr ""
+
+#. module: web_export_view
+#. openerp-web
+#: code:addons/web_export_view/static/src/js/web_advanced_export.js:84
+#, python-format
+msgid "False"
+msgstr ""

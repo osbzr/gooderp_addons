@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import openerp.addons.decimal_precision as dp
-from openerp import fields, models
+from openerp import fields, models, api
 import datetime
 
 
@@ -10,6 +10,7 @@ class buy_summary_partner(models.Model):
     _inherit = 'report.base'
     _description = u'采购汇总表（按供应商）'
 
+    id_lists = fields.Text(u'移动明细行id列表')
     date = fields.Date(u'日期')
     s_category = fields.Char(u'供应商类别')
     partner = fields.Char(u'供应商')
@@ -29,6 +30,7 @@ class buy_summary_partner(models.Model):
     def select_sql(self, sql_type='out'):
         return '''
         SELECT MIN(wml.id) as id,
+               array_agg(wml.id) AS id_lists,
                MIN(wml.date) AS date,
                c_categ.name AS s_category,
                partner.name AS partner,
@@ -107,3 +109,30 @@ class buy_summary_partner(models.Model):
         collection = self.execute_sql(sql_type='out')
 
         return collection
+
+    @api.multi
+    def view_detail(self):
+        '''采购汇总表（按供应商）查看明细按钮'''
+        line_ids = []
+        res = []
+        move_lines = []
+        result = self.get_data_from_cache()
+        for line in result:
+            if line.get('id') == self.id:
+                line_ids = line.get('id_lists')
+                move_lines = self.env['wh.move.line'].search(
+                        [('id', 'in', line_ids)])
+
+        for move_line in move_lines:
+            detail = self.env['buy.order.detail'].search(
+                [('order_name', '=', move_line.move_id.name)])
+            res.append(detail.id)
+
+        return {
+            'name': u'采购明细表',
+            'view_mode': 'tree',
+            'view_id': False,
+            'res_model': 'buy.order.detail',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', res)],
+        }

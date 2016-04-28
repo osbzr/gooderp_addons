@@ -61,7 +61,8 @@ class buy_order(models.Model):
             elif line.quantity == line.quantity_in:
                 self.goods_state = u'全部入库'
 
-    partner_id = fields.Many2one('partner', u'供应商', states=READONLY_STATES)
+    partner_id = fields.Many2one('partner', u'供应商', states=READONLY_STATES,
+                                 ondelete='restrict')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        select=True, copy=False, help=u"默认是订单创建日期")
@@ -86,8 +87,10 @@ class buy_order(models.Model):
                           digits_compute=dp.get_precision('Amount'))
     prepayment = fields.Float(u'预付款', states=READONLY_STATES,
                            digits_compute=dp.get_precision('Amount'))
-    bank_account_id = fields.Many2one('bank.account', u'结算账户')
-    approve_uid = fields.Many2one('res.users', u'审核人', copy=False)
+    bank_account_id = fields.Many2one('bank.account', u'结算账户',
+                                      ondelete='restrict')
+    approve_uid = fields.Many2one('res.users', u'审核人',
+                                  copy=False, ondelete='restrict')
     state = fields.Selection(BUY_ORDER_STATES, u'审核状态', readonly=True,
                              help=u"购货订单的审核状态", select=True, copy=False,
                              default='draft')
@@ -307,14 +310,17 @@ class buy_order_line(models.Model):
 
     order_id = fields.Many2one('buy.order', u'订单编号', select=True,
                                required=True, ondelete='cascade')
-    goods_id = fields.Many2one('goods', u'商品')
+    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
     attribute_id = fields.Many2one('attribute', u'属性',
+                                   ondelete='restrict',
                                    domain="[('goods_id', '=', goods_id)]")
-    uom_id = fields.Many2one('uom', u'单位')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
+                                   ondelete='restrict',
                                    default=_default_warehouse)
-    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
+    warehouse_dest_id = fields.Many2one('warehouse',
+                                        u'仓库', ondelete='restrict')
     quantity = fields.Float(u'数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
     quantity_in = fields.Float(u'已入库数量', copy=False,
@@ -414,11 +420,12 @@ class buy_receipt(models.Model):
 
     buy_move_id = fields.Many2one('wh.move', u'入库单',
                                   required=True, ondelete='cascade')
-    is_return = fields.Boolean(
-                    u'是否退货',
+    is_return = fields.Boolean(u'是否退货',
                     default=lambda self: self.env.context.get('is_return'))
-    order_id = fields.Many2one('buy.order', u'源单号', copy=False)
-    invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False)
+    order_id = fields.Many2one('buy.order', u'源单号',
+                               copy=False, ondelete='cascade')
+    invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False,
+                                 ondelete='restrict')
     date_due = fields.Date(u'到期日期', copy=False)
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
@@ -428,7 +435,8 @@ class buy_receipt(models.Model):
                           digits_compute=dp.get_precision('Amount'))
     payment = fields.Float(u'本次付款', states=READONLY_STATES,
                            digits_compute=dp.get_precision('Amount'))
-    bank_account_id = fields.Many2one('bank.account', u'结算账户')
+    bank_account_id = fields.Many2one('bank.account', u'结算账户', 
+                                      ondelete='restrict')
     debt = fields.Float(u'本次欠款', compute=_compute_all_amount,
                         store=True, readonly=True, copy=False,
                         digits_compute=dp.get_precision('Amount'))
@@ -605,7 +613,8 @@ class wh_move_line(models.Model):
     _inherit = 'wh.move.line'
     _description = u"采购入库明细"
 
-    buy_line_id = fields.Many2one('buy.order.line', u'购货单行')
+    buy_line_id = fields.Many2one('buy.order.line',
+                                  u'购货单行', ondelete='cascade')
     share_cost = fields.Float(u'采购费用',
                               digits_compute=dp.get_precision('Amount'))
 
@@ -654,10 +663,12 @@ class wh_move_line(models.Model):
 class cost_line(models.Model):
     _inherit = 'cost.line'
 
-    buy_id = fields.Many2one('buy.receipt', u'入库单号')
+    buy_id = fields.Many2one('buy.receipt', u'入库单号', ondelete='cascade')
 
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
 
-    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
+    move_id = fields.Many2one('wh.move', string=u'出入库单',
+                              readonly=True, ondelete='cascade')
+

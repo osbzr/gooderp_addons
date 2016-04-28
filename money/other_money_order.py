@@ -60,7 +60,8 @@ class other_money_order(models.Model):
                           ('done', u'已审核'),
                            ], string=u'状态', readonly=True,
                              default='draft', copy=False)
-    partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True,
+    partner_id = fields.Many2one('partner', string=u'往来单位',
+                                 readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]})
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
@@ -69,7 +70,8 @@ class other_money_order(models.Model):
     total_amount = fields.Float(string=u'金额', compute='_compute_total_amount',
                                 store=True, readonly=True,
                                 digits_compute=dp.get_precision('Amount'))
-    bank_id = fields.Many2one('bank.account', string=u'结算账户', required=True,
+    bank_id = fields.Many2one('bank.account', string=u'结算账户',
+                              required=True, ondelete='restrict',
                               readonly=True, states={'draft': [('readonly', False)]})
     line_ids = fields.One2many('other.money.order.line', 'other_money_id',
                                string=u'收支单行', readonly=True,
@@ -153,10 +155,13 @@ class other_money_order_line(models.Model):
     _name = 'other.money.order.line'
     _description = u'其他收支单明细'
 
-    other_money_id = fields.Many2one('other.money.order', string=u'其他收支')
-    category_id = fields.Many2one('core.category', u'类别',
+    other_money_id = fields.Many2one('other.money.order',
+                                string=u'其他收支', ondelete='cascade')
+    category_id = fields.Many2one('core.category',
+                        u'类别', ondelete='restrict',
                         domain="[('type', '=', context.get('type'))]")
-    source_id = fields.Many2one('money.invoice', string=u'源单')
+    source_id = fields.Many2one('money.invoice',
+                                string=u'源单', ondelete='cascade')
     amount = fields.Float(string=u'金额',
                         digits_compute=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注')

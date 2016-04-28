@@ -5,9 +5,10 @@
             <field name="name">buy.summary.partner.tree</field>
             <field name="model">buy.summary.partner</field>
             <field name="arch" type="xml">
-                <tree string="采购汇总表（按供应商）">
+                <tree string="采购汇总表（按供应商）" create="false">
                 	<field name="s_category"/>
                 	<field name="partner"/>
+                	<button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"/>
                 	<field name="goods_code"/>
                     <field name="goods"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
