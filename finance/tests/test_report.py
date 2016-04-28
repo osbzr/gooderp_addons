@@ -11,6 +11,7 @@ class test_report(TransactionCase):
         self.env.ref('finance.voucher_12').voucher_done()
         self.env.ref('finance.voucher_1').voucher_done()
         self.env.ref('finance.voucher_2').voucher_done()
+        self.env.ref('finance.voucher_12_1').voucher_done()
         
         self.period_id = self.env.ref('finance.period_201601').id
         ''' FIXME
@@ -42,7 +43,7 @@ class test_report(TransactionCase):
             report.create_general_ledger_account()
 
     def test_balance_sheet(self):
-        ''' 测试科目余额表 '''
+        ''' 测试资产负债表 '''
         report = self.env['create.balance.sheet.wizard'].create(
             {'period_id': self.period_id}
                     )
@@ -50,7 +51,20 @@ class test_report(TransactionCase):
             report.create_balance_sheet()
         with self.assertRaises(except_orm):
             report.create_profit_statement()
-
+        # 结转2015年12月的期间
+        month_end = self.env['checkout.wizard'].create(
+                       {'date':'2015-12-31',
+                        'period_id':self.env.ref('finance.period_201512').id})
+        month_end.button_checkout()
+        report.create_balance_sheet()
+        report.create_profit_statement()
+        self.env.ref('finance.account_cost').balance_directions = 'out'
+        report.create_profit_statement()
+        balance_sheet_objs = self.env['profit.statement'].search([])
+        for balance_sheet_obj in balance_sheet_objs:
+            balance_sheet_obj.cumulative_occurrence_balance_formula = ''
+        report.create_profit_statement()
+        
 
 class test_checkout_wizard(TransactionCase):
     
@@ -107,7 +121,3 @@ class test_checkout_wizard(TransactionCase):
         wizard.button_counter_checkout()
         with self.assertRaises(except_orm):
             wizard.button_counter_checkout()
-
-
-
-
