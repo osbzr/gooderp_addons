@@ -90,10 +90,8 @@ class wh_move_line(models.Model):
     production_date = fields.Date(u'生产日期', default=fields.Date.context_today)
     shelf_life = fields.Integer(u'保质期(天)')
     valid_date = fields.Date(u'有效期至')
-    uom_id = fields.Many2one('uom', string=u'单位',
-                             readonly=True, ondelete='restrict')
-    uos_id = fields.Many2one('uom', string=u'辅助单位',
-                             readonly=True, ondelete='restrict')
+    uom_id = fields.Many2one('uom', string=u'单位', ondelete='restrict')
+    uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict')
     warehouse_id = fields.Many2one('warehouse', string=u'调出仓库',
                                    required=True, ondelete='restrict',
                                    default=_get_default_warehouse)

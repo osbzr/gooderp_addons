@@ -94,6 +94,7 @@
             <field name='account_id' ref='finance.account_goods'/>
             <field name='credit'>10000</field>
         </record>
+
         <!-- 2016年2月的凭证-->
         <record id='voucher_4' model='voucher'>
             <field name='date'>2016-01-10</field> 

@@ -28,8 +28,7 @@ CORE_CATEGORY_TYPE = [('customer', u'客户'),
                       ('income', u'收入'),
                       ('other_pay', u'其他支出'),
                       ('other_get', u'其他收入'),
-                      ('attribute', u'属性'),
-                      ('goods', u'产品')]
+                      ('attribute', u'属性')]
 # 成本计算方法，已实现 先入先出
 
 CORE_COST_METHOD = [('average', u'移动平均法'),
