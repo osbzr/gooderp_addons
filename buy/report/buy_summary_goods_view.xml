@@ -5,7 +5,7 @@
             <field name="name">buy.summary.goods.tree</field>
             <field name="model">buy.summary.goods</field>
             <field name="arch" type="xml">
-                <tree string="采购汇总表（按商品）">
+                <tree string="采购汇总表（按商品）" create="false">
                 	<field name="goods_categ"/>
                 	<field name="goods_code"/>
                     <field name="goods"/>

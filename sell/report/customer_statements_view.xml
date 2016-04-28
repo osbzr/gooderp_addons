@@ -6,7 +6,7 @@
             <field name="name">customer.statements.report.tree</field>
             <field name="model">customer.statements.report</field>
             <field name="arch" type="xml">
-                <tree string="Partner Statements Report">
+                <tree string="Partner Statements Report" create="false">
                 	<field name="date"/>
                     <field name="name"/>
                     <button name="find_source_order" type="object" string="查看源单" icon="terp-stock_zoom" attrs="{'invisible':[('name','=','期初余额')]}" class="oe_highlight"/>
@@ -27,7 +27,7 @@
             <field name="name">customer.statements.report.with.goods.tree</field>
             <field name="model">customer.statements.report.with.goods</field>
             <field name="arch" type="xml">
-                <tree string="Customer Statements Report">
+                <tree string="Customer Statements Report" create="false">
 					<field name="date"/>
                     <field name="name"/>
                     <button name="find_source_order" type="object" string="查看源单" class="oe_highlight" icon="terp-stock_zoom" attrs="{'invisible':['|',('name','=','期初余额'),('goods_name','!=',False)]}"/>
