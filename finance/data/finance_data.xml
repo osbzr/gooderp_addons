@@ -118,63 +118,52 @@
         <record id='bs_1' model='balance.sheet'>
             <field name='balance'>货币资金</field>
             <field name='line_num'>1</field>
-            <field name='beginning_balance_formula'>1001~1009</field>
-            <field name='ending_balance_formula'>1001~1009</field>
+            <field name='balance_formula'>1001~1009</field>
             <field name='balance_two'>应付账款</field>
             <field name='line_num_two'>31</field>
-            <field name='beginning_balance_two_formula'>2202~2202</field>
-            <field name='ending_balance_two_formula'>2202~2202</field>
+            <field name='balance_two_formula'>2202~2202</field>
         </record>
         <record id='bs_2' model='balance.sheet'>
             <field name='balance'>应收账款</field>
             <field name='line_num'>2</field>
-            <field name='beginning_balance_formula'>1122~1122</field>
-            <field name='ending_balance_formula'>1122~1122</field>
+            <field name='balance_formula'>1122~1122</field>
             <field name='balance_two'>应付工资</field>
             <field name='line_num_two'>32</field>
-            <field name='beginning_balance_two_formula'>2211~2211</field>
-            <field name='ending_balance_two_formula'>2211~2211</field>
+            <field name='balance_two_formula'>2211~2211</field>
         </record>
         <record id='bs_3' model='balance.sheet'>
             <field name='balance'>库存商品</field>
             <field name='line_num'>3</field>
-            <field name='beginning_balance_formula'>1406~1406</field>
-            <field name='ending_balance_formula'>1406~1406</field>
+            <field name='balance_formula'>1406~1406</field>
             <field name='balance_two'>实收资本</field>
             <field name='line_num_two'>33</field>
-            <field name='beginning_balance_two_formula'>4001~4001</field>
-            <field name='ending_balance_two_formula'>4001~4001</field>
+            <field name='balance_two_formula'>4001~4001</field>
         </record>
         <record id='bs_4' model='balance.sheet'>
             <field name='balance_two'>本年利润</field>
             <field name='line_num_two'>55</field>
-            <field name='beginning_balance_two_formula'>4103~4103</field>
-            <field name='ending_balance_two_formula'>4103~4103</field>
+            <field name='balance_two_formula'>4103~4103</field>
         </record>
         <record id='bs_5' model='balance.sheet'>
             <field name='balance_two'>未分配利润</field>
             <field name='line_num_two'>56</field>
-            <field name='beginning_balance_two_formula'>410403~410403</field>
-            <field name='ending_balance_two_formula'>410403~410403</field>
+            <field name='balance_two_formula'>410403~410403</field>
         </record>
         <!-- 利润表 -->
         <record id='pl_1' model='profit.statement'>
             <field name='balance'>主营业务收入</field>
             <field name='line_num'>1</field>
-            <field name='cumulative_occurrence_balance_formula'>6001~6001</field>
-            <field name='current_occurrence_balance_formula'>6001~6001</field>
+            <field name='occurrence_balance_formula'>6001~6001</field>
         </record>
         <record id='pl_2' model='profit.statement'>
             <field name='balance'>主营业务成本</field>
             <field name='line_num'>1</field>
-            <field name='cumulative_occurrence_balance_formula'>6401~6401</field>
-            <field name='current_occurrence_balance_formula'>6401~6401</field>
+            <field name='occurrence_balance_formula'>6401~6401</field>
         </record>
         <record id='pl_3' model='profit.statement'>
             <field name='balance'>主营业务利润</field>
             <field name='line_num'>1</field>
-            <field name='cumulative_occurrence_balance_formula'>6001~6401</field>
-            <field name='current_occurrence_balance_formula'>6001~6401</field>
+            <field name='occurrence_balance_formula'>6001~6401</field>
         </record>
     </data>
 </openerp>

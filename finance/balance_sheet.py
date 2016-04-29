@@ -16,15 +16,14 @@ class BalanceSheet(models.Model):
     balance = fields.Char(u'资产')
     line_num = fields.Integer(u'行次')
     ending_balance = fields.Float(u'期末余额')
-    ending_balance_formula = fields.Text(u'期末余额计算公式')
-    beginning_balance_formula = fields.Text(u'年初余额计算公式')
+    balance_formula = fields.Text(u'计算公式')
+    balance_formula = fields.Text(u'年初余额计算公式')
     beginning_balance = fields.Float(u'年初余额')
 
     balance_two = fields.Char(u'资产')
     line_num_two = fields.Integer(u'行次')
     ending_balance_two = fields.Float(u'期末余额')
-    ending_balance_two_formula = fields.Text(u'期末余额计算公式')
-    beginning_balance_two_formula = fields.Text(u'年初余额计算公式')
+    balance_two_formula = fields.Text(u'计算公式')
     beginning_balance_two = fields.Float(u'年初余额')
 
 
@@ -63,10 +62,10 @@ class create_balance_sheet_wizard(models.TransientModel):
         year_begain_field = ['initial_balance_debit', 'initial_balance_credit']
         current_period_field = ['ending_balance_debit', 'ending_balance_credit']
         for balance_sheet_obj in balance_sheet_objs:
-            balance_sheet_obj.write({'beginning_balance': self.compute_balance(balance_sheet_obj.beginning_balance_formula, period, year_begain_field),
-                                     'ending_balance': self.compute_balance(balance_sheet_obj.ending_balance_formula, self.period_id, current_period_field),
-                                     'beginning_balance_two': self.compute_balance(balance_sheet_obj.beginning_balance_two_formula, period, year_begain_field),
-                                     'ending_balance_two': self.compute_balance(balance_sheet_obj.ending_balance_two_formula, self.period_id, current_period_field)})
+            balance_sheet_obj.write({'beginning_balance': self.compute_balance(balance_sheet_obj.balance_formula, period, year_begain_field),
+                                     'ending_balance': self.compute_balance(balance_sheet_obj.balance_formula, self.period_id, current_period_field),
+                                     'beginning_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, period, year_begain_field),
+                                     'ending_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, self.period_id, current_period_field)})
         return {     # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
             'name': '资产负债表',
@@ -90,8 +89,8 @@ class create_balance_sheet_wizard(models.TransientModel):
         year_begain_field = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit']
         current_period_field = ['current_occurrence_debit', 'current_occurrence_credit']
         for balance_sheet_obj in balance_sheet_objs:
-            balance_sheet_obj.write({'cumulative_occurrence_balance': self.compute_profit(balance_sheet_obj.cumulative_occurrence_balance_formula, self.period_id, year_begain_field),
-                                     'current_occurrence_balance': self.compute_profit(balance_sheet_obj.current_occurrence_balance_formula, self.period_id, current_period_field)})
+            balance_sheet_obj.write({'cumulative_occurrence_balance': self.compute_profit(balance_sheet_obj.occurrence_balance_formula, self.period_id, year_begain_field),
+                                     'current_occurrence_balance': self.compute_profit(balance_sheet_obj.occurrence_balance_formula, self.period_id, current_period_field)})
         return {      # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
             'name': '利润表',
@@ -129,6 +128,5 @@ class ProfitStatement(models.Model):
     balance = fields.Char(u'项目')
     line_num = fields.Integer(u'行次')
     cumulative_occurrence_balance = fields.Float(u'本年累计金额')
-    cumulative_occurrence_balance_formula = fields.Text(u'本年累计金额计算参数')
-    current_occurrence_balance_formula = fields.Text(u'本月累计金额计算参数')
+    occurrence_balance_formula = fields.Text(u'金额计算参数')
     current_occurrence_balance = fields.Float(u'本月累计金额')
