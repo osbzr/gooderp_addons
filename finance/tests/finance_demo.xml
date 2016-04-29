@@ -2,9 +2,19 @@
 <openerp>
     <data>
         <!--会计期间-->
+        <record id='period_201411' model='finance.period'>
+            <field name='year'>2014</field>
+            <field name='month'>11</field>
+            <field name='is_closed'>True</field>
+        </record>
         <record id='period_201412' model='finance.period'>
             <field name='year'>2014</field>
             <field name='month'>12</field>
+        </record>
+        <record id='period_201511' model='finance.period'>
+            <field name='year'>2015</field>
+            <field name='month'>11</field>
+            <field name='is_closed'>True</field>
         </record>
         <record id='period_201512' model='finance.period'>
             <field name='year'>2015</field>
@@ -97,7 +107,7 @@
 
         <!-- 2016年2月的凭证-->
         <record id='voucher_4' model='voucher'>
-            <field name='date'>2016-01-10</field> 
+            <field name='date'>2016-02-10</field> 
         </record>
         <record id='voucher_line_4_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_4'/>
@@ -142,6 +152,5 @@
             <field name="profit_account" ref='finance.account_profit'/>
             <field name="remain_account" ref='finance.account_remain'/>
         </record>
-
     </data>
 </openerp>
