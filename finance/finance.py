@@ -231,7 +231,7 @@ class auxiliary_financing(models.Model):
 class res_company(models.Model):
     '''继承公司对象,添加字段'''
     _inherit = 'res.company'
-
-    profit_account = fields.Many2one('finance.account',u'本年利润科目')
-    remain_account = fields.Many2one('finance.account',u'未分配利润科目')
+    
+    profit_account = fields.Many2one('finance.account',u'本年利润科目', ondelete='restrict')
+    remain_account = fields.Many2one('finance.account',u'未分配利润科目', ondelete='restrict')
 
