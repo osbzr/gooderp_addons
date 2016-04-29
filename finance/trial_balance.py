@@ -413,6 +413,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             local_last_period = local_currcy_period
             local_currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(local_currcy_period)
             for vals in create_vals:
+                del vals['date']
                 if vals.get('voucher_id'):
                     del vals['date']
                 vouchers_summary_ids.append((self.env['general.ledger.account'].create(vals)).id)
