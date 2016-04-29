@@ -158,16 +158,16 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     period_end_id = fields.Many2one('finance.period', string='结束期间')
     subject_name_id = fields.Many2one('finance.account', string='科目名称')
 
-    @api.one
+    @api.multi
     @api.onchange('period_begin_id', 'period_end_id')
     def onchange_period(self):
         '''结束期间大于起始期间报错'''
 
         if self.period_end_id and self.period_begin_id and  \
-                not (self.period_begin_id.year <= self.period_end_id.year and self.period_begin_id.month <= self.period_end_id.month):
+                (self.period_begin_id.year > self.period_end_id.year or self.period_begin_id.month > self.period_end_id.month):
             self.period_end_id = self.period_begin_id
             return {'warning': {
-                'title': u'警告',
+                'title': u'错误',
                 'message': u'结束期间必须大于等于开始期间!',
             }}
 
