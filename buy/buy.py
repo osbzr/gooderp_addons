@@ -95,7 +95,7 @@ class buy_order(models.Model):
                              help=u"购货订单的审核状态", select=True, copy=False,
                              default='draft')
     goods_state = fields.Char(u'收货状态', compute=_get_buy_goods_state,
-                              default=u'未入库',
+                              default=u'未入库', store=True,
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
 
@@ -389,34 +389,28 @@ class buy_receipt(models.Model):
         self.debt = self.amount - self.payment
 
     @api.one
-    @api.depends('state', 'amount', 'payment')
+    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
     def _get_buy_money_state(self):
         '''返回付款状态'''
         if not self.is_return:
-            if self.state == 'draft':
+            if self.invoice_id.reconciled == 0:
                 self.money_state = u'未付款'
-            else:
-                if self.payment == 0:
-                    self.money_state = u'未付款'
-                elif self.amount > self.payment:
-                    self.money_state = u'部分付款'
-                elif self.amount == self.payment:
-                    self.money_state = u'全部付款'
+            elif self.invoice_id.reconciled < self.invoice_id.amount:
+                self.money_state = u'部分付款'
+            elif self.invoice_id.reconciled == self.invoice_id.amount:
+                self.money_state = u'全部付款'
 
     @api.one
-    @api.depends('state', 'amount', 'payment')
+    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
     def _get_buy_return_state(self):
         '''返回退款状态'''
         if self.is_return:
-            if self.state == 'draft':
+            if self.invoice_id.reconciled == 0:
                 self.return_state = u'未退款'
-            else:
-                if self.payment == 0:
-                    self.return_state = u'未退款'
-                elif self.amount > self.payment:
-                    self.return_state = u'部分退款'
-                elif self.amount == self.payment:
-                    self.return_state = u'全部退款'
+            elif abs(self.invoice_id.reconciled) < abs(self.invoice_id.amount):
+                self.return_state = u'部分退款'
+            elif self.invoice_id.reconciled == self.invoice_id.amount:
+                self.return_state = u'全部退款'
 
     buy_move_id = fields.Many2one('wh.move', u'入库单',
                                   required=True, ondelete='cascade')
@@ -442,9 +436,13 @@ class buy_receipt(models.Model):
                         digits_compute=dp.get_precision('Amount'))
     cost_line_ids = fields.One2many('cost.line', 'buy_id', u'采购费用', copy=False)
     money_state = fields.Char(u'付款状态', compute=_get_buy_money_state,
-                              help=u"采购入库单的付款状态", select=True, copy=False)
+                              store=True, default=u'未付款',
+                              help=u"采购入库单的付款状态",
+                              select=True, copy=False)
     return_state = fields.Char(u'退款状态', compute=_get_buy_return_state,
-                               help=u"采购退货单的退款状态", select=True, copy=False)
+                               store=True, default=u'未退款',
+                               help=u"采购退货单的退款状态",
+                               select=True, copy=False)
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
