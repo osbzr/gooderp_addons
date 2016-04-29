@@ -54,7 +54,7 @@ class test_report(TransactionCase):
              'subject_name_id': self.env.ref('finance.account_fund').id}
                     )
         #会计期间相同时报错
-        report.period_end_id = self.env.ref('finance.period_201602')
+        report.period_end_id = self.env.ref('finance.period_201512')
         report.onchange_period()
         #上一期间不存在报错
         new_report = report.copy()
@@ -88,7 +88,19 @@ class test_report(TransactionCase):
         trial_balance_obj.unlink()
         report.create_vouchers_summary()
         report.create_general_ledger_account()
-        
+
+    def test_get_year_balance(self):
+        '''根据期间和科目名称 计算出本期合计 和本年累计 (已经关闭的期间)'''
+        voucher = self.env['checkout.wizard'].create({
+                  'date':'2015-12-31'
+                                                     })
+        voucher.button_checkout()
+        trial_wizard = self.env['create.vouchers.summary.wizard'].create({
+                        'period_begin_id':self.env.ref('finance.period_201512').id,
+                        'period_end_id':self.env.ref('finance.period_201601').id,
+                        'subject_name_id':self.env.ref('finance.account_income').id,
+                                                                          })
+        trial_wizard.create_vouchers_summary()
 
     def test_balance_sheet(self):
         ''' 测试资产负债表 '''
