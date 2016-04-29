@@ -101,5 +101,15 @@
             </field>
         </record>
 
+		<record id='wh_inventory_search' model='ir.ui.view'>
+            <field name='name'>wh.inventory.search</field>
+            <field name='model'>wh.inventory</field>
+            <field name='arch' type='xml'>
+                <search string='盘点表' >
+                    <filter string="未完成" domain="[('state','!=','done')]" name="not_done_inventory_filter"/>
+                </search>
+            </field>
+        </record>
+
     </data>
 </openerp>
