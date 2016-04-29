@@ -111,10 +111,6 @@ class ExcelExportView(ExcelExport,):
         else:
             workbook = xlwt.Workbook()
             worksheet = workbook.add_sheet('Sheet 1')
-            for i, fieldname in enumerate(fields):
-                worksheet.write(0, i, fieldname)
-                worksheet.col(i).width = 8000  # around 220 pixels
-
             base_style = xlwt.easyxf('align: wrap yes')
             date_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD')
             datetime_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD HH:mm:SS')
