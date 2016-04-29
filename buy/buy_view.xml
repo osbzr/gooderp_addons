@@ -185,7 +185,7 @@
                             <field name="name" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
-                            <field name="money_state" readonly="1"/>
+                            <field name="money_state" readonly='1'/>
                         </group>
                     </group>
                     <notebook>

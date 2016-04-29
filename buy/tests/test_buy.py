@@ -219,6 +219,9 @@ class test_buy_receipt(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
+        self.bank_account = self.env.ref('core.alipay')
+        self.bank_account.balance = 10000
+
     def test_compute_all_amount(self):
         '''测试当优惠金额改变时，改变优惠后金额和本次欠款'''
         self.receipt.discount_amount = 5
@@ -226,17 +229,23 @@ class test_buy_receipt(TransactionCase):
 
     def test_get_buy_money_state(self):
         '''测试返回付款状态'''
-        self.receipt._get_buy_money_state()
         self.receipt.buy_receipt_done()
         self.receipt._get_buy_money_state()
         self.assertTrue(self.receipt.money_state == u'未付款')
-        self.receipt._get_buy_money_state()
-        self.receipt.payment = self.receipt.amount - 1
-        self.receipt._get_buy_money_state()
-        self.assertTrue(self.receipt.money_state == u'部分付款')
-        self.receipt.payment = self.receipt.amount
-        self.receipt._get_buy_money_state()
-        self.assertTrue(self.receipt.money_state == u'全部付款')
+
+        receipt = self.receipt.copy()
+        receipt.payment = receipt.amount - 1
+        receipt.bank_account_id = self.bank_account
+        receipt.buy_receipt_done()
+        receipt._get_buy_money_state()
+        self.assertTrue(receipt.money_state == u'部分付款')
+
+        receipt = self.receipt.copy()
+        receipt.payment = receipt.amount
+        receipt.bank_account_id = self.bank_account
+        receipt.buy_receipt_done()
+        receipt._get_buy_money_state()
+        self.assertTrue(receipt.money_state == u'全部付款')
 
     def test_get_buy_return_state(self):
         '''测试返回退款状态'''
@@ -244,13 +253,20 @@ class test_buy_receipt(TransactionCase):
         self.return_receipt.buy_receipt_done()
         self.return_receipt._get_buy_return_state()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
-        self.return_receipt._get_buy_return_state()
-        self.return_receipt.payment = self.return_receipt.amount - 1
-        self.return_receipt._get_buy_return_state()
-        self.assertTrue(self.return_receipt.return_state == u'部分退款')
-        self.return_receipt.payment = self.return_receipt.amount
-        self.return_receipt._get_buy_return_state()
-        self.assertTrue(self.return_receipt.return_state == u'全部退款')
+
+        return_receipt = self.return_receipt.copy()
+        return_receipt.payment = return_receipt.amount - 1
+        return_receipt.bank_account_id = self.bank_account
+        return_receipt.buy_receipt_done()
+        return_receipt._get_buy_return_state()
+        self.assertTrue(return_receipt.return_state == u'部分退款')
+
+        return_receipt = self.return_receipt.copy()
+        return_receipt.payment = return_receipt.amount
+        return_receipt.bank_account_id = self.bank_account
+        return_receipt.buy_receipt_done()
+        return_receipt._get_buy_return_state()
+        self.assertTrue(return_receipt.return_state == u'全部退款')
 
     def test_onchange_discount_rate(self):
         '''测试优惠率改变时，优惠金额改变'''
