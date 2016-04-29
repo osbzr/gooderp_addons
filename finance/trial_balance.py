@@ -249,8 +249,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         direction_tuple = self.judgment_lending(cumulative_occurrence_credit, cumulative_occurrence_debit)
         direction_tuple_period = self.judgment_lending(current_occurrence_credit, current_occurrence_debit)
         period_vals = {
-            'date': '%s-%s-%s' % (period.year, period.month, (calendar.monthrange(int(period.year), int(period.month)))[1]),
-            'period_id': period.id,
+            'date': False,
             'direction': direction_tuple_period[0],
             'credit': current_occurrence_credit,
             'subject_name_id': subject_name.id,
@@ -259,7 +258,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'balance': direction_tuple_period[1],
             'summary': '本期合计'}
         vals_dict.update({
-            'date': '%s-%s-%s' % (period.year, period.month, (calendar.monthrange(int(period.year), int(period.month)))[1]),
+            'date': False,
             'direction': direction_tuple[0],
             'balance': direction_tuple[1],
             'subject_name_id': subject_name.id,
@@ -318,7 +317,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         direction_tuple = self.judgment_lending(year_balance_credit, year_balance_debit)
         direction_tuple_current = self.judgment_lending(current_credit, current_debit)
         current_occurrence.update({
-            'date': (datetime.now()).strftime(ISODATEFORMAT),
+            'date': False,
             'direction': direction_tuple_current[0],
             'balance': direction_tuple_current[1],
             'debit': current_debit,
@@ -328,7 +327,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'summary': u'本期发生额'
         })
         initial_balance_new.update({
-            'date': (datetime.now()).strftime(ISODATEFORMAT),
+            'date': False,
             'direction': direction_tuple[0],
             'balance': direction_tuple[1],
             'debit': year_balance_debit,
@@ -409,7 +408,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             local_currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(local_currcy_period)
             local_last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(local_currcy_period)
             for vals in create_vals:
-                del vals['date']
                 if vals.get('voucher_id'):
                     del vals['date']
                 vouchers_summary_ids.append((self.env['general.ledger.account'].create(vals)).id)

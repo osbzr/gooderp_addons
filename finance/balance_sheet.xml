@@ -27,8 +27,7 @@
                 <tree string='利润表模板' editable="bottom" >
                     <field name="balance"/>
                     <field name="line_num"/>
-                    <field name="cumulative_occurrence_balance_formula" />
-                     <field name="current_occurrence_balance_formula"/>
+                    <field name="occurrence_balance_formula" />
                 </tree>
             </field>
         </record>
@@ -51,12 +50,10 @@
                 <tree string="资产负债表模板" editable="bottom" >
                     <field name="balance"/>
                     <field name="line_num"/>
-                    <field name="beginning_balance_formula"/>
-                    <field name="ending_balance_formula"/>
+                    <field name="balance_formula"/>
                     <field name="balance_two" />
                      <field name="line_num_two"/>
-                    <field name="beginning_balance_two_formula"  />
-                    <field name="ending_balance_two_formula"  />
+                    <field name="balance_two_formula"  />
                 </tree>
             </field>
         </record>
