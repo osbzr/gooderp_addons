@@ -155,8 +155,7 @@ class wh_inventory(models.Model):
     def get_line_detail(self, uos_zero=False):
         for inventory in self:
             if uos_zero:
-                remaining_text = '(line.qty_remaining > 0 \
-                    OR line.uos_qty_remaining > 0)'
+                remaining_text = 'line.uos_qty_remaining > 0'
             else:
                 remaining_text = 'line.qty_remaining > 0'
 
