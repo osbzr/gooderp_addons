@@ -29,7 +29,6 @@ openerp.home_page = function(instance, local) {
                         }else{
                             result_one[4]="/web/binary/image?model=home.page&id="+result_one[4]+"&field=image"
                         }
-                        console.log(result_one)
                         var center_html_str="<td ><img class='oe_img oe_main_link_"+index+"' id='"+index+"' height='150' \
                          width='150' src='"+result_one[4]+"' alt='暂无快捷菜单链接' />\
                         <br/><p>"+result_one[0]+"</p>\
