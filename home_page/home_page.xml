@@ -28,7 +28,7 @@
                 <tree string="首页设置">
                     <field name="sequence"/>
                     <field name="action"/>
-                    <field name="image"  widget="image" />
+                    <field name="note_one" />
                     <field name="menu_type"/> 
                 </tree>
             </field>
@@ -42,9 +42,10 @@
                     <group>
                         <field name="sequence" invisible="1"/>
                         <field name="action" atts="{'required':[('menu_type','=','main')]}"/>
+                        <field name="view_id" domain="[('type', '=', 'tree')]"/>
                         <field name="image"  widget="image" atts="{'required':[('menu_type','=','main')]}"/>
                         <field name="menu_type" required='1'/>
-
+                        
                         <field name="domain" atts="{'required':[('menu_type','in',('top','left')]}"/> 
                         <field name="compute_field_one" atts="{'required':[('menu_type','=','top')]}"/> 
                         <field name="note_one" atts="{'required':[('menu_type','=','main')]}"/> 

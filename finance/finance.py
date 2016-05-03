@@ -142,6 +142,13 @@ class voucher_line(models.Model):
                 ('type', '=', self.account_id.auxiliary_financing)]
         return res
 
+    @api.multi
+    def unlink(self):
+        for active_voucher_line in self:
+            if active_voucher_line.voucher_id.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的凭证行')
+        return super(voucher, self).unlink()
+
 
 class finance_period(models.Model):
     '''会计期间'''

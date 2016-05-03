@@ -36,21 +36,21 @@ class test_trial_balance(TransactionCase):
         self.period_2016_11_03 = self.env['create.vouchers.summary.wizard'].create({'period_begin_id': self.period_last.id,
                                                                                     'period_end_id': self.period_now.id, 'subject_name_id': subject_name_id_4.id})
 
-        self.balance_sheet_1 = self.env['balance.sheet'].create({'balance': '货币资金', 'line_num': 1, 'beginning_balance_formula': '1001~1002', 'ending_balance_formula': '1001~1002',
-                                                                 'balance_two': '短期借款', 'line_num_two': 12, 'beginning_balance_two_formula': '', 'ending_balance_two_formula': '',
+        self.balance_sheet_1 = self.env['balance.sheet'].create({'balance': '货币资金', 'line_num': 1, 'balance_formula': '1001~1002', 'balance_formula': '1001~1002',
+                                                                 'balance_two': '短期借款', 'line_num_two': 12, 'balance_two_formula': '', 'balance_two_formula': '',
                                                                  })
 
-        self.balance_sheet_2 = self.env['balance.sheet'].create({'balance': '应收票据', 'line_num': 2, 'beginning_balance_formula': '1602~1702', 'ending_balance_formula': '',
-                                                                 'balance_two': '应付账款', 'line_num_two': 13, 'beginning_balance_two_formula': '', 'ending_balance_two_formula': '',
+        self.balance_sheet_2 = self.env['balance.sheet'].create({'balance': '应收票据', 'line_num': 2, 'balance_formula': '1602~1702', 'balance_formula': '',
+                                                                 'balance_two': '应付账款', 'line_num_two': 13, 'balance_two_formula': '', 'balance_two_formula': '',
                                                                  })
 
-        self.balance_sheet_1 = self.env['profit.statement'].create({'balance': '营业收入', 'line_num': '1', 'cumulative_occurrence_balance_formula': '1001~1002',
-                                                                    'current_occurrence_balance_formula': '1001~1002'})
+        self.balance_sheet_1 = self.env['profit.statement'].create({'balance': '营业收入', 'line_num': '1', 'occurrence_balance_formula': '1001~1002',
+                                                                    'occurrence_balance_formula': '1001~1002'})
 
-        self.balance_sheet_2 = self.env['profit.statement'].create({'balance': '营业成本', 'line_num': '2', 'cumulative_occurrence_balance_formula': '1001~1121',
-                                                                    'current_occurrence_balance_formula': '1602~1121'})
-        self.balance_sheet_3 = self.env['profit.statement'].create({'balance': '营业税金及附加', 'line_num': '3', 'cumulative_occurrence_balance_formula': '1622~1702',
-                                                                    'current_occurrence_balance_formula': ''})
+        self.balance_sheet_2 = self.env['profit.statement'].create({'balance': '营业成本', 'line_num': '2', 'occurrence_balance_formula': '1001~1121',
+                                                                    'occurrence_balance_formula': '1602~1121'})
+        self.balance_sheet_3 = self.env['profit.statement'].create({'balance': '营业税金及附加', 'line_num': '3', 'occurrence_balance_formula': '1622~1702',
+                                                                    'occurrence_balance_formula': ''})
         self.balance_sheet_wizard = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_now.id})
         self.balance_sheet_wizard_last = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_last.id})
 

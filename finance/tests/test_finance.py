@@ -14,6 +14,9 @@ class test_voucher(TransactionCase):
         #已审批的凭证不可以删除
         with self.assertRaises(except_orm):
             voucher.unlink()
+        for line in voucher.line_ids:
+            with self.assertRaises(except_orm):
+                line.unlink()
         #重复审批
         with self.assertRaises(except_orm):
             voucher.voucher_done()
