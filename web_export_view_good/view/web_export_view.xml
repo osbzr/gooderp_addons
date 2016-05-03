@@ -4,7 +4,7 @@
     <data>
         <template id="assets_backend" name="web_export_view assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
-                <script type="text/javascript" src="/web_export_view/static/src/js/web_export_view.js"></script>
+                <script type="text/javascript" src="/web_export_view_good/static/src/js/web_export_view_good.js"></script>
             </xpath>
         </template>
        
