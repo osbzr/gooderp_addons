@@ -78,6 +78,11 @@ class checkout_wizard(models.TransientModel):
                             voucher_line.append(res)
                     #利润结余
                     year_profit_account = company_obj.search([])[0].profit_account
+                    remain_account = company_obj.search([])[0].remain_account
+                    if not year_profit_account:
+                        raise except_orm(u'错误', u'公司本年利润科目未配置')
+                    if not remain_account:
+                        raise except_orm(u'错误', u'公司未分配利润科目未配置')
                     if (revenue_total - expense_total) > 0:
                         res={
                              'name':u'利润结余',
@@ -112,7 +117,7 @@ class checkout_wizard(models.TransientModel):
                         year_total += (year_profit_id.credit - year_profit_id.debit)
                     year_line_ids=[{
                          'name':u'年度结余',
-                         'account_id':company_obj.search([])[0].remain_account.id,
+                         'account_id':remain_account.id,
                          'debit':0,
                          'credit':year_total,
                          },{
