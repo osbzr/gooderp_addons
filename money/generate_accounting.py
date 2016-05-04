@@ -23,8 +23,7 @@ from openerp.exceptions import except_orm
 
 class money_order(models.Model):
     _inherit = 'money.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True)
-    #  --test-enable -d gooderp_test -u money
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
 
     @api.multi
     def money_order_done(self):
@@ -38,7 +37,8 @@ class money_order(models.Model):
     @api.multi
     def money_order_draft(self):
         res = super(money_order, self).money_order_draft()
-        self.voucher_id.unlink()
+        voucher, self.voucher_id = self.voucher_id, False
+        voucher.unlink()
         return res
 
     @api.multi
@@ -86,12 +86,13 @@ class money_order(models.Model):
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True)
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
 
     @api.multi
     def money_invoice_draft(self):
         res = super(money_invoice, self).money_invoice_draft()
-        self.voucher_id.unlink()
+        voucher, self.voucher_id = self.voucher_id, False
+        voucher.unlink()
         return res
 
     @api.multi
@@ -139,12 +140,13 @@ class money_invoice(models.Model):
 
 class other_money_order(models.Model):
     _inherit = 'other.money.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True)
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
 
     @api.multi
     def other_money_draft(self):
         res = super(other_money_order, self).other_money_draft()
-        self.voucher_id.unlink()
+        voucher, self.voucher_id = self.voucher_id, False
+        voucher.unlink()
         return res
 
     @api.multi
@@ -178,7 +180,7 @@ class other_money_order(models.Model):
 
 class money_transfer_order(models.Model):
     _inherit = 'money.transfer.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True)
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
 
     @api.multi
     def money_transfer_done(self):
@@ -192,4 +194,11 @@ class money_transfer_order(models.Model):
                          'debit_account_id': line.in_bank_id.account_id.id,
                          })
             self.env['money.invoice'].create_voucher_line(vals)
+        return res
+
+    @api.multi
+    def money_transfer_draft(self):
+        res = super(money_transfer_order, self).money_transfer_draft()
+        voucher, self.voucher_id = self.voucher_id, False
+        voucher.unlink()
         return res
