@@ -12,6 +12,7 @@
             		<field name='type'/>
             		<field name='staff_id'/>
             		<field name='partner_id'/>
+            		<field name="amount" sum="合计"/>
             		<field name='state'/>
             		<field name='goods_state'/>
             		<field name='delivery_date'/>
