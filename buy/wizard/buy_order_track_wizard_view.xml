@@ -12,9 +12,13 @@
                             <field name="date_end" required="1"/>
                         </group>
                         <group>
-                            <field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
-                            <field name="goods_id"/>
-                            <field name="order_id"/>
+                            <field name="partner_id"
+                            	domain="[('s_category_id', '!=', False)]"
+                            	options="{'no_open': True, 'no_create': True}"/>
+                            <field name="goods_id"
+                            	options="{'no_open': True, 'no_create': True}"/>
+                            <field name="order_id"
+                            	options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <footer>
                             <button name="button_ok" type="object" string="确定" class="oe_highlight"/>
