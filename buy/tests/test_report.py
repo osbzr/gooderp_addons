@@ -187,6 +187,18 @@ class test_payment_wizard(TransactionCase):
         self.payment.order_id = False
         self.payment.button_ok()
 
+    def test_view_detail(self):
+        '''查看明细按钮'''
+        self.payment.button_ok()
+        payment_line = self.env['buy.payment'].search(
+                                [('order_name', '=', self.receipt.name)])
+        for line in payment_line:
+            line.view_detail()
+        payment_line2 = self.env['buy.payment'].search(
+                                [('order_name', '=', self.receipt_return.name)])
+        for line in payment_line2:
+            line.view_detail()
+
 
 class test_goods_wizard(TransactionCase):
     '''测试采购汇总表（按商品）向导'''
@@ -256,6 +268,15 @@ class test_goods_wizard(TransactionCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(len(new_results), 0)
 
+    def test_view_detail(self):
+        '''采购汇总表（按商品）  查看明细按钮'''
+        summary_goods = self.env['buy.summary.goods'].create({})
+        context = self.goods_wizard.button_ok().get('context')
+        results = summary_goods.with_context(context).search_read(domain=[])
+        for line in results:
+            summary_line = summary_goods.browse(line['id'])
+            summary_line.with_context(context).view_detail()
+
 
 class test_partner_wizard(TransactionCase):
     '''测试采购汇总表（按供应商）向导'''
@@ -304,3 +325,12 @@ class test_partner_wizard(TransactionCase):
                                                                     domain=[])
         self.assertEqual(len(results), 2)
         self.assertEqual(len(new_results), 0)
+
+    def test_view_detail(self):
+        '''采购汇总表（按供应商）  查看明细按钮'''
+        summary_partner = self.env['buy.summary.partner'].create({})
+        context = self.partner.button_ok().get('context')
+        results = summary_partner.with_context(context).search_read(domain=[])
+        for line in results:
+            summary_line = summary_partner.browse(line['id'])
+            summary_line.with_context(context).view_detail()

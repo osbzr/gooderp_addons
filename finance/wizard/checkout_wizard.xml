@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="checkout_wizard_form" model="ir.ui.view">
+            <field name="name">checkout.wizard.form</field>
+            <field name="model">checkout.wizard</field>
+            <field name="arch" type="xml">
+                <form string="月末结账">
+                	<group>
+	                	<group>
+	                		<field name='date'/>
+                            <field name='period_id' invisible='True'/>
+	                	</group>
+                        <footer>
+                            <button name="button_checkout" type="object" string="结账" class="oe_highlight"/>
+                            or
+                            <button name="button_counter_checkout" type="object" string="反结账" class="oe_highlight"/>
+                        </footer>
+                	</group>
+                </form>
+            </field>
+        </record>
+        <record id="preiod_check_action" model="ir.actions.act_window">
+            <field name="name">月末结账</field>
+            <field name="res_model">checkout.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <!--结账菜单-->
+        <menuitem id='checkout_menu' name='月末结账' parent='finance_menu' sequence='15'/>
+        <menuitem id='preiod_check_menu' action='preiod_check_action' parent='checkout_menu' sequence='10'/>
+    </data>
+</openerp>

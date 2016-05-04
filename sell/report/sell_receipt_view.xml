@@ -5,9 +5,11 @@
             <field name="name">sell.receipt.tree</field>
             <field name="model">sell.receipt</field>
             <field name="arch" type="xml">
-                <tree string="销售收款一览表">
+                <tree string="销售收款一览表" create="false">
                 	<field name="c_category_id"/>
                 	<field name="partner_id"/>
+                	<button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"
+                		attrs="{'invisible': [('partner_id', '=', False)]}"/>
                 	<field name="staff_id"/>
                 	<field name="type"/>
                     <field name="date"/>

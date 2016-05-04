@@ -5,9 +5,11 @@
             <field name="name">sell.order.track.tree</field>
             <field name="model">sell.order.track</field>
             <field name="arch" type="xml">
-                <tree string="销售订单跟踪表">
+                <tree string="销售订单跟踪表" create="false">
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
+                    <button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"
+                    	attrs="{'invisible': [('goods_id','=', False)]}"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
                     <field name="uom"/>
                     <field name="date"/>

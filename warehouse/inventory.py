@@ -155,8 +155,7 @@ class wh_inventory(models.Model):
     def get_line_detail(self, uos_zero=False):
         for inventory in self:
             if uos_zero:
-                remaining_text = '(line.qty_remaining > 0 \
-                    OR line.uos_qty_remaining > 0)'
+                remaining_text = 'line.uos_qty_remaining > 0'
             else:
                 remaining_text = 'line.qty_remaining > 0'
 
@@ -234,19 +233,20 @@ class wh_inventory_line(models.Model):
     ]
 
     inventory_id = fields.Many2one('wh.inventory', u'盘点', ondelete='cascade')
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
-    goods_id = fields.Many2one('goods', u'产品')
-    attribute_id = fields.Many2one('attribute', u'属性')
+    warehouse_id = fields.Many2one('warehouse', u'仓库', ondelete='restrict')
+    goods_id = fields.Many2one('goods', u'产品', ondelete='restrict')
+    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
     using_batch = fields.Boolean(
         related='goods_id.using_batch', string=u'批号管理')
     force_batch_one = fields.Boolean(
         related='goods_id.force_batch_one', string=u'每批号数量为1')
     lot = fields.Char(u'批号')
     new_lot = fields.Char(u'盘盈批号')
-    new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号')
+    new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号',
+                                ondelete='restrict')
     lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing')
-    uom_id = fields.Many2one('uom', u'单位')
-    uos_id = fields.Many2one('uom', u'辅助单位')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
+    uos_id = fields.Many2one('uom', u'辅助单位', ondelete='restrict')
     real_qty = fields.Float(
         u'系统库存', digits_compute=dp.get_precision('Quantity'))
     real_uos_qty = fields.Float(

@@ -15,7 +15,7 @@ class test_trial_balance(TransactionCase):
 
         subject_name_id_1 = self.env.ref('finance.finance_account_1')
         subject_name_id_4 = self.env.ref('finance.finance_account_4')
-        subject_name_id_11 = self.env.ref('finance.finance_account_11')
+        # subject_name_id_11 = self.env.ref('finance.finance_account_11')
         self.trial_balance_wizard_now = self.env['create.trial.balance.wizard'].create({'period_id': self.period_now.id})
         self.trial_balance_wizard_last = self.env['create.trial.balance.wizard'].create({'period_id': self.period_last.id})
         # self.trial_balance_wizard_period_first_year = self.env['create.trial.balance.wizard'].create({'period_id': self.period_first_year.id})
@@ -35,6 +35,24 @@ class test_trial_balance(TransactionCase):
 
         self.period_2016_11_03 = self.env['create.vouchers.summary.wizard'].create({'period_begin_id': self.period_last.id,
                                                                                     'period_end_id': self.period_now.id, 'subject_name_id': subject_name_id_4.id})
+
+        self.balance_sheet_1 = self.env['balance.sheet'].create({'balance': '货币资金', 'line_num': 1, 'balance_formula': '1001~1002', 'balance_formula': '1001~1002',
+                                                                 'balance_two': '短期借款', 'line_num_two': 12, 'balance_two_formula': '', 'balance_two_formula': '',
+                                                                 })
+
+        self.balance_sheet_2 = self.env['balance.sheet'].create({'balance': '应收票据', 'line_num': 2, 'balance_formula': '1602~1702', 'balance_formula': '',
+                                                                 'balance_two': '应付账款', 'line_num_two': 13, 'balance_two_formula': '', 'balance_two_formula': '',
+                                                                 })
+
+        self.balance_sheet_1 = self.env['profit.statement'].create({'balance': '营业收入', 'line_num': '1', 'occurrence_balance_formula': '1001~1002',
+                                                                    'occurrence_balance_formula': '1001~1002'})
+
+        self.balance_sheet_2 = self.env['profit.statement'].create({'balance': '营业成本', 'line_num': '2', 'occurrence_balance_formula': '1001~1121',
+                                                                    'occurrence_balance_formula': '1602~1121'})
+        self.balance_sheet_3 = self.env['profit.statement'].create({'balance': '营业税金及附加', 'line_num': '3', 'occurrence_balance_formula': '1622~1702',
+                                                                    'occurrence_balance_formula': ''})
+        self.balance_sheet_wizard = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_now.id})
+        self.balance_sheet_wizard_last = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_last.id})
 
     def test_creare_trial_balance(self):
         '''创建科目余额表'''
@@ -70,3 +88,15 @@ class test_trial_balance(TransactionCase):
         self.period_last.is_closed = False
         self.period_2016_11_03.create_vouchers_summary()
         #   22 24
+
+    def test_creare_balance_sheet(self):
+        """测试 创建资产负债表"""
+        self.balance_sheet_wizard_last.create_balance_sheet()
+        self.period_last.is_closed = True
+        self.balance_sheet_wizard.create_balance_sheet()
+
+    def test_create_profit_statement(self):
+        """测试 创建利润表"""
+        self.balance_sheet_wizard_last.create_balance_sheet()
+        self.period_last.is_closed = True
+        self.balance_sheet_wizard.create_profit_statement()

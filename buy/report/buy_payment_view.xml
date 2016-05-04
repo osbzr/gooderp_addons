@@ -5,9 +5,11 @@
             <field name="name">buy.payment.tree</field>
             <field name="model">buy.payment</field>
             <field name="arch" type="xml">
-                <tree string="采购付款一览表">
+                <tree string="采购付款一览表" create="false">
                 	<field name="s_category_id"/>
                 	<field name="partner_id"/>
+                	<button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"
+                		attrs="{'invisible': [('partner_id', '=', False)]}"/>
                 	<field name="type"/>
                     <field name="date"/>
                     <field name="order_name"/>

@@ -53,6 +53,7 @@ class voucher(models.Model):
     amount_text = fields.Char(u'总计', compute='_compute_amount', store=True)
     state = fields.Selection([('draft',u'草稿'),
                               ('done',u'已审核')],u'状态',default='draft')
+    is_checkout = fields.Boolean(u'结账凭证')
     @api.one
     def voucher_done(self):
         if self.state == 'done':
@@ -94,6 +95,12 @@ class voucher(models.Model):
             if line.debit * line.credit != 0:
                 raise ValidationError(u'单行凭证行不能同时输入借和贷')
 
+    @api.multi
+    def unlink(self):
+        for active_voucher in self:
+            if active_voucher.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的凭证')
+        return super(voucher, self).unlink()
 
 class voucher_line(models.Model):
     '''凭证明细'''
@@ -121,7 +128,6 @@ class voucher_line(models.Model):
                 'goods_id': [('name', '=', False)],
                 'auxiliary_id': [('name', '=', False)]}}
         if not self.account_id:
-            print '111111111111'    # TODO FIXME  此处不应有输出.
             return res
         if not self.account_id.auxiliary_financing:
             return res
@@ -135,6 +141,13 @@ class voucher_line(models.Model):
             res['domain']['auxiliary_id'] = [
                 ('type', '=', self.account_id.auxiliary_financing)]
         return res
+
+    @api.multi
+    def unlink(self):
+        for active_voucher_line in self:
+            if active_voucher_line.voucher_id.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的凭证行')
+        return super(voucher, self).unlink()
 
 
 class finance_period(models.Model):
@@ -183,11 +196,6 @@ class finance_account(models.Model):
     _name = 'finance.account'
     name = fields.Char(u'名称')
     code = fields.Char(u'编码', required="1")
-    category = fields.Many2one(
-        'finance.category', u'类别',
-        domain=[('type', '=', 'finance_account')],
-        context={'type': 'finance_account'},
-        ondelete='restrict')
     balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向')
     auxiliary_financing = fields.Selection([('partner', u'客户'),
                                             ('supplier', u'供应商'),
@@ -196,6 +204,13 @@ class finance_account(models.Model):
                                             ('department', u'部门'),
                                             ('goods', u'存货'),
                                             ], u'辅助核算')
+    costs_types = fields.Selection([
+                                    ('assets',U'资产'),
+                                    ('debt',U'负债'),
+                                    ('equity',U'所有者权益'),
+                                    ('in', u'收入类'),
+                                    ('out', u'费用类')
+                                    ], u'类型')
     state = fields.Boolean(u'状态')
 
 
@@ -210,6 +225,7 @@ class finance_category(models.Model):
 class auxiliary_financing(models.Model):
     '''辅助核算'''
     _name = 'auxiliary.financing'
+    
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
     type = fields.Selection([
@@ -217,3 +233,12 @@ class auxiliary_financing(models.Model):
         ('project', u'项目'),
         ('department', u'部门'),
     ], u'分类')
+
+
+class res_company(models.Model):
+    '''继承公司对象,添加字段'''
+    _inherit = 'res.company'
+    
+    profit_account = fields.Many2one('finance.account',u'本年利润科目', ondelete='restrict')
+    remain_account = fields.Many2one('finance.account',u'未分配利润科目', ondelete='restrict')
+

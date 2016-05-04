@@ -42,8 +42,10 @@ class sell_order(models.Model):
             else:
                 self.goods_state = u'全部出库'
 
-    partner_id = fields.Many2one('partner', u'客户', states=READONLY_STATES)
-    staff_id = fields.Many2one('staff', u'销售员', states=READONLY_STATES)
+    partner_id = fields.Many2one('partner', u'客户',
+                            ondelete='restrict', states=READONLY_STATES)
+    staff_id = fields.Many2one('staff', u'销售员',
+                            ondelete='restrict', states=READONLY_STATES)
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        select=True, copy=False, help=u"默认是订单创建日期")
@@ -67,12 +69,15 @@ class sell_order(models.Model):
                         digits_compute=dp.get_precision('Amount'))
     pre_receipt = fields.Float(u'预收款', states=READONLY_STATES,
                            digits_compute=dp.get_precision('Amount'))
-    bank_account_id = fields.Many2one('bank.account', u'结算账户')
-    approve_uid = fields.Many2one('res.users', u'审核人', copy=False)
+    bank_account_id = fields.Many2one('bank.account', u'结算账户',
+                                      ondelete='restrict')
+    approve_uid = fields.Many2one('res.users', u'审核人', copy=False,
+                                  ondelete='restrict')
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态', readonly=True,
                              help=u"销货订单的审核状态", select=True, 
                              copy=False, default='draft')
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
+                              store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
 
@@ -297,13 +302,15 @@ class sell_order_line(models.Model):
 
     order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
                                required=True, ondelete='cascade')
-    goods_id = fields.Many2one('goods', u'商品')
+    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
-    attribute_id = fields.Many2one('attribute', u'属性', 
+    attribute_id = fields.Many2one('attribute', u'属性',
+                                   ondelete='restrict', 
                                    domain="[('goods_id', '=', goods_id)]")
-    uom_id = fields.Many2one('uom', u'单位')
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
+    warehouse_id = fields.Many2one('warehouse', u'仓库', ondelete='restrict')
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库', 
+                                        ondelete='restrict',
                                         default=_default_warehouse_dest)
     quantity = fields.Float(u'数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
@@ -377,42 +384,38 @@ class sell_delivery(models.Model):
         self.total_debt = self.partner_id.receivable + self.debt
 
     @api.one
-    @api.depends('state', 'amount', 'receipt')
+    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
     def _get_sell_money_state(self):
         '''返回收款状态'''
         if not self.is_return:
-            if self.state == 'draft':
+            if self.invoice_id.reconciled == 0:
                 self.money_state = u'未收款'
-            else:
-                if self.receipt == 0:
-                    self.money_state = u'未收款'
-                elif self.amount > self.receipt:
-                    self.money_state = u'部分收款'
-                elif self.amount == self.receipt:
-                    self.money_state = u'全部收款'
+            elif self.invoice_id.reconciled < self.invoice_id.amount:
+                self.money_state = u'部分收款'
+            elif self.invoice_id.reconciled == self.invoice_id.amount:
+                self.money_state = u'全部收款'
 
     @api.one
-    @api.depends('state', 'amount', 'receipt')
+    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
     def _get_sell_return_state(self):
         '''返回退款状态'''
         if self.is_return:
-            if self.state == 'draft':
+            if self.invoice_id.reconciled == 0:
                 self.return_state = u'未退款'
-            else:
-                if self.receipt == 0:
-                    self.return_state = u'未退款'
-                elif self.amount > self.receipt:
-                    self.return_state = u'部分退款'
-                elif self.amount == self.receipt:
-                    self.return_state = u'全部退款'
+            elif abs(self.invoice_id.reconciled) < abs(self.invoice_id.amount):
+                self.return_state = u'部分退款'
+            elif self.invoice_id.reconciled == self.invoice_id.amount:
+                self.return_state = u'全部退款'
 
     sell_move_id = fields.Many2one('wh.move', u'发货单', required=True, 
                                    ondelete='cascade')
     is_return = fields.Boolean(u'是否退货', default=lambda self: \
                                self.env.context.get('is_return'))
-    staff_id = fields.Many2one('staff', u'销售员')
-    order_id = fields.Many2one('sell.order', u'源单号', copy=False)
-    invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False)
+    staff_id = fields.Many2one('staff', u'销售员', ondelete='restrict')
+    order_id = fields.Many2one('sell.order', u'源单号', copy=False,
+                               ondelete='cascade')
+    invoice_id = fields.Many2one('money.invoice', u'发票号',
+                                 copy=False, ondelete='restrict')
     date_due = fields.Date(u'到期日期', copy=False)
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
@@ -424,7 +427,8 @@ class sell_delivery(models.Model):
                         digits_compute=dp.get_precision('Amount'))
     receipt = fields.Float(u'本次收款', states=READONLY_STATES,
                            digits_compute=dp.get_precision('Amount'))
-    bank_account_id = fields.Many2one('bank.account', u'结算账户')
+    bank_account_id = fields.Many2one('bank.account',
+                                      u'结算账户', ondelete='restrict')
     debt = fields.Float(u'本次欠款', compute=_compute_all_amount, 
                         store=True, readonly=True, copy=False,
                         digits_compute=dp.get_precision('Amount'))
@@ -434,8 +438,10 @@ class sell_delivery(models.Model):
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', 
                                     copy=False)
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
+                              store=True, default=u'未收款',
                               help=u"销售发货单的收款状态", select=True, copy=False)
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
+                               store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
 
     @api.one
@@ -496,9 +502,9 @@ class sell_delivery(models.Model):
             if line.goods_qty == 0:
                 raise except_orm(u'错误', u'请输入产品数量！')
         if self.bank_account_id and not self.receipt:
-            raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')
+            raise except_orm(u'警告！', u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
-            raise except_orm(u'警告！', u'付款额不为空时，请选择结算账户！')
+            raise except_orm(u'警告！', u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount:
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
 
@@ -589,16 +595,19 @@ class wh_move_line(models.Model):
     _inherit = 'wh.move.line'
     _description = u'销售发货单行'
 
-    sell_line_id = fields.Many2one('sell.order.line', u'销货单行')
+    sell_line_id = fields.Many2one('sell.order.line', u'销货单行',
+                                   ondelete='cascade')
 
 
 class cost_line(models.Model):
     _inherit = 'cost.line'
 
-    sell_id = fields.Many2one('sell.delivery', u'出库单号')
+    sell_id = fields.Many2one('sell.delivery', u'出库单号',
+                              ondelete='cascade')
 
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
 
-    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
+    move_id = fields.Many2one('wh.move', string=u'出入库单',
+                              readonly=True, ondelete='cascade')
