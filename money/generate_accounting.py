@@ -1,4 +1,22 @@
 # -*- coding: utf-8 -*-
+# ##############################################################################
+#
+#    Copyright (C) 2016  开阖软件(<http://www.osbzr.com>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
 from openerp import models, fields, api
 from openerp.exceptions import except_orm
 
@@ -32,7 +50,7 @@ class money_order(models.Model):
                 raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
             self.env['voucher.line'].create({
                 'name': "%s收款单%s" % (partner.name, name), 'account_id': line.bank_id.account_id.id, 'debit': line.amount,
-                'voucher_id': vouch_obj.id, 'partner_id': partner.id
+                'voucher_id': vouch_obj.id, 'partner_id': ''
             })
             if partner.c_category_id:
                 partner_account_id = partner.c_category_id.account_id.id
@@ -40,7 +58,7 @@ class money_order(models.Model):
                 partner_account_id = partner.s_category_id.account_id.id
             self.env['voucher.line'].create({
                 'name': "%s收款单%s " % (partner.name, name), 'account_id': partner_account_id, 'credit': line.amount,
-                'voucher_id': vouch_obj.id,
+                'voucher_id': vouch_obj.id, 'partner_id': partner.id
             })
         return vouch_obj
 
@@ -53,7 +71,7 @@ class money_order(models.Model):
                 raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
             self.env['voucher.line'].create({
                 'name': "收款单%s" % (name), 'account_id': line.bank_id.account_id.id, 'credit': line.amount,
-                'voucher_id': vouch_obj.id, 'partner_id': partner.id,
+                'voucher_id': vouch_obj.id, 'partner_id': '',
             })
             if partner.c_category_id:
                 partner_account_id = partner.c_category_id.account_id.id
@@ -61,7 +79,7 @@ class money_order(models.Model):
                 partner_account_id = partner.s_category_id.account_id.id
             self.env['voucher.line'].create({
                 'name': "付款单 %s " % (name), 'account_id': partner_account_id, 'debit': line.amount,
-                'voucher_id': vouch_obj.id,
+                'voucher_id': vouch_obj.id, 'partner_id': partner.id
             })
         return vouch_obj
 
@@ -143,7 +161,7 @@ class other_money_order(models.Model):
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': '其他收入单',
                              'amount': abs(line.amount), 'credit_account_id': line.category_id.account_id.id,
-                             'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': self.partner_id.id
+                             'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': ''
                              })
                 self.env['money.invoice'].create_voucher_line(vals)
         else:
@@ -152,7 +170,26 @@ class other_money_order(models.Model):
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': '其他支出单',
                              'amount': abs(line.amount), 'credit_account_id': self.bank_id.account_id.id,
-                             'debit_account_id': line.category_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': self.partner_id.id
+                             'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id
                              })
                 self.env['money.invoice'].create_voucher_line(vals)
+        return res
+
+
+class money_transfer_order(models.Model):
+    _inherit = 'money.transfer.order'
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True)
+
+    @api.multi
+    def money_transfer_done(self):
+        res = super(money_transfer_order, self).money_transfer_done()
+        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vals = {}
+        self.write({'voucher_id': vouch_obj.id})
+        for line in self.line_ids:
+            vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': '资金转账单',
+                         'amount': abs(line.amount), 'credit_account_id': line.out_bank_id.account_id.id,
+                         'debit_account_id': line.in_bank_id.account_id.id,
+                         })
+            self.env['money.invoice'].create_voucher_line(vals)
         return res
