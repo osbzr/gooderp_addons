@@ -46,31 +46,21 @@ class province_city_county(models.Model):
     @api.onchange('province_id')
     def onchange_province(self):
         # 为地址填写时方便，当选定省时 ，市区的列表里面只有所选省的
-        print '&&&&&&&&&&&&&'
         domain_dict = {'city_id': [('province_id', '=', self.province_id.id)]}
         if self.province_id:
-            print '111111111'
             if self.city_id:
-                print '222222222'
                 if self.city_id.province_id.id == self.province_id.id:
-                    print '333333333333'
                     if self.county_id:
-                        print '444444444444'
                         if self.county_id.city_id.id == self.city_id.id:
-                            print '5555555555'
                             return{}
-                    print '666666666666666'
                     self.county_id = ''
                     return {'domain': domain_dict}
                 else:
-                    print '77777777777'
                     self.city_id = ''
                     return {'domain': domain_dict}
             else:
-                print '888888888'
                 return {'domain': domain_dict}
         else:
-            print '999999999'
             self.city_id = ''
             self.county_id = ''
             return {'domain': {'city_id': [], 'county_id': []}}
@@ -150,11 +140,9 @@ class partner(models.Model):
     def _compute_partner_address(self):
         '''如果业务伙伴地址中有默认地址，则显示在业务伙伴列表上'''
         if not self.child_ids:
-            print '@@@@@@@@@@@@'
             return {}
         for child in self.child_ids:
             if child.is_default_add:
-                print '############'
                 self.contact_people = child.contact_people
                 self.mobile = child.mobile
                 self.phone = child.phone
