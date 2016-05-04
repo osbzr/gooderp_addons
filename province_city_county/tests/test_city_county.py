@@ -13,15 +13,16 @@ class test_province_city_county(TransactionCase):
         self.partner_id = self.env.ref('core.jd')
         self.partner =  self.env['partner'].search(
                     [('id', '=', self.partner_id.id)])
+        address_id = self.env['province.city.county'].create({
+                'detail_address': u'金海路1688号',
+            })
         self.partner.write({'child_ids':
             [(0, 0,
               {'contact_people': u'小东',
-               'address_id': 1,
+               'address_id': address_id.id,
                }
             )]
         })
-        for child in self.partner.child_ids:
-            child.address_id.detail_address = u'金海路1688号'
 
     def test_onchange_province(self):
         '''测试onchange province'''
@@ -170,10 +171,13 @@ class test_partner(TransactionCase):
         # 没有联系人地址child_ids时
         partner._compute_partner_address()
         # 没有联系人地址child_ids，并为默认地址时
+        address_id = self.env['province.city.county'].create({
+                'detail_address': u'金海路1688号',
+            })
         partner.write({'child_ids':
             [(0, 0,
               {'contact_people': u'小东',
-               'address_id': 1,
+               'address_id': address_id.id,
                }
             )]
         })
@@ -181,7 +185,6 @@ class test_partner(TransactionCase):
             child.mobile = 1385559999
             child.phone = 55558888
             child.qq = 11116666
-            child.address_id.detail_address = u'金海路1688号'
             child.is_default_add = True
 
         partner._compute_partner_address()
