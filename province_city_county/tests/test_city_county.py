@@ -20,6 +20,8 @@ class test_province_city_county(TransactionCase):
                }
             )]
         })
+        for child in self.partner.child_ids:
+            child.address_id.detail_address = u'金海路1688号'
 
     def test_onchange_province(self):
         '''测试onchange province'''
