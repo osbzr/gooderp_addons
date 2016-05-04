@@ -28,16 +28,6 @@ MOUTH_SELECTION = [
     ('12', u'12')]
 
 
-class bank_account(models.Model):
-    _inherit = 'bank.account'
-    account_id = fields.Many2one('finance.account', u'账户')
-
-
-class core_category(models.Model):
-    _inherit = 'core.category'
-    account_id = fields.Many2one('finance.account', u'账户')
-
-
 class voucher(models.Model):
     '''新建凭证'''
     _name = 'voucher'
@@ -253,3 +243,13 @@ class res_company(models.Model):
 
     profit_account = fields.Many2one('finance.account', u'本年利润科目', ondelete='restrict')
     remain_account = fields.Many2one('finance.account', u'未分配利润科目', ondelete='restrict')
+
+
+class bank_account(models.Model):
+    _inherit = 'bank.account'
+    account_id = fields.Many2one('finance.account', u'账户')
+
+
+class core_category(models.Model):
+    _inherit = 'core.category'
+    account_id = fields.Many2one('finance.account', u'账户')
