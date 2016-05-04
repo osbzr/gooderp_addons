@@ -6,6 +6,7 @@ from openerp.exceptions import except_orm
 
 class test_money_order(TransactionCase):
     '''测试收付款'''
+
     def test_money_order_unlink(self):
         '''测试收付款单删除'''
         self.env.ref('money.get_40000').money_order_done()
@@ -71,7 +72,7 @@ class test_money_order(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         # 执行money_order_draft 遍历source_ids的操作
         invoice = self.env['money.invoice'].create({
-            'partner_id': self.env.ref('core.jd').id,
+            'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
             'name': 'invoice/2016001',
             'category_id': self.env.ref('money.core_category_sale').id,
             'amount': 200.0,
@@ -81,7 +82,7 @@ class test_money_order(TransactionCase):
         money = self.env['money.order'].with_context({'type': 'get'}) \
             .create({
                 'partner_id': self.env.ref('core.jd').id,
-                'name': 'GET/2016001',
+                'name': 'GET/2016001', 'date': "2016-02-20",
                 'note': 'zxy note',
                 'line_ids': [(0, 0, {
                     'bank_id': self.env.ref('core.comm').id,
@@ -112,6 +113,7 @@ class test_money_order(TransactionCase):
 
 class test_other_money_order(TransactionCase):
     '''测试其他收支单'''
+
     def test_other_money_order_unlink(self):
         '''测试其他收支单删除'''
         self.env.ref('money.other_get_60').other_money_done()
@@ -144,7 +146,7 @@ class test_other_money_order(TransactionCase):
         self.env.ref('money.other_pay_1000').other_money_done()
         # onchange_date  同时执行create时的type=other_get
         invoice = self.env['money.invoice'].create({
-            'name': 'invoice',
+            'name': 'invoice', 'date': "2016-02-20",
             'partner_id': self.env.ref('core.jd').id,
             'category_id': self.env.ref('money.core_category_sale').id,
             'amount': 10.0,
@@ -152,7 +154,7 @@ class test_other_money_order(TransactionCase):
         other = self.env['other.money.order'] \
             .with_context({'type': 'other_get'}) \
             .create({
-                'partner_id': self.env.ref('core.jd').id,
+                'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
                 'bank_id': self.env.ref('core.comm').id,
                 'line_ids': [(0, 0, {
                     'source_id': invoice.id,
@@ -191,6 +193,7 @@ class test_other_money_order(TransactionCase):
 
 class test_money_transfer_order(TransactionCase):
     '''测试其他资金转账单'''
+
     def test_money_transfer_order_unlink(self):
         '''测试资金转账单删除'''
         self.env.ref('money.get_40000').money_order_done()
@@ -253,6 +256,7 @@ class test_money_transfer_order(TransactionCase):
 
 
 class test_partner(TransactionCase):
+
     def test_partner(self):
         ''' 客户、供应商对账单 和  银行帐'''
         self.env.ref('core.jd').partner_statements()
@@ -261,6 +265,7 @@ class test_partner(TransactionCase):
 
 
 class test_go_live_order(TransactionCase):
+
     def test_go_live_order(self):
         '''期初余额'''
         self.env['go.live.order'].create({
