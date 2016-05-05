@@ -37,6 +37,12 @@ class test_voucher(TransactionCase):
         with self.assertRaises(except_orm):
             voucher.voucher_draft()
 
+    def test_line_unlink(self):
+        '''测试可正常删除未审核的凭证行'''
+        voucher = self.env.ref('finance.voucher_1')
+        for line in voucher.line_ids:
+            line.unlink()
+
     def test_compute(self):
         '''新建凭证时计算字段加载'''
         voucher = self.env.ref('finance.voucher_1')
