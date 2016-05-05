@@ -17,7 +17,7 @@
                         <t t-if="column.tag !== 'button'"  ><t t-esc="column.string"/></t>
                     </div></th>
                      <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' " t-att-data-id="column.id"   rowspan="1" colspan="2" style='text-align:center;'><div>
-                        <t t-if="column.tag !== 'button'"  ><t t-esc="column.string"/></t>
+                        <t t-if="column.tag !== 'button'"  ><t t-esc="column.base_string"/></t>
                     </div></th>
                 </t>
                 <th t-if="options.deletable" class="oe_list_record_delete" width="13px"/>

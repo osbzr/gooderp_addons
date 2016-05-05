@@ -77,6 +77,11 @@ class checkout_wizard(models.TransientModel):
                             voucher_line.append(res)
                     #利润结余
                     year_profit_account = company_obj.search([])[0].profit_account
+                    remain_account = company_obj.search([])[0].remain_account
+                    if not year_profit_account:
+                        raise except_orm(u'错误', u'公司本年利润科目未配置')
+                    if not remain_account:
+                        raise except_orm(u'错误', u'公司未分配利润科目未配置')
                     if (revenue_total - expense_total) > 0:
                         res={
                              'name':u'利润结余',
@@ -111,7 +116,7 @@ class checkout_wizard(models.TransientModel):
                         year_total += (year_profit_id.credit - year_profit_id.debit)
                     year_line_ids=[{
                          'name':u'年度结余',
-                         'account_id':company_obj.search([])[0].remain_account.id,
+                         'account_id':remain_account.id,
                          'debit':0,
                          'credit':year_total,
                          },{
@@ -127,6 +132,11 @@ class checkout_wizard(models.TransientModel):
                            }
                     year_account = voucher_obj.create(value)
                     year_account.voucher_done()
+                #生成科目余额表
+                trial_wizard = self.env['create.trial.balance.wizard'].create({
+                        'period_id':self.period_id.id,
+                                                                })
+                trial_wizard.create_trial_balance()
                 #关闭会计期间
                 self.period_id.is_closed = True
                 #如果下一个会计期间没有，则创建。

@@ -77,6 +77,7 @@ class sell_order(models.Model):
                              help=u"销货订单的审核状态", select=True, 
                              copy=False, default='draft')
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
+                              store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
 
@@ -383,34 +384,28 @@ class sell_delivery(models.Model):
         self.total_debt = self.partner_id.receivable + self.debt
 
     @api.one
-    @api.depends('state', 'amount', 'receipt')
+    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
     def _get_sell_money_state(self):
         '''返回收款状态'''
         if not self.is_return:
-            if self.state == 'draft':
+            if self.invoice_id.reconciled == 0:
                 self.money_state = u'未收款'
-            else:
-                if self.receipt == 0:
-                    self.money_state = u'未收款'
-                elif self.amount > self.receipt:
-                    self.money_state = u'部分收款'
-                elif self.amount == self.receipt:
-                    self.money_state = u'全部收款'
+            elif self.invoice_id.reconciled < self.invoice_id.amount:
+                self.money_state = u'部分收款'
+            elif self.invoice_id.reconciled == self.invoice_id.amount:
+                self.money_state = u'全部收款'
 
     @api.one
-    @api.depends('state', 'amount', 'receipt')
+    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
     def _get_sell_return_state(self):
         '''返回退款状态'''
         if self.is_return:
-            if self.state == 'draft':
+            if self.invoice_id.reconciled == 0:
                 self.return_state = u'未退款'
-            else:
-                if self.receipt == 0:
-                    self.return_state = u'未退款'
-                elif self.amount > self.receipt:
-                    self.return_state = u'部分退款'
-                elif self.amount == self.receipt:
-                    self.return_state = u'全部退款'
+            elif abs(self.invoice_id.reconciled) < abs(self.invoice_id.amount):
+                self.return_state = u'部分退款'
+            elif self.invoice_id.reconciled == self.invoice_id.amount:
+                self.return_state = u'全部退款'
 
     sell_move_id = fields.Many2one('wh.move', u'发货单', required=True, 
                                    ondelete='cascade')
@@ -443,8 +438,10 @@ class sell_delivery(models.Model):
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', 
                                     copy=False)
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
+                              store=True, default=u'未收款',
                               help=u"销售发货单的收款状态", select=True, copy=False)
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
+                               store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
 
     @api.one
@@ -505,9 +502,9 @@ class sell_delivery(models.Model):
             if line.goods_qty == 0:
                 raise except_orm(u'错误', u'请输入产品数量！')
         if self.bank_account_id and not self.receipt:
-            raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')
+            raise except_orm(u'警告！', u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
-            raise except_orm(u'警告！', u'付款额不为空时，请选择结算账户！')
+            raise except_orm(u'警告！', u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount:
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
 

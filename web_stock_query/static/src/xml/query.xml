@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates id='template' xml:space='preserve'>
+<t t-name='web_stock_query.search_list'>
+    <ul >
+        <li t-foreach='values' t-as='goods' t-attf-class='{{ goods_first and "select" or ""}}' t-att-data-id='goods.id' >
+            <t t-esc='goods.name' />
+        </li>
+
+        <li class='search-list-more'>打开库存余额表</li>
+
+    </ul>
+</t>
+</templates>

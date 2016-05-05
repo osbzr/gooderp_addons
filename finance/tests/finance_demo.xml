@@ -2,9 +2,19 @@
 <openerp>
     <data>
         <!--会计期间-->
+        <record id='period_201411' model='finance.period'>
+            <field name='year'>2014</field>
+            <field name='month'>11</field>
+            <field name='is_closed'>True</field>
+        </record>
         <record id='period_201412' model='finance.period'>
             <field name='year'>2014</field>
             <field name='month'>12</field>
+        </record>
+        <record id='period_201511' model='finance.period'>
+            <field name='year'>2015</field>
+            <field name='month'>11</field>
+            <field name='is_closed'>True</field>
         </record>
         <record id='period_201512' model='finance.period'>
             <field name='year'>2015</field>
@@ -94,9 +104,10 @@
             <field name='account_id' ref='finance.account_goods'/>
             <field name='credit'>10000</field>
         </record>
+
         <!-- 2016年2月的凭证-->
         <record id='voucher_4' model='voucher'>
-            <field name='date'>2016-01-10</field> 
+            <field name='date'>2016-02-10</field> 
         </record>
         <record id='voucher_line_4_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_4'/>
@@ -142,5 +153,42 @@
             <field name="remain_account" ref='finance.account_remain'/>
         </record>
 
+        <record id='account_other_in' model='finance.account'>
+            <field name='code'>12334</field>
+            <field name='name'>其他应收款</field>
+            <field name='costs_types'>assets</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_other_out' model='finance.account'>
+            <field name='code'>12334</field>
+            <field name='name'>其他应付款</field>
+            <field name='costs_types'>assets</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="core.customer_category_1" model="core.category">
+            <field name="account_id" ref="finance.account_ar"/>
+        </record>
+        <record id="core.customer_category_2" model="core.category">
+           <field name="account_id" ref="finance.account_ar"/>
+        </record>
+         <record id="core.customer_category_vip" model="core.category">
+           <field name="account_id" ref="finance.account_ar"/>
+        </record>
+
+        <record id="core.supplier_category_1" model="core.category">
+          <field name="account_id" ref="finance.account_ap"/>
+        </record>
+        <record id="core.cat_freight" model="core.category">
+           <field name="account_id" ref="finance.account_other_in"/>
+        </record>
+        <record id="core.cat_consult" model="core.category">
+           <field name="account_id" ref="finance.account_other_out"/>
+        </record>
+        <record id="core.alipay" model="bank.account">
+             <field name="account_id" ref="finance.account_bank"/>
+        </record>
+        <record id="core.comm" model="bank.account">
+           <field name="account_id" ref="finance.account_bank"/>
+        </record>
     </data>
 </openerp>

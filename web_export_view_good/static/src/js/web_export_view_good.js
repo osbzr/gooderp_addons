@@ -20,7 +20,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //#############################################################################
-openerp.web_export_view = function (instance) {
+openerp.web_export_view_good = function (instance) {
 
     var _t = instance.web._t, QWeb = instance.web.qweb;
 		instance.web.TreeView.include({
@@ -161,8 +161,6 @@ openerp.web_export_view = function (instance) {
                         $.each(export_columns_keys, function () {
                             cell = $row.find('td[data-field="' + this + '"]').get(0);
                             text = cell.text || cell.textContent || cell.innerHTML || "";
-                            console.log(cell);
-
                             if (cell.classList.contains("oe_list_field_float")) {
                                 export_row.push(instance.web.parse_value(text, {'type': "float"}));
                             }
@@ -233,6 +231,9 @@ openerp.web_export_view = function (instance) {
           	       operation_message[2]= _t("操作时间");
           	       operation_message[3]=_t(now_day.trim());
 				           export_rows.push(operation_message);
+                   if (self.view.dataset.context.attachment_information !==undefined){
+                    export_rows.push([])
+                    export_rows.push([self.view.dataset.context.attachment_information]);}
 				           $.blockUI();
 				           view.session.get_file({
 				                url: '/web/export/xls_view',

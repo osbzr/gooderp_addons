@@ -10,6 +10,7 @@ class report_stock_balance(models.Model):
     _auto = False
 
     goods = fields.Char(u'产品')
+    goods_id = fields.Many2one('goods', u'产品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
     lot = fields.Char(u'批号')
@@ -26,6 +27,7 @@ class report_stock_balance(models.Model):
             create or replace view report_stock_balance as (
                 SELECT min(line.id) as id,
                        goods.name as goods,
+                       goods.id as goods_id,
                        line.lot as lot,
                        line.attribute_id as attribute_id,
                        uom.name as uom,
@@ -45,7 +47,7 @@ class report_stock_balance(models.Model):
                   AND wh.type = 'stock'
                   AND line.state = 'done'
 
-                GROUP BY wh.name, line.lot, line.attribute_id, goods.name, uom.name, uos.name
+                GROUP BY wh.name, line.lot, line.attribute_id, goods.name, goods.id, uom.name, uos.name
 
                 ORDER BY goods.name, wh.name, goods_qty asc
             )
