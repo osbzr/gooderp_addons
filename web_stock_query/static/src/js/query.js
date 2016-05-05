@@ -112,6 +112,10 @@ openerp.web_stock_query = function(instance) {
             var self = this;
             if (self.$board) {
                 $target = $target || self.$board.find('li.select');
+                if ($target.hasClass('search-list-more')) {
+                    return self.open_report_stock_balance();
+                }
+
                 self.action_manager.do_action({
                     type: 'ir.actions.act_window',
                     res_model: 'report.stock.balance',
