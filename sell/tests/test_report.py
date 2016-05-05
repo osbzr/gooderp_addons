@@ -495,3 +495,38 @@ class test_receipt_wizard(TransactionCase):
                                 [('order_name', '=', self.delivery_return.name)])
         for line in receipt_line2:
             line.view_detail()
+
+
+class test_sell_top_ten_wizard(TransactionCase):
+    '''测试销量前十商品向导'''
+
+    def setUp(self):
+        ''' 准备报表数据 '''
+        super(test_sell_top_ten_wizard, self).setUp()
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        self.order = self.env.ref('sell.sell_order_2')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.delivery.sell_delivery_done()
+        self.wizard_obj = self.env['sell.top.ten.wizard']
+        self.wizard = self.wizard_obj.create({})
+
+    def test_button_ok(self):
+        '''销量前十商品向导确认按钮'''
+        # 日期报错
+        wizard = self.wizard.create({
+                             'date_start': '2016-11-01',
+                             'date_end': '2016-1-01',
+                             })
+        with self.assertRaises(except_orm):
+            wizard.button_ok()
+
+    def test_goods_report(self):
+        '''测试销量前十商品报表'''
+        summary_top_ten = self.env['sell.top.ten'].create({})
+        context = self.wizard.button_ok().get('context')
+        results = summary_top_ten.with_context(context).search_read(domain=[])
+
+        self.assertEqual(len(results), 1)

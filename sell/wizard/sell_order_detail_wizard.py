@@ -64,7 +64,7 @@ class sell_order_detail_wizard(models.TransientModel):
                     'goods_id': line.goods_id.id,
                     'attribute': line.attribute_id.name,
                     'uom': line.uom_id.name,
-                    'warehouse_dest': line.warehouse_dest_id.name,
+                    'warehouse': line.warehouse_id.name,
                     'qty': line.goods_qty,
                     'price': line.price,
                     'amount': line.amount,
