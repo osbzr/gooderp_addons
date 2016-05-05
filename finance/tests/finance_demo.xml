@@ -152,5 +152,43 @@
             <field name="profit_account" ref='finance.account_profit'/>
             <field name="remain_account" ref='finance.account_remain'/>
         </record>
+
+        <record id='account_other_in' model='finance.account'>
+            <field name='code'>12334</field>
+            <field name='name'>其他应收款</field>
+            <field name='costs_types'>assets</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_other_out' model='finance.account'>
+            <field name='code'>12334</field>
+            <field name='name'>其他应付款</field>
+            <field name='costs_types'>assets</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="core.customer_category_1" model="core.category">
+            <field name="account_id" ref="finance.account_ar"/>
+        </record>
+        <record id="core.customer_category_2" model="core.category">
+           <field name="account_id" ref="finance.account_ar"/>
+        </record>
+         <record id="core.customer_category_vip" model="core.category">
+           <field name="account_id" ref="finance.account_ar"/>
+        </record>
+
+        <record id="core.supplier_category_1" model="core.category">
+          <field name="account_id" ref="finance.account_ap"/>
+        </record>
+        <record id="core.cat_freight" model="core.category">
+           <field name="account_id" ref="finance.account_other_in"/>
+        </record>
+        <record id="core.cat_consult" model="core.category">
+           <field name="account_id" ref="finance.account_other_out"/>
+        </record>
+        <record id="core.alipay" model="bank.account">
+             <field name="account_id" ref="finance.account_bank"/>
+        </record>
+        <record id="core.comm" model="bank.account">
+           <field name="account_id" ref="finance.account_bank"/>
+        </record>
     </data>
 </openerp>
