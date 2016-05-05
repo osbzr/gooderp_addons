@@ -56,7 +56,6 @@ class sell_receipt_wizard(models.TransientModel):
                 for source in order.source_ids:
                     if source.name.name == delivery.name:
                         receipt += source.this_reconcile
-                        balance = source.to_reconcile
 
             # 如果是退货则金额均取反
             if not delivery.is_return:
@@ -84,7 +83,7 @@ class sell_receipt_wizard(models.TransientModel):
                 'amount': amount,
                 'partner_cost': partner_cost,
                 'receipt': receipt,
-                'balance': balance,
+                'balance': amount + partner_cost - receipt,
                 'receipt_rate': receipt_rate,
                 'note': delivery.note,
             })

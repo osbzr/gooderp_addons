@@ -12,6 +12,7 @@
             		<field name='type'/>
             		<field name='staff_id'/>
             		<field name='partner_id'/>
+            		<field name="amount" sum="合计"/>
             		<field name='state'/>
             		<field name='goods_state'/>
             		<field name='delivery_date'/>
@@ -40,7 +41,9 @@
                      	</div>
             			<group>
             				<group>
-            					<field name='partner_id' required='1' domain="[('c_category_id', '!=', False)]"/>
+            					<field name='partner_id' required='1'
+            						domain="[('c_category_id', '!=', False)]"
+            						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='staff_id'/>
             					<field name='date'/>
             				</group>
@@ -180,8 +183,10 @@
                      	</div>
             			<group>
             				<group>
-            					<field name='partner_id' required='1' attrs="{'readonly': [('state','!=','draft')]}"
-            						domain="[('c_category_id', '!=', False)]"/>
+            					<field name='partner_id' required='1'
+            						attrs="{'readonly': [('state','!=','draft')]}"
+            						domain="[('c_category_id', '!=', False)]"
+            						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="is_return" invisible="1"/>
@@ -333,8 +338,10 @@
                      	</div>
             			<group>
             				<group>
-            					<field name='partner_id' required='1' attrs="{'readonly': [('state','!=','draft')]}"
-            						domain="[('c_category_id', '!=', False)]"/>
+            					<field name='partner_id' required='1'
+            						attrs="{'readonly': [('state','!=','draft')]}"
+            						domain="[('c_category_id', '!=', False)]"
+            						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="is_return" invisible="1"/>

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<record id="core_category_tree_inherit" model="ir.ui.view">
+            <field name="name">core_category_tree</field>
+            <field name="model">core.category</field>
+            <field name='inherit_id' ref='core.core_category_tree' />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+					<field name="account_id"/>
+				</field>
+            </field>
+        </record>
+
+       	<record id="bank_account_tree_inherit" model="ir.ui.view">
+            <field name="name">bank_account_tree</field>
+            <field name="model">bank.account</field>
+            <field name='inherit_id' ref='core.bank_account_tree' />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+					<field name="account_id"/>
+				</field>
+            </field>
+        </record>
+
+        <record id="money_order_form_inherit" model="ir.ui.view">
+            <field name="name">bank_account_tree</field>
+            <field name="model">money.order</field>
+            <field name='inherit_id' ref='money.money_order_form' />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="voucher_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="money_invoice_tree_inherit" model="ir.ui.view">
+            <field name="name">money_invoice_tree_inherit</field>
+            <field name="model">money.invoice</field>
+            <field name='inherit_id' ref='money.money_invoice_tree' />
+            <field name="arch" type="xml">
+                <field name="category_id" position="after">
+                    <field name="voucher_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="other_money_order_form_inherit" model="ir.ui.view">
+            <field name="name">other_money_order_form_inherit</field>
+            <field name="model">other.money.order</field>
+            <field name='inherit_id' ref='money.other_money_order_form' />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="voucher_id"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

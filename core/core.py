@@ -87,6 +87,27 @@ class partner(models.Model):
 
 class goods(models.Model):
     _name = 'goods'
+
+    @api.multi
+    def name_get(self):
+        '''在many2one字段里显示 编号_名称'''
+        res = []
+
+        for goods in self:
+            res.append((goods.id, goods.code + '_' + goods.name))
+        return res
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        '''在many2one字段中支持按编号搜索'''
+        args = args or []
+        if name:
+            goods_ids = self.search([('code', 'ilike', name)])
+            if goods_ids:
+                return goods_ids.name_get()
+        return super(goods, self).name_search(
+                name=name, args=args, operator=operator, limit=limit)
+
     code = fields.Char(u'编号')
     name = fields.Char(u'名称')
     category_id = fields.Many2one('core.category', u'产品类别',
