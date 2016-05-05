@@ -54,8 +54,6 @@ class money_order(models.Model):
             })
             if partner.c_category_id:
                 partner_account_id = partner.c_category_id.account_id.id
-            else:
-                partner_account_id = partner.s_category_id.account_id.id
             self.env['voucher.line'].create({
                 'name': u"%s收款单%s " % (partner.name, name), 'account_id': partner_account_id, 'credit': line.amount,
                 'voucher_id': vouch_obj.id, 'partner_id': partner.id
@@ -73,9 +71,7 @@ class money_order(models.Model):
                 'name': u"收款单%s" % (name), 'account_id': line.bank_id.account_id.id, 'credit': line.amount,
                 'voucher_id': vouch_obj.id, 'partner_id': '',
             })
-            if partner.c_category_id:
-                partner_account_id = partner.c_category_id.account_id.id
-            else:
+            if partner.s_category_id:
                 partner_account_id = partner.s_category_id.account_id.id
             self.env['voucher.line'].create({
                 'name': u"付款单 %s " % (name), 'account_id': partner_account_id, 'debit': line.amount,
