@@ -1,33 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-    	<!--业务伙伴地址form-->
-        <record id="partner_address_form" model="ir.ui.view">
-            <field name='name'>partner.address.form</field>
-            <field name='model'>res.partner</field>
+		<record id="province_city_county_form" model="ir.ui.view">
+            <field name='name'>province.city.county.form</field>
+            <field name='model'>province.city.county</field>
             <field eval="0" name="priority"/>
             <field name="arch" type="xml">
-                <form string="PARTNER ADDRESS FORM">
-	                <sheet>
-	                    <group>
-	                        <group>
-	                            <field name="address"/>
-	                            <field name="mobile"/>
-	                            <field name="contact_people"/>
-	                            <field name="province_id"/>
-	                            <field name="county_id"/>
-	                        </group>
-	                        <group>
-	                            <field name="phone"/>
-	                            <field name="zip"/>
-	                            <field name="is_default_add"/>
-	                            <field name="city_id"/>
-	                        </group>
-	                    </group>
-	                    <label for="detail_address" />
-	                    <field name="detail_address"/>
-	                </sheet>
+                <form string="详细地址">
+                    <group>
+        				<group>
+        					<field name="province_id"/>
+        					<field name="county_id"/>
+        				</group>
+        				<group>
+	                        <field name="city_id"/>
+        				</group>
+        			</group>
+        			<group>
+                        <field name="detail_address"/>
+    				</group>
                 </form>
+            </field>
+        </record>
+
+		<!--继承客户tree,添加地址信息-->
+        <record id="customer_tree_inherit" model="ir.ui.view">
+            <field name="name">customer.tree.inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.customer_tree'/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                	<field name="contact_people"/>
+                	<field name="mobile"/>
+                	<field name="phone"/>
+                	<field name="qq"/>
+                	<field name="address"/>
+				</field>
             </field>
         </record>
 
@@ -37,14 +45,34 @@
             <field name="model">partner</field>
             <field name='inherit_id' ref='core.customer_address_form' />
             <field name="arch" type="xml">
-                <field name="code" position="after">
-					<field name="partner_address"/>
-                    <label for="province_id" string="地址"/>
-                    <div class="address_format">
-                         <field name="province_id" style="width: 40%"/>
-                         <field name="city_id" placeholder="市" style="width: 30%"/>
-                         <field name="county_id" placeholder="县" style="width: 30%"/>
-                    </div>
+                <xpath expr="//group" position="after">
+                    <field name="child_ids">
+                    	<tree string="联系人地址" editable="bottom">
+	                    	<field name="contact_people"/>
+	                    	<field name="mobile"/>
+	                    	<field name="phone"/>
+	                    	<field name="qq"/>
+	                    	<field name="address_id" context="{
+	                    		'form_view_ref': 'province_city_county_form'}"/>
+	                    	<field name="is_default_add"/>
+	                    </tree>
+	                </field>
+				</xpath>
+            </field>
+        </record>
+
+		<!--继承供应商tree,添加地址信息-->
+        <record id="vendor_tree_inherit" model="ir.ui.view">
+            <field name="name">vendor.tree.inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.vendor_tree'/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                	<field name="contact_people"/>
+                	<field name="mobile"/>
+                	<field name="phone"/>
+                	<field name="qq"/>
+                	<field name="address"/>
 				</field>
             </field>
         </record>
@@ -55,15 +83,19 @@
             <field name="model">partner</field>
             <field name='inherit_id' ref='core.supplier_address_form' />
             <field name="arch" type="xml">
-                <field name="code" position="after">
-					<field name="partner_address"/>
-                    <label for="province_id" string="地址"/>
-                    <div class="address_format">
-                         <field name="province_id" style="width: 40%"/>
-                         <field name="city_id" placeholder="市" style="width: 30%"/>
-                         <field name="county_id" placeholder="县" style="width: 30%"/>
-                    </div>
-				</field>
+                <xpath expr="//group" position="after">
+                    <field name="child_ids">
+                    	<tree string="联系人地址" editable="bottom">
+	                    	<field name="contact_people"/>
+	                    	<field name="mobile"/>
+	                    	<field name="phone"/>
+	                    	<field name="qq"/>
+	                    	<field name="address_id" context="{
+	                    		'form_view_ref': 'province_city_county_form'}"/>
+	                    	<field name="is_default_add"/>
+	                    </tree>
+	                </field>
+				</xpath>
             </field>
         </record>
     </data>

@@ -112,7 +112,6 @@ class test_report(TransactionCase):
             balance_sheet_obj.cumulative_occurrence_balance_formula = ''
         report.create_profit_statement()
 
-
 class test_checkout_wizard(TransactionCase):
     
     def setUp(self):
@@ -168,3 +167,12 @@ class test_checkout_wizard(TransactionCase):
         wizard.button_counter_checkout()
         with self.assertRaises(except_orm):
             wizard.button_counter_checkout()
+        #公司科目未配置报错
+        company_pro = self.env.ref('base.main_company')
+        company_pro.profit_account = False
+        with self.assertRaises(except_orm):
+            wizard.button_checkout()
+        company_pro.profit_account = self.env.ref('finance.account_profit')
+        company_pro.remain_account = False
+        with self.assertRaises(except_orm):
+            wizard.button_checkout()

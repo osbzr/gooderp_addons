@@ -355,6 +355,7 @@ class test_buy_receipt(TransactionCase):
         # 入库单上的采购费用分摊到入库单明细行上
         receipt.cost_line_ids.create({
                           'buy_id': receipt.id,
+                          'category_id':self.env.ref('core.cat_consult').id,
                           'partner_id': 4,
                           'amount': 100, })
         # 测试分摊之前审核是否会弹出警告

@@ -40,6 +40,7 @@ class all_county(models.Model):
 
 class province_city_county(models.Model):
     _name = 'province.city.county'
+    _rec_name = 'detail_address'
     _description = u'省市县'
 
     @api.onchange('province_id')
@@ -116,35 +117,41 @@ class province_city_county(models.Model):
     county_id = fields.Many2one('all.county', u'县')
     province_id = fields.Many2one('country.state', u'省',
                                   domain="[('country_id.name','=','中国')]")
+    detail_address = fields.Char(u'详细地址')
 
-class res_partner(models.Model):
-    _name = 'res.partner'
-    _inherit = ['res.partner', 'province.city.county']
+class partner_address(models.Model):
+    _name = 'partner.address'
     _description = u'业务伙伴地址'
  
-    address = fields.Char(string=u'地址简称')
-    phone = fields.Char(string=u'联系电话')
-    mobile = fields.Char(string=u'手机号码')
-    zip = fields.Char(string=u'邮政编码')
-    contact_people = fields.Char(string=u'联系人')
-    is_default_add = fields.Boolean(string=u'是否默认地址', default=False)
-    detail_address = fields.Char(string=u'详细地址')
+    partner_id = fields.Many2one('partner', u'业务伙伴')
+    contact_people = fields.Char(u'联系人')
+    mobile = fields.Char(u'手机')
+    phone = fields.Char(u'座机')
+    qq = fields.Char(u'QQ/MSN')
+    address_id = fields.Many2one('province.city.county', u'联系地址')
+    is_default_add = fields.Boolean(u'是否默认地址')
 
 class partner(models.Model):
     _inherit = 'partner'
     _description = u'业务伙伴'
 
-    partner_address = fields.Many2one('res.partner', u'业务伙伴地址')
-    city_id = fields.Many2one('all.city', u'市', readonly=True)
-    county_id = fields.Many2one('all.county', u'县', readonly=True)
-    province_id = fields.Many2one('country.state', u'省',
-                                  readonly=True,
-                                  domain="[('country_id.name','=','中国')]")
-
-    @api.onchange('partner_address')
-    def onchange_partner_id(self):
-        if not self.partner_address:
+    @api.one
+    @api.depends('child_ids.is_default_add')
+    def _compute_partner_address(self):
+        '''如果业务伙伴地址中有默认地址，则显示在业务伙伴列表上'''
+        if not self.child_ids:
             return {}
-        self.city_id = self.partner_address.city_id
-        self.county_id = self.partner_address.county_id
-        self.province_id = self.partner_address.province_id
+        for child in self.child_ids:
+            if child.is_default_add:
+                self.contact_people = child.contact_people
+                self.mobile = child.mobile
+                self.phone = child.phone
+                self.qq = child.qq
+                self.address = child.address_id.detail_address
+
+    child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
+    contact_people = fields.Char(u'联系人', compute='_compute_partner_address')
+    mobile = fields.Char(u'手机', compute='_compute_partner_address')
+    phone = fields.Char(u'座机', compute='_compute_partner_address')
+    qq = fields.Char(u'QQ/MSN', compute='_compute_partner_address')
+    address = fields.Char(u'送货地址', compute='_compute_partner_address')
