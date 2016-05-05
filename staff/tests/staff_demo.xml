@@ -10,5 +10,14 @@
         <record id='staff_1' model='staff'>
             <field name='name'>Admin</field>
         </record>
+        <!--部门-->
+        <record id='department_1' model='staff.department'>
+            <field name='name'>人事部</field>
+        </record>
+        <!--职位-->
+        <record id='staff_job_1' model='staff.job'>
+            <field name='name'>人事专员</field>
+            <field name='department_id' ref='staff.department_1'/>
+        </record>
     </data>
 </openerp>
