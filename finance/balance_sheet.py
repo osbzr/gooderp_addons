@@ -118,8 +118,6 @@ class create_balance_sheet_wizard(models.TransientModel):
                 elif trial_balance.subject_name_id.balance_directions == 'out':
                     subject_vals.append(trial_balance[compute_field_list[1]])
             return sum(subject_vals)
-        else:
-            return 0
 
 
 class ProfitStatement(models.Model):

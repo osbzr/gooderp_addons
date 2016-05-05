@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <openerp>
-    <data>   
+    <data>
+        <record id="base.main_company" model="res.company">
+            <field name="start_date">2016-01-01</field>
+        </record>   
         <!-- 收款单 -->
         <record id="get_40000" model="money.order">
             <field name="type">get</field>

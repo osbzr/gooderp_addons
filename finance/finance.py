@@ -149,7 +149,7 @@ class voucher_line(models.Model):
         for active_voucher_line in self:
             if active_voucher_line.voucher_id.state == 'done':
                 raise except_orm(u'错误', u'不能删除已审核的凭证行')
-        return super(voucher, self).unlink()
+        return super(voucher_line, self).unlink()
 
 
 class finance_period(models.Model):
@@ -173,8 +173,13 @@ class finance_period(models.Model):
     def init_period(self):
         ''' 根据系统启用日期（安装core模块的日期）创建 '''
         current_date = self.env.ref('base.main_company').start_date
-        return self.create({'year':current_date[0:4],
-                            'month':str(int(current_date[5:7])),})
+        period_id = self.search([
+                ('year', '=', current_date[0:4]),
+                ('month', '=', int(current_date[5:7]))
+            ])
+        if not period_id:
+            return self.create({'year':current_date[0:4],
+                                'month':str(int(current_date[5:7])),})
 
     @api.multi
     def get_period(self, date):
