@@ -17,6 +17,7 @@
                     <field name="name"/>
                     <field name="type"/>
                     <field name="partner_id"/>
+                    <field name="amount" sum="合计"/>
                     <field name="state"/>
                     <field name="goods_state"/>
                     <field name="planned_date"/>
