@@ -17,6 +17,7 @@
                     <field name="name"/>
                     <field name="type"/>
                     <field name="partner_id"/>
+                    <field name="amount" sum="合计"/>
                     <field name="state"/>
                     <field name="goods_state"/>
                     <field name="planned_date"/>
@@ -44,7 +45,9 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required="1" domain="[('s_category_id', '!=', False)]"/>
+                            <field name="partner_id" required="1"
+                            	domain="[('s_category_id', '!=', False)]"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="date" required="1"/>
                         </group>
                         <group>
@@ -175,8 +178,10 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"
-                            	domain="[('s_category_id', '!=', False)]"/>
+                            <field name="partner_id" required='1'
+                            	attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                         </group>
@@ -336,8 +341,10 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" required='1' attrs="{'readonly': [('state','!=','draft')]}"
-                            	domain="[('s_category_id', '!=', False)]"/>
+                            <field name="partner_id" required='1'
+                            	attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                         </group>

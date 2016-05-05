@@ -14,7 +14,6 @@
     'data': [
              'security/ir.model.access.csv',
              'staff.xml',
-             'holidays_view.xml',
         ],
 }
 

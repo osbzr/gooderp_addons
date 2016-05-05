@@ -66,6 +66,7 @@ class staff(models.Model):
                                 ('widower',u'丧偶'),
                                 ('divorced',u'离异')
                                 ],u'婚姻状况')
+    contract_ids=fields.One2many('staff.contract', 'staff_id', u'合同')
     active = fields.Boolean(u'生效',default='1')
     #公开信息
     work_mobile = fields.Char(u'办公手机')

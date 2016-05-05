@@ -53,7 +53,6 @@ class buy_payment_wizard(models.TransientModel):
                 for source in order.source_ids:
                     if source.name.name == receipt.name:
                         payment += source.this_reconcile
-                        balance = source.to_reconcile
             # 如果是退货则金额均取反
             if not receipt.is_return:
                 order_type = u'普通采购'
@@ -77,7 +76,7 @@ class buy_payment_wizard(models.TransientModel):
                 'discount_amount': discount_amount,
                 'amount': amount,
                 'payment': payment,
-                'balance': balance,
+                'balance': amount - payment,
                 'payment_rate': payment_rate,
                 'note': receipt.note,
             })
