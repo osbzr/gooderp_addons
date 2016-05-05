@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <!--创建系统启用日期所属会计期间-->
+        <function model="finance.period" name="init_period"/>
     	<!-- 会计凭证序列号 -->
         <record id="seq_type_voucher" model="ir.sequence.type">
             <field name="name">会计凭证</field>
@@ -113,6 +115,14 @@
             <field name='name'>所得税</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_ppe' model='finance.account'>
+            <field name='code'>220201</field>
+            <field name='name'>应付账款-暂估</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+            <field name='state'>True</field>
+            <field name='auxiliary_financing'>supplier</field>
         </record>
         <!-- 资产负债表-->
         <record id='bs_1' model='balance.sheet'>

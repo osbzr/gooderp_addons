@@ -14,5 +14,10 @@
             <field name="code">General</field>
             <field name='type'>stock</field>
         </record>
+        <record id="base.main_company" model="res.company">
+            <field name="name">开阖GoodERP</field>
+            <field name="currency_id" ref="base.CNY" />
+            <field name='cost_method'>fifo</field>
+        </record>
     </data>
 </openerp>

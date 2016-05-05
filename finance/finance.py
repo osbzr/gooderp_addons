@@ -51,16 +51,17 @@ class voucher(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
     amount_text = fields.Char(u'总计', compute='_compute_amount', store=True)
-    state = fields.Selection([('draft',u'草稿'),
-                              ('done',u'已审核')],u'状态',default='draft')
+    state = fields.Selection([('draft', u'草稿'),
+                              ('done', u'已审核')], u'状态', default='draft')
     is_checkout = fields.Boolean(u'结账凭证')
+
     @api.one
     def voucher_done(self):
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
         if self.period_id.is_closed == True:
             raise except_orm(u'错误', u'该会计期间已结账！不能审核')
-        self.state='done'
+        self.state = 'done'
 
     @api.one
     def voucher_draft(self):
@@ -68,7 +69,7 @@ class voucher(models.Model):
             raise except_orm(u'错误', u'请不要重复反审核！')
         if self.period_id.is_closed == True:
             raise except_orm(u'错误', u'该会计期间已结账！不能反审核')
-        self.state='draft'
+        self.state = 'draft'
 
     @api.one
     @api.depends('line_ids')
@@ -101,6 +102,7 @@ class voucher(models.Model):
             if active_voucher.state == 'done':
                 raise except_orm(u'错误', u'不能删除已审核的凭证')
         return super(voucher, self).unlink()
+
 
 class voucher_line(models.Model):
     '''凭证明细'''
@@ -166,6 +168,13 @@ class finance_period(models.Model):
     def _compute_name(self):
         if self.year and self.month:
             self.name = u'%s年 第%s期' % (self.year, self.month)
+    
+    @api.model
+    def init_period(self):
+        ''' 根据系统启用日期（安装core模块的日期）创建 '''
+        current_date = self.env.ref('base.main_company').start_date
+        return self.create({'year':current_date[0:4],
+                            'month':str(int(current_date[5:7])),})
 
     @api.multi
     def get_period(self, date):
@@ -205,12 +214,12 @@ class finance_account(models.Model):
                                             ('goods', u'存货'),
                                             ], u'辅助核算')
     costs_types = fields.Selection([
-                                    ('assets',U'资产'),
-                                    ('debt',U'负债'),
-                                    ('equity',U'所有者权益'),
-                                    ('in', u'收入类'),
-                                    ('out', u'费用类')
-                                    ], u'类型')
+        ('assets', U'资产'),
+        ('debt', U'负债'),
+        ('equity', U'所有者权益'),
+        ('in', u'收入类'),
+        ('out', u'费用类')
+    ], u'类型')
     state = fields.Boolean(u'状态')
 
 
@@ -225,7 +234,7 @@ class finance_category(models.Model):
 class auxiliary_financing(models.Model):
     '''辅助核算'''
     _name = 'auxiliary.financing'
-    
+
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
     type = fields.Selection([
@@ -238,7 +247,16 @@ class auxiliary_financing(models.Model):
 class res_company(models.Model):
     '''继承公司对象,添加字段'''
     _inherit = 'res.company'
-    
-    profit_account = fields.Many2one('finance.account',u'本年利润科目', ondelete='restrict')
-    remain_account = fields.Many2one('finance.account',u'未分配利润科目', ondelete='restrict')
 
+    profit_account = fields.Many2one('finance.account', u'本年利润科目', ondelete='restrict')
+    remain_account = fields.Many2one('finance.account', u'未分配利润科目', ondelete='restrict')
+
+
+class bank_account(models.Model):
+    _inherit = 'bank.account'
+    account_id = fields.Many2one('finance.account', u'账户')
+
+
+class core_category(models.Model):
+    _inherit = 'core.category'
+    account_id = fields.Many2one('finance.account', u'账户')

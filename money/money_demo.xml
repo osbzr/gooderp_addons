@@ -4,6 +4,7 @@
         <!-- 收款单 -->
         <record id="get_40000" model="money.order">
             <field name="type">get</field>
+            <field name="date">2016-02-20</field>
             <field name="partner_id" ref="core.jd"/>
         </record>
         <record id="get_line_1" model="money.order.line">
@@ -14,6 +15,7 @@
 		<!-- 付款单 -->
         <record id="pay_2000" model="money.order">
             <field name="type">pay</field>
+            <field name="date">2016-02-20</field>
             <field name="partner_id" ref="core.lenovo"/>
         </record>
         <record id="pay_line_1" model="money.order.line">
@@ -24,6 +26,7 @@
         <!-- 其他收款单 -->
         <record id="other_get_60" model="other.money.order">
             <field name="type">other_get</field>
+            <field name="date">2016-02-20</field>
             <field name="partner_id" ref="core.lenovo"/>
             <field name="bank_id" ref="core.comm"/>
         </record>
@@ -35,6 +38,7 @@
         <!-- 其他付款单 -->
         <record id="other_pay_1000" model="other.money.order">
             <field name="type">other_pay</field>
+            <field name="date">2016-02-20</field>
             <field name="bank_id" ref="core.comm"/>
         </record>
         <record id="other_pay_line_2" model="other.money.order.line">
@@ -44,6 +48,7 @@
         </record>
         <record id="other_pay_9000" model="other.money.order">
             <field name="type">other_pay</field>
+            <field name="date">2016-02-20</field>
             <field name="bank_id" ref="core.alipay"/>
         </record>
         <record id="other_pay_line_1" model="other.money.order.line">
@@ -53,6 +58,7 @@
         </record>
 		<!-- 资金转账单 -->
         <record id="transfer_300" model="money.transfer.order">
+            <field name="date">2016-02-20</field>
             <field name="note"></field>
         </record>
         <record id="transfer_line_1" model="money.transfer.order.line">
@@ -63,6 +69,7 @@
         </record>
         <record id="transfer_400" model="money.transfer.order">
             <field name="note"></field>
+            <field name="date">2016-02-20</field>
         </record>
         <record id="transfer_line_2" model="money.transfer.order.line">
             <field name="transfer_id" ref="transfer_400"/>
@@ -94,5 +101,7 @@
             <field name="to_partner_id" ref="core.yixun"/>
             <field name="business_type">get_to_get</field>
         </record>
+
+
     </data>
 </openerp>

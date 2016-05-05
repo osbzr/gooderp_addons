@@ -546,10 +546,13 @@ class cost_line(models.Model):
     _name = 'cost.line'
     _description = u"采购销售费用"
 
-    partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict')
+    partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict',
+                                 required=True,)
     category_id = fields.Many2one('core.category', u'类别',
+                                  required=True,
                                   ondelete='restrict',
                                   domain="[('type', '=', 'other_pay')]")
     amount = fields.Float(u'金额',
+                          required=True,
                           digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
