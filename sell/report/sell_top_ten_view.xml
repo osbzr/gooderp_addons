@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<record id="sell_top_ten_tree" model="ir.ui.view">
+            <field name="name">sell.top.ten.tree</field>
+            <field name="model">sell.top.ten</field>
+            <field name="arch" type="xml">
+                <tree string="销量前十商品" create="false">
+                    <field name="goods"/>
+                    <field name="qty" sum="基本数量合计"/>
+                    <field name="amount" sum="销售收入合计"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>
