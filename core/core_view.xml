@@ -71,10 +71,8 @@
                     <field name="phone"/>
                     <field name="fax" string="手机"/>
                     <field name="zip"/>
-                    <field name="start_date"/>
+                    <field name="start_date" readonly="1" />
                     <field name="currency_id"/>
-                    <field name="quantity_digits"/>
-                    <field name="amount_digits"/>
                     <field name="cost_method"/>
                     <field name="draft_invoice"/>
                    </group>

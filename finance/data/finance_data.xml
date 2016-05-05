@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <!--创建系统启用日期所属会计期间-->
+        <function model="finance.period" name="init_period"/>
     	<!-- 会计凭证序列号 -->
         <record id="seq_type_voucher" model="ir.sequence.type">
             <field name="name">会计凭证</field>
