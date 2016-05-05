@@ -30,8 +30,8 @@
                             <page string="公开信息">
                                 <group>
                                     <group string="职位">
-                                        <field name="department_id"/>
                                         <field name="job_id"/>
+                                        <field name="department_id"/>
                                         <field name="parent_id"/>
                                     </group>
                                     <group string="联系信息">

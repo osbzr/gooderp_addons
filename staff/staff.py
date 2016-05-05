@@ -5,11 +5,11 @@ class staff_department(models.Model):
     _name = "staff.department"
     
     company_id = fields.Many2one('res.company',u'公司')
-    name = fields.Char(u'部门名称')
+    name = fields.Char(u'部门名称',required=True)
     manager_id = fields.Many2one('staff',u'部门经理')
-    member_ids = fields.One2many('staff', 'department_id', u'部门成员'),
+    member_ids = fields.One2many('staff', 'department_id', u'部门成员')
     parent_id = fields.Many2one('staff.department',u'上级部门')
-    child_ids = fields.One2many('staff.department', 'parent_id', u'下级部门'),
+    child_ids = fields.One2many('staff.department', 'parent_id', u'下级部门')
     jobs_ids = fields.One2many('staff.job','department_id',u'职位')
     note = fields.Text(u'备注')
 
@@ -17,7 +17,7 @@ class staff_department(models.Model):
 class staff_job(models.Model):
     _name = "staff.job"
     
-    name = fields.Char(u'职位')
+    name = fields.Char(u'职位',required=True)
     note = fields.Text(u'描述')
     department_id = fields.Many2one('staff.department',u'部门')
 
@@ -42,6 +42,14 @@ class staff(models.Model):
     def _get_image(self):
         self.image_medium = self.user_id.image
     
+    @api.one
+    @api.onchange('job_id')
+    def onchange_job_id(self):
+        '''选择职位时带出部门和部门经理'''
+        if self.job_id:
+            self.department_id = self.job_id.department_id
+            self.parent_id = self.job_id.department_id.manager_id
+
     name = fields.Char(u'名称',required=True)
     category_ids = fields.Many2many('staff.employee.category', 
                                     'employee_category_rel', 
@@ -81,7 +89,7 @@ class res_users(models.Model):
     _name = 'res.users'
     _inherit = 'res.users'
     
-    employee_ids =  fields.One2many('staff', 'user_id', u'对应员工'),
+    employee_ids =  fields.One2many('staff', 'user_id', u'对应员工')
 
     
     
