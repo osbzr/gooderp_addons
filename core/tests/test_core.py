@@ -20,7 +20,7 @@ class test_goods(TransactionCase):
 
     def setUp(self):
         super(test_goods, self).setUp()
-        self.mouse = self.browse_ref('goods.mouse')
+        self.mouse = self.env.ref('goods.mouse')
 
     def test_name_search(self):
         # 使用name来搜索键盘
