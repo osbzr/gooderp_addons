@@ -14,22 +14,3 @@ class test_core(TransactionCase):
     def test_res_currency(self):
         """测试阿拉伯数字转换称中文大写数字的方法"""
         self.env['res.currency'].rmb_upper(10000100.3)
-
-
-class test_goods(TransactionCase):
-
-    def setUp(self):
-        super(test_goods, self).setUp()
-        self.mouse = self.env.ref('goods.mouse')
-
-    def test_name_search(self):
-        # 使用name来搜索键盘
-        result = self.env['goods'].name_search('鼠标')
-        real_result = [(self.mouse.id,
-                        self.mouse.code + '_' + self.mouse.name)]
-
-        self.assertEqual(result, real_result)
-
-        # 使用code来搜索键盘
-        result = self.env['goods'].name_search('001')
-        self.assertEqual(result, real_result)
