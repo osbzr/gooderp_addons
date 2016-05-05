@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        <record id="base.main_company" model="res.company">
-            <field name="name">GoodERP测试公司</field>
-            <field name="start_date">2016-01-01</field>
-        </record>
         <record id="customer_category_1" model="core.category">
             <field name="name">一级客户</field>
             <field name="type">customer</field>
