@@ -173,8 +173,13 @@ class finance_period(models.Model):
     def init_period(self):
         ''' 根据系统启用日期（安装core模块的日期）创建 '''
         current_date = self.env.ref('base.main_company').start_date
-        return self.create({'year':current_date[0:4],
-                            'month':str(int(current_date[5:7])),})
+        period_id = self.search([
+                ('year', '=', current_date[0:4]),
+                ('month', '=', int(current_date[5:7]))
+            ])
+        if not period_id:
+            return self.create({'year':current_date[0:4],
+                                'month':str(int(current_date[5:7])),})
 
     @api.multi
     def get_period(self, date):
