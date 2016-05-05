@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_staff_department,access.staff.department,model_staff_department,,1,1,1,1
+access_staff_job,access.staff.job,model_staff_job,,1,1,1,1
+access_staff_employee_category,access.staff.employee.category,model_staff_employee_category,,1,1,1,1
+access_staff,access.staff,model_staff,,1,1,1,1
+access_staff_contract,access.staff.contract,model_staff_contract,,1,1,1,1

@@ -86,7 +86,10 @@ openerp.web_stock_query = function(instance) {
 
                 if (_.contains(['up', 'down'], direction)) {
                     next_move = direction === 'down'? current_move.next(): current_move.prev();
-                    // this.$board.scrollTop(next_move.offset().top);
+                    if (next_move && next_move.is('li')) {
+                        var offset_y = next_move.offset().top - (direction === 'down'? this.$board.height(): 40);
+                        this.$board.scrollTop(this.$board.scrollTop() + offset_y);
+                    }
                 } else if (direction.jquery) {
                     next_move = direction;
                 }
@@ -112,6 +115,10 @@ openerp.web_stock_query = function(instance) {
             var self = this;
             if (self.$board) {
                 $target = $target || self.$board.find('li.select');
+                if ($target.hasClass('search-list-more')) {
+                    return self.open_report_stock_balance();
+                }
+
                 self.action_manager.do_action({
                     type: 'ir.actions.act_window',
                     res_model: 'report.stock.balance',
