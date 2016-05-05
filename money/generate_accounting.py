@@ -49,7 +49,7 @@ class money_order(models.Model):
             if not line.bank_id.account_id:
                 raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
             self.env['voucher.line'].create({
-                'name': "%s收款单%s" % (partner.name, name), 'account_id': line.bank_id.account_id.id, 'debit': line.amount,
+                'name': u"%s收款单%s" % (partner.name, name), 'account_id': line.bank_id.account_id.id, 'debit': line.amount,
                 'voucher_id': vouch_obj.id, 'partner_id': ''
             })
             if partner.c_category_id:
@@ -57,7 +57,7 @@ class money_order(models.Model):
             else:
                 partner_account_id = partner.s_category_id.account_id.id
             self.env['voucher.line'].create({
-                'name': "%s收款单%s " % (partner.name, name), 'account_id': partner_account_id, 'credit': line.amount,
+                'name': u"%s收款单%s " % (partner.name, name), 'account_id': partner_account_id, 'credit': line.amount,
                 'voucher_id': vouch_obj.id, 'partner_id': partner.id
             })
         return vouch_obj
@@ -70,7 +70,7 @@ class money_order(models.Model):
             if not line.bank_id.account_id:
                 raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
             self.env['voucher.line'].create({
-                'name': "收款单%s" % (name), 'account_id': line.bank_id.account_id.id, 'credit': line.amount,
+                'name': u"收款单%s" % (name), 'account_id': line.bank_id.account_id.id, 'credit': line.amount,
                 'voucher_id': vouch_obj.id, 'partner_id': '',
             })
             if partner.c_category_id:
@@ -78,7 +78,7 @@ class money_order(models.Model):
             else:
                 partner_account_id = partner.s_category_id.account_id.id
             self.env['voucher.line'].create({
-                'name': "付款单 %s " % (name), 'account_id': partner_account_id, 'debit': line.amount,
+                'name': u"付款单 %s " % (name), 'account_id': partner_account_id, 'debit': line.amount,
                 'voucher_id': vouch_obj.id, 'partner_id': partner.id
             })
         return vouch_obj
@@ -128,11 +128,11 @@ class money_invoice(models.Model):
     @api.multi
     def create_voucher_line(self, vals):
         self.env['voucher.line'].create({
-            'name': "%s %s " % (vals.get('string'), vals.get('name')), 'account_id': vals.get('debit_account_id'),
+            'name': u"%s %s " % (vals.get('string'), vals.get('name')), 'account_id': vals.get('debit_account_id'),
             'debit': vals.get('amount'), 'voucher_id': vals.get('vouch_obj_id'), 'partner_id': vals.get('partner_debit', ''),
         })
         self.env['voucher.line'].create({
-            'name': "%s %s" % (vals.get('string'), vals.get('name')), 'partner_id': vals.get('partner_credit', ''),
+            'name': u"%s %s" % (vals.get('string'), vals.get('name')), 'partner_id': vals.get('partner_credit', ''),
             'account_id': vals.get('credit_account_id'), 'credit': vals.get('amount'), 'voucher_id': vals.get('vouch_obj_id'),
         })
         return True
