@@ -112,7 +112,7 @@ class money_invoice(models.Model):
             raise except_orm(u'错误', u'请配置%s的会计科目' % (self.category_id.name))
         if self.category_id.type == 'income':
 
-            vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': '源单',
+            vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': '',
                          'debit_account_id': partner_account_id
                          })
