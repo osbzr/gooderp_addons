@@ -118,7 +118,7 @@ class money_invoice(models.Model):
                          })
 
         else:
-            vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': '源单',
+            vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'源单',
                          'amount': abs(self.amount), 'credit_account_id': partner_account_id,
                          'debit_account_id': self.category_id.account_id.id, 'partner_credit': "", 'partner_debit': self.partner_id.id
                          })
@@ -161,7 +161,7 @@ class other_money_order(models.Model):
             for line in self.line_ids:
                 if not line.category_id.account_id:
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
-                vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': '其他收入单',
+                vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他收入单',
                              'amount': abs(line.amount), 'credit_account_id': line.category_id.account_id.id,
                              'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': ''
                              })
@@ -170,7 +170,7 @@ class other_money_order(models.Model):
             for line in self.line_ids:
                 if not line.category_id.account_id:
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
-                vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': '其他支出单',
+                vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他支出单',
                              'amount': abs(line.amount), 'credit_account_id': self.bank_id.account_id.id,
                              'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id
                              })
@@ -189,7 +189,7 @@ class money_transfer_order(models.Model):
         vals = {}
         self.write({'voucher_id': vouch_obj.id})
         for line in self.line_ids:
-            vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': '资金转账单',
+            vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'资金转账单',
                          'amount': abs(line.amount), 'credit_account_id': line.out_bank_id.account_id.id,
                          'debit_account_id': line.in_bank_id.account_id.id,
                          })
