@@ -65,7 +65,8 @@
            <field name='arch' type='xml'>
                <form string='属性'>
                    <field name='name'/>
-                     <field name='value_ids'>
+                   <field name='ean' />
+                   <field name='value_ids'>
                        <tree editable='TOP' string='属性值'>
                            <field name='category_id'/>
                            <field name='value_id' />

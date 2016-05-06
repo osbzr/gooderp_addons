@@ -32,6 +32,7 @@ class attribute(models.Model):
     def _compute_name(self):
         self.name = ' '.join([value.category_id.name + ':' + value.value_id.name for value in self.value_ids])
 
+    ean = fields.Char(u'条码')
     name = fields.Char(u'名称', compute='_compute_name', store=True, readonly=True)
     goods_id = fields.Many2one('goods', u'商品', ondelete='cascade')
     value_ids = fields.One2many('attribute.value', 'attribute_id', string=u'属性')
