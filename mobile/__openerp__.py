@@ -29,11 +29,17 @@
     "website": "http://www.osbzr.com",
     'category': 'Technical Settings',
     'depends': [
+        'core'
     ],
     'description':
     """
         移动端界面支持
     """,
+    'data': [
+        'view/mobile_view.xml',
+        'data/test_demo.xml',
+        'security/ir.model.access.csv',
+    ],
     'installable': True,
     'auto_install': False,
 }

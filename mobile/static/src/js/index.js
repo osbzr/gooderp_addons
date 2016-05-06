@@ -13,28 +13,39 @@ $(function(){
         }
     }};
 
-    function sync_lists(name, domain, offset, limit) {
+    function sync_lists(name, options) {
         return $.when($.get('/mobile/get_lists', {
             name: name,
-            domain: domain,
-            offset: offset,
-            limit: limit,
+            options: JSON.stringify(options || {}),
+            // options: {
+            //     domain: domain,
+            //     offset: offset,
+            //     limit: limit,
+            //     order: order,
+            //     type: type || 'tree', // 获取数据来源是tree还是form
+            //     record_id: record_id,
+            // }
         }));
     }
 
-    function create_vue(model) {
-        sync_lists('goods', 'i', 0, 80).then(function(results) {
-            console.log(results);
-        });
-
-        new Vue({
+    function create_vue(model, display_name) {
+        var vue = new Vue({
             el: '#container',
             data: {
-                message: model,
-                records: [{'field': 'nihao'}, {'field': 'sm'}, {'field': 'hha'}],
+                model: model,
+                display_name: display_name,
+                records: [],
+                headers: {},
             },
             methods: {
             },
+        });
+
+        sync_lists(vue.model).then(function(results) {
+            results = JSON.parse(results);
+            console.log(results);
+            vue.records = results.values;
+            vue.headers = results.headers;
         });
     }
 
@@ -47,7 +58,7 @@ $(function(){
                 return $('#tree').html();
             },
             bind: function() {
-                create_vue(grid_name);
+                create_vue(grid_name, $(grid).data('display'));
             },
         };
     });
