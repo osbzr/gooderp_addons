@@ -22,9 +22,21 @@ class test_reconcile_order(TransactionCase):
                                                              'reconciled': 0,
                                                              'to_reconcile': 600.0})
 
+    def test_money_invoice_done(self):
+        # money.invoice 没有设置科目 银行账户没设置科目
+        self.get_invoice.partner_id.c_category_id = False
+        self.get_invoice.partner_id.s_category_id = False
+        with self.assertRaises(except_orm):
+            self.get_invoice.money_invoice_done()
+        self.get_invoice.category_id.account_id = False
+        with self.assertRaises(except_orm):
+            self.get_invoice.money_invoice_done()
+
     def test_adv_pay_to_get(self):
         '''测试核销单: 预收冲应收'''
+
         self.get_invoice.money_invoice_done()
+
         reconcile = self.env.ref('money.reconcile_adv_pay_to_get')
         reconcile.partner_id = self.env.ref('core.jd').id
         reconcile.onchange_partner_id()
