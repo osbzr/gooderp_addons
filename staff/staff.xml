@@ -35,7 +35,6 @@
                                         <field name="parent_id"/>
                                     </group>
                                     <group string="联系信息">
-                                        <field name="company_id"/>
                                         <field name="work_mobile"/>
                                     </group>
                                     <group>
@@ -87,7 +86,6 @@
                     <field name="name"/>
                     <field name="work_phone"/>
                     <field name="work_email"/>
-                    <field name="company_id"/>
                     <field name="department_id"/>
                     <field name="job_id"/>
                     <field name="parent_id"/>
@@ -113,7 +111,6 @@
                 	<group>
                 		<group>
 		                    <field name="name"/>
-		                    <field name="company_id"/>
                 		</group>
                 		<group>
 		                    <field name="manager_id"/>
@@ -134,7 +131,6 @@
             <field name="arch" type="xml">
                 <tree string="部门">
                     <field name="name"/>
-                    <field name="company_id"/>
                     <field name="manager_id"/>
                     <field name="parent_id"/>
                 </tree>
