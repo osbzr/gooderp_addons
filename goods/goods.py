@@ -10,6 +10,7 @@ class goods(models.Model):
     force_batch_one = fields.Boolean(u'每批号数量为1')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
     image=fields.Binary(u'图片')
+    price = fields.Float(u'零售价')
 
     @api.one
     @api.onchange('uom_id')
