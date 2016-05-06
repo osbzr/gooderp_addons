@@ -60,6 +60,8 @@ class ExcelExportView(ExcelExport,):
     @http.route('/web/export/xls_view', type='http', auth='user')
     def export_xls_view(self, data, token):
         data = json.loads(data)
+        print data
+        print token, "+++++++++=="
         model = data.get('model', [])
         columns_headers = data.get('headers', [])
         rows = data.get('rows', [])

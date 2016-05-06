@@ -4,7 +4,6 @@ from openerp import fields, models, api
 class staff_department(models.Model):
     _name = "staff.department"
     
-    company_id = fields.Many2one('res.company',u'公司')
     name = fields.Char(u'部门名称',required=True)
     manager_id = fields.Many2one('staff',u'部门经理')
     member_ids = fields.One2many('staff', 'department_id', u'部门成员')
@@ -78,7 +77,6 @@ class staff(models.Model):
     active = fields.Boolean(u'生效',default='1')
     #公开信息
     work_mobile = fields.Char(u'办公手机')
-    company_id = fields.Many2one('res.company',u'所属公司')
     department_id = fields.Many2one('staff.department',u'部门')
     parent_id = fields.Many2one('staff',u'部门经理')
     job_id = fields.Many2one('staff.job',u'职位')

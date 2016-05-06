@@ -16,7 +16,7 @@ class sell_order_detail(models.TransientModel):
     goods_id = fields.Many2one('goods', u'商品名称')
     attribute = fields.Char(u'属性')
     uom = fields.Char(u'单位')
-    warehouse_dest = fields.Char(u'仓库')
+    warehouse = fields.Char(u'仓库')
     qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
     price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
     amount = fields.Float(u'销售收入', digits_compute=dp.get_precision('Amount'))
