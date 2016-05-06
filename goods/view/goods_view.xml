@@ -38,12 +38,6 @@
                            <page string='高级'>
                                <group>
                                    <group>
-                                       <field name='using_batch' groups='goods.batch_groups'/>
-                                       <field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
-                                       	groups='goods.batch_serial_groups' />
-                                       <field name='attribute_ids' groups='goods.multi_attrs_groups'/>
-                                   </group>
-                                   <group>
                                        <field name='cost'/>
                                        <field name='price_ids'>
                                            <tree editable="BOTTOM" string="价格清单">
@@ -51,6 +45,12 @@
                                                <field name="price"/>
                                            </tree>
                                        </field>
+                                   </group>
+                                   <group>
+                                       <field name='using_batch' groups='goods.batch_groups'/>
+                                       <field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
+                                       	groups='goods.batch_serial_groups' />
+                                       <field name='attribute_ids' groups='goods.multi_attrs_groups'/>
                                    </group>
                                </group>
                            </page>
