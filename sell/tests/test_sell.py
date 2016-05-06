@@ -182,6 +182,20 @@ class test_sell_order(TransactionCase):
         super(test_sell_order, self).setUp()
         self.order = self.env.ref('sell.sell_order_1')
 
+    def test_default_warehouse(self):
+        '''新建销货订单时调出仓库的默认值'''
+        order = self.env['sell.order'].with_context({
+             'warehouse_type': 'stock'
+             }).create({})
+        # 验证明细行上仓库是否是销货订单上调出仓库
+        hd_stock = self.browse_ref('warehouse.hd_stock')
+        order.warehouse_id = hd_stock
+        line = order.line_ids.with_context({
+            'default_warehouse_id': order.warehouse_id}).create({
+            'order_id': order.id})
+        self.assertTrue(line.warehouse_id == hd_stock)
+        self.env['sell.order'].create({})
+
     def test_unlink(self):
         '''测试删除已审核的销货订单'''
         self.order.sell_order_done()
@@ -255,7 +269,7 @@ class test_sell_order_line(TransactionCase):
             self.assertTrue(line.using_attribute)
 
     def test_onchange_goods_id(self):
-        '''当销货订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
+        '''当销货订单行的产品变化时，带出产品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
         goods.default_wh = self.env.ref('warehouse.hd_stock').id
         c_category_id = self.order.partner_id.c_category_id
@@ -266,8 +280,6 @@ class test_sell_order_line(TransactionCase):
             line.goods_id = goods
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
-            wh_id = line.warehouse_id.id
-            self.assertTrue(wh_id == goods.default_wh.id)
 
             # 测试价格是否是商品价格清单中的价格
             self.assertTrue(line.price == price_ids.price)

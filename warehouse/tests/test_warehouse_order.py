@@ -167,3 +167,31 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(temp_out.origin, 'wh.out.others')
         self.assertEqual(temp_in.origin, 'wh.in.others')
         self.assertEqual(temp_internal.origin, 'wh.internal')
+
+    def test_get_default_warehouse(self):
+        '''获取调出仓库'''
+        order = self.env['wh.out'].with_context({
+             'warehouse_type': 'stock'
+        }).create({'type': 'others'})
+        # 验证明细行上仓库是否是订单上调出仓库
+        hd_stock = self.browse_ref('warehouse.hd_stock')
+        order.warehouse_id = hd_stock
+        line = order.line_out_ids.with_context({
+            'default_warehouse_id': order.warehouse_id}).create({
+            'goods_id': self.browse_ref('goods.mouse').id})
+        self.assertTrue(line.warehouse_id == hd_stock)
+        self.env['wh.out'].create({'type': 'others'})
+
+    def test__get_default_warehouse_dest(self):
+        '''获取调入仓库'''
+        order = self.env['wh.in'].with_context({
+             'warehouse_dest_type': 'stock'
+        }).create({'type': 'others'})
+        # 验证明细行上仓库是否是订单上调入仓库
+        hd_stock = self.browse_ref('warehouse.hd_stock')
+        order.warehouse_dest_id = hd_stock
+        line = order.line_in_ids.with_context({
+            'default_warehouse_dest_id': order.warehouse_dest_id}).create({
+            'goods_id': self.browse_ref('goods.mouse').id})
+        self.assertTrue(line.warehouse_dest_id == hd_stock)
+        self.env['wh.in'].create({'type': 'others'})

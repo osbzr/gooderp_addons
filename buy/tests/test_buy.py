@@ -43,6 +43,20 @@ class test_buy_order(TransactionCase):
         order_copy_1._get_buy_goods_state()
         self.assertTrue(order_copy_1.goods_state == u'部分入库')
 
+    def test_default_warehouse_dest(self):
+        '''新建购货订单时调入仓库的默认值'''
+        order = self.env['buy.order'].with_context({
+             'warehouse_dest_type': 'stock'
+             }).create({})
+        # 验证明细行上仓库是否是购货订单上调入仓库
+        hd_stock = self.browse_ref('warehouse.hd_stock')
+        order.warehouse_dest_id = hd_stock
+        line = order.line_ids.with_context({
+            'default_warehouse_dest_id': order.warehouse_dest_id}).create({
+            'order_id': order.id})
+        self.assertTrue(line.warehouse_dest_id == hd_stock)
+        self.env['buy.order'].create({})
+
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
         self.order.buy_order_done()
@@ -180,15 +194,13 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.subtotal == 117)
 
     def test_onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本'''
+        '''当订单行的产品变化时，带出产品上的单位、成本'''
         goods = self.env.ref('goods.cable')
         goods.default_wh = self.env.ref('warehouse.hd_stock').id
         for line in self.order.line_ids:
             line.goods_id = goods
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
-            wh_id = line.warehouse_dest_id.id
-            self.assertTrue(wh_id == goods.default_wh.id)
 
             # 测试价格是否是商品的成本
             self.assertTrue(line.price == goods.cost)

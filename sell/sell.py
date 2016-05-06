@@ -42,6 +42,14 @@ class sell_order(models.Model):
             else:
                 self.goods_state = u'全部出库'
 
+    @api.model
+    def _default_warehouse(self):
+        if self.env.context.get('warehouse_type'):
+            return self.env['warehouse'].get_warehouse_by_type(
+                        self.env.context.get('warehouse_type'))
+
+        return self.env['warehouse'].browse()
+
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES)
     staff_id = fields.Many2one('staff', u'销售员',
@@ -55,6 +63,9 @@ class sell_order(models.Model):
         select=True, copy=False, help=u"订单的要求交货日期")
     type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', 
                             default='sell', states=READONLY_STATES)
+    warehouse_id = fields.Many2one('warehouse', u'调出仓库',
+                                   ondelete='restrict',
+                                   default=_default_warehouse)
     name = fields.Char(u'单据编号', select=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
     line_ids = fields.One2many('sell.order.line', 'order_id', u'销货订单行',
@@ -341,7 +352,6 @@ class sell_order_line(models.Model):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
             matched = False   # 在商品的价格清单中是否找到匹配的价格
             for line in self.goods_id.price_ids:
                 if self.order_id.partner_id.c_category_id == line.category_id:
