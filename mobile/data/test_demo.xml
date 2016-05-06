@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate='0'>
+        <record id='mobile_view_goods' model='mobile.view'>
+            <field name='name'>goods</field>
+            <field name='display_name'>产品</field>
+            <field name='model'>goods</field>
+            <field name='arch' type='xml'>
+                <mobile>
+                    <tree>
+                        <field name='code' string='编码' />
+                        <field name='name' string='产品' />
+                        <field name='cost' string='成本' />
+                    </tree>
+                    <form>
+                        <field name='uom_id' string='单位' />
+                        <field name='using_batch' string='批号管理' />
+                    </form>
+                </mobile>
+            </field>
+        </record>
+    </data>
+</openerp>
