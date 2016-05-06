@@ -13,6 +13,7 @@
 					<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 					<field name='conversion' string='转化率' groups='goods.auxiliary_unit_groups' />
 					<field name='cost' />
+					<field name='price' />
 				</tree>
 			</field>
 		</record>
@@ -46,6 +47,7 @@
 								<group>
 									<group>
 										<field name='cost'/>
+										<feild name='price'/>
 										<field name='price_ids'>
 											<tree editable="BOTTOM" string="价格清单">
 												<field name="category_id" widget="selection"/>
