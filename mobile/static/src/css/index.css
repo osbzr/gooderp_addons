@@ -1,0 +1,94 @@
+body, html {
+    height: 100%;
+    -webkit-tap-highlight-color: transparent
+}
+
+body {
+    overflow-x: hidden;
+    background-color: #FEF9F9
+}
+
+.container {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch
+}
+
+.container > div {
+    background-color: #fbf9fe
+}
+
+.hd {
+    padding: 2em 0
+}
+
+.page_title {
+    text-align: center;
+    font-size: 34px;
+    color: #611FC6;
+    font-weight: 400;
+    margin: 0 15%
+}
+
+.icon_default > i {
+    background: url('default.png') no-repeat;
+    background-size: 28px 28px;
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+.enter, .leave {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.enter {
+    animation: slideIn .2s forwards;
+}
+
+.leave {
+    animation: slideOut .25s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translate3d(100%, 0, 0);
+        opacity: 0;
+    }
+    to {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+    }
+    to {
+        transform: translate3d(100%, 0, 0);
+        opacity: 0;
+    }
+}
+
+.gooderp_tree_header {
+    background: #A7A7A7;
+    color: white;
+}
+
+.gooderp_more {
+    width: 16px;
+    height: 16px;
+    display: block;
+    position: absolute;
+    top: .8rem;
+    right: .8rem;
+    background: url('more-2.png') no-repeat;
+    background-size: 16px 16px;
+}

@@ -69,7 +69,7 @@
     padding: 4px 20px;
 }
 
-.stock-query-search-list li:hover,
+/*.stock-query-search-list li:hover,*/
 .stock-query-search-list .select{
     background-color: #6A6A6A;
     color: white;
