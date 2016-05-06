@@ -20,6 +20,7 @@ class TestWebExportView(TransactionCase):
         a = ExcelExportView()
         a.from_data(data.get('headers'), data.get("rows"), data.get("file_address"))
         a.from_data(data.get('headers'), data.get("rows"), '')
+        data.update({"file_address": ""})
         a.export_xls_view(json.dumps(data), 1462499490263)
 
         # print "++++++++++", data
