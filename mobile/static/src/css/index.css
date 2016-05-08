@@ -89,6 +89,84 @@ body {
     position: absolute;
     top: .8rem;
     right: .8rem;
-    background: url('more-2.png') no-repeat;
+    background: url('more.png') no-repeat;
     background-size: 16px 16px;
+}
+
+.gooderp_tree {
+    margin-top: 0;
+}
+
+.gooderp_search {
+    overflow: visible;
+}
+
+.gooderp_search_filter {
+    background-color: #636363;
+    border-radius: 5px;
+    color: white;
+    margin-right: 10px;
+    font-size: 12px;
+    padding: 5px 5px;
+	box-shadow: #313131 0 1px 2px 0 inset;
+    margin-right: .4rem;
+}
+
+.gooderp_filter_cancel_search {
+    border-left: 1px solid #BBB;
+    padding-left: .3rem;
+}
+
+.gooderp_cancel_search {
+    width: 24px;
+    height: 24px;
+    display: block;
+    position: absolute;
+    top: .8rem;
+    right: .7rem;
+    background: url('delete.png') no-repeat;
+    background-size: 24px 24px;
+    zoom: .5;
+}
+
+.gooder_search_results {
+    margin-top: 0;
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+    background-color: #A7A7A7;
+    color: white;
+}
+
+.gooder_search_results > a:first-child {
+    background-color: #6675E2;
+}
+
+.gooderp_fade-transition {
+    transition: opacity .3s ease;
+}
+
+.gooderp_fade-enter {
+    opacity: 0;
+}
+
+.gooderp_fade-leave {
+    opacity: 0;
+}
+
+.weui_cell_ft:after {
+    border-color: white !important;
+}
+
+.gooderp_search_operator {
+    background-color: #636363;
+    border-radius: 5px;
+    margin-right: 10px;
+    font-size: 12px;
+    padding: 5px 5px;
+	box-shadow: #313131 0 1px 2px 0 inset;
+}
+
+.gooderp_operator_dialog > div {
+    margin-top: 0;
 }

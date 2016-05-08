@@ -22,7 +22,6 @@ env = jinja2.Environment('<%', '%>', '${', '}', '%', loader=loader, autoescape=T
 
 
 class MobileSupport(http.Controller):
-
     @http.route('/mobile', auth='public')
     def index(self):
         template = env.get_template('index.html')
@@ -67,8 +66,12 @@ class MobileSupport(http.Controller):
         return [{node.attrib.get('name'): node.attrib.get('string')}
                 for node in tree.findall('.//form/field')]
 
-    def _get_format_domain(self, name, domain):
-        return []
+    def _get_format_domain(self, domain):
+        return [(
+            item.get('name'),
+            item.get('operator') or 'ilike',
+            item.get('operator') and float(item.get('word')) or item.get('word')
+        ) for item in domain]
 
     def _get_order(self, name, order):
         return ''
@@ -86,7 +89,9 @@ class MobileSupport(http.Controller):
         model_obj = self._get_model(name)
         if options.get('tree', 'tree') == 'tree':
             fields, headers = self._get_fields_list(name)
-            domain = self._get_format_domain(name, options.get('domain', ''))
+            domain = self._get_format_domain(options.get('domain', ''))
+            print '------------options---------------'
+            print domain
             order = self._get_order(name, options.get('order', ''))
 
             return request.make_response(simplejson.dumps({
@@ -106,3 +111,13 @@ class MobileSupport(http.Controller):
                 'headers': fields,
                 'values': model_obj.browse(self._parse_int(options.get(record_id))).read(fields.keys()),
             }))
+
+    @http.route('/mobile/get_search_view', auth='public')
+    def get_search_view(self, name):
+        view = request.env['mobile.view'].search([('name', '=', name)])
+        tree = ElementTree.parse(StringIO(view.arch.encode('utf-8')))
+
+        return request.make_response(simplejson.dumps(
+            [dict(node.attrib, column=view.column_type(
+                node.attrib.get('name', ''))) for node in tree.findall('.//form/field')]
+        ))

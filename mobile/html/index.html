@@ -32,7 +32,29 @@
         <div class="hd">
             <h1 class="page_title">{{ display_name }}</h1>
         </div>
-        <div class="weui_cells">
+        <div class="weui_cells weui_cells_form gooderp_search">
+            <div class="weui_cell gooderp_search">
+                <span class="gooderp_search_filter" v-for="filter in search_filter">
+                    {{ filter.string }} {{ filter.operator || ':' }} {{ filter.word }}
+                    <a class="gooderp_filter_cancel_search" @click="cancel_filter($index)">x</a>
+                </span>
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input @keydown.delete.esc="esc_search" @keydown.enter="enter_search" class="weui_input" v-model="search_word" type="text" placeholder="{{ display_name }}搜索框">
+                </div>
+            </div>
+            <a v-if="search_word || search_filter.length > 0" class="gooderp_cancel_search" @click="cancel_search"></a>
+            <div class="weui_cells weui_cells_access gooder_search_results" v-if="search_word" transition="gooderp_fade">
+                <a v-for="view in search_view" @click="add_search(view)" class="weui_cell" href="javascript:;">
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <p>搜索{{view.string}}：{{ search_word }}</p>
+                    </div>
+                    <div @click.self.stop="choose_operator(view)" v-if="['integer', 'float'].indexOf(view.column) >= 0" class="gooderp_search_operator">{{ map_operator(view.operator) }}</div>
+                    <div class="weui_cell_ft">
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="gooderp_tree weui_cells">
             <div class="weui_cell gooderp_tree_header" >
                 <div class="weui_cell_bd weui_cell_primary">{{ headers.left }}</div>
                 <div class="weui_cell_bd weui_cell_primary">{{ headers.center }}</div>
@@ -43,6 +65,36 @@
                 <div class="weui_cell_bd weui_cell_primary">{{ record.center }}</div>
                 <div class="weui_cell_bd weui_cell_primary">{{ record.right }}</div>
                 <a class="gooderp_more"></a>
+            </div>
+        </div>
+
+        <div class="weui_dialog_confirm" id="dialog1" style="display: none;">
+            <div class="weui_mask"></div>
+            <div class="gooderp_operator_dialog weui_dialog">
+                <div class="weui_cells weui_cells_access">
+                    <div class="weui_cell" data-operator=">">
+                        <div class="weui_cell_bd weui_cell_primary">大于</div>
+                    </div>
+                    <div class="weui_cell" data-operator="<">
+                        <div class="weui_cell_bd weui_cell_primary">小与</div>
+                    </div>
+                    <div class="weui_cell" data-operator=">=">
+                        <div class="weui_cell_bd weui_cell_primary">大于等于</div>
+                    </div>
+                    <div class="weui_cell" data-operator="<=">
+                        <div class="weui_cell_bd weui_cell_primary">小与等于</div>
+                    </div>
+                    <div class="weui_cell" data-operator="=">
+                        <div class="weui_cell_bd weui_cell_primary">等于</div>
+                    </div>
+                    <div class="weui_cell" data-operator="!=">
+                        <div class="weui_cell_bd weui_cell_primary">不等于</div>
+                    </div>
+                </div>
+
+                <div class="weui_dialog_ft">
+                    <a href="javascript:;" class="weui_btn_dialog default">取消</a>
+                </div>
             </div>
         </div>
 

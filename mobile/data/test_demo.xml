@@ -13,8 +13,8 @@
                         <field name='cost' string='成本' />
                     </tree>
                     <form>
-                        <field name='uom_id' string='单位' />
-                        <field name='using_batch' string='批号管理' />
+                        <field name='name' string='产品' />
+                        <field name='cost' string='成本' operator='>' />
                     </form>
                 </mobile>
             </field>
