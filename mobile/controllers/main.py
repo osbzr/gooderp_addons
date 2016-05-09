@@ -60,13 +60,20 @@ class MobileSupport(http.Controller):
         ) for item in domain]
 
     def _get_order(self, name, order):
-        return order
+        if len(order.split()) == 2:
+            return order
+        return ''
 
     def _parse_int(self, val):
         try:
             return int(val)
         except:
             return 0
+
+    def _get_max_count(self, name, domain):
+        # 可以考虑写成SQL语句来提高性能
+        view = request.env['mobile.view'].search([('name', '=', name)])
+        return len(request.env[view.model].search(domain))
 
     @http.route('/mobile/get_lists', auth='public')
     def get_lists(self, name, options):
@@ -80,6 +87,7 @@ class MobileSupport(http.Controller):
 
             return request.make_response(simplejson.dumps({
                 'headers': headers,
+                'max_count': self._get_max_count(name, domain),
                 'values': [{
                     'left': record.get(headers.get('left').get('name')),
                     'center': record.get(headers.get('center').get('name')),

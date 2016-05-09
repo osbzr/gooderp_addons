@@ -11,7 +11,8 @@ body {
 .container {
     height: 100%;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch
+    -webkit-overflow-scrolling: touch;
+    /*padding-bottom: 50px;*/
 }
 
 .container > div {
@@ -38,20 +39,13 @@ body {
     display: block;
 }
 
-.enter, .leave {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-}
-
 .enter {
+    display: block !important;
     animation: slideIn .2s forwards;
 }
 
 .leave {
+    display: none !important;
     animation: slideOut .25s forwards;
 }
 
@@ -99,6 +93,7 @@ body {
 
 .gooderp_tree {
     margin-top: 0;
+    /*overflow-y: auto;*/
 }
 
 .gooderp_search {
@@ -213,4 +208,18 @@ body {
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
     margin-top: 1px;
+}
+
+.gooderp_max_count {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    font-size: 12px;
+    transform: rotate(45deg);
+    /*background-color: white !important;*/
+}
+
+.gooderp_max_count > span {
+    transform: rotate(-45deg);
+    display: inline-block;
 }
