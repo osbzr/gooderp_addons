@@ -190,6 +190,8 @@
             						attrs="{'readonly': [('state','!=','draft')]}"
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            				    <field name="address"/>
+            				    <field name="mobile"/>
             					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="is_return" invisible="1"/>
