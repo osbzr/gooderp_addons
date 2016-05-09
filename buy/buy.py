@@ -61,6 +61,14 @@ class buy_order(models.Model):
             elif line.quantity == line.quantity_in:
                 self.goods_state = u'全部入库'
 
+    @api.model
+    def _default_warehouse_dest(self):
+        if self.env.context.get('warehouse_dest_type'):
+            return self.env['warehouse'].get_warehouse_by_type(
+                        self.env.context.get('warehouse_dest_type'))
+
+        return self.env['warehouse'].browse()
+
     partner_id = fields.Many2one('partner', u'供应商', states=READONLY_STATES,
                                  ondelete='restrict')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
@@ -74,6 +82,9 @@ class buy_order(models.Model):
                        help=u"购货订单的唯一编号，当创建时它会自动生成下一个编号。")
     type = fields.Selection([('buy', u'购货'), ('return', u'退货')], u'类型',
                             default='buy', states=READONLY_STATES)
+    warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
+                                        default=_default_warehouse_dest,
+                                        ondelete='restrict')
     line_ids = fields.One2many('buy.order.line', 'order_id', u'购货订单行',
                                states=READONLY_STATES, copy=True)
     note = fields.Text(u'备注')
@@ -353,7 +364,6 @@ class buy_order_line(models.Model):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本价'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            self.warehouse_dest_id = self.goods_id.default_wh  # 取产品的默认仓库
             if not self.goods_id.cost:
                 raise except_orm(u'错误', u'请先设置商品的成本！')
             self.price = self.goods_id.cost
@@ -624,7 +634,6 @@ class wh_move_line(models.Model):
             partner = self.env['partner'].search([('id', '=', partner_id)])
             is_return = self.env.context.get('default_is_return')
             if self.type == 'in':
-                self.warehouse_dest_id = self.goods_id.default_wh  # 取产品的默认仓库
                 if not self.goods_id.cost:
                     raise except_orm(u'错误', u'请先设置商品的成本！')
                 self.price = self.goods_id.cost

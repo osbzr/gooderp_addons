@@ -167,6 +167,7 @@
                             </group>
                             <group>
                                 <field name='type' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_id'/>
                             </group>
                         </group>
 
@@ -176,6 +177,7 @@
                                 'warehouse_dest_type': 'others',
                                 'lot': True,
                                 'type': 'out',
+                                'default_warehouse_id': warehouse_id,
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
@@ -242,6 +244,7 @@
                             </group>
                             <group>
                                 <field name='type' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_dest_id'/>
                             </group>
                         </group>
 
@@ -249,6 +252,7 @@
                             <field nolabel='1' name='line_in_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_in_tree',
                                 'warehouse_type': 'others',
+                                'default_warehouse_dest_id': warehouse_dest_id,
                                 'type': 'in',
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
@@ -312,14 +316,22 @@
                         <group>
                             <group>
                                 <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_id'/>
                             </group>
                             <group>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_dest_id'/>
                             </group>
                         </group>
 
                         <group string='移库明细'>
-                            <field nolabel='1' name='line_out_ids' context="{'tree_view_ref': 'warehouse.wh_move_line_internal_tree', 'lot': True, 'type': 'internal'}" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                            <field nolabel='1' name='line_out_ids' context="{
+                            	'tree_view_ref': 'warehouse.wh_move_line_internal_tree',
+                            	'lot': True,
+                            	'type': 'internal',
+                            	'default_warehouse_id': warehouse_id,
+                            	'default_warehouse_dest_id': warehouse_dest_id}"
+                            	attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
                         <group col='6'>

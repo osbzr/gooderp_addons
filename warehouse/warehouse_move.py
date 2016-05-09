@@ -12,11 +12,35 @@ class wh_move(models.Model):
         ('done', u'已审核'),
     ]
 
+    @api.model
+    def _get_default_warehouse(self):
+        '''获取调出仓库'''
+        if self.env.context.get('warehouse_type'):
+            return self.env['warehouse'].get_warehouse_by_type(
+                    self.env.context.get('warehouse_type'))
+
+        return self.env['warehouse'].browse()
+
+    @api.model
+    def _get_default_warehouse_dest(self):
+        '''获取调入仓库'''
+        if self.env.context.get('warehouse_dest_type'):
+            return self.env['warehouse'].get_warehouse_by_type(
+                    self.env.context.get('warehouse_dest_type'))
+
+        return self.env['warehouse'].browse()
+
     origin = fields.Char(u'源单类型', required=True)
     name = fields.Char(u'单据编号', copy=False, default='/')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft')
     partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict')
     date = fields.Date(u'单据日期', copy=False, default=fields.Date.context_today)
+    warehouse_id = fields.Many2one('warehouse', u'调出仓库',
+                                   ondelete='restrict',
+                                   default=_get_default_warehouse)
+    warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
+                                        ondelete='restrict',
+                                        default=_get_default_warehouse_dest)
     approve_uid = fields.Many2one('res.users', u'审核人',
                                   copy=False, ondelete='restrict')
     approve_date = fields.Datetime(u'审核日期', copy=False)

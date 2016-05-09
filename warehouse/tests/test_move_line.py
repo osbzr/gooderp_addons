@@ -38,20 +38,6 @@ class TestMoveLine(TransactionCase):
 
     def test_default(self):
         # 需找默认的仓库
-        self.assertEqual(self.env['wh.move.line']._get_default_warehouse(), False)
-        others_warehouse = self.env['wh.move.line'].with_context({
-            'warehouse_type': 'others'
-        })._get_default_warehouse()
-
-        self.assertEqual(others_warehouse.type, 'others')
-
-        self.assertEqual(self.env['wh.move.line']._get_default_warehouse_dest(), False)
-        customer_warehouse = self.env['wh.move.line'].with_context({
-            'warehouse_dest_type': 'customer'
-        })._get_default_warehouse_dest()
-
-        self.assertEqual(customer_warehouse.type, 'customer')
-
         defaults = self.env['wh.move.line'].with_context({
             'goods_id': 1,
             'warehouse_id': 1,

@@ -49,6 +49,7 @@
                             	domain="[('s_category_id', '!=', False)]"
                             	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="date" required="1"/>
+                            <field name="warehouse_dest_id"/>
                         </group>
                         <group>
                         	<field name="planned_date" required="1"/>
@@ -57,7 +58,9 @@
                             <field name="goods_state" readonly="1"/>
                         </group>
                     </group>
-                    <field name="line_ids" context="{'warehouse_type': 'supplier'}">
+                    <field name="line_ids" context="{
+                    	'warehouse_type': 'supplier',
+                    	'default_warehouse_dest_id': warehouse_dest_id}">
                     	<tree string="购货订单行" editable="bottom">
                             <field name="goods_id" required='1'/>
                             <field name='using_attribute' invisible='1'/>
@@ -184,6 +187,7 @@
                             	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
+                            <field name="warehouse_dest_id"/>
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -196,7 +200,10 @@
                     <notebook>
                     	<page string="入库单行">
 		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')]}"
-		                    	context="{'warehouse_type':'supplier','type':'in'}">
+		                    	context="{
+		                    	'warehouse_type':'supplier',
+		                    	'type':'in',
+		                    	'default_warehouse_dest_id': warehouse_dest_id}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
 		                            <field name="goods_id" required='1'
 		                            	context="{'default_partner':parent.partner_id,
@@ -347,6 +354,7 @@
                             	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
+                            <field name="warehouse_id"/>
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -359,7 +367,11 @@
                     <notebook>
                     	<page string="退货单行">
 		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
-		                    	context="{'warehouse_dest_type':'supplier','type':'out'}">
+		                    	context="{
+		                    	'warehouse_dest_type':'supplier',
+		                    	'type':'out',
+		                    	'default_warehouse_id': warehouse_id,
+		                    	}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
 		                            <field name="goods_id" required='1'
 		                            	context="{'default_partner':parent.partner_id,
@@ -471,6 +483,7 @@
             <field name="name">购货订单</field>
             <field name="res_model">buy.order</field>
             <field name="view_mode">tree,form</field>
+            <field name="context">{'warehouse_dest_type': 'stock'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建购货订单
@@ -482,7 +495,7 @@
             <field name="name">采购入库单</field>
             <field name="res_model">buy.receipt</field>
             <field name="view_mode">tree,form</field>
-            <field name="context">{'is_return':False}</field>
+            <field name="context">{'is_return':False, 'warehouse_dest_type': 'stock'}</field>
             <field name="domain">[('is_return','=',False)]</field>
             <field name="search_view_id" ref="buy_receipt_search"/>
             <field name="help" type="html">
@@ -496,7 +509,7 @@
             <field name="name">采购退货单</field>
             <field name="res_model">buy.receipt</field>
             <field name="view_mode">tree,form</field>
-            <field name="context">{'is_return':True}</field>
+            <field name="context">{'is_return':True, 'warehouse_type': 'stock'}</field>
             <field name="domain">[('is_return','=',True)]</field>
             <field name="search_view_id" ref="buy_return_search"/>
             <field name="help" type="html">
