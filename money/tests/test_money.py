@@ -112,10 +112,19 @@ class test_money_order(TransactionCase):
 
     def test_other_money_order_voucher(self):
         # get  银行账户没设置科目
-        self.env.ref('money.pay_2000').line_ids[0].bank_id.account_id = False
+        money1 = self.env['money.order'].with_context({'type': 'get'}) \
+            .create({
+                'partner_id': self.env.ref('core.jd').id,
+                'name': 'GET/2016001', 'date': "2016-02-20",
+                'note': 'zxy note',
+                'line_ids': [(0, 0, {
+                    'bank_id': self.env.ref('core.comm').id,
+                    'amount': 200.0, 'note': 'money note'})],
+                'type': 'get'})
+        money1.line_ids[0].bank_id.account_id = False
         with self.assertRaises(except_orm):
-            self.env.ref('money.pay_2000').money_order_done()
-        money = self.env['money.order'].with_context({'type': 'pay'}) \
+            money1.money_order_done()
+        money2 = self.env['money.order'].with_context({'type': 'pay'}) \
             .create({
                 'partner_id': self.env.ref('core.jd').id,
                 'name': 'GET/2016001', 'date': "2016-02-20",
@@ -125,9 +134,9 @@ class test_money_order(TransactionCase):
                     'amount': 200.0, 'note': 'money note'})],
                 'type': 'pay'})
         # pay  银行账户没设置科目
-        money.line_ids[0].bank_id.account_id = False
+        money2.line_ids[0].bank_id.account_id = False
         with self.assertRaises(except_orm):
-            money.money_order_done()
+            money2.money_order_done()
 
 
 class test_other_money_order(TransactionCase):
@@ -190,15 +199,6 @@ class test_other_money_order(TransactionCase):
         # onchange_date 执行type=other_pay
         invoice.partner_id = self.env.ref('core.lenovo').id,
 
-        # other_get 没有设置科目 银行账户没设置科目
-        #
-        other.line_ids[0].category_id.account_id = False
-        with self.assertRaises(except_orm):
-            other.other_money_done()
-        other.bank_id.account_id = False
-        with self.assertRaises(except_orm):
-            other.other_money_done()
-
         other = self.env['other.money.order'] \
             .with_context({'type': 'other_pay'}) \
             .create({
@@ -222,6 +222,19 @@ class test_other_money_order(TransactionCase):
         # other_get 没有设置科目 银行账户没设置科目
         #
         other.line_ids[0].amount = 10
+        other.line_ids[0].category_id.account_id = False
+        with self.assertRaises(except_orm):
+            other.other_money_done()
+        # other_pay 没有设置科目 银行账户没设置科目
+        other = self.env['other.money.order'] \
+            .with_context({'type': 'other_get'}) \
+            .create({
+                'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
+                    'bank_id': self.env.ref('core.comm').id,
+                    'line_ids': [(0, 0, {
+                        'source_id': invoice.id,
+                        'category_id': self.env.ref('money.core_category_sale').id,
+                        'amount': 10.0})]})
         other.line_ids[0].category_id.account_id = False
         with self.assertRaises(except_orm):
             other.other_money_done()
