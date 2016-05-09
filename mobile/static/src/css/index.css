@@ -19,7 +19,7 @@ body {
 }
 
 .hd {
-    padding: 2em 0
+    padding: 1em 0
 }
 
 .page_title {
@@ -82,6 +82,10 @@ body {
     color: white;
 }
 
+.gooderp_tree_header > div {
+    position: relative;
+}
+
 .gooderp_more {
     width: 16px;
     height: 16px;
@@ -109,7 +113,6 @@ body {
     font-size: 12px;
     padding: 5px 5px;
 	box-shadow: #313131 0 1px 2px 0 inset;
-    margin-right: .4rem;
 }
 
 .gooderp_filter_cancel_search {
@@ -169,4 +172,45 @@ body {
 
 .gooderp_operator_dialog > div {
     margin-top: 0;
+}
+
+.gooderp_tree_order {
+    display: inline-block;
+    position: absolute;
+    right: 1rem;
+    bottom: 2px;
+    line-height: 1;
+}
+
+.asc .gooderp_tree_order_up {
+    border-bottom-color: #444444;
+}
+
+.gooderp_tree_order_current .gooderp_tree_order_up,
+.gooderp_tree_order_current .gooderp_tree_order_down {
+    display: block;
+}
+
+.gooderp_tree_order_up {
+    display: none;
+    width: 0;
+    height: 0;
+    border-bottom: 8px solid #868686;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    margin-bottom: 1px;
+}
+
+.desc .gooderp_tree_order_down {
+    border-top-color: #444444;
+}
+
+.gooderp_tree_order_down {
+    display: none;
+    width: 0;
+    height: 0;
+    border-top: 8px solid #868686;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    margin-top: 1px;
 }

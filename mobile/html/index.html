@@ -39,11 +39,11 @@
                     <a class="gooderp_filter_cancel_search" @click="cancel_filter($index)">x</a>
                 </span>
                 <div class="weui_cell_bd weui_cell_primary">
-                    <input @keydown.delete.esc="esc_search" @keydown.enter="enter_search" class="weui_input" v-model="search_word" type="text" placeholder="{{ display_name }}搜索框">
+                    <input @focus="focus_search" @blur="blur_search" @keydown.delete.esc="esc_search" @keydown.enter="enter_search" class="weui_input" v-model="search_word" type="text" placeholder="{{ display_name }}搜索框">
                 </div>
             </div>
             <a v-if="search_word || search_filter.length > 0" class="gooderp_cancel_search" @click="cancel_search"></a>
-            <div class="weui_cells weui_cells_access gooder_search_results" v-if="search_word" transition="gooderp_fade">
+            <div class="weui_cells weui_cells_access gooder_search_results" v-if="search_word && display_search_results" transition="gooderp_fade">
                 <a v-for="view in search_view" @click="add_search(view)" class="weui_cell" href="javascript:;">
                     <div class="weui_cell_bd weui_cell_primary">
                         <p>搜索{{view.string}}：{{ search_word }}</p>
@@ -56,14 +56,32 @@
         </div>
         <div class="gooderp_tree weui_cells">
             <div class="weui_cell gooderp_tree_header" >
-                <div class="weui_cell_bd weui_cell_primary">{{ headers.left }}</div>
-                <div class="weui_cell_bd weui_cell_primary">{{ headers.center }}</div>
-                <div class="weui_cell_bd weui_cell_primary">{{ headers.right }}</div>
+                <div class="weui_cell_bd weui_cell_primary" :class="[order_direction, {gooderp_tree_order_current: order_name == headers.left.name}]" @click.self="order_by($event, headers.left)">
+                    {{ headers.left.string }}
+                    <div class="gooderp_tree_order">
+                        <span class="gooderp_tree_order_up" ></span>
+                        <span class="gooderp_tree_order_down" ></span>
+                    </div>
+                </div>
+                <div class="weui_cell_bd weui_cell_primary" :class="[order_direction, {gooderp_tree_order_current: order_name == headers.center.name}]" @click.self="order_by($event, headers.center)">
+                    {{ headers.center.string }}
+                    <div class="gooderp_tree_order">
+                        <span class="gooderp_tree_order_up" ></span>
+                        <span class="gooderp_tree_order_down" ></span>
+                    </div>
+                </div>
+                <div class="weui_cell_bd weui_cell_primary" :class="[order_direction, {gooderp_tree_order_current: order_name == headers.right.name}]" @click.self="order_by($event, headers.right)">
+                    {{ headers.right.string }}
+                    <div class="gooderp_tree_order">
+                        <span class="gooderp_tree_order_up" ></span>
+                        <span class="gooderp_tree_order_down" ></span>
+                    </div>
+                </div>
             </div>
             <div class="weui_cell gooderp_tree_row" v-for="record in records">
-                <div class="weui_cell_bd weui_cell_primary">{{ record.left }}</div>
-                <div class="weui_cell_bd weui_cell_primary">{{ record.center }}</div>
-                <div class="weui_cell_bd weui_cell_primary">{{ record.right }}</div>
+                <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.left) }}">{{{ compute_widget(headers.left, record.left) }}}</div>
+                <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.center) }}">{{{ compute_widget(headers.center, record.center) }}}</div>
+                <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.right) }}">{{{ compute_widget(headers.right, record.right) }}}</div>
                 <a class="gooderp_more"></a>
             </div>
         </div>
