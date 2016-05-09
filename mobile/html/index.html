@@ -43,13 +43,13 @@
                         <input @focus="focus_search" @blur="blur_search" @keydown.delete.esc="esc_search" @keydown.enter="enter_search" class="weui_input" v-model="search_word" type="text" placeholder="{{ display_name }}搜索框">
                     </div>
                 </div>
-                <a v-if="search_word || search_filter.length > 0" class="gooderp_cancel_search" @click="cancel_search"></a>
-                <div class="weui_cells weui_cells_access gooder_search_results" v-if="search_word" transition="gooderp_fade">
+                <a v-show="search_word || search_filter.length > 0" class="gooderp_cancel_search" @click="cancel_search"></a>
+                <div class="weui_cells weui_cells_access gooder_search_results" v-show="search_word" transition="gooderp_fade">
                     <a v-for="view in search_view" @click="add_search(view)" class="weui_cell" href="javascript:;">
                         <div class="weui_cell_bd weui_cell_primary">
                             <p>搜索{{view.string}}：{{ search_word }}</p>
                         </div>
-                        <div @click.self.stop="choose_operator(view)" v-if="['integer', 'float'].indexOf(view.column) >= 0" class="gooderp_search_operator">{{ map_operator(view.operator) }}</div>
+                        <div @click.self.stop="choose_operator(view)" v-show="['integer', 'float'].indexOf(view.column) >= 0" class="gooderp_search_operator">{{ map_operator(view.operator) }}</div>
                         <div class="weui_cell_ft">
                         </div>
                     </a>
