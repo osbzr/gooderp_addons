@@ -151,7 +151,7 @@ $(function(){
                         offset: this.records.length,
                     }, function(results) {
                         results = JSON.parse(results);
-                        self.records = self.records.concat(results.values);
+                        self.records.splice.apply(self.records, [self.records.length, 0].concat(results.values));
                         self.loading = false;
                     });
                 },
