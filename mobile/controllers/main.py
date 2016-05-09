@@ -92,6 +92,7 @@ class MobileSupport(http.Controller):
                     'left': record.get(headers.get('left').get('name')),
                     'center': record.get(headers.get('center').get('name')),
                     'right': record.get(headers.get('right').get('name')),
+                    'id': record.get('id'),
                 } for record in model_obj.search_read(
                     domain=domain, fields=map(lambda field: field.get('name'), headers.values()),
                     offset=self._parse_int(options.get('offset', 0)),

@@ -79,7 +79,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="weui_cell gooderp_tree_row" v-for="record in records">
+                <div class="weui_cell gooderp_tree_row" v-for="record in records" track-by="id">
                     <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.left) }}">{{{ compute_widget(headers.left, record.left) }}}</div>
                     <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.center) }}">{{{ compute_widget(headers.center, record.center) }}}</div>
                     <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.right) }}">{{{ compute_widget(headers.right, record.right) }}}</div>
