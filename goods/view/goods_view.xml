@@ -2,77 +2,86 @@
 <openerp>
 	<data>
 		<record id='goods_tree' model='ir.ui.view'>
-           <field name='name'>goods.tree</field>
-           <field name='model'>goods</field>
-           <field name='arch' type='xml'>
+			<field name='name'>goods.tree</field>
+			<field name='model'>goods</field>
+			<field name='arch' type='xml'>
 				<tree string='产品'>
-                   <field name='code' />
-                   <field name='name' />
-                   <field name='category_id' />
-                   <field name='uom_id' />
-                   <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                   <field name='conversion' string='转化率' groups='goods.auxiliary_unit_groups' />
-                   <field name='cost' />
-               </tree>
-           </field>
-       </record>
-       <record id='goods_form' model='ir.ui.view'>
-           <field name='name'>goods.form</field>
-           <field name='model'>goods</field>
-           <field name='arch' type='xml'>
-               <form string='产品'>
-                   <sheet>
-                       <group>
-                           <group>
-                               <field name='code'/>
-                               <field name='name' required='1' />
-                               <field name='category_id'/>
-                           </group>
-                           <group>
-                               <field name='uom_id' required='1' />
-                               <field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
-                               <field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" groups='goods.auxiliary_unit_groups' />
-                           </group>
-                       </group>
-                       <notebook>
-                           <page string='高级'>
-                               <group>
-                                   <group>
-                                       <field name='using_batch' groups='goods.batch_groups'/>
-                                       <field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
-                                       	groups='goods.batch_serial_groups' />
-                                       <field name='attribute_ids' groups='goods.multi_attrs_groups'/>
-                                   </group>
-                                   <group>
-                                       <field name='cost'/>
-                                       <field name='price_ids'>
-                                           <tree editable="BOTTOM" string="价格清单">
-                                               <field name="category_id" widget="selection"/>
-                                               <field name="price"/>
-                                           </tree>
-                                       </field>
-                                   </group>
-                               </group>
-                           </page>
-                       </notebook>
-                   </sheet>
-               </form>
-           </field>
-       </record>
-       <record id='attribute_form' model='ir.ui.view'>
-           <field name='name'>attribute.form</field>
-           <field name='model'>attribute</field>
-           <field name='arch' type='xml'>
-               <form string='属性'>
-                   <field name='name'/>
-                     <field name='value_ids'>
-                       <tree editable='TOP' string='属性值'>
-                           <field name='category_id'/>
-                           <field name='value_id' />
-                       </tree>
-                   </field>
-               </form>
-           </field>
-       </record>
+					<field name='code' />
+					<field name='name' />
+					<field name='category_id' />
+					<field name='uom_id' />
+					<field name='uos_id' groups='goods.auxiliary_unit_groups' />
+					<field name='conversion' string='转化率' groups='goods.auxiliary_unit_groups' />
+					<field name='cost' />
+					<field name='price' />
+				</tree>
+			</field>
+		</record>
+		<record id='goods_form' model='ir.ui.view'>
+			<field name='name'>goods.form</field>
+			<field name='model'>goods</field>
+			<field name='arch' type='xml'>
+				<form string='产品'>
+					<sheet>
+                		<group>
+							<group>
+								<group>
+									<field name='name' required='1'/>
+									<field name='code'/>
+									<field name='category_id'/>
+									<field name='uom_id' required='1' />
+									<field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
+									<field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" groups='goods.auxiliary_unit_groups' />
+								</group>
+							</group>
+							<group>
+	            				<div>
+	            					<field name='image' widget='image' 
+	            						class="oe_right oe_avatar"
+	            						options='{"preview_image": "image", "size": [500, 500]}'/>
+	            				</div>
+							</group>
+                		</group>
+						<notebook>
+							<page string='高级'>
+								<group>
+									<group>
+										<field name='cost'/>
+										<feild name='price'/>
+										<field name='price_ids'>
+											<tree editable="BOTTOM" string="价格清单">
+												<field name="category_id" widget="selection"/>
+												<field name="price"/>
+											</tree>
+										</field>
+									</group>
+									<group>
+										<field name='using_batch' groups='goods.batch_groups'/>
+										<field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
+										groups='goods.batch_serial_groups' />
+										<field name='attribute_ids' groups='goods.multi_attrs_groups'/>
+									</group>
+								</group>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record id='attribute_form' model='ir.ui.view'>
+			<field name='name'>attribute.form</field>
+			<field name='model'>attribute</field>
+			<field name='arch' type='xml'>
+				<form string='属性'>
+					<field name='name'/>
+					<field name='value_ids'>
+						<tree editable='TOP' string='属性值'>
+							<field name='category_id'/>
+							<field name='value_id' />
+						</tree>
+					</field>
+				</form>
+			</field>
+		</record>
 	</data>
 </openerp>

@@ -95,8 +95,7 @@ openerp.web_stock_query = function(instance) {
                 }
 
                 if (next_move && next_move.is('li')) {
-                    current_move.removeClass('select');
-                    next_move.addClass('select');
+                    next_move.addClass('select').siblings('.select').removeClass('select');
                 }
             }
         },

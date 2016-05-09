@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>GoodERP</title>
+    <link rel="stylesheet" href="/mobile/static/src/css/weui.css" />
+    <link rel="stylesheet" href="/mobile/static/src/css/index.css" />
+</head>
+<body ontouchstart>
+    <div id="container" class="container"></div>
+    <div id="home" style="display:none">
+        <div class="hd">
+            <h1 class="page_title">GoodERP</h1>
+        </div>
+        <div class="bd">
+            <div class="weui_grids">
+                <% for menu in menus %>
+                <a data-display="${menu.display_name}" href="#/${ menu.name }" class="weui_grid">
+                    <div class="weui_grid_icon icon_default">
+                        <i class="${ menu.icon_class }"></i>
+                    </div>
+                    <p class="weui_grid_label">
+                        ${ menu.display_name }
+                    </p>
+                </a>
+                <% endfor %>
+            </div>
+        </div>
+    </div>
+
+    <div id="tree" style="display:none">
+        <div class="hd">
+            <h1 class="page_title">{{ display_name }}</h1>
+        </div>
+        <div class="weui_cells">
+            <div class="weui_cell gooderp_tree_header" >
+                <div class="weui_cell_bd weui_cell_primary">{{ headers.left }}</div>
+                <div class="weui_cell_bd weui_cell_primary">{{ headers.center }}</div>
+                <div class="weui_cell_bd weui_cell_primary">{{ headers.right }}</div>
+            </div>
+            <div class="weui_cell gooderp_tree_row" v-for="record in records">
+                <div class="weui_cell_bd weui_cell_primary">{{ record.left }}</div>
+                <div class="weui_cell_bd weui_cell_primary">{{ record.center }}</div>
+                <div class="weui_cell_bd weui_cell_primary">{{ record.right }}</div>
+                <a class="gooderp_more"></a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/mobile/static/src/js/jquery.js" ></script>
+    <script src="/mobile/static/src/js/vue.js" ></script>
+    <script src="/mobile/static/src/js/router.min.js" ></script>
+    <script src="/mobile/static/src/js/index.js"></script>
+</body>
