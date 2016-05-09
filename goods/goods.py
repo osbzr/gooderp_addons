@@ -10,6 +10,7 @@ class goods(models.Model):
     force_batch_one = fields.Boolean(u'每批号数量为1')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
     image=fields.Binary(u'图片')
+    supplier_id = fields.Many2one('partner',u'供应商',domain="[('s_category_id','!=',False)]")
     price = fields.Float(u'零售价')
 
     @api.one
@@ -35,10 +36,13 @@ class attribute(models.Model):
         self.name = ' '.join([value.category_id.name + ':' + value.value_id.name for value in self.value_ids])
 
     ean = fields.Char(u'条码')
-    name = fields.Char(u'名称', compute='_compute_name', store=True, readonly=True)
+    name = fields.Char(u'属性', compute='_compute_name', store=True, readonly=True)
     goods_id = fields.Many2one('goods', u'商品', ondelete='cascade')
     value_ids = fields.One2many('attribute.value', 'attribute_id', string=u'属性')
 
+    _sql_constraints = [
+        ('ean_uniq', 'unique (ean)', u'该条码已存在'),
+    ]
 
 class attribute_value(models.Model):
     _name = 'attribute.value'
