@@ -19,5 +19,24 @@
                 </mobile>
             </field>
         </record>
+
+        <record id='mobile_view_warehouse' model='mobile.view'>
+            <field name='name'>warehouse</field>
+            <field name='display_name'>仓库</field>
+            <field name='model'>warehouse</field>
+            <field name='arch' type='xml'>
+                <mobile>
+                    <tree>
+                        <field name='code' string='编码' />
+                        <field name='name' string='仓库' />
+                        <field name='active' string='有效' />
+                    </tree>
+                    <form>
+                        <field name='name' string='仓库' />
+                        <field name='code' string='编码' />
+                    </form>
+                </mobile>
+            </field>
+        </record>
     </data>
 </openerp>
