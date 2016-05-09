@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
-from openerp.osv import osv
+from openerp.osv import osv, fields as osv_fields
 from xml.etree import ElementTree
 try:
     from cStringIO import StringIO
@@ -11,6 +11,15 @@ except:
 class MobileView(models.Model):
     _name = 'mobile.view'
     _order = 'sequence desc'
+
+    MAP_OPERATOR = {
+        '>': u'大于',
+        '<': u'小与',
+        '>=': u'大于等于',
+        '<=': u'小与等于',
+        '=': u'等于',
+        '!=': u'不等于',
+    }
 
     display_name = fields.Char(u'菜单名称', required=True, copy=False)
     name = fields.Char(u'名称', required=True, copy=False)
@@ -48,5 +57,14 @@ class MobileView(models.Model):
                 raise osv.except_osv(u'错误', u'每个field标签都必须要存在name和string属性')
 
             if node.attrib.get('name') not in columns:
-                print 'shit', node.attrib.get('name')
                 raise osv.except_osv(u'错误', u'字段属性%s未定义' % node.attrib.get('name'))
+
+            if node.attrib.get('operator'):
+                if node.attrib.get('operator') not in self.MAP_OPERATOR:
+                    raise osv.except_osv(u'错误', u'不能识别的操作符%s' % node.attrib.get('operator'))
+
+    def map_operator(self, operator):
+        return self.MAP_OPERATOR.get(operator, '')
+
+    def column_type(self, field):
+        return self.env[self.model]._columns[field]._type
