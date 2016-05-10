@@ -160,6 +160,9 @@
                             <label string='出库单' />
                             <field name="name" class="oe_inline" readonly="1" />
                         </h1>
+                        <div>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
+                        </div>
                         <group>
                             <group>
                                 <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}" />
@@ -237,6 +240,9 @@
                             <label string='入库单' />
                             <field name="name" class="oe_inline" readonly="1"/>
                         </h1>
+                        <div>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
+                        </div>
                         <group>
                             <group>
                                 <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}" />

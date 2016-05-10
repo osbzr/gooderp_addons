@@ -178,6 +178,7 @@
                         <h1>
                             <label string="采购入库单 " attrs="{'invisible': [('is_return','=',True)]}"/>
                         </h1>
+                        <input type='text' class="ge_scan_barcode" autofocus="true"/>
                     </div>
                     <group>
                         <group>
@@ -345,6 +346,7 @@
                         <h1>
                             <label string="采购退货单 "/>
                         </h1>
+                        <input type='text' class="ge_scan_barcode" autofocus="true"/>
                     </div>
                     <group>
                         <group>
