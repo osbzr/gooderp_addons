@@ -48,6 +48,68 @@ class wh_move(models.Model):
     line_in_ids = fields.One2many('wh.move.line', 'move_id', u'明细', domain=[('type', '=', 'in')], context={'type': 'in'}, copy=True)
     note = fields.Text(u'备注')
 
+    @api.model
+    def scan_barcode(self,model_name,barcode,order_id):
+        print 'model_name',model_name
+        val = {}
+        create_line = False
+        att = self.env['attribute'].search([('ean','=',barcode)])
+        if not att:
+            raise osv.except_osv(u'错误', u'该产品不存在')
+        else:
+            if model_name in ['wh.out','wh.in']:
+                move = self.env[model_name].browse(order_id).move_id
+            if model_name == 'wh.out':
+                val['type'] = 'out'
+                for line in move.line_out_ids:
+                    if line.attribute_id.id == att.id:
+                        line.goods_qty += 1
+                        create_line =True
+            if model_name == 'wh.in':
+                val['type'] = 'in'
+                for line in move.line_in_ids:
+                    if line.attribute_id.id == att.id:
+                        line.goods_qty += 1
+                        create_line =True
+            #销售出入库单的二维码
+            if model_name == 'sell.delivery':
+                move = self.env[model_name].browse(order_id).sell_move_id
+                if self.env[model_name].browse(order_id).is_return == True:
+                    val['type'] = 'in'
+                    for line in move.line_in_ids:
+                        if line.attribute_id.id == att.id:
+                            line.goods_qty += 1
+                            create_line =True
+                else:
+                    val['type'] = 'out'
+                    for line in move.line_out_ids:
+                        if line.attribute_id.id == att.id:
+                            line.goods_qty += 1
+                            create_line =True
+            #采购出入库单的二维码
+            if model_name == 'buy.receipt':
+                move = self.env[model_name].browse(order_id).buy_move_id
+                if self.env[model_name].browse(order_id).is_return == True:
+                    val['type'] = 'out'
+                    for line in move.line_out_ids:
+                        if line.attribute_id.id == att.id:
+                            line.goods_qty += 1
+                            create_line =True
+                else:
+                    val['type'] = 'in'
+                    for line in move.line_in_ids:
+                        if line.attribute_id.id == att.id:
+                            line.goods_qty += 1
+                            create_line =True
+            val.update({
+              'goods_id':att.goods_id.id,
+              'uom_id':att.goods_id.uom_id.id,
+              'attribute_id':att.id,
+              'goods_qty':1,
+              'move_id':move.id})
+            if create_line == False:
+                self.env['wh.move.line'].create(val)
+
     @api.multi
     def unlink(self):
         for move in self:
