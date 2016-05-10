@@ -229,6 +229,7 @@ body {
     right: 30px;
     font-size: 12px;
     transform: rotate(45deg);
+    background-color: transparent !important;
 }
 
 .gooderp_max_count > span {
@@ -251,4 +252,10 @@ body {
     margin-top: 0;
     background-color: #E2E2E2;
     /*display: none;*/
+}
+
+.gooderp_progress {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }

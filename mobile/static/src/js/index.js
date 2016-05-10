@@ -79,7 +79,7 @@ $(function(){
     function init_tree_view(hash) {
         refresh_vue_data(hash, $('a[href="#/' + hash + '"]').data('display'));
         vue = vue || create_vue(vue_data);
-        vue.sync_records();
+        vue.do_sync();
     }
 
     var MAP_OPERATOR = {
@@ -154,35 +154,17 @@ $(function(){
                         scrollDistance = container.scrollTop() + container.height();
 
                     if (container.prop('scrollHeight') - scrollDistance < 10) {
-                        vue.loadMore();
+                        var self = this;
+                        return self.do_sync({
+                            offset: this.records.length,
+                        }, function(results) {
+                            results = JSON.parse(results);
+                            self.records.splice.apply(self.records, [self.records.length, 0].concat(results.values));
+                            self.loading = false;
+                        }, null, function() {
+                            return this.records.length <= 0 || this.records.length >= this.max_count;
+                        });
                     }
-                },
-                loadMore: function() {
-                    var self = this;
-                    if (self.records.length <= 0 || self.loading) return;
-                    if (self.records.length >= self.max_count) return;
-
-                    self.loading = true;
-
-                    var progress = 0;
-                    var $progress = $('.js_progress');
-
-                    function next() {
-                        $progress.css({width: progress + '%'});
-                        progress = ++progress % 100;
-                        if (self.loading) setTimeout(next, 30);
-                        else $progress.css({width: 0});
-                    }
-
-                    next();
-
-                    self.do_sync({
-                        offset: this.records.length,
-                    }, function(results) {
-                        results = JSON.parse(results);
-                        self.records.splice.apply(self.records, [self.records.length, 0].concat(results.values));
-                        self.loading = false;
-                    });
                 },
                 order_by: function(event, headers) {
                     if (this.order_name === headers.name) {
@@ -232,12 +214,36 @@ $(function(){
                     this.search_word = '';
                     this.do_sync(null, null, function() { alert('搜索错误'); });
                 },
-                do_sync: function(options, success, error) {
-                    options = options || {};
-                    options.domain = options.domain || this.search_filter;
-                    options.order = options.order || [this.order_name, this.order_direction].join(' ');
+                do_sync: function(options, success, error, check) {
+                    var self = this;
+                    return this.loadMore(function() {
+                        options = options || {};
+                        options.domain = options.domain || this.search_filter;
+                        options.order = options.order || [this.order_name, this.order_direction].join(' ');
+                        return this.sync_records(options, success, error).then(function() {
+                            self.loading = false;
+                        });
+                    }, check);
+                },
+                loadMore: function(finish, check) {
+                    var self = this;
+                    if (self.loading) return true;
+                    if (check && check.apply(self)) return true;
 
-                    return this.sync_records(options, success, error);
+                    self.loading = true;
+                    var progress = 0;
+                    var $progress = $('.js_progress');
+
+                    function next() {
+                        $progress.css({width: progress + '%'});
+                        progress = ++progress % 100;
+                        if (self.loading) setTimeout(next, 30);
+                        else $progress.css({width: 0});
+                    }
+
+                    next();
+
+                    return finish.apply(self);
                 },
                 map_operator: map_operator,
                 choose_operator: function(value) {
