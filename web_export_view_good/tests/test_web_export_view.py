@@ -5,12 +5,14 @@ import os
 import openerp.tests
 
 
-@openerp.tests.common.at_install(False)
-@openerp.tests.common.post_install(True)
-class TestWebExportView(openerp.tests.HttpCase):
+# @openerp.tests.common.at_install(False)
+# @openerp.tests.common.post_install(True)
+# class TestWebExportView(openerp.tests.HttpCase):
 
-    def test_01_admin_bank_statement_reconciliation(self):
-        self.phantom_js("/", "openerp.Tour.run('test_export_view', 'test')", "openerp.Tour.tours.test_export_view", login="admin")
+#     def test_web_export_view(self):
+#         print "++++"
+#         self.phantom_js("/", "openerp.Tour.run('test_export_view', 'test')", "openerp.Tour.tours.test_export_view", login="admin")
+#         print "----------"
 
 
 class TestWebExportViewTwo(TransactionCase):

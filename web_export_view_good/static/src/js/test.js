@@ -19,22 +19,25 @@
                 title:     "用户菜单",
                 element:   '.oe_menu_leaf:contains("用户"):visible',
             },
-/*            {
-                title:     "选中要显示的数据",
-                element:   '.oe_list_record_selector',
-            },*/
            {
                 title:     "选中要显示的数据",
                 element:   'tr[data-id="1"] .oe_list_record_selector input[type="checkbox"]',
+                popover:   { fixed: true },
             }, 
              {
                 title:     "显示导出按钮",
                 element:   'button[class="oe_dropdown_toggle oe_dropdown_arrow"]:contains("导出当前列表"):visible',
+                popover:   { fixed: true },
             },
             {
                 title:     "导出当前列表",
                 element:   'li[class="oe_sidebar_export_view_xls"]:first-child',
+                popover:   { fixed: true },
+                autoComplete: function (tour) {}
             },
+            {
+                title:     "结束了",
+            }
         ]
     });
 
