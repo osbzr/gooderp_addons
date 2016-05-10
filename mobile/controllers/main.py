@@ -49,8 +49,8 @@ class MobileSupport(http.Controller):
         view = request.env['mobile.view'].search([('name', '=', name)])
         tree = ElementTree.parse(StringIO(view.arch.encode('utf-8')))
 
-        return [{node.attrib.get('name'): node.attrib.get('string')}
-                for node in tree.findall('.//form/field')]
+        return {node.attrib.get('name'): dict(node.attrib, column=view.column_type(node.attrib.get('name', '')))
+                for node in tree.findall('.//form/field')}
 
     def _get_format_domain(self, domain):
         return [(
@@ -80,7 +80,7 @@ class MobileSupport(http.Controller):
         options = simplejson.loads(options)
 
         model_obj = self._get_model(name)
-        if options.get('tree', 'tree') == 'tree':
+        if options.get('type', 'tree') == 'tree':
             headers = self._get_fields_list(name)
             domain = self._get_format_domain(options.get('domain', ''))
             order = self._get_order(name, options.get('order', ''))
@@ -100,10 +100,14 @@ class MobileSupport(http.Controller):
             }))
         else:
             headers = self._get_form_fields_list(name)
-            return request.make_response(simplejson.dumps({
-                'headers': headers,
-                'values': model_obj.browse(self._parse_int(options.get(record_id))).read(headers.keys()),
-            }))
+            return request.make_response(simplejson.dumps([{
+                'name': key,
+                'value': value,
+                'string': headers.get(key, {}).get('string'),
+                'column': headers.get(key, {}).get('column'),
+            } for key, value in model_obj.browse(self._parse_int(
+                options.get('record_id'))).read(headers.keys())[0].iteritems()
+            ]))
 
     @http.route('/mobile/get_search_view', auth='public')
     def get_search_view(self, name):
@@ -112,5 +116,5 @@ class MobileSupport(http.Controller):
 
         return request.make_response(simplejson.dumps(
             [dict(node.attrib, column=view.column_type(
-                node.attrib.get('name', ''))) for node in tree.findall('.//form/field')]
+                node.attrib.get('name', ''))) for node in tree.findall('.//search/field')]
         ))

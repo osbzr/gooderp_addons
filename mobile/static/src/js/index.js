@@ -10,9 +10,11 @@ $(function(){
             display_name: '',
             records: [],
             headers: {'left': '', 'center': '', 'right': ''},
+            form_records: [],
             search_view: [],
             search_filter: [],
             order_name: '',
+            record_form: '',
             order_direction: 'desc',
             loading: false,
         },
@@ -55,7 +57,7 @@ $(function(){
         }
     }
 
-    window.addEventListener('hashchange', function(event){
+    window.addEventListener('hashchange', function(event) {
         hashchange(event.newURL);
     });
     hashchange(location.hash, true);
@@ -64,6 +66,7 @@ $(function(){
         origin_data.records = [];
         origin_data.search_view = [];
         origin_data.search_filter = [];
+        origin_data.form_records = [];
         origin_data.headers = {'left': '', 'center': '', 'right': ''};
 
         for (var key in origin_data) {
@@ -119,6 +122,32 @@ $(function(){
             el: '#container',
             data: data,
             methods: {
+                open_form: function(record_id) {
+                    var self = this;
+                    if (self.record_form === record_id) {
+                        self.record_form = '';
+                        return;
+                    }
+                    this.do_sync({
+                        type: 'form',
+                        record_id: record_id,
+                    }, function(results) {
+                        self.form_records = JSON.parse(results);
+                        self.record_form = record_id;
+                    });
+                },
+
+                compute_form_header: function(record) {
+                    return record.string;
+                },
+
+                compute_form_widget: function(record) {
+                    if (record.column === 'many2one') {
+                        return record.value[1];
+                    }
+
+                    return record.value;
+                },
                 // 参考https://github.com/ElemeFE/vue-infinite-scroll来添加无限滑动
                 scroll_container: function() {
                     var container = $('#container'),
@@ -238,6 +267,9 @@ $(function(){
                     return header.class || '';
                 },
                 compute_widget: function(header, field) {
+                    if (header.column === 'many2one') {
+                        return field[1];
+                    }
                     return field;
                 },
             },
@@ -247,6 +279,12 @@ $(function(){
             if (!vue.search_cache) {
                 sync_search_view(vue.model).then(function(results) {
                     vue.search_view = JSON.parse(results);
+                    if (vue.search_view.length <= 0) {
+                        vue.search_view = [{
+                            name: vue.headers.left.name,
+                            string: vue.headers.left.string,
+                        }];
+                    }
                 });
                 vue.search_cache = true;
             }
