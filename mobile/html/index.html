@@ -8,7 +8,7 @@
 </head>
 <body ontouchstart>
     <div id="container" class="container" @scroll.self="scroll_container">
-        <div id="home" >
+        <div id="home" style="display: none">
             <div class="hd">
                 <h1 class="page_title">GoodERP</h1>
             </div>
@@ -27,7 +27,7 @@
                 </div>
             </div>
         </div>
-        <div id="tree" >
+        <div id="tree" style="display: none">
             <div class="hd">
                 <h1 class="page_title">{{ display_name }}</h1>
             </div>
@@ -78,7 +78,7 @@
                     </div>
                 </div>
                 <template v-for="record in records">
-                    <div class="weui_cell gooderp_tree_row" track-by="id" transition="staggered" stagger="10">
+                    <div class="weui_cell gooderp_tree_row" track-by="id" >
                         <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.left) }}">{{{ compute_widget(headers.left, record.left) }}}</div>
                         <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.center) }}">{{{ compute_widget(headers.center, record.center) }}}</div>
                         <div class="weui_cell_bd weui_cell_primary {{ compute_class(headers.right) }}">{{{ compute_widget(headers.right, record.right) }}}</div>

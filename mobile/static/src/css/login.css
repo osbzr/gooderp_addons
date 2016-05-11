@@ -1,0 +1,52 @@
+body, html {
+    height: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    overflow-x: hidden;
+    background-color: #F5F5F5
+}
+
+.container {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.hd {
+    padding: 1em 0
+}
+
+.page_title {
+    text-align: center;
+    font-size: 34px;
+    color: #611FC6;
+    font-weight: 400;
+    margin: 0 15%;
+    padding: .5em 0;
+}
+
+.gooderp_db {
+    padding: 5px 15px;
+}
+
+.weui_cells {
+    margin: 10px auto;
+    width: 90%;
+}
+
+#gooderp_login_button {
+    width: 88%;
+    margin: 45px auto;
+}
+
+.gooderp_login_message {
+    display: none;
+    font-size: 12px;
+    background-color: #636363;
+    border-radius: 5px;
+    color: white;
+    padding: 5px 5px;
+	box-shadow: #313131 0 1px 2px 0 inset;
+}

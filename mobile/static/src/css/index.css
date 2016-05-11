@@ -31,6 +31,10 @@ body {
     margin: 0 15%
 }
 
+.gooderp_login .page_title {
+    padding: 1em 0;
+}
+
 .icon_default > i {
     background: url('default.png') no-repeat;
     background-size: 28px 28px;

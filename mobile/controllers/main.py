@@ -2,11 +2,15 @@
 
 from openerp.addons.web import http
 from openerp.addons.web.http import request
+import openerp
 import simplejson
 import os
 import sys
 import jinja2
+import werkzeug
 from xml.etree import ElementTree
+from openerp.modules.registry import RegistryManager
+from contextlib import closing
 try:
     from cStringIO import StringIO
 except:
@@ -22,8 +26,45 @@ env = jinja2.Environment('<%', '%>', '${', '}', '%', loader=loader, autoescape=T
 
 
 class MobileSupport(http.Controller):
-    @http.route('/mobile', auth='public')
+    @http.route('/mobile/login', type='http', auth='none')
+    def login(self):
+        db_list = http.db_list() or []
+        db_list_by_mobile = []
+        for db in db_list:
+            db_manager = RegistryManager.get(db)
+            with closing(db_manager.cursor()) as cr:
+                cr.execute('''
+                           SELECT id FROM ir_module_module
+                           WHERE state = 'installed' AND name = 'mobile'
+                           ''')
+                if cr.fetchall():
+                    db_list_by_mobile.append(db)
+
+        template = env.get_template('login.html')
+        return template.render({'db_list': db_list, 'db_choose': 'warehouse'})
+
+    @http.route('/mobile/db_login', auth='none')
+    def db_login(self, db, account, passwd):
+        request.session.db = db
+        uid = request.session.authenticate(request.session.db, account, passwd)
+
+        if uid is not False:
+            return 'ok'
+
+        return '错误的帐号或密码'
+
+    @http.route('/mobile', type='http', auth='none')
     def index(self):
+        if not request.db or not request.session.uid:
+            return werkzeug.utils.redirect('/mobile/login')
+
+        return werkzeug.utils.redirect('/mobile/home')
+
+    @http.route('/mobile/home', auth='public')
+    def home(self):
+        if not request.db or not request.session.uid:
+            return werkzeug.utils.redirect('/mobile/login')
+
         template = env.get_template('index.html')
         return template.render({
             'menus': request.env['mobile.view'].search_read(
