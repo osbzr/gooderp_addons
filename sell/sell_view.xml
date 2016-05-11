@@ -183,6 +183,7 @@
                         	<h1>
                             	<label string="销售发货单 "/>
                         	</h1>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                      	</div>
             			<group>
             				<group>
@@ -345,6 +346,7 @@
                         	<h1>
                             	<label string="销售退货单 "/>
                         	</h1>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                      	</div>
             			<group>
             				<group>

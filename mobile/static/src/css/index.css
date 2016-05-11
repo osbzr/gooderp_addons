@@ -85,15 +85,28 @@ body {
     height: 16px;
     display: block;
     position: absolute;
-    top: .8rem;
+    bottom: .8rem;
     right: .8rem;
     background: url('more.png') no-repeat;
     background-size: 16px 16px;
 }
 
+.gooderp_more.choosed {
+    background: url('more-choosed.png') no-repeat;
+    background-size: 16px 16px;
+}
+
 .gooderp_tree {
     margin-top: 0;
-    /*overflow-y: auto;*/
+}
+
+.gooderp_tree_row:nth-child(3n) {
+    background-color: #F7F7F7;
+}
+
+.gooderp_tree .weui_cell_primary {
+    width: 30%;
+    overflow: hidden;
 }
 
 .gooderp_search {
@@ -216,10 +229,33 @@ body {
     right: 30px;
     font-size: 12px;
     transform: rotate(45deg);
-    /*background-color: white !important;*/
+    background-color: transparent !important;
 }
 
 .gooderp_max_count > span {
     transform: rotate(-45deg);
     display: inline-block;
+}
+
+.staggered-transition {
+    transition: all .5s ease;
+}
+.staggered-enter, .staggered-leave {
+    opacity: 0;
+}
+
+.gooderp_tree_sequence {
+    width: 10px;
+}
+
+.gooderp_form {
+    margin-top: 0;
+    background-color: #E2E2E2;
+    /*display: none;*/
+}
+
+.gooderp_progress {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
