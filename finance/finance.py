@@ -120,6 +120,21 @@ class voucher_line(models.Model):
     auxiliary_id = fields.Many2one(
         'auxiliary.financing', u'辅助核算',
         ondelete='restrict')
+    date = fields.Date(compute='_compute_voucher_date', store=True, string='凭证日期')
+    state = fields.Selection([('draft', u'草稿'),
+                              ('done', u'已审核')], compute='_compute_voucher_state', store=True, string='状态')
+
+    @api.one
+    @api.depends('voucher_id.date')
+    def _compute_voucher_date(self):
+        # todo 实现明细行总金额
+        self.date = self.voucher_id.date
+
+    @api.one
+    @api.depends('voucher_id.state')
+    def _compute_voucher_state(self):
+        # todo 实现明细行总金额
+        self.state = self.voucher_id.state
 
     @api.multi
     @api.onchange('account_id')
@@ -168,18 +183,18 @@ class finance_period(models.Model):
     def _compute_name(self):
         if self.year and self.month:
             self.name = u'%s年 第%s期' % (self.year, self.month)
-    
+
     @api.model
     def init_period(self):
         ''' 根据系统启用日期（安装core模块的日期）创建 '''
         current_date = self.env.ref('base.main_company').start_date
         period_id = self.search([
-                ('year', '=', current_date[0:4]),
-                ('month', '=', int(current_date[5:7]))
-            ])
+            ('year', '=', current_date[0:4]),
+            ('month', '=', int(current_date[5:7]))
+        ])
         if not period_id:
-            return self.create({'year':current_date[0:4],
-                                'month':str(int(current_date[5:7])),})
+            return self.create({'year': current_date[0:4],
+                                'month': str(int(current_date[5:7])), })
 
     @api.multi
     def get_period(self, date):
