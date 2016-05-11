@@ -388,6 +388,21 @@ class test_sell_delivery(TransactionCase):
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
 
+    def test_scan_barcode(self):
+        '''销售扫码出入库'''
+        warehouse = self.env['wh.move']
+        barcode = '12345678987'
+        #销售退货扫码
+        model_name = 'sell.delivery'
+        warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
+        warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
+        #销售出库单扫码
+        sell_order = self.env.ref('sell.sell_order_1')
+        sell_order.sell_order_done()
+        delivery_order = self.env['sell.delivery'].search([('order_id', '=', sell_order.id)])
+        warehouse.scan_barcode(model_name,barcode,delivery_order.id)
+        warehouse.scan_barcode(model_name,barcode,delivery_order.id)
+
 
 class test_wh_move_line(TransactionCase):
 

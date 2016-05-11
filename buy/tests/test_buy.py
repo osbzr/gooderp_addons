@@ -380,6 +380,19 @@ class test_buy_receipt(TransactionCase):
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
 
+    def test_scan_barcode(self):
+        '''采购扫码出入库'''
+        warehouse = self.env['wh.move']
+        barcode = '12345678987'
+        model_name = 'buy.receipt'
+        #采购出库单扫码
+        buy_order_return = self.env.ref('buy.buy_receipt_return_1')
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+        #采购入库单扫码
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
+
 
 class test_wh_move_line(TransactionCase):
 
