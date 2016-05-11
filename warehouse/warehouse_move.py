@@ -50,7 +50,6 @@ class wh_move(models.Model):
 
     @api.model
     def scan_barcode(self,model_name,barcode,order_id):
-        print 'model_name',model_name
         val = {}
         create_line = False
         att = self.env['attribute'].search([('ean','=',barcode)])
