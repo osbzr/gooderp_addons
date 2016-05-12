@@ -27,7 +27,7 @@ env = jinja2.Environment('<%', '%>', '${', '}', '%', loader=loader, autoescape=T
 
 class MobileSupport(http.Controller):
     @http.route('/mobile/login', type='http', auth='none')
-    def login(self):
+    def login(self, db_choose=''):
         db_list = http.db_list() or []
         db_list_by_mobile = []
         for db in db_list:
@@ -41,7 +41,7 @@ class MobileSupport(http.Controller):
                     db_list_by_mobile.append(db)
 
         template = env.get_template('login.html')
-        return template.render({'db_list': db_list, 'db_choose': 'warehouse'})
+        return template.render({'db_list': db_list_by_mobile, 'db_choose': db_choose})
 
     @http.route('/mobile/db_login', auth='none')
     def db_login(self, db, account, passwd):
