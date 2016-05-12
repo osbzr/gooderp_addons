@@ -2,6 +2,7 @@ $(function(){
     // vue对象
     var vue = false,
         origin_data = {
+            component_plugin: 'char-input',
             max_count: 0,
             search_word: '',
             display_search_results: true,
@@ -11,12 +12,14 @@ $(function(){
             records: [],
             headers: {'left': '', 'center': '', 'right': ''},
             form_records: [],
+            wizard_records: [],
             search_view: [],
             search_filter: [],
             order_name: '',
             record_form: '',
             order_direction: 'desc',
             loading: false,
+            wizard: false,
         },
         vue_data = {};
 
@@ -62,24 +65,43 @@ $(function(){
     });
     hashchange(location.hash, true);
 
-    function refresh_vue_data(hash, display_name) {
+    function refresh_vue_data(options) {
         origin_data.records = [];
         origin_data.search_view = [];
         origin_data.search_filter = [];
         origin_data.form_records = [];
+        origin_data.wizard_records = [];
         origin_data.headers = {'left': '', 'center': '', 'right': ''};
 
         for (var key in origin_data) {
             vue_data[key] = origin_data[key];
         }
-        vue_data.model = hash;
-        vue_data.display_name = display_name;
+        // vue_data.model = hash;
+        for (var options_key in options) {
+            vue_data[options_key] = options[options_key];
+        }
     }
 
     function init_tree_view(hash) {
-        refresh_vue_data(hash, $('a[href="#/' + hash + '"]').data('display'));
+        var reg = new RegExp('-using_wizard$').test(hash);
+        refresh_vue_data({
+            model: reg? hash.slice(0, hash.length - '-using_wizard'.length) : hash,
+            display_name: $('a[href="#/' + hash + '"]').data('display'),
+            wizard: reg,
+        });
+
         vue = vue || create_vue(vue_data);
-        vue.do_sync();
+        if (reg) {
+            // 用来解决进入tree视图的动画影响到了dialog视图的显示
+            $('#tree').css('animation', 'none');
+            $.when($.get('/mobile/get_wizard_view', {
+                name: vue.model,
+            })).then(function(results) {
+                vue.wizard_records = JSON.parse(results);
+            });
+        } else {
+            vue.do_sync();
+        }
     }
 
     var MAP_OPERATOR = {
@@ -100,14 +122,6 @@ $(function(){
         return $.when($.get('/mobile/get_lists', {
             name: name,
             options: JSON.stringify(options || {}),
-            // options: {
-            //     domain: domain,
-            //     offset: offset,
-            //     limit: limit,
-            //     order: order,
-            //     type: type || 'tree', // 获取数据来源是tree还是form
-            //     record_id: record_id,
-            // }
         }));
     }
 
@@ -122,6 +136,12 @@ $(function(){
             el: '#container',
             data: data,
             methods: {
+                cancel_wizard: function() {
+                    console.log('cancel');
+                },
+                confirm_wizard: function() {
+                    console.log(this.wizard_records);
+                },
                 open_form: function(record_id) {
                     var self = this;
                     if (self.record_form === record_id) {
@@ -140,7 +160,6 @@ $(function(){
                 compute_form_header: function(record) {
                     return record.string;
                 },
-
                 compute_form_widget: function(record) {
                     if (record.column === 'many2one') {
                         return record.value[1];
