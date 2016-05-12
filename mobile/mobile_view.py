@@ -2,6 +2,7 @@
 from openerp import models, fields, api
 from openerp.osv import osv, fields as osv_fields
 from xml.etree import ElementTree
+import itertools
 try:
     from cStringIO import StringIO
 except:
@@ -10,16 +11,27 @@ except:
 
 class MobileView(models.Model):
     _name = 'mobile.view'
-    _order = 'sequence desc'
+    _order = 'sequence asc'
 
     MAP_OPERATOR = {
-        '>': u'大于',
-        '<': u'小与',
-        '>=': u'大于等于',
-        '<=': u'小与等于',
-        '=': u'等于',
-        '!=': u'不等于',
+        '>': u'大于', '<': u'小与', '>=': u'大于等于',
+        '<=': u'小与等于', '=': u'等于', '!=': u'不等于',
     }
+
+    WIZARD_TYPE = [
+        'many2one', 'number', 'date',
+        'datetime', 'char', 'text',
+    ]
+
+    @api.one
+    @api.depends('arch')
+    def _get_using_wizard(self):
+        tree = ElementTree.parse(StringIO(self.arch.encode('utf-8')))
+        for wizard_node in tree.findall('.//wizard/field'):
+            self.using_wizard = True
+            return
+
+        self.using_wizard = False
 
     display_name = fields.Char(u'菜单名称', required=True, copy=False)
     name = fields.Char(u'名称', required=True, copy=False)
@@ -28,6 +40,7 @@ class MobileView(models.Model):
     domain = fields.Char('domain')
     limit = fields.Integer(u'初始数量', default=20)
     sequence = fields.Integer(u'排序', default=16)
+    using_wizard = fields.Boolean(compute='_get_using_wizard', string='启动wizard')
     arch = fields.Text(u'XML视图', required=True)
 
     _sql_constraints = [
@@ -51,8 +64,15 @@ class MobileView(models.Model):
         if len(tree_nodes) != 3:
             raise osv.except_osv(u'错误', u'XML视图中tree标签下面的field标签必须是3个字段')
 
-        columns = self.env[self.model]._columns
-        for node in tree.findall('.//field'):
+        for wizard_node in tree.findall('.//wizard/field'):
+            attrib = wizard_node.attrib
+            if not attrib.get('type') or attrib.get('type') not in self.WIZARD_TYPE:
+                raise osv.except_osv(u'错误', u'wizard里面的field标签type属性必须存在或type属性值错误')
+
+        columns = self.env[self.model].fields_get()
+        for node in itertools.chain(tree.findall('.//tree/field'),
+                                    tree.findall('.//form/field'),
+                                    tree.findall('.//search/field')):
             if 'name' not in node.attrib or 'string' not in node.attrib:
                 raise osv.except_osv(u'错误', u'每个field标签都必须要存在name和string属性')
 

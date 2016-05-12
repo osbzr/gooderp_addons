@@ -27,7 +27,7 @@ env = jinja2.Environment('<%', '%>', '${', '}', '%', loader=loader, autoescape=T
 
 class MobileSupport(http.Controller):
     @http.route('/mobile/login', type='http', auth='none')
-    def login(self):
+    def login(self, db_choose=''):
         db_list = http.db_list() or []
         db_list_by_mobile = []
         for db in db_list:
@@ -41,7 +41,7 @@ class MobileSupport(http.Controller):
                     db_list_by_mobile.append(db)
 
         template = env.get_template('login.html')
-        return template.render({'db_list': db_list, 'db_choose': 'warehouse'})
+        return template.render({'db_list': db_list_by_mobile, 'db_choose': db_choose})
 
     @http.route('/mobile/db_login', auth='none')
     def db_login(self, db, account, passwd):
@@ -68,7 +68,7 @@ class MobileSupport(http.Controller):
         template = env.get_template('index.html')
         return template.render({
             'menus': request.env['mobile.view'].search_read(
-                fields=['name', 'icon_class', 'display_name'])
+                fields=['name', 'icon_class', 'display_name', 'using_wizard'])
         })
 
     def _get_model(self, name):
@@ -158,4 +158,13 @@ class MobileSupport(http.Controller):
         return request.make_response(simplejson.dumps(
             [dict(node.attrib, column=view.column_type(
                 node.attrib.get('name', ''))) for node in tree.findall('.//search/field')]
+        ))
+
+    @http.route('/mobile/get_wizard_view', auth='public')
+    def get_wizard_view(self, name):
+        view = request.env['mobile.view'].search([('name', '=', name)])
+        tree = ElementTree.parse(StringIO(view.arch.encode('utf-8')))
+
+        return request.make_response(simplejson.dumps(
+            [node.attrib for node in tree.findall('.//wizard/field')]
         ))

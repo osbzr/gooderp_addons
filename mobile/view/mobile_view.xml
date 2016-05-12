@@ -13,6 +13,7 @@
                     <field name='icon_class' />
                     <field name='domain' />
                     <field name='limit' />
+					<field name='using_wizard' />
                 </tree>
             </field>
         </record>

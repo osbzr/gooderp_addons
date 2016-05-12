@@ -255,11 +255,23 @@ body {
 .gooderp_form {
     margin-top: 0;
     background-color: #E2E2E2;
-    /*display: none;*/
 }
 
 .gooderp_progress {
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+.gooderp_wizard > .weui_dialog {
+    top: 30%;
+}
+
+.gooderp_wizard .weui_cells {
+    margin-top: 0;
+}
+
+.gooderp_wizard .weui_cell_hd,
+.gooderp_wizard .weui_cell_bd {
+    text-align: left;
 }
