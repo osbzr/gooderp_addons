@@ -148,6 +148,7 @@
                     <group>
                         <group>
                             <field name="code"/>
+                    		<field name="mobile"/>
                         </group>
                         <group>
 							<field name="c_category_id" required="1"/>
@@ -167,6 +168,7 @@
                 <tree editable="TOP" string="客户">
                     <field name="c_category_id" required="1"/>
                     <field name="code"/>
+                    <field name="mobile"/>
                     <field name="name"/>
                     <field name="receivable" sum='sum'/>
                 </tree>
