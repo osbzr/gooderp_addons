@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>GoodERP Login</title>
+    <link rel="stylesheet" href="/mobile/static/src/css/weui.css" />
+    <link rel="stylesheet" href="/mobile/static/src/css/login.css" />
+</head>
+<body ontouchstart>
+    <div id="container" class="container" >
+        <div class="hd">
+            <h1 class="page_title">GoodERP</h1>
+        </div>
+        <div class="weui_cells weui_cells_form ">
+            <div class="weui_cell gooderp_db">
+                <div class="weui_cell_hd"><label class="weui_label">数据库</label></div>
+                <select class="weui_select">
+                    <% for db in db_list %>
+                    <option ${db_choose == db and "selected" or ""} value="${db}">${db}</option>
+                    <% endfor %>
+                </select>
+            </div>
+        </div>
+
+        <div class="weui_cells weui_cells_form">
+            <div class="weui_cell gooderp_login_account">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" type="text" placeholder="帐号"/>
+                </div>
+                <div class="gooderp_login_message">密码错误</div>
+            </div>
+            <div class="weui_cell gooderp_login_password">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" type="password" placeholder="密码"/>
+                </div>
+                <div class="gooderp_login_message">密码错误</div>
+            </div>
+        </div>
+
+        <div class="weui_btn_area" id="gooderp_login_button">
+            <a class="weui_btn weui_btn_primary" href="javascript:" id="showTooltips">登录</a>
+        </div>
+    </div>
+
+
+    <script src="/mobile/static/src/js/jquery.js" ></script>
+    <script src="/mobile/static/src/js/login.js"></script>
+</body>
