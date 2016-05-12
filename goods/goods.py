@@ -35,6 +35,17 @@ class attribute(models.Model):
     def _compute_name(self):
         self.name = ' '.join([value.category_id.name + ':' + value.value_id.name for value in self.value_ids])
 
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        '''在many2one字段中支持按条形码搜索'''
+        args = args or []
+        if name:
+            goods_ids = self.search([('ean', 'ilike', name)])
+            if goods_ids:
+                return goods_ids.name_get()
+        return super(attribute, self).name_search(
+                name=name, args=args, operator=operator, limit=limit)
+
     ean = fields.Char(u'条码')
     name = fields.Char(u'属性', compute='_compute_name', store=True, readonly=True)
     goods_id = fields.Many2one('goods', u'商品', ondelete='cascade')
