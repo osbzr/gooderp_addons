@@ -7,13 +7,11 @@ openerp.home_page = function(instance, local) {
         start: function() {
             var num=this.get('value');
             var self=this
-            self.$el.append("<div style='top:150PX'>\
-                                    <div style='float:left;width:80%;'>\
-                                        <div style='float:left;width:20%;' class='top_div'></div>\
-                                        <div style='float:right;width:80%;' class='main_div'></div>\
-                                    </div>\
-                                    <div style='float:right;width:20%;' class='right_div'></div>\
-                            </div>")
+            self.$el.append("<div class='container-fluid'><div class='row'>\
+                                    <div  class='top_div col-md-3'></div>\
+                                    <div  class='main_div col-md-8'></div>\
+                                    <div class='right_div col-md-1'></div>\
+                                    </div></div>")
             new instance.web.Model("home.page").call("get_action_url").then(function(result){
                 var index=0
                 var center_main_table="<div class='center_class'><table border='1' cellpadding='3' class='oe_table_main'></table></div>"
