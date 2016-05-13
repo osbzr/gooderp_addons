@@ -287,6 +287,15 @@ class test_sell_order_line(TransactionCase):
             self.order.partner_id.c_category_id = False
             with self.assertRaises(except_orm):
                 line.onchange_goods_id()
+                
+    def test_onchange_warehouse_id(self):
+        '''仓库和商品带出价格策略的折扣率'''
+        order_line=self.env.ref('sell.sell_order_line_1')
+        order_line.onchange_warehouse_id()
+        order=self.env.ref('sell.sell_order_1')
+        order.partner_id = self.env.ref('core.yixun').id
+        order_line.onchange_warehouse_id()
+        
 
 
 class test_sell_delivery(TransactionCase):
@@ -444,3 +453,12 @@ class test_wh_move_line(TransactionCase):
             with self.assertRaises(except_orm):
                 line.with_context({'default_is_return': False,
                 'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+                
+    def test_onchange_warehouse_id(self):
+        '''wh.move.line仓库和商品带出价格策略的折扣率'''
+        for line in self.delivery.line_out_ids:
+            line.with_context({'default_is_return': False,
+                'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
+        for line in self.delivery.line_out_ids:
+            line.with_context({'default_is_return': False,
+                'default_partner': self.env.ref('core.yixun').id}).onchange_warehouse_id()
