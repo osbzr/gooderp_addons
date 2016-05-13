@@ -67,33 +67,41 @@ class MobileView(models.Model):
             except:
                 raise osv.except_osv(u'错误', '无法解析的selection属性%s' % attrib.get('selection'))
 
+    def _check_domain(self, model, domain):
+        try:
+            model_columns = self.env[model].fields_get()
+            domain = eval(domain)
+            if not isinstance(domain, list):
+                raise ValueError()
+
+            for item in domain:
+                if item == '|':
+                    continue
+
+                if not isinstance(item, (list, tuple)):
+                    raise ValueError()
+
+                if item[0] not in model_columns:
+                    raise ValueError()
+
+                if len(item) != 3:
+                    raise ValueError()
+        except:
+            raise osv.except_osv(u'错误', '无法解析的domain条件%s' % domain)
+
+    def _check_model(self, model):
+        try:
+            self.env[model]
+        except KeyError:
+            raise osv.except_osv(u'错误', u'Model %s不存在' % model)
+
     def _check_many2one(self, attrib):
         if attrib.get('type') == 'many2one':
             if not attrib.get('model'):
                 raise osv.except_osv(u'错误', u'many2one类型的字段需要指定该字段的model')
 
-            try:
-                self.env[attrib.get('model')]
-            except KeyError:
-                raise osv.except_osv(u'错误', u'Model %s不存在' % self.model)
-
-            if attrib.get('domain'):
-                try:
-                    model_columns = self.env[attrib.get('model')].fields_get()
-                    domain = eval(attrib.get('domain'))
-                    if not isinstance(domain, list):
-                        raise ValueError()
-
-                    for item in domain:
-                        if item == '|':
-                            continue
-                        if not isinstance(item, (list, tuple)):
-                            raise ValueError()
-
-                        if item[0] not in model_columns:
-                            raise ValueError()
-                except:
-                    raise osv.except_osv(u'错误', '无法解析的domain条件%s' % attrib.get('domain'))
+            self._check_model(attrib.get('model'))
+            self._check_domain(attrib.get('model'), attrib.get('domain'))
 
     def _check_wizard(self, tree):
         for wizard_node in tree.findall('.//wizard/field'):
@@ -120,12 +128,20 @@ class MobileView(models.Model):
                     raise osv.except_osv(u'错误', u'不能识别的操作符%s' % node.attrib.get('operator'))
 
     @api.one
+    @api.constrains('domain')
+    def check_domain(self):
+        if self.domain:
+            self._check_domain(self.model, self.domain)
+
+    @api.one
+    @api.constrains('model')
+    def check_model(self):
+        self._check_model(self.model)
+
+    @api.one
     @api.constrains('arch', 'model')
     def _check_seats_limit(self):
-        try:
-            self.env[self.model]
-        except KeyError:
-            raise osv.except_osv(u'错误', u'Model %s不存在' % self.model)
+        self._check_model(self.model)
 
         try:
             tree = ElementTree.parse(StringIO(self.arch.encode('utf-8')))
