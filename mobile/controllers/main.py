@@ -2,6 +2,7 @@
 
 from openerp.addons.web import http
 from openerp.addons.web.http import request
+from openerp.tools.safe_eval import safe_eval as eval
 import openerp
 import simplejson
 import os
@@ -134,7 +135,7 @@ class MobileSupport(http.Controller):
                     'center': record.get(headers.get('center').get('name')),
                     'right': record.get(headers.get('right').get('name')),
                     'id': record.get('id'),
-                } for record in model_obj.search_read(
+                } for record in model_obj.with_context(options.get('context') or {}).search_read(
                     domain=domain, fields=map(lambda field: field.get('name'), headers.values()),
                     offset=self._parse_int(options.get('offset', 0)),
                     limit=self._parse_int(options.get('limit', 20)), order=order)]
@@ -146,7 +147,7 @@ class MobileSupport(http.Controller):
                 'value': value,
                 'string': headers.get(key, {}).get('string'),
                 'column': headers.get(key, {}).get('column'),
-            } for key, value in model_obj.browse(self._parse_int(
+            } for key, value in model_obj.with_context(options.get('context') or {}).browse(self._parse_int(
                 options.get('record_id'))).read(headers.keys())[0].iteritems()
             ]))
 
@@ -166,5 +167,14 @@ class MobileSupport(http.Controller):
         tree = ElementTree.parse(StringIO(view.arch.encode('utf-8')))
 
         return request.make_response(simplejson.dumps(
-            [node.attrib for node in tree.findall('.//wizard/field')]
+            [dict(node.attrib, value='') for node in tree.findall('.//wizard/field')]
         ))
+
+    @http.route('/mobile/many2one/search', auth='public')
+    def many2one_search(self, word, model, domain):
+        return request.make_response(simplejson.dumps([
+            {
+            'id': record[0], 'value': record[1]
+            } for record in request.env[model].name_search(
+                word, args=eval(domain), limit=20)
+        ]))

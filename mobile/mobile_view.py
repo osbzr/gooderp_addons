@@ -2,6 +2,7 @@
 from openerp import models, fields, api
 from openerp.osv import osv, fields as osv_fields
 from xml.etree import ElementTree
+from openerp.tools.safe_eval import safe_eval as eval
 import itertools
 try:
     from cStringIO import StringIO
@@ -20,7 +21,7 @@ class MobileView(models.Model):
 
     WIZARD_TYPE = [
         'many2one', 'number', 'date',
-        'datetime', 'char', 'text',
+        'datetime', 'char', 'text', 'selection'
     ]
 
     @api.one
@@ -47,6 +48,77 @@ class MobileView(models.Model):
         ('Unique name', 'unique(name)', u'名称必须唯一')
     ]
 
+    def _check_selection(self, attrib):
+        if attrib.get('type') == 'selection':
+            if not attrib.get('selection'):
+                raise osv.except_osv(u'错误', u'selection类型的字段需要指定该字段的selection属性')
+
+            try:
+                selection = eval(attrib.get('selection'))
+                if not isinstance(selection, list):
+                    raise ValueError()
+
+                for item in selection:
+                    if not isinstance(item, (list, tuple)):
+                        raise ValueError()
+
+                    if len(item) != 2:
+                        raise ValueError()
+            except:
+                raise osv.except_osv(u'错误', '无法解析的selection属性%s' % attrib.get('selection'))
+
+    def _check_many2one(self, attrib):
+        if attrib.get('type') == 'many2one':
+            if not attrib.get('model'):
+                raise osv.except_osv(u'错误', u'many2one类型的字段需要指定该字段的model')
+
+            try:
+                self.env[attrib.get('model')]
+            except KeyError:
+                raise osv.except_osv(u'错误', u'Model %s不存在' % self.model)
+
+            if attrib.get('domain'):
+                try:
+                    model_columns = self.env[attrib.get('model')].fields_get()
+                    domain = eval(attrib.get('domain'))
+                    if not isinstance(domain, list):
+                        raise ValueError()
+
+                    for item in domain:
+                        if item == '|':
+                            continue
+                        if not isinstance(item, (list, tuple)):
+                            raise ValueError()
+
+                        if item[0] not in model_columns:
+                            raise ValueError()
+                except:
+                    raise osv.except_osv(u'错误', '无法解析的domain条件%s' % attrib.get('domain'))
+
+    def _check_wizard(self, tree):
+        for wizard_node in tree.findall('.//wizard/field'):
+            attrib = wizard_node.attrib
+            if not attrib.get('type') or attrib.get('type') not in self.WIZARD_TYPE:
+                raise osv.except_osv(u'错误', u'wizard里面的field标签type属性必须存在或type属性值错误')
+
+            self._check_many2one(attrib)
+            self._check_selection(attrib)
+
+    def _check_field(self, tree):
+        columns = self.env[self.model].fields_get()
+        for node in itertools.chain(tree.findall('.//tree/field'),
+                                    tree.findall('.//form/field'),
+                                    tree.findall('.//search/field')):
+            if 'name' not in node.attrib or 'string' not in node.attrib:
+                raise osv.except_osv(u'错误', u'每个field标签都必须要存在name和string属性')
+
+            if node.attrib.get('name') not in columns:
+                raise osv.except_osv(u'错误', u'字段属性%s未定义' % node.attrib.get('name'))
+
+            if node.attrib.get('operator'):
+                if node.attrib.get('operator') not in self.MAP_OPERATOR:
+                    raise osv.except_osv(u'错误', u'不能识别的操作符%s' % node.attrib.get('operator'))
+
     @api.one
     @api.constrains('arch', 'model')
     def _check_seats_limit(self):
@@ -64,24 +136,8 @@ class MobileView(models.Model):
         if len(tree_nodes) != 3:
             raise osv.except_osv(u'错误', u'XML视图中tree标签下面的field标签必须是3个字段')
 
-        for wizard_node in tree.findall('.//wizard/field'):
-            attrib = wizard_node.attrib
-            if not attrib.get('type') or attrib.get('type') not in self.WIZARD_TYPE:
-                raise osv.except_osv(u'错误', u'wizard里面的field标签type属性必须存在或type属性值错误')
-
-        columns = self.env[self.model].fields_get()
-        for node in itertools.chain(tree.findall('.//tree/field'),
-                                    tree.findall('.//form/field'),
-                                    tree.findall('.//search/field')):
-            if 'name' not in node.attrib or 'string' not in node.attrib:
-                raise osv.except_osv(u'错误', u'每个field标签都必须要存在name和string属性')
-
-            if node.attrib.get('name') not in columns:
-                raise osv.except_osv(u'错误', u'字段属性%s未定义' % node.attrib.get('name'))
-
-            if node.attrib.get('operator'):
-                if node.attrib.get('operator') not in self.MAP_OPERATOR:
-                    raise osv.except_osv(u'错误', u'不能识别的操作符%s' % node.attrib.get('operator'))
+        self._check_wizard(tree)
+        self._check_field(tree)
 
     def map_operator(self, operator):
         return self.MAP_OPERATOR.get(operator, '')

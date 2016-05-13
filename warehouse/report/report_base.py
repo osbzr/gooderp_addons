@@ -37,9 +37,13 @@ class report_base(models.Model):
         return {}
 
     def execute_sql(self, sql_type='out'):
+        context = self.get_context(sql_type, context=self.env.context)
+        for key, value in context.iteritems():
+            context[key] = value.encode('utf-8')
+
         self.env.cr.execute((self.select_sql(sql_type) + self.from_sql(sql_type) + self.where_sql(
             sql_type) + self.group_sql(sql_type) + self.order_sql(
-            sql_type)).format(**self.get_context(sql_type, context=self.env.context)))
+            sql_type)).format(**context))
 
         return self.env.cr.dictfetchall()
 
@@ -70,10 +74,10 @@ class report_base(models.Model):
             field, opto, value = domain
 
             compute_operator = {
-                'ilike': lambda field, value: str(value).lower() in str(field).lower(),
-                'like': lambda field, value: str(value) in str(field),
-                'not ilike': lambda field, value: str(value).lower() not in str(field).lower(),
-                'not like': lambda field, value: str(value) not in str(field),
+                'ilike': lambda field, value: unicode(value).lower() in unicode(field).lower(),
+                'like': lambda field, value: unicode(value) in unicode(field),
+                'not ilike': lambda field, value: unicode(value).lower() not in unicode(field).lower(),
+                'not like': lambda field, value: unicode(value) not in unicode(field),
                 'in': lambda field, value: field in value,
                 'not in': lambda field, value: field not in value,
                 '=': operator.eq,
@@ -189,5 +193,18 @@ class report_base(models.Model):
         result = self._compute_limit_and_offset(result, limit, offset)
 
         return result
+
+    @api.multi
+    def read(self, fields=None, context=None, load='_classic_read'):
+        res = []
+        fields = fields or []
+
+        fields.append('id')
+        for record in self.get_data_from_cache():
+            if record.get('id') in self.ids:
+                res.append({field: record.get(field) for field in fields})
+
+        return res
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
