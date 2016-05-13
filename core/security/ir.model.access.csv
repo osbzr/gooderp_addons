@@ -10,3 +10,4 @@ access_warehouse,access_warehouse,model_warehouse,,1,1,1,1
 access_staff,access_staff,model_staff,,1,1,1,1
 access_bank_account,access_bank_account,model_bank_account,,1,1,1,1
 access_settle_mode,access_settle_mode,model_settle_mode,,1,1,1,1
+access_pricing,access_pricing,model_pricing,,1,1,1,1

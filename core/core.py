@@ -152,6 +152,25 @@ class bank_account(models.Model):
                            digits_compute=dp.get_precision('Amount'))
 
 
+class pricing(models.Model):
+    _name = 'pricing'
+
+    name=fields.Char(u'描述')
+    warehouse_id = fields.Many2one('warehouse',u'仓库')
+    c_category_id = fields.Many2one('core.category', u'客户类别',
+                                    ondelete='restrict',
+                                    domain=[('type', '=', 'customer')],
+                                    context={'type': 'customer'})
+    goods_category_id = fields.Many2one('core.category', u'产品类别',
+                                  ondelete='restrict',
+                                  domain=[('type', '=', 'goods')],
+                                  context={'type': 'goods'})
+    deactive_date = fields.Date(u'终止日期')
+    discount_rate = fields.Float(u'折扣率%')
+    
+    
+
+
 class res_currency(models.Model):
     _inherit = 'res.currency'
 

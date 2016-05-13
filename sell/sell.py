@@ -347,6 +347,22 @@ class sell_order_line(models.Model):
     note = fields.Char(u'备注')
 
     @api.one
+    @api.onchange('warehouse_id','goods_id')
+    def onchange_warehouse_id(self):
+        '''当订单行的仓库变化时，带出定价策略中的折扣率'''
+        if self.warehouse_id:
+            if self.goods_id and self.order_id.partner_id:
+                pricing = self.env['pricing'].search([
+                        ('warehouse_id','=',self.warehouse_id.id),
+                        ('c_category_id','=',self.order_id.partner_id.c_category_id.id),
+                        ('goods_category_id','=',self.goods_id.category_id.id),
+                                                      ])
+                if pricing:
+                    self.discount_rate = pricing.discount_rate
+                else:
+                    self.discount_rate = 0
+
+    @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
@@ -608,6 +624,25 @@ class wh_move_line(models.Model):
     sell_line_id = fields.Many2one('sell.order.line', u'销货单行',
                                    ondelete='cascade')
 
+    @api.one
+    @api.onchange('warehouse_id','goods_id')
+    def onchange_warehouse_id(self):
+        '''当订单行的仓库变化时，带出定价策略中的折扣率'''
+        if self.warehouse_id:
+            partner_id = self.env.context.get('default_partner')
+            print '----1----',self.goods_id,partner_id
+            partner = self.env['partner'].browse(partner_id)
+            if self.goods_id and partner:
+                print '----2----',self.warehouse_id.name,partner.c_category_id.name,self.goods_id.category_id.name
+                pricing = self.env['pricing'].search([
+                        ('warehouse_id','=',self.warehouse_id.id),
+                        ('c_category_id','=',partner.c_category_id.id),
+                        ('goods_category_id','=',self.goods_id.category_id.id),
+                                                      ])
+                if pricing:
+                    self.discount_rate = pricing.discount_rate
+                else:
+                    self.discount_rate = 0
 
 class cost_line(models.Model):
     _inherit = 'cost.line'
