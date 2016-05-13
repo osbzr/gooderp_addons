@@ -630,10 +630,8 @@ class wh_move_line(models.Model):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
         if self.warehouse_id:
             partner_id = self.env.context.get('default_partner')
-            print '----1----',self.goods_id,partner_id
             partner = self.env['partner'].browse(partner_id)
             if self.goods_id and partner:
-                print '----2----',self.warehouse_id.name,partner.c_category_id.name,self.goods_id.category_id.name
                 pricing = self.env['pricing'].search([
                         ('warehouse_id','=',self.warehouse_id.id),
                         ('c_category_id','=',partner.c_category_id.id),

@@ -71,5 +71,14 @@
             <field eval="10" name="discount_amount"/>
             <field eval="10.0" name="quantity"/>
         </record>
+        <!--价格策略-->
+        <record id="pricing_demo" model="pricing">
+        	<field name='name'>价格策略demo</field>
+            <field name="c_category_id" ref="core.customer_category_1"/>
+            <field name="goods_category_id" ref="core.goods_category_1"/>
+            <field name="warehouse_id" ref="warehouse.bj_stock"/>
+            <field name="deactive_date">2016-05-20</field>
+            <field name="discount_rate">20</field>
+        </record>
     </data>
 </openerp>
