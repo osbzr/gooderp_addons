@@ -39,7 +39,8 @@ class report_base(models.Model):
     def execute_sql(self, sql_type='out'):
         context = self.get_context(sql_type, context=self.env.context)
         for key, value in context.iteritems():
-            context[key] = value.encode('utf-8')
+            if isinstance(context[key], basestring):
+                context[key] = value.encode('utf-8')
 
         self.env.cr.execute((self.select_sql(sql_type) + self.from_sql(sql_type) + self.where_sql(
             sql_type) + self.group_sql(sql_type) + self.order_sql(
