@@ -350,17 +350,16 @@ class sell_order_line(models.Model):
     @api.onchange('warehouse_id','goods_id')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
-        if self.warehouse_id:
-            if self.goods_id and self.order_id.partner_id:
-                pricing = self.env['pricing'].search([
-                        ('warehouse_id','=',self.warehouse_id.id),
-                        ('c_category_id','=',self.order_id.partner_id.c_category_id.id),
-                        ('goods_category_id','=',self.goods_id.category_id.id),
-                                                      ])
-                if pricing:
-                    self.discount_rate = pricing.discount_rate
-                else:
-                    self.discount_rate = 0
+        if self.warehouse_id and self.goods_id:
+            partner = self.order_id.partner_id
+            warehouse = self.warehouse_id
+            goods = self.goods_id
+            date = self.order_id.date
+            pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
+            if pricing:
+                self.discount_rate = pricing.discount_rate
+            else:
+                self.discount_rate = 0
 
     @api.one
     @api.onchange('goods_id')
@@ -628,19 +627,17 @@ class wh_move_line(models.Model):
     @api.onchange('warehouse_id','goods_id')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
-        if self.warehouse_id:
+        if self.warehouse_id and self.goods_id:
             partner_id = self.env.context.get('default_partner')
-            partner = self.env['partner'].browse(partner_id)
-            if self.goods_id and partner:
-                pricing = self.env['pricing'].search([
-                        ('warehouse_id','=',self.warehouse_id.id),
-                        ('c_category_id','=',partner.c_category_id.id),
-                        ('goods_category_id','=',self.goods_id.category_id.id),
-                                                      ])
-                if pricing:
-                    self.discount_rate = pricing.discount_rate
-                else:
-                    self.discount_rate = 0
+            partner = self.env['partner'].browse(partner_id) or self.move_id.partner_id
+            warehouse = self.warehouse_id
+            goods = self.goods_id
+            date = self.env.context.get('default_date') or self.move_id.date
+            pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
+            if pricing:
+                self.discount_rate = pricing.discount_rate
+            else:
+                self.discount_rate = 0
 
 class cost_line(models.Model):
     _inherit = 'cost.line'
