@@ -39,8 +39,8 @@
             <field name='arch' type='xml'>
                 <mobile>
                     <wizard>
-                        <field name='goods_id' string='产品' type='many2one' model='goods' domain="[('using_batch', '=', 'True')]"  />
-                        <field name='warehouse' string='仓库' type='char' placeholder="请输入仓库" />
+                        <field name='goods' string='产品' type='char' placeholder="请输入产品" />
+                        <field name='warehouse' string='仓库' type='selection' selection="[('上海仓', '上海仓'), ('北京仓', '北京仓'), ('总仓', '总仓')]" />
                         <field name='date_start' string='开始时间' type='date' required='1' />
                         <field name='date_end' string='结束时间' type='date' required='1' />
                     </wizard>

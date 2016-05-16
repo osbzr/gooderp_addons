@@ -15,11 +15,13 @@ $(function(){
             wizard_records: [],
             search_view: [],
             search_filter: [],
+            context: {},
             order_name: '',
             record_form: '',
             order_direction: 'desc',
             loading: false,
             wizard: false,
+            editable: false,
         },
         vue_data = {};
 
@@ -71,6 +73,7 @@ $(function(){
         origin_data.search_filter = [];
         origin_data.form_records = [];
         origin_data.wizard_records = [];
+        origin_data.context = {};
         origin_data.headers = {'left': '', 'center': '', 'right': ''};
 
         for (var key in origin_data) {
@@ -98,6 +101,9 @@ $(function(){
                 name: vue.model,
             })).then(function(results) {
                 vue.wizard_records = JSON.parse(results);
+                Vue.nextTick(function () {
+                    $('.gooderp_wizard input:first').focus();
+                });
             });
         } else {
             vue.do_sync();
@@ -137,10 +143,34 @@ $(function(){
             data: data,
             methods: {
                 cancel_wizard: function() {
-                    console.log('cancel');
+                    window.history.back();
                 },
                 confirm_wizard: function() {
-                    console.log(this.wizard_records);
+                    this.editable = true;
+                    if (this.check_wizard_value()) {
+                        for (var index in this.wizard_records) {
+                            var record = this.wizard_records[index];
+                            if (record.type === 'many2one') {
+                                this.context[record.name] = [record.id, record.value];
+                            } else {
+                                this.context[record.name] = record.value;
+                            }
+                        }
+
+                        this.do_sync(null, null, function() {
+                            alert('出现内部错误，请联系管理员修复');
+                        });
+                    }
+                },
+                check_wizard_value: function() {
+                    for (var index in this.wizard_records) {
+                        var record = this.wizard_records[index];
+                        if (record.required && !record.value) {
+                            return false;
+                        }
+                    }
+
+                    return true;
                 },
                 open_form: function(record_id) {
                     var self = this;
@@ -161,7 +191,7 @@ $(function(){
                     return record.string;
                 },
                 compute_form_widget: function(record) {
-                    if (record.column === 'many2one') {
+                    if (record.column === 'many2one' && $.isArray(record.value)) {
                         return record.value[1];
                     }
 
@@ -235,11 +265,15 @@ $(function(){
                 },
                 do_sync: function(options, success, error, check) {
                     var self = this;
+                    self.wizard = false;
                     return this.loadMore(function() {
                         options = options || {};
                         options.domain = options.domain || this.search_filter;
                         options.order = options.order || [this.order_name, this.order_direction].join(' ');
+                        options.context = options.context || this.context;
                         return this.sync_records(options, success, error).then(function() {
+                            self.loading = false;
+                        }, function() {
                             self.loading = false;
                         });
                     }, check);
@@ -292,7 +326,7 @@ $(function(){
                     return header.class || '';
                 },
                 compute_widget: function(header, field) {
-                    if (header.column === 'many2one') {
+                    if (header.column === 'many2one' && $.isArray(field)) {
                         return field[1];
                     }
                     return field;
