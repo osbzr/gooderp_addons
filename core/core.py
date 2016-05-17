@@ -121,19 +121,6 @@ class goods(models.Model):
     conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
     cost = fields.Float(u'成本',
                         digits_compute=dp.get_precision('Amount'))
-    price_ids = fields.One2many('goods.price', 'goods_id', u'价格清单')
-
-
-class goods_price(models.Model):
-    _name = 'goods.price'
-    goods_id = fields.Many2one('goods', ondelete='cascade', string=u'商品')
-    category_id = fields.Many2one('core.category', u'客户类别',
-                                  ondelete='cascade',
-                                  domain=[('type', '=', 'customer')],
-                                  context={'type': 'customer'})
-    price = fields.Float(u'价格',
-                         digits_compute=dp.get_precision('Amount'))
-
 
 class warehouse(models.Model):
     _name = 'warehouse'
