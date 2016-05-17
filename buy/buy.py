@@ -347,7 +347,7 @@ class buy_order_line(models.Model):
     amount = fields.Float(u'金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits_compute=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)', default=17.0)
+    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
                               digits_compute=dp.get_precision('Amount'))
@@ -636,16 +636,20 @@ class wh_move_line(models.Model):
             if self.type == 'in':
                 if not self.goods_id.cost:
                     raise except_orm(u'错误', u'请先设置商品的成本！')
+                self.tax_rate = self.env.user.company_id.import_tax_rate
                 self.price = self.goods_id.cost
                 # 如果是销售退货单行
                 if is_return:
+                    self.tax_rate = self.env.user.company_id.output_tax_rate
                     self.price = self.goods_id.price
             elif self.type == 'out':
+                self.tax_rate = self.env.user.company_id.output_tax_rate
                 self.price = self.goods_id.price
                 # 如果是采购退货单行
                 if is_return:
                     if not self.goods_id.cost:
                         raise except_orm(u'错误', u'请先设置商品的成本！')
+                    self.tax_rate = self.env.user.company_id.import_tax_rate
                     self.price = self.goods_id.cost
 
         return super(wh_move_line,self).onchange_goods_id()

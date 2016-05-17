@@ -57,6 +57,8 @@ class res_company(models.Model):
                     default=lambda self: fields.Date.context_today(self))
     cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法')
     draft_invoice = fields.Boolean(u'根据发票确认应收应付')
+    import_tax_rate=fields.Float(string="默认进项税税率")
+    output_tax_rate=fields.Float(string="默认销项税税率")
 
 
 class uom(models.Model):
