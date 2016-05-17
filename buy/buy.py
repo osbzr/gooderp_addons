@@ -109,7 +109,7 @@ class buy_order(models.Model):
                               default=u'未入库', store=True,
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
-    pay_ids=fields.One2many("payment_plan","payment_plan_id",string="付款计划")
+    pay_ids=fields.One2many("payment.plan","payment_plan_id",string="付款计划")
 
 
     @api.one
@@ -291,7 +291,7 @@ class buy_order(models.Model):
             'target': 'current',
         }
 class payment(models.Model):
-    _name="payment_plan"
+    _name="payment.plan"
     name=fields.Char(string="名称",required=True)
     amount_money=fields.Float(string="金额",required=True)
     date_application=fields.Date(string="申请日期",readonly=True)

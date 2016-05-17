@@ -90,7 +90,6 @@
                             <field name="name"></field>
                             <field name="amount_money"></field> 
                             <field name="date_application"></field> 
-                            <!-- <button></button> -->
                         </tree>
                     </field>
 
