@@ -17,6 +17,7 @@ class test_invoice(TransactionCase):
         self.partner = self.env['partner'].create({
             'name': 'Jeff',
             'c_category_id': self.cate.id,
+            'main_mobile': '14957236658',
         })
 
     def tearDown(self):

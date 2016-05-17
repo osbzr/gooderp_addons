@@ -48,30 +48,35 @@
         <record id="jd" model="partner">
             <field name="name">京东</field>
             <field name="code">jd</field>
+            <field name="main_mobile">13276432176</field>
             <field name="c_category_id" ref="customer_category_1"/>
         </record>
 
         <record id="yixun" model="partner">
                <field name="name">易迅</field>
                <field name="code">yixun</field>
+            <field name="main_mobile">13276443276</field>
             <field name="c_category_id" ref="customer_category_2"/>
         </record>
 
         <record id="1" model="partner">
                <field name="name">1号店</field>
                <field name="code">1</field>
+            <field name="main_mobile">13276128376</field>
             <field name="c_category_id" ref="customer_category_vip" />
         </record>
 
         <record id="lenovo" model="partner">
              <field name="name">联想</field>
               <field name="code">lenovo</field>
+            <field name="main_mobile">13276453126</field>
             <field name="s_category_id" ref="supplier_category_1"/>
         </record>
         
         <record id="zt" model="partner">
              <field name="name">中通</field>
               <field name="code">zt</field>
+            <field name="main_mobile">13276463376</field>
             <field name="s_category_id" ref="supplier_category_1"/>
         </record>
 

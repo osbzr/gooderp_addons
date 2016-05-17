@@ -73,8 +73,8 @@ class settle_mode(models.Model):
 class partner(models.Model):
     _name = 'partner'
     code = fields.Char(u'编号')
-    name = fields.Char(u'名称')
-    main_mobile = fields.Char(u'主要手机号')
+    name = fields.Char(u'名称',required=True,)
+    main_mobile = fields.Char(u'主要手机号',required=True,)
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
@@ -147,40 +147,103 @@ class pricing(models.Model):
     def get_pricing_id(self,partner,warehouse,goods,date):
         '''传入客户，仓库，商品，日期，返回合适的价格策略'''
         if partner and warehouse and goods:
-            #客户类别、仓库、产品三个条件都符合的截止日期在传入日期之后的
+            #客户类别、仓库、产品满足条件
             good_pricing = self.search([
                                         ('c_category_id','=',partner.c_category_id.id),
                                         ('warehouse_id','=',warehouse.id),
                                         ('goods_id','=',goods.id),
+                                        ('goods_category_id','=',False),
                                         ('deactive_date','>=',date)
                                         ])
-            #客户类别、仓库、产品类别三个条件都符合的截止日期在传入日期之后的
+            #客户类别、仓库、产品类别满足条件
             gc_pricing = self.search([
                                       ('c_category_id','=',partner.c_category_id.id),
                                       ('warehouse_id','=',warehouse.id),
+                                      ('goods_id','=',False),
                                       ('goods_category_id','=',goods.category_id.id),
                                       ('deactive_date','>=',date)
                                       ])
-            #客户类别、仓库两个条件都符合，产品类别为空的截止日期在传入日期之后的
+            #客户类别、仓库满足条件
             pw_pricing = self.search([
                                       ('c_category_id','=',partner.c_category_id.id),
                                       ('warehouse_id','=',warehouse.id),
+                                      ('goods_id','=',False),
                                       ('goods_category_id','=',False),
                                       ('deactive_date','>=',date)
                                       ])
-            #客户类别条件符合、仓库、产品类别为空的截止日期在传入日期之后的
-            partner_pricing = self.search([
-                                          ('c_category_id','=',partner.c_category_id.id),
-                                          ('warehouse_id','=',False),
+            #仓库,产品满足
+            wg_pricing = self.search([
+                                          ('c_category_id','=',False),
+                                          ('warehouse_id','=',warehouse.id),
+                                          ('goods_id','=',goods.id),
                                           ('goods_category_id','=',False),
                                           ('deactive_date','>=',date)
                                           ])
+            #仓库，产品分类满足条件
+            w_gc_pricing = self.search([
+                                          ('c_category_id','=',False),
+                                          ('warehouse_id','=',warehouse.id),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',goods.category_id.id),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #仓库满足条件
+            warehouse_pricing = self.search([
+                                          ('c_category_id','=',False),
+                                          ('warehouse_id','=',warehouse.id),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #客户类别,产品满足条件
+            ccg_pricing = self.search([
+                                          ('c_category_id','=',partner.c_category_id.id),
+                                          ('warehouse_id','=',False),
+                                          ('goods_id','=',goods.id),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #客户类别,产品分类满足条件
+            ccgc_pricing = self.search([
+                                          ('c_category_id','=',partner.c_category_id.id),
+                                          ('warehouse_id','=',False),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',goods.category_id.id),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #客户类别满足条件
+            partner_pricing = self.search([
+                                          ('c_category_id','=',partner.c_category_id.id),
+                                          ('warehouse_id','=',False),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #仓库，客户类别，产品
             if len(good_pricing) == 1 :
                 return good_pricing
+            #仓库，客户类别，产品分类
             elif len(gc_pricing) == 1 :
                 return gc_pricing
+            #仓库，客户类别
             elif len(pw_pricing) == 1 :
                 return pw_pricing
+            #仓库，产品
+            elif len(wg_pricing) == 1 :
+                return wg_pricing
+            #仓库，产品分类
+            elif len(w_gc_pricing) == 1 :
+                return w_gc_pricing
+            #仓库
+            elif len(warehouse_pricing) == 1 :
+                return warehouse_pricing
+            #客户类别，产品
+            elif len(ccg_pricing) == 1 :
+                return ccg_pricing
+            #仓库，产品分类
+            elif len(ccgc_pricing) == 1 :
+                return ccgc_pricing
+            #客户类别
             elif len(partner_pricing) == 1 :
                 return partner_pricing
             elif len(good_pricing)+len(gc_pricing)+len(pw_pricing)+len(partner_pricing) == 0:
