@@ -196,7 +196,6 @@ class test_buy_order_line(TransactionCase):
     def test_onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、成本'''
         goods = self.env.ref('goods.cable')
-        goods.default_wh = self.env.ref('warehouse.hd_stock').id
         for line in self.order.line_ids:
             line.goods_id = goods
             line.onchange_goods_id()
