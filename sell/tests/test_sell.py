@@ -273,20 +273,11 @@ class test_sell_order_line(TransactionCase):
         goods = self.env.ref('goods.keyboard')
         goods.default_wh = self.env.ref('warehouse.hd_stock').id
         c_category_id = self.order.partner_id.c_category_id
-        price_ids = self.env['goods.price'].search(
-                                [('goods_id', '=', goods.id),
-                                 ('category_id', '=', c_category_id.id)])
+    
         for line in self.order.line_ids:
             line.goods_id = goods
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
-
-            # 测试价格是否是商品价格清单中的价格
-            self.assertTrue(line.price == price_ids.price)
-            # 测试不设置订单客户的客户类别时是否弹出警告
-            self.order.partner_id.c_category_id = False
-            with self.assertRaises(except_orm):
-                line.onchange_goods_id()
                 
     def test_onchange_warehouse_id(self):
         '''仓库和商品带出价格策略的折扣率'''
