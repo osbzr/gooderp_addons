@@ -109,6 +109,8 @@ class buy_order(models.Model):
                               default=u'未入库', store=True,
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
+    pay_ids=fields.One2many("payment_plan","payment_plan_id",string="付款计划")
+
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -288,7 +290,12 @@ class buy_order(models.Model):
             'domain': [('id', '=', receipt_id)],
             'target': 'current',
         }
-
+class payment(models.Model):
+    _name="payment_plan"
+    name=fields.Char(string="名称",required=True)
+    amount_money=fields.Float(string="金额",required=True)
+    date_application=fields.Date(string="申请日期",readonly=True)
+    payment_plan_id=fields.Many2one("buy_order_line")
 
 class buy_order_line(models.Model):
     _name = 'buy.order.line'
@@ -357,7 +364,7 @@ class buy_order_line(models.Model):
     note = fields.Char(u'备注')
     # TODO:放到单独模块中 sell_to_buy many2one 到sell.order
     origin = fields.Char(u'销售单号')
-
+    
     @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
@@ -374,7 +381,6 @@ class buy_order_line(models.Model):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
         self.discount_amount = (self.quantity * self.price *
                                 self.discount_rate * 0.01)
-
 
 class buy_receipt(models.Model):
     _name = "buy.receipt"

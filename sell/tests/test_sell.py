@@ -140,7 +140,7 @@ class Test_sell(TransactionCase):
         # 退货单折扣率测试
         self.sell_delivery_obj.discount_rate = 10
         self.sell_delivery_obj.onchange_discount_rate()
-        self.assertEqual(self.sell_delivery_obj.discount_amount, 52.65)
+        self.assertEqual(self.sell_delivery_obj.discount_amount, 45)
         #  结算账户 需要输入付款额 测试
         self.sell_delivery_obj.bank_account_id = self.bank.id
         self.receipt = False

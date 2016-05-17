@@ -84,6 +84,15 @@
                             <field name="origin" invisible="1"/>
                         </tree>
                     </field>
+
+                    <field name="pay_ids">
+                        <tree string="Payment Form" editable="bottom">
+                            <field name="name"></field>
+                            <field name="amount_money"></field> 
+                            <field name="date_application"></field> 
+                        </tree>
+                    </field>
+
                     <field name="note" placeholder="暂无备注信息"/>
                     <group>
                         <group col="6" colspan="6">
