@@ -24,9 +24,6 @@
             <field eval="32.0" name="discount_amount"/>
             <field name="delivery_date">2016-03-02</field>
         </record>
-        <record id="goods.cable" model="goods">
-           <field name="default_wh" ref="warehouse.hd_stock"/> 
-        </record>
         <record id="sell_order_line_2_3" model="sell.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="warehouse_dest_id" ref="warehouse.warehouse_customer"/>
@@ -70,6 +67,15 @@
             <field name="warehouse_id" ref="warehouse.warehouse_customer"/>
             <field eval="10" name="discount_amount"/>
             <field eval="10.0" name="quantity"/>
+        </record>
+        <!--价格策略-->
+        <record id="pricing_demo" model="pricing">
+        	<field name='name'>价格策略demo</field>
+            <field name="c_category_id" ref="core.customer_category_1"/>
+            <field name="goods_category_id" ref="core.goods_category_1"/>
+            <field name="warehouse_id" ref="warehouse.bj_stock"/>
+            <field name="deactive_date">2016-05-20</field>
+            <field name="discount_rate">20</field>
         </record>
     </data>
 </openerp>

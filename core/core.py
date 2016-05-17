@@ -2,6 +2,7 @@
 
 import openerp.addons.decimal_precision as dp
 from openerp import models, fields, api
+from openerp.exceptions import except_orm
 
 # 单据自动编号，避免在所有单据对象上重载
 
@@ -73,6 +74,7 @@ class partner(models.Model):
     _name = 'partner'
     code = fields.Char(u'编号')
     name = fields.Char(u'名称')
+    main_mobile = fields.Char(u'主要手机号')
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
@@ -120,19 +122,6 @@ class goods(models.Model):
     conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
     cost = fields.Float(u'成本',
                         digits_compute=dp.get_precision('Amount'))
-    price_ids = fields.One2many('goods.price', 'goods_id', u'价格清单')
-
-
-class goods_price(models.Model):
-    _name = 'goods.price'
-    goods_id = fields.Many2one('goods', ondelete='cascade', string=u'商品')
-    category_id = fields.Many2one('core.category', u'客户类别',
-                                  ondelete='cascade',
-                                  domain=[('type', '=', 'customer')],
-                                  context={'type': 'customer'})
-    price = fields.Float(u'价格',
-                         digits_compute=dp.get_precision('Amount'))
-
 
 class warehouse(models.Model):
     _name = 'warehouse'
@@ -149,6 +138,71 @@ class bank_account(models.Model):
     name = fields.Char(u'名称')
     balance = fields.Float(u'余额', readonly=True,
                            digits_compute=dp.get_precision('Amount'))
+
+
+class pricing(models.Model):
+    _name = 'pricing'
+
+    @api.model
+    def get_pricing_id(self,partner,warehouse,goods,date):
+        '''传入客户，仓库，商品，日期，返回合适的价格策略'''
+        if partner and warehouse and goods:
+            #客户类别、仓库、产品三个条件都符合的截止日期在传入日期之后的
+            good_pricing = self.search([
+                                        ('c_category_id','=',partner.c_category_id.id),
+                                        ('warehouse_id','=',warehouse.id),
+                                        ('goods_id','=',goods.id),
+                                        ('deactive_date','>=',date)
+                                        ])
+            #客户类别、仓库、产品类别三个条件都符合的截止日期在传入日期之后的
+            gc_pricing = self.search([
+                                      ('c_category_id','=',partner.c_category_id.id),
+                                      ('warehouse_id','=',warehouse.id),
+                                      ('goods_category_id','=',goods.category_id.id),
+                                      ('deactive_date','>=',date)
+                                      ])
+            #客户类别、仓库两个条件都符合，产品类别为空的截止日期在传入日期之后的
+            pw_pricing = self.search([
+                                      ('c_category_id','=',partner.c_category_id.id),
+                                      ('warehouse_id','=',warehouse.id),
+                                      ('goods_category_id','=',False),
+                                      ('deactive_date','>=',date)
+                                      ])
+            #客户类别条件符合、仓库、产品类别为空的截止日期在传入日期之后的
+            partner_pricing = self.search([
+                                          ('c_category_id','=',partner.c_category_id.id),
+                                          ('warehouse_id','=',False),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            if len(good_pricing) == 1 :
+                return good_pricing
+            elif len(gc_pricing) == 1 :
+                return gc_pricing
+            elif len(pw_pricing) == 1 :
+                return pw_pricing
+            elif len(partner_pricing) == 1 :
+                return partner_pricing
+            elif len(good_pricing)+len(gc_pricing)+len(pw_pricing)+len(partner_pricing) == 0:
+                return False
+            else:
+                raise except_orm(u'错误', u'价格策略设置有误')
+
+    name=fields.Char(u'描述')
+    warehouse_id = fields.Many2one('warehouse',u'仓库')
+    c_category_id = fields.Many2one('core.category', u'客户类别',
+                                    ondelete='restrict',
+                                    domain=[('type', '=', 'customer')],
+                                    context={'type': 'customer'})
+    goods_category_id = fields.Many2one('core.category', u'产品类别',
+                                  ondelete='restrict',
+                                  domain=[('type', '=', 'goods')],
+                                  context={'type': 'goods'})
+    goods_id = fields.Many2one('goods',u'产品')
+    deactive_date = fields.Date(u'终止日期')
+    discount_rate = fields.Float(u'折扣率%')
+    
+    
 
 
 class res_currency(models.Model):

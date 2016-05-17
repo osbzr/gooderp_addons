@@ -1,43 +1,42 @@
 <?xml version="1.0"?>
 <openerp>
-    <data>
-        <record id="hd_stock" model="warehouse">
-            <field name="name">总仓</field>
-            <field name="code">000</field>
-            <field name='type'>stock</field>
-        </record>
-        <record id="sh_stock" model="warehouse">
-            <field name="name">上海仓</field>
-            <field name="code">021</field>
-            <field name='type'>stock</field>
-        </record>
-        <record id="bj_stock" model="warehouse">
-            <field name="name">北京仓</field>
-            <field name="code">010</field>
-            <field name='type'>stock</field>
-        </record>
-    </data>
-    <data noupdate="1">
-        <record id="wh_in_whin3" model="wh.in">
+	<data>
+		<record id="hd_stock" model="warehouse">
+			<field name="name">总仓</field>
+			<field name="code">000</field>
+			<field name='type'>stock</field>
+		</record>
+		<record id="sh_stock" model="warehouse">
+			<field name="name">上海仓</field>
+			<field name="code">021</field>
+			<field name='type'>stock</field>
+		</record>
+		<record id="bj_stock" model="warehouse">
+			<field name="name">北京仓</field>
+			<field name="code">010</field>
+			<field name='type'>stock</field>
+		</record>
+	</data>
+	<data noupdate="1">
+		<record id="wh_in_whin3" model="wh.in">
 			<field name="name">WH/IN/16040003</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
 		</record>
-        <record id="wh_move_line_keyboard_mouse_in_2" model="wh.move.line">
+		<record id="wh_move_line_keyboard_mouse_in_2" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.keyboard_mouse" />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
-            <field name='uom_id' ref='core.uom_set' />
-            <field name='uos_id' ref='core.uom_set' />
-	 		<field eval="48.0" name="goods_qty"/>
+			<field name='uom_id' ref='core.uom_set' />
+			<field name='uos_id' ref='core.uom_set' />
+			<field eval="48.0" name="goods_qty"/>
 			<field name="type">in</field>
 			<field eval="80.0" name="cost_unit"/>
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040003')]"/>
 		</record>
-
 		<record id="wh_in_whin0" model="wh.in">
 			<field name="name">WH/IN/16040002</field>
 			<field name="type">overage</field>
@@ -46,10 +45,10 @@
 		<record id="wh_move_line_12" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field name="goods_id" ref="goods.mouse"/>
-            <field name='cost_unit' eval='40' />
+			<field name='cost_unit' eval='40' />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
 			<field eval="1.0" name="goods_qty"/>
@@ -58,13 +57,13 @@
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040002')]"/>
 		</record>
-        <record id="wh_move_line_mouse_2" model="wh.move.line">
+		<record id="wh_move_line_mouse_2" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field name="goods_id" ref="goods.mouse"/>
-            <field name='cost_unit' eval='40' />
+			<field name='cost_unit' eval='40' />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
 			<field eval="1.0" name="goods_qty"/>
@@ -77,11 +76,11 @@
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field eval="0" name="force_batch_one"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
-            <field name='cost_unit' eval='80' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
+			<field name='cost_unit' eval='80' />
 			<field name="goods_id" ref="goods.keyboard"/>
-            <field name='attribute_id' ref='goods.keyboard_white' />
+			<field name='attribute_id' ref='goods.keyboard_white' />
 			<field name="production_date">2016-04-02</field>
 			<field eval="600.0" name="goods_qty"/>
 			<field name="lot">kb160000567</field>
@@ -93,9 +92,9 @@
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.cable"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_set' />
-            <field name='cost_unit' eval='80' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_set' />
+			<field name='cost_unit' eval='80' />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
 			<field eval="12000.0" name="goods_qty"/>
@@ -104,8 +103,7 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040002')]"/>
 		</record>
 	</data>
-
-    <data noupdate="1">
+	<data noupdate="1">
 		<record id="wh_assembly_ass0" model="wh.assembly">
 			<field name="name">ASS/16040001</field>
 			<field name="date">2016-04-02</field>
@@ -114,8 +112,8 @@
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field model="wh.move.line" name="lot_id" search="[('lot', '=', 'ms160301')]"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field name="goods_id" ref="goods.mouse"/>
 			<field name="production_date">2016-04-02</field>
 			<field eval="1.0" name="goods_qty"/>
@@ -129,10 +127,10 @@
 			<field eval="600.0" name="lot_uos_qty"/>
 			<field model="wh.move.line" name="lot_id" search="[('lot', '=', 'kb160000567')]"/>
 			<field name="goods_id" ref="goods.keyboard"/>
-            <field name='attribute_id' ref='goods.keyboard_white' />
+			<field name='attribute_id' ref='goods.keyboard_white' />
 			<field name="production_date">2016-04-02</field>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field eval="2.0" name="goods_qty"/>
 			<field name="type">out</field>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
@@ -143,15 +141,14 @@
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.keyboard_mouse"/>
 			<field name="production_date">2016-04-02</field>
-            <field name='uom_id' ref='core.uom_set' />
-            <field name='uos_id' ref='core.uom_set' />
+			<field name='uom_id' ref='core.uom_set' />
+			<field name='uos_id' ref='core.uom_set' />
 			<field eval="2.0" name="goods_qty"/>
 			<field name="type">in</field>
 			<field name="warehouse_id" ref="warehouse.warehouse_production"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'ASS/16040001')]"/>
 		</record>
-
-        <record id="wh_assembly_ass1" model="wh.assembly">
+		<record id="wh_assembly_ass1" model="wh.assembly">
 			<field name="name">ASS/16040002</field>
 			<field name="date">2016-04-07</field>
 		</record>
@@ -159,8 +156,8 @@
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field model="wh.move.line" name="lot_id" search="[('lot', '=', 'ms160301')]"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field name="goods_id" ref="goods.mouse"/>
 			<field name="production_date">2016-04-07</field>
 			<field eval="1.0" name="goods_qty"/>
@@ -168,12 +165,12 @@
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'ASS/16040002')]"/>
 		</record>
-        <record id="wh_move_line_mouse1" model="wh.move.line">
+		<record id="wh_move_line_mouse1" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field model="wh.move.line" name="lot_id" search="[('lot', '=', 'ms160302')]"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field name="goods_id" ref="goods.mouse"/>
 			<field name="production_date">2016-04-07</field>
 			<field eval="1.0" name="goods_qty"/>
@@ -187,10 +184,10 @@
 			<field eval="600.0" name="lot_uos_qty"/>
 			<field model="wh.move.line" name="lot_id" search="[('lot', '=', 'kb160000567')]"/>
 			<field name="goods_id" ref="goods.keyboard"/>
-            <field name='attribute_id' ref='goods.keyboard_white' />
+			<field name='attribute_id' ref='goods.keyboard_white' />
 			<field name="production_date">2016-04-02</field>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field eval="2.0" name="goods_qty"/>
 			<field name="type">out</field>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
@@ -201,21 +198,20 @@
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.keyboard_mouse"/>
 			<field name="production_date">2016-04-02</field>
-            <field name='uom_id' ref='core.uom_set' />
-            <field name='uos_id' ref='core.uom_set' />
+			<field name='uom_id' ref='core.uom_set' />
+			<field name='uos_id' ref='core.uom_set' />
 			<field eval="1.0" name="goods_qty"/>
 			<field name="type">in</field>
 			<field name="warehouse_id" ref="warehouse.warehouse_production"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'ASS/16040002')]"/>
 		</record>
-
-        <record id="wh_move_line_ass3" model="wh.move.line">
+		<record id="wh_move_line_ass3" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.keyboard_mouse"/>
 			<field name="production_date">2016-04-07</field>
-            <field name='uom_id' ref='core.uom_set' />
-            <field name='uos_id' ref='core.uom_set' />
+			<field name='uom_id' ref='core.uom_set' />
+			<field name='uos_id' ref='core.uom_set' />
 			<field eval="1.0" name="goods_qty"/>
 			<field name="type">in</field>
 			<field name="warehouse_id" ref="warehouse.warehouse_production"/>
@@ -256,8 +252,8 @@
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.keyboard_mouse"/>
-            <field name='uom_id' ref='core.uom_set' />
-            <field name='uos_id' ref='core.uom_set' />
+			<field name='uom_id' ref='core.uom_set' />
+			<field name='uos_id' ref='core.uom_set' />
 			<field name="production_date">2016-04-02</field>
 			<field eval="1.0" name="goods_qty"/>
 			<field name="type">out</field>
@@ -269,8 +265,8 @@
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.mouse"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field name="production_date">2016-04-02</field>
 			<field eval="1.0" name="goods_qty"/>
 			<field name="lot">self001</field>
@@ -283,10 +279,10 @@
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.keyboard"/>
-            <field name='attribute_id' ref='goods.keyboard_white' />
+			<field name='attribute_id' ref='goods.keyboard_white' />
 			<field name="production_date">2016-04-02</field>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field eval="1.0" name="goods_qty"/>
 			<field name="lot">self002</field>
 			<field name="type">in</field>
@@ -295,7 +291,6 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'DIS/16040001')]"/>
 		</record>
 	</data>
-
 	<data noupdate="1">
 		<record id="wh_in_whin1" model="wh.in">
 			<field name="name">WH/IN/16040001</field>
@@ -308,30 +303,29 @@
 			<field name="goods_id" ref="goods.keyboard_mouse" />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
-            <field name='uom_id' ref='core.uom_set' />
-            <field name='uos_id' ref='core.uom_set' />
-	 		<field eval="48.0" name="goods_qty"/>
+			<field name='uom_id' ref='core.uom_set' />
+			<field name='uos_id' ref='core.uom_set' />
+			<field eval="48.0" name="goods_qty"/>
 			<field name="type">in</field>
 			<field eval="120.0" name="cost_unit"/>
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040001')]"/>
 		</record>
-        <record id="wh_move_line_15" model="wh.move.line">
+		<record id="wh_move_line_15" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.cable" />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_set' />
-	 		<field eval="48.0" name="goods_qty"/>
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_set' />
+			<field eval="48.0" name="goods_qty"/>
 			<field name="type">in</field>
 			<field eval="80.0" name="cost_unit"/>
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040001')]"/>
 		</record>
-
-        <record id="wh_in_wh_in_attribute" model="wh.in">
+		<record id="wh_in_wh_in_attribute" model="wh.in">
 			<field name="name">WH/IN/16040004</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
@@ -342,28 +336,28 @@
 			<field name="goods_id" ref="goods.iphone" />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
-	 		<field eval="12" name="goods_qty"/>
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
+			<field eval="12" name="goods_qty"/>
 			<field name="type">in</field>
 			<field eval="4888.0" name="cost_unit"/>
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
-            <field name='attribute_id' ref='goods.iphone_white' />
+			<field name='attribute_id' ref='goods.iphone_white' />
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040004')]"/>
 		</record>
-        <record id="wh_move_line_iphone_in_2" model="wh.move.line">
+		<record id="wh_move_line_iphone_in_2" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.iphone" />
 			<field name="production_date">2016-04-02</field>
 			<field name="state">draft</field>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
-	 		<field eval="12" name="goods_qty"/>
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
+			<field eval="12" name="goods_qty"/>
 			<field name="type">in</field>
 			<field eval="5000.0" name="cost_unit"/>
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
-            <field name='attribute_id' ref='goods.iphone_black' />
+			<field name='attribute_id' ref='goods.iphone_black' />
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040004')]"/>
 		</record>
 	</data>
@@ -377,8 +371,8 @@
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.cable"/>
 			<field name="production_date">2016-04-02</field>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_set' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_set' />
 			<field eval="120.0" name="goods_qty"/>
 			<field name="type">out</field>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
@@ -386,7 +380,7 @@
 		</record>
 	</data>
 	<data noupdate="1">
-        <record id="wh_out_wh_out_attribute" model="wh.out">
+		<record id="wh_out_wh_out_attribute" model="wh.out">
 			<field name="name">WH/OUT/16040003</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
@@ -395,9 +389,9 @@
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.iphone"/>
-            <field name='attribute_id' ref='goods.iphone_white' />
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_pc' />
+			<field name='attribute_id' ref='goods.iphone_white' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_pc' />
 			<field name="production_date">2016-04-02</field>
 			<field eval="4.0" name="goods_qty"/>
 			<field name="type">out</field>
@@ -405,7 +399,6 @@
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/OUT/16040003')]"/>
 		</record>
-
 		<record id="wh_out_whout0" model="wh.out">
 			<field name="name">WH/OUT/16040001</field>
 			<field name="type">others</field>
@@ -415,8 +408,8 @@
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.cable"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_set' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_set' />
 			<field name="production_date">2016-04-02</field>
 			<field eval="12.0" name="goods_qty"/>
 			<field name="type">out</field>
@@ -424,8 +417,7 @@
 			<field name="warehouse_id" ref="warehouse.sh_stock"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/OUT/16040001')]"/>
 		</record>
-
-        <record id="wh_out_whout1" model="wh.out">
+		<record id="wh_out_whout1" model="wh.out">
 			<field name="name">WH/OUT/16040002</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
@@ -434,8 +426,8 @@
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field eval="2.0" name="goods_uos_qty"/>
 			<field name="goods_id" ref="goods.keyboard_mouse"/>
-            <field name='uom_id' ref='core.uom_pc' />
-            <field name='uos_id' ref='core.uom_set' />
+			<field name='uom_id' ref='core.uom_pc' />
+			<field name='uos_id' ref='core.uom_set' />
 			<field name="production_date">2016-04-02</field>
 			<field eval="24.0" name="goods_qty"/>
 			<field name="type">out</field>

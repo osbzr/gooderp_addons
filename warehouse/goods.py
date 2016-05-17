@@ -9,14 +9,6 @@ from openerp import models, fields, api
 class goods(models.Model):
     _inherit = 'goods'
 
-    @api.model
-    def _get_default_wh(self):
-        return self.env.ref('core.warehouse_general')
-
-    default_wh = fields.Many2one('warehouse', u'默认库位',
-                                 required=True, ondelete='restrict',
-                                 default=_get_default_wh)
-
     # 使用SQL来取得指定产品情况下的库存数量
     def get_stock_qty(self):
         for goods in self:

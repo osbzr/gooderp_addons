@@ -196,7 +196,6 @@ class test_buy_order_line(TransactionCase):
     def test_onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、成本'''
         goods = self.env.ref('goods.cable')
-        goods.default_wh = self.env.ref('warehouse.hd_stock').id
         for line in self.order.line_ids:
             line.goods_id = goods
             line.onchange_goods_id()
@@ -379,6 +378,19 @@ class test_buy_receipt(TransactionCase):
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
+
+    def test_scan_barcode(self):
+        '''采购扫码出入库'''
+        warehouse = self.env['wh.move']
+        barcode = '12345678987'
+        model_name = 'buy.receipt'
+        #采购出库单扫码
+        buy_order_return = self.env.ref('buy.buy_receipt_return_1')
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+        #采购入库单扫码
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
 
 
 class test_wh_move_line(TransactionCase):

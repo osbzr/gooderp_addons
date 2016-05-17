@@ -639,29 +639,14 @@ class wh_move_line(models.Model):
                 self.price = self.goods_id.cost
                 # 如果是销售退货单行
                 if is_return:
-                    matched = False # 在商品的价格清单中是否找到匹配的价格
-                    for line in self.goods_id.price_ids:
-                        if partner.c_category_id == line.category_id:
-                            self.price = line.price
-                            matched = True
-                    if not matched:
-                        raise except_orm(u'错误', u'请先设置商品的价格清单或客户类别！')
+                    self.price = self.goods_id.price
             elif self.type == 'out':
-                self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
-                matched = False # 在商品的价格清单中是否找到匹配的价格
-                for line in self.goods_id.price_ids:
-                    if partner.c_category_id == line.category_id:
-                        self.price = line.price
-                        matched = True
+                self.price = self.goods_id.price
                 # 如果是采购退货单行
                 if is_return:
                     if not self.goods_id.cost:
                         raise except_orm(u'错误', u'请先设置商品的成本！')
                     self.price = self.goods_id.cost
-                    matched = True
-
-                if not matched:
-                    raise except_orm(u'错误', u'请先设置商品的价格清单或客户类别！')
 
         return super(wh_move_line,self).onchange_goods_id()
 

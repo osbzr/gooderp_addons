@@ -20,7 +20,6 @@ class Test_sell(TransactionCase):
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
         self.others_warehouse_id = self.env.ref('warehouse.warehouse_others')
         self.goods = self.env.ref('goods.cable')
-        self.goods.default_wh = self.warehouse_id.id
         self.partner = self.env.ref('core.lenovo')
         # 因为下面要用到 产品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -271,22 +270,21 @@ class test_sell_order_line(TransactionCase):
     def test_onchange_goods_id(self):
         '''当销货订单行的产品变化时，带出产品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
-        goods.default_wh = self.env.ref('warehouse.hd_stock').id
         c_category_id = self.order.partner_id.c_category_id
-        price_ids = self.env['goods.price'].search(
-                                [('goods_id', '=', goods.id),
-                                 ('category_id', '=', c_category_id.id)])
+    
         for line in self.order.line_ids:
             line.goods_id = goods
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
-
-            # 测试价格是否是商品价格清单中的价格
-            self.assertTrue(line.price == price_ids.price)
-            # 测试不设置订单客户的客户类别时是否弹出警告
-            self.order.partner_id.c_category_id = False
-            with self.assertRaises(except_orm):
-                line.onchange_goods_id()
+                
+    def test_onchange_warehouse_id(self):
+        '''仓库和商品带出价格策略的折扣率'''
+        order_line=self.env.ref('sell.sell_order_line_1')
+        order_line.onchange_warehouse_id()
+        order=self.env.ref('sell.sell_order_1')
+        order.partner_id = self.env.ref('core.yixun').id
+        order_line.onchange_warehouse_id()
+        
 
 
 class test_sell_delivery(TransactionCase):
@@ -388,6 +386,21 @@ class test_sell_delivery(TransactionCase):
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
 
+    def test_scan_barcode(self):
+        '''销售扫码出入库'''
+        warehouse = self.env['wh.move']
+        barcode = '12345678987'
+        #销售退货扫码
+        model_name = 'sell.delivery'
+        warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
+        warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
+        #销售出库单扫码
+        sell_order = self.env.ref('sell.sell_order_1')
+        sell_order.sell_order_done()
+        delivery_order = self.env['sell.delivery'].search([('order_id', '=', sell_order.id)])
+        warehouse.scan_barcode(model_name,barcode,delivery_order.id)
+        warehouse.scan_barcode(model_name,barcode,delivery_order.id)
+
 
 class test_wh_move_line(TransactionCase):
 
@@ -406,26 +419,12 @@ class test_wh_move_line(TransactionCase):
 
         self.goods_cable = self.browse_ref('goods.cable')
         self.goods_keyboard = self.browse_ref('goods.keyboard')
-
-    def test_onchange_goods_id(self):
-        '''测试销售模块中商品的onchange,是否会带出默认库位和单价'''
-        # 销售退货单行
-        for line in self.delivery_return.line_in_ids:
-            # 在商品鼠标的价格清单中没有找到匹配的价格
-            with self.assertRaises(except_orm):
-                line.with_context({'default_is_return': True,
-                    'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
-            # 在商品键盘的价格清单中找到匹配的价格
-            line.goods_id = self.goods_keyboard.id
-            line.with_context({'default_is_return': True,
-                'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
-
-        # 发货单行：
+                
+    def test_onchange_warehouse_id(self):
+        '''wh.move.line仓库和商品带出价格策略的折扣率'''
         for line in self.delivery.line_out_ids:
-            line.goods_id = self.goods_keyboard.id
             line.with_context({'default_is_return': False,
-                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
-            line.goods_id = self.goods_cable.id
-            with self.assertRaises(except_orm):
-                line.with_context({'default_is_return': False,
-                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+                'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
+        for line in self.delivery.line_out_ids:
+            line.with_context({'default_is_return': False,
+                'default_partner': self.env.ref('core.yixun').id}).onchange_warehouse_id()
