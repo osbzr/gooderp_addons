@@ -109,6 +109,8 @@ class buy_order(models.Model):
                               default=u'未入库', store=True,
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
+    pay_ids=fields.One2many("payment.plan","payment_plan_id",string="付款计划")
+
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -288,7 +290,12 @@ class buy_order(models.Model):
             'domain': [('id', '=', receipt_id)],
             'target': 'current',
         }
-
+class payment(models.Model):
+    _name="payment.plan"
+    name=fields.Char(string="名称",required=True)
+    amount_money=fields.Float(string="金额",required=True)
+    date_application=fields.Date(string="申请日期",readonly=True)
+    payment_plan_id=fields.Many2one("buy.order")
 
 class buy_order_line(models.Model):
     _name = 'buy.order.line'
@@ -347,7 +354,7 @@ class buy_order_line(models.Model):
     amount = fields.Float(u'金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits_compute=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)', default=17.0)
+    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
                               digits_compute=dp.get_precision('Amount'))
@@ -357,7 +364,7 @@ class buy_order_line(models.Model):
     note = fields.Char(u'备注')
     # TODO:放到单独模块中 sell_to_buy many2one 到sell.order
     origin = fields.Char(u'销售单号')
-
+    
     @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
@@ -374,7 +381,6 @@ class buy_order_line(models.Model):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
         self.discount_amount = (self.quantity * self.price *
                                 self.discount_rate * 0.01)
-
 
 class buy_receipt(models.Model):
     _name = "buy.receipt"
@@ -663,16 +669,20 @@ class wh_move_line(models.Model):
             if self.type == 'in':
                 if not self.goods_id.cost:
                     raise except_orm(u'错误', u'请先设置商品的成本！')
+                self.tax_rate = self.env.user.company_id.import_tax_rate
                 self.price = self.goods_id.cost
                 # 如果是销售退货单行
                 if is_return:
+                    self.tax_rate = self.env.user.company_id.output_tax_rate
                     self.price = self.goods_id.price
             elif self.type == 'out':
+                self.tax_rate = self.env.user.company_id.output_tax_rate
                 self.price = self.goods_id.price
                 # 如果是采购退货单行
                 if is_return:
                     if not self.goods_id.cost:
                         raise except_orm(u'错误', u'请先设置商品的成本！')
+                    self.tax_rate = self.env.user.company_id.import_tax_rate
                     self.price = self.goods_id.cost
 
         return super(wh_move_line,self).onchange_goods_id()
