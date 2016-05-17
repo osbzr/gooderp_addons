@@ -641,7 +641,6 @@ class wh_move_line(models.Model):
                 if is_return:
                     self.price = self.goods_id.price
             elif self.type == 'out':
-                self.warehouse_id = self.goods_id.default_wh  # 取产品的默认仓库
                 self.price = self.goods_id.price
                 # 如果是采购退货单行
                 if is_return:

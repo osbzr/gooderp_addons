@@ -20,7 +20,6 @@ class Test_sell(TransactionCase):
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
         self.others_warehouse_id = self.env.ref('warehouse.warehouse_others')
         self.goods = self.env.ref('goods.cable')
-        self.goods.default_wh = self.warehouse_id.id
         self.partner = self.env.ref('core.lenovo')
         # 因为下面要用到 产品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -271,7 +270,6 @@ class test_sell_order_line(TransactionCase):
     def test_onchange_goods_id(self):
         '''当销货订单行的产品变化时，带出产品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
-        goods.default_wh = self.env.ref('warehouse.hd_stock').id
         c_category_id = self.order.partner_id.c_category_id
     
         for line in self.order.line_ids:
