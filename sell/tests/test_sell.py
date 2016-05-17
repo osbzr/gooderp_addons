@@ -421,29 +421,6 @@ class test_wh_move_line(TransactionCase):
 
         self.goods_cable = self.browse_ref('goods.cable')
         self.goods_keyboard = self.browse_ref('goods.keyboard')
-
-    def test_onchange_goods_id(self):
-        '''测试销售模块中商品的onchange,是否会带出默认库位和单价'''
-        # 销售退货单行
-        for line in self.delivery_return.line_in_ids:
-            # 在商品鼠标的价格清单中没有找到匹配的价格
-            with self.assertRaises(except_orm):
-                line.with_context({'default_is_return': True,
-                    'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
-            # 在商品键盘的价格清单中找到匹配的价格
-            line.goods_id = self.goods_keyboard.id
-            line.with_context({'default_is_return': True,
-                'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
-
-        # 发货单行：
-        for line in self.delivery.line_out_ids:
-            line.goods_id = self.goods_keyboard.id
-            line.with_context({'default_is_return': False,
-                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
-            line.goods_id = self.goods_cable.id
-            with self.assertRaises(except_orm):
-                line.with_context({'default_is_return': False,
-                'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
                 
     def test_onchange_warehouse_id(self):
         '''wh.move.line仓库和商品带出价格策略的折扣率'''
