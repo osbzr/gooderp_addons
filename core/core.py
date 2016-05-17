@@ -73,8 +73,8 @@ class settle_mode(models.Model):
 class partner(models.Model):
     _name = 'partner'
     code = fields.Char(u'编号')
-    name = fields.Char(u'名称')
-    main_mobile = fields.Char(u'主要手机号')
+    name = fields.Char(u'名称',required=True,)
+    main_mobile = fields.Char(u'主要手机号',required=True,)
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
