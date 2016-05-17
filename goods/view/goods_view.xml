@@ -49,12 +49,6 @@
 										<field name='cost'/>
 										<field name='supplier_id'/>
                                         <field name='price'/>
-                                        <field name="price_ids" colspan="2" nolabel='1'>
-                                            <tree editable="BOTTOM" string="价格清单">
-                                                <field name="category_id" widget="selection"/>
-                                                <field name="price"/>
-                                            </tree>
-                                        </field>
 									</group>
 									<group>
 										<field name='using_batch' groups='goods.batch_groups'/>

@@ -108,20 +108,5 @@
 			<field name="value_id" ref="goods.black"/>
 			<field name="category_id" ref="goods.attribute_color"/>
 		</record>
-		<record id="goods_price_0" model="goods.price">
-			<field name="goods_id" ref="goods.keyboard"/>
-			<field eval="2000.0" name="price"/>
-			<field name="category_id" ref="core.customer_category_1"/>
-		</record>
-		<record id="goods_price_1" model="goods.price">
-			<field name="goods_id" ref="goods.keyboard"/>
-			<field eval="1500.0" name="price"/>
-			<field name="category_id" ref="core.customer_category_2"/>
-		</record>
-		<record id="goods_price_2" model="goods.price">
-			<field name="goods_id" ref="goods.keyboard"/>
-			<field eval="1200.0" name="price"/>
-			<field name="category_id" ref="core.customer_category_vip"/>
-		</record>
 	</data>
 </openerp>
