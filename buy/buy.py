@@ -295,7 +295,7 @@ class payment(models.Model):
     name=fields.Char(string="名称",required=True)
     amount_money=fields.Float(string="金额",required=True)
     date_application=fields.Date(string="申请日期",readonly=True)
-    payment_plan_id=fields.Many2one("buy_order_line")
+    payment_plan_id=fields.Many2one("buy_order")
 
 class buy_order_line(models.Model):
     _name = 'buy.order.line'
