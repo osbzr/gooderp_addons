@@ -34,7 +34,7 @@ class wh_move(models.Model):
     name = fields.Char(u'单据编号', copy=False, default='/')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft')
     partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict')
-    date = fields.Date(u'单据日期', copy=False, default=fields.Date.context_today)
+    date = fields.Date(u'单据日期', required=True, copy=False, default=fields.Date.context_today)
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict',
                                    default=_get_default_warehouse)

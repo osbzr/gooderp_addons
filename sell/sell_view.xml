@@ -210,12 +210,15 @@
 		    						context="{
 		    						'warehouse_dest_type': 'customer',
 		    						'type':'out',
-		    						'default_warehouse_id': warehouse_id
+		    						'default_warehouse_id': warehouse_id,
+		         					'default_date':date,
+		         					'default_partner':partner_id,
 		    						}">
 		         					<tree string='销售发货单行' editable='bottom'>
 		         						<field name='goods_id'
 		         							context="{'default_partner':parent.partner_id,
-		         									  'default_is_return':parent.is_return}"/>
+		         									  'default_is_return':parent.is_return,
+		         									  }"/>
 		         						<field name='using_attribute' invisible='1'/>
 		         						<field name='attribute_id'
 		         							domain="[('goods_id', '=', goods_id)]"

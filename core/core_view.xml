@@ -150,7 +150,7 @@
                     <group>
                         <group>
                             <field name="code"/>
-                    		<field name="mobile"/>
+                    		<field name="main_mobile"/>
                         </group>
                         <group>
 							<field name="c_category_id" required="1"/>
@@ -167,10 +167,10 @@
             <field name="name">客户列表</field>
             <field name="model">partner</field>
             <field name="arch" type="xml">
-                <tree editable="TOP" string="客户">
+                <tree string="客户">
                     <field name="c_category_id" required="1"/>
                     <field name="code"/>
-                    <field name="mobile"/>
+                    <field name="main_mobile"/>
                     <field name="name"/>
                     <field name="receivable" sum='sum'/>
                 </tree>
@@ -214,6 +214,7 @@
                     <group>
                         <group>
                             <field name="code"/>
+                    		<field name="main_mobile"/>
                         </group>
                         <group>
 							<field name="s_category_id"/>
@@ -230,10 +231,11 @@
             <field name="name">供应商列表</field>
             <field name="model">partner</field>
             <field name="arch" type="xml">
-                <tree editable="TOP" string="供应商">
+                <tree string="供应商">
                     <field name="s_category_id" required="1"/>
                     <field name="code"/>
                     <field name="name"/>
+                    <field name="main_mobile"/>
                     <field name="payable" sum='sum'/>
                 </tree>
             </field>
@@ -296,6 +298,7 @@
                     <field name="warehouse_id"/>
                     <field name="c_category_id"/>
                     <field name="goods_category_id"/>
+                    <field name='goods_id'/>
                     <field name="deactive_date"/>
                     <field name="discount_rate"/>
                 </tree>
