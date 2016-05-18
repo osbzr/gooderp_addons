@@ -90,6 +90,9 @@
                             <field name="name"></field>
                             <field name="amount_money"></field> 
                             <field name="date_application"></field> 
+                            <button name="request_payment" type="object"
+                                    string="确认"> 
+                            </button>
                         </tree>
                     </field>
 

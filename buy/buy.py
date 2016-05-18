@@ -109,8 +109,34 @@ class buy_order(models.Model):
                               default=u'未入库', store=True,
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
-    pay_ids=fields.One2many("payment.plan","payment_plan_id",string="付款计划")
+    pay_ids=fields.One2many("payment.plan","buy_id",string="付款计划")
 
+    @api.one
+    def request_payment(self):
+        categ = self.env.ref('money.core_category_purchase')
+        source_id = self.env['money.invoice'].create({
+                            'name': self.buy_id.name,
+                            'partner_id': self.buy_id.partner_id.id,
+                            'category_id': categ.id, 
+                            'date': fields.Date.context_today(self),
+                            'amount': amount_money,
+                            'reconciled': 0,
+                            'to_reconcile': amount_money,
+                            'date_due': fields.Date.context_today(self),
+                            'state': 'draft',
+                        })
+        source_id.money_invoice_done()
+        payment_id = self.env["money.order"].create({
+                            'partner_id': self.buy_id.partner_id.id,
+                                'date': fields.Date.context_today(self),
+                                'source_ids':
+                                [(0, 0, line) for line in source_lines],
+                                'type': 'pay',
+                                'amount': amount_money,
+                                'reconciled': 0,
+                                'to_reconcile': amount_money,
+                                'state': 'draft',
+            })
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -295,7 +321,7 @@ class payment(models.Model):
     name=fields.Char(string="名称",required=True)
     amount_money=fields.Float(string="金额",required=True)
     date_application=fields.Date(string="申请日期",readonly=True)
-    payment_plan_id=fields.Many2one("buy.order")
+    buy_id=fields.Many2one("buy.order")    
 
 class buy_order_line(models.Model):
     _name = 'buy.order.line'
