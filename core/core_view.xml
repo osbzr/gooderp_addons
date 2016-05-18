@@ -217,8 +217,8 @@
 				<tree string="供应商">
 					<field name="s_category_id" required="1"/>
 					<field name="code"/>
-					<field name="name"/>
 					<field name="main_mobile"/>
+					<field name="name"/>
 					<field name="payable" sum='sum'/>
 				</tree>
 			</field>
