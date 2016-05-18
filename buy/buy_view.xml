@@ -91,7 +91,7 @@
                             <field name="amount_money"></field> 
                             <field name="date_application"></field> 
                             <button name="request_payment" type="object"
-                                    string="确认"> 
+                                    string="确认" attrs="{'invisible': [('date_application','!=',False)]}"> 
                             </button>
                         </tree>
                     </field>

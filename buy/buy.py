@@ -22,6 +22,7 @@
 from openerp import fields, models, api
 import openerp.addons.decimal_precision as dp
 from openerp.exceptions import except_orm
+from datetime import datetime
 
 # 购货订单审核状态可选值
 BUY_ORDER_STATES = [
@@ -110,33 +111,6 @@ class buy_order(models.Model):
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
     pay_ids=fields.One2many("payment.plan","buy_id",string="付款计划")
-
-    @api.one
-    def request_payment(self):
-        categ = self.env.ref('money.core_category_purchase')
-        source_id = self.env['money.invoice'].create({
-                            'name': self.buy_id.name,
-                            'partner_id': self.buy_id.partner_id.id,
-                            'category_id': categ.id, 
-                            'date': fields.Date.context_today(self),
-                            'amount': amount_money,
-                            'reconciled': 0,
-                            'to_reconcile': amount_money,
-                            'date_due': fields.Date.context_today(self),
-                            'state': 'draft',
-                        })
-        source_id.money_invoice_done()
-        payment_id = self.env["money.order"].create({
-                            'partner_id': self.buy_id.partner_id.id,
-                                'date': fields.Date.context_today(self),
-                                'source_ids':
-                                [(0, 0, line) for line in source_lines],
-                                'type': 'pay',
-                                'amount': amount_money,
-                                'reconciled': 0,
-                                'to_reconcile': amount_money,
-                                'state': 'draft',
-            })
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -321,8 +295,40 @@ class payment(models.Model):
     name=fields.Char(string="名称",required=True)
     amount_money=fields.Float(string="金额",required=True)
     date_application=fields.Date(string="申请日期",readonly=True)
-    buy_id=fields.Many2one("buy.order")    
+    buy_id=fields.Many2one("buy.order") 
 
+    @api.one
+    def request_payment(self):
+        categ = self.env.ref('money.core_category_purchase')
+        source_id = self.env['money.invoice'].create({
+                            'name': self.buy_id.name,
+                            'partner_id': self.buy_id.partner_id.id,
+                            'category_id': categ.id, 
+                            'date': fields.Date.context_today(self),
+                            'amount': self.amount_money,
+                            'reconciled': 0,
+                            'to_reconcile': self.amount_money,
+                            'date_due': fields.Date.context_today(self),
+                            'state': 'draft',
+                        })
+        payment_id = self.env["money.order"].create({
+                            'partner_id': self.buy_id.partner_id.id,
+                                'date': fields.Date.context_today(self),
+                                'source_ids':
+                                [(0, 0, {'name':source_id.id, 
+                                 'category_id':categ.id, 
+                                 'date':source_id.date, 
+                                 'amount':self.amount_money, 
+                                 'reconciled':0.0, 
+                                 'to_reconcile':self.amount_money, 
+                                 'this_reconcile':self.amount_money})],
+                                'type': 'pay',
+                                'amount': self.amount_money,
+                                'reconciled': 0,
+                                'to_reconcile': self.amount_money,
+                                'state': 'draft',
+            })   
+        self.date_application = datetime.now()
 class buy_order_line(models.Model):
     _name = 'buy.order.line'
     _description = u'购货订单明细'
