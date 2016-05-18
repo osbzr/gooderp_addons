@@ -292,6 +292,5 @@
 			<field name="view_mode">tree</field>
 		</record>
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
-
-	</data>
+    </data>
 </openerp>
