@@ -6,6 +6,7 @@
             <field name="planned_date">2016-02-22</field>
             <field name="partner_id" ref="core.lenovo"/>
             <field name="type">buy</field>
+            <field name="invoice_by_receipt">True</field>
         </record>
         <record id="buy_order_line_1" model="buy.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
@@ -22,6 +23,7 @@
             <field name="planned_date">2016-02-22</field>
             <field name="partner_id" ref="core.lenovo"/>
             <field name="type">buy</field>
+            <field name="invoice_by_receipt">True</field>
         </record>
         <record id="buy_order_line_1_same" model="buy.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
@@ -57,6 +59,7 @@
             <field name="planned_date">2016-02-22</field>
             <field name="partner_id" ref="core.lenovo"/>
             <field name="type">return</field>
+            <field name="invoice_by_receipt">True</field>
         </record>
         <record id="buy_return_order_line_1" model="buy.order.line">
             <field name="uom_id" ref="core.uom_pc"/>

@@ -58,6 +58,8 @@ class res_company(models.Model):
                     default=lambda self: fields.Date.context_today(self))
     cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法')
     draft_invoice = fields.Boolean(u'根据发票确认应收应付')
+    import_tax_rate=fields.Float(string="默认进项税税率")
+    output_tax_rate=fields.Float(string="默认销项税税率")
 
 
 class uom(models.Model):
@@ -73,8 +75,8 @@ class settle_mode(models.Model):
 class partner(models.Model):
     _name = 'partner'
     code = fields.Char(u'编号')
-    name = fields.Char(u'名称')
-    main_mobile = fields.Char(u'主要手机号')
+    name = fields.Char(u'名称',required=True,)
+    main_mobile = fields.Char(u'主要手机号',required=True,)
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
@@ -97,7 +99,7 @@ class goods(models.Model):
         res = []
 
         for goods in self:
-            res.append((goods.id, goods.code + '_' + goods.name))
+            res.append((goods.id, goods.code and (goods.code + '_' + goods.name) or goods.name))
         return res
 
     @api.model
@@ -147,46 +149,169 @@ class pricing(models.Model):
     def get_pricing_id(self,partner,warehouse,goods,date):
         '''传入客户，仓库，商品，日期，返回合适的价格策略'''
         if partner and warehouse and goods:
-            #客户类别、仓库、产品三个条件都符合的截止日期在传入日期之后的
+            #客户类别、仓库、产品满足条件
             good_pricing = self.search([
                                         ('c_category_id','=',partner.c_category_id.id),
                                         ('warehouse_id','=',warehouse.id),
                                         ('goods_id','=',goods.id),
+                                        ('goods_category_id','=',False),
                                         ('deactive_date','>=',date)
                                         ])
-            #客户类别、仓库、产品类别三个条件都符合的截止日期在传入日期之后的
+            #仓库，客户类别，产品
+            if len(good_pricing) == 1 :
+                return good_pricing
+            if len(good_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
+                                                                 warehouse.name,
+                                                                 goods.name,
+                                                                 date))
+            #客户类别、仓库、产品类别满足条件
             gc_pricing = self.search([
                                       ('c_category_id','=',partner.c_category_id.id),
                                       ('warehouse_id','=',warehouse.id),
+                                      ('goods_id','=',False),
                                       ('goods_category_id','=',goods.category_id.id),
                                       ('deactive_date','>=',date)
                                       ])
-            #客户类别、仓库两个条件都符合，产品类别为空的截止日期在传入日期之后的
+            #仓库，客户类别，产品分类
+            if len(gc_pricing) == 1 :
+                return gc_pricing
+            if len(gc_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
+                                                                 warehouse.name,
+                                                                 goods.category_id.name,
+                                                                 date))
+            #客户类别、仓库满足条件
             pw_pricing = self.search([
                                       ('c_category_id','=',partner.c_category_id.id),
                                       ('warehouse_id','=',warehouse.id),
+                                      ('goods_id','=',False),
                                       ('goods_category_id','=',False),
                                       ('deactive_date','>=',date)
                                       ])
-            #客户类别条件符合、仓库、产品类别为空的截止日期在传入日期之后的
-            partner_pricing = self.search([
-                                          ('c_category_id','=',partner.c_category_id.id),
-                                          ('warehouse_id','=',False),
+            #仓库，客户类别
+            if len(pw_pricing) == 1 :
+                return pw_pricing
+            if len(pw_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
+                                                                 warehouse.name,
+                                                                 date))
+            #仓库,产品满足
+            wg_pricing = self.search([
+                                          ('c_category_id','=',False),
+                                          ('warehouse_id','=',warehouse.id),
+                                          ('goods_id','=',goods.id),
                                           ('goods_category_id','=',False),
                                           ('deactive_date','>=',date)
                                           ])
-            if len(good_pricing) == 1 :
-                return good_pricing
-            elif len(gc_pricing) == 1 :
-                return gc_pricing
-            elif len(pw_pricing) == 1 :
-                return pw_pricing
-            elif len(partner_pricing) == 1 :
+            #仓库，产品
+            if len(wg_pricing) == 1 :
+                return wg_pricing
+            if len(wg_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s 的价格策略不唯一'%(warehouse.name,
+                                                                 goods.name,
+                                                                 date))
+            #仓库，产品分类满足条件
+            w_gc_pricing = self.search([
+                                          ('c_category_id','=',False),
+                                          ('warehouse_id','=',warehouse.id),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',goods.category_id.id),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #仓库，产品分类
+            if len(w_gc_pricing) == 1 :
+                return w_gc_pricing
+            if len(w_gc_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s 的价格策略不唯一'%(warehouse.name,
+                                                                 goods.category_id.name,
+                                                                 date))
+            #仓库满足条件
+            warehouse_pricing = self.search([
+                                          ('c_category_id','=',False),
+                                          ('warehouse_id','=',warehouse.id),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #仓库
+            if len(warehouse_pricing) == 1 :
+                return warehouse_pricing
+            if len(warehouse_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s 的价格策略不唯一'%(warehouse.name,
+                                                                 date))
+            #客户类别,产品满足条件
+            ccg_pricing = self.search([
+                                          ('c_category_id','=',partner.c_category_id.id),
+                                          ('warehouse_id','=',False),
+                                          ('goods_id','=',goods.id),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #客户类别，产品
+            if len(ccg_pricing) == 1 :
+                return ccg_pricing
+            if len(ccg_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
+                                                                 goods.name,
+                                                                 date))
+            #客户类别,产品分类满足条件
+            ccgc_pricing = self.search([
+                                          ('c_category_id','=',partner.c_category_id.id),
+                                          ('warehouse_id','=',False),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',goods.category_id.id),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #仓库，产品分类
+            if len(ccgc_pricing) == 1 :
+                return ccgc_pricing
+            if len(ccgc_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
+                                                                 goods.category_id.name,
+                                                                 date))
+            #客户类别满足条件
+            partner_pricing = self.search([
+                                          ('c_category_id','=',partner.c_category_id.id),
+                                          ('warehouse_id','=',False),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #客户类别
+            if len(partner_pricing) == 1 :
                 return partner_pricing
-            elif len(good_pricing)+len(gc_pricing)+len(pw_pricing)+len(partner_pricing) == 0:
+            if len(partner_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s,%s 的价格策略不唯一'%(partner.c_category_id.name,
+                                                                 date))
+            #所有产品打折
+            all_goods_pricing = self.search([
+                                          ('c_category_id','=',False),
+                                          ('warehouse_id','=',False),
+                                          ('goods_id','=',False),
+                                          ('goods_category_id','=',False),
+                                          ('deactive_date','>=',date)
+                                          ])
+            #所有产品
+            if len(all_goods_pricing) == 1 :
+                return all_goods_pricing
+            if len(all_goods_pricing) > 1 :
+                raise except_orm(u'错误', 
+                                 u'适用于 %s 的价格策略不唯一'%(date))
+            if len(good_pricing)+len(gc_pricing)+len(pw_pricing)+len(wg_pricing)\
+                    +len(w_gc_pricing)+len(warehouse_pricing)+len(ccg_pricing)\
+                    +len(partner_pricing)+len(all_goods_pricing) == 0:
                 return False
-            else:
-                raise except_orm(u'错误', u'价格策略设置有误')
+            
 
     name=fields.Char(u'描述')
     warehouse_id = fields.Many2one('warehouse',u'仓库')

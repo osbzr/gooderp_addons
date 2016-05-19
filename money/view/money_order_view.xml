@@ -27,9 +27,10 @@
             <field name="arch" type="xml">
                 <form string="Money Order">
                 <header>
-                	<button name="money_order_done" states="draft" string="审核" type="object" class="oe_highlight"/>
-					<button name="money_order_draft" states="done" string="反审核" type="object"/>
-					<!-- <button name="print_money_order" states="done" string="打印" type="object" class="oe_highlight"/> -->
+                	<button name="money_order_done" states="draft" string="审核" 
+                		type="object" class="oe_highlight" groups='money.group_money_manager'/>
+					<button name="money_order_draft" states="done" string="反审核" 
+						type="object" groups='money.group_money_manager'/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>

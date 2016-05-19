@@ -337,7 +337,7 @@ class sell_order_line(models.Model):
     amount = fields.Float(u'金额', compute=_compute_all_amount, 
                           store=True, readonly=True,
                           digits_compute=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)', default=17.0)
+    tax_rate = fields.Float(u'税率(%)',default=lambda self:self.env.user.company_id.output_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, 
                               readonly=True,
                               digits_compute=dp.get_precision('Amount'))
