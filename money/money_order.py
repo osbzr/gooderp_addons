@@ -67,7 +67,6 @@ class money_order(models.Model):
     state = fields.Selection([
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
-                          ('confirm', u'确认付款'),
                           ], string=u'状态', readonly=True,
                              default='draft', copy=False)
     partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True,
@@ -208,15 +207,6 @@ class money_order(models.Model):
             order.state = 'draft'
         return True
 
-    @api.multi
-    def money_order_confirm(self):
-        '''对收支单的确认付款按钮'''
-        self.state = 'confirm'
-
-    @api.multi
-    def money_order_unconfirm(self):
-        '''对收支单的取消确认付款按钮'''
-        self.state = 'done'
 #     @api.multi
 #     def print_money_order(self):
 #         return True

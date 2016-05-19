@@ -7,14 +7,6 @@ from openerp.exceptions import except_orm
 class test_money_order(TransactionCase):
     '''测试收付款'''
 
-    def test_money_confirm_un_confirm(self):
-        '''测试确认付款和取消确认付款'''
-        order = self.env.ref('money.get_40000')
-        order.money_order_confirm()
-        self.assertEqual(order.state, 'confirm')
-        order.money_order_unconfirm()
-        self.assertEqual(order.state, 'done')
-
     def test_money_order_unlink(self):
         '''测试收付款单删除'''
         self.env.ref('money.get_40000').money_order_done()
