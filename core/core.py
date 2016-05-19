@@ -99,7 +99,7 @@ class goods(models.Model):
         res = []
 
         for goods in self:
-            res.append((goods.id, goods.code + '_' + goods.name))
+            res.append((goods.id, goods.code and (goods.code + '_' + goods.name) or goods.name))
         return res
 
     @api.model
