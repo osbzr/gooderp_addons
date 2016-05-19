@@ -71,7 +71,7 @@
 				 						<field name='warehouse_dest_id' invisible='1'/>
                  						<field name='quantity' sum='数量合计'/>
                  						<field name="quantity_out" readonly="1" sum="合计已发货数量"/>
-				 						<field name='price'/>
+				 						<field name='price' readonly='1'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -236,7 +236,7 @@
 		         						<field name='goods_qty' sum='数量合计'/>
 		         						<field name='goods_uos_qty' sum='辅助数量合计'
 		         							groups='goods.auxiliary_unit_groups'/>
-				 						<field name='price'/>
+				 						<field name='price' readonly='1'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
