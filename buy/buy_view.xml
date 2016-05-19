@@ -50,6 +50,7 @@
                             	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="date" required="1"/>
                             <field name="warehouse_dest_id"/>
+                            <field name="invoice_by_receipt"></field>
                         </group>
                         <group>
                         	<field name="planned_date" required="1"/>
@@ -85,10 +86,10 @@
                         </tree>
                     </field>
 
-                    <field name="pay_ids">
-                        <tree string="Payment Form" editable="bottom">
+                    <field name="pay_ids" attrs="{'invisible': [('invoice_by_receipt','=',True)]}">
+                        <tree string="Payment Form" editable="bottom" >
                             <field name="name"></field>
-                            <field name="amount_money"></field> 
+                            <field name="amount_money" sum="合计"></field> 
                             <field name="date_application"></field> 
                             <button name="request_payment" type="object"
                                     string="确认" attrs="{'invisible': [('date_application','!=',False)]}"> 
@@ -106,12 +107,12 @@
                     </group>
                     <group>
                         <group>
-                        	<field name="prepayment"/>
+                        	<field name="prepayment" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="create_uid" readonly="1" string="制单人"/>
                             <field name="approve_uid" readonly="1"/>
                         </group>
                     	<group>
-                    		<field name="bank_account_id"/>
+                    		<field name="bank_account_id" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="create_date" readonly="1" string="录单时间"/>
                             <field name="write_date" readonly="1" string="最后修改时间"/>
                         </group>
@@ -201,6 +202,7 @@
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                             <field name="warehouse_dest_id"/>
+                            <field name="invoice_by_receipt"></field>
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
