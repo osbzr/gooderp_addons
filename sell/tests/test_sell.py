@@ -453,14 +453,6 @@ class test_wh_move_line(TransactionCase):
             line.with_context({'default_date':'2017-02-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 0)
-        order = self.env.ref('sell.sell_order_2')
-        order.sell_order_done()
-        delivery = self.env['sell.delivery'].search(
-                        [('order_id', '=', order.id)])
-        for line in delivery.line_out_ids[0]:
             line.with_context({'default_date':'2017-01-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            self.env.ref('sell.pricing_10').copy()
-            with self.assertRaises(except_orm):
-                line.with_context({'default_date':'2017-01-01',
-                    'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
+            self.assertTrue(line.discount_rate == 0)
