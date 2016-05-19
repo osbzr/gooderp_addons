@@ -91,8 +91,6 @@ class sell_order(models.Model):
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
-    address = fields.Char(u'地址')
-    mobile = fields.Char(u'手机')
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -464,6 +462,8 @@ class sell_delivery(models.Model):
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
                                store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
+    address = fields.Char(u'地址')
+    mobile = fields.Char(u'手机')
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
