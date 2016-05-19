@@ -91,6 +91,8 @@ class sell_order(models.Model):
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
+    address = fields.Char(u'地址')
+    mobile = fields.Char(u'手机')
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -434,7 +436,8 @@ class sell_delivery(models.Model):
                                ondelete='cascade')
     invoice_id = fields.Many2one('money.invoice', u'发票号',
                                  copy=False, ondelete='restrict')
-    date_due = fields.Date(u'到期日期', copy=False)
+    date_due = fields.Date(u'到期日期', copy=False,
+                           default=lambda self: fields.Date.context_today(self))
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                             digits_compute=dp.get_precision('Amount'))
