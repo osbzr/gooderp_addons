@@ -86,6 +86,7 @@ class buy_order(models.Model):
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         default=_default_warehouse_dest,
                                         ondelete='restrict')
+    invoice_by_receipt=fields.Boolean(string="按收货结算")
     line_ids = fields.One2many('buy.order.line', 'order_id', u'购货订单行',
                                states=READONLY_STATES, copy=True)
     note = fields.Text(u'备注')
@@ -238,7 +239,7 @@ class buy_order(models.Model):
         for line in self.line_ids:
             # 如果订单部分入库，则点击此按钮时生成剩余数量的入库单
             to_in = line.quantity - line.quantity_in
-            if to_in == 0:
+            if to_in <= 0:
                 continue
             if line.goods_id.force_batch_one:
                 i = 0
@@ -255,6 +256,7 @@ class buy_order(models.Model):
             receipt_id = self.env['buy.receipt'].create({
                                 'partner_id': self.partner_id.id,
                                 'date': self.planned_date,
+                                'date_due': fields.Date.context_today(self),
                                 'order_id': self.id,
                                 'line_in_ids': [
                                     (0, 0, line[0]) for line in receipt_line],
@@ -262,6 +264,7 @@ class buy_order(models.Model):
                                 'note': self.note,
                                 'discount_rate': self.discount_rate,
                                 'discount_amount': self.discount_amount,
+                                'invoice_by_receipt':self.invoice_by_receipt,
                             })
             view_id = self.env.ref('buy.buy_receipt_form').id
             name = u'采购入库单'
@@ -270,12 +273,14 @@ class buy_order(models.Model):
             receipt_id = rec.env['buy.receipt'].create({
                             'partner_id': self.partner_id.id,
                             'date': self.planned_date,
+                            'date_due': fields.Date.context_today(self),
                             'order_id': self.id,
                             'line_out_ids': [
                                 (0, 0, line[0]) for line in receipt_line],
                             'note': self.note,
                             'discount_rate': self.discount_rate,
                             'discount_amount': self.discount_amount,
+                            'invoice_by_receipt':self.invoice_by_receipt,
                         })
             view_id = self.env.ref('buy.buy_return_form').id
             name = u'采购退货单'
@@ -472,6 +477,7 @@ class buy_receipt(models.Model):
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                                    digits_compute=dp.get_precision('Amount'))
+    invoice_by_receipt=fields.Boolean(string="按收货结算")
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits_compute=dp.get_precision('Amount'))
@@ -579,6 +585,8 @@ class buy_receipt(models.Model):
         if not self.is_return:
             amount = self.amount
             this_reconcile = self.payment
+            if not self.invoice_by_receipt:
+                return False
         else:
             amount = -self.amount
             this_reconcile = -self.payment
@@ -669,6 +677,7 @@ class buy_receipt(models.Model):
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id:
             return self.order_id.buy_generate_receipt()
+
 
     @api.one
     def buy_share_cost(self):
