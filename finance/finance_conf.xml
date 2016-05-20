@@ -40,7 +40,6 @@
                     <field name="costs_types"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
-                    <field name="state" widget='boolean_clickable'/>
                 </tree>
             </field>
         </record>
