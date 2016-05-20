@@ -378,7 +378,7 @@ class buy_order_line(models.Model):
                                         u'仓库', ondelete='restrict')
     quantity = fields.Float(u'数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
-    quantity_in = fields.Float(u'已入库数量', copy=False,
+    quantity_in = fields.Float(u'已执行数量', copy=False,
                                digits_compute=dp.get_precision('Quantity'))
     price = fields.Float(u'购货单价',
                          digits_compute=dp.get_precision('Amount'))
@@ -575,7 +575,6 @@ class buy_receipt(models.Model):
             else:
                 line_ids = self.line_out_ids
             for line in line_ids:
-                #退货也增加？
                 line.buy_line_id.quantity_in += line.goods_qty
         
         return
