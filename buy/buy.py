@@ -625,6 +625,8 @@ class buy_receipt(models.Model):
     
     @api.one
     def _make_payment(self,source_id):
+        if not source_id[0]:
+            return False
         if self.payment:
             if not self.is_return:
                 amount = self.amount
