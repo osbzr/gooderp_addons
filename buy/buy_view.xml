@@ -270,12 +270,14 @@
                             <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
-                            <field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="payment" attrs="{'readonly': [('state','!=','draft')],
+                                                'invisible': [('invoice_by_receipt','=',False)]}"/>
                         </group>
                     </group>
                     <group>
                         <group col="6" colspan="6">
-                            <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')],
+                                                        'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="debt"/>
                         </group>
                     </group>
