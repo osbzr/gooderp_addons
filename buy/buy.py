@@ -168,8 +168,8 @@ class buy_order(models.Model):
         if not self.line_ids:
             raise except_orm(u'错误', u'请输入产品明细行！')
         for line in self.line_ids:
-            if line.quantity == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
+            if line.quantity <= 0 or line.price < 0:
+                raise except_orm(u'错误', u'产品数量和产品单价不能小于0！')
         if self.bank_account_id and not self.prepayment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.prepayment:
@@ -378,7 +378,7 @@ class buy_order_line(models.Model):
                                         u'仓库', ondelete='restrict')
     quantity = fields.Float(u'数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
-    quantity_in = fields.Float(u'已入库数量', copy=False,
+    quantity_in = fields.Float(u'已执行数量', copy=False,
                                digits_compute=dp.get_precision('Quantity'))
     price = fields.Float(u'购货单价',
                          digits_compute=dp.get_precision('Amount'))
@@ -401,7 +401,7 @@ class buy_order_line(models.Model):
     note = fields.Char(u'备注')
     # TODO:放到单独模块中 sell_to_buy many2one 到sell.order
     origin = fields.Char(u'销售单号')
-    
+
     @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
@@ -575,7 +575,6 @@ class buy_receipt(models.Model):
             else:
                 line_ids = self.line_out_ids
             for line in line_ids:
-                #退货也增加？
                 line.buy_line_id.quantity_in += line.goods_qty
         
         return

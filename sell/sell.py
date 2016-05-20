@@ -223,7 +223,7 @@ class sell_order(models.Model):
         for line in self.line_ids:
             # 如果订单部分出库，则点击此按钮时生成剩余数量的出库单
             to_out = line.quantity - line.quantity_out
-            if to_out == 0:
+            if to_out <= 0:
                 continue
             if line.goods_id.force_batch_one:
                 i = 0
