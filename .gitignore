@@ -4,3 +4,6 @@
 .project
 .pydevproject
 .settings/
+.DS_Store
+*~
+*.orig

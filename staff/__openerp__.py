@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['base','province_city_county'],
+    'depends': ['base', 'province_city_county'],
     'demo': [
              'tests/staff_demo.xml'
         ],
@@ -16,4 +16,3 @@
              'staff.xml',
         ],
 }
-
