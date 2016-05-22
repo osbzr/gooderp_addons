@@ -319,3 +319,9 @@ body {
 .display_message .show {
     display: inline-block;
 }
+
+.gooderp_tree_footer {
+    background-color: #00BCD4;
+    font-weight: bold;
+    color: white;
+}

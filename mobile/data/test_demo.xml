@@ -31,7 +31,7 @@
                     <tree>
                         <field name='code' string='编码' />
                         <field name='name' string='产品' />
-                        <field name='cost' string='成本' />
+                        <field name='cost' string='成本' aggregate='sum' />
                     </tree>
                     <form>
                         <field name='uom_id' string='产品' />

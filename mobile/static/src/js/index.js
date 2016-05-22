@@ -11,6 +11,7 @@ $(function(){
             display_name: '',
             records: [],
             headers: {'left': '', 'center': '', 'right': ''},
+            footers: {'left': '', 'center': '', 'right': ''},
             form_records: [],
             wizard_records: [],
             search_view: [],
@@ -75,6 +76,7 @@ $(function(){
         origin_data.wizard_records = [];
         origin_data.context = {};
         origin_data.headers = {'left': '', 'center': '', 'right': ''};
+        origin_data.footers = {'left': '', 'center': '', 'right': ''};
 
         for (var key in origin_data) {
             vue_data[key] = origin_data[key];
@@ -119,6 +121,49 @@ $(function(){
         '!=': '不等于',
     };
 
+    function aggregate_sum(key, records) {
+        var res = 0;
+        records.forEach(function(record) {
+            res += record[key];
+        });
+        return res;
+    }
+
+    function aggregate_avg(key, records) {
+        var res = 0;
+        records.forEach(function(record) {
+            res += record[key];
+        });
+        return records.length? res / records.length: 0;
+    }
+
+    function aggregate_min(key, records) {
+        var res = records[0][key];
+        records.forEach(function(record) {
+            if (record[key] < res) {
+                res = record[key];
+            }
+        });
+        return res;
+    }
+
+    function aggregate_max(key, records) {
+        var res = records[0][key];
+        records.forEach(function(record) {
+            if (record[key] > res) {
+                res = record[key];
+            }
+        });
+        return res;
+    }
+
+    var AGGREGATE_OPERAOR = {
+        'sum': aggregate_sum,
+        'avg': aggregate_avg,
+        'min': aggregate_min,
+        'max': aggregate_max,
+    };
+
     function map_operator(operator) {
         operator = operator || '=';
         return MAP_OPERATOR[operator];
@@ -141,7 +186,28 @@ $(function(){
         var vue = new Vue({
             el: '#container',
             data: data,
+            computed: {
+                footers: function() {
+                    var self = this,
+                        footers = {};
+                    if (self.records.length > 0) {
+                        ['left', 'center', 'right'].forEach(function(key) {
+                            if (self.headers[key] && ['float', 'integer'].indexOf(self.headers[key].column) >= 0 && self.headers[key].aggregate) {
+                                footers[key] = self._aggerate_func(key);
+                            }
+                        });
+                    }
+
+                    return footers;
+                },
+            },
             methods: {
+                _aggerate_func: function(key) {
+                    if (this.headers[key] && this.headers[key].aggregate in AGGREGATE_OPERAOR) {
+                        return AGGREGATE_OPERAOR[this.headers[key].aggregate](key, this.records);
+                    }
+                    return '';
+                },
                 cancel_wizard: function() {
                     window.history.back();
                 },

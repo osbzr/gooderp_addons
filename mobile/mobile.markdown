@@ -27,10 +27,11 @@
 - ##### tree 视图
 ```xml
 <tree>
-    <field name='field' string='string' />
+    <field name='field' string='string' aggregate='sum' />
 </tree>
 ```
 - 在tree视图中field标签强制为3个，分别定义到界面列表中的左、中、右三个字段
+- 使用aggregate属性来指定float、integer字段类型的聚合函数（sum、avg、max、min）
 
 
 - #### form 视图
