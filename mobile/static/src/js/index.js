@@ -202,6 +202,15 @@ $(function(){
                     var container = $('#container'),
                         scrollDistance = container.scrollTop() + container.height();
 
+                    var header = $('.gooderp_tree_header'),
+                        tree = $('.gooderp_tree');
+
+                    if (header.css('position') === 'relative' && header.offset().top <= 0) {
+                        header.css('position', 'fixed');
+                    } else if (header.css('position') === 'fixed' && tree.offset().top >= header.innerHeight()){
+                        header.css('position', 'relative');
+                    }
+
                     if (container.prop('scrollHeight') - scrollDistance < 10) {
                         var self = this;
                         return self.do_sync({
