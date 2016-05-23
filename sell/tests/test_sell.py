@@ -425,45 +425,34 @@ class test_wh_move_line(TransactionCase):
         for line in self.delivery.line_out_ids[0]:
             line.with_context({'default_date':'2016-04-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 10)
             line.with_context({'default_date':'2016-05-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 20)
             line.with_context({'default_date':'2016-06-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 30)
             line.with_context({'default_date':'2016-07-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 40)
             line.with_context({'default_date':'2016-08-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 50)
             line.with_context({'default_date':'2016-09-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 60)
             line.with_context({'default_date':'2016-10-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 70)
             line.with_context({'default_date':'2016-11-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 80)
             line.with_context({'default_date':'2016-12-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 90)
+            line.with_context({'default_date':'2017-02-01',
+                'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
+            self.assertTrue(line.discount_rate == 0)
             line.with_context({'default_date':'2017-01-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
-            print line.discount_rate
             self.assertTrue(line.discount_rate == 0)
-            self.env.ref('sell.pricing_9').copy()
-            with self.assertRaises(except_orm):
-                line.with_context({'default_date':'2016-12-01',
-                    'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()

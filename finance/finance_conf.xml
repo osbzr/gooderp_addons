@@ -40,7 +40,6 @@
                     <field name="costs_types"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
-                    <field name="state" widget='boolean_clickable'/>
                 </tree>
             </field>
         </record>
@@ -76,30 +75,7 @@
             <field name="view_mode">tree</field>
         </record>
 
-        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='25'/>
-
-        <!--可选值-->
-        <record id="finance_category_tree" model="ir.ui.view">
-            <field name="name">finance.category.tree</field>
-            <field name="model">finance.category</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="可选值">
-                    <field name="name"/>
-                    <field name="type"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="finance_category_action" model="ir.actions.act_window">
-            <field name="name">可选值</field>
-            <field name="res_model">finance.category</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <menuitem id='finance_category_menu' action='finance_category_action' parent='finance_setting_menu' sequence='30'/>
-        
+        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='25'/>       
 
         <!--会计期间-->
         <record id="period_tree" model="ir.ui.view">

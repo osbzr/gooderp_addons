@@ -223,7 +223,7 @@ class sell_order(models.Model):
         for line in self.line_ids:
             # 如果订单部分出库，则点击此按钮时生成剩余数量的出库单
             to_out = line.quantity - line.quantity_out
-            if to_out == 0:
+            if to_out <= 0:
                 continue
             if line.goods_id.force_batch_one:
                 i = 0
@@ -461,6 +461,8 @@ class sell_delivery(models.Model):
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
                                store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
+    address = fields.Char(u'地址')
+    mobile = fields.Char(u'手机')
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')

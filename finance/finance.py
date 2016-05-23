@@ -240,15 +240,6 @@ class finance_account(models.Model):
         ('in', u'收入类'),
         ('out', u'费用类')
     ], u'类型')
-    state = fields.Boolean(u'状态')
-
-
-class finance_category(models.Model):
-    '''财务类别下拉选项'''
-    _name = 'finance.category'
-    name = fields.Char(u'名称')
-    type = fields.Selection(FIANNCE_CATEGORY_TYPE, u'类型',
-                            default=lambda self: self._context.get('type'))
 
 
 class auxiliary_financing(models.Model):
