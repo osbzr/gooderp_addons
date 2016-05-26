@@ -132,6 +132,9 @@
 				<form string="GOODERP PARTNER FORM">
 					<sheet>
 						<div class="oe_title">
+							<div class="oe_edit_only">
+								<label for='name' string='名称'/>
+							</div>
 							<h1>
 								<field name="name" required="1"/>
 							</h1>

@@ -103,7 +103,9 @@ class wh_move(models.Model):
             val.update({
               'goods_id':att.goods_id.id,
               'uom_id':att.goods_id.uom_id.id,
+              'warehouse_id':move.warehouse_id.id,
               'attribute_id':att.id,
+              'price':att.goods_id.price,
               'goods_qty':1,
               'move_id':move.id})
             if create_line == False:
