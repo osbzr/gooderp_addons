@@ -31,6 +31,7 @@ MOUTH_SELECTION = [
 class voucher(models.Model):
     '''新建凭证'''
     _name = 'voucher'
+    _order = 'create_date desc'
 
     @api.one
     @api.depends('date')
@@ -265,9 +266,9 @@ class res_company(models.Model):
 
 class bank_account(models.Model):
     _inherit = 'bank.account'
-    account_id = fields.Many2one('finance.account', u'账户')
+    account_id = fields.Many2one('finance.account', u'科目')
 
 
 class core_category(models.Model):
     _inherit = 'core.category'
-    account_id = fields.Many2one('finance.account', u'账户')
+    account_id = fields.Many2one('finance.account', u'科目')
