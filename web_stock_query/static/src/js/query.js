@@ -121,7 +121,7 @@ openerp.web_stock_query = function(instance) {
                 self.action_manager.do_action({
                     type: 'ir.actions.act_window',
                     res_model: 'report.stock.balance',
-                    views: [[false, 'list']],
+                    views: [[false, 'graph']],
                     domain: [['goods_id', '=', $target.data('id')]],
                     target: 'new',
                     name: '搜索：' + $target.text().trim(),
