@@ -68,13 +68,14 @@
             <field name="name">voucher.tree</field>
             <field name="model">voucher</field>
             <field name="arch" type="xml">
-                <tree string="会计凭证">
+                <tree string="会计凭证" colors="blue:state == 'draft';">
                     <field name="document_word_id"/>
                     <field name="date"/>
                     <field name="name"/>
                     <field name="att_count"/>
                     <field name="period_id"/>
                     <field name="amount_text"/>
+                    <field name = "state" invisible="1" />
                 </tree>
             </field>
         </record>
