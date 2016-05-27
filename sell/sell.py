@@ -525,7 +525,7 @@ class sell_delivery(models.Model):
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
             raise except_orm(u'警告！', u'收款额不为空时，请选择结算账户！')
-        if self.receipt > self.amount:
+        if self.receipt > self.amount + self.partner_cost:
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
 
         if self.order_id:
