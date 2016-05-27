@@ -124,9 +124,11 @@ class buy_summary_partner(models.Model):
                         [('id', 'in', line_ids)])
 
         for move_line in move_lines:
-            detail = self.env['buy.order.detail'].search(
-                [('order_name', '=', move_line.move_id.name)])
-            res.append(detail.id)
+            details = self.env['buy.order.detail'].search(
+                [('order_name', '=', move_line.move_id.name),
+                 ('goods_id', '=', move_line.goods_id.id)])
+            for detail in details:
+                res.append(detail.id)
 
         return {
             'name': u'采购明细表',
