@@ -25,7 +25,7 @@ class mail_message(osv.Model):
                 #创建一条祝福信息
                 values['subject'] = "生日快乐！"
                 values['model'] = "mail.group"
-                values['body'] = staff.name + "，祝你生日快乐!"
+                values['body'] = staff.name + u"，祝你生日快乐!"
                 values['res_id'] = 1
                 newid = self.create(cr, uid, values, context) 
         return newid
