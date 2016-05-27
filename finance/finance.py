@@ -240,7 +240,6 @@ class finance_account(models.Model):
         ('in', u'收入类'),
         ('out', u'费用类')
     ], u'类型')
-    state = fields.Boolean(u'状态')
 
 
 class auxiliary_financing(models.Model):

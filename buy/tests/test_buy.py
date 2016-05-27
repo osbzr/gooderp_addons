@@ -75,7 +75,7 @@ class test_buy_order(TransactionCase):
         # 重复审核报错
         with self.assertRaises(except_orm):
             self.order.buy_order_done()
-        # 未填数量应报错
+        # 数量单价小于0应报错
         self.order.buy_order_draft()
         for line in self.order.line_ids:
             line.quantity = 0

@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <a v-show="search_word || search_filter.length > 0" class="gooderp_cancel_search" @click="cancel_search"></a>
-                    <div class="weui_cells weui_cells_access gooder_search_results" v-show="search_word" transition="gooderp_fade">
+                    <div class="weui_cells weui_cells_access gooderp_search_results" v-show="search_word" transition="gooderp_fade">
                         <a v-for="view in search_view" @click="add_search(view)" class="weui_cell" href="javascript:;">
                             <div class="weui_cell_bd weui_cell_primary">
                                 <p>搜索{{view.string}}：{{ search_word }}</p>
@@ -94,6 +94,17 @@
                             </div>
                         </div>
                     </template>
+                    <div class="weui_cell gooderp_tree_footer" >
+                        <div class="weui_cell_bd weui_cell_primary" >
+                            {{ footers.left }}
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary" >
+                            {{ footers.center }}
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary" >
+                            {{ footers.right }}
+                        </div>
+                    </div>
                 </div>
 
                 <div class="weui_dialog_confirm" id="dialog1" style="display: none;">
@@ -132,15 +143,16 @@
                 </div>
             </div>
             <div id="tree_wizard" v-if="wizard">
-                <div class="gooderp_wizard weui_dialog_confirm">
+                <div class="gooderp_wizard weui_dialog_confirm" :class="{display_message: editable}">
                     <div class="weui_mask"></div>
                     <div class="weui_dialog">
                         <div  class="weui_cells" transition="gooderp_fade">
-                            <div class="weui_cell" v-for="wizard_record in wizard_records" >
+                            <div class="weui_cell" :class="{required: wizard_record.required}" v-for="wizard_record in wizard_records" >
                                 <div class="weui_cell_hd"><label class="weui_label">{{ wizard_record.string }}</label></div>
                                 <div class="weui_cell_bd weui_cell_primary">
-                                    <component :placeholder="wizard_record.placeholder" :model.sync="wizard_record.value" :is="wizard_record.type + '-input'">
+                                    <component :model.sync="wizard_record" :is="wizard_record.type + '-input'">
                                     </component>
+                                    <div class="gooderp_wizard_message" :class="{show: wizard_record.required && !wizard_record.value}">必输</div>
                                 </div>
                             </div>
                         </div>
@@ -153,6 +165,19 @@
             </div>
         </div>
         <div class="gooderp_max_count"><span>{{ records.length }}</span>|<span>{{ max_count }}</span></div>
+        <template id="many2oneInput">
+            <input @blur="blur_input" @keydown.esc.delete="delete_input" @keydown.enter="enter_input" class="weui_input" v-model="word" type="text" :placeholder="model.placeholder" @input="input_change" />
+            <div class="weui_cells gooderp_many2oneInput gooderp_search_results" v-show="search_word" transition="gooderp_fade">
+                <div v-for="record in records" @click.stop.prevent="choose_record(record)" class="weui_cell" href="javascript:;">
+                    {{record.value}}
+                </div>
+            </div>
+        </template>
+        <template id="selectionInput">
+            <select class="weui_select" v-model="model.value" >
+                <option v-for="select in selection" :value="select[0]">{{select[1]}}</option>
+            </select>
+        </template>
     </div>
     <script src="/mobile/static/src/js/jquery.js" ></script>
     <script src="/mobile/static/src/js/component.js" ></script>

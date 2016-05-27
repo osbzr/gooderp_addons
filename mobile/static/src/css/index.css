@@ -78,6 +78,9 @@ body {
 .gooderp_tree_header {
     background: #A7A7A7;
     color: white;
+    width: 100%;
+    top: 0;
+    z-index: 9999;
 }
 
 .gooderp_tree_header > div {
@@ -144,7 +147,7 @@ body {
     zoom: .5;
 }
 
-.gooder_search_results {
+.gooderp_search_results {
     margin-top: 0;
     position: absolute;
     z-index: 10;
@@ -153,7 +156,7 @@ body {
     color: white;
 }
 
-.gooder_search_results > a:first-child {
+.gooderp_search_results > a:first-child {
     background-color: #6675E2;
 }
 
@@ -264,7 +267,7 @@ body {
 }
 
 .gooderp_wizard > .weui_dialog {
-    top: 30%;
+    top: 40%;
 }
 
 .gooderp_wizard .weui_cells {
@@ -274,4 +277,51 @@ body {
 .gooderp_wizard .weui_cell_hd,
 .gooderp_wizard .weui_cell_bd {
     text-align: left;
+    position: relative;
+}
+
+.gooderp_wizard .required {
+    background: #D2D2FF;
+}
+.gooderp_many2oneInput {
+    overflow-y: auto;
+    max-height: 300px;
+    position: fixed;
+    max-width: 65%;
+}
+
+.gooderp_many2oneInput .weui_cell {
+    /*padding: 4px 15px;*/
+    font-size: 14px;
+}
+
+.gooderp_many2oneInput .weui_cell:before {
+    left: 5px;
+}
+
+.gooderp_many2oneInput .weui_cell:first-child {
+    background-color: #6675E2;
+}
+
+.gooderp_wizard_message {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 12px;
+    background-color: #636363;
+    border-radius: 5px;
+    color: white;
+    padding: 5px 5px;
+	box-shadow: #313131 0 1px 2px 0 inset;
+}
+
+.display_message .show {
+    display: inline-block;
+}
+
+.gooderp_tree_footer {
+    background-color: #00BCD4;
+    font-weight: bold;
+    color: white;
 }

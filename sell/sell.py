@@ -223,7 +223,7 @@ class sell_order(models.Model):
         for line in self.line_ids:
             # 如果订单部分出库，则点击此按钮时生成剩余数量的出库单
             to_out = line.quantity - line.quantity_out
-            if to_out == 0:
+            if to_out <= 0:
                 continue
             if line.goods_id.force_batch_one:
                 i = 0
@@ -434,8 +434,7 @@ class sell_delivery(models.Model):
                                ondelete='cascade')
     invoice_id = fields.Many2one('money.invoice', u'发票号',
                                  copy=False, ondelete='restrict')
-    date_due = fields.Date(u'到期日期', copy=False,
-                           default=lambda self: fields.Date.context_today(self))
+    date_due = fields.Date(u'到期日期', copy=False, default=lambda self: fields.Date.context_today(self))
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                             digits_compute=dp.get_precision('Amount'))

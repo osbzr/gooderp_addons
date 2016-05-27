@@ -2,6 +2,7 @@
 
 from openerp.addons.web import http
 from openerp.addons.web.http import request
+from openerp.tools.safe_eval import safe_eval as eval
 import openerp
 import simplejson
 import os
@@ -93,12 +94,16 @@ class MobileSupport(http.Controller):
         return {node.attrib.get('name'): dict(node.attrib, column=view.column_type(node.attrib.get('name', '')))
                 for node in tree.findall('.//form/field')}
 
-    def _get_format_domain(self, domain):
-        return [(
+    def _get_format_domain(self, name, domain):
+        view = request.env['mobile.view'].search([('name', '=', name)])
+        res = view.domain and eval(view.domain) or []
+        res.extend([(
             item.get('name'),
             item.get('operator') or 'ilike',
             item.get('operator') and float(item.get('word')) or item.get('word')
-        ) for item in domain]
+        ) for item in domain])
+
+        return res
 
     def _get_order(self, name, order):
         if len(order.split()) == 2:
@@ -116,6 +121,10 @@ class MobileSupport(http.Controller):
         view = request.env['mobile.view'].search([('name', '=', name)])
         return len(request.env[view.model].search(domain))
 
+    def _get_limit(self, name):
+        view = request.env['mobile.view'].search([('name', '=', name)])
+        return view.limit or 20
+
     @http.route('/mobile/get_lists', auth='public')
     def get_lists(self, name, options):
         options = simplejson.loads(options)
@@ -123,8 +132,9 @@ class MobileSupport(http.Controller):
         model_obj = self._get_model(name)
         if options.get('type', 'tree') == 'tree':
             headers = self._get_fields_list(name)
-            domain = self._get_format_domain(options.get('domain', ''))
+            domain = self._get_format_domain(name, options.get('domain', ''))
             order = self._get_order(name, options.get('order', ''))
+            limit = self._get_limit(name)
 
             return request.make_response(simplejson.dumps({
                 'headers': headers,
@@ -134,10 +144,9 @@ class MobileSupport(http.Controller):
                     'center': record.get(headers.get('center').get('name')),
                     'right': record.get(headers.get('right').get('name')),
                     'id': record.get('id'),
-                } for record in model_obj.search_read(
+                } for record in model_obj.with_context(options.get('context') or {}).search_read(
                     domain=domain, fields=map(lambda field: field.get('name'), headers.values()),
-                    offset=self._parse_int(options.get('offset', 0)),
-                    limit=self._parse_int(options.get('limit', 20)), order=order)]
+                    offset=self._parse_int(options.get('offset', 0)), limit=limit, order=order)]
             }))
         else:
             headers = self._get_form_fields_list(name)
@@ -146,7 +155,7 @@ class MobileSupport(http.Controller):
                 'value': value,
                 'string': headers.get(key, {}).get('string'),
                 'column': headers.get(key, {}).get('column'),
-            } for key, value in model_obj.browse(self._parse_int(
+            } for key, value in model_obj.with_context(options.get('context') or {}).browse(self._parse_int(
                 options.get('record_id'))).read(headers.keys())[0].iteritems()
             ]))
 
@@ -166,5 +175,14 @@ class MobileSupport(http.Controller):
         tree = ElementTree.parse(StringIO(view.arch.encode('utf-8')))
 
         return request.make_response(simplejson.dumps(
-            [node.attrib for node in tree.findall('.//wizard/field')]
+            [dict(node.attrib, value='') for node in tree.findall('.//wizard/field')]
         ))
+
+    @http.route('/mobile/many2one/search', auth='public')
+    def many2one_search(self, word, model, domain):
+        return request.make_response(simplejson.dumps([
+            {
+            'id': record[0], 'value': record[1]
+            } for record in request.env[model].name_search(
+                word, args=eval(domain), limit=20)
+        ]))
