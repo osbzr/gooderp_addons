@@ -270,6 +270,11 @@ class test_goods_wizard(TransactionCase):
 
     def test_view_detail(self):
         '''采购汇总表（按商品）  查看明细按钮'''
+        # 先创建采购明细表
+        detail_obj = self.env['buy.order.detail.wizard']
+        detail = detail_obj.create({})
+        detail.button_ok()
+
         summary_goods = self.env['buy.summary.goods'].create({})
         context = self.goods_wizard.button_ok().get('context')
         results = summary_goods.with_context(context).search_read(domain=[])
@@ -328,6 +333,11 @@ class test_partner_wizard(TransactionCase):
 
     def test_view_detail(self):
         '''采购汇总表（按供应商）  查看明细按钮'''
+        # 先创建采购明细表
+        detail_obj = self.env['buy.order.detail.wizard']
+        detail = detail_obj.create({})
+        detail.button_ok()
+
         summary_partner = self.env['buy.summary.partner'].create({})
         context = self.partner.button_ok().get('context')
         results = summary_partner.with_context(context).search_read(domain=[])
