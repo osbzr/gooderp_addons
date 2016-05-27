@@ -17,10 +17,10 @@
 
                     <field name='uom' />
 
-					<field name='cost_begain' />
-                    <field name='cost_out' />
-                    <field name='cost_in' />
-                    <field name='cost_end' />
+					<field name='cost_begain' groups='goods.view_cost_groups'/>
+                    <field name='cost_out' groups='goods.view_cost_groups'/>
+                    <field name='cost_in' groups='goods.view_cost_groups'/>
+                    <field name='cost_end' groups='goods.view_cost_groups'/>
                     <button name="find_source_move_line" type="object" string="查看库存调拨明细" icon="terp-stock_zoom" class="oe_highlight"/>
                 </tree>
             </field>
@@ -53,7 +53,7 @@
                     <field name='goods' type='row' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='goods_qty_begain' type='measure' />
-                    <field name='cost_begain' type='measure' />
+                    <field name='cost_begain' type='measure' groups='goods.view_cost_groups'/>
                 </graph>
             </field>
         </record>

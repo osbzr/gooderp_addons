@@ -28,7 +28,7 @@
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='goods_qty' type='measure' />
                     <field name='goods_uos_qty' type='measure' groups='goods.auxiliary_unit_groups' />
-                    <field name='cost' type='measure' />
+                    <field name='cost' type='measure' groups='goods.view_cost_groups'/>
                 </graph>
             </field>
         </record>
