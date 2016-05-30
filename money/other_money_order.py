@@ -155,13 +155,26 @@ class other_money_order_line(models.Model):
     _name = 'other.money.order.line'
     _description = u'其他收支单明细'
 
+    @api.one
+    @api.depends('service')
+    def _compute_category(self):
+        # 计算类别和金额
+        if self.service.get_categ_id:
+            self.category_id = self.service.get_categ_id.id
+        elif self.service.pay_categ_id:
+            self.category_id = self.service.pay_categ_id.id
+        self.amount = self.service.price
+
     other_money_id = fields.Many2one('other.money.order',
-                                string=u'其他收支', ondelete='cascade')
+                                u'其他收支', ondelete='cascade')
+    service = fields.Many2one('service', u'服务')
     category_id = fields.Many2one('core.category',
                         u'类别', ondelete='restrict',
-                        domain="[('type', '=', context.get('type'))]")
+                        domain="[('type', '=', context.get('type'))]",
+                        compute='_compute_category')
     source_id = fields.Many2one('money.invoice',
-                                string=u'源单', ondelete='cascade')
-    amount = fields.Float(string=u'金额',
-                        digits_compute=dp.get_precision('Amount'))
-    note = fields.Char(string=u'备注')
+                                u'源单', ondelete='cascade')
+    amount = fields.Float(u'金额',
+                        digits_compute=dp.get_precision('Amount'),
+                        compute='_compute_category')
+    note = fields.Char(u'备注')

@@ -240,6 +240,30 @@ class test_other_money_order(TransactionCase):
             other.other_money_done()
 
 
+class test_other_money_order_line(TransactionCase):
+    ''' 测试其他收支单明细 '''
+
+    def setUp(self):
+        '''准备数据'''
+        super(test_other_money_order_line, self).setUp()
+        self.order = self.env.ref('money.other_get_60')
+        self.service_1 = self.env.ref('core.service_1')
+        self.service_2 = self.env.ref('core.service_2')
+        self.get_categ_id = self.env.ref('core.cat_consult')
+        self.pay_categ_id = self.env.ref('core.cat_freight')
+
+    def test_compute_category(self):
+        ''' 测试计算类别和金额 '''
+        for line in self.order.line_ids:
+            line.service = self.service_1   # 咨询服务
+            self.assertTrue(line.category_id.id == self.get_categ_id.id)
+            self.assertTrue(line.amount == 500)
+
+            line.service = self.service_2   # 邮寄服务
+            self.assertTrue(line.category_id.id == self.pay_categ_id.id)
+            self.assertTrue(line.amount == 200)
+
+
 class test_money_transfer_order(TransactionCase):
     '''测试其他资金转账单'''
 
