@@ -159,10 +159,8 @@ class other_money_order_line(models.Model):
     def onchange_service(self):
         # 当选择了服务后，则自动填充上类别和金额
         if self.env.context.get('type') == 'other_get':
-            print '1111111111'
             self.category_id = self.service.get_categ_id.id
         elif self.env.context.get('type') == 'other_pay':
-            print '222222222'
             self.category_id = self.service.pay_categ_id.id
         self.amount = self.service.price
 
