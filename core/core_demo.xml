@@ -94,12 +94,13 @@
         <record id="service_1" model="service">
         	<field name="name">咨询服务</field>
         	<field name="get_categ_id" ref="cat_consult"/>
+        	<field name="pay_categ_id" ref="cat_freight"/>
         	<field name="price">500</field>
         </record>
-        <record id="service_2" model="service">
+        <!-- <record id="service_2" model="service">
         	<field name="name">邮寄服务</field>
-        	<field name="get_categ_id" ref="cat_freight"/>
+        	<field name="pay_categ_id" ref="cat_freight"/>
         	<field name="price">200</field>
-        </record>
+        </record> -->
     </data>
 </openerp>

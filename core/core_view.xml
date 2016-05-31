@@ -295,8 +295,8 @@
 							<field name="price"/>
 						</group>
 						<group>
-							<field name="get_categ_id"/>
-							<field name="pay_categ_id"/>
+							<field name="get_categ_id" required="1"/>
+							<field name="pay_categ_id" required="1"/>
 						</group>
 					</group>
 				</form>
