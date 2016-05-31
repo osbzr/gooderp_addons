@@ -364,3 +364,16 @@ class res_currency(models.Model):
         if words[-1] != unit[0]:  # 结尾非‘分’补整字
             words.append(u"整")
         return ''.join(words)
+
+class service(models.Model):
+    _name = 'service'
+    _description = u'服务'
+
+    name = fields.Char(u'名称')
+    get_categ_id = fields.Many2one('core.category',
+                    u'收入类别', ondelete='restrict',
+                    domain="[('type', '=', 'other_get')]")
+    pay_categ_id = fields.Many2one('core.category',
+                    u'支出类别', ondelete='restrict',
+                    domain="[('type', '=', 'other_pay')]")
+    price = fields.Float(u'价格')

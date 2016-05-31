@@ -9,5 +9,9 @@
 			<field name='name'>管理结算方式</field>
 			<field name='category_id' ref="Gooderp"/>
 		</record>
+		<record id='service_groups' model='res.groups'>
+			<field name='name'>管理服务</field>
+			<field name='category_id' ref="Gooderp"/>
+		</record>
 	</data>
 </openerp>
