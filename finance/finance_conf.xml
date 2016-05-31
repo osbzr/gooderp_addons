@@ -84,9 +84,9 @@
             <field name="arch" type="xml">
                 <tree editable="TOP" delete='false' string="会计期间">
                     <field name="name"/>
-                    <field name="year"/>
-                    <field name="month"/>
-                    <field name="is_closed"/>
+                    <field name="year" attrs="{'readonly': [('is_closed','=',True)]}"/>
+                    <field name="month" attrs="{'readonly': [('is_closed','=',True)]}"/>
+                    <field name="is_closed" readonly='1'/>
                 </tree>
             </field>
         </record>
