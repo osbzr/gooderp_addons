@@ -51,7 +51,7 @@
                                 <field name='name'/>
                                 <field name='account_id'/>
                                 <field name='partner_id'/>
-                                <field name='goods_id'/>
+                                <field name='goods_id' groups='finance.group_account_goods'/>
                                 <field name='auxiliary_id'/>
                                 <field name='debit' sum='借方合计'/>
                                 <field name='credit' sum='贷方合计'/>
