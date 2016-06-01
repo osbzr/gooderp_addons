@@ -86,7 +86,7 @@ class buy_order(models.Model):
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         default=_default_warehouse_dest,
                                         ondelete='restrict')
-    invoice_by_receipt=fields.Boolean(string="按收货结算")
+    invoice_by_receipt=fields.Boolean(string=u"按收货结算")
     line_ids = fields.One2many('buy.order.line', 'order_id', u'购货订单行',
                                states=READONLY_STATES, copy=True)
     note = fields.Text(u'备注')
@@ -111,7 +111,7 @@ class buy_order(models.Model):
                               default=u'未入库', store=True,
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
-    pay_ids=fields.One2many("payment.plan","buy_id",string="付款计划")
+    pay_ids=fields.One2many("payment.plan","buy_id",string=u"付款计划")
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -297,9 +297,9 @@ class buy_order(models.Model):
         }
 class payment(models.Model):
     _name="payment.plan"
-    name=fields.Char(string="名称",required=True)
-    amount_money=fields.Float(string="金额",required=True)
-    date_application=fields.Date(string="申请日期",readonly=True)
+    name=fields.Char(string=u"名称",required=True)
+    amount_money=fields.Float(string=u"金额",required=True)
+    date_application=fields.Date(string=u"申请日期",readonly=True)
     buy_id=fields.Many2one("buy.order") 
 
     @api.one
@@ -477,7 +477,7 @@ class buy_receipt(models.Model):
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                                    digits_compute=dp.get_precision('Amount'))
-    invoice_by_receipt=fields.Boolean(string="按收货结算")
+    invoice_by_receipt=fields.Boolean(string=u"按收货结算")
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits_compute=dp.get_precision('Amount'))
