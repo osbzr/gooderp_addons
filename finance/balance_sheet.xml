@@ -92,7 +92,7 @@
                         </group>
                     </group>
 
-                    <button name="create_balance_sheet" invisible="context.get('profit_statement')"  string="科目余额表" type="object" class="oe_highlight"/>
+                    <button name="create_balance_sheet" invisible="context.get('profit_statement')"  string="资产负债表" type="object" class="oe_highlight"/>
                     <button name="create_profit_statement" invisible="context.get('balance_sheet')"  string="利润表" type="object" class="oe_highlight"/>
                     或者 
                     <button string="取消" class="oe_link" special="cancel"/>
