@@ -57,3 +57,28 @@ class TestWarehouse(TransactionCase):
         x.unlink()
         with self.assertRaises(except_orm):
             self.env['warehouse'].get_warehouse_by_type('inventory')
+
+    def test_scan_barcode(self):
+        '''扫码出入库'''
+        warehouse = self.env['wh.move']
+        barcode = '12345678987'
+        #其它入库单扫码
+        model_name = 'wh.in'
+        order = self.env.ref('warehouse.wh_in_whin3')
+        warehouse.scan_barcode(model_name,barcode,order.id)
+        warehouse.scan_barcode(model_name,barcode,order.id)
+        #其他出库单扫码
+        model_name = 'wh.out'
+        order = self.env.ref('warehouse.wh_out_wh_out_attribute')
+        warehouse.scan_barcode(model_name,barcode,order.id)
+        warehouse.scan_barcode(model_name,barcode,order.id)
+        #产品不存在报错
+        barcode = '12342312312'
+        with self.assertRaises(except_orm):
+            warehouse.scan_barcode(model_name,barcode,order.id)
+        
+        
+        
+        
+        
+        

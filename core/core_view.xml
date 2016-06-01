@@ -1,286 +1,341 @@
 <?xml version="1.0"?>
 <openerp>
-    <data>
+	<data>
 
-        <!--根菜单-->
+		<!--根菜单-->
 
-        <menuitem id='setting_menu' name='配置'/>
+		<menuitem id='setting_menu' name='配置'/>
+		<menuitem id='master_data_menu' name='基础资料' parent='setting_menu' sequence='10'/>
+		<menuitem id='config_data_menu' name='辅助资料' parent='setting_menu' sequence='20'/>
+		<menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
 
-        <menuitem id='master_data_menu' name='基础资料' parent='setting_menu' sequence='10'/>
-        <menuitem id='config_data_menu' name='辅助资料' parent='setting_menu' sequence='20'/>
-        <menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
+		<!--类别-->
+		<record id="core_category_tree" model="ir.ui.view">
+			<field name="name">core.category.tree</field>
+			<field name="model">core.category</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="类别">
+					<field name="name"/>
+					<field name="type"/>
+				</tree>
+			</field>
+		</record>
+		<record id="core_category_action" model="ir.actions.act_window">
+			<field name="name">类别</field>
+			<field name="res_model">core.category</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='core_category_menu' action='core_category_action' parent='config_data_menu' sequence='10'/>
 
-        <!--类别-->
+		<!--可选值-->
+		<record id="core_value_tree" model="ir.ui.view">
+			<field name="name">core.value.tree</field>
+			<field name="model">core.value</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="可选值">
+					<field name="name"/>
+					<field name="type"/>
+				</tree>
+			</field>
+		</record>
+		<record id="core_value_action" model="ir.actions.act_window">
+			<field name="name">可选值</field>
+			<field name="res_model">core.value</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='core_value_menu' action='core_value_action' parent='config_data_menu' sequence='900'/>
+		<record id="core_value_menu" model="ir.ui.menu">
+			<field name="create_tag">1</field>
+		</record>
 
-        <record id="core_category_tree" model="ir.ui.view">
-            <field name="name">core.category.tree</field>
-            <field name="model">core.category</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="类别">
-                    <field name="name"/>
-                    <field name="type"/>
-                </tree>
-            </field>
-        </record>
+		<!--系统参数-->
+		<record id="company_form" model="ir.ui.view">
+			<field name="name">company.form</field>
+			<field name="model">res.company</field>
+			<field name="arch" type="xml">
+				<form string="系统参数" create='0'>
+					<group string="基础参数">
+						<field name="name"/>
+						<field name="street"/>
+						<field name="phone"/>
+						<field name="fax" string="手机"/>
+						<field name="zip"/>
+						<field name="start_date" readonly="1" />
+						<field name="currency_id"/>
+						<field name="cost_method"/>
+						<field name="draft_invoice"/>
+                        <field name="import_tax_rate"></field>
+	                    <field name="output_tax_rate"></field>
+					</group>
+				</form>
+			</field>
+		</record>
+		<record id="company_action" model="ir.actions.act_window">
+			<field name="name">系统参数</field>
+			<field name="res_model">res.company</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="res_id">1</field>
+		</record>
+		<record id="company_action_view_form" model="ir.actions.act_window.view">
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="company_form"/>
+			<field name="act_window_id" ref="company_action"/>
+		</record>
+		<menuitem id='company_menu' action='company_action' parent='system_menu' sequence='10'/>
+		<!--单位-->
+		<record id="uom_tree" model="ir.ui.view">
+			<field name="name">uom.tree</field>
+			<field name="model">uom</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="单位">
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+		<record id="uom_action" model="ir.actions.act_window">
+			<field name="name">单位</field>
+			<field name="res_model">uom</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='uom_menu' action='uom_action' parent='config_data_menu' sequence='20'/>
+		<!--结算方式-->
+		<record id="settle_mode_tree" model="ir.ui.view">
+			<field name="name">settle.mode.tree</field>
+			<field name="model">settle.mode</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="结算方式">
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+		<record id="settle_mode_action" model="ir.actions.act_window">
+			<field name="name">结算方式</field>
+			<field name="res_model">settle.mode</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='settle_mode_menu' action='settle_mode_action' parent='config_data_menu' groups='core.settle_mode_groups' sequence='30'/>
+		<!--客户 form-->
+		<record id="customer_address_form" model="ir.ui.view">
+			<field name="name">customer.address.form</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<form string="GOODERP PARTNER FORM">
+					<sheet>
+						<div class="oe_title">
+							<div class="oe_edit_only">
+								<label for='name' string='名称'/>
+							</div>
+							<h1>
+								<field name="name" required="1"/>
+							</h1>
+						</div>
+						<group>
+							<group>
+								<field name="code"/>
+								<field name="main_mobile"/>
+							</group>
+							<group>
+								<field name="c_category_id" required="1"/>
+								<field name="receivable"/>
+							</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<!--客户-->
+		<record id="customer_tree" model="ir.ui.view">
+			<field name="name">客户列表</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<tree string="客户">
+					<field name="c_category_id" required="1"/>
+					<field name="code"/>
+					<field name="main_mobile"/>
+					<field name="name"/>
+					<field name="receivable" sum='sum'/>
+				</tree>
+			</field>
+		</record>
+		<record id="customer_action" model="ir.actions.act_window">
+			<field name="name">客户</field>
+			<field name="res_model">partner</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('c_category_id','!=',False)]</field>
+		</record>
+		<record id="customer_address_action_tree" model="ir.actions.act_window.view">
+			<field eval="1" name="sequence"/>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="customer_tree"/>
+			<field name="act_window_id" ref="customer_action"/>
+		</record>
+		<record id="customer_address_action_form" model="ir.actions.act_window.view">
+			<field eval="2" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="customer_address_form"/>
+			<field name="act_window_id" ref="customer_action"/>
+		</record>
+		<menuitem id='customer_menu' action='customer_action' parent='master_data_menu' sequence='10'/>
+		<!--供应商 form-->
+		<record id="supplier_address_form" model="ir.ui.view">
+			<field name="name">supplier.address.form</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<form string="GOODERP PARTNER FORM">
+					<sheet>
+						<div class="oe_title">
+							<h1>
+								<field name="name" required="1"/>
+							</h1>
+						</div>
+						<group>
+							<group>
+								<field name="code"/>
+								<field name="main_mobile"/>
+							</group>
+							<group>
+								<field name="s_category_id" required="1"/>
+								<field name="payable"/>
+							</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<!--供应商-->
+		<record id="vendor_tree" model="ir.ui.view">
+			<field name="name">供应商列表</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<tree string="供应商">
+					<field name="s_category_id" required="1"/>
+					<field name="code"/>
+					<field name="main_mobile"/>
+					<field name="name"/>
+					<field name="payable" sum='sum'/>
+				</tree>
+			</field>
+		</record>
+		<record id="vendor_action" model="ir.actions.act_window">
+			<field name="name">供应商</field>
+			<field name="res_model">partner</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[('s_category_id','!=',False)]</field>
+		</record>
+		<record id="supplier_address_action_tree" model="ir.actions.act_window.view">
+			<field eval="1" name="sequence"/>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="vendor_tree"/>
+			<field name="act_window_id" ref="vendor_action"/>
+		</record>
+		<record id="supplier_address_action_form" model="ir.actions.act_window.view">
+			<field eval="2" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="supplier_address_form"/>
+			<field name="act_window_id" ref="vendor_action"/>
+		</record>
+		<menuitem id='vendor_menu' action='vendor_action' parent='master_data_menu' sequence='20'/>
+		<!--用户-->
+		<menuitem id='users_menu' name="用户" action='base.action_res_users' parent='master_data_menu' sequence='50'/>
+		<!--账户-->
+		<record id="bank_account_tree" model="ir.ui.view">
+			<field name="name">bank.account.tree</field>
+			<field name="model">bank.account</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="账户">
+					<field name="name"/>
+					<field name="balance" sum='sum'/>
+				</tree>
+			</field>
+		</record>
+		<record id="bank_account_action" model="ir.actions.act_window">
+			<field name="name">账户</field>
+			<field name="res_model">bank.account</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='bank_account_menu' action='bank_account_action' parent='master_data_menu' sequence='60'/>
 
-        <record id="core_category_action" model="ir.actions.act_window">
-            <field name="name">类别</field>
-            <field name="res_model">core.category</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
+		<!--服务-->
+		<record id="service_tree" model="ir.ui.view">
+			<field name="name">服务列表</field>
+			<field name="model">service</field>
+			<field name="arch" type="xml">
+				<tree string="服务">
+					<field name="name"/>
+					<field name="get_categ_id"/>
+					<field name="pay_categ_id"/>
+					<field name="price"/>
+				</tree>
+			</field>
+		</record>
+		<record id="service_form" model="ir.ui.view">
+			<field name="name">服务</field>
+			<field name="model">service</field>
+			<field name="arch" type="xml">
+				<form string="Service">
+					<group>
+						<group>
+							<field name="name"/>
+							<field name="price"/>
+						</group>
+						<group>
+							<field name="get_categ_id" required="1"/>
+							<field name="pay_categ_id" required="1"/>
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
+		<record id="service_action" model="ir.actions.act_window">
+			<field name="name">服务</field>
+			<field name="res_model">service</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+		<menuitem id='service_menu' action='service_action' parent='master_data_menu' groups='core.service_groups' sequence='70'/>
 
-        <menuitem id='core_category_menu' action='core_category_action' parent='config_data_menu' sequence='10'/>
+		<!-- 角色 -->
+		<menuitem id='groups_menu' name='权限设置' action='base.action_res_groups' parent='system_menu' sequence='20'/>
 
-        <!--可选值-->
-        <record id="core_value_tree" model="ir.ui.view">
-            <field name="name">core.value.tree</field>
-            <field name="model">core.value</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="可选值">
-                    <field name="name"/>
-                    <field name="type"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="core_value_action" model="ir.actions.act_window">
-            <field name="name">可选值</field>
-            <field name="res_model">core.value</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <menuitem id='core_value_menu' action='core_value_action' parent='config_data_menu' sequence='900'/>
-
-        <record id="core_value_menu" model="ir.ui.menu">
-            <field name="create_tag">1</field>
-        </record>
-
-        <!--系统参数-->
-        <record id="company_form" model="ir.ui.view">
-            <field name="name">company.form</field>
-            <field name="model">res.company</field>
-            <field name="arch" type="xml">
-                <form string="系统参数" create='0'>
-                   <group string="基础参数">
-                    <field name="name"/>
-                    <field name="street"/>
-                    <field name="phone"/>
-                    <field name="fax" string="手机"/>
-                    <field name="zip"/>
-                    <field name="start_date" readonly="1" />
-                    <field name="currency_id"/>
-                    <field name="cost_method"/>
-                    <field name="draft_invoice"/>
-                   </group>
-                </form>
-            </field>
-        </record>
-        <record id="company_action" model="ir.actions.act_window">
-            <field name="name">系统参数</field>
-            <field name="res_model">res.company</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="res_id">1</field>
-        </record>
-        <record id="company_action_view_form" model="ir.actions.act_window.view">
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="company_form"/>
-            <field name="act_window_id" ref="company_action"/>
-        </record>
-        <menuitem id='company_menu' action='company_action' parent='system_menu' sequence='10'/>
-        <!--单位-->
-        <record id="uom_tree" model="ir.ui.view">
-            <field name="name">uom.tree</field>
-            <field name="model">uom</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="单位">
-                    <field name="name"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="uom_action" model="ir.actions.act_window">
-            <field name="name">单位</field>
-            <field name="res_model">uom</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <menuitem id='uom_menu' action='uom_action' parent='config_data_menu' sequence='20'/>
-        <!--结算方式-->
-        <record id="settle_mode_tree" model="ir.ui.view">
-            <field name="name">settle.mode.tree</field>
-            <field name="model">settle.mode</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="结算方式">
-                    <field name="name"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="settle_mode_action" model="ir.actions.act_window">
-            <field name="name">结算方式</field>
-            <field name="res_model">settle.mode</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <menuitem id='settle_mode_menu' action='settle_mode_action' parent='config_data_menu' groups='core.settle_mode_groups' sequence='30'/>
-        <!--客户 form-->
-        <record id="customer_address_form" model="ir.ui.view">
-            <field name="name">customer.address.form</field>
-            <field name="model">partner</field>
-            <field name="arch" type="xml">
-                <form string="GOODERP PARTNER FORM">
-                <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" required="1"/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="code"/>
-                        </group>
-                        <group>
-							<field name="c_category_id" required="1"/>
-                            <field name="receivable"/>
-                            <field name="payable"/>
-                        </group>
-                    </group>
-                </sheet>
-                </form>
-            </field>
-        </record>
-        <!--客户-->
-        <record id="customer_tree" model="ir.ui.view">
-            <field name="name">客户列表</field>
-            <field name="model">partner</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="客户">
-                    <field name="c_category_id" required="1"/>
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="receivable" sum='sum'/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="customer_action" model="ir.actions.act_window">
-            <field name="name">客户</field>
-            <field name="res_model">partner</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('c_category_id','!=',False)]</field>
-        </record>
-        <record id="customer_address_action_tree" model="ir.actions.act_window.view">
-            <field eval="1" name="sequence"/>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="customer_tree"/>
-            <field name="act_window_id" ref="customer_action"/>
-        </record>
-        <record id="customer_address_action_form" model="ir.actions.act_window.view">
-            <field eval="2" name="sequence"/>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="customer_address_form"/>
-            <field name="act_window_id" ref="customer_action"/>
-        </record>
-
-        <menuitem id='customer_menu' action='customer_action' parent='master_data_menu' sequence='10'/>
-         <!--供应商 form-->
-        <record id="supplier_address_form" model="ir.ui.view">
-            <field name="name">supplier.address.form</field>
-            <field name="model">partner</field>
-            <field name="arch" type="xml">
-                <form string="GOODERP PARTNER FORM">
-                <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" required="1"/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="code"/>
-                        </group>
-                        <group>
-							<field name="s_category_id"/>
-                            <field name="receivable"/>
-                            <field name="payable"/>
-                        </group>
-                    </group>
-                </sheet>
-                </form>
-            </field>
-        </record>
-        <!--供应商-->
-        <record id="vendor_tree" model="ir.ui.view">
-            <field name="name">供应商列表</field>
-            <field name="model">partner</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="供应商">
-                    <field name="s_category_id" required="1"/>
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="payable" sum='sum'/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="vendor_action" model="ir.actions.act_window">
-            <field name="name">供应商</field>
-            <field name="res_model">partner</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('s_category_id','!=',False)]</field>
-        </record>
-        <record id="supplier_address_action_tree" model="ir.actions.act_window.view">
-            <field eval="1" name="sequence"/>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="vendor_tree"/>
-            <field name="act_window_id" ref="vendor_action"/>
-        </record>
-        <record id="supplier_address_action_form" model="ir.actions.act_window.view">
-            <field eval="2" name="sequence"/>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="supplier_address_form"/>
-            <field name="act_window_id" ref="vendor_action"/>
-        </record>
-        <menuitem id='vendor_menu' action='vendor_action' parent='master_data_menu' sequence='20'/>
-        <!--用户-->
-        <menuitem id='users_menu' name="用户" action='base.action_res_users' parent='master_data_menu' sequence='50'/>
-        <!--账户-->
-        <record id="bank_account_tree" model="ir.ui.view">
-            <field name="name">bank.account.tree</field>
-            <field name="model">bank.account</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="账户">
-                    <field name="name"/>
-                    <field name="balance" sum='sum'/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="bank_account_action" model="ir.actions.act_window">
-            <field name="name">账户</field>
-            <field name="res_model">bank.account</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <menuitem id='bank_account_menu' action='bank_account_action' parent='master_data_menu' sequence='60'/>
-        <!-- 角色 -->
-        <menuitem id='groups_menu' name='权限设置' action='base.action_res_groups' parent='system_menu' sequence='20'/>
-
+		<!--定价策略-->
+		<record id="pricing_tree" model="ir.ui.view">
+			<field name="name">pricing.tree</field>
+			<field name="model">pricing</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="定价策略">
+					<field name="name"/>
+					<field name="warehouse_id"/>
+					<field name="c_category_id"/>
+					<field name="goods_category_id"/>
+					<field name='goods_id'/>
+					<field name="deactive_date"/>
+					<field name="discount_rate"/>
+				</tree>
+			</field>
+		</record>
+		<record id="action_pricing" model="ir.actions.act_window">
+			<field name="name">定价策略</field>
+			<field name="res_model">pricing</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
     </data>
 </openerp>

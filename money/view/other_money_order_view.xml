@@ -44,7 +44,8 @@
                     </group>
                     <field name="line_ids" context="{'type': type}">
                     	<tree string="其他收支单明细" editable="bottom">
-                    		<field name="category_id"/>
+                    		<field name="service" groups="core.service_groups"/>
+                    		<field name="category_id" required="1"/>
                             <field name="amount" sum="合计"/>
                             <field name="note"/>
                             <field name="source_id" invisible='1'/>

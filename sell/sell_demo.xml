@@ -24,9 +24,6 @@
             <field eval="32.0" name="discount_amount"/>
             <field name="delivery_date">2016-03-02</field>
         </record>
-        <record id="goods.cable" model="goods">
-           <field name="default_wh" ref="warehouse.hd_stock"/> 
-        </record>
         <record id="sell_order_line_2_3" model="sell.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="warehouse_dest_id" ref="warehouse.warehouse_customer"/>
@@ -70,6 +67,70 @@
             <field name="warehouse_id" ref="warehouse.warehouse_customer"/>
             <field eval="10" name="discount_amount"/>
             <field eval="10.0" name="quantity"/>
+        </record>
+        <!--价格策略-->
+        <record id="pricing_1" model="pricing">
+        	<field name="name">测试价格策略1</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_id" ref='goods.mouse'/>
+        	<field name="deactive_date">2016-04-30</field>
+        	<field name="discount_rate">10</field>
+        </record>
+        <record id="pricing_2" model="pricing">
+        	<field name="name">测试价格策略2</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_category_id" ref='core.goods_category_1'/>
+        	<field name="deactive_date">2016-05-30</field>
+        	<field name="discount_rate">20</field>
+        </record>
+        <record id="pricing_3" model="pricing">
+        	<field name="name">测试价格策略3</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="deactive_date">2016-06-30</field>
+        	<field name="discount_rate">30</field>
+        </record>
+        <record id="pricing_4" model="pricing">
+        	<field name="name">测试价格策略4</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="goods_id" ref='goods.mouse'/>
+        	<field name="deactive_date">2016-07-30</field>
+        	<field name="discount_rate">40</field>
+        </record>
+        <record id="pricing_5" model="pricing">
+        	<field name="name">测试价格策略5</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="goods_category_id" ref='core.goods_category_1'/>
+        	<field name="deactive_date">2016-08-30</field>
+        	<field name="discount_rate">50</field>
+        </record>
+        <record id="pricing_6" model="pricing">
+        	<field name="name">测试价格策略6</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="deactive_date">2016-09-30</field>
+        	<field name="discount_rate">60</field>
+        </record>
+        <record id="pricing_7" model="pricing">
+        	<field name="name">测试价格策略7</field>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_id" ref='goods.mouse'/>
+        	<field name="deactive_date">2016-10-30</field>
+        	<field name="discount_rate">70</field>
+        </record>
+        <record id="pricing_8" model="pricing">
+        	<field name="name">测试价格策略8</field>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_category_id" ref='core.goods_category_1'/>
+        	<field name="deactive_date">2016-11-30</field>
+        	<field name="discount_rate">80</field>
+        </record>
+        <record id="pricing_9" model="pricing">
+        	<field name="name">测试价格策略9</field>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="deactive_date">2016-12-30</field>
+        	<field name="discount_rate">90</field>
         </record>
     </data>
 </openerp>

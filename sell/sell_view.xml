@@ -71,7 +71,7 @@
 				 						<field name='warehouse_dest_id' invisible='1'/>
                  						<field name='quantity' sum='数量合计'/>
                  						<field name="quantity_out" readonly="1" sum="合计已发货数量"/>
-				 						<field name='price'/>
+				 						<field name='price' invisible='1'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -183,6 +183,7 @@
                         	<h1>
                             	<label string="销售发货单 "/>
                         	</h1>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                      	</div>
             			<group>
             				<group>
@@ -190,6 +191,8 @@
             						attrs="{'readonly': [('state','!=','draft')]}"
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            				    <field name="address"/>
+            				    <field name="mobile"/>
             					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="is_return" invisible="1"/>
@@ -209,12 +212,15 @@
 		    						context="{
 		    						'warehouse_dest_type': 'customer',
 		    						'type':'out',
-		    						'default_warehouse_id': warehouse_id
+		    						'default_warehouse_id': warehouse_id,
+		         					'default_date':date,
+		         					'default_partner':partner_id,
 		    						}">
 		         					<tree string='销售发货单行' editable='bottom'>
 		         						<field name='goods_id'
 		         							context="{'default_partner':parent.partner_id,
-		         									  'default_is_return':parent.is_return}"/>
+		         									  'default_is_return':parent.is_return,
+		         									  }"/>
 		         						<field name='using_attribute' invisible='1'/>
 		         						<field name='attribute_id'
 		         							domain="[('goods_id', '=', goods_id)]"
@@ -232,7 +238,7 @@
 		         						<field name='goods_qty' sum='数量合计'/>
 		         						<field name='goods_uos_qty' sum='辅助数量合计'
 		         							groups='goods.auxiliary_unit_groups'/>
-				 						<field name='price'/>
+				 						<field name='price' invisible='1'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -343,6 +349,7 @@
                         	<h1>
                             	<label string="销售退货单 "/>
                         	</h1>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                      	</div>
             			<group>
             				<group>
@@ -390,7 +397,7 @@
 		         						<field name='goods_qty' sum='数量合计'/>
 		         						<field name='goods_uos_qty' sum='辅助数量合计'
 		         							groups='goods.auxiliary_unit_groups'/>
-				 						<field name='price'/>
+				 						<field name='price' invisible='1'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>

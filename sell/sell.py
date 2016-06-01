@@ -223,7 +223,7 @@ class sell_order(models.Model):
         for line in self.line_ids:
             # 如果订单部分出库，则点击此按钮时生成剩余数量的出库单
             to_out = line.quantity - line.quantity_out
-            if to_out == 0:
+            if to_out <= 0:
                 continue
             if line.goods_id.force_batch_one:
                 i = 0
@@ -337,7 +337,7 @@ class sell_order_line(models.Model):
     amount = fields.Float(u'金额', compute=_compute_all_amount, 
                           store=True, readonly=True,
                           digits_compute=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)', default=17.0)
+    tax_rate = fields.Float(u'税率(%)',default=lambda self:self.env.user.company_id.output_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, 
                               readonly=True,
                               digits_compute=dp.get_precision('Amount'))
@@ -347,19 +347,27 @@ class sell_order_line(models.Model):
     note = fields.Char(u'备注')
 
     @api.one
+    @api.onchange('warehouse_id','goods_id')
+    def onchange_warehouse_id(self):
+        '''当订单行的仓库变化时，带出定价策略中的折扣率'''
+        if self.warehouse_id and self.goods_id:
+            partner = self.order_id.partner_id
+            warehouse = self.warehouse_id
+            goods = self.goods_id
+            date = self.order_id.date
+            pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
+            if pricing:
+                self.discount_rate = pricing.discount_rate
+            else:
+                self.discount_rate = 0
+
+    @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            matched = False   # 在商品的价格清单中是否找到匹配的价格
-            for line in self.goods_id.price_ids:
-                if self.order_id.partner_id.c_category_id == line.category_id:
-                    self.price = line.price
-                    matched = True
-
-            if not matched:
-                raise except_orm(u'错误', u'请先设置商品的价格清单或客户类别！')
+            self.price = self.goods_id.price
 
     @api.one
     @api.onchange('quantity', 'price', 'discount_rate')
@@ -426,7 +434,7 @@ class sell_delivery(models.Model):
                                ondelete='cascade')
     invoice_id = fields.Many2one('money.invoice', u'发票号',
                                  copy=False, ondelete='restrict')
-    date_due = fields.Date(u'到期日期', copy=False)
+    date_due = fields.Date(u'到期日期', copy=False, default=lambda self: fields.Date.context_today(self))
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                             digits_compute=dp.get_precision('Amount'))
@@ -453,6 +461,8 @@ class sell_delivery(models.Model):
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
                                store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
+    address = fields.Char(u'地址')
+    mobile = fields.Char(u'手机')
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
@@ -515,7 +525,7 @@ class sell_delivery(models.Model):
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
             raise except_orm(u'警告！', u'收款额不为空时，请选择结算账户！')
-        if self.receipt > self.amount:
+        if self.receipt > self.amount + self.partner_cost:
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
 
         if self.order_id:
@@ -608,6 +618,21 @@ class wh_move_line(models.Model):
     sell_line_id = fields.Many2one('sell.order.line', u'销货单行',
                                    ondelete='cascade')
 
+    @api.one
+    @api.onchange('warehouse_id','goods_id')
+    def onchange_warehouse_id(self):
+        '''当订单行的仓库变化时，带出定价策略中的折扣率'''
+        if self.warehouse_id and self.goods_id:
+            partner_id = self.env.context.get('default_partner')
+            partner = self.env['partner'].browse(partner_id) or self.move_id.partner_id
+            warehouse = self.warehouse_id
+            goods = self.goods_id
+            date = self.env.context.get('default_date') or self.move_id.date
+            pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
+            if pricing:
+                self.discount_rate = pricing.discount_rate
+            else:
+                self.discount_rate = 0
 
 class cost_line(models.Model):
     _inherit = 'cost.line'

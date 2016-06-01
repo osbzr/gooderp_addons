@@ -25,7 +25,7 @@
     "author": 'ZhengXiang',
     "website": "http://www.osbzr.com",
     "category": "Generic Modules",
-    "depends": ['core', 'goods', 'decimal_precision', 'web_sublist', 'web_float_limit', 'web_readonly_bypass'],
+    "depends": ['core', 'goods', 'mobile', 'decimal_precision', 'web_sublist', 'web_float_limit', 'web_readonly_bypass'],
     "description": """
     """,
     "data": [
@@ -38,7 +38,6 @@
         'view/warehouse_view.xml',
         'view/inventory_view.xml',
         'view/production_view.xml',
-        'view/goods_view.xml',
         'report/stock_balance_view.xml',
         'report/stock_transceive_view.xml',
         'report/lot_status_view.xml',

@@ -155,4 +155,25 @@ openerp.warehouse = function(instance) {
             });
         },
     });
+    
+    instance.web.FormView.include({
+    	load_form: function() {
+    		var self = this,
+    		    res = this._super.apply(this, arguments);
+    		
+    		return res.then(function() {
+    			self.$el.on('keydown', '.ge_scan_barcode', function(event) {
+    				if (event.keyCode === 13){
+    					new instance.web.Model("wh.move").call("scan_barcode",[self.model,$(this).val(),self.datarecord.id]).then(
+    						function() {
+                        		self.reload();
+                        		self.$el.find('input').val('');
+    						}
+    					);
+    				}
+    			})
+    		});
+    	},
+    });
+    
 };

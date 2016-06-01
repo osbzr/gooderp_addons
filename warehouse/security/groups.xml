@@ -22,5 +22,6 @@
 			<field name='name'>管理多个仓库</field>
 			<field name='category_id' ref="core.Gooderp"/>
 		</record>
+
 	</data>
 </openerp>

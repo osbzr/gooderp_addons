@@ -12,7 +12,7 @@
 					<field name='uom_id' />
 					<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 					<field name='conversion' string='转化率' groups='goods.auxiliary_unit_groups' />
-					<field name='cost' />
+					<field name='cost' groups='goods.view_cost_groups'/>
 					<field name='price' />
 				</tree>
 			</field>
@@ -46,15 +46,9 @@
 							<page string='高级'>
 								<group>
 									<group>
-										<field name='cost'/>
+										<field name='cost' groups='goods.view_cost_groups'/>
 										<field name='supplier_id'/>
                                         <field name='price'/>
-                                        <field name="price_ids" colspan="2" nolabel='1'>
-                                            <tree editable="BOTTOM" string="价格清单">
-                                                <field name="category_id" widget="selection"/>
-                                                <field name="price"/>
-                                            </tree>
-                                        </field>
 									</group>
 									<group>
 										<field name='using_batch' groups='goods.batch_groups'/>
