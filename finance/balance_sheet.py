@@ -19,7 +19,7 @@ class BalanceSheet(models.Model):
     balance_formula = fields.Text(u'计算公式')
     beginning_balance = fields.Float(u'年初余额')
 
-    balance_two = fields.Char(u'资产')
+    balance_two = fields.Char(u'负债和所有者权益')
     line_num_two = fields.Integer(u'行次')
     ending_balance_two = fields.Float(u'期末余额')
     balance_two_formula = fields.Text(u'计算公式')
