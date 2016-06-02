@@ -43,7 +43,7 @@ class voucher(models.Model):
         default=lambda self: self.env.ref('finance.document_word_1'))
     date = fields.Date(
         u'凭证日期', required=True,
-        default=datetime.now().strftime('%Y-%m-%d'))
+        default=lambda self: fields.Date.context_today(self))
     name = fields.Char(u'凭证号')
     att_count = fields.Integer(u'附单据', default=1)
     period_id = fields.Many2one(
