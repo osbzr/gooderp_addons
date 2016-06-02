@@ -224,6 +224,7 @@ class document_word(models.Model):
 class finance_account(models.Model):
     '''科目'''
     _name = 'finance.account'
+    _order = "code"
     name = fields.Char(u'名称')
     code = fields.Char(u'编码', required="1")
     balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向')
