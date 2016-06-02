@@ -158,7 +158,10 @@ class partner(models.Model):
                 self.mobile = child.mobile
                 self.phone = child.phone
                 self.qq = child.qq
-                self.address = child.address_id.detail_address
+                addr = child.address_id
+                address = (addr.province_id.name + addr.city_id.city_name
+                + addr.county_id.county_name + addr.detail_address)
+                self.address = address
 
     child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
     contact_people = fields.Char(u'联系人', compute='_compute_partner_address')
