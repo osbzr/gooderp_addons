@@ -47,7 +47,7 @@
 								<group>
 									<group>
 										<field name='cost' groups='goods.view_cost_groups'/>
-										<field name='supplier_id'/>
+										<field name='supplier_id' context="{'form_view_ref': 'core.supplier_address_form'}"/>
                                         <field name='price'/>
 									</group>
 									<group>
