@@ -51,7 +51,7 @@ class voucher(models.Model):
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
-    amount_text = fields.Char(u'总计', compute='_compute_amount', store=True)
+    amount_text = fields.Float(u'总计', compute='_compute_amount', store=True)
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核')], u'状态', default='draft')
     is_checkout = fields.Boolean(u'结账凭证')
