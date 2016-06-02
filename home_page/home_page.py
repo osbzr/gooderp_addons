@@ -7,16 +7,16 @@ class home_page(models.Model):
     _rec_name = "action"
 
     sequence = fields.Integer(u'序列')
-    action = fields.Many2one('ir.actions.act_window', string='快捷页面', required='1')
-    view_id = fields.Many2one('ir.ui.view', string='对应的视图')
+    action = fields.Many2one('ir.actions.act_window', string=u'快捷页面', required='1')
+    view_id = fields.Many2one('ir.ui.view', string=u'对应的视图')
     image = fields.Binary(u"显示的图片")
-    menu_type = fields.Selection([(u'main', u'主菜单'), (u'top', u'金额汇总'), (u'left', u'快速查看')], string='类型', required="1")
+    menu_type = fields.Selection([(u'main', u'主菜单'), (u'top', u'金额汇总'), (u'left', u'快速查看')], string=u'类型', required="1")
     domain = fields.Char(u'页面的过滤', default='[]')
     note_one = fields.Char(u'第一个显示名称')
-    compute_field_one = fields.Many2one('ir.model.fields', string='需要计算的字段')
+    compute_field_one = fields.Many2one('ir.model.fields', string=u'需要计算的字段')
     note_two = fields.Char(u'显示名称')
-    compute_field_two = fields.Many2one('ir.model.fields', string='需要计算的字段')
-    compute_type = fields.Selection([(u'sum', u'sum'), (u'average', u'average')], default="sum", string="计算类型")
+    compute_field_two = fields.Many2one('ir.model.fields', string=u'需要计算的字段')
+    compute_type = fields.Selection([(u'sum', u'sum'), (u'average', u'average')], default="sum", string=u"计算类型")
     context = fields.Char(u'动作的上下文')
 
     @api.onchange('action')

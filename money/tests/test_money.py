@@ -246,11 +246,10 @@ class test_other_money_order_line(TransactionCase):
     def setUp(self):
         '''准备数据'''
         super(test_other_money_order_line, self).setUp()
-        self.get_order = self.env.ref('money.other_get_60')
-        self.pay_order = self.env.ref('money.other_pay_1000')
+        self.get_order = self.env.ref('money.other_get_60').with_context({'type': 'other_get'})
+        self.pay_order = self.env.ref('money.other_pay_1000').with_context({'type': 'other_pay'})
 
         self.service_1 = self.env.ref('core.service_1')
-        print 'service:',self.service_1.get_categ_id.name,self.service_1.pay_categ_id.name
 
     def test_onchange_service(self):
         ''' 测试选择了服务的onchange '''
@@ -258,16 +257,14 @@ class test_other_money_order_line(TransactionCase):
         for line in self.get_order.line_ids:
             line.service = self.service_1   # 咨询服务
             line.onchange_service()
-            print '收入单比较：',line.category_id.name,self.service_1.get_categ_id.name
-#             self.assertTrue(line.category_id.id == self.service_1.get_categ_id.id)
+            self.assertTrue(line.category_id.id == self.service_1.get_categ_id.id)
             self.assertTrue(line.amount == 500)
 
         # 其他支出单
         for line in self.pay_order.line_ids:
             line.service = self.service_1   # 咨询服务
             line.onchange_service()
-            print '支出单比较：',line.category_id.name,self.service_1.pay_categ_id.name
-#             self.assertTrue(line.category_id.id == self.service_1.pay_categ_id.id)
+            self.assertTrue(line.category_id.id == self.service_1.pay_categ_id.id)
             self.assertTrue(line.amount == 500)
 
 

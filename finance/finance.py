@@ -121,9 +121,9 @@ class voucher_line(models.Model):
     auxiliary_id = fields.Many2one(
         'auxiliary.financing', u'辅助核算',
         ondelete='restrict')
-    date = fields.Date(compute='_compute_voucher_date', store=True, string='凭证日期')
+    date = fields.Date(compute='_compute_voucher_date', store=True, string=u'凭证日期')
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核')], compute='_compute_voucher_state', store=True, string='状态')
+                              ('done', u'已审核')], compute='_compute_voucher_state', store=True, string=u'状态')
 
     @api.one
     @api.depends('voucher_id.date')
