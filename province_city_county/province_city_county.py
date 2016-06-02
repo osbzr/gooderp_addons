@@ -158,9 +158,9 @@ class partner(models.Model):
                 self.mobile = child.mobile
                 self.phone = child.phone
                 self.qq = child.qq
-                address = (child.address_id.province_id.name +
-                           child.address_id.city_id.city_name +
-                           child.address_id.county_id.county_name +
+                address = '%s%s%s%s' % (child.address_id.province_id.name,
+                           child.address_id.city_id.city_name,
+                           child.address_id.county_id.county_name,
                            child.address_id.detail_address)
                 self.address = address
 
