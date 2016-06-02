@@ -13,9 +13,9 @@ class TrialBalance(models.Model):
     """科目余额表"""
     _name = "trial.balance"
 
-    period_id = fields.Many2one('finance.period', string='会计期间')
+    period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
-    subject_name_id = fields.Many2one('finance.account', string='科目名称')
+    subject_name_id = fields.Many2one('finance.account', string=u'科目名称')
     initial_balance_debit = fields.Float(u'期初余额(借方)', default=0)
     initial_balance_credit = fields.Float(u'期初余额(贷方)', default=0)
     current_occurrence_debit = fields.Float(u'本期发生额(借方)', default=0)
@@ -29,7 +29,7 @@ class TrialBalance(models.Model):
 class CreateTrialBalanceWizard(models.TransientModel):
     """生成科目余额表的 向导 根据输入的期间"""
     _name = "create.trial.balance.wizard"
-    period_id = fields.Many2one('finance.period', string='会计期间')
+    period_id = fields.Many2one('finance.period', string=u'会计期间')
 
     @api.multi
     def compute_last_period_id(self, period_id):
@@ -142,7 +142,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         view_id = self.env.ref('finance.trial_balance_tree').id
         return {
             'type': 'ir.actions.act_window',
-            'name': '期末余额表',
+            'name': u'期末余额表',
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'trial.balance',
@@ -156,9 +156,9 @@ class CreateTrialBalanceWizard(models.TransientModel):
 class CreateVouchersSummaryWizard(models.TransientModel):
     """创建 明细账或者总账的向导 """
     _name = "create.vouchers.summary.wizard"
-    period_begin_id = fields.Many2one('finance.period', string='开始期间')
-    period_end_id = fields.Many2one('finance.period', string='结束期间')
-    subject_name_id = fields.Many2one('finance.account', string='科目名称')
+    period_begin_id = fields.Many2one('finance.period', string=u'开始期间')
+    period_end_id = fields.Many2one('finance.period', string=u'结束期间')
+    subject_name_id = fields.Many2one('finance.account', string=u'科目名称')
 
     @api.multi
     @api.onchange('period_begin_id', 'period_end_id')
@@ -194,8 +194,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'date': False,
             'direction': direction_tuple[0],
             'balance': direction_tuple[1],
-            'subject_name_id': subject_name,
-            'period_id': local_currcy_period.id,
             'summary': u'期初余额'})
         return vals_dict
 
@@ -203,38 +201,15 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     def judgment_lending(self, balance_credit, balance_debit):
         """根据明细账的借贷 金额 判断出本条记录的余额 及方向"""
         if balance_credit > balance_debit:
-            direction = '贷'
+            direction = u'贷'
             balance = balance_credit - balance_debit
         elif balance_credit < balance_debit:
-            direction = '借'
+            direction = u'借'
             balance = balance_debit - balance_credit
         else:
-            direction = '平'
+            direction = u'平'
             balance = 0
         return (direction, balance)
-
-    # @api.multi
-    # def get_ending_balance(self, period, subject_name):
-    #     vals_dict = {}
-    #     trial_balance_obj = self.env['trial.balance'].search([('period_id', '=', period.id), ('subject_name_id', '=', subject_name)])
-    #     if trial_balance_obj:
-    #         print "====19"
-    #         ending_balance_credit = trial_balance_obj.ending_balance_credit
-    #         ending_balance_debit = trial_balance_obj.ending_balance_debit
-    #     else:
-    #         print "====20"
-    #         ending_balance_credit = 0
-    #         ending_balance_debit = 0
-
-    #     direction_tuple = self.judgment_lending(ending_balance_credit, ending_balance_debit)
-    #     vals_dict.update({
-    #         'date': '%s-%s-01' % (period.year, period.month),
-    #         'direction': direction_tuple[0],
-    #         'balance': direction_tuple[1],
-    #         'debit': ending_balance_debit,
-    #         'credit': ending_balance_credit,
-    #         'summary': u'期末余额'})
-    #     return vals_dict
 
     @api.multi
     def get_year_balance(self, period, subject_name):
@@ -257,21 +232,19 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         period_vals = {
             'date': False,
             'direction': direction_tuple_period[0],
-            'credit': current_occurrence_credit,
-            'subject_name_id': subject_name.id,
             'period_id': period.id,
+            'credit': current_occurrence_credit,
             'debit': current_occurrence_debit,
             'balance': direction_tuple_period[1],
-            'summary': '本期合计'}
+            'summary': u'本期合计'}
         vals_dict.update({
             'date': False,
             'direction': direction_tuple[0],
             'balance': direction_tuple[1],
-            'subject_name_id': subject_name.id,
             'period_id': period.id,
             'debit': cumulative_occurrence_debit,
             'credit': cumulative_occurrence_credit,
-            'summary': u'本年累计发生额'})
+            'summary': u'本年累计'})
         return [period_vals, vals_dict]
 
     @api.multi
@@ -287,7 +260,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             direction_tuple = self.judgment_lending(sql_results[i]['credit'], sql_results[i]['debit'])
             sql_results[i].update({'direction': direction_tuple[0],
                                    'balance': direction_tuple[1],
-                                   'subject_name_id': subject_name.id,
                                    'period_id': period.id}
                                   )
         return sql_results
@@ -307,14 +279,14 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         if sql_results:
             current_credit = sql_results[0].get('credit', 0)
             current_debit = sql_results[0].get('debit', 0)
-            if initial_balance_new.get('direction') == '借':
+            if initial_balance_new.get('direction') == u'借':
                 year_balance_debit = sql_results[0].get('debit', 0) + initial_balance_new.get('balance', 0)
                 year_balance_credit = sql_results[0].get('credit', 0)
             else:
                 year_balance_debit = sql_results[0].get('debit', 0)
                 year_balance_credit = sql_results[0].get('credit', 0) + initial_balance_new.get('balance', 0)
         else:
-            if initial_balance_new.get('direction') == '借':
+            if initial_balance_new.get('direction') == u'借':
                 year_balance_debit = initial_balance_new.get('balance', 0)
                 year_balance_credit = 0
             else:
@@ -328,19 +300,17 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'balance': direction_tuple_current[1],
             'debit': current_debit,
             'credit': current_credit,
-            'subject_name_id': subject_name.id,
             'period_id': period.id,
-            'summary': u'本期发生额'
+            'summary': u'本期合计'
         })
         initial_balance_new.update({
             'date': False,
             'direction': direction_tuple[0],
             'balance': direction_tuple[1],
             'debit': year_balance_debit,
-            'subject_name_id': subject_name.id,
-            'period_id': period.id,
             'credit': year_balance_credit,
-            'summary': u'本年累计发生额'
+            'period_id': period.id,
+            'summary': u'本年累计'
         })
         return [current_occurrence, initial_balance_new]
 
@@ -356,10 +326,13 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         local_currcy_period = self.period_begin_id
         vouchers_summary_ids = []
         break_flag = True
+        init = 1
         while (break_flag):
             create_vals = []
             initial_balance = self.get_initial_balance(local_last_period, local_currcy_period, self.subject_name_id.id)
-            create_vals.append(initial_balance)
+            if init:
+                create_vals.append(initial_balance)
+                init = 0
             occurrence_amount = self.get_current_occurrence_amount(local_currcy_period, self.subject_name_id)
             create_vals += occurrence_amount
             if local_currcy_period.id != self.period_end_id.id:
@@ -376,7 +349,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         view_id = self.env.ref('finance.vouchers_summary_tree').id
         return {
             'type': 'ir.actions.act_window',
-            'name': '期末余额表',
+            'name': u'明细账 : %s' % self.subject_name_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'vouchers.summary',
@@ -390,9 +363,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     def create_general_ledger_account(self):
         """创建总账"""
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_begin_id)
-        if not last_period:
-            raise except_orm(u'错误', u'上一个期间不存在,无法取到期初余额')
-        if not last_period.is_closed:
+        if last_period and not last_period.is_closed:
             raise except_orm(u'错误', u'前一期间未结账，无法取到期初余额')
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         local_last_period = last_period
@@ -421,7 +392,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         view_id = self.env.ref('finance.general_ledger_account_tree').id
         return {
             'type': 'ir.actions.act_window',
-            'name': '期末余额表',
+            'name': u'总账 %s' % self.subject_name_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'general.ledger.account',
@@ -436,8 +407,7 @@ class VouchersSummary(models.TransientModel):
     """总账"""
     _name = 'vouchers.summary'
     date = fields.Date(u'日期')
-    subject_name_id = fields.Many2one('finance.account', string='科目名称')
-    period_id = fields.Many2one('finance.period', string='会计区间')
+    period_id = fields.Many2one('finance.period', string=u'会计期间')
     voucher_id = fields.Many2one('voucher', u'凭证字号')
     summary = fields.Char(u'摘要')
     direction = fields.Char(u'方向')
@@ -449,8 +419,7 @@ class VouchersSummary(models.TransientModel):
 class GeneralLedgerAccount(models.TransientModel):
     """明细帐"""
     _name = 'general.ledger.account'
-    period_id = fields.Many2one('finance.period', string='会计期间')
-    subject_name_id = fields.Many2one('finance.account', string='科目名称')
+    period_id = fields.Many2one('finance.period', string=u'会计期间')
     summary = fields.Char(u'摘要')
     direction = fields.Char(u'方向')
     debit = fields.Float(u'借方金额')

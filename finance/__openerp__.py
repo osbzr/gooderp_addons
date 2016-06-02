@@ -20,6 +20,7 @@
         'finance_view.xml',
         'company.xml',
         'trial_balance.xml',
+        'report/report_voucher.xml',
         'balance_sheet.xml'
     ],
     'qweb': [

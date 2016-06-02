@@ -43,7 +43,7 @@ class voucher(models.Model):
         default=lambda self: self.env.ref('finance.document_word_1'))
     date = fields.Date(
         u'凭证日期', required=True,
-        default=datetime.now().strftime('%Y-%m-%d'))
+        default=lambda self: fields.Date.context_today(self))
     name = fields.Char(u'凭证号')
     att_count = fields.Integer(u'附单据', default=1)
     period_id = fields.Many2one(
@@ -51,7 +51,7 @@ class voucher(models.Model):
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
-    amount_text = fields.Char(u'总计', compute='_compute_amount', store=True)
+    amount_text = fields.Float(u'总计', compute='_compute_amount', store=True)
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核')], u'状态', default='draft')
     is_checkout = fields.Boolean(u'结账凭证')
@@ -121,9 +121,9 @@ class voucher_line(models.Model):
     auxiliary_id = fields.Many2one(
         'auxiliary.financing', u'辅助核算',
         ondelete='restrict')
-    date = fields.Date(compute='_compute_voucher_date', store=True, string='凭证日期')
+    date = fields.Date(compute='_compute_voucher_date', store=True, string=u'凭证日期')
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核')], compute='_compute_voucher_state', store=True, string='状态')
+                              ('done', u'已审核')], compute='_compute_voucher_state', store=True, string=u'状态')
 
     @api.one
     @api.depends('voucher_id.date')
@@ -224,6 +224,7 @@ class document_word(models.Model):
 class finance_account(models.Model):
     '''科目'''
     _name = 'finance.account'
+    _order = "code"
     name = fields.Char(u'名称')
     code = fields.Char(u'编码', required="1")
     balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向')

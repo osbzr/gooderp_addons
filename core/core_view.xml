@@ -270,6 +270,46 @@
 			<field name="view_mode">tree</field>
 		</record>
 		<menuitem id='bank_account_menu' action='bank_account_action' parent='master_data_menu' sequence='60'/>
+
+		<!--服务-->
+		<record id="service_tree" model="ir.ui.view">
+			<field name="name">服务列表</field>
+			<field name="model">service</field>
+			<field name="arch" type="xml">
+				<tree string="服务">
+					<field name="name"/>
+					<field name="get_categ_id"/>
+					<field name="pay_categ_id"/>
+					<field name="price"/>
+				</tree>
+			</field>
+		</record>
+		<record id="service_form" model="ir.ui.view">
+			<field name="name">服务</field>
+			<field name="model">service</field>
+			<field name="arch" type="xml">
+				<form string="Service">
+					<group>
+						<group>
+							<field name="name"/>
+							<field name="price"/>
+						</group>
+						<group>
+							<field name="get_categ_id" required="1"/>
+							<field name="pay_categ_id" required="1"/>
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
+		<record id="service_action" model="ir.actions.act_window">
+			<field name="name">服务</field>
+			<field name="res_model">service</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+		<menuitem id='service_menu' action='service_action' parent='master_data_menu' groups='core.service_groups' sequence='70'/>
+
 		<!-- 角色 -->
 		<menuitem id='groups_menu' name='权限设置' action='base.action_res_groups' parent='system_menu' sequence='20'/>
 

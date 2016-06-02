@@ -10,31 +10,31 @@ class Country(models.Model):
     
 class CountryState(models.Model):
     _name = 'country.state'
-    _description = u'省'
+    _description = u'省/直辖市/自治区'
 
     country_id = fields.Many2one('country', u'国家')
-    name = fields.Char(u'省名')
+    name = fields.Char(u'名称')
     code = fields.Char(u'编号')
-    city_ids = fields.One2many('all.city', 'province_id', u'城市')
+    city_ids = fields.One2many('all.city', 'province_id', u'下辖市/区')
 
 
 class all_city(models.Model):
     _name = 'all.city'
     _rec_name = 'city_name'
-    _description = u'市'
-    city_name = fields.Char(u'市')
-    country_ids = fields.One2many('all.county', 'city_id', u'县')
-    province_id = fields.Many2one('country.state', u'省',
+    _description = u'地级市'
+    city_name = fields.Char(u'名称')
+    country_ids = fields.One2many('all.county', 'city_id', u'下辖县/市')
+    province_id = fields.Many2one('country.state', u'省/直辖市/自治区',
                                   domain="[('country_id.name','=','中国')]")
 
 
 class all_county(models.Model):
     _name = 'all.county'
     _rec_name = 'county_name'
-    _description = u'县'
+    _description = u'县/市/区'
 
-    city_id = fields.Many2one('all.city', u'城市名称')
-    county_name = fields.Char(u'县名称')
+    city_id = fields.Many2one('all.city', u'地级市')
+    county_name = fields.Char(u'名称')
     description = fields.Char(u'描述')
 
 
@@ -113,9 +113,9 @@ class province_city_county(models.Model):
             self.province_id = self.city_id.province_id.id
             return {'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
 
-    city_id = fields.Many2one('all.city', u'市')
-    county_id = fields.Many2one('all.county', u'县')
-    province_id = fields.Many2one('country.state', u'省',
+    city_id = fields.Many2one('all.city', u'市/区')
+    county_id = fields.Many2one('all.county', u'县/市')
+    province_id = fields.Many2one('country.state', u'省/市',
                                   domain="[('country_id.name','=','中国')]")
     detail_address = fields.Char(u'详细地址')
 

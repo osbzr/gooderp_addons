@@ -17,10 +17,9 @@ class BalanceSheet(models.Model):
     line_num = fields.Integer(u'行次')
     ending_balance = fields.Float(u'期末余额')
     balance_formula = fields.Text(u'计算公式')
-    balance_formula = fields.Text(u'年初余额计算公式')
     beginning_balance = fields.Float(u'年初余额')
 
-    balance_two = fields.Char(u'资产')
+    balance_two = fields.Char(u'负债和所有者权益')
     line_num_two = fields.Integer(u'行次')
     ending_balance_two = fields.Float(u'期末余额')
     balance_two_formula = fields.Text(u'计算公式')
@@ -30,7 +29,7 @@ class BalanceSheet(models.Model):
 class create_balance_sheet_wizard(models.TransientModel):
     """创建资产负债 和利润表的 wizard"""
     _name = "create.balance.sheet.wizard"
-    period_id = fields.Many2one('finance.period', string='会计期间')
+    period_id = fields.Many2one('finance.period', string=u'会计期间')
 
     @api.multi
     def compute_balance(self, parameter_str, period_id, compute_field_list):

@@ -108,7 +108,6 @@
             <field name="arch" type="xml">
                 <tree string="科目明细帐" create="false" edit='false'>
                     <field name="date"/>
-                    <field name="subject_name_id"/>
                     <field name="period_id"/>
                     <field name="voucher_id"/>
                     <field name="summary"/>
@@ -141,7 +140,6 @@
             <field name="model">general.ledger.account</field>
             <field name="arch" type="xml">
                 <tree string="科目总账" create="false" edit='false'>
-                    <field name="subject_name_id"/>
                     <field name="period_id"/>
                     <field name="summary"/>
                     <field name="debit"/>
