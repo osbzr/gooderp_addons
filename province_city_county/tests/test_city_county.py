@@ -157,6 +157,18 @@ class test_province_city_county(TransactionCase):
             child.address_id.county_id = county.id
             child.address_id.onchange_county()
 
+    def test_name_get(self):
+        '''测试将省市县及详细地址拼接起来'''
+        province = self.env['country.state'].search([('name', '=', u'上海市')])
+        city = self.env['all.city'].search([('city_name', '=', u'上海市')])
+        county = self.env['all.county'].search([('county_name', '=', u'徐汇区')])
+        for child in self.partner.child_ids:
+            child.address_id.province_id = province.id
+            child.address_id.city_id = city.id
+            child.address_id.county_id = county.id
+            child.address_id.detail_address = u'8888号'
+            child.address_id.name_get()
+
 class test_partner(TransactionCase):
 
     def setUp(self):
