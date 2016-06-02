@@ -113,6 +113,17 @@ class province_city_county(models.Model):
             self.province_id = self.city_id.province_id.id
             return {'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
 
+    @api.multi
+    def name_get(self):
+        '''将省市县及详细地址拼接起来'''
+        res = []
+        for addr in self:
+            res.append((addr.id, u'%s%s%s%s' % (
+                addr.province_id.name, addr.city_id.city_name,
+                addr.county_id.county_name, addr.detail_address)))
+
+        return res
+
     city_id = fields.Many2one('all.city', u'市/区')
     county_id = fields.Many2one('all.county', u'县/市')
     province_id = fields.Many2one('country.state', u'省/市',
@@ -147,7 +158,11 @@ class partner(models.Model):
                 self.mobile = child.mobile
                 self.phone = child.phone
                 self.qq = child.qq
-                self.address = child.address_id.detail_address
+                address = '%s%s%s%s' % (child.address_id.province_id.name,
+                           child.address_id.city_id.city_name,
+                           child.address_id.county_id.county_name,
+                           child.address_id.detail_address)
+                self.address = address
 
     child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
     contact_people = fields.Char(u'联系人', compute='_compute_partner_address')
