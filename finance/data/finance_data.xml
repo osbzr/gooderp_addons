@@ -121,7 +121,6 @@
             <field name='name'>应付账款-暂估</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
-            <field name='state'>True</field>
             <field name='auxiliary_financing'>supplier</field>
         </record>
         <!-- 资产负债表-->
@@ -174,6 +173,11 @@
             <field name='balance'>主营业务利润</field>
             <field name='line_num'>1</field>
             <field name='occurrence_balance_formula'>6001~6401</field>
+        </record>
+		<!--公司添加利润科目-->
+        <record id="base.main_company" model="res.company">
+            <field name="profit_account" ref='account_profit'/>
+            <field name="remain_account" ref='account_remain'/>
         </record>
     </data>
 </openerp>

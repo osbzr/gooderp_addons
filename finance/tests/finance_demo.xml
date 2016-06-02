@@ -151,8 +151,6 @@
         <record id="base.main_company" model="res.company">
             <field name="import_tax_rate">17</field>
             <field name="output_tax_rate">17</field>
-            <field name="profit_account" ref='finance.account_profit'/>
-            <field name="remain_account" ref='finance.account_remain'/>
         </record>
 
         <record id='account_other_in' model='finance.account'>
