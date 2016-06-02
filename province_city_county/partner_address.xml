@@ -17,7 +17,7 @@
         				</group>
         			</group>
         			<group>
-                        <field name="detail_address"/>
+                        <field name="detail_address" required='1'/>
     				</group>
                 </form>
             </field>
@@ -91,7 +91,8 @@
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>
 	                    	<field name="address_id" context="{
-	                    		'form_view_ref': 'province_city_county_form'}"/>
+	                    		'form_view_ref': 'province_city_county_form'}"
+	                    		domain="[('detail_address', '=', False)]"/>
 	                    	<field name="is_default_add"/>
 	                    </tree>
 	                </field>
