@@ -1,0 +1,47 @@
+# -*- encoding: utf-8 -*-
+from openerp.osv import osv
+from openerp.report import report_sxw
+from openerp import models, fields, api
+
+
+
+class action_report_picking_wrapped(report_sxw.rml_parse):
+    def __init__(self, cr, uid, name, context=None):
+        super(action_report_picking_wrapped, self).__init__(cr, uid, name, context=context)
+        self.localcontext.update({
+                'paginate': self._paginate,
+                'rmb_upper': self._rmb_upper,
+                'rmb_format': self._rmb_format,
+            })
+
+        self.context = context
+
+    def _rmb_upper(self, value):
+        return self.pool['res.currency'].rmb_upper(self.cr,self.uid,value)
+    
+    def _rmb_format(self, value):
+        """
+                        将数值按位数分开
+        """
+        if value < 0.01:
+            # 值为0的不输出，即返回12个空格
+            return ['' for i in range(12)]
+        # 先将数字转为字符，去掉小数点，然后和12个空格拼成列表，取最后12个元素返回
+        return (['' for i in range(12)] + list(('%0.2f' % value).replace('.', '')))[-12:]
+
+    def _paginate(self, items, max_per_page=5):
+        """
+        分页函数
+        items 为要分页的条目们
+        max_per_page 设定每页条数
+        返回：页数
+        """
+        count = len(items)
+        return int(ceil(float(count) / max_per_page))
+
+
+class report_voucher(osv.AbstractModel):
+    _name = 'report.finance.report_voucher_view'
+    _inherit = 'report.abstract_report'
+    _template = 'finance.report_voucher_view'
+    _wrapped_report_class = action_report_picking_wrapped

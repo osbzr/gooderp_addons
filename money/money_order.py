@@ -84,7 +84,7 @@ class money_order(models.Model):
                                string=u'收付款单行', readonly=True,
                                states={'draft': [('readonly', False)]})
     source_ids = fields.One2many('source.order.line', 'money_id',
-                                 string=u'源单行', readonly=True,
+                                 string=u'结算单行', readonly=True,
                                  states={'draft': [('readonly', False)]})
     type = fields.Selection(TYPE_SELECTION, string=u'类型',
                             default=lambda self: self._context.get('type'))
@@ -99,6 +99,7 @@ class money_order(models.Model):
                                 digits_compute=dp.get_precision('Amount'))
     reconciled = fields.Float(string=u'已核销预收款',
                               digits_compute=dp.get_precision('Amount'))
+    origin_name = fields.Char(u'来源单号')
 
     @api.onchange('date')
     def onchange_date(self):
@@ -230,7 +231,7 @@ class money_order_line(models.Model):
 
 class money_invoice(models.Model):
     _name = 'money.invoice'
-    _description = u'源单'
+    _description = u'结算单'
 
     state = fields.Selection([
                           ('draft', u'草稿'),
@@ -290,7 +291,7 @@ class money_invoice(models.Model):
 
 class source_order_line(models.Model):
     _name = 'source.order.line'
-    _description = u'源单明细'
+    _description = u'结算单明细'
 
     money_id = fields.Many2one('money.order', string=u'收付款单',
                                ondelete='cascade')  # 收付款单上的源单明细
@@ -298,7 +299,7 @@ class source_order_line(models.Model):
                             string=u'核销单', ondelete='cascade') # 核销单上的应收源单明细
     payable_reconcile_id = fields.Many2one('reconcile.order',
                             string=u'核销单', ondelete='cascade') # 核销单上的应付源单明细
-    name = fields.Many2one('money.invoice', string=u'源单编号',
+    name = fields.Many2one('money.invoice', string=u'结算单编号',
                            copy=False, required=True,
                            ondelete='cascade')
     category_id = fields.Many2one('core.category', string=u'类别',
@@ -360,11 +361,11 @@ class reconcile_order(models.Model):
                             states={'draft': [('readonly', False)]})
     receivable_source_ids = fields.One2many(
                             'source.order.line', 'receivable_reconcile_id',
-                             string=u'应收源单行', readonly=True,
+                             string=u'应收结算单行', readonly=True,
                              states={'draft': [('readonly', False)]})
     payable_source_ids = fields.One2many(
                             'source.order.line', 'payable_reconcile_id',
-                            string=u'应付源单行', readonly=True,
+                            string=u'应付结算单行', readonly=True,
                             states={'draft': [('readonly', False)]})
     business_type = fields.Selection(TYPE_SELECTION, string=u'业务类型',
                                      readonly=True,
