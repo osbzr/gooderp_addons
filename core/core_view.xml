@@ -58,8 +58,17 @@
 			<field name="model">res.company</field>
 			<field name="arch" type="xml">
 				<form string="系统参数" create='0'>
-					<group string="基础参数">
-						<field name="name"/>
+                  <sheet>
+                    <div>
+                        <field name="logo" widget="image"  class="oe_avatar oe_left"/>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                    </div>
+					<group>
 						<field name="street"/>
 						<field name="phone"/>
 						<field name="fax" string="手机"/>
@@ -71,6 +80,7 @@
                         <field name="import_tax_rate"></field>
 	                    <field name="output_tax_rate"></field>
 					</group>
+                  </sheet>
 				</form>
 			</field>
 		</record>
