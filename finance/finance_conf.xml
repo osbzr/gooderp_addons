@@ -6,30 +6,7 @@
         <menuitem id='finance_menu' name='会计' groups='group_accountant'/>
 
         <menuitem id='finance_setting_menu' name='配置' parent='finance_menu' sequence='10'/>
-        
-        <!--凭证字-->
-<!--        
-        <record id="document_word_tree" model="ir.ui.view">
-            <field name="name">document.word.tree</field>
-            <field name="model">document.word</field>
-            <field name="arch" type="xml">
-                <tree editable="TOP" string="凭证字">
-                    <field name="name"/>
-                    <field name="print_title"/>
-                </tree>
-            </field>
-        </record>
 
-        <record id="document_word_action" model="ir.actions.act_window">
-            <field name="name">凭证字</field>
-            <field name="res_model">document.word</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-
-        <menuitem id='document_word_menu' action='document_word_action' parent='finance_setting_menu' sequence='10'/>
--->      
         <!--会计科目-->
         <record id="finance_account_tree" model="ir.ui.view">
             <field name="name">finance.account.tree</field>
