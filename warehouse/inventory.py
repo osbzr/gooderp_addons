@@ -140,9 +140,9 @@ class wh_inventory(models.Model):
                         u'错误',
                         u'产品"%s"行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏\
                         方向不一致' % line.goods_id.name)
-                if line.difference_qty < 0 and line.difference_uos_qty < 0:
+                if line.difference_qty < 0 or line.difference_uos_qty < 0:
                     out_line.append(line)
-                elif line.difference_qty > 0 and line.difference_uos_qty > 0:
+                elif line.difference_qty > 0 or line.difference_uos_qty > 0:
                     in_line.append(line)
 
             if out_line:
