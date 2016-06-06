@@ -222,22 +222,86 @@
                                     </tr>
                                 </t>
                                 <tr>
-                                    <td height='40px' >
+                                    <td class='col-xs-2 text-center'  height='40px' >
                                         <span>附件:</span>
                                         <span t-esc="o.att_count or '0'" />
                                         <span>张</span>
                                     </td>
-                                    <td colspan='4'>
+                                    <td class='col-xs-2 text-center' >
                                         <span>合计:</span>
                                         <span t-esc='rmb_upper(o.amount_text)' />
                                     </td>
-                                    <td colspan='12'>
-                                        <span t-field='user.company_id.currency_id.symbol' />
-                                        <span t-field='o.amount_text' />
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[0]" />
                                     </td>
-                                    <td colspan='12'>
-                                        <span t-field='user.company_id.currency_id.symbol'/>
-                                        <span t-field='o.amount_text' />
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[1]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[2]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[3]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[4]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[5]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[6]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[7]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[8]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[9]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[10]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[11]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[0]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[1]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[2]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[3]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[4]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[5]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[6]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[7]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[8]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[9]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[10]" />
+                                    </td>
+                                    <td>
+                                        <span t-esc="rmb_format(o.amount_text)[11]" />
                                     </td>
                                 </tr>
                             </tbody>
