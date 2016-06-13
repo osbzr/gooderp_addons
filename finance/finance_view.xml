@@ -37,7 +37,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="document_word_id" readonly='1' style="width: 1%%"/>
+                                <field name="document_word_id" />
                                 <field name="name" readonly='1' style="width: 1%%"/>
                             </group>
                             <group>
