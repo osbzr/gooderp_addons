@@ -21,7 +21,7 @@
             	</tree>
         	</field>
     	</record>
-    	
+
     	<!--销货订单form视图-->
     	<record id='sell_order_form' model='ir.ui.view'>
         	<field name='name'>sell.order.form</field>
@@ -167,7 +167,7 @@
             	</tree>
         	</field> 
     	</record>
-    	
+
     	<!--销售发货单form视图-->
     	<record id='sell_delivery_form' model='ir.ui.view'>
         	<field name='name'>sell.delivery.form</field>
@@ -282,6 +282,10 @@
                 			</group>
             			</group>
             		</sheet>
+	                <div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+	                </div>
             	</form>
         	</field> 
     	</record>
@@ -333,7 +337,7 @@
             	</tree>
         	</field> 
     	</record>
-    	
+
     	<!--销售退货单form视图-->
     	<record id='sell_return_form' model='ir.ui.view'>
         	<field name='name'>sell.return.form</field>
@@ -441,6 +445,10 @@
                 			</group>
             			</group>
             		</sheet>
+	                <div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+	                </div>
             	</form>
         	</field> 
     	</record>
@@ -485,7 +493,7 @@
                </p>
              </field>
     	</record>
-    	
+
     	<record id='sell_delivery_action' model='ir.actions.act_window'>
         	<field name='name'>销售发货单</field>
         	<field name='res_model'>sell.delivery</field>
