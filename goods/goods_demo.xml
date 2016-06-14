@@ -108,5 +108,18 @@
 			<field name="value_id" ref="goods.black"/>
 			<field name="category_id" ref="goods.attribute_color"/>
 		</record>
+
+		<!-- 虚拟商品 -->
+        <record id="diy" model="goods">
+            <field name="code">005</field>
+            <field name="name">装机</field>
+            <field name="category_id" ref="core.goods_category_1"/>
+            <field name="uom_id" ref="core.uom_set"/>
+            <field name="uos_id" ref="core.uom_set"/>
+            <field name="no_stock">True</field>
+            <field name="cost">20</field>
+            <field name="price">50</field>
+            <field name="conversion">1</field>
+        </record>
 	</data>
 </openerp>
