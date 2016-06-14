@@ -9,6 +9,10 @@
 			<field name='name'>管理批号</field>
 			<field name='category_id' ref="core.Gooderp"/>
 		</record>
+		<record id='no_stock_groups' model='res.groups'>
+            <field name='name'>管理虚拟商品</field>
+            <field name='category_id' ref="core.Gooderp"/>
+        </record>
 		<record id='batch_serial_groups' model='res.groups'>
 			<field name='name'>管理序列号</field>
 			<field name='implied_ids' eval="[(4,ref('goods.batch_groups'))]"/>
