@@ -92,7 +92,7 @@ class wh_move_line(models.Model):
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额',
                                    digits_compute=dp.get_precision('Amount'))
-    amount = fields.Float(compute=_compute_all_amount, store=True, readonly=True)
+    amount = fields.Float(u'金额',compute=_compute_all_amount, store=True, readonly=True)
     tax_rate = fields.Float(u'税率(%)')
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, readonly=True,
                               digits_compute=dp.get_precision('Amount'))

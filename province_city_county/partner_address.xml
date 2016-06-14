@@ -9,11 +9,11 @@
                 <form string="详细地址">
                     <group>
         				<group>
-        					<field name="province_id"/>
-        					<field name="county_id"/>
+        					<field name="province_id" required="1"/>
+        					<field name="county_id" required="1"/>
         				</group>
         				<group>
-	                        <field name="city_id"/>
+	                        <field name="city_id" required="1"/>
         				</group>
         			</group>
         			<group>
