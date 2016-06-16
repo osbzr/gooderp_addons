@@ -70,7 +70,7 @@
                             	attrs="{'required': [('using_attribute','=', True)]}"/>
                             <field name="uom_id"/>
                             <field name='warehouse_id' invisible='1'/>
-                            <field name='warehouse_dest_id' required='1' groups='warehouse.multi_warehouse_groups'/>
+                            <field name='warehouse_dest_id' required='1' groups='warehouse.multi_warehouse_groups' invisible='1'/>
                             <field name="quantity" sum="合计数量"/>
                             <field name="quantity_in" readonly="1" sum="合计已入库数量"/>
                             <field name="price"/>
@@ -234,7 +234,7 @@
 				                    <field name='lot' groups='goods.batch_groups'
 											attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
 		                            <field name="warehouse_id" invisible="1"/>
-		                            <field name="warehouse_dest_id" required="1" groups='warehouse.multi_warehouse_groups'/>
+		                            <field name="warehouse_dest_id" required="1" groups='warehouse.multi_warehouse_groups' invisible='1'/>
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="goods_uos_qty" sum="合计辅助数量"
 		                            	groups="goods.auxiliary_unit_groups"/>
