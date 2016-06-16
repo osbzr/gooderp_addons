@@ -111,11 +111,17 @@ class create_balance_sheet_wizard(models.TransientModel):
             subject_vals = []
             subject_ids = self.env['finance.account'].search([('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
+            has_income = False
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
-                    subject_vals.append(trial_balance[compute_field_list[0]])
+                    # 成本记负数
+                    subject_vals.append(-trial_balance[compute_field_list[0]])
                 elif trial_balance.subject_name_id.balance_directions == 'out':
+                    has_income = True
                     subject_vals.append(trial_balance[compute_field_list[1]])
+            # 只统计成本
+            if not has_income:
+                return -sum(subject_vals)
             return sum(subject_vals)
 
 
