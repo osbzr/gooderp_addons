@@ -202,7 +202,7 @@
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                             <field name="warehouse_dest_id"/>
-                            <field name="invoice_by_receipt"></field>
+                            <field name="invoice_by_receipt" invisible="1"></field>
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
