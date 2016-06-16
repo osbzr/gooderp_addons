@@ -58,8 +58,9 @@
 			<field name="model">res.company</field>
 			<field name="arch" type="xml">
 				<form string="系统参数" create='0'>
-					<group string="基础参数">
-						<field name="name"/>
+					<group>
+						<field name="logo" widget="image"  class="oe_avatar oe_left"/>
+                        <field name="name" class="oe_inline"/>
 						<field name="street"/>
 						<field name="phone"/>
 						<field name="fax" string="手机"/>

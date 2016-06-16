@@ -142,6 +142,7 @@ class sell_order(models.Model):
                                 'reconciled': this_reconcile,
                                 'to_reconcile': amount,
                                 'state': 'draft',
+                                'origin_name':self.name,
                             })
             money_order.money_order_done()
 
@@ -178,6 +179,12 @@ class sell_order(models.Model):
                 [('order_id', '=', self.name)])
             if delivery:
                 delivery.unlink()
+            # 查找产生的收款单并删除
+            money_order = self.env['money.order'].search(
+                              [('origin_name','=',self.name)])
+            if money_order:
+                money_order.money_order_draft()
+                money_order.unlink()
         self.state = 'draft'
         self.approve_uid = ''
 

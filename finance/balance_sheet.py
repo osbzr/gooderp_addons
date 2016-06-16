@@ -13,14 +13,17 @@ class BalanceSheet(models.Model):
     """资产负债表"""
 
     _name = "balance.sheet"
+    _order = "line"
+
+    line = fields.Integer(u'序号', required=True)
     balance = fields.Char(u'资产')
-    line_num = fields.Integer(u'行次')
+    line_num = fields.Char(u'行次')
     ending_balance = fields.Float(u'期末余额')
     balance_formula = fields.Text(u'计算公式')
     beginning_balance = fields.Float(u'年初余额')
 
     balance_two = fields.Char(u'负债和所有者权益')
-    line_num_two = fields.Integer(u'行次')
+    line_num_two = fields.Char(u'行次')
     ending_balance_two = fields.Float(u'期末余额')
     balance_two_formula = fields.Text(u'计算公式')
     beginning_balance_two = fields.Float(u'年初余额')
@@ -37,7 +40,10 @@ class create_balance_sheet_wizard(models.TransientModel):
         if parameter_str:
             parameter_str_list = parameter_str.split('~')
             subject_vals = []
-            subject_ids = self.env['finance.account'].search([('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
+            if len(parameter_str_list) == 1:
+                subject_ids = self.env['finance.account'].search([('code', '=', parameter_str_list[0])])
+            else:
+                subject_ids = self.env['finance.account'].search([('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 # 根据参数code 对应的科目的 方向 进行不同的操作
@@ -105,18 +111,32 @@ class create_balance_sheet_wizard(models.TransientModel):
 
     @api.multi
     def compute_profit(self, parameter_str, period_id, compute_field_list):
+        print "parameter_str,period_id,compute_field_list=",parameter_str,period_id,compute_field_list
         """ 根据传进来的 的科目的code 进行利润表的计算 """
         if parameter_str:
             parameter_str_list = parameter_str.split('~')
-            subject_vals = []
-            subject_ids = self.env['finance.account'].search([('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
+            subject_vals_in = []
+            subject_vals_out = []
+            total_sum = 0
+            if len(parameter_str_list) == 1:
+                subject_ids = self.env['finance.account'].search([('code', '=', parameter_str_list[0])])
+            else:
+                subject_ids = self.env['finance.account'].search([('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
-                    subject_vals.append(trial_balance[compute_field_list[0]])
+                    subject_vals_in.append(trial_balance[compute_field_list[0]])
                 elif trial_balance.subject_name_id.balance_directions == 'out':
-                    subject_vals.append(trial_balance[compute_field_list[1]])
-            return sum(subject_vals)
+                    subject_vals_out.append(trial_balance[compute_field_list[1]])
+                if subject_vals_in and subject_vals_out:
+                    total_sum = sum(subject_vals_out)-sum(subject_vals_in)
+                else:
+                    if subject_vals_in:
+                        total_sum = sum(subject_vals_in)
+                    else:
+                        total_sum = sum(subject_vals_out)
+            return total_sum
+
 
 
 class ProfitStatement(models.Model):

@@ -163,7 +163,7 @@
             <field name='code'>1602</field>
             <field name='name'>累计折旧</field>
             <field name='costs_types'>assets</field>
-            <field name='balance_directions'>out</field>
+            <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1604" model='finance.account'>
             <field name='code'>1604</field>
@@ -414,31 +414,31 @@
         <record id="account_fund" model='finance.account'>
             <field name='code'>3001</field>
             <field name='name'>实收资本</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3002" model='finance.account'>
             <field name='code'>3002</field>
             <field name='name'>资本公积</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3002001" model='finance.account'>
             <field name='code'>3002001</field>
             <field name='name'>资本溢价</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3002002" model='finance.account'>
             <field name='code'>3002002</field>
             <field name='name'>股本溢价</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3002003" model='finance.account'>
             <field name='code'>3002003</field>
             <field name='name'>其他资本公积</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
 
@@ -446,43 +446,43 @@
         <record id="small_business_chart3101" model='finance.account'>
             <field name='code'>3101</field>
             <field name='name'>盈余公积</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="account_profit" model='finance.account'>
             <field name='code'>3103</field>
             <field name='name'>本年利润</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3104" model='finance.account'>
             <field name='code'>3104</field>
             <field name='name'>利润分配</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3104001" model='finance.account'>
             <field name='code'>3104001</field>
             <field name='name'>其他转入</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3104002" model='finance.account'>
             <field name='code'>3104002</field>
             <field name='name'>提取法定盈余公积</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3104003" model='finance.account'>
             <field name='code'>3104003</field>
             <field name='name'>提取任意盈余公积金</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="account_remain" model='finance.account'>
             <field name='code'>3104004</field>
             <field name='name'>未分配利润</field>
-            <field name='costs_types'>debt</field>
+            <field name='costs_types'>equity</field>
             <field name='balance_directions'>out</field>
         </record>
         <!-- 成本类 -->
@@ -548,7 +548,7 @@
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart5301" model='finance.account'>
-            <field name='code'>5301</field>
+            <field name='code'>5701</field>
             <field name='name'>营业外收入</field>
             <field name='costs_types'>in</field>
             <field name='balance_directions'>out</field>
@@ -578,13 +578,13 @@
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale' model='finance.account'>
-            <field name='code'>660101</field>
+            <field name='code'>560101</field>
             <field name='name'>销售费用-差旅费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='finance_expense_admin' model='finance.account'>
-            <field name='code'>660201</field>
+            <field name='code'>560201</field>
             <field name='name'>管理费用-工资</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
@@ -732,57 +732,396 @@
 
 
         <!-- 资产负债表-->
+        <record id='bs_0' model='balance.sheet'>
+            <field name="line">1</field>
+            <field name='balance'>流动资产：</field>
+
+            <field name='balance_two'>流动负债：</field>
+
+        </record>
+
         <record id='bs_1' model='balance.sheet'>
+            <field name="line">2</field>
             <field name='balance'>货币资金</field>
             <field name='line_num'>1</field>
-            <field name='balance_formula'>1001~1009</field>
-            <field name='balance_two'>应付账款</field>
+            <field name='balance_formula'>1001~1012999999</field>
+            <field name='balance_two'>短期借款</field>
             <field name='line_num_two'>31</field>
-            <field name='balance_two_formula'>2202~2202</field>
+            <field name='balance_two_formula'>2001~2001999999</field>
         </record>
         <record id='bs_2' model='balance.sheet'>
-            <field name='balance'>应收账款</field>
+            <field name="line">3</field>
+            <field name='balance'>短期投资</field>
             <field name='line_num'>2</field>
-            <field name='balance_formula'>1122~1122</field>
-            <field name='balance_two'>应付工资</field>
+            <field name='balance_formula'>1101~1101999999</field>
+            <field name='balance_two'>应付票据</field>
             <field name='line_num_two'>32</field>
-            <field name='balance_two_formula'>2211~2211</field>
+            <field name='balance_two_formula'>2201~2201999999</field>
         </record>
         <record id='bs_3' model='balance.sheet'>
-            <field name='balance'>库存商品</field>
+            <field name="line">4</field>
+            <field name='balance'>应收票据</field>
             <field name='line_num'>3</field>
-            <field name='balance_formula'>1406~1406</field>
-            <field name='balance_two'>实收资本</field>
+            <field name='balance_formula'>1121~1121999999</field>
+            <field name='balance_two'>应付账款</field>
             <field name='line_num_two'>33</field>
-            <field name='balance_two_formula'>4001~4001</field>
+            <field name='balance_two_formula'>2202~2202999999</field>
         </record>
         <record id='bs_4' model='balance.sheet'>
-            <field name='balance_two'>本年利润</field>
-            <field name='line_num_two'>55</field>
-            <field name='balance_two_formula'>4103~4103</field>
+            <field name="line">5</field>
+            <field name='balance'>应收账款</field>
+            <field name='line_num'>4</field>
+            <field name='balance_formula'>1122~1122999999</field>
+            <field name='balance_two'>预收账款</field>
+            <field name='line_num_two'>34</field>
+            <field name='balance_two_formula'>2203~2203999999</field>
         </record>
         <record id='bs_5' model='balance.sheet'>
-            <field name='balance_two'>未分配利润</field>
-            <field name='line_num_two'>56</field>
-            <field name='balance_two_formula'>410403~410403</field>
+            <field name="line">6</field>
+            <field name='balance'>预付账款</field>
+            <field name='line_num'>5</field>
+            <field name='balance_formula'>1123~1123999999</field>
+            <field name='balance_two'>应付职工薪酬</field>
+            <field name='line_num_two'>35</field>
+            <field name='balance_two_formula'>2211~2211999999</field>
         </record>
+        <record id='bs_5' model='balance.sheet'>
+            <field name="line">6</field>
+            <field name='balance'>预付账款</field>
+            <field name='line_num'>5</field>
+            <field name='balance_formula'>1123~1123999999</field>
+            <field name='balance_two'>应付职工薪酬</field>
+            <field name='line_num_two'>35</field>
+            <field name='balance_two_formula'>2211~2211999999</field>
+        </record>
+        <record id='bs_6' model='balance.sheet'>
+            <field name="line">7</field>
+            <field name='balance'>应收股利</field>
+            <field name='line_num'>6</field>
+            <field name='balance_formula'>1131~1131999999</field>
+            <field name='balance_two'>应交税费</field>
+            <field name='line_num_two'>36</field>
+            <field name='balance_two_formula'>2221~2221999999</field>
+        </record>
+        <record id='bs_7' model='balance.sheet'>
+            <field name="line">8</field>
+            <field name='balance'>应收利息</field>
+            <field name='line_num'>7</field>
+            <field name='balance_formula'>1132~1132999999</field>
+            <field name='balance_two'>应付利息</field>
+            <field name='line_num_two'>37</field>
+            <field name='balance_two_formula'>2231~2231999999</field>
+        </record>
+        <record id='bs_8' model='balance.sheet'>
+            <field name="line">9</field>
+            <field name='balance'>其他应收款</field>
+            <field name='line_num'>8</field>
+            <field name='balance_formula'>1221~1221999999</field>
+            <field name='balance_two'>应付利润</field>
+            <field name='line_num_two'>38</field>
+            <field name='balance_two_formula'>2232~2232999999</field>
+        </record>
+        <record id='bs_9' model='balance.sheet'>
+            <field name="line">10</field>
+            <field name='balance'>存货</field>
+            <field name='line_num'>9</field>
+            <field name='balance_formula'>1401~1408999999</field>
+            <field name='balance_two'>其他应付款</field>
+            <field name='line_num_two'>39</field>
+            <field name='balance_two_formula'>2241~2241999999</field>
+        </record>
+        <record id='bs_10' model='balance.sheet'>
+            <field name="line">11</field>
+            <field name='balance'>其中：原材料</field>
+            <field name='line_num'>10</field>
+            <field name='balance_formula'>1403~1403999999</field>
+            <field name='balance_two'>其他流动负债</field>
+            <field name='line_num_two'>40</field>
+        </record>
+        <record id='bs_11' model='balance.sheet'>
+            <field name="line">12</field>
+            <field name='balance'>在产品</field>
+            <field name='line_num'>11</field>
+            <field name='balance_two'>流动负债合计</field>
+            <field name='line_num_two'>41</field>
+            <field name='balance_two_formula'>2001~2241999999</field>
+        </record>
+        <record id='bs_12' model='balance.sheet'>
+            <field name="line">13</field>
+            <field name='balance'>库存商品</field>
+            <field name='line_num'>12</field>
+            <field name='balance_formula'>1405~1405999999</field>
+            <field name='balance_two'>非流动负债：</field>
+        </record>
+        <record id='bs_13' model='balance.sheet'>
+            <field name="line">14</field>
+            <field name='balance'>周转材料</field>
+            <field name='line_num'>13</field>
+            <field name='balance_formula'>1411~1411999999</field>
+            <field name='balance_two'>长期借款</field>
+            <field name='line_num_two'>42</field>
+            <field name='balance_two_formula'>2501~2501999999</field>
+        </record>
+        <record id='bs_14' model='balance.sheet'>
+            <field name="line">15</field>
+            <field name='balance'>其他流动资产</field>
+            <field name='line_num'>14</field>
+            <field name='balance_formula'>1421~1421999999</field>
+            <field name='balance_two'>长期应付款</field>
+            <field name='line_num_two'>43</field>
+            <field name='balance_two_formula'>2701~2701999999</field>
+        </record>
+        <record id='bs_15' model='balance.sheet'>
+            <field name="line">16</field>
+            <field name='balance'>流动资产合计</field>
+            <field name='line_num'>15</field>
+            <field name='balance_formula'>1001~1421999999</field>
+            <field name='balance_two'>递延收益</field>
+            <field name='line_num_two'>44</field>
+            <field name='balance_two_formula'>2401~2401999999</field>
+        </record>
+        <record id='bs_151' model='balance.sheet'>
+            <field name="line">17</field>
+            <field name='balance'>非流动资产：</field>
+            <field name='balance_two'>其他非流动负债</field>
+            <field name='line_num_two'>45</field>
+        </record>
+        <record id='bs_16' model='balance.sheet'>
+            <field name="line">18</field>
+            <field name='balance'>长期债券投资</field>
+            <field name='line_num'>16</field>
+            <field name='balance_formula'>1501~1501999999</field>
+            <field name='balance_two'>非流动负债合计</field>
+            <field name='line_num_two'>46</field>
+            <field name='balance_two_formula'>2401~2701999999</field>
+        </record>
+        <record id='bs_17' model='balance.sheet'>
+            <field name="line">19</field>
+            <field name='balance'>长期股权投资</field>
+            <field name='line_num'>17</field>
+            <field name='balance_formula'>1511~1511999999</field>
+            <field name='balance_two'>负债合计</field>
+            <field name='line_num_two'>47</field>
+            <field name='balance_two_formula'>2001~2401999999</field>
+        </record>
+        <record id='bs_18' model='balance.sheet'>
+            <field name="line">20</field>
+            <field name='balance'>固定资产原价</field>
+            <field name='line_num'>18</field>
+            <field name='balance_formula'>1601~1601999999</field>
+        </record>
+        <record id='bs_19' model='balance.sheet'>
+            <field name="line">21</field>
+            <field name='balance'>减：累计折旧</field>
+            <field name='line_num'>19</field>
+            <field name='balance_formula'>1602~1602999999</field>
+        </record>
+        <record id='bs_20' model='balance.sheet'>
+            <field name="line">22</field>
+            <field name='balance'>固定资产账面价值</field>
+            <field name='line_num'>20</field>
+            <field name='balance_formula'>1601~16029999</field>
+        </record>
+        <record id='bs_21' model='balance.sheet'>
+            <field name="line">23</field>
+            <field name='balance'>在建工程</field>
+            <field name='line_num'>21</field>
+            <field name='balance_formula'>1604~1604999999</field>
+        </record>
+        <record id='bs_22' model='balance.sheet'>
+            <field name="line">24</field>
+            <field name='balance'>工程物资</field>
+            <field name='line_num'>22</field>
+            <field name='balance_formula'>1605~1605999999</field>
+        </record>
+        <record id='bs_23' model='balance.sheet'>
+            <field name="line">25</field>
+            <field name='balance'>固定资产清理</field>
+            <field name='line_num'>23</field>
+            <field name='balance_formula'>1606~1606999999</field>
+        </record>
+        <record id='bs_24' model='balance.sheet'>
+            <field name="line">26</field>
+            <field name='balance'>生产性生物资产</field>
+            <field name='line_num'>24</field>
+            <field name='balance_formula'>1621~1621999999</field>
+            <field name='balance_two'>所有者权益（或股东权益）：</field>
+
+        </record>
+        <record id='bs_25' model='balance.sheet'>
+            <field name="line">27</field>
+            <field name='balance'>无形资产</field>
+            <field name='line_num'>25</field>
+            <field name='balance_formula'>1701~1701999999</field>
+            <field name='balance_two'>实收资本（或股本）</field>
+            <field name='line_num_two'>48</field>
+            <field name='balance_two_formula'>3001~3001999999</field>
+        </record>
+        <record id='bs_26' model='balance.sheet'>
+            <field name="line">28</field>
+            <field name='balance'>开发支出</field>
+            <field name='line_num'>26</field>
+            <field name='balance_two'>资本公积</field>
+            <field name='line_num_two'>49</field>
+            <field name='balance_two_formula'>3002~3002999999</field>
+        </record>
+        <record id='bs_27' model='balance.sheet'>
+            <field name="line">29</field>
+            <field name='balance'>长期待摊费用</field>
+            <field name='line_num'>27</field>
+            <field name='balance_formula'>1801~1801999999</field>
+            <field name='balance_two'>盈余公积</field>
+            <field name='line_num_two'>50</field>
+            <field name='balance_two_formula'>3101~3101999999</field>
+        </record>
+        <record id='bs_28' model='balance.sheet'>
+            <field name="line">30</field>
+            <field name='balance'>其他非流动资产</field>
+            <field name='line_num'>28</field>
+            <field name='balance_formula'>1901~1901999999</field>
+            <field name='balance_two'>未分配利润</field>
+            <field name='line_num_two'>51</field>
+            <field name='balance_two_formula'>3104004</field>
+        </record>
+        <record id='bs_29' model='balance.sheet'>
+            <field name="line">31</field>
+            <field name='balance'>非流动资产合计</field>
+            <field name='line_num'>29</field>
+            <field name='balance_formula'>1501~1901999999</field>
+            <field name='balance_two'>所有者权益（或股东权益）合计</field>
+            <field name='line_num_two'>52</field>
+            <field name='balance_two_formula'>3001~3104999999</field>
+        </record>
+        <record id='bs_30' model='balance.sheet'>
+            <field name="line">32</field>
+            <field name='balance'>资产总计</field>
+            <field name='line_num'>30</field>
+            <field name='balance_formula'>1001~1901999999</field>
+            <field name='balance_two'>负债和所有者权益（或股东权益）总计</field>
+            <field name='line_num_two'>53</field>
+            <field name='balance_two_formula'>2001~3104999999</field>
+        </record>
+
         <!-- 利润表 -->
         <record id='pl_1' model='profit.statement'>
-            <field name='balance'>主营业务收入</field>
+            <field name='balance'>一、营业收入</field>
             <field name='line_num'>1</field>
-            <field name='occurrence_balance_formula'>6001~6001</field>
+            <field name='occurrence_balance_formula'>5001~50519999</field>
         </record>
         <record id='pl_2' model='profit.statement'>
-            <field name='balance'>主营业务成本</field>
-            <field name='line_num'>1</field>
-            <field name='occurrence_balance_formula'>6401~6401</field>
+            <field name='balance'>减：营业成本</field>
+            <field name='line_num'>2</field>
+            <field name='occurrence_balance_formula'>5401~54029999</field>
         </record>
         <record id='pl_3' model='profit.statement'>
-            <field name='balance'>主营业务利润</field>
-            <field name='line_num'>1</field>
-            <field name='occurrence_balance_formula'>6001~6401</field>
+            <field name='balance'>营业税金及附加</field>
+            <field name='line_num'>3</field>
+            <field name='occurrence_balance_formula'>5403~5403999999</field>
         </record>
-		<!--公司添加利润科目-->
+        <record id='pl_4' model='profit.statement'>
+            <field name='balance'>其中：消费税</field>
+            <field name='line_num'>4</field>
+            <field name='occurrence_balance_formula'>2221004</field>
+        </record>
+        <record id='pl_5' model='profit.statement'>
+            <field name='balance'>        营业税</field>
+            <field name='line_num'>5</field>
+            <field name='occurrence_balance_formula'>2221003</field>
+        </record>
+        <record id='pl_6' model='profit.statement'>
+            <field name='balance'>        城市维护建设税</field>
+            <field name='line_num'>5</field>
+            <field name='occurrence_balance_formula'>2221006</field>
+        </record>
+        <record id='pl_7' model='profit.statement'>
+            <field name='balance'>        资源税</field>
+            <field name='line_num'>7</field>
+
+        </record>
+        <record id='pl_8' model='profit.statement'>
+            <field name='balance'>        土地增值税</field>
+            <field name='line_num'>8</field>
+            <field name='occurrence_balance_formula'>2221005</field>
+        </record>
+        <record id='pl_9' model='profit.statement'>
+            <field name='balance'>        城镇土地使用税、房产税、车船税、印花税</field>
+            <field name='line_num'>9</field>
+
+        </record>
+        <record id='pl_10' model='profit.statement'>
+            <field name='balance'>        教育费附加、矿产资源补偿费、排污费</field>
+            <field name='line_num'>10</field>
+            <field name='occurrence_balance_formula'>2221008</field>
+        </record>
+        <record id='pl_11' model='profit.statement'>
+            <field name='balance'>销售费用</field>
+            <field name='line_num'>11</field>
+            <field name='occurrence_balance_formula'>5601</field>
+        </record>
+        <record id='pl_14' model='profit.statement'>
+            <field name='balance'>管理费用</field>
+            <field name='line_num'>14</field>
+            <field name='occurrence_balance_formula'>5602~5602999</field>
+        </record>
+        <record id='pl_18' model='profit.statement'>
+            <field name='balance'>财务费用</field>
+            <field name='line_num'>18</field>
+            <field name='occurrence_balance_formula'>5603~5603999999</field>
+        </record>
+        <record id='pl_19' model='profit.statement'>
+            <field name='balance'>其中：利息费用（收入以“-”号填列）</field>
+            <field name='line_num'>19</field>
+            <field name='occurrence_balance_formula'>5603002</field>
+        </record>
+        <record id='pl_20' model='profit.statement'>
+            <field name='balance'>加：投资收益（损失以“-”号填列）</field>
+            <field name='line_num'>20</field>
+            <field name='occurrence_balance_formula'>5111</field>
+        </record>
+        <record id='pl_21' model='profit.statement'>
+            <field name='balance'> 二、营业利润（亏损以“-”号填列）</field>
+            <field name='line_num'>21</field>
+            <field name='occurrence_balance_formula'>5001~5603999999</field>
+        </record>
+        <record id='pl_22' model='profit.statement'>
+            <field name='balance'>加：营业外收入</field>
+            <field name='line_num'>22</field>
+            <field name='occurrence_balance_formula'>5701~57019999</field>
+        </record>
+        <record id='pl_23' model='profit.statement'>
+            <field name='balance'>        其中：政府补助</field>
+            <field name='line_num'>23</field>
+
+        </record>
+        <record id='pl_24' model='profit.statement'>
+            <field name='balance'>减：营业外支出</field>
+            <field name='line_num'>24</field>
+            <field name='occurrence_balance_formula'>5711~57119999</field>
+        </record>
+        <record id='pl_25' model='profit.statement'>
+            <field name='balance'>       其中：坏账损失</field>
+            <field name='line_num'>25</field>
+
+        </record>
+        <record id='pl_30' model='profit.statement'>
+            <field name='balance'> 三、利润总额（亏损总额以“-”号填列）</field>
+            <field name='line_num'>30</field>
+            <field name='occurrence_balance_formula'>5001~5711999999</field>
+        </record>
+        <record id='pl_31' model='profit.statement'>
+            <field name='balance'>减：所得税费用</field>
+            <field name='line_num'>31</field>
+            <field name='occurrence_balance_formula'>5801~58019999</field>
+        </record>
+        <record id='pl_32' model='profit.statement'>
+            <field name='balance'> 四、净利润（净亏损以“-”号填列）</field>
+            <field name='line_num'>32</field>
+            <field name='occurrence_balance_formula'>5001~58019999</field>
+        </record>
+
+
+
+        <!--公司添加利润科目-->
         <record id="base.main_company" model="res.company">
             <field name="profit_account" ref='account_profit'/>
             <field name="remain_account" ref='account_remain'/>
