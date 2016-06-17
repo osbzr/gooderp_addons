@@ -83,6 +83,9 @@ class voucher(models.Model):
     def _check_balance(self):
         debit_sum = sum([line.debit for line in self.line_ids])
         credit_sum = sum([line.credit for line in self.line_ids])
+        precision = self.env['decimal.precision'].precision_get('Account')
+        debit_sum = round(debit_sum, precision)
+        credit_sum = round(credit_sum, precision)
         if debit_sum != credit_sum:
             raise ValidationError(u'借贷方不平')
 
@@ -225,6 +228,24 @@ class finance_account(models.Model):
     '''科目'''
     _name = 'finance.account'
     _order = "code"
+    _rec_name = 'out_name'
+
+    # 如是子科目，科目名称为：上级科目名称->子科目名称
+    @api.depends('name')
+    def _compute_account_name(self):
+        for line in self:
+            account_name = line.name
+            if len(line.code) > 4:
+                # 子科目
+                f_code = line.code[:4]
+                f_name = self.search([('code', '=', f_code)], limit=1).name
+                if f_name:
+                    account_name = line.code + ' ' + f_name + u"→" + account_name
+            else:
+                account_name = line.code + ' ' + account_name
+            line.out_name = account_name
+
+    out_name = fields.Char(compute='_compute_account_name', string=u'科目全称')
     name = fields.Char(u'名称')
     code = fields.Char(u'编码', required="1")
     balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向')

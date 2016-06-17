@@ -99,14 +99,15 @@ class checkout_wizard(models.TransientModel):
                              }
                         voucher_line.append(res)
                     #生成凭证
-                    valus={
-                           'is_checkout':True,
-                           'date':self.date,
-                           'line_ids':[
-                                    (0, 0, line) for line in voucher_line],
-                           }
-                    voucher = voucher_obj.create(valus)
-                    voucher.voucher_done()
+                    if voucher_line:
+                        valus={
+                               'is_checkout':True,
+                               'date':self.date,
+                               'line_ids':[
+                                        (0, 0, line) for line in voucher_line],
+                               }
+                        voucher = voucher_obj.create(valus)
+                        voucher.voucher_done()
                 if self.period_id.month == '12':
                     year_profit_ids = voucher_line_obj.search([
                                         ('account_id','=',year_profit_account.id),
@@ -114,24 +115,27 @@ class checkout_wizard(models.TransientModel):
                     year_total=0
                     for year_profit_id in year_profit_ids:
                         year_total += (year_profit_id.credit - year_profit_id.debit)
-                    year_line_ids=[{
-                         'name':u'年度结余',
-                         'account_id':remain_account.id,
-                         'debit':0,
-                         'credit':year_total,
-                         },{
-                         'name':u'年度结余',
-                         'account_id':year_profit_account.id,
-                         'debit':year_total,
-                         'credit':0,
-                            }]
-                    value={'is_checkout':True,
-                           'date':self.date,
-                           'line_ids':[
-                                    (0, 0, line) for line in year_line_ids],
-                           }
-                    year_account = voucher_obj.create(value)
-                    year_account.voucher_done()
+                    precision = self.env['decimal.precision'].precision_get('Account')
+                    year_total = round(year_total, precision)
+                    if year_total != 0:
+                        year_line_ids=[{
+                             'name':u'年度结余',
+                             'account_id':remain_account.id,
+                             'debit':0,
+                             'credit':year_total,
+                             },{
+                             'name':u'年度结余',
+                             'account_id':year_profit_account.id,
+                             'debit':year_total,
+                             'credit':0,
+                                }]
+                        value={'is_checkout':True,
+                               'date':self.date,
+                               'line_ids':[
+                                        (0, 0, line) for line in year_line_ids],
+                               }
+                        year_account = voucher_obj.create(value)
+                        year_account.voucher_done()
                 #生成科目余额表
                 trial_wizard = self.env['create.trial.balance.wizard'].create({
                         'period_id':self.period_id.id,
@@ -150,16 +154,18 @@ class checkout_wizard(models.TransientModel):
                                                            'month':str(int(self.period_id.month) + 1),})
                 #显示凭证
                 view = self.env.ref('finance.voucher_form')
-                return {
-                    'name': u'月末结账',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'views': [(view.id, 'form')],
-                    'res_model': 'voucher',
-                    'type': 'ir.actions.act_window',
-                    'res_id': voucher.id,
-                    'limit': 300,
-                }
+                if voucher_line:
+                    return {
+                        'name': u'月末结账',
+                        'view_type': 'form',
+                        'view_mode': 'form',
+                        'views': [(view.id, 'form')],
+                        'res_model': 'voucher',
+                        'type': 'ir.actions.act_window',
+                        'res_id': voucher.id,
+                        'limit': 300,
+                    }
+
 
     @api.multi
     def button_counter_checkout(self):
