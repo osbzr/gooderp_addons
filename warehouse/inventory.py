@@ -73,7 +73,11 @@ class wh_inventory(models.Model):
               (not inventory.in_id or inventory.in_id.state == 'done'):
                 self.state = 'done'
                 return True
-
+            if inventory.state == 'done' and \
+              (not inventory.out_id or inventory.out_id.state != 'done') and \
+              (not inventory.in_id or inventory.in_id.state != 'done'):
+                self.state = 'confirmed'
+                return True
         return False
 
     @api.multi
@@ -129,23 +133,26 @@ class wh_inventory(models.Model):
     def generate_inventory(self):
         for inventory in self:
             out_line, in_line = [], []
-            for line in inventory.line_ids.filtered(
-              lambda line: line.difference_qty or line.difference_uos_qty):
-                if line.difference_qty <= 0 and line.difference_uos_qty <= 0:
-                    out_line.append(line)
-                elif line.difference_qty >= 0 and line.difference_uos_qty >= 0:
-                    in_line.append(line)
-                else:
+            for line in inventory.line_ids:
+                if (line.difference_qty > 0 and line.difference_uos_qty < 0) or \
+                (line.difference_qty < 0 and line.difference_uos_qty > 0):
                     raise osv.except_osv(
                         u'错误',
                         u'产品"%s"行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏\
                         方向不一致' % line.goods_id.name)
+                if line.difference_qty < 0 or line.difference_uos_qty < 0:
+                    out_line.append(line)
+                elif line.difference_qty > 0 or line.difference_uos_qty > 0:
+                    in_line.append(line)
 
             if out_line:
                 self.create_losses_out(inventory, out_line)
 
             if in_line:
                 self.create_overage_in(inventory, in_line)
+
+            if  len(out_line) + len(in_line) == 0:
+                inventory.state = 'done'
 
             if out_line or in_line:
                 inventory.state = 'confirmed'
@@ -358,6 +365,13 @@ class wh_out(models.Model):
             order.inventory_ids.check_done()
 
         return res
+    @api.multi
+    def cancel_approved_order(self):
+        res = super(wh_out, self).cancel_approved_order()
+        for order in self:
+            order.inventory_ids.check_done()
+
+        return res
 
 
 class wh_in(models.Model):
@@ -368,6 +382,13 @@ class wh_in(models.Model):
     @api.multi
     def approve_order(self):
         res = super(wh_in, self).approve_order()
+        for order in self:
+            order.inventory_ids.check_done()
+
+        return res
+    @api.multi
+    def cancel_approved_order(self):
+        res = super(wh_in, self).cancel_approved_order()
         for order in self:
             order.inventory_ids.check_done()
 

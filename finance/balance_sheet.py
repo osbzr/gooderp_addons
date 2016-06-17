@@ -138,7 +138,6 @@ class create_balance_sheet_wizard(models.TransientModel):
             return total_sum
 
 
-
 class ProfitStatement(models.Model):
     """资产负债表"""
     _name = "profit.statement"

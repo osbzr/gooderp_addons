@@ -51,6 +51,7 @@
                                         <field name='price'/>
 									</group>
 									<group>
+									    <field name='no_stock' groups='goods.no_stock_groups'/>
 										<field name='using_batch' groups='goods.batch_groups'/>
 										<field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
 										groups='goods.batch_serial_groups' />

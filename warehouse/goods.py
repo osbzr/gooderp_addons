@@ -73,6 +73,8 @@ class goods(models.Model):
         return cost_unit * qty, cost_unit
 
     def is_using_matching(self):
+        if self.no_stock:
+            return False
         return True
 
     def is_using_batch(self):

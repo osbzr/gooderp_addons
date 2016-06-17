@@ -264,6 +264,23 @@ class finance_account(models.Model):
         ('out', u'费用类')
     ], u'类型')
 
+    @api.multi
+    @api.depends('name', 'code')
+    def name_get(self):
+        result = []
+        for account in self:
+            name = account.code + ' ' + account.name
+            result.append((account.id, name))
+        return result
+
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('code', '=ilike', name + '%'), ('name', operator, name)]
+        accounts = self.search(domain + args, limit=limit)
+        return accounts.name_get()
 
 class auxiliary_financing(models.Model):
     '''辅助核算'''

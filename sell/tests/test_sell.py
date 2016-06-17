@@ -386,6 +386,13 @@ class test_sell_delivery(TransactionCase):
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
 
+    def test_no_stock(self):
+        ''' 测试虚拟商品出库 '''
+        delivery = self.delivery.copy()
+        for line in delivery.line_out_ids:
+            line.goods_id = self.env.ref('goods.diy')
+        delivery.sell_delivery_done()
+
     def test_scan_barcode(self):
         '''销售扫码出入库'''
         warehouse = self.env['wh.move']

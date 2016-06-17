@@ -98,6 +98,9 @@
                             <div class='col-xs-6 text-right'>
                                 <span>凭证号</span>
                                 <span t-field='o.name' />
+                                <span>附件:</span>
+                                <span t-esc="o.att_count or '0'" />
+                                <span>张</span>
                             </div>
                         </div>
                         <style>
@@ -222,12 +225,7 @@
                                     </tr>
                                 </t>
                                 <tr>
-                                    <td class='col-xs-2 text-center'  height='40px' >
-                                        <span>附件:</span>
-                                        <span t-esc="o.att_count or '0'" />
-                                        <span>张</span>
-                                    </td>
-                                    <td class='col-xs-2 text-center' >
+                                    <td class='col-xs-4' colspan = '2'>
                                         <span>合计:</span>
                                         <span t-esc='rmb_upper(o.amount_text)' />
                                     </td>
