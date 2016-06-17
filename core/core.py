@@ -346,7 +346,7 @@ class res_currency(models.Model):
         # 冲红负数处理
         xflag = False
         if value < 0:
-            value = -value
+            value = 0-value
             xflag = True
         nums = map(int, list(str('%0.2f' % value).replace('.', '')))
         words = []
