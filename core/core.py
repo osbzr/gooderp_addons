@@ -344,10 +344,10 @@ class res_currency(models.Model):
         unit = [u"分", u"角", u"元", u"拾", u"佰", u"仟", u"万", u"拾", u"佰", u"仟", u"亿",
                 u"拾", u"佰", u"仟", u"万", u"拾", u"佰", u"仟", u"兆"]
         # 冲红负数处理
-        xflag = False
+        xflag = 0
         if value < 0:
-            value = 0-value
-            xflag = True
+            xflag = value
+            value = abs(value)
         nums = map(int, list(str('%0.2f' % value).replace('.', '')))
         words = []
         zflag = 0  # 标记连续0次数，以删除万字，或适时插入零字
@@ -366,8 +366,8 @@ class res_currency(models.Model):
                 zflag += 1
         if words[-1] != unit[0]:  # 结尾非‘分’补整字
             words.append(u"整")
-        if xflag:
-            words.insert(0, u'负')
+        if xflag < 0:
+            words.insert(0, u"负")
         return ''.join(words)
 
 class service(models.Model):
