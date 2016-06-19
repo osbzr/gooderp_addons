@@ -66,17 +66,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
         return self.env.cr.dictfetchall()
 
     @api.multi
-    def compute_ending_balance(self, ending_credit, ending_debit):
-        """计算出科目余额表的 期末余额(传入的是  )"""
-        if ending_credit > ending_debit:
-            ending_credit = ending_credit - ending_debit
-            ending_debit = 0
-        else:
-            ending_credit = 0
-            ending_debit = ending_debit - ending_credit
-        return [ending_credit, ending_debit]
-
-    @api.multi
     def create_trial_balance(self):
         """ \
             生成科目余额表 \
@@ -89,6 +78,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         trial_balance_ids = [balance.id for balance in trial_balance_objs]
         if not self.period_id.is_closed:
             trial_balance_objs.unlink()
+            trial_balance_ids = []
             last_period = self.compute_last_period_id(self.period_id)
             if last_period:
                 last_period_id = last_period.id
@@ -98,41 +88,64 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 last_period_id = False
             period_id = self.period_id.id
             current_occurrence_dic_list = self.get_period_balance(period_id)
+            print 'this_month', current_occurrence_dic_list
             trial_balance_dict = {}
             """把本期发生额的数量填写到  准备好的dict 中 """
             for current_occurrence in current_occurrence_dic_list:
                 account = self.env['finance.account'].browse(current_occurrence.get('account_id'))
-                ending_balance_result = self.compute_ending_balance(current_occurrence.get('credit', 0) or 0, current_occurrence.get('debit', 0) or 0)
-                account_dict = {'period_id': period_id, 'current_occurrence_debit': current_occurrence.get('debit', 0) or 0,
-                                'current_occurrence_credit': current_occurrence.get('credit') or 0, 'subject_code': account.code,
-                                'initial_balance_credit': 0, 'initial_balance_debit': 0,
-                                'ending_balance_credit': ending_balance_result[0], 'ending_balance_debit': ending_balance_result[1],
-                                'cumulative_occurrence_credit': current_occurrence.get('credit', 0) or 0, 'cumulative_occurrence_debit': current_occurrence.get('debit', 0) or 0,
-                                'subject_name_id': current_occurrence.get('account_id')}
-                trial_balance_dict[current_occurrence.get('account_id')] = account_dict
+                ending_balance_debit = ending_balance_credit = 0
+                this_debit = current_occurrence.get('debit', 0)
+                this_credit = current_occurrence.get('credit', 0)
+                if account.balance_directions == 'in':
+                    ending_balance_debit = this_debit - this_credit
+                else:
+                    ending_balance_credit = this_credit - this_debit
+
+                account_dict = {'period_id': period_id, 
+                                'current_occurrence_debit': this_debit,
+                                'current_occurrence_credit': this_credit, 
+                                'subject_code': account.code,
+                                'initial_balance_credit': 0,
+                                'initial_balance_debit': 0,
+                                'ending_balance_debit': ending_balance_debit,
+                                'ending_balance_credit': ending_balance_credit,
+                                'cumulative_occurrence_debit': this_debit,
+                                'cumulative_occurrence_credit': this_credit, 
+                                'subject_name_id': account.id}
+                trial_balance_dict[account.id] = account_dict
 
             """ 结合上一期间的 数据 填写  trial_balance_dict(余额表 记录生成dict)   """
             for trial_balance in self.env['trial.balance'].search([('period_id', '=', last_period_id)]):
                 initial_balance_credit = trial_balance.ending_balance_credit or 0
                 initial_balance_debit = trial_balance.ending_balance_debit or 0
+                ending_balance_debit = ending_balance_credit = 0
+                this_debit = this_credit = 0
+                cumulative_occurrence_credit = cumulative_occurrence_debit = 0
                 subject_name_id = trial_balance.subject_name_id.id
                 if subject_name_id in trial_balance_dict:
-                    ending_balance_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) + initial_balance_credit
-                    ending_balance_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) + initial_balance_debit
-                    cumulative_occurrence_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) + trial_balance.cumulative_occurrence_credit
-                    cumulative_occurrence_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) + trial_balance.cumulative_occurrence_debit
+                    this_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0)
+                    this_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0)
+
+                    if trial_balance.subject_name_id.balance_directions == 'in':
+                        ending_balance_debit = initial_balance_debit + this_debit - this_credit
+                    else:
+                        ending_balance_credit = initial_balance_credit + this_credit - this_debit
+                    if self.period_id.year == last_period.year:
+                        cumulative_occurrence_credit = this_credit + trial_balance.cumulative_occurrence_credit
+                        cumulative_occurrence_debit = this_debit + trial_balance.cumulative_occurrence_debit
                 else:
                     ending_balance_credit = initial_balance_credit
                     ending_balance_debit = initial_balance_debit
                     cumulative_occurrence_credit = trial_balance.cumulative_occurrence_credit or 0
                     cumulative_occurrence_debit = trial_balance.cumulative_occurrence_debit or 0
-                ending_balance_result = self.compute_ending_balance(ending_balance_credit, ending_balance_debit)
                 subject_code = trial_balance.subject_code
                 trial_balance_dict[subject_name_id] = {
                     'initial_balance_credit': initial_balance_credit,
                     'initial_balance_debit': initial_balance_debit,
-                    'ending_balance_credit': ending_balance_result[0],
-                    'ending_balance_debit': ending_balance_result[1],
+                    'ending_balance_credit': ending_balance_credit,
+                    'ending_balance_debit': ending_balance_debit,
+                    'current_occurrence_debit': this_debit,
+                    'current_occurrence_credit': this_credit, 
                     'cumulative_occurrence_credit': cumulative_occurrence_credit,
                     'cumulative_occurrence_debit': cumulative_occurrence_debit,
                     'subject_code': subject_code,
