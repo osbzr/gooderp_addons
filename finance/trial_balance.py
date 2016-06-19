@@ -92,8 +92,8 @@ class CreateTrialBalanceWizard(models.TransientModel):
             for current_occurrence in current_occurrence_dic_list:
                 account = self.env['finance.account'].browse(current_occurrence.get('account_id'))
                 ending_balance_debit = ending_balance_credit = 0
-                this_debit = current_occurrence.get('debit', 0)
-                this_credit = current_occurrence.get('credit', 0)
+                this_debit = current_occurrence.get('debit', 0) or 0
+                this_credit = current_occurrence.get('credit', 0) or 0
                 if account.balance_directions == 'in':
                     ending_balance_debit = this_debit - this_credit
                 else:
@@ -121,8 +121,8 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 cumulative_occurrence_credit = cumulative_occurrence_debit = 0
                 subject_name_id = trial_balance.subject_name_id.id
                 if subject_name_id in trial_balance_dict:
-                    this_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0)
-                    this_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0)
+                    this_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) or 0
+                    this_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) or 0
 
                     if trial_balance.subject_name_id.balance_directions == 'in':
                         ending_balance_debit = initial_balance_debit + this_debit - this_credit
