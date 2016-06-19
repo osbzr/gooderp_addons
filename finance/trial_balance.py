@@ -120,7 +120,8 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 this_debit = this_credit = 0
                 cumulative_occurrence_credit = cumulative_occurrence_debit = 0
                 subject_name_id = trial_balance.subject_name_id.id
-                if subject_name_id in trial_balance_dict:
+
+                if subject_name_id in trial_balance_dict:               #本月有发生额
                     this_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) or 0
                     this_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) or 0
 
@@ -128,14 +129,16 @@ class CreateTrialBalanceWizard(models.TransientModel):
                         ending_balance_debit = initial_balance_debit + this_debit - this_credit
                     else:
                         ending_balance_credit = initial_balance_credit + this_credit - this_debit
-                    if self.period_id.year == last_period.year:
-                        cumulative_occurrence_credit = this_credit + trial_balance.cumulative_occurrence_credit
-                        cumulative_occurrence_debit = this_debit + trial_balance.cumulative_occurrence_debit
                 else:
                     ending_balance_credit = initial_balance_credit
                     ending_balance_debit = initial_balance_debit
-                    cumulative_occurrence_credit = trial_balance.cumulative_occurrence_credit or 0
-                    cumulative_occurrence_debit = trial_balance.cumulative_occurrence_debit or 0
+
+                if self.period_id.year == last_period.year:
+                    cumulative_occurrence_credit = this_credit + trial_balance.cumulative_occurrence_credit
+                    cumulative_occurrence_debit = this_debit + trial_balance.cumulative_occurrence_debit
+                else:
+                    cumulative_occurrence_credit = this_credit
+                    cumulative_occurrence_debit = this_debit
                 subject_code = trial_balance.subject_code
                 trial_balance_dict[subject_name_id] = {
                     'initial_balance_credit': initial_balance_credit,
