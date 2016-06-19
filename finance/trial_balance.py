@@ -78,7 +78,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
         trial_balance_ids = [balance.id for balance in trial_balance_objs]
         if not self.period_id.is_closed:
             trial_balance_objs.unlink()
-            trial_balance_ids = []
             last_period = self.compute_last_period_id(self.period_id)
             if last_period:
                 last_period_id = last_period.id
@@ -88,7 +87,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 last_period_id = False
             period_id = self.period_id.id
             current_occurrence_dic_list = self.get_period_balance(period_id)
-            print 'this_month', current_occurrence_dic_list
             trial_balance_dict = {}
             """把本期发生额的数量填写到  准备好的dict 中 """
             for current_occurrence in current_occurrence_dic_list:
