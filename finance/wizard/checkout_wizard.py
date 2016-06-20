@@ -179,4 +179,5 @@ class checkout_wizard(models.TransientModel):
                 for voucher_id in voucher_ids:
                     voucher_id.voucher_draft()
                     voucher_id.unlink()
-        return
+                trial_balance_objs = self.env['trial.balance'].search([('period_id', '=', self.period_id.id)])
+                trial_balance_objs.unlink()

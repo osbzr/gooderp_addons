@@ -163,7 +163,7 @@
             <field name='code'>1602</field>
             <field name='name'>累计折旧</field>
             <field name='costs_types'>assets</field>
-            <field name='balance_directions'>in</field>
+            <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart1604" model='finance.account'>
             <field name='code'>1604</field>
@@ -920,7 +920,7 @@
             <field name="line">22</field>
             <field name='balance'>固定资产账面价值</field>
             <field name='line_num'>20</field>
-            <field name='balance_formula'>1601~16029999</field>
+            <field name='balance_formula'>1601~1602999999</field>
         </record>
         <record id='bs_21' model='balance.sheet'>
             <field name="line">23</field>
