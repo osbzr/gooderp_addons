@@ -46,7 +46,6 @@
                             <page string="个人信息">
                                 <group>
                                     <group string="国籍和其他">
-                                        <field name="country_id" options='{"no_open": True, "no_create": True}'/>
                                         <field name="identification_id"/>
                                         <field name="passport_id"/>
                                         <field name="birthday"/>

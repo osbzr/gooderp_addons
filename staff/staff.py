@@ -59,7 +59,6 @@ class staff(models.Model):
     user_id = fields.Many2one('res.users', u'对应用户')
     image_medium = fields.Binary(string='头像', compute=_get_image)
     # 个人信息
-    country_id = fields.Many2one('country', u'国籍')
     birthday = fields.Date(u'生日')
     identification_id = fields.Char(u'身份证号')
     passport_id = fields.Char(u'护照号')
