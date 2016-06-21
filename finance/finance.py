@@ -229,9 +229,9 @@ class finance_account(models.Model):
     _name = 'finance.account'
     _order = "code"
 
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required="1")
     code = fields.Char(u'编码', required="1")
-    balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向')
+    balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向', required="1")
     auxiliary_financing = fields.Selection([('partner', u'客户'),
                                             ('supplier', u'供应商'),
                                             ('member', u'个人'),
@@ -245,7 +245,12 @@ class finance_account(models.Model):
         ('equity', U'所有者权益'),
         ('in', u'收入类'),
         ('out', u'费用类')
-    ], u'类型')
+    ], u'类型', required="1")
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', u'科目名称必须唯一!'),
+        ('code', 'unique(code)', u'科目代码必须唯一!'),
+    ]
 
     @api.multi
     @api.depends('name', 'code')

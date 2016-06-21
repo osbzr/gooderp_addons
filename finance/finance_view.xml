@@ -49,7 +49,7 @@
                         <field name="line_ids">
                             <tree editable='bottom'>
                                 <field name='name'/>
-                                <field name='account_id'/>
+                                <field name='account_id'  options="{'no_create': True}"/>
                                 <field name='partner_id'/>
                                 <field name='goods_id' groups='finance.group_account_goods'/>
                                 <field name='auxiliary_id'/>
