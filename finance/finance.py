@@ -248,7 +248,6 @@ class finance_account(models.Model):
     ], u'类型', required="1")
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', u'科目名称必须唯一!'),
         ('code', 'unique(code)', u'科目代码必须唯一!'),
     ]
 
