@@ -267,6 +267,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         sql = ''' select vo.date as date, vo.id as voucher_id,COALESCE(vol.debit,0) as debit,vol.name as summary,COALESCE(vol.credit,0) as credit
          from voucher as vo left join voucher_line as vol
             on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id=%s
+            order by vo.name
                  '''
         self.env.cr.execute(sql, (period.id, subject_name.id))
         sql_results = self.env.cr.dictfetchall()
