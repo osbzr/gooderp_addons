@@ -299,22 +299,26 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         sql_results = self.env.cr.dictfetchall()
         current_credit = 0
         current_debit = 0
+        initial_balance_tan = initial_balance_new.get('balance', 0)
+        last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_begin_id)
+        if self.period_begin_id.year != last_period.year: # 上年度期初余额不记入本年累计
+                initial_balance_tan = 0
         if sql_results:
             current_credit = sql_results[0].get('credit', 0)
             current_debit = sql_results[0].get('debit', 0)
             if initial_balance_new.get('direction') == u'借':
-                year_balance_debit = sql_results[0].get('debit', 0) + initial_balance_new.get('balance', 0)
+                year_balance_debit = sql_results[0].get('debit', 0) + initial_balance_tan
                 year_balance_credit = sql_results[0].get('credit', 0)
             else:
                 year_balance_debit = sql_results[0].get('debit', 0)
-                year_balance_credit = sql_results[0].get('credit', 0) + initial_balance_new.get('balance', 0)
+                year_balance_credit = sql_results[0].get('credit', 0) + initial_balance_tan
         else:
             if initial_balance_new.get('direction') == u'借':
-                year_balance_debit = initial_balance_new.get('balance', 0)
+                year_balance_debit = initial_balance_tan
                 year_balance_credit = 0
             else:
                 year_balance_debit = 0
-                year_balance_credit = initial_balance_new.get('balance', 0)
+                year_balance_credit = initial_balance_tan
         direction_tuple = self.judgment_lending(initial_balance_new.get('balance', 0), year_balance_credit, year_balance_debit)
         direction_tuple_current = self.judgment_lending(initial_balance_new.get('balance', 0), current_credit, current_debit)
         current_occurrence.update({
