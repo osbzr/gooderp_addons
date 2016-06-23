@@ -4,7 +4,7 @@
 
 		<!--根菜单-->
 
-		<menuitem id='setting_menu' name='配置'/>
+		<menuitem id='setting_menu' name='配置' groups="core.master_groups"/>
 		<menuitem id='master_data_menu' name='基础资料' parent='setting_menu' sequence='10'/>
 		<menuitem id='config_data_menu' name='辅助资料' parent='setting_menu' sequence='20'/>
 		<menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
