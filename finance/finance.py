@@ -248,6 +248,7 @@ class finance_account(models.Model):
     ], u'类型', required="1")
 
     _sql_constraints = [
+        ('name_uniq', 'unique(name)', u'科目名称必须唯一!'),
         ('code', 'unique(code)', u'科目代码必须唯一!'),
     ]
 
@@ -256,16 +257,7 @@ class finance_account(models.Model):
     def name_get(self):
         result = []
         for line in self:
-            account_name = line.name
-            # 如是子科目，科目名称为：上级科目名称->子科目名称
-            if len(line.code) > 4:
-                # 子科目
-                f_code = line.code[:4]
-                f_name = self.search([('code', '=', f_code)], limit=1).name
-                if f_name:
-                    account_name = line.code + ' ' + f_name + u"→" + account_name
-            else:
-                account_name = line.code + ' ' + account_name
+            account_name = line.code + ' ' + line.name
             result.append((line.id, account_name))
         return result
 
