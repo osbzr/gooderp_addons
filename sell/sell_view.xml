@@ -158,10 +158,8 @@
             		<field name='staff_id'/>
             		<field name='partner_id'/>
             		<field name="amount"/>
-            		<field name='receipt'/>
             		<field name='state'/>
             		<field name='money_state'/>
-            		<field name='date_due'/>
             		<field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
             	</tree>
@@ -180,9 +178,7 @@
             		</header>
             		<sheet>
             			<div class="oe_title">
-                        	<h1>
-                            	<label string="销售发货单 "/>
-                        	</h1>
+                            <label string="扫码出库 "/>
                         	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                      	</div>
             			<group>
@@ -199,11 +195,10 @@
             					<field name="warehouse_id"/>
             				</group>
             				<group>
-            					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
-            					<field name='name' readonly='1'/>
             					<field name='order_id' readonly='1'/>
             					<field name='invoice_id' readonly='1'/>
             					<field name="money_state" readonly="1"/>
+								<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
             				</group>
             			</group>
             			<notebook>
@@ -262,25 +257,31 @@
 			                	</field>
 			                </page>
 			            </notebook>
-		 				<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
 		 				<group>
                 			<group>
 								<field name="discount_rate" groups='sell.sell_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
 								<field name="discount_amount" groups='sell.sell_discount_groups'/>
                     			<field name="amount"/>
                     			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
-                    			<field name="create_uid" readonly="1" string="制单人"/>
-                    			<field name="approve_uid" readonly="1"/>
                 			</group>
                 			<group>
                 				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
                 				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
                 				<field name="debt"/>
                 				<field name="total_debt"/>
+                			</group>
+            			</group>
+						<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+		 				<group>
+						    <group>
+                    			<field name="create_uid" readonly="1" string="制单人"/>
+                    			<field name="approve_uid" readonly="1"/>
+                			</group>
+                			<group>
                 				<field name="create_date" readonly="1" string="录单时间"/>
                 				<field name="write_date" readonly="1" string="最后修改时间"/>
                 			</group>
-            			</group>
+					    </group>
             		</sheet>
 	                <div class="oe_chatter">
 	                    <field name="message_follower_ids" widget="mail_followers"/>
