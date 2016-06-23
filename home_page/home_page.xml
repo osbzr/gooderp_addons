@@ -8,6 +8,8 @@
             </xpath>
         </template>
 
+        <menuitem id="mail.mail_feeds_main" groups='-base.group_user,home_page.group_mail'/>
+
         <menuitem id="main_home_menu" name="首页" groups='group_all_manager'/>
 
         <menuitem id="home_page_menu_two" name="首页"

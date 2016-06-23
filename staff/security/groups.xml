@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="0">
+        <record id='hr_groups' model='res.groups'>
+			<field name='name'>人事</field>
+			<field name='category_id' ref="core.Gooderp"/>
+		</record>
+    </data>
+</openerp>

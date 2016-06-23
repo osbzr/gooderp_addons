@@ -5,6 +5,10 @@
 		<record model="ir.module.category" id="Gooderp">
 			<field name="name">Gooderp</field>
 		</record>
+		<record id='master_groups' model='res.groups'>
+			<field name='name'>主数据</field>
+			<field name='category_id' ref="Gooderp"/>
+		</record>
 		<record id='settle_mode_groups' model='res.groups'>
 			<field name='name'>管理结算方式</field>
 			<field name='category_id' ref="Gooderp"/>
