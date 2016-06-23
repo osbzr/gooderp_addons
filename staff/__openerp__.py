@@ -13,6 +13,7 @@
         ],
     'data': [
              'security/ir.model.access.csv',
+             'security/groups.xml',
              'staff.xml',
              'mail_data.xml',
         ],

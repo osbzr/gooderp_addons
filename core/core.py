@@ -155,6 +155,7 @@ class pricing(models.Model):
                                         ('warehouse_id','=',warehouse.id),
                                         ('goods_id','=',goods.id),
                                         ('goods_category_id','=',False),
+                                        ('active_date','<=',date),
                                         ('deactive_date','>=',date)
                                         ])
             #仓库，客户类别，产品
@@ -172,6 +173,7 @@ class pricing(models.Model):
                                       ('warehouse_id','=',warehouse.id),
                                       ('goods_id','=',False),
                                       ('goods_category_id','=',goods.category_id.id),
+                                      ('active_date','<=',date),
                                       ('deactive_date','>=',date)
                                       ])
             #仓库，客户类别，产品分类
@@ -189,6 +191,7 @@ class pricing(models.Model):
                                       ('warehouse_id','=',warehouse.id),
                                       ('goods_id','=',False),
                                       ('goods_category_id','=',False),
+                                      ('active_date','<=',date),
                                       ('deactive_date','>=',date)
                                       ])
             #仓库，客户类别
@@ -205,6 +208,7 @@ class pricing(models.Model):
                                           ('warehouse_id','=',warehouse.id),
                                           ('goods_id','=',goods.id),
                                           ('goods_category_id','=',False),
+                                          ('active_date','<=',date),
                                           ('deactive_date','>=',date)
                                           ])
             #仓库，产品
@@ -221,6 +225,7 @@ class pricing(models.Model):
                                           ('warehouse_id','=',warehouse.id),
                                           ('goods_id','=',False),
                                           ('goods_category_id','=',goods.category_id.id),
+                                          ('active_date','<=',date),
                                           ('deactive_date','>=',date)
                                           ])
             #仓库，产品分类
@@ -237,6 +242,7 @@ class pricing(models.Model):
                                           ('warehouse_id','=',warehouse.id),
                                           ('goods_id','=',False),
                                           ('goods_category_id','=',False),
+                                          ('active_date','<=',date),
                                           ('deactive_date','>=',date)
                                           ])
             #仓库
@@ -252,6 +258,7 @@ class pricing(models.Model):
                                           ('warehouse_id','=',False),
                                           ('goods_id','=',goods.id),
                                           ('goods_category_id','=',False),
+                                          ('active_date','<=',date),
                                           ('deactive_date','>=',date)
                                           ])
             #客户类别，产品
@@ -268,6 +275,7 @@ class pricing(models.Model):
                                           ('warehouse_id','=',False),
                                           ('goods_id','=',False),
                                           ('goods_category_id','=',goods.category_id.id),
+                                          ('active_date','<=',date),
                                           ('deactive_date','>=',date)
                                           ])
             #仓库，产品分类
@@ -284,6 +292,7 @@ class pricing(models.Model):
                                           ('warehouse_id','=',False),
                                           ('goods_id','=',False),
                                           ('goods_category_id','=',False),
+                                          ('active_date','<=',date),
                                           ('deactive_date','>=',date)
                                           ])
             #客户类别
@@ -299,6 +308,7 @@ class pricing(models.Model):
                                           ('warehouse_id','=',False),
                                           ('goods_id','=',False),
                                           ('goods_category_id','=',False),
+                                          ('active_date','<=',date),
                                           ('deactive_date','>=',date)
                                           ])
             #所有产品
@@ -324,6 +334,7 @@ class pricing(models.Model):
                                   domain=[('type', '=', 'goods')],
                                   context={'type': 'goods'})
     goods_id = fields.Many2one('goods',u'产品')
+    active_date = fields.Date(u'开始日期')
     deactive_date = fields.Date(u'终止日期')
     discount_rate = fields.Float(u'折扣率%')
     
