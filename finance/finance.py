@@ -229,9 +229,9 @@ class finance_account(models.Model):
     _name = 'finance.account'
     _order = "code"
 
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required="1")
     code = fields.Char(u'编码', required="1")
-    balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向')
+    balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向', required="1")
     auxiliary_financing = fields.Selection([('partner', u'客户'),
                                             ('supplier', u'供应商'),
                                             ('member', u'个人'),
@@ -245,23 +245,19 @@ class finance_account(models.Model):
         ('equity', U'所有者权益'),
         ('in', u'收入类'),
         ('out', u'费用类')
-    ], u'类型')
+    ], u'类型', required="1")
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', u'科目名称必须唯一!'),
+        ('code', 'unique(code)', u'科目代码必须唯一!'),
+    ]
 
     @api.multi
     @api.depends('name', 'code')
     def name_get(self):
         result = []
         for line in self:
-            account_name = line.name
-            # 如是子科目，科目名称为：上级科目名称->子科目名称
-            if len(line.code) > 4:
-                # 子科目
-                f_code = line.code[:4]
-                f_name = self.search([('code', '=', f_code)], limit=1).name
-                if f_name:
-                    account_name = line.code + ' ' + f_name + u"→" + account_name
-            else:
-                account_name = line.code + ' ' + account_name
+            account_name = line.code + ' ' + line.name
             result.append((line.id, account_name))
         return result
 

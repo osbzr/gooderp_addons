@@ -8,9 +8,6 @@
     """,
     'version': '8.0.0.1',
     'depends': ['base', 'decimal_precision', 'core', 'num_to_china'],
-    'demo': [
-        'tests/finance_demo.xml',
-    ],
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
@@ -22,6 +19,9 @@
         'trial_balance.xml',
         'report/report_voucher.xml',
         'balance_sheet.xml'
+    ],
+    'demo': [
+        'tests/finance_demo.xml',
     ],
     'qweb': [
         "static/src/xml/*.xml",

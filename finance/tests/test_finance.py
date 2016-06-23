@@ -107,7 +107,7 @@ class test_period(TransactionCase):
             line.onchange_account_id()
             line.account_id = self.env.ref('finance.account_ap').id
             line.onchange_account_id()
-            line.account_id = self.env.ref('finance.account_wage').id
+            line.account_id = self.env.ref('finance.small_business_chart2211004').id
             line.onchange_account_id()
         #这么写覆盖到了，但是这什么逻辑=。=
         self.env['voucher.line'].onchange_account_id()
