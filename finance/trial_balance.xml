@@ -79,10 +79,10 @@
                         <group>
                             <field name="period_begin_id" options="{'no_open':True,'no_create':True}" required="True"/>
                             <field name="subject_name_id" options="{'no_open':True,'no_create':True}" required="True"/>
-                            
                         </group>
                          <group>
                             <field name="period_end_id" options="{'no_open':True,'no_create':True}" required="True"/>
+                            <field name="subject_name_end_id" options="{'no_open':True,'no_create':True}" required="True"/>
                          </group>
                     </group>
 

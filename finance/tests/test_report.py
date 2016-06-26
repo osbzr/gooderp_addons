@@ -43,7 +43,9 @@ class test_report(TransactionCase):
         report = self.env['create.vouchers.summary.wizard'].create(
             {'period_begin_id': self.period_id,
              'period_end_id': self.period_id,
-             'subject_name_id': self.env.ref('finance.account_fund').id}
+             'subject_name_id': self.env.ref('finance.account_fund').id,
+             'subject_name_end_id': self.env.ref('finance.account_fund').id,
+             }
                     )
         #会计期间相同时报错
         report.period_end_id = self.env.ref('finance.period_201512')
@@ -86,6 +88,7 @@ class test_report(TransactionCase):
                         'period_begin_id':self.env.ref('finance.period_201512').id,
                         'period_end_id':self.env.ref('finance.period_201601').id,
                         'subject_name_id':self.env.ref('finance.account_income').id,
+                        'subject_name_end_id':self.env.ref('finance.account_income').id,
                                                                           })
         trial_wizard.create_vouchers_summary()
 
