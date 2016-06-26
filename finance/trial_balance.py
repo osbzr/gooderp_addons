@@ -438,7 +438,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
 
 
 class VouchersSummary(models.TransientModel):
-    """总账"""
+    """明细帐"""
     _name = 'vouchers.summary'
     date = fields.Date(u'日期')
     period_id = fields.Many2one('finance.period', string=u'会计期间')
@@ -451,7 +451,7 @@ class VouchersSummary(models.TransientModel):
 
 
 class GeneralLedgerAccount(models.TransientModel):
-    """明细帐"""
+    """总账"""
     _name = 'general.ledger.account'
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     summary = fields.Char(u'摘要')
