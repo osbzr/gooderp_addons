@@ -33,6 +33,16 @@ class voucher(models.Model):
     _name = 'voucher'
     _order = 'create_date desc'
 
+    @api.model
+    def _default_voucher_date(self):
+        voucher_setting = self.env['ir.values'].get_default('finance.config.settings', 'default_voucher_date')
+        now_date = fields.Date.context_today(self)
+        if voucher_setting == 'last' and self.search([], limit=1):
+            create_date = self.search([], limit=1).date
+        else:
+            create_date = now_date
+        return create_date
+
     @api.one
     @api.depends('date')
     def _compute_period_id(self):
@@ -41,9 +51,7 @@ class voucher(models.Model):
     document_word_id = fields.Many2one(
         'document.word', u'凭证字', ondelete='restrict', required=True,
         default=lambda self: self.env.ref('finance.document_word_1'))
-    date = fields.Date(
-        u'凭证日期', required=True,
-        default=lambda self: fields.Date.context_today(self))
+    date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date)
     name = fields.Char(u'凭证号')
     att_count = fields.Integer(u'附单据', default=1)
     period_id = fields.Many2one(

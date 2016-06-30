@@ -7,6 +7,10 @@
 
         <menuitem id='finance_setting_menu' name='配置' parent='finance_menu' sequence='10'/>
 
+        <menuitem id='finance_default_setting_menu' name='设置' parent='finance_menu' sequence='80'/>
+        <menuitem id="menu_finance_setting_default" name="默认设置" parent="finance_default_setting_menu"
+                  action="view_finance_config_setting_action" sequence="0"/>
+
         <!--会计科目-->
         <record id="finance_account_tree" model="ir.ui.view">
             <field name="name">finance.account.tree</field>
