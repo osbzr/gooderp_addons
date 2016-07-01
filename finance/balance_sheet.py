@@ -74,7 +74,7 @@ class create_balance_sheet_wizard(models.TransientModel):
                                      'ending_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, self.period_id, current_period_field)})
         return {     # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': '资产负债表',
+            'name': u'资产负债表:' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'balance.sheet',
@@ -99,7 +99,7 @@ class create_balance_sheet_wizard(models.TransientModel):
                                      'current_occurrence_balance': self.compute_profit(balance_sheet_obj.occurrence_balance_formula, self.period_id, current_period_field)})
         return {      # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': '利润表',
+            'name': u'利润表:' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'profit.statement',
