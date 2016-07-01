@@ -47,7 +47,7 @@ class wh_move_line(models.Model):
         '''当订单行的数量、单价、折扣额、税率改变时，改变金额、税额、价税合计'''
         amount = self.goods_qty * self.price - self.discount_amount
         tax_amt = amount * self.tax_rate * 0.01
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+        self.price_taxed = self.price * (100 - self.discount_rate) * 0.01 * (1 + self.tax_rate * 0.01)
         self.amount = amount
         self.tax_amount = tax_amt
         self.subtotal = amount + tax_amt
