@@ -148,6 +148,10 @@ class pricing(models.Model):
     @api.model
     def get_pricing_id(self,partner,warehouse,goods,date):
         '''传入客户，仓库，商品，日期，返回合适的价格策略'''
+        if not partner:
+            raise except_orm(u'错误',u'请先输入客户')
+        if not warehouse:
+            raise except_orm(u'错误',u'请先输入仓库')
         if partner and warehouse and goods:
             #客户类别、仓库、产品满足条件
             good_pricing = self.search([
