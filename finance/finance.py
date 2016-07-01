@@ -182,7 +182,7 @@ class voucher_line(models.Model):
 class finance_period(models.Model):
     '''会计期间'''
     _name = 'finance.period'
-
+    _order = 'year desc,month desc '
     name = fields.Char(
         u'会计期间',
         compute='_compute_name', readonly=True, store=True)
