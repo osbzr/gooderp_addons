@@ -325,8 +325,8 @@
 					<field name="c_category_id"/>
 					<field name="goods_category_id"/>
 					<field name='goods_id'/>
-					<field name="active_date"/>
-					<field name="deactive_date"/>
+					<field name="active_date" required='1'/>
+					<field name="deactive_date" required='1'/>
 					<field name="discount_rate"/>
 				</tree>
 			</field>
