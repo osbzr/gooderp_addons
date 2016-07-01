@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_finance_config" model="ir.ui.view">
+            <field name="name">finance_settings</field>
+            <field name="model">finance.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Configure finance" class="oe_form_configuration">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <div id="main" position="inside">
+                        <group string="凭证设置">
+                            <label for="id" string="凭证日期"/>
+                            <div>
+                                <label for="default_voucher_date"/>
+                                <field name="default_voucher_date" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_finance_config_setting_action" model="ir.actions.act_window">
+            <field name="name">Configure_finance</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">finance.config.settings</field>
+            <field name="view_id" ref="view_finance_config"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+
+
+    </data>
+</openerp>

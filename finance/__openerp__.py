@@ -12,13 +12,15 @@
         'security/groups.xml',
         'security/ir.model.access.csv',
         'data/finance_data.xml',
+        'res_config_view.xml',
         'finance_conf.xml',
         'wizard/checkout_wizard.xml',
         'finance_view.xml',
         'company.xml',
         'trial_balance.xml',
         'report/report_voucher.xml',
-        'balance_sheet.xml'
+        'balance_sheet.xml',
+
     ],
     'demo': [
         'tests/finance_demo.xml',
