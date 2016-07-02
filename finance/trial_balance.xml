@@ -159,6 +159,6 @@
         </record>
      <menuitem id='create_general_ledger_account_menu' action='create_ledger_account_action' parent='voucher_books_menu' sequence='60' name="科目总账"/>
      <menuitem id='create_vouchers_summary_menu' action='create_vouchers_summary_wizard_action' parent='voucher_books_menu' sequence='50' name="科目明细账"/>
-	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='30'/>
+	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='22'/>
     </data>
 </openerp>

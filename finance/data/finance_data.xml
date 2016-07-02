@@ -997,7 +997,7 @@
             <field name='balance_formula'>1901~1901999999</field>
             <field name='balance_two'>未分配利润</field>
             <field name='line_num_two'>51</field>
-            <field name='balance_two_formula'>3103~3104004</field>
+            <field name='balance_two_formula'>3103~3104999999</field>
         </record>
         <record id='bs_29' model='balance.sheet'>
             <field name="line">31</field>

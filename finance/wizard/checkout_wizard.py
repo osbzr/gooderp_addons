@@ -166,13 +166,17 @@ class checkout_wizard(models.TransientModel):
                         'limit': 300,
                     }
 
-
+    # 反结账
     @api.multi
     def button_counter_checkout(self):
         if self.period_id:
             if not self.period_id.is_closed:
                 raise except_orm(u'错误', u'本期间未结账')
             else:
+                next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_id)
+                if next_period:
+                    if next_period.is_closed:
+                        raise except_orm(u'错误', u'下一个期间%s已结账！' % next_period.name)
                 self.period_id.is_closed = False
                 voucher_ids = self.env['voucher'].search([('is_checkout','=',True),
                                                           ('period_id','=',self.period_id.id)])
