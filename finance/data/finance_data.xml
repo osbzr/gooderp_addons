@@ -50,18 +50,21 @@
             <field name='name'>应收票据</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
+            <field name='auxiliary_financing'>partner</field>
         </record>
         <record id="account_ar" model='finance.account'>
             <field name='code'>1122</field>
             <field name='name'>应收账款</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
+            <field name='auxiliary_financing'>partner</field>
         </record>
         <record id="small_business_chart1123" model='finance.account'>
             <field name='code'>1123</field>
             <field name='name'>预付账款</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
+            <field name='auxiliary_financing'>supplier</field>
         </record>
         <record id="small_business_chart1131" model='finance.account'>
             <field name='code'>1131</field>
@@ -80,6 +83,7 @@
             <field name='name'>其他应收款</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
+            <field name='auxiliary_financing'>member</field>
         </record>
         <record id="small_business_chart1401" model='finance.account'>
             <field name='code'>1401</field>
@@ -225,24 +229,28 @@
             <field name='name'>应付票据</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
+            <field name='auxiliary_financing'>supplier</field>
         </record>
         <record id="account_ap" model='finance.account'>
             <field name='code'>2202</field>
             <field name='name'>应付账款</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
+            <field name='auxiliary_financing'>supplier</field>
         </record>
         <record id="small_business_chart2203" model='finance.account'>
             <field name='code'>2203</field>
             <field name='name'>预收账款</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
+            <field name='auxiliary_financing'>partner</field>
         </record>
         <record id="small_business_chart2211001" model='finance.account'>
             <field name='code'>2211001</field>
             <field name='name'>应付职工薪酬-工资</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
+            <field name='auxiliary_financing'>member</field>
         </record>
         <record id="small_business_chart2211002" model='finance.account'>
             <field name='code'>2211002</field>
@@ -989,7 +997,7 @@
             <field name='balance_formula'>1901~1901999999</field>
             <field name='balance_two'>未分配利润</field>
             <field name='line_num_two'>51</field>
-            <field name='balance_two_formula'>3104004</field>
+            <field name='balance_two_formula'>3103~3104004</field>
         </record>
         <record id='bs_29' model='balance.sheet'>
             <field name="line">31</field>
