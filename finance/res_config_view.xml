@@ -18,6 +18,13 @@
                                 <field name="default_voucher_date" class="oe_inline"/>
                             </div>
                         </group>
+                        <group string="资产负债表 利润表">
+                            <label for="id" string="未结账期间"/>
+                            <div>
+                                <label for="default_period_domain"/>
+                                <field name="default_period_domain" class="oe_inline"/>
+                            </div>
+                        </group>
                     </div>
                 </form>
             </field>

@@ -13,6 +13,7 @@ ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
 class TrialBalance(models.Model):
     """科目余额表"""
     _name = "trial.balance"
+    _order = 'subject_code'
 
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
@@ -157,7 +158,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         view_id = self.env.ref('finance.trial_balance_tree').id
         return {
             'type': 'ir.actions.act_window',
-            'name': u'期末余额表',
+            'name': u'期末余额表:' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'trial.balance',

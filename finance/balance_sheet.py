@@ -32,7 +32,17 @@ class BalanceSheet(models.Model):
 class create_balance_sheet_wizard(models.TransientModel):
     """创建资产负债 和利润表的 wizard"""
     _name = "create.balance.sheet.wizard"
-    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=[('is_closed', '!=', False)])
+
+    @api.model
+    def _default_period_domain(self):
+        period_domain_setting = self.env['ir.values'].get_default('finance.config.settings', 'default_period_domain')
+        if period_domain_setting == 'cannot':
+            domain = [('is_closed', '!=', False)]
+        else:
+            domain = []
+        return domain
+
+    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain)
 
     @api.multi
     def compute_balance(self, parameter_str, period_id, compute_field_list):
