@@ -415,7 +415,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 create_vals = []
                 initial_balance = self.get_initial_balance(local_last_period, local_currcy_period, account_line.id)
                 create_vals.append(initial_balance)
-                if local_currcy_period.id != self.period_end_id.id:
+                if local_currcy_period.is_closed:
                     cumulative_year_occurrence = self.get_year_balance(local_currcy_period, account_line)
                 else:
                     cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(), local_currcy_period, account_line)
@@ -424,12 +424,14 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                     break_flag = False
                 local_last_period = local_currcy_period
                 local_currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(local_currcy_period)
+                if not local_currcy_period:  # 无下一期间，退出循环。
+                    break_flag = False
                 for vals in create_vals:
                     del vals['date']
                     if vals.get('voucher_id'):
                         del vals['date']
                     vouchers_summary_ids.append((self.env['general.ledger.account'].create(vals)).id)
-        # view_id = self.env.ref('finance.vouchers_summary_tree').id
+
         view_id = self.env.ref('finance.general_ledger_account_tree').id
         return {
             'type': 'ir.actions.act_window',
