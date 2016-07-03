@@ -32,7 +32,17 @@ class BalanceSheet(models.Model):
 class create_balance_sheet_wizard(models.TransientModel):
     """创建资产负债 和利润表的 wizard"""
     _name = "create.balance.sheet.wizard"
-    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=[('is_closed', '!=', False)])
+
+    @api.model
+    def _default_period_domain(self):
+        period_domain_setting = self.env['ir.values'].get_default('finance.config.settings', 'default_period_domain')
+        if period_domain_setting == 'cannot':
+            domain = [('is_closed', '!=', False)]
+        else:
+            domain = []
+        return domain
+
+    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain)
 
     @api.multi
     def compute_balance(self, parameter_str, period_id, compute_field_list):
@@ -146,4 +156,4 @@ class ProfitStatement(models.Model):
     line_num = fields.Integer(u'行次')
     cumulative_occurrence_balance = fields.Float(u'本年累计金额')
     occurrence_balance_formula = fields.Text(u'金额计算参数')
-    current_occurrence_balance = fields.Float(u'本月累计金额')
+    current_occurrence_balance = fields.Float(u'本月金额')

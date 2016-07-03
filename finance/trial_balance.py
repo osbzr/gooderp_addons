@@ -13,6 +13,7 @@ ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
 class TrialBalance(models.Model):
     """科目余额表"""
     _name = "trial.balance"
+    _order = 'subject_code'
 
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
@@ -121,14 +122,17 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 cumulative_occurrence_credit = cumulative_occurrence_debit = 0
                 subject_name_id = trial_balance.subject_name_id.id
 
-                if subject_name_id in trial_balance_dict:               #本月有发生额
+                if subject_name_id in trial_balance_dict:               # 本月有发生额
                     this_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) or 0
                     this_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) or 0
-
-                    if trial_balance.subject_name_id.balance_directions == 'in':
-                        ending_balance_debit = initial_balance_debit + this_debit - this_credit
-                    else:
-                        ending_balance_credit = initial_balance_credit + this_credit - this_debit
+                    # if trial_balance.subject_name_id.balance_directions == 'in':
+                    #     ending_balance_debit = initial_balance_debit + this_debit - this_credit
+                    # else:
+                    #     ending_balance_credit = initial_balance_credit + this_credit - this_debit
+                    ending_balance_debit = initial_balance_debit + this_debit - initial_balance_credit - this_credit
+                    if ending_balance_debit < 0:
+                        ending_balance_credit -= ending_balance_debit
+                        ending_balance_debit = 0
                 else:
                     ending_balance_credit = initial_balance_credit
                     ending_balance_debit = initial_balance_debit
@@ -157,7 +161,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         view_id = self.env.ref('finance.trial_balance_tree').id
         return {
             'type': 'ir.actions.act_window',
-            'name': u'期末余额表',
+            'name': u'科目余额表:' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'trial.balance',

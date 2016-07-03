@@ -31,7 +31,7 @@ MOUTH_SELECTION = [
 class voucher(models.Model):
     '''新建凭证'''
     _name = 'voucher'
-    _order = 'create_date desc'
+    _order = 'period_id , name desc'
 
     @api.model
     def _default_voucher_date(self):
