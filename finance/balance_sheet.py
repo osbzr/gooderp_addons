@@ -122,7 +122,6 @@ class create_balance_sheet_wizard(models.TransientModel):
 
     @api.multi
     def compute_profit(self, parameter_str, period_id, compute_field_list):
-        print "parameter_str,period_id,compute_field_list=",parameter_str,period_id,compute_field_list
         """ 根据传进来的 的科目的code 进行利润表的计算 """
         if parameter_str:
             parameter_str_list = parameter_str.split('~')
