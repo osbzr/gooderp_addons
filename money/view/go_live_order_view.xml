@@ -31,7 +31,7 @@
         </record>
 
 		<!--期初余额表 menu-->
-        <menuitem id="menu_money_go_live_action" action="go_live_order_action" parent="menu_money_report" sequence="5"/>
+        <menuitem id="menu_money_go_live_action" action="go_live_order_action" parent="menu_money_report" groups="base.group_system" sequence="5"/>
 	</data>
 </openerp>
 	

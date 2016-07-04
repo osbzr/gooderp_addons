@@ -251,7 +251,7 @@
 		</record>
 		<menuitem id='vendor_menu' action='vendor_action' parent='master_data_menu' sequence='20'/>
 		<!--用户-->
-		<menuitem id='users_menu' name="用户" action='base.action_res_users' parent='master_data_menu' sequence='50'/>
+		<menuitem id='users_menu' name="用户" action='base.action_res_users' parent='master_data_menu' sequence='50' groups="base.group_system"/>
 		<!--账户-->
 		<record id="bank_account_tree" model="ir.ui.view">
 			<field name="name">bank.account.tree</field>

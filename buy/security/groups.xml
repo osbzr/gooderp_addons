@@ -6,6 +6,7 @@
 			<field name='name'>采购</field>
 			<field name='category_id' ref="core.Gooderp"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="implied_ids" eval="[(4, ref('goods.view_cost_groups'))]"/>
 		</record>
 		<!--添加管理采购订单组-->
 		<record id='buy_groups' model='res.groups'>

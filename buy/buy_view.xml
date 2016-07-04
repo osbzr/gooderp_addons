@@ -557,5 +557,7 @@
             parent="menu_buy_manage" sequence="2"/>
         <menuitem id="menu_buy_return" action="buy_return_action"
             parent="menu_buy_manage" sequence="3"/>
+        <menuitem id='buy_vendor_menu' action='core.vendor_action' name="供应商" parent='menu_buy_manage' sequence='10'/>
+		<menuitem id='buy_goods_menu' name='商品' parent='menu_buy_manage' action='goods.goods_action' sequence='20' />
 	</data>
 </openerp>
