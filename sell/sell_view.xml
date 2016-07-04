@@ -548,5 +548,7 @@
 			parent='sell_order_menu_root' sequence='2'/>
 		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"
             parent="sell_order_menu_root" sequence="3"/>
+		<menuitem id='sell_customer_menu' action='core.customer_action' name="客户" parent='sell_order_menu_root' sequence='10'/>
+		<menuitem id='sell_goods_menu' name='商品' parent='sell_order_menu_root' action='goods.goods_action' sequence='20' />
     </data>
 </openerp>
