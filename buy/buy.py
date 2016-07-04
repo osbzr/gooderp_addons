@@ -86,7 +86,7 @@ class buy_order(models.Model):
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         default=_default_warehouse_dest,
                                         ondelete='restrict')
-    invoice_by_receipt=fields.Boolean(string=u"按收货结算")
+    invoice_by_receipt=fields.Boolean(string=u"按收货结算", default=True)
     line_ids = fields.One2many('buy.order.line', 'order_id', u'购货订单行',
                                states=READONLY_STATES, copy=True)
     note = fields.Text(u'备注')
@@ -484,7 +484,7 @@ class buy_receipt(models.Model):
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                                    digits_compute=dp.get_precision('Amount'))
-    invoice_by_receipt=fields.Boolean(string=u"按收货结算")
+    invoice_by_receipt=fields.Boolean(string=u"按收货结算",default=True)
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits_compute=dp.get_precision('Amount'))
