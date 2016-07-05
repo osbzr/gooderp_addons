@@ -39,15 +39,24 @@ CORE_COST_METHOD = [('average', u'移动平均法'),
 
 class core_value(models.Model):
     _name = 'core.value'
-    name = fields.Char(u'名称')
-    type = fields.Char(u'类型', default=lambda self: self._context.get('type'))
+    name = fields.Char(u'名称', required=True)
+    type = fields.Char(u'类型', required=True, default=lambda self: self._context.get('type'))
+    note = fields.Text(u'备注')
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', '可选值不能重名')
+    ]
 
 
 class core_category(models.Model):
     _name = 'core.category'
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
     type = fields.Selection(CORE_CATEGORY_TYPE, u'类型',
+                            required=True,
                             default=lambda self: self._context.get('type'))
+    note = fields.Text(u'备注')
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', '类别不能重名')
+    ]
 
 
 class res_company(models.Model):
@@ -148,6 +157,10 @@ class pricing(models.Model):
     @api.model
     def get_pricing_id(self,partner,warehouse,goods,date):
         '''传入客户，仓库，商品，日期，返回合适的价格策略'''
+        if not partner:
+            raise except_orm(u'错误',u'请先输入客户')
+        if not warehouse:
+            raise except_orm(u'错误',u'请先输入仓库')
         if partner and warehouse and goods:
             #客户类别、仓库、产品满足条件
             good_pricing = self.search([

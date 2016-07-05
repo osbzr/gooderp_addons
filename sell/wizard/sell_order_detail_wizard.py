@@ -75,15 +75,16 @@ class sell_order_detail_wizard(models.TransientModel):
             res.append(detail.id)
 
         view = self.env.ref('sell.sell_order_detail_tree')
+        graph_view = self.env.ref('sell.sell_order_detail_graph')
         cond = [('id', 'in', res)]
         if self.staff_id:
             cond.append(('staff_id', '=', self.staff_id.id))
         return {
             'name': u'销售明细表',
             'view_type': 'form',
-            'view_mode': 'tree',
+            'view_mode': 'tree,graph',
             'view_id': False,
-            'views': [(view.id, 'tree')],
+            'views': [(view.id, 'tree'),(graph_view.id,'graph')],
             'res_model': 'sell.order.detail',
             'type': 'ir.actions.act_window',
             'domain': cond,

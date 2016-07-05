@@ -340,17 +340,3 @@ class test_partner(TransactionCase):
         self.env.ref('core.lenovo').partner_statements()
         self.env.ref('core.comm').bank_statements()
 
-
-class test_go_live_order(TransactionCase):
-
-    def test_go_live_order(self):
-        '''期初余额'''
-        self.env['go.live.order'].create({
-            'bank_id': self.env.ref('core.comm').id,
-            'balance': 20.0})
-        self.env['go.live.order'].create({
-            'partner_id': self.env.ref('core.jd').id,
-            'receivable': 100.0})
-        self.env['go.live.order'].create({
-            'partner_id': self.env.ref('core.lenovo').id,
-            'payable': 200.0})

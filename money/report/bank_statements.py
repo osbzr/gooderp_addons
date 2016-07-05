@@ -52,16 +52,7 @@ class bank_statements_report(models.Model):
                     partner_id,
                     note
             FROM
-                (SELECT go.bank_id AS bank_id,
-                        go.date AS date,
-                        '期初余额' AS name,
-                        go.balance AS get,
-                        0 AS pay,
-                        0 AS balance,
-                        NULL AS partner_id,
-                        NULL AS note
-                FROM go_live_order AS go
-                UNION ALL
+                (
                 SELECT mol.bank_id,
                         mo.date,
                         mo.name,
@@ -81,7 +72,7 @@ class bank_statements_report(models.Model):
                         (CASE WHEN omo.type = 'other_pay' THEN omo.total_amount ELSE 0 END) AS pay,
                         0 AS balance,
                         omo.partner_id,
-                        NULL AS note
+                        omo.note AS note
                 FROM other_money_order AS omo
                 WHERE omo.state = 'done'
                 UNION ALL

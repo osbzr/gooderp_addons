@@ -59,6 +59,7 @@
 		                	<field name="total_amount"/>
 		                </group>
 		            </group>
+                    <field name="note" placeholder="备注"/>
 		            <group>
 						<group>
 		                	<field name="create_date" string="录单时间" readonly="1"/>

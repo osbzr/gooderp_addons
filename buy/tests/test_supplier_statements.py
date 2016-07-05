@@ -14,10 +14,6 @@ class test_supplier_statements(TransactionCase):
             'partner_id': self.env.ref('core.lenovo').id,
             'from_date': '2016-01-01',
             'to_date': '2016-11-01'}).with_context({'default_supplier': True})
-        # 创建期初余额记录
-        self.env['go.live.order'].create({
-            'partner_id': self.env.ref('core.lenovo').id,
-            'balance': 200.0})
         # 创建付款记录
         money_get = self.env.ref('money.get_40000')
         money_get.money_order_done()

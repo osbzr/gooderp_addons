@@ -22,7 +22,6 @@
         'report/other_money_statements_view.xml',
         'wizard/other_money_statements_wizard_view.xml',
         'security/ir.model.access.csv',
-        'view/go_live_order_view.xml',
         'view/partner_view.xml',
         'generate_accounting.xml'
     ],

@@ -37,6 +37,7 @@
         <!--所有产品的价格策略-->
         <record id="pricing_10" model="pricing">
         	<field name="name">适用所有</field>
+        	<field name="active_date">2016-05-30</field>
         	<field name="deactive_date">2017-01-30</field>
         	<field name="discount_rate">0</field>
         </record>

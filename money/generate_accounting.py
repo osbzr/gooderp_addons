@@ -99,23 +99,21 @@ class money_invoice(models.Model):
         self.write({'voucher_id': vouch_obj.id})
         if not self.category_id.account_id:
             raise except_orm(u'错误', u'请配置%s的会计科目' % (self.category_id.name))
-        if self.partner_id.c_category_id:
-            partner_account_id = self.partner_id.c_category_id.account_id.id
-        else:
-            partner_account_id = self.partner_id.s_category_id.account_id.id
-
+        partner_cat = self.partner_id.c_category_id or self.partner_id.s_category_id
+        partner_account_id = partner_cat.account_id.id
         if not partner_account_id:
-            raise except_orm(u'错误', u'请配置%s的会计科目' % (self.partner_id.name))
+            raise except_orm(u'错误', u'请配置%s的会计科目' % (partner_cat.name))
         if self.category_id.type == 'income':
             vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': u'源单',
-                         'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': '',
+                         'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
                          'debit_account_id': partner_account_id
                          })
 
         else:
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'源单',
                          'amount': abs(self.amount), 'credit_account_id': partner_account_id,
-                         'debit_account_id': self.category_id.account_id.id, 'partner_credit': "", 'partner_debit': self.partner_id.id
+                         'debit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
+                         'partner_credit':self.partner_id.id,
                          })
         self.create_voucher_line(vals)
         return res

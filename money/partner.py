@@ -1,11 +1,55 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, api
+from openerp import fields, models, api
+import openerp.addons.decimal_precision as dp
 
 
 class partner(models.Model):
     _inherit = 'partner'
     _description = u'查看业务伙伴对账单'
+
+    @api.multi
+    def _set_receivable_init(self):
+        print 'we are in'
+        if self.receivable_init:
+            # 创建源单
+            categ = self.env.ref('money.core_category_sale')
+            source_id = self.env['money.invoice'].create({
+            'name': "期初应收余额",
+            'partner_id': self.id,
+            'category_id': categ.id,
+            'date': self.env.user.company_id.start_date,
+            'amount': self.receivable_init,
+            'reconciled': 0,
+            'to_reconcile': self.receivable_init,
+            'date_due': self.env.user.company_id.start_date,
+            'state': 'draft',
+             })
+
+    @api.multi
+    def _set_payable_init(self):
+        if self.payable_init:
+            # 创建源单
+            categ = self.env.ref('money.core_category_purchase')
+            source_id = self.env['money.invoice'].create({
+            'name': "期初应付余额",
+            'partner_id': self.id,
+            'category_id': categ.id,
+            'date': self.env.user.company_id.start_date,
+            'amount': self.payable_init,
+            'reconciled': 0,
+            'to_reconcile': self.payable_init,
+            'date_due': self.env.user.company_id.start_date,
+            'state': 'draft',
+             })
+
+    receivable_init = fields.Float(u'应收期初', 
+                                   digits_compute=dp.get_precision('Amount'),
+                                   inverse=_set_receivable_init)
+    payable_init = fields.Float(u'应付期初', 
+                           digits_compute=dp.get_precision('Amount'),
+                           inverse=_set_payable_init)
+
 
     @api.multi
     def partner_statements(self):
