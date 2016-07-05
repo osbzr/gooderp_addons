@@ -738,13 +738,6 @@
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
-        <!--    <record id='account_ppe' model='finance.account'>
-               <field name='code'>220201</field>
-               <field name='name'>应付账款-暂估</field>
-               <field name='costs_types'>debt</field>
-               <field name='balance_directions'>out</field>
-               <field name='auxiliary_financing'>supplier</field>
-           </record> -->
 
 
         <!-- 资产负债表-->

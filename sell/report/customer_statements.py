@@ -84,24 +84,7 @@ class customer_statements_report(models.Model):
                     note,
                     move_id
             FROM
-                (SELECT go.partner_id AS partner_id,
-                        '期初余额' AS name,
-                        go.date AS date,
-                        go.write_date AS done_date,
-                        0 AS sale_amount,
-                        0 AS benefit_amount,
-                        0 AS fee,
-                        go.receivable AS amount,
-                        0 AS pay_amount,
-                        0 as discount_money,
-                        0 AS balance_amount,
-                        Null AS note,
-                        0 AS move_id
-                FROM go_live_order AS go
-                LEFT JOIN partner AS p ON go.partner_id = p.id
-                LEFT JOIN core_category AS c ON p.c_category_id = c.id
-                WHERE c.type = 'customer'
-                UNION ALL
+                (
                 SELECT m.partner_id,
                         m.name,
                         m.date,
