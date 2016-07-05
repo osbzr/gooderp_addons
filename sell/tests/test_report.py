@@ -35,8 +35,6 @@ class test_customer_statements(TransactionCase):
                     {'partner_id': self.env.ref('core.jd').id,
                     'from_date': '2016-01-01',
                     'to_date': '2016-11-01'}).with_context({'default_customer': True})
-        # 创建期初余额记录
-        self.env['go.live.order'].create({'partner_id':self.env.ref('core.jd').id, 'balance':20.0})
         # 创建收款记录
         money_get = self.env.ref('money.get_40000')
         money_get.money_order_done()
