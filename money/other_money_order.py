@@ -79,6 +79,7 @@ class other_money_order(models.Model):
     type = fields.Selection(TYPE_SELECTION, string=u'类型', readonly=True,
                             default=lambda self: self._context.get('type'),
                             states={'draft': [('readonly', False)]})
+    note = fields.Text(u'备注')
 
     @api.onchange('date')
     def onchange_date(self):

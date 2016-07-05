@@ -72,7 +72,7 @@ class bank_statements_report(models.Model):
                         (CASE WHEN omo.type = 'other_pay' THEN omo.total_amount ELSE 0 END) AS pay,
                         0 AS balance,
                         omo.partner_id,
-                        NULL AS note
+                        omo.note AS note
                 FROM other_money_order AS omo
                 WHERE omo.state = 'done'
                 UNION ALL
