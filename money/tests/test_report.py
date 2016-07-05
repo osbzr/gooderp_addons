@@ -5,8 +5,6 @@ from openerp.exceptions import except_orm
 class test_report(TransactionCase):
     def test_bank_report(self):
         ''' 测试银行对账单报表 '''
-        # 生成name='期初余额'记录
-        self.env['go.live.order'].create({'bank_id': self.env.ref('core.comm').id, 'balance':2000.0})
         # 生成收款单记录
         self.env.ref('money.get_40000').money_order_done()
         # 生成其他收支单记录
