@@ -635,10 +635,11 @@ class wh_move_line(models.Model):
             warehouse = self.warehouse_id
             goods = self.goods_id
             date = self.env.context.get('default_date') or self.move_id.date
-            if self.env.context.get('type') == 'internal':
-                pricing = False
-            else:
+            if self.env.context.get('warehouse_type') == 'customer' or \
+                    self.env.context.get('warehouse_dest_type') == 'customer':
                 pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
+            else:
+                pricing = False
             if pricing:
                 self.discount_rate = pricing.discount_rate
             else:
