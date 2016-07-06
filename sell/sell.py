@@ -247,6 +247,8 @@ class sell_order(models.Model):
         if self.type == 'sell':
             delivery_id = self.env['sell.delivery'].create({
                 'partner_id': self.partner_id.id,
+                'warehouse_id': self.warehouse_id.id,
+                'warehouse_dest_id': self.env.ref("warehouse.warehouse_customer").id,
                 'staff_id': self.staff_id.id,
                 'date': self.delivery_date,
                 'order_id': self.id,
