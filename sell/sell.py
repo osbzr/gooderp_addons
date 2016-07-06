@@ -354,7 +354,7 @@ class sell_order_line(models.Model):
     note = fields.Char(u'备注')
 
     @api.one
-    @api.onchange('warehouse_id','goods_id')
+    @api.onchange('warehouse_id','goods_id','order_id.partner_id','order_id.date')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
         if self.warehouse_id and self.goods_id:
@@ -635,7 +635,10 @@ class wh_move_line(models.Model):
             warehouse = self.warehouse_id
             goods = self.goods_id
             date = self.env.context.get('default_date') or self.move_id.date
-            pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
+            if self.env.context.get('type') == 'internal':
+                pricing = False
+            else:
+                pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
             if pricing:
                 self.discount_rate = pricing.discount_rate
             else:
