@@ -19,6 +19,8 @@
 	</data>
 	<data noupdate="1">
 		<record id="wh_in_whin3" model="wh.in">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040003</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
@@ -38,6 +40,8 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040003')]"/>
 		</record>
 		<record id="wh_in_whin0" model="wh.in">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040002</field>
 			<field name="type">overage</field>
 			<field name="date">2016-04-02</field>
@@ -105,6 +109,8 @@
 	</data>
 	<data noupdate="1">
 		<record id="wh_assembly_ass0" model="wh.assembly">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+		    <field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field name="name">ASS/16040001</field>
 			<field name="date">2016-04-02</field>
 		</record>
@@ -149,6 +155,8 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'ASS/16040001')]"/>
 		</record>
 		<record id="wh_assembly_ass1" model="wh.assembly">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field name="name">ASS/16040002</field>
 			<field name="date">2016-04-07</field>
 		</record>
@@ -244,6 +252,8 @@
 	</data>
 	<data noupdate="1">
 		<record id="wh_disassembly_dis1" model="wh.disassembly">
+		    <field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field name="name">DIS/16040001</field>
 			<field name="bom_id" ref="wh_bom_0"/>
 			<field name="date">2016-04-02</field>
@@ -293,6 +303,8 @@
 	</data>
 	<data noupdate="1">
 		<record id="wh_in_whin1" model="wh.in">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040001</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
@@ -326,6 +338,8 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040001')]"/>
 		</record>
 		<record id="wh_in_wh_in_attribute" model="wh.in">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040004</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
@@ -363,8 +377,10 @@
 	</data>
 	<data noupdate="1">
 		<record id="wh_internal_whint0" model="wh.internal">
+		    <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
 			<field name="name">WH/INT/16040001</field>
 			<field name="date">2016-04-02</field>
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 		</record>
 		<record id="wh_move_line_17" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
@@ -384,6 +400,8 @@
 			<field name="name">WH/OUT/16040003</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
+			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 		</record>
 		<record id="wh_move_line_iphone_out" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
@@ -400,6 +418,8 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/OUT/16040003')]"/>
 		</record>
 		<record id="wh_out_whout0" model="wh.out">
+		    <field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
+			<field name="warehouse_id" ref="warehouse.sh_stock"/>
 			<field name="name">WH/OUT/16040001</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
@@ -418,9 +438,11 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/OUT/16040001')]"/>
 		</record>
 		<record id="wh_out_whout1" model="wh.out">
+		    <field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/OUT/16040002</field>
 			<field name="type">others</field>
 			<field name="date">2016-04-02</field>
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 		</record>
 		<record id="wh_move_line_out_2" model="wh.move.line">
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
