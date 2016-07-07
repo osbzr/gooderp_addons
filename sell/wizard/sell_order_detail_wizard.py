@@ -45,6 +45,7 @@ class sell_order_detail_wizard(models.TransientModel):
             domain.append(('move_id.partner_id', '=', self.partner_id.id))
 
         order_type = ''
+        staff_id = None
         for line in self.env['wh.move.line'].search(domain, order='move_id'):
             if line.move_id.origin and 'return' in line.move_id.origin:
                 order_type = u'退货'
