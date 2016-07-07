@@ -37,12 +37,12 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="document_word_id" readonly='1' style="width: 1%%"/>
-                                <field name="name" readonly='1' style="width: 1%%"/>
+                                <field name="document_word_id" readonly='1' />
+                                <field name="name"  readonly='1'  style="width: 30%%"/>
                             </group>
                             <group>
                                 <field name="date"/>
-                                <field name="period_id"/>
+                                <field name="period_id"  options="{'no_open':True,'no_create':True}"/>
                                 <field name="att_count"/>
                             </group>
                         </group>

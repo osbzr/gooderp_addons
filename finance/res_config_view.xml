@@ -17,6 +17,21 @@
                                 <label for="default_voucher_date"/>
                                 <field name="default_voucher_date" class="oe_inline"/>
                             </div>
+                            <label for="id" string="自动重置凭证号"/>
+                            <div>
+                                <label for="default_auto_reset"/>
+                                <field name="default_auto_reset" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="凭证号重置间隔"/>
+                            <div>
+                                <label for="default_reset_period"/>
+                                <field name="default_reset_period" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="重置后起始数字"/>
+                            <div>
+                                <label for="default_reset_init_number"/>
+                                <field name="default_reset_init_number" class="oe_inline"/>
+                            </div>
                         </group>
                         <group string="资产负债表 利润表">
                             <label for="id" string="未结账期间"/>
@@ -39,7 +54,6 @@
             <field name="view_mode">form</field>
             <field name="target">inline</field>
         </record>
-
 
 
     </data>

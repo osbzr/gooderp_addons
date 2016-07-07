@@ -68,7 +68,7 @@ class voucher(models.Model):
     def voucher_done(self):
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
-        if self.period_id.is_closed == True:
+        if self.period_id.is_closed is True:
             raise except_orm(u'错误', u'该会计期间已结账！不能审核')
         self.state = 'done'
 
@@ -76,7 +76,7 @@ class voucher(models.Model):
     def voucher_draft(self):
         if self.state == 'draft':
             raise except_orm(u'错误', u'请不要重复反审核！')
-        if self.period_id.is_closed == True:
+        if self.period_id.is_closed is True:
             raise except_orm(u'错误', u'该会计期间已结账！不能反审核')
         self.state = 'draft'
 

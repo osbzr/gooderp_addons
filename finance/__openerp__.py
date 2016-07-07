@@ -11,6 +11,7 @@
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
+        'data/finance_voucher_data.xml',
         'data/finance_data.xml',
         'res_config_view.xml',
         'finance_conf.xml',
