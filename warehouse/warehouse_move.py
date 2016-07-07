@@ -15,18 +15,18 @@ class wh_move(models.Model):
     @api.model
     def _get_default_warehouse(self):
         '''获取调出仓库'''
-        if self.env.context.get('warehouse_type'):
+        if self.env.context.get('warehouse_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
-                    self.env.context.get('warehouse_type'))
+                    self.env.context.get('warehouse_type', 'stock'))
 
         return self.env['warehouse'].browse()
 
     @api.model
     def _get_default_warehouse_dest(self):
         '''获取调入仓库'''
-        if self.env.context.get('warehouse_dest_type'):
+        if self.env.context.get('warehouse_dest_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
-                    self.env.context.get('warehouse_dest_type'))
+                    self.env.context.get('warehouse_dest_type', 'stock'))
 
         return self.env['warehouse'].browse()
 
@@ -37,15 +37,21 @@ class wh_move(models.Model):
     date = fields.Date(u'单据日期', required=True, copy=False, default=fields.Date.context_today)
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict',
+                                   required=True,
                                    default=_get_default_warehouse)
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         ondelete='restrict',
+                                        required=True,
                                         default=_get_default_warehouse_dest)
     approve_uid = fields.Many2one('res.users', u'审核人',
                                   copy=False, ondelete='restrict')
     approve_date = fields.Datetime(u'审核日期', copy=False)
-    line_out_ids = fields.One2many('wh.move.line', 'move_id', u'明细', domain=[('type', '=', 'out')], context={'type': 'out'}, copy=True)
-    line_in_ids = fields.One2many('wh.move.line', 'move_id', u'明细', domain=[('type', '=', 'in')], context={'type': 'in'}, copy=True)
+    line_out_ids = fields.One2many('wh.move.line', 'move_id', u'出库明细',
+                                   domain=[('type', '=', 'out')],
+                                   context={'type': 'out'}, copy=True)
+    line_in_ids = fields.One2many('wh.move.line', 'move_id', u'入库明细',
+                                  domain=[('type', '=', 'in')],
+                                  context={'type': 'in'}, copy=True)
     note = fields.Text(u'备注')
 
     @api.model
