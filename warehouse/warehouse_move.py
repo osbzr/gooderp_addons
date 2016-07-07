@@ -15,18 +15,18 @@ class wh_move(models.Model):
     @api.model
     def _get_default_warehouse(self):
         '''获取调出仓库'''
-        if self.env.context.get('warehouse_type'):
+        if self.env.context.get('warehouse_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
-                    self.env.context.get('warehouse_type'))
+                    self.env.context.get('warehouse_type', 'stock'))
 
         return self.env['warehouse'].browse()
 
     @api.model
     def _get_default_warehouse_dest(self):
         '''获取调入仓库'''
-        if self.env.context.get('warehouse_dest_type'):
+        if self.env.context.get('warehouse_dest_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
-                    self.env.context.get('warehouse_dest_type'))
+                    self.env.context.get('warehouse_dest_type', 'stock'))
 
         return self.env['warehouse'].browse()
 
