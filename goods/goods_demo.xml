@@ -50,7 +50,6 @@
 			<field name="uom_id" ref="core.uom_pc"/>
 			<field name="uos_id" ref="core.uom_pc"/>
 			<field name="conversion">1</field>
-			<field name="using_batch">False</field>
 			<field name="cost">800</field>
 		</record>
 
