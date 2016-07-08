@@ -358,7 +358,7 @@ class sell_order_line(models.Model):
     note = fields.Char(u'备注')
 
     @api.one
-    @api.onchange('warehouse_id','goods_id','order_id.partner_id','order_id.date')
+    @api.onchange('warehouse_id','goods_id')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
         if self.warehouse_id and self.goods_id:
