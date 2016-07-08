@@ -252,7 +252,7 @@
 	</data>
 	<data noupdate="1">
 		<record id="wh_disassembly_dis1" model="wh.disassembly">
-		    <field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field name="name">DIS/16040001</field>
 			<field name="bom_id" ref="wh_bom_0"/>

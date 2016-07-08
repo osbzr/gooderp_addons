@@ -119,7 +119,7 @@ class TestProduction(TransactionCase):
 
         self.disassembly.approve_order()
 
-        # 170的成本被拆分成鼠标 * 1(成本40) + 键盘 * 1（成本80）,所以此时应该均分为50 + 100
+        # 150的成本被拆分成鼠标 * 1(成本40) + 键盘 * 1（成本80）,所以此时应该均分为50 + 100
         self.assertEqual(self.disassembly_mouse.cost_unit, 50)
         self.assertEqual(self.disassembly_keyboard.cost_unit, 100)
 

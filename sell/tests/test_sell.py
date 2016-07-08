@@ -18,16 +18,20 @@ class Test_sell(TransactionCase):
         self.warehouse_dest_id = self.env.ref('warehouse.warehouse_customer')
         self.bank = self.env.ref('core.alipay')
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
-        self.others_warehouse_id = self.env.ref('warehouse.warehouse_others')
+        self.customer_warehouse_id = self.env.ref('warehouse.warehouse_customer')
         self.goods = self.env.ref('goods.cable')
         self.partner = self.env.ref('core.lenovo')
         # 因为下面要用到 产品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
-        vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
-                'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
-                                        'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})]}
+        vals = {'partner_id': self.partner.id,
+                'is_return': True,
+                'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+                'warehouse_id': self.customer_warehouse_id.id,
+                'warehouse_dest_id': self.warehouse_id.id,
+                'line_in_ids': [(0, 0, {'goods_id': self.goods.id,
+                                        'price': 100, 'goods_qty': 5})]}
 
         self.sell_delivery_obj = self.env['sell.delivery'].with_context({'is_return': True}).create(vals)
 
@@ -156,9 +160,13 @@ class Test_sell(TransactionCase):
 
     def test_sale_usage_return(self):
         """测试销售退货单 审核流程"""
-        vals = {'partner_id': self.partner.id, 'is_return': True, 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
-                'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 'warehouse_dest_id': self.others_warehouse_id.id,
-                                        'price': 100, 'warehouse_id': self.warehouse_id.id, 'goods_qty': 5})],
+        vals = {'partner_id': self.partner.id, 
+                'is_return': True, 
+                'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+                'warehouse_id': self.customer_warehouse_id.id,
+                'warehouse_dest_id': self.warehouse_id.id,
+                'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 
+                                        'price': 100, 'goods_qty': 5})],
                 'cost_line_ids': [(0, 0, {'partner_id': self.partner.id,
                                           'category_id': self.env.ref('core.cat_freight').id,
                                           'amount': 50})]}
@@ -431,35 +439,46 @@ class test_wh_move_line(TransactionCase):
         '''wh.move.line仓库和商品带出价格策略的折扣率'''
         for line in self.delivery.line_out_ids[0]:
             line.with_context({'default_date':'2016-04-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 10)
             line.with_context({'default_date':'2016-05-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 20)
             line.with_context({'default_date':'2016-06-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 30)
             line.with_context({'default_date':'2016-07-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 40)
             line.with_context({'default_date':'2016-08-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 50)
             line.with_context({'default_date':'2016-09-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 60)
             line.with_context({'default_date':'2016-10-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 70)
             line.with_context({'default_date':'2016-11-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 80)
             line.with_context({'default_date':'2016-12-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 90)
-            line.with_context({'default_date':'2017-02-01',
+            line.with_context({'default_date':'3000-02-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 0)
             line.with_context({'default_date':'2017-01-01',
+                               'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 0)

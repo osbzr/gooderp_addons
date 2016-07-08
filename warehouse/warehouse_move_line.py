@@ -57,13 +57,19 @@ class wh_move_line(models.Model):
     def _compute_using_attribute(self):
         self.using_attribute = self.goods_id.attribute_ids and True or False
     
-    @api.model
+    @api.one
+    @api.depends('move_id.warehouse_id')
     def _get_line_warehouse(self):
-        return self.env.context.get('warehouse_id',False)
+        self.warehouse_id = self.move_id.warehouse_id.id
+        if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly') and self.type == 'in':
+            self.warehouse_id = self.env.ref('warehouse.warehouse_production').id
 
-    @api.model
+    @api.one
+    @api.depends('move_id.warehouse_dest_id')
     def _get_line_warehouse_dest(self):
-        return self.env.context.get('warehouse_dest_id',False)
+        self.warehouse_dest_id = self.move_id.warehouse_dest_id.id
+        if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly') and self.type == 'out':
+            self.warehouse_dest_id = self.env.ref('warehouse.warehouse_production').id
 
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade')
     date = fields.Datetime(u'完成日期', copy=False)
@@ -88,13 +94,13 @@ class wh_move_line(models.Model):
     uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict')
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict',
-                                   required=True,
-                                   default=_get_line_warehouse,
+                                   store=True,
+                                   compute=_get_line_warehouse,
                                    )
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         ondelete='restrict',
-                                        required=True,
-                                        default=_get_line_warehouse_dest,
+                                        store=True,
+                                        compute=_get_line_warehouse_dest,
                                         )
     goods_qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'), default=1)
     goods_uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'), default=1)
