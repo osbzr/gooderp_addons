@@ -22,6 +22,8 @@ class TestMoveLine(TransactionCase):
         self.goods_mouse = self.browse_ref('goods.mouse')
         self.goods_cable = self.browse_ref('goods.cable')
 
+        self.assembly = self.browse_ref('warehouse.wh_assembly_ass0')
+
     def test_origin_explain(self):
         explain = self.mouse_in_line.get_origin_explain()
         self.assertEqual(explain, u'盘盈')
@@ -60,17 +62,21 @@ class TestMoveLine(TransactionCase):
 
     def test_copy_data(self):
         # 复制的时候，如果该明细行是出库行为，那么需要重新计算成本
+        _, cost_unit = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
+            self.mouse_out_line.warehouse_id, self.mouse_out_line.goods_qty,
+            lot_id=self.mouse_out_line.lot_id)
+
+        self.assertEqual(cost_unit, self.mouse_out_line.lot_id.cost_unit)
+
+        self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
+        self.overage_in.approve_order()
+        self.assembly.approve_order()
         results = self.mouse_out_line.copy_data()
         _, cost_unit = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
             self.mouse_out_line.warehouse_id, self.mouse_out_line.goods_qty)
 
         self.assertEqual(results.get('cost_unit'), cost_unit)
 
-        _, cost_unit = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
-            self.mouse_out_line.warehouse_id, self.mouse_out_line.goods_qty,
-            lot_id=self.mouse_out_line.lot_id)
-
-        self.assertEqual(cost_unit, self.mouse_out_line.lot_id.cost_unit)
 
 
     def test_get_matching_records_by_lot(self):

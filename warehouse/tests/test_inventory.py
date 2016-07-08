@@ -15,9 +15,9 @@ class TestInventory(TransactionCase):
 
         # 创建一个临时的一个库存调拨，将1个产品调拨到上海仓库
         self.temp_mouse_in = self.env['wh.move.line'].with_context({
-            'warehouse_type': 'others',
             'type': 'in',
         }).create({
+            'move_id': self.others_in.move_id.id,
             'goods_id': self.goods_mouse.id,
             'uom_id': self.goods_mouse.uom_id.id,
             'uos_id': self.goods_mouse.uos_id.id,
@@ -30,9 +30,9 @@ class TestInventory(TransactionCase):
 
         # 创建一个临时的库存调拨，此时数量为0，但是辅助数量为1
         self.temp_mouse_in_zero_qty = self.env['wh.move.line'].with_context({
-            'warehouse_type': 'others',
             'type': 'in',
         }).create({
+            'move_id': self.others_in.move_id.id,
             'goods_id': self.goods_mouse.id,
             'uom_id': self.goods_mouse.uom_id.id,
             'uos_id': self.goods_mouse.uos_id.id,
@@ -52,7 +52,9 @@ class TestInventory(TransactionCase):
         self.temp_mouse_in.action_done()
         self.temp_mouse_in_zero_qty.action_done()
 
-        self.inventory = self.env['wh.inventory'].create({})
+        self.inventory = self.env['wh.inventory'].create({
+                'warehouse_id': self.browse_ref('warehouse.hd_stock').id,
+                })
         self.inventory.query_inventory()
 
     def test_query_inventory(self):

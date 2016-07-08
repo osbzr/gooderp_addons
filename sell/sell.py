@@ -265,6 +265,8 @@ class sell_order(models.Model):
             rec = self.with_context(is_return=True)
             delivery_id = rec.env['sell.delivery'].create({
                 'partner_id': self.partner_id.id,
+                'warehouse_id': self.env.ref("warehouse.warehouse_customer").id,
+                'warehouse_dest_id': self.warehouse_id.id,
                 'staff_id': self.staff_id.id,
                 'date': self.delivery_date,
                 'order_id': self.id,

@@ -262,6 +262,8 @@ class buy_order(models.Model):
         if self.type == 'buy':
             receipt_id = self.env['buy.receipt'].create({
                                 'partner_id': self.partner_id.id,
+                                'warehouse_id': self.env.ref("warehouse.warehouse_supplier").id,
+                                'warehouse_dest_id': self.warehouse_dest_id.id,
                                 'date': self.planned_date,
                                 'date_due': fields.Date.context_today(self),
                                 'order_id': self.id,
@@ -279,6 +281,8 @@ class buy_order(models.Model):
             rec = self.with_context(is_return=True)
             receipt_id = rec.env['buy.receipt'].create({
                             'partner_id': self.partner_id.id,
+                            'warehouse_dest_id': self.env.ref("warehouse.warehouse_supplier").id,
+                            'warehouse_id': self.warehouse_dest_id.id,
                             'date': self.planned_date,
                             'date_due': fields.Date.context_today(self),
                             'order_id': self.id,

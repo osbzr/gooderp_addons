@@ -104,7 +104,10 @@ class wh_inventory(models.Model):
         self.line_ids.unlink()
 
     def create_losses_out(self, inventory, out_line):
+        inventory_warehouse = self.env.ref('warehouse.warehouse_inventory')
         out_vals = {
+            'warehouse_dest_id': inventory_warehouse.id,
+            'warehouse_id': inventory.warehouse_id.id,
             'type': 'losses',
             'line_out_ids': [],
         }
@@ -117,7 +120,10 @@ class wh_inventory(models.Model):
         inventory.out_id = out_id
 
     def create_overage_in(self, inventory, in_line):
+        inventory_warehouse = self.env.ref('warehouse.warehouse_inventory')
         in_vals = {
+            'warehouse_dest_id': inventory.warehouse_id.id,
+            'warehouse_id': inventory_warehouse.id,
             'type': 'overage',
             'line_in_ids': [],
         }
@@ -208,7 +214,6 @@ class wh_inventory(models.Model):
         for inventory in self:
             inventory.delete_line()
             line_ids = inventory.get_line_detail(inventory.uos_not_zero)
-
             for line in line_ids:
                 line_obj.create({
                         'inventory_id': inventory.id,
@@ -240,8 +245,8 @@ class wh_inventory_line(models.Model):
     ]
 
     inventory_id = fields.Many2one('wh.inventory', u'盘点', ondelete='cascade')
-    warehouse_id = fields.Many2one('warehouse', u'仓库', ondelete='restrict')
-    goods_id = fields.Many2one('goods', u'产品', ondelete='restrict')
+    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True, ondelete='restrict')
+    goods_id = fields.Many2one('goods', u'产品', required=True, ondelete='restrict')
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
     using_batch = fields.Boolean(
         related='goods_id.using_batch', string=u'批号管理')
@@ -334,12 +339,6 @@ class wh_inventory_line(models.Model):
                     attribute=inventory.attribute_id)
 
             return {
-                'warehouse_id':
-                    wh_type == 'out' and inventory.warehouse_id.id or
-                    inventory_warehouse.id,
-                'warehouse_dest_id':
-                    wh_type == 'in' and inventory.warehouse_id.id or
-                    inventory_warehouse.id,
                 'lot': inventory.new_lot,
                 'lot_id': inventory.new_lot_id.id,
                 'goods_id': inventory.goods_id.id,
