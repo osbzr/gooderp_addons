@@ -15,7 +15,7 @@ class wh_out(models.Model):
     }
 
     TYPE_SELECTION = [
-        ('losses', u'盘亏'),
+        ('inventory', u'盘亏'),
         ('others', u'其他出库'),
     ]
 
@@ -53,6 +53,10 @@ class wh_out(models.Model):
     def create(self, vals):
         return super(wh_out, self).create(vals)
 
+    @api.multi
+    @api.onchange('type')
+    def onchange_type(self):
+        self.warehouse_dest_id = self.env['warehouse'].get_warehouse_by_type(self.type)
 
 class wh_in(models.Model):
     _name = 'wh.in'
@@ -63,7 +67,7 @@ class wh_in(models.Model):
     }
 
     TYPE_SELECTION = [
-        ('overage', u'盘盈'),
+        ('inventory', u'盘盈'),
         ('others', u'其他入库'),
     ]
 
@@ -100,6 +104,11 @@ class wh_in(models.Model):
     @create_origin
     def create(self, vals):
         return super(wh_in, self).create(vals)
+
+    @api.multi
+    @api.onchange('type')
+    def onchange_type(self):
+        self.warehouse_id = self.env['warehouse'].get_warehouse_by_type(self.type)
 
 
 class wh_internal(osv.osv):

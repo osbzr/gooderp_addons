@@ -14,8 +14,8 @@
             <field name='name'>出库单</field>
             <field name='res_model'>wh.out</field>
             <field name='view_mode'>tree,form</field>
-            <field name='context'>{'readonly_by_pass': ['uom_id', 'uos_id', 'goods_uos_qty', 'goods_qty', 'cost', 'cost_unit'],
-            	'warehouse_type': 'stock'}</field>
+            <!--readonly_by_pass是否有效？ -->
+            <field name='context'>{'readonly_by_pass': ['uom_id', 'uos_id', 'goods_uos_qty', 'goods_qty', 'cost', 'cost_unit']}</field>
             <field name='view_id' ref='wh_out_tree' />
         </record>
 
@@ -23,8 +23,8 @@
             <field name='name'>入库单</field>
             <field name='res_model'>wh.in</field>
             <field name='view_mode'>tree,form</field>
-            <field name='context'>{'readonly_by_pass': ['uom_id', 'uos_id', 'goods_uos_qty', 'goods_qty', 'cost'],
-            	'warehouse_dest_type': 'stock'}</field>
+            <!--readonly_by_pass是否有效？ -->
+            <field name='context'>{'readonly_by_pass': ['uom_id', 'uos_id', 'goods_uos_qty', 'goods_qty', 'cost']}</field>
             <field name='view_id' ref='wh_in_tree' />
         </record>
 
@@ -32,9 +32,8 @@
             <field name='name'>移库单</field>
             <field name='res_model'>wh.internal</field>
             <field name='view_mode'>tree,form</field>
-            <field name='context'>{'readonly_by_pass': ['uom_id', 'uos_id', 'goods_uos_qty', 'goods_qty'],
-            	'warehouse_type': 'stock',
-            	'warehouse_dest_type': 'stock'}</field>
+            <!--readonly_by_pass 是否有效？ -->
+            <field name='context'>{'readonly_by_pass': ['uom_id', 'uos_id', 'goods_uos_qty', 'goods_qty']}</field>
             <field name='view_id' ref='wh_internal_tree' />
         </record>
 
