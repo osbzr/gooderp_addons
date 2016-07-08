@@ -153,7 +153,7 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(self.others_in.origin, 'wh.in.others')
         self.assertEqual(self.others_out.origin, 'wh.out.others')
         self.assertEqual(self.internal.origin, 'wh.internal')
-        self.assertEqual(self.overage_in.origin, 'wh.in.overage')
+        self.assertEqual(self.overage_in.origin, 'wh.in.inventory')
 
     def test_create(self):
         temp_out = self.env['wh.out'].create({'name': '/', 'type': 'others'})
