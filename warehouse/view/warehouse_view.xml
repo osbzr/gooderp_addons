@@ -23,17 +23,17 @@
                 <form string='仓库' >
                     <group>
                         <group>
-                            <field name='code' />
+                            <field name='code' required='1' />
                         </group>
                         <group>
-                            <field name='name' />
+                            <field name='name' required='1' />
                         </group>
                     </group>
                 </form>
             </field>
         </record>
 
-        <!-- 移库单的move -->
+        <!-- 库存调拨 -->
         <record id='wh_move_line_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.tree</field>
             <field name='model'>wh.move.line</field>
@@ -42,113 +42,140 @@
                 <tree string='库存调拨' create='0' edit='0' delete="0">
                     <field name='move_id' string='单据编号' />
                     <field name='goods_id' />
-                    <field name='uom_id' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='attribute_id' groups='goods.multi_attrs_groups' />
+                    <field name='lot' groups='goods.batch_groups' />
                     <field name='goods_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' sum='1' />
+                    <field name='uom_id' />
                     <field name='warehouse_id' groups='warehouse.multi_warehouse_groups' />
                     <field name='warehouse_dest_id' groups='warehouse.multi_warehouse_groups' />
-                    <field name='lot' groups='goods.batch_groups' />
                     <field name='qty_remaining' />
                     <field name='uos_qty_remaining' groups='goods.auxiliary_unit_groups' />
                     <field name='cost_unit' />
                     <field name='cost' sum='1' />
-                    <field name='state' />
                     <field name='note' />
                     <field name='type' />
+                    <field name='state' />
                 </tree>
             </field>
         </record>
 
+		<!-- 其他出库单明细 -->
         <record id='wh_move_line_out_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.out.tree</field>
             <field name='model'>wh.move.line</field>
             <field name='arch' type='xml'>
                 <tree string='库存调拨' editable='bottom'>
                     <field name='goods_id' required='1' />
-                    <field name='using_batch' invisible='1' />
-                    <field name='force_batch_one' invisible='1' />
-                    <field name='uom_id' required='1' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                    <field name='using_attribute' invisible='1' />
-                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]" attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                    <field name='attribute_id'
+                    	domain="[('goods_id', '=', goods_id)]"
+                    	attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
 						groups='goods.multi_attrs_groups'/>
-                    <field name='lot_qty' invisible='1' />
-                    <field name='lot_uos_qty' invisible='1' />
-                    <field name='lot_id' groups='goods.batch_groups' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]" context="{'lot': True}" options="{'no_open': True, 'no_create': True}" />
-                    <field name='goods_uos_qty' sum='1' widget='float_limit' options="{'field': 'lot_uos_qty'}" groups='goods.auxiliary_unit_groups' attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
-                    <field name='goods_qty' widget='float_limit' options="{'field': 'lot_qty'}" attrs="{'readonly': [('force_batch_one', '=', True)]}" />
-                    <field name='warehouse_id' string='仓库' required='1' groups='warehouse.multi_warehouse_groups' />
-
-                    <field name='warehouse_dest_id' invisible='1' />
+                    <field name='lot_id'
+                    	groups='goods.batch_groups'
+                    	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
+                    	domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]"
+                    	context="{'lot': True}"
+                    	options="{'no_open': True, 'no_create': True}" />
+                    <field name='goods_uos_qty' sum='1'
+                    	widget='float_limit'
+                    	options="{'field': 'lot_uos_qty'}"
+                    	groups='goods.auxiliary_unit_groups'
+                    	attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                    <field name='goods_qty'
+                    	widget='float_limit'
+                    	options="{'field': 'lot_qty'}"
+                    	attrs="{'readonly': [('force_batch_one', '=', True)]}" />
+                    <field name='uom_id' required='1' />
                     <field name='cost_unit' string='出库单位成本' readonly='1' />
                     <field name='cost' string='出库成本' readonly='1' sum='1' />
                     <field name='note' string='备注' />
+                    <field name='using_attribute' invisible='1' />
+                    <field name='using_batch' invisible='1' />
+                    <field name='force_batch_one' invisible='1' />
+                    <field name='lot_qty' invisible='1' />
+                    <field name='lot_uos_qty' invisible='1' />
                 </tree>
             </field>
         </record>
 
+		<!-- 其他入库单明细 -->
         <record id='wh_move_line_in_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.in.tree</field>
             <field name='model'>wh.move.line</field>
             <field name='arch' type='xml'>
                 <tree string='库存调拨' editable='bottom'>
                     <field name='goods_id' required='1' />
+                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]"
+                    	attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                    	groups='goods.multi_attrs_groups'/>
+                    <field name='lot'
+                    	groups='goods.batch_groups'
+                    	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
+                    <field name='goods_uos_qty' sum='1'
+                    	groups='goods.auxiliary_unit_groups'
+                    	attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
+					<field name='uos_id' groups='goods.auxiliary_unit_groups' />
+					<field name='goods_qty'
+						attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1' />
                     <field name='uom_id' required='1' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                    <field name='using_batch' invisible='1' />
-                    <field name='force_batch_one' invisible='1' />
-                    <field name='using_attribute' invisible='1' />
-                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]" attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
-                    	 groups='goods.multi_attrs_groups'/>
-                    <field name='lot' groups='goods.batch_groups' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
-                    <field name='goods_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
-                    <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1' />
-
-                    <field name='warehouse_id' invisible='1' />
-                    <field name='warehouse_dest_id' string='仓库' required='1' groups='warehouse.multi_warehouse_groups' />
                     <field name='cost_unit' string='入库单价' />
                     <field name='cost' string='入库金额' sum='1' readonly='1' />
                     <field name='note' string='备注' />
+                    <field name='using_attribute' invisible='1' />
+                    <field name='using_batch' invisible='1' />
+                    <field name='force_batch_one' invisible='1' />
                 </tree>
             </field>
         </record>
 
+		<!-- 调拨单明细 -->
         <record id='wh_move_line_internal_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.internal.tree</field>
             <field name='model'>wh.move.line</field>
             <field name='arch' type='xml'>
                 <tree string='库存调拨' editable='bottom'>
                     <field name='goods_id' required='1' />
+                    <field name='attribute_id'
+                    	domain="[('goods_id', '=', goods_id)]"
+                    	attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}" 
+                    	groups='goods.multi_attrs_groups'/>
+                    <field name='lot_id'
+                    	groups='goods.batch_groups'
+                    	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
+                    	domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0)]"
+                    	context="{'lot': True}"
+                    	options="{'no_open': True, 'no_create': True}" />
+                    <field name='goods_uos_qty' sum='1'
+                    	widget='float_limit'
+                    	options="{'field': 'lot_uos_qty'}"
+                    	groups='goods.auxiliary_unit_groups'
+                    	attrs="{'readonly': [('force_batch_one', '=', True)]}" />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                    <field name='goods_qty' sum='1'
+                    	widget='float_limit'
+                    	options="{'field': 'lot_qty'}"
+                    	attrs="{'readonly': [('force_batch_one', '=', True)]}" />
+                    <field name='uom_id' required='1' />
+                    <field name='note' string='备注' />
+                    <field name='using_attribute' invisible='1' />
                     <field name='using_batch' invisible='1' />
                     <field name='force_batch_one' invisible='1' />
-                    <field name='uom_id' required='1' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                    <field name='using_attribute' invisible='1' />
-                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]" attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}" 
-                    	groups='goods.multi_attrs_groups'/>
-                    <field name='lot' invisible='1' />
-                    <field name='lot_id' groups='goods.batch_groups' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0)]" context="{'lot': True}" options="{'no_open': True, 'no_create': True}" />
-
                     <field name='lot_qty' invisible='1' />
                     <field name='lot_uos_qty' invisible='1' />
-                    <field name='goods_uos_qty' sum='1' widget='float_limit' options="{'field': 'lot_uos_qty'}" groups='goods.auxiliary_unit_groups' attrs="{'readonly': [('force_batch_one', '=', True)]}" />
-                    <field name='goods_qty' sum='1' widget='float_limit' options="{'field': 'lot_qty'}" attrs="{'readonly': [('force_batch_one', '=', True)]}" />
-
-                    <field name='warehouse_id' required='0' groups='warehouse.multi_warehouse_groups' />
-                    <field name='warehouse_dest_id' required='0' groups='warehouse.multi_warehouse_groups' />
-                    <field name='note' string='备注' />
+                    <field name='lot' invisible='1' /> <!-- 能否去掉？ -->
                 </tree>
             </field>
         </record>
 
-        <!-- 出库单 -->
+        <!-- 其他出库单 -->
         <record id='wh_out_form' model='ir.ui.view'>
             <field name='name'>wh.out.form</field>
             <field name='model'>wh.out</field>
             <field name='arch' type='xml'>
-                <form string='出库单'>
+                <form string='其他出库单'>
                     <header>
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft'
 																	groups='warehouse.other_out_picking_groups'/>
@@ -156,11 +183,8 @@
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
                     <sheet>
-                        <h1>
-                            <label string='出库单' />
-                            <field name="name" class="oe_inline" readonly="1" />
-                        </h1>
                         <div>
+                        	<label string="扫描条码"/>
                         	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                         </div>
                         <group>
@@ -177,11 +201,13 @@
                         <group string='出库明细'>
                             <field nolabel='1' name='line_out_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_out_tree',
-                                'warehouse_dest_type': 'others',
                                 'lot': True,
                                 'type': 'out',
-                                'default_warehouse_id': warehouse_id,
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                        </group>
+
+						<group>
+                            <field name='note' nolabel='1' placeholder='备注...' />
                         </group>
 
                         <group col='6'>
@@ -198,10 +224,6 @@
                                 <field name='approve_date' readonly='1' />
                             </group>
                         </group>
-
-                        <group>
-                            <field name='note' nolabel='1' placeholder='备注。。。' />
-                        </group>
                     </sheet>
                 </form>
             </field>
@@ -211,7 +233,7 @@
             <field name='name'>wh.out.tree</field>
             <field name='model'>wh.out</field>
             <field name='arch' type='xml'>
-                <tree string='出库单' colors='blue:state == "draft"'>
+                <tree string='其他出库单' colors='blue:state == "draft"'>
                     <field name='name' />
                     <field name='date' />
                     <field name='type' />
@@ -219,28 +241,25 @@
                     <field name='partner_id' string='客户' />
                     <field name='create_uid' string='制单人' />
                     <field name='approve_uid' />
-                    <field name='state' />
                     <field name='note' />
+                    <field name='state' />
                 </tree>
             </field>
         </record>
 
-        <!-- 入库单 -->
+        <!-- 其他入库单 -->
         <record id='wh_in_form' model='ir.ui.view'>
             <field name='name'>wh.in.form</field>
             <field name='model'>wh.in</field>
             <field name='arch' type='xml'>
-                <form string='入库单'>
+                <form string='其他入库单'>
                     <header>
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
                         <field name='state' widget='statusbar' readonly='1' />                    </header>
                     <sheet>
-                        <h1>
-                            <label string='入库单' />
-                            <field name="name" class="oe_inline" readonly="1"/>
-                        </h1>
                         <div>
+                        	<label string="扫描条码"/>
                         	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                         </div>
                         <group>
@@ -261,6 +280,10 @@
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
+                        <group>
+                            <field name='note' nolabel='1' placeholder='备注...' />
+                        </group>
+
                         <group col='6'>
                             <group colspan='2'>
                                 <field name='create_uid' string='制单人' readonly='1' />
@@ -275,10 +298,6 @@
                                 <field name='approve_date' readonly='1' />
                             </group>
                         </group>
-
-                        <group>
-                            <field name='note' nolabel='1' placeholder='备注。。。' />
-                        </group>
                     </sheet>
                 </form>
             </field>
@@ -288,7 +307,7 @@
             <field name='name'>wh.in.tree</field>
             <field name='model'>wh.in</field>
             <field name='arch' type='xml'>
-                <tree string='入库单' colors='blue:state == "draft"'>
+                <tree string='其他入库单' colors='blue:state == "draft"'>
                     <field name='name' />
                     <field name='date' />
                     <field name='type' />
@@ -296,8 +315,8 @@
                     <field name='partner_id' string='供应商' />
                     <field name='create_uid' string='制单人' />
                     <field name='approve_uid' />
-                    <field name='state' />
                     <field name='note' />
+                    <field name='state' />
                 </tree>
             </field>
         </record>
@@ -307,16 +326,12 @@
             <field name='name'>wh.internal.form</field>
             <field name='model'>wh.internal</field>
             <field name='arch' type='xml'>
-                <form string='移库单'>
+                <form string='调拨单'>
                     <header>
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
                         <field name='state' widget='statusbar' readonly='1' />                    </header>
                     <sheet>
-                        <h1>
-                            <label string='移库单' />
-                            <field name="name" class="oe_inline" readonly="1"/>
-                        </h1>
                         <group>
                             <group>
                                 <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}" />
@@ -333,9 +348,12 @@
                             	'tree_view_ref': 'warehouse.wh_move_line_internal_tree',
                             	'lot': True,
                             	'type': 'internal',
-                            	'warehouse_id': warehouse_id,
-                            	'warehouse_dest_id': warehouse_dest_id}"
+                            	}"
                             	attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                        </group>
+
+                        <group>
+                            <field name='note' nolabel='1' placeholder='备注...' />
                         </group>
 
                         <group col='6'>
@@ -352,10 +370,6 @@
                                 <field name='approve_date' readonly='1' />
                             </group>
                         </group>
-
-                        <group>
-                            <field name='note' nolabel='1' placeholder='备注。。。' />
-                        </group>
                     </sheet>
                 </form>
             </field>
@@ -371,8 +385,8 @@
                     <field name='amount_total' />
                     <field name='create_uid' string='制单人' />
                     <field name='approve_uid' />
-                    <field name='state' />
                     <field name='note' />
+                    <field name='state' />
                 </tree>
             </field>
         </record>

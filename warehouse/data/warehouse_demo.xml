@@ -43,7 +43,7 @@
 		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040002</field>
-			<field name="type">overage</field>
+			<field name="type">inventory</field>
 			<field name="date">2016-04-02</field>
 		</record>
 		<record id="wh_move_line_12" model="wh.move.line">
