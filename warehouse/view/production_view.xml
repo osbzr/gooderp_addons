@@ -71,6 +71,7 @@
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='子件单位' />
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='子件单位成本' />
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本' />
+                    <field name='warehouse_id' />
                     <field name='state' />
                 </tree>
             </field>
@@ -82,22 +83,24 @@
             <field name='arch' type='xml'>
                 <tree string='库存调拨' editable='bottom'>
                     <field name='goods_id' required='1' />
-                    <field name='uom_id' required='1' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                    <field name='using_batch' invisible='1' />
-                    <field name='force_batch_one' invisible='1' />
-                    <field name='using_attribute' invisible='1' />
-                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]" attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                    <field name='attribute_id'
+                    	domain="[('goods_id', '=', goods_id)]"
+                    	attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
                     	groups='goods.multi_attrs_groups' />
-                    <field name='lot' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
-                    <field name='goods_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
+                    <field name='lot'
+                    	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
+                    <field name='goods_uos_qty' sum='1'
+                    	groups='goods.auxiliary_unit_groups'
+                    	attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1' />
-
-                    <field name='warehouse_id' invisible='1' />
-                    <field name='warehouse_dest_id' string='仓库' required='1' groups='warehouse.multi_warehouse_groups' />
+                    <field name='uom_id' required='1' />
                     <field name='cost_unit' string='入库单位成本' readonly='1' />
                     <field name='cost' string='入库金额' readonly='1' sum='1' />
                     <field name='note' string='备注' />
+                    <field name='using_batch' invisible='1' />
+                    <field name='force_batch_one' invisible='1' />
+                    <field name='using_attribute' invisible='1' />
                 </tree>
             </field>
         </record>
@@ -114,35 +117,34 @@
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
                     <sheet>
-                        <h1>
-                            <label string='组装单' />
-                            <field name="name" class="oe_inline" readonly="1" />
-                        </h1>
-
                         <group>
                             <group>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_id' />
                                 <field name='bom_id' options="{'no_create': 1}" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                             </group>
                             <group>
                                 <field name='fee' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_dest_id' />
                             </group>
                         </group>
 
                         <group string='组合件'>
                             <field nolabel='1' name='line_in_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_in_assembly_tree',
-                                'warehouse_type': 'production',
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
                         <group string='子件'>
                             <field nolabel='1' name='line_out_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_out_tree',
-                                'warehouse_dest_type': 'others',
                                 'lot': True,
                                 'type': 'out',
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                        </group>
+
+                        <group>
+                            <field name='note' nolabel='1' placeholder='备注...' />
                         </group>
 
                         <group col='6'>
@@ -158,10 +160,6 @@
                                 <field name='approve_uid' readonly='1' />
                                 <field name='approve_date' readonly='1' />
                             </group>
-                        </group>
-
-                        <group>
-                            <field name='note' nolabel='1' placeholder='备注。。。' />
                         </group>
                     </sheet>
                 </form>
@@ -186,6 +184,7 @@
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='子件单位' />
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='子件单位成本' />
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本' />
+                    <field name='warehouse_id' />
                     <field name='state' />
                 </tree>
             </field>
@@ -203,25 +202,21 @@
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
                     <sheet>
-                        <h1>
-                            <label string='拆卸单' />
-                            <field name="name" class="oe_inline" readonly="1" />
-                        </h1>
-
                         <group>
                             <group>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_id' />
                                 <field name='bom_id' options="{'no_create': 1}" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                             </group>
                             <group>
                                 <field name='fee' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='warehouse_dest_id' />
                             </group>
                         </group>
 
                         <group string='组合件'>
                             <field nolabel='1' name='line_out_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_out_tree',
-                                'warehouse_dest_type': 'others',
                                 'lot': True,
                                 'type': 'out',
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
@@ -230,11 +225,12 @@
                         <group string='子件'>
                             <field nolabel='1' name='line_in_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_in_assembly_tree',
-                                'warehouse_type': 'production',
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
-
+                        <group>
+                            <field name='note' nolabel='1' placeholder='备注...' />
+                        </group>
 
                         <group col='6'>
                             <group colspan='2'>
@@ -249,10 +245,6 @@
                                 <field name='approve_uid' readonly='1' />
                                 <field name='approve_date' readonly='1' />
                             </group>
-                        </group>
-
-                        <group>
-                            <field name='note' nolabel='1' placeholder='备注。。。' />
                         </group>
                     </sheet>
                 </form>

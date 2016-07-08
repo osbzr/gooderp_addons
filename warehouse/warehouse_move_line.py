@@ -17,6 +17,7 @@ class wh_move_line(models.Model):
     MOVE_LINE_TYPE = [
         ('out', u'出库'),
         ('in', u'入库'),
+        ('internal', u'内部调拨'),
     ]
 
     MOVE_LINE_STATE = [

@@ -23,7 +23,7 @@ class wh_inventory(models.Model):
 
     date = fields.Date(u'日期', default=fields.Date.context_today)
     name = fields.Char(u'名称', copy=False, default='/')
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
+    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True)
     goods = fields.Char(u'产品')
     uos_not_zero = fields.Boolean(u'辅助数量不为0')
     out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False)
@@ -108,7 +108,7 @@ class wh_inventory(models.Model):
         out_vals = {
             'warehouse_dest_id': inventory_warehouse.id,
             'warehouse_id': inventory.warehouse_id.id,
-            'type': 'losses',
+            'type': 'inventory',
             'line_out_ids': [],
         }
 
@@ -124,7 +124,7 @@ class wh_inventory(models.Model):
         in_vals = {
             'warehouse_dest_id': inventory.warehouse_id.id,
             'warehouse_id': inventory_warehouse.id,
-            'type': 'overage',
+            'type': 'inventory',
             'line_in_ids': [],
         }
 

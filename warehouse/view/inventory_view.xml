@@ -34,19 +34,13 @@
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
                     <sheet>
-                        <h1>
-                            <label string='盘点单' />
-                            <field name="name" class="oe_inline" readonly="1" />
-                        </h1>
-
                         <div>
                             <p>在盘点完成前，请不要做出入库单据，盘点库存与查询时的系统库存比较计算盈亏,如果库存在查询后又发生了变化，需要重新查询一次获取最新的库存信息</p>
                         </div>
 
                         <group >
                             <group>
-                                <field name='warehouse_id' attrs="{'readonly': [('state', 'not in', ('draft', 'query'))]}"
-                                	groups='warehouse.multi_warehouse_groups' />
+                                <field name='warehouse_id' attrs="{'readonly': [('state', 'not in', ('draft', 'query'))]}"/>
                                 <field name='goods' help='输入产品的关键字，将只会查询到关键字匹配到的产品' attrs="{'readonly': [('state', 'not in', ('draft', 'query'))]}" />
                                 <field name='out_id' invisible='1' />
                                 <field name='in_id' invisible='1' />
@@ -60,25 +54,35 @@
                         <group string='盘点明细'>
                             <field name='line_ids' nolabel='1' context="{'lot': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'query'))]}" >
                                 <tree string='盘点明细' create='0' delete='0' editable='bottom'>
-                                    <field name='warehouse_id' readonly='1' groups='warehouse.multi_warehouse_groups' />
                                     <field name='goods_id' readonly='1 '/>
-                                    <field name='lot_type' invisible='1' groups='goods.auxiliary_unit_groups' />
                                     <field name='attribute_id' readonly='1' groups='goods.multi_attrs_groups' />
-                                    <field name='uom_id' readonly='1' />
-                                    <field name='uos_id' readonly='1' groups='goods.auxiliary_unit_groups' />
                                     <field name='lot' readonly='1' groups='goods.batch_groups' />
-                                    <field name='real_qty' readonly='1' sum='1' />
-                                    <field name='real_uos_qty' readonly='1' sum='1' groups='goods.auxiliary_unit_groups' />
-                                    <field name='inventory_qty' />
                                     <field name='inventory_uos_qty' groups='goods.auxiliary_unit_groups' />
-                                    <field name='new_lot' attrs="{'readonly': [('lot_type', '!=', 'in')], 'required': [('lot_type', '=', 'in')]}" groups='goods.batch_groups' />
+                                    <field name='uos_id' readonly='1' groups='goods.auxiliary_unit_groups' />
+                                    <field name='inventory_qty' />
+                                    <field name='uom_id' readonly='1' />
+                                    <field name='real_uos_qty' readonly='1' sum='1' groups='goods.auxiliary_unit_groups' />
+                                    <field name='real_qty' readonly='1' sum='1' />
+                                    <!--readonly 应该为invisible ?-->
+                                    <field name='new_lot'
+                                    	attrs="{'readonly': [('lot_type', '!=', 'in')], 'required': [('lot_type', '=', 'in')]}"
+                                    	groups='goods.batch_groups' />
 
-                                    <field name='new_lot_id' attrs="{'readonly': [('lot_type', '!=', 'out')], 'required': [('lot_type', '=', 'out')]}" domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('lot', '=', lot)]" context="{'lot': True}" options="{'no_open': True, 'no_create': True}" groups='goods.batch_groups' />
-
-                                    <field name='difference_qty' readonly='1' />
+                                    <field name='new_lot_id'
+                                    	attrs="{'readonly': [('lot_type', '!=', 'out')], 'required': [('lot_type', '=', 'out')]}"
+                                    	domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('lot', '=', lot)]"
+                                    	context="{'lot': True}"
+                                    	options="{'no_open': True, 'no_create': True}"
+                                    	groups='goods.batch_groups' />
                                     <field name='difference_uos_qty' readonly='1' groups='goods.auxiliary_unit_groups' />
+                                    <field name='difference_qty' readonly='1' />
+                                    <field name='lot_type' invisible='1' />
                                 </tree>
                             </field>
+                        </group>
+
+                        <group>
+                            <field name='note' nolabel='1' placeholder='备注...' />
                         </group>
 
                         <group >
@@ -91,11 +95,6 @@
                                 <field name='write_date' string='最后修改时间' readonly='1' />
                             </group>
                         </group>
-
-                        <group>
-                            <field name='note' nolabel='1' placeholder='备注。。。' />
-                        </group>
-
                     </sheet>
                 </form>
             </field>
