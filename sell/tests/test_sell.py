@@ -474,7 +474,7 @@ class test_wh_move_line(TransactionCase):
                                'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 90)
-            line.with_context({'default_date':'2017-02-01',
+            line.with_context({'default_date':'3000-02-01',
                                'warehouse_type': 'customer',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 0)

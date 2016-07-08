@@ -257,8 +257,6 @@
                         <group string='入库明细'>
                             <field nolabel='1' name='line_in_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_in_tree',
-                                'warehouse_id': warehouse_id,
-                                'warehouse_dest_id': warehouse_dest_id,
                                 'type': 'in',
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
