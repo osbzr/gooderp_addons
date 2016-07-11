@@ -109,6 +109,7 @@ class checkout_wizard(models.TransientModel):
                         }
                         voucher = voucher_obj.create(valus)
                         voucher.voucher_done()
+                year_account = None
                 if self.period_id.month == '12':
                     year_profit_ids = voucher_line_obj.search([
                         ('account_id', '=', year_profit_account.id),
