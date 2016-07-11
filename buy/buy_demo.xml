@@ -12,7 +12,6 @@
         <record id="buy_order_line_1" model="buy.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.keyboard"/>
-            <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
             <field name="order_id" ref="buy_order_1"/>
             <field eval="50.0" name="price"/>
             <field name="attribute_id" ref="goods.keyboard_black"/>
@@ -29,7 +28,6 @@
         <record id="buy_order_line_1_same" model="buy.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.keyboard"/>
-            <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
             <field name="order_id" ref="buy_order_1_same"/>
             <field eval="50.0" name="price"/>
             <field name="attribute_id" ref="goods.keyboard_black"/>
@@ -65,7 +63,6 @@
         <record id="buy_return_order_line_1" model="buy.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.keyboard"/>
-            <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
             <field name="order_id" ref="buy_return_order_1"/>
             <field eval="50.0" name="price"/>
             <field name="attribute_id" ref="goods.keyboard_black"/>
@@ -81,7 +78,6 @@
         <record id="buy_return_order_line_1_same" model="buy.order.line">
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.cable"/>
-            <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
             <field name="order_id" ref="buy_return_order_1_same"/>
             <field eval="50.0" name="price"/>
             <field eval="10.0" name="quantity"/>
