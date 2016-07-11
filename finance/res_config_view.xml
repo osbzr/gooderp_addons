@@ -48,7 +48,7 @@
 
 
         <record id="view_finance_config_setting_action" model="ir.actions.act_window">
-            <field name="name">Configure_finance</field>
+            <field name="name">会计设置</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">finance.config.settings</field>
             <field name="view_id" ref="view_finance_config"/>
