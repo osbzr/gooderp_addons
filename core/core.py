@@ -73,12 +73,12 @@ class res_company(models.Model):
 
 class uom(models.Model):
     _name = 'uom'
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
 
 
 class settle_mode(models.Model):
     _name = 'settle.mode'
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
 
 
 class partner(models.Model):
@@ -123,7 +123,7 @@ class goods(models.Model):
                 name=name, args=args, operator=operator, limit=limit)
 
     code = fields.Char(u'编号')
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称',required=True)
     category_id = fields.Many2one('core.category', u'产品类别',
                                   ondelete='restrict',
                                   domain=[('type', '=', 'goods')],
@@ -132,21 +132,22 @@ class goods(models.Model):
     uos_id = fields.Many2one('uom', ondelete='restrict', string=u'辅助单位')
     conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
     cost = fields.Float(u'成本',
+                        required=True,
                         digits_compute=dp.get_precision('Amount'))
 
 class warehouse(models.Model):
     _name = 'warehouse'
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
 
 
 class staff(models.Model):
     _name = 'staff'
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
 
 
 class bank_account(models.Model):
     _name = 'bank.account'
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
     balance = fields.Float(u'余额', readonly=True,
                            digits_compute=dp.get_precision('Amount'))
 
@@ -347,8 +348,8 @@ class pricing(models.Model):
                                   domain=[('type', '=', 'goods')],
                                   context={'type': 'goods'})
     goods_id = fields.Many2one('goods',u'产品')
-    active_date = fields.Date(u'开始日期')
-    deactive_date = fields.Date(u'终止日期')
+    active_date = fields.Date(u'开始日期', required=True)
+    deactive_date = fields.Date(u'终止日期', required=True)
     discount_rate = fields.Float(u'折扣率%')
     
     
@@ -398,11 +399,11 @@ class service(models.Model):
     _name = 'service'
     _description = u'服务'
 
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
     get_categ_id = fields.Many2one('core.category',
                     u'收入类别', ondelete='restrict',
                     domain="[('type', '=', 'other_get')]")
     pay_categ_id = fields.Many2one('core.category',
                     u'支出类别', ondelete='restrict',
                     domain="[('type', '=', 'other_pay')]")
-    price = fields.Float(u'价格')
+    price = fields.Float(u'价格', required=True)
