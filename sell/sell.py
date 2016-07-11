@@ -190,7 +190,7 @@ class sell_order(models.Model):
 
     @api.one
     def get_delivery_line(self, line, single=False):
-        # TODO：如果退货，warehouse_dest_id，warehouse_id要调换
+        '''返回销售发货/退货单行'''
         qty = 0
         discount_amount = 0
         if single:
@@ -200,20 +200,12 @@ class sell_order(models.Model):
         else:
             qty = line.quantity - line.quantity_out
             discount_amount = line.discount_amount
-        if self.type == 'sell':
-            warehouse_id = line.warehouse_id.id
-            warehouse_dest_id = line.warehouse_dest_id.id
-        # 如果退货，调换warehouse_dest_id，warehouse_id
-        elif self.type == 'return':
-            warehouse_id = line.warehouse_dest_id.id
-            warehouse_dest_id = line.warehouse_id.id
+
         return {
             'sell_line_id': line.id,
             'goods_id': line.goods_id.id,
             'attribute_id': line.attribute_id.id,
             'uom_id': line.uom_id.id,
-            'warehouse_id': warehouse_id,
-            'warehouse_dest_id': warehouse_dest_id,
             'goods_qty': qty,
             'price': line.price,
             'discount_rate': line.discount_rate,
@@ -225,6 +217,7 @@ class sell_order(models.Model):
     @api.one
     def sell_generate_delivery(self):
         '''由销货订单生成销售发货单'''
+        # 如果退货，warehouse_dest_id，warehouse_id要调换
         delivery_line = []  # 销售发货单行
 
         for line in self.line_ids:
@@ -302,15 +295,6 @@ class sell_order_line(models.Model):
         '''返回订单行中产品是否使用属性'''
         self.using_attribute = self.goods_id.attribute_ids and True or False
 
-    @api.model
-    def _default_warehouse_dest(self):
-        context = self._context or {}
-        if context.get('warehouse_dest_type'):
-            return self.env['warehouse'].get_warehouse_by_type(
-                context.get('warehouse_dest_type'))
-
-        return False
-
     @api.one
     @api.depends('quantity', 'price', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
@@ -330,10 +314,6 @@ class sell_order_line(models.Model):
                                    ondelete='restrict', 
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
-    warehouse_id = fields.Many2one('warehouse', u'仓库', ondelete='restrict')
-    warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库', 
-                                        ondelete='restrict',
-                                        default=_default_warehouse_dest)
     quantity = fields.Float(u'数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
     quantity_out = fields.Float(u'已发货数量', copy=False,
@@ -358,12 +338,12 @@ class sell_order_line(models.Model):
     note = fields.Char(u'备注')
 
     @api.one
-    @api.onchange('warehouse_id','goods_id')
+    @api.onchange('goods_id')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
-        if self.warehouse_id and self.goods_id:
+        if self.order_id.warehouse_id and self.goods_id:
             partner = self.order_id.partner_id
-            warehouse = self.warehouse_id
+            warehouse = self.order_id.warehouse_id
             goods = self.goods_id
             date = self.order_id.date
             pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)

@@ -44,18 +44,11 @@ class test_buy_order(TransactionCase):
         self.assertTrue(order_copy_1.goods_state == u'部分入库')
 
     def test_default_warehouse_dest(self):
-        '''新建购货订单时调入仓库的默认值'''
+        '''新建购货订单时默认调入仓库'''
         order = self.env['buy.order'].with_context({
              'warehouse_dest_type': 'stock'
              }).create({})
-        # 验证明细行上仓库是否是购货订单上调入仓库
-        hd_stock = self.browse_ref('warehouse.hd_stock')
-        order.warehouse_dest_id = hd_stock
-        line = order.line_ids.with_context({
-            'default_warehouse_dest_id': order.warehouse_dest_id}).create({
-            'order_id': order.id})
-        self.assertTrue(line.warehouse_dest_id == hd_stock)
-        self.env['buy.order'].create({})
+        self.assertTrue(order.warehouse_dest_id.type == 'stock')
 
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
@@ -172,17 +165,6 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.using_attribute)
             line.goods_id = self.env.ref('goods.mouse')
             self.assertTrue(not line.using_attribute)
-
-    def test_default_warehouse(self):
-        '''新建订单行调出仓库默认值'''
-        self.order.line_ids.with_context({
-             'warehouse_type': 'supplier'
-             }).create({
-                       'order_id': self.order.id,
-                       })
-        self.order.line_ids.create({
-                       'order_id': self.order.id,
-                       })
 
     def test_compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
