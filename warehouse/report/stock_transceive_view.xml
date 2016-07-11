@@ -11,15 +11,15 @@
                     <field name='attribute' groups='goods.multi_attrs_groups' />
 
                     <field name='goods_qty_begain' />
-                    <field name='goods_qty_out' />
                     <field name='goods_qty_in' />
+                    <field name='goods_qty_out' />
                     <field name='goods_qty_end' />
 
                     <field name='uom' />
 
 					<field name='cost_begain' groups='goods.view_cost_groups'/>
-                    <field name='cost_out' groups='goods.view_cost_groups'/>
                     <field name='cost_in' groups='goods.view_cost_groups'/>
+                    <field name='cost_out' groups='goods.view_cost_groups'/>
                     <field name='cost_end' groups='goods.view_cost_groups'/>
                     <button name="find_source_move_line" type="object" string="查看库存调拨明细" icon="terp-stock_zoom" class="oe_highlight"/>
                 </tree>
