@@ -9,6 +9,7 @@
 		<record id="group_mail" model="res.groups">
 			<field name='name'>查看消息</field>
 			<field name='category_id' ref="core.Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 	</data>
 </openerp>

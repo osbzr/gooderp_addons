@@ -11,6 +11,7 @@
 		<record id="group_account_goods" model="res.groups">
 			<field name='name'>凭证行上的商品</field>
 			<field name='category_id' ref="core.Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 
 	</data>

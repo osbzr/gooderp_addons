@@ -11,16 +11,19 @@
 			<field name='name'>财务经理</field>
 			<field name='category_id' ref="core.Gooderp"/>
 			<field name="implied_ids" eval="[(4, ref('group_cashier'))]"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理核销组-->
 		<record id='reconcile_groups' model='res.groups'>
 			<field name='name'>管理核销</field>
 			<field name='category_id' ref="core.Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理其他收入支出组-->
 		<record id='other_get_pay_groups' model='res.groups'>
 			<field name='name'>管理其他收入支出</field>
 			<field name='category_id' ref="core.Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 	</data>
 </openerp>
