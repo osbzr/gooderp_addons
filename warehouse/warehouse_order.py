@@ -108,7 +108,7 @@ class wh_in(models.Model):
     @api.multi
     @api.onchange('type')
     def onchange_type(self):
-        self.warehouse_id = self.env['warehouse'].get_warehouse_by_type(self.type)
+        self.warehouse_id = self.env['warehouse'].get_warehouse_by_type(self.type).id
 
 
 class wh_internal(osv.osv):
