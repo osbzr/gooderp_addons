@@ -64,6 +64,7 @@ class buy_order(models.Model):
 
     @api.model
     def _default_warehouse_dest(self):
+        '''获取默认调入仓库'''
         if self.env.context.get('warehouse_dest_type'):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_dest_type'))
@@ -205,7 +206,7 @@ class buy_order(models.Model):
 
     @api.one
     def get_receipt_line(self, line, single=False):
-        # TODO：如果退货，warehouse_dest_id，warehouse_id要调换
+        '''返回采购入库/退货单行'''
         qty = 0
         discount_amount = 0
         if single:
@@ -215,20 +216,11 @@ class buy_order(models.Model):
         else:
             qty = line.quantity - line.quantity_in
             discount_amount = line.discount_amount
-        if self.type == 'buy':
-            warehouse_id = line.warehouse_id.id
-            warehouse_dest_id = line.warehouse_dest_id.id
-        # 如果退货，调换warehouse_dest_id，warehouse_id
-        elif self.type == 'return':
-            warehouse_id = line.warehouse_dest_id.id
-            warehouse_dest_id = line.warehouse_id.id
         return {
                     'buy_line_id': line.id,
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
                     'uom_id': line.uom_id.id,
-                    'warehouse_id': warehouse_id,
-                    'warehouse_dest_id': warehouse_dest_id,
                     'goods_qty': qty,
                     'cost_unit': line.price,
                     'price': line.price,
@@ -240,8 +232,9 @@ class buy_order(models.Model):
 
     @api.one
     def buy_generate_receipt(self):
-        '''由购货订单生成采购入库单'''
-        receipt_line = []  # 采购入库单行
+        '''由购货订单生成采购入库/退货单'''
+        # 如果退货，warehouse_dest_id，warehouse_id要调换
+        receipt_line = []  # 采购入库/退货单行
 
         for line in self.line_ids:
             # 如果订单部分入库，则点击此按钮时生成剩余数量的入库单
@@ -355,14 +348,6 @@ class buy_order_line(models.Model):
         '''返回订单行中产品是否使用属性'''
         self.using_attribute = self.goods_id.attribute_ids and True or False
 
-    @api.model
-    def _default_warehouse(self):
-        context = self._context or {}
-        if context.get('warehouse_type'):
-            return self.env['warehouse'].get_warehouse_by_type(
-                                            context.get('warehouse_type'))
-        return False
-
     @api.one
     @api.depends('quantity', 'price', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
@@ -382,11 +367,6 @@ class buy_order_line(models.Model):
                                    ondelete='restrict',
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
-    warehouse_id = fields.Many2one('warehouse', u'调出仓库',
-                                   ondelete='restrict',
-                                   default=_default_warehouse)
-    warehouse_dest_id = fields.Many2one('warehouse',
-                                        u'仓库', ondelete='restrict')
     quantity = fields.Float(u'数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
     quantity_in = fields.Float(u'已执行数量', copy=False,

@@ -89,18 +89,6 @@ class Test_sell(TransactionCase):
 
     def test_sale_order_line_compute(self):
         """测试销售订单的on_change 和 计算字段"""
-        vals = {
-            'order_id': self.order_2.id,
-            'goods_id': self.goods.id
-        }
-        sell_order_line = self.env['sell.order.line']
-        sell_order_line._default_warehouse_dest()
-
-        sell_order_line_default = sell_order_line.with_context({'warehouse_dest_type': u'customer'}).create(vals)
-
-        # 测试 产品自动带出 默认值 的仓库
-        self.assertEqual(sell_order_line_default.warehouse_dest_id.id,  self.warehouse_dest_id.id)
-        # self.assertEqual(sell_order_line_default.warehouse_id.id,  self.warehouse_id.id)
 
         # sell_order_line 的计算字段的测试
         self.assertEqual(self.sell_order_line.amount, 90)  # tax_amount subtotal
@@ -194,14 +182,7 @@ class test_sell_order(TransactionCase):
         order = self.env['sell.order'].with_context({
              'warehouse_type': 'stock'
              }).create({})
-        # 验证明细行上仓库是否是销货订单上调出仓库
-        hd_stock = self.browse_ref('warehouse.hd_stock')
-        order.warehouse_id = hd_stock
-        line = order.line_ids.with_context({
-            'default_warehouse_id': order.warehouse_id}).create({
-            'order_id': order.id})
-        self.assertTrue(line.warehouse_id == hd_stock)
-        self.env['sell.order'].create({})
+        self.assertTrue(order.warehouse_id.type == 'stock')
 
     def test_unlink(self):
         '''测试删除已审核的销货订单'''
