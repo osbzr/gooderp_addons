@@ -25,53 +25,22 @@ class buy_order_detail_wizard(models.TransientModel):
 
     @api.multi
     def button_ok(self):
-        res = []
+        '''向导上的确定按钮'''
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
 
-        # 先查找采购明细表，若有数据则清空
-        for detail in self.env['buy.order.detail'].search([]):
-            detail.unlink()
-
-        domain = [('move_id.date', '>=', self.date_start),
-                  ('move_id.date', '<=', self.date_end),
-                  ('move_id.origin', 'like', 'buy'),
-                  ('state', '=', 'done'),
+        domain = [('date', '>=', self.date_start),
+                  ('date', '<=', self.date_end),
                   ]
 
         if self.goods_id:
             domain.append(('goods_id', '=', self.goods_id.id))
         if self.partner_id:
-            domain.append(('move_id.partner_id', '=', self.partner_id.id))
+            domain.append(('partner_id', '=', self.partner_id.id))
         if self.order_id:
             buy_receipt = self.env['buy.receipt'].search(
                                 [('id', '=', self.order_id.id)])
-            domain.append(('move_id.id', '=', buy_receipt.buy_move_id.id))
-
-        order_type = ''
-        for line in self.env['wh.move.line'].search(domain, order='move_id'):
-            if line.move_id.origin and 'return' in line.move_id.origin:
-                order_type = '退货'
-            else:
-                order_type = '购货'
-            detail = self.env['buy.order.detail'].create({
-                'date': line.move_id.date,
-                'order_name': line.move_id.name,
-                'type': order_type,
-                'partner_id': line.move_id.partner_id.id,
-                'goods_code': line.goods_id.code,
-                'goods_id': line.goods_id.id,
-                'attribute': line.attribute_id.name,
-                'uom': line.uom_id.name,
-                'warehouse_dest': line.warehouse_dest_id.name,
-                'qty': line.goods_qty,
-                'price': line.price,
-                'amount': line.amount,
-                'tax_amount': line.tax_amount,
-                'subtotal': line.subtotal,
-                'note': line.note,
-            })
-            res.append(detail.id)
+            domain.append(('id', '=', buy_receipt.buy_move_id.id))
 
         view = self.env.ref('buy.buy_order_detail_tree')
         return {
@@ -82,6 +51,6 @@ class buy_order_detail_wizard(models.TransientModel):
             'views': [(view.id, 'tree')],
             'res_model': 'buy.order.detail',
             'type': 'ir.actions.act_window',
-            'domain': [('id', 'in', res)],
+            'domain': domain,
             'limit': 300,
         }
