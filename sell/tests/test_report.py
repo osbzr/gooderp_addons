@@ -268,6 +268,7 @@ class test_goods_wizard(TransactionCase):
         new_context = new_goods_wizard.button_ok().get('context')
         new_results = summary_goods.with_context(new_context).search_read(
                                                                   domain=[])
+        print '结果：',results
         self.assertEqual(len(results), 1)
         self.assertEqual(len(new_results), 0)
 
