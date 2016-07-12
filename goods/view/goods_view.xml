@@ -64,6 +64,17 @@
 				</form>
 			</field>
 		</record>
+		<record id='goods_search' model='ir.ui.view'>
+			<field name='name'>goods.search</field>
+			<field name='model'>goods</field>
+			<field name='arch' type='xml'>
+				<search string='产品'>
+					<field name='code' />
+					<field name='name' />
+					<field name='category_id' />
+				</search>
+			</field>
+		</record>
 		<record id='attribute_form' model='ir.ui.view'>
 			<field name='name'>attribute.form</field>
 			<field name='model'>attribute</field>
