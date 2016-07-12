@@ -25,61 +25,23 @@ class sell_order_detail_wizard(models.TransientModel):
 
     @api.multi
     def button_ok(self):
-        res = []
+        '''向导上的确定按钮'''
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
 
-        # 先查找销售明细表，若有数据则清空
-        for detail in self.env['sell.order.detail'].search([]):
-            detail.unlink()
-
-        domain = [('move_id.date', '>=', self.date_start),
-                  ('move_id.date', '<=', self.date_end),
-                  ('move_id.origin', 'like', 'sell.delivery'),
-                  ('state', '=', 'done'),
+        domain = [('date', '>=', self.date_start),
+                  ('date', '<=', self.date_end),
                   ]
 
         if self.goods_id:
             domain.append(('goods_id', '=', self.goods_id.id))
         if self.partner_id:
-            domain.append(('move_id.partner_id', '=', self.partner_id.id))
-
-        order_type = ''
-        staff_id = None
-        for line in self.env['wh.move.line'].search(domain, order='move_id'):
-            if line.move_id.origin and 'return' in line.move_id.origin:
-                order_type = u'退货'
-            else:
-                order_type = u'销货'
-            sell_delivery = self.env['sell.delivery'].search(
-                                [('sell_move_id', '=', line.move_id.id)])
-            if sell_delivery:
-                staff_id = sell_delivery.staff_id and sell_delivery.staff_id.id or ''
-            detail = self.env['sell.order.detail'].create({
-                    'date': line.move_id.date,
-                    'order_name': line.move_id.name,
-                    'type': order_type,
-                    'staff_id': staff_id,
-                    'partner_id': line.move_id.partner_id.id,
-                    'goods_code': line.goods_id.code,
-                    'goods_id': line.goods_id.id,
-                    'attribute': line.attribute_id.name,
-                    'uom': line.uom_id.name,
-                    'warehouse': line.warehouse_id.name,
-                    'qty': line.goods_qty,
-                    'price': line.price,
-                    'amount': line.amount,
-                    'tax_amount': line.tax_amount,
-                    'subtotal': line.subtotal,
-                    'note': line.note,
-                })
-            res.append(detail.id)
+            domain.append(('partner_id', '=', self.partner_id.id))
+        if self.staff_id:
+            domain.append(('staff_id', '=', self.staff_id.id))
 
         view = self.env.ref('sell.sell_order_detail_tree')
         graph_view = self.env.ref('sell.sell_order_detail_graph')
-        cond = [('id', 'in', res)]
-        if self.staff_id:
-            cond.append(('staff_id', '=', self.staff_id.id))
         return {
             'name': u'销售明细表',
             'view_type': 'form',
@@ -88,6 +50,6 @@ class sell_order_detail_wizard(models.TransientModel):
             'views': [(view.id, 'tree'),(graph_view.id,'graph')],
             'res_model': 'sell.order.detail',
             'type': 'ir.actions.act_window',
-            'domain': cond,
+            'domain': domain,
             'limit': 300,
         }
