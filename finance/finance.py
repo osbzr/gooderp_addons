@@ -216,7 +216,10 @@ class finance_period(models.Model):
                 ('month', '=', int(date[5:7]))
             ])
             if period_id:
-                return period_id
+                if period_id.is_closed:
+                    raise except_orm(u'错误', u'此会计期间已关闭')
+                else:
+                    return period_id
             else:
                 raise except_orm(u'错误', u'此日期对应的会计期间不存在')
 
