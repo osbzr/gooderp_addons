@@ -57,9 +57,11 @@ class wh_move(models.Model):
     @api.model
     def scan_barcode(self,model_name,barcode,order_id):
         val = {}
-        create_line = False
+        create_line = False # 是否需要创建明细行
         att = self.env['attribute'].search([('ean','=',barcode)])
-        if not att:
+        goods = self.env['goods'].search([('barcode', '=', barcode)])
+        print '产品：',att,goods
+        if not att and not goods:
             raise osv.except_osv(u'错误', u'该产品不存在')
         else:
             if model_name in ['wh.out','wh.in']:
@@ -67,54 +69,107 @@ class wh_move(models.Model):
             if model_name == 'wh.out':
                 val['type'] = 'out'
                 for line in move.line_out_ids:
-                    if line.attribute_id.id == att.id:
+                    line.cost_unit = line.goods_id.price
+                    # 如果产品属性上存在条码，且明细行上已经存在该产品，则数量累加
+                    if att and line.attribute_id.id == att.id:
                         line.goods_qty += 1
-                        create_line =True
+                        create_line = True
+                    # 如果产品上存在条码，且明细行上已经存在该产品，则数量累加
+                    elif goods and line.goods_id.id == goods.id:
+                        line.goods_qty += 1
+                        create_line = True
             if model_name == 'wh.in':
                 val['type'] = 'in'
                 for line in move.line_in_ids:
+                    line.cost_unit = line.goods_id.cost
                     if line.attribute_id.id == att.id:
                         line.goods_qty += 1
-                        create_line =True
+                        create_line = True
+                    elif goods and line.goods_id.id == goods.id:
+                        line.goods_qty += 1
+                        create_line = True
             #销售出入库单的二维码
             if model_name == 'sell.delivery':
                 move = self.env[model_name].browse(order_id).sell_move_id
                 if self.env[model_name].browse(order_id).is_return == True:
                     val['type'] = 'in'
                     for line in move.line_in_ids:
+                        line.price = line.goods_id.cost
                         if line.attribute_id.id == att.id:
                             line.goods_qty += 1
-                            create_line =True
+                            create_line = True
+                        elif goods and line.goods_id.id == goods.id:
+                            line.goods_qty += 1
+                            create_line = True
                 else:
                     val['type'] = 'out'
                     for line in move.line_out_ids:
+                        line.price = line.goods_id.price
                         if line.attribute_id.id == att.id:
                             line.goods_qty += 1
-                            create_line =True
+                            create_line = True
+                        elif goods and line.goods_id.id == goods.id:
+                            line.goods_qty += 1
+                            create_line = True
             #采购出入库单的二维码
             if model_name == 'buy.receipt':
                 move = self.env[model_name].browse(order_id).buy_move_id
                 if self.env[model_name].browse(order_id).is_return == True:
                     val['type'] = 'out'
                     for line in move.line_out_ids:
+                        line.price = line.goods_id.price
                         if line.attribute_id.id == att.id:
                             line.goods_qty += 1
-                            create_line =True
+                            create_line = True
+                        elif goods and line.goods_id.id == goods.id:
+                            line.goods_qty += 1
+                            create_line = True
                 else:
                     val['type'] = 'in'
                     for line in move.line_in_ids:
+                        line.price = line.goods_id.cost
                         if line.attribute_id.id == att.id:
                             line.goods_qty += 1
-                            create_line =True
+                            create_line = True
+                        elif goods and line.goods_id.id == goods.id:
+                            line.goods_qty += 1
+                            create_line = True
+            if att:
+                goods_id = att.goods_id.id
+                uos_id = att.goods_id.uos_id.id
+                uom_id = att.goods_id.uom_id.id
+                attribute_id = att.id
+                conversion = att.goods_id.conversion
+                if val['type'] == 'in':
+                    # 入库操作取产品的成本
+                    price = cost_unit = att.goods_id.cost
+                elif val['type'] == 'out':
+                    # 出库操作取产品的零售价
+                    price = cost_unit = att.goods_id.price
+            elif goods:
+                goods_id = goods.id
+                uos_id = goods.uos_id.id
+                uom_id = goods.uom_id.id
+                attribute_id = False
+                conversion = goods.conversion
+                if val['type'] == 'in':
+                    # 入库操作取产品的成本
+                    price = cost_unit = goods.cost
+                elif val['type'] == 'out':
+                    # 出库操作取产品的零售价
+                    price = cost_unit = goods.price
             val.update({
-              'goods_id':att.goods_id.id,
-              'uom_id':att.goods_id.uom_id.id,
-              'warehouse_id':move.warehouse_id.id,
+              'goods_id': goods_id,
+              'attribute_id': attribute_id,
+              'warehouse_id': move.warehouse_id.id,
               'warehouse_dest_id': move.warehouse_dest_id.id,
-              'attribute_id':att.id,
-              'price':att.goods_id.price,
-              'goods_qty':1,
-              'move_id':move.id})
+              'goods_uos_qty': 1.0 / conversion,
+              'uos_id': uos_id,
+              'goods_qty': 1,
+              'uom_id': uom_id,
+              'price': price,
+              'cost_unit': cost_unit,
+              'move_id': move.id})
             if create_line == False:
                 self.env['wh.move.line'].create(val)
 
