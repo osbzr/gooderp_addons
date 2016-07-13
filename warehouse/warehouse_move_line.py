@@ -161,13 +161,26 @@ class wh_move_line(models.Model):
     def name_get(self):
         res = []
         for line in self:
-            if self.env.context.get('lot'):
-                res.append((line.id, '%s-%s-%s' % (line.lot, line.warehouse_dest_id.name, line.qty_remaining)))
-            else:
+            if self.env.context.get('match'):
                 res.append((line.id, '%s-%s->%s(%s, %s%s)' %
                     (line.move_id.name, line.warehouse_id.name, line.warehouse_dest_id.name,
                         line.goods_id.name, str(line.goods_qty), line.uom_id.name)))
+            else:
+                res.append((line.id, line.lot))
         return res
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        ''' 批号下拉的时候显示批次和剩余数量 '''
+        result = []
+        domain = []
+        if args:
+            domain = args
+        if name:
+            domain.append(('lot',operator,name))
+        records = self.search(domain,limit=limit)
+        for line in records:
+            result.append((line.id, u'%s 余 %s' % (line.lot, line.qty_remaining)))
+        return result
 
     def check_availability(self):
         if self.warehouse_dest_id == self.warehouse_id:
@@ -214,8 +227,8 @@ class wh_move_line(models.Model):
         lot_domain = [('goods_id', '=', self.goods_id.id), ('state', '=', 'done'),
             ('lot', '!=', False), ('qty_remaining', '>', 0)]
 
-        if self.warehouse_id:
-            lot_domain.append(('warehouse_dest_id', '=', self.warehouse_id.id))
+        if self.move_id:
+            lot_domain.append(('warehouse_dest_id', '=', self.move_id.warehouse_id.id))
 
         if self.attribute_id:
             lot_domain.append(('attribute_id', '=', self.attribute_id.id))
@@ -282,7 +295,6 @@ class wh_move_line(models.Model):
     @api.onchange('lot_id')
     def onchange_lot_id(self):
         if self.lot_id:
-            self.warehouse_id = self.lot_id.warehouse_dest_id
             self.lot_qty = self.lot_id.qty_remaining
             self.lot_uos_qty = self.goods_id.anti_conversion_unit(self.lot_qty)
 
