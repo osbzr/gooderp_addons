@@ -154,5 +154,5 @@ class ProfitStatement(models.Model):
     balance = fields.Char(u'项目')
     line_num = fields.Integer(u'行次')
     cumulative_occurrence_balance = fields.Float(u'本年累计金额')
-    occurrence_balance_formula = fields.Text(u'金额计算参数')
+    occurrence_balance_formula = fields.Text(u'科目范围')
     current_occurrence_balance = fields.Float(u'本月金额')

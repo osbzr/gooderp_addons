@@ -78,6 +78,25 @@ class test_report(TransactionCase):
         report.create_vouchers_summary()
         report.create_general_ledger_account()
 
+    def test_view_detail_voucher(self):
+        '''在明细账上查看凭证明细按钮'''
+        report = self.env['create.vouchers.summary.wizard'].create(
+            {'period_begin_id': self.period_id,
+             'period_end_id': self.period_id,
+             'subject_name_id': self.env.ref('finance.account_fund').id,
+             'subject_name_end_id': self.env.ref('finance.account_fund').id,
+             })
+        # 结转2015年12月的期间
+        month_end = self.env['checkout.wizard'].create(
+                       {'date':'2015-12-31'})
+        month_end.onchange_period_id()
+        month_end.button_checkout()
+        result = report.create_vouchers_summary()
+        ids = result['domain'][0][2]
+        for line in self.env['vouchers.summary'].browse(ids):
+            if line.voucher_id:
+                line.view_detail_voucher()
+
     def test_get_year_balance(self):
         '''根据期间和科目名称 计算出本期合计 和本年累计 (已经关闭的期间)'''
         voucher = self.env['checkout.wizard'].create({
