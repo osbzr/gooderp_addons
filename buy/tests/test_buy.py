@@ -374,6 +374,16 @@ class test_buy_receipt(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,self.receipt.id)
         warehouse.scan_barcode(model_name,barcode,self.receipt.id)
 
+        # 产品的条形码扫码出入库
+        barcode = '123456789'
+        #采购入库单扫码
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
+        #采购退货单扫码
+        buy_order_return = self.env.ref('buy.buy_receipt_return_1')
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+
 
 class test_wh_move_line(TransactionCase):
 

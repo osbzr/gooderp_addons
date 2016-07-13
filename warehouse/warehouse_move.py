@@ -60,12 +60,13 @@ class wh_move(models.Model):
         create_line = False # 是否需要创建明细行
         att = self.env['attribute'].search([('ean','=',barcode)])
         goods = self.env['goods'].search([('barcode', '=', barcode)])
-        print '产品：',att,goods
+
         if not att and not goods:
             raise osv.except_osv(u'错误', u'该产品不存在')
         else:
             if model_name in ['wh.out','wh.in']:
                 move = self.env[model_name].browse(order_id).move_id
+            # 在其他出库单上扫描条码
             if model_name == 'wh.out':
                 val['type'] = 'out'
                 for line in move.line_out_ids:
@@ -78,13 +79,16 @@ class wh_move(models.Model):
                     elif goods and line.goods_id.id == goods.id:
                         line.goods_qty += 1
                         create_line = True
+            # 在其他入库单上扫描条码
             if model_name == 'wh.in':
                 val['type'] = 'in'
                 for line in move.line_in_ids:
                     line.cost_unit = line.goods_id.cost
-                    if line.attribute_id.id == att.id:
+                    # 如果产品属性上存在条码
+                    if att and line.attribute_id.id == att.id:
                         line.goods_qty += 1
                         create_line = True
+                    # 如果产品上存在条码
                     elif goods and line.goods_id.id == goods.id:
                         line.goods_qty += 1
                         create_line = True
@@ -95,9 +99,11 @@ class wh_move(models.Model):
                     val['type'] = 'in'
                     for line in move.line_in_ids:
                         line.price = line.goods_id.cost
-                        if line.attribute_id.id == att.id:
+                        # 如果产品属性上存在条码
+                        if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
                             create_line = True
+                        # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
                             create_line = True
@@ -105,9 +111,11 @@ class wh_move(models.Model):
                     val['type'] = 'out'
                     for line in move.line_out_ids:
                         line.price = line.goods_id.price
-                        if line.attribute_id.id == att.id:
+                        # 如果产品属性上存在条码
+                        if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
                             create_line = True
+                        # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
                             create_line = True
@@ -118,9 +126,11 @@ class wh_move(models.Model):
                     val['type'] = 'out'
                     for line in move.line_out_ids:
                         line.price = line.goods_id.price
-                        if line.attribute_id.id == att.id:
+                        # 如果产品属性上存在条码
+                        if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
                             create_line = True
+                        # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
                             create_line = True
@@ -128,9 +138,11 @@ class wh_move(models.Model):
                     val['type'] = 'in'
                     for line in move.line_in_ids:
                         line.price = line.goods_id.cost
-                        if line.attribute_id.id == att.id:
+                        # 如果产品属性上存在条码
+                        if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
                             create_line = True
+                        # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
                             create_line = True
