@@ -179,7 +179,7 @@ class wh_move_line(models.Model):
             domain.append(('lot',operator,name))
         records = self.search(domain,limit=limit)
         for line in records:
-            result.append((line.id, u'%s 余 %s' % (line.lot, line.qty_remaining)))
+            result.append((line.id, u'%s %s 余 %s' % (line.lot, line.warehouse_dest_id.name, line.qty_remaining)))
         return result
 
     def check_availability(self):
