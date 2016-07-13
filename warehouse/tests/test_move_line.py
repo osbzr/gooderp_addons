@@ -50,14 +50,14 @@ class TestMoveLine(TransactionCase):
 
     def test_name_get(self):
         line = self.mouse_in_line
-        name = line.name_get()
+        name = line.with_context({'match': 1}).name_get()
         real_name = '%s-%s->%s(%s, %s%s)' % (line.move_id.name, line.warehouse_id.name,
                                              line.warehouse_dest_id.name, line.goods_id.name,
                                              str(line.goods_qty), line.uom_id.name)
         self.assertEqual(name[0][1], real_name)
 
-        lot_name = line.with_context({'lot': True}).name_get()
-        real_lot_name = '%s-%s-%s' % (line.lot, line.warehouse_dest_id.name, line.qty_remaining)
+        lot_name = line.name_get()
+        real_lot_name = line.lot
         self.assertEqual(lot_name[0][1], real_lot_name)
 
     def test_copy_data(self):
