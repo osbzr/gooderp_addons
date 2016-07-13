@@ -110,6 +110,15 @@ class test_money_order(TransactionCase):
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
 
+        # 清空一级客户类别的科目，审核时报错
+        self.env.ref('core.customer_category_1').account_id = False
+        with self.assertRaises(except_orm):
+            self.env.ref('money.get_40000').money_order_done()
+        # 清空本地供应商类别的科目，审核时报错
+        self.env.ref('core.supplier_category_1').account_id = False
+        with self.assertRaises(except_orm):
+            self.env.ref('money.pay_2000').money_order_done()
+
     def test_other_money_order_voucher(self):
         # get  银行账户没设置科目
         money1 = self.env['money.order'].with_context({'type': 'get'}) \
