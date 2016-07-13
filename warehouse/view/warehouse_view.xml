@@ -75,7 +75,7 @@
                     <field name='lot_id'
                     	groups='goods.batch_groups'
                     	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
-                    	domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]"
+                    	domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
                     	context="{'lot': True}"
                     	options="{'no_open': True, 'no_create': True}" />
                     <field name='goods_uos_qty' sum='1'
@@ -145,7 +145,7 @@
                     <field name='lot_id'
                     	groups='goods.batch_groups'
                     	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
-                    	domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0)]"
+                    	domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
                     	context="{'lot': True}"
                     	options="{'no_open': True, 'no_create': True}" />
                     <field name='goods_uos_qty' sum='1'

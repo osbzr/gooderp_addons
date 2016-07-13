@@ -211,7 +211,7 @@
 		         							groups='goods.multi_attrs_groups'
 		         							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
 	                    				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
-	                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', warehouse_id)]"
+	                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
 	                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
 	                    					groups='goods.batch_groups'/>
 		         						<field name='goods_uos_qty' sum='辅助数量合计'
