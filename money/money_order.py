@@ -143,6 +143,10 @@ class money_order(models.Model):
     def money_order_done(self):
         '''对收支单的审核按钮'''
         for order in self:
+            if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
+                raise except_orm(u'错误', u'请输入供应商类别上的科目')
+            if order.type == 'get' and not order.partner_id.c_category_id.account_id:
+                raise except_orm(u'错误', u'请输入客户类别上的科目')
             if order.advance_payment < 0:
                 raise except_orm(u'错误', u'核销金额不能大于付款金额')
 
