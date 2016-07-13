@@ -47,7 +47,6 @@ class voucher(models.Model):
     @api.depends('date')
     def _compute_period_id(self):
         self.period_id = self.env['finance.period'].get_period(self.date)
-        print '======period======',self.period_id
 
     document_word_id = fields.Many2one(
         'document.word', u'凭证字', ondelete='restrict', required=True,
@@ -211,13 +210,11 @@ class finance_period(models.Model):
 
     @api.multi
     def get_period(self, date):
-        print '222222222',date
         if date:
             period_id = self.search([
                 ('year', '=', date[0:4]),
                 ('month', '=', int(date[5:7]))
             ])
-            print '====period+++++++',period_id
             if period_id:
                 if period_id.is_closed:
                     raise except_orm(u'错误', u'此会计期间已关闭')
