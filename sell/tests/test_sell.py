@@ -397,6 +397,15 @@ class test_sell_delivery(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,delivery_order.id)
         warehouse.scan_barcode(model_name,barcode,delivery_order.id)
 
+        # 产品的条形码扫码出入库
+        barcode = '123456789'
+        #销售出库单扫码
+        warehouse.scan_barcode(model_name,barcode,delivery_order.id)
+        warehouse.scan_barcode(model_name,barcode,delivery_order.id)
+        #销售退货扫码
+        warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
+        warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
+
 
 class test_wh_move_line(TransactionCase):
 

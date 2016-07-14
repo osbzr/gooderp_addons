@@ -75,11 +75,17 @@ class uom(models.Model):
     _name = 'uom'
     name = fields.Char(u'名称', required=True)
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '单位不能重名')
+    ]
 
 class settle_mode(models.Model):
     _name = 'settle.mode'
     name = fields.Char(u'名称', required=True)
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '结算方式不能重名')
+    ]
 
 class partner(models.Model):
     _name = 'partner'
@@ -98,6 +104,10 @@ class partner(models.Model):
                               digits_compute=dp.get_precision('Amount'))
     payable = fields.Float(u'应付余额', readonly=True,
                            digits_compute=dp.get_precision('Amount'))
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '业务伙伴不能重名')
+    ]
 
 class goods(models.Model):
     _name = 'goods'
@@ -135,15 +145,25 @@ class goods(models.Model):
                         required=True,
                         digits_compute=dp.get_precision('Amount'))
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '产品不能重名')
+    ]
+
 class warehouse(models.Model):
     _name = 'warehouse'
     name = fields.Char(u'名称', required=True)
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '仓库不能重名')
+    ]
 
 class staff(models.Model):
     _name = 'staff'
     name = fields.Char(u'名称', required=True)
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '员工不能重名')
+    ]
 
 class bank_account(models.Model):
     _name = 'bank.account'
@@ -151,6 +171,9 @@ class bank_account(models.Model):
     balance = fields.Float(u'余额', readonly=True,
                            digits_compute=dp.get_precision('Amount'))
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '账户不能重名')
+    ]
 
 class pricing(models.Model):
     _name = 'pricing'
