@@ -4,25 +4,25 @@
 		<!--添加管理仓库组-->
 		<record id="group_warehouse" model="res.groups">
 			<field name='name'>仓库</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理组装拆卸组-->
 		<record id='assembly_groups' model='res.groups'>
 			<field name='name'>管理组装拆卸</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理其它出库单审核组-->
 		<record id='other_out_picking_groups' model='res.groups'>
 			<field name='name'>其它出库单审核</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理多个仓库组-->
 		<record id='multi_warehouse_groups' model='res.groups'>
 			<field name='name'>管理多个仓库</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 

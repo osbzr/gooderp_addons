@@ -430,3 +430,21 @@ class service(models.Model):
                     u'支出类别', ondelete='restrict',
                     domain="[('type', '=', 'other_pay')]")
     price = fields.Float(u'价格', required=True)
+
+
+class res_users(models.Model):
+    _inherit = 'res.users'
+
+    @api.multi
+    def write(self, vals):
+        res = super(res_users, self).write(vals)
+        # 如果普通用户修改管理员，则报错
+        if self.env.user.id != 1:
+            for record in self:
+                if record.id == 1:
+                    raise except_orm(u'错误', u'系统用户不可修改')
+        # 如果管理员将自己的系统管理权限去掉，则报错
+        else:
+            if not self.env.user.has_group('base.group_erp_manager'):
+                raise except_orm(u'错误', u'不能删除管理员的管理权限')
+        return res
