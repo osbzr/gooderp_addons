@@ -42,7 +42,7 @@
 			<field name="res_model">core.category</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
-			<field name="view_mode">tree,form</field>
+			<field name="view_mode">tree</field>
 		</record>
 		<menuitem id='core_category_menu' action='core_category_action' parent='config_data_menu' sequence='10'/>
 

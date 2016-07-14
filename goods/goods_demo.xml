@@ -122,7 +122,7 @@
         </record>
 
         <!-- 带条形码商品 -->
-        <record id="keyboard" model="goods">
+        <record id="computer" model="goods">
 			<field name="code">006</field>
 			<field name="name">电脑</field>
 			<field name="category_id" ref="core.goods_category_1"/>
@@ -130,8 +130,8 @@
 			<field name="uos_id" ref="core.uom_pc"/>
 			<field name="conversion">1</field>
 			<field name="barcode">123456789</field>
-			<field name="cost">800</field>
-			<field name="price">50</field>
+			<field name="cost">8000</field>
+			<field name="price">10000</field>
 		</record>
 	</data>
 </openerp>
