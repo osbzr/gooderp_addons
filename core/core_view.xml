@@ -1,12 +1,9 @@
 <?xml version="1.0"?>
 <openerp>
 	<data>
-
 		<!--根菜单-->
-
 		<menuitem id='setting_menu' name='配置' groups="core.master_groups"/>
-		<menuitem id='master_data_menu' name='基础资料' parent='setting_menu' sequence='10'/>
-		<menuitem id='config_data_menu' name='辅助资料' parent='setting_menu' sequence='20'/>
+		<menuitem id='config_data_menu' name='基本配置' parent='setting_menu' sequence='20'/>
 		<menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
 
 		<!--类别-->
@@ -44,7 +41,7 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<menuitem id='core_category_menu' action='core_category_action' parent='config_data_menu' sequence='10'/>
+		<menuitem id='core_category_menu' name='类别' action='core_category_action' parent='config_data_menu' sequence='2'/>
 
 		<!--可选值-->
 		<record id="core_value_tree" model="ir.ui.view">
@@ -64,7 +61,7 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<menuitem id='core_value_menu' action='core_value_action' parent='config_data_menu' sequence='900'/>
+		<menuitem id='core_value_menu' name='可选值' action='core_value_action' parent='config_data_menu' sequence='3'/>
 		<record id="core_value_menu" model="ir.ui.menu">
 			<field name="create_tag">1</field>
 		</record>
@@ -105,7 +102,7 @@
 			<field name="view_id" ref="company_form"/>
 			<field name="act_window_id" ref="company_action"/>
 		</record>
-		<menuitem id='company_menu' action='company_action' parent='system_menu' sequence='10'/>
+		<menuitem id='company_menu' name='系统参数' action='company_action' parent='system_menu' sequence='10'/>
 		<!--单位-->
 		<record id="uom_tree" model="ir.ui.view">
 			<field name="name">uom.tree</field>
@@ -123,7 +120,6 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<menuitem id='uom_menu' action='uom_action' parent='config_data_menu' sequence='20'/>
 		<!--结算方式-->
 		<record id="settle_mode_tree" model="ir.ui.view">
 			<field name="name">settle.mode.tree</field>
@@ -141,7 +137,6 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<menuitem id='settle_mode_menu' action='settle_mode_action' parent='config_data_menu' groups='core.settle_mode_groups' sequence='30'/>
 		<!--客户 form-->
 		<record id="customer_address_form" model="ir.ui.view">
 			<field name="name">customer.address.form</field>
@@ -205,7 +200,6 @@
 			<field name="view_id" ref="customer_address_form"/>
 			<field name="act_window_id" ref="customer_action"/>
 		</record>
-		<menuitem id='customer_menu' action='customer_action' parent='master_data_menu' sequence='10'/>
 		<!--供应商 form-->
 		<record id="supplier_address_form" model="ir.ui.view">
 			<field name="name">supplier.address.form</field>
@@ -266,9 +260,8 @@
 			<field name="view_id" ref="supplier_address_form"/>
 			<field name="act_window_id" ref="vendor_action"/>
 		</record>
-		<menuitem id='vendor_menu' action='vendor_action' parent='master_data_menu' sequence='20'/>
 		<!--用户-->
-		<menuitem id='users_menu' name="用户" action='base.action_res_users' parent='master_data_menu' sequence='50' groups="base.group_system"/>
+		<menuitem id='users_menu' name="用户" action='base.action_res_users' parent='config_data_menu' sequence='1' groups="base.group_erp_manager"/>
 		<!--账户-->
 		<record id="bank_account_tree" model="ir.ui.view">
 			<field name="name">bank.account.tree</field>
@@ -287,7 +280,6 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<menuitem id='bank_account_menu' action='bank_account_action' parent='master_data_menu' sequence='60'/>
 
 		<!--服务-->
 		<record id="service_tree" model="ir.ui.view">
@@ -326,10 +318,6 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
-		<menuitem id='service_menu' action='service_action' parent='master_data_menu' groups='core.service_groups' sequence='70'/>
-
-		<!-- 角色 -->
-		<menuitem id='groups_menu' name='权限设置' action='base.action_res_groups' parent='system_menu' sequence='20'/>
 
 		<!--定价策略-->
 		<record id="pricing_tree" model="ir.ui.view">
@@ -356,5 +344,9 @@
 			<field name="view_mode">tree</field>
 		</record>
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
+
+		<record model="ir.ui.menu" id="base.menu_administration">
+            <field name="groups_id" eval="[(3, ref('base.group_erp_manager'))]"/>
+        </record>
     </data>
 </openerp>

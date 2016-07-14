@@ -36,7 +36,7 @@
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
-        <menuitem id="menu_buy_report" name="报表" parent="menu_buy_root" sequence="2"/>
+
         <menuitem id="menu_buy_order_track" name="采购订单跟踪表" action="buy_order_track_wizard_action"
         	parent="menu_buy_report" sequence="1"
         	groups='buy.buy_groups'/>

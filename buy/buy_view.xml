@@ -532,14 +532,19 @@
             <field name="act_window_id" ref="buy_return_action"/>
         </record>
 
-        <menuitem id="menu_buy_order" action="buy_order_action"
+        <menuitem id="menu_buy_order" name='购货订单' action="buy_order_action"
             parent="menu_buy_manage" sequence="1"
             groups='buy.buy_groups'/>
-        <menuitem id="menu_buy_receipt" action="buy_receipt_action"
+        <menuitem id="menu_buy_receipt" name='采购入库单' action="buy_receipt_action"
             parent="menu_buy_manage" sequence="2"/>
-        <menuitem id="menu_buy_return" action="buy_return_action"
+        <menuitem id="menu_buy_return" name='采购退货单' action="buy_return_action"
             parent="menu_buy_manage" sequence="3"/>
-        <menuitem id='buy_vendor_menu' action='core.vendor_action' name="供应商" parent='menu_buy_manage' sequence='10'/>
-		<menuitem id='buy_goods_menu' name='商品' parent='menu_buy_manage' action='goods.goods_action' sequence='20' />
+
+		<!-- 采购主数据 -->
+		<menuitem id="menu_buy_master" name="主数据" parent="menu_buy_root" sequence="2"/>
+        <menuitem id='buy_vendor_menu' action='core.vendor_action' name="供应商" parent='menu_buy_master' sequence='10'/>
+		<menuitem id='buy_goods_menu' name='商品' parent='menu_buy_master' action='goods.goods_action' sequence='20' />
+		<!-- 采购报表 -->
+		<menuitem id="menu_buy_report" name="报表" parent="menu_buy_root" sequence="3"/>
 	</data>
 </openerp>
