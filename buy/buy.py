@@ -736,3 +736,104 @@ class money_invoice(models.Model):
     move_id = fields.Many2one('wh.move', string=u'出入库单',
                               readonly=True, ondelete='cascade')
 
+class buy_adjust(models.Model):
+    _name = "buy.adjust"
+    _inherit = ['mail.thread']
+    _description = u"采购调整单"
+    _order = 'date desc, id desc'
+
+    name = fields.Char(u'单据编号', copy=False)
+    order_id = fields.Many2one('buy.order', u'原始单据', states=READONLY_STATES,
+                             copy=False, ondelete='restrict')
+    date = fields.Date(u'单据日期', states=READONLY_STATES,
+                       default=lambda self: fields.Date.context_today(self),
+                       select=True, copy=False)
+    line_ids = fields.One2many('buy.adjust.line', 'order_id', u'调整单行',
+                               states=READONLY_STATES, copy=True)
+    approve_uid = fields.Many2one('res.users', u'审核人',
+                            copy=False, ondelete='restrict')
+    state = fields.Selection(BUY_ORDER_STATES, u'审核状态',
+                             select=True, copy=False,
+                             default='draft')
+    note = fields.Text(u'备注')
+
+    @api.one
+    def buy_adjust_done(self):
+        '''审核采购调整单'''
+        pass
+
+    @api.one
+    def buy_adjust_draft(self):
+        '''反审核采购调整单'''
+        pass
+
+
+class buy_adjust_line(models.Model):
+    _name = 'buy.adjust.line'
+    _description = u'采购调整单明细'
+
+    @api.one
+    @api.depends('goods_id')
+    def _compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        self.using_attribute = self.goods_id.attribute_ids and True or False
+
+    @api.one
+    @api.depends('quantity', 'price', 'discount_amount', 'tax_rate')
+    def _compute_all_amount(self):
+        '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
+        amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
+        tax_amt = amount * self.tax_rate * 0.01  # 税额
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+        self.amount = amount
+        self.tax_amount = tax_amt
+        self.subtotal = amount + tax_amt
+
+    order_id = fields.Many2one('buy.adjust', u'订单编号', select=True,
+                               required=True, ondelete='cascade')
+    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
+    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
+    attribute_id = fields.Many2one('attribute', u'属性',
+                                   ondelete='restrict',
+                                   domain="[('goods_id', '=', goods_id)]")
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
+    quantity = fields.Float(u'数量', default=1,
+                            digits_compute=dp.get_precision('Quantity'))
+    quantity_in = fields.Float(u'已执行数量', copy=False,
+                               digits_compute=dp.get_precision('Quantity'))
+    price = fields.Float(u'购货单价',
+                         digits_compute=dp.get_precision('Amount'))
+    price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount,
+                               store=True, readonly=True,
+                               digits_compute=dp.get_precision('Amount'))
+    discount_rate = fields.Float(u'折扣率%')
+    discount_amount = fields.Float(u'折扣额',
+                                   digits_compute=dp.get_precision('Amount'))
+    amount = fields.Float(u'金额', compute=_compute_all_amount,
+                          store=True, readonly=True,
+                          digits_compute=dp.get_precision('Amount'))
+    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
+    tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
+                              store=True, readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
+                            store=True, readonly=True,
+                            digits_compute=dp.get_precision('Amount'))
+    note = fields.Char(u'备注')
+
+    @api.one
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本价'''
+        if self.goods_id:
+            self.uom_id = self.goods_id.uom_id
+            if not self.goods_id.cost:
+                raise except_orm(u'错误', u'请先设置商品的成本！')
+            self.price = self.goods_id.cost
+
+    @api.one
+    @api.onchange('quantity', 'price', 'discount_rate')
+    def onchange_discount_rate(self):
+        '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
+        self.discount_amount = (self.quantity * self.price *
+                                self.discount_rate * 0.01)

@@ -34,5 +34,16 @@
             <field name="prefix">IN/RETURN/</field>
             <field name="padding">5</field>
         </record>
+        <!-- 采购调整单序列号 -->
+        <record id="seq_type_buy_adjust" model="ir.sequence.type">
+            <field name="name">Buy Adjust</field>
+            <field name="code">buy.adjust</field>
+        </record>
+        <record id="seq_buy_adjust" model="ir.sequence">
+            <field name="name">Buy Adjust</field>
+            <field name="code">buy.adjust</field>
+            <field name="prefix">BA</field>
+            <field name="padding">5</field>
+        </record>
     </data>
 </openerp>
