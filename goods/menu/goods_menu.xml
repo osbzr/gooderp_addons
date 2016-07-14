@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem id='goods_menu' name='商品' parent='core.master_data_menu' action='goods_action' sequence='30' />
+        <menuitem id='goods_menu' name='商品' parent='core.config_data_menu' action='goods_action' sequence='30' />
     </data>
 </openerp>
