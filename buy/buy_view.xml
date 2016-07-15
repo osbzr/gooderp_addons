@@ -631,6 +631,12 @@
             parent="menu_buy_manage" sequence="3"/>
         <menuitem id="menu_buy_adjust" name='采购调整单' action="buy_adjust_action"
             parent="menu_buy_manage" sequence="4"/>
+        
+        <!-- 菜单加入仓库模块 -->
+        <menuitem id="menu_wh_buy_receipt" name='采购入库单' action="buy_receipt_action"
+            parent="warehouse.warehouse_order" sequence="3"/>
+        <menuitem id="menu_wh_buy_return" name='采购退货单' action="buy_return_action"
+            parent="warehouse.warehouse_order" sequence="4"/>
 
 		<!-- 采购主数据 -->
 		<menuitem id="menu_buy_master" name="主数据" parent="menu_buy_root" sequence="2"/>
