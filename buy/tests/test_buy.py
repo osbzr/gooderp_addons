@@ -374,6 +374,16 @@ class test_buy_receipt(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,self.receipt.id)
         warehouse.scan_barcode(model_name,barcode,self.receipt.id)
 
+        # 产品的条形码扫码出入库
+        barcode = '123456789'
+        #采购入库单扫码
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
+        warehouse.scan_barcode(model_name,barcode,self.receipt.id)
+        #采购退货单扫码
+        buy_order_return = self.env.ref('buy.buy_receipt_return_1')
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+        warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
+
 
 class test_wh_move_line(TransactionCase):
 
@@ -407,3 +417,143 @@ class test_wh_move_line(TransactionCase):
             line.goods_id.cost = 1.0
             line.with_context({'default_is_return': True,
                 'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
+
+
+class test_buy_adjust(TransactionCase):
+
+    def setUp(self):
+        '''采购调整单准备基本数据'''
+        super(test_buy_adjust, self).setUp()
+        self.order = self.env.ref('buy.buy_order_1')
+        self.order.buy_order_done()
+        self.keyboard = self.env.ref('goods.keyboard')
+        self.keyboard_black = self.env.ref('goods.keyboard_black')
+        self.mouse = self.env.ref('goods.mouse')
+        self.cable = self.env.ref('goods.cable')
+
+    def test_buy_adjust_done(self):
+        '''审核采购调整单:正常情况'''
+        # 正常情况下审核，新增产品鼠标（每批次为1的）、网线（无批次的）
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': 3.0,
+                                }),
+                         (0, 0, {'goods_id': self.mouse.id,
+                                'quantity': 1,
+                                }),
+                         (0, 0, {'goods_id': self.cable.id,
+                                'quantity': 1,
+                                })
+                         ]
+        })
+        adjust.buy_adjust_done()
+        # 重复审核时报错
+        with self.assertRaises(except_orm):
+            adjust.buy_adjust_done()
+
+    def test_buy_adjust_done_no_line(self):
+        '''审核采购调整单:没输入明细行，审核时报错'''
+        adjust_no_line = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+        })
+        with self.assertRaises(except_orm):
+            adjust_no_line.buy_adjust_done()
+
+    def test_buy_adjust_done_price_negative(self):
+        '''审核采购调整单:产品价格为负，审核时报错'''
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': 3,
+                                'price': -1,
+                                })]
+        })
+        with self.assertRaises(except_orm):
+            adjust.buy_adjust_done()
+
+    def test_buy_adjust_done_quantity(self):
+        '''审核采购调整单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
+        buy_receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id)])
+        for line in buy_receipt.line_in_ids:
+            line.goods_qty = 6
+        buy_receipt.buy_receipt_done()
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': -5,
+                                })]
+        })
+        with self.assertRaises(except_orm):
+            adjust.buy_adjust_done()
+
+    def test_buy_adjust_done_all_in(self):
+        '''审核采购调整单'''
+        # 购货订单生成的采购入库单已全部入库，不能调整
+        new_order = self.order.copy()
+        new_order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', new_order.id)])
+        receipt.buy_receipt_done()
+        adjust = self.env['buy.adjust'].create({
+            'order_id': new_order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': 3.0,
+                                }),
+                         ]
+        })
+        with self.assertRaises(except_orm):
+            adjust.buy_adjust_done()
+
+    def test_buy_adjust_done_more_same_line(self):
+        '''审核采购调整单：查找到购货订单中多行同一产品，不能调整'''
+        new_order = self.order.copy()
+        new_order.line_ids.create({'order_id': new_order.id,
+                                   'goods_id': self.keyboard.id,
+                                   'attribute_id': self.keyboard_black.id,
+                                   'quantity': 10,})
+        new_order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', new_order.id)])
+        for line in receipt.line_in_ids:
+            line.goods_qty = 1
+        receipt.buy_receipt_done()
+        adjust = self.env['buy.adjust'].create({
+            'order_id': new_order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': 3.0,
+                                }),
+                         ]
+        })
+        with self.assertRaises(except_orm):
+            adjust.buy_adjust_done()
+
+
+    def test_buy_adjust_done_goods_done(self):
+        '''审核采购调整单:原始单据中一行产品已全部入库，另一行没有'''
+        new_order = self.order.copy()
+        new_order.line_ids.create({'order_id': new_order.id,
+                                   'goods_id': self.cable.id,
+                                   'quantity': 10})
+        new_order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', new_order.id)])
+        for line in receipt.line_in_ids:
+            if line.goods_id.id != self.cable.id:
+                line.unlink()
+        receipt.buy_receipt_done()
+        adjust = self.env['buy.adjust'].create({
+        'order_id': new_order.id,
+        'line_ids': [(0, 0, {'goods_id': self.cable.id,
+                            'quantity': 3.0,
+                            }),
+                     ]
+        })
+        with self.assertRaises(except_orm):
+            adjust.buy_adjust_done()

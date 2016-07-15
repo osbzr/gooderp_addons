@@ -458,6 +458,23 @@ class VouchersSummary(models.TransientModel):
     credit = fields.Float(u'贷方金额')
     balance = fields.Float(u'余额')
 
+    @api.multi
+    def view_detail_voucher(self):
+        '''查看凭证明细按钮'''
+        voucher = self.env['voucher'].search([('name', '=', self.voucher_id.name)])
+        if voucher:
+            view = self.env.ref('finance.voucher_form')
+        return {
+                'name': u'会计凭证明细',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'voucher',
+                'type': 'ir.actions.act_window',
+                'res_id': voucher.id,
+            }
+
 
 class GeneralLedgerAccount(models.TransientModel):
     """总账"""

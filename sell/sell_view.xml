@@ -57,7 +57,7 @@
                  						<field name='goods_id'/>
                  						<field name='attribute_id'
                  							groups='goods.multi_attrs_groups'
-                 							attrs="{'required': [('using_attribute','=', True)]}"/>
+                 							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
                  						<field name='quantity' sum='数量合计'/>
                  						<field name="quantity_out" readonly="1" sum="合计已发货数量"/>
                  						<field name='uom_id'/>
@@ -209,7 +209,7 @@
 		         						<field name='attribute_id'
 		         							domain="[('goods_id', '=', goods_id)]"
 		         							groups='goods.multi_attrs_groups'
-		         							attrs="{'required': [('using_attribute','=', True)]}"/>
+		         							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
 	                    				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
 	                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
 	                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
@@ -376,7 +376,7 @@
 		         						<field name='attribute_id'
 		         							domain="[('goods_id', '=', goods_id)]"
 		         							groups='goods.multi_attrs_groups'
-		         							attrs="{'required': [('using_attribute','=', True)]}"/>
+		         							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
 					                    <field name='lot' groups='goods.batch_groups'
 					                    	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
 		         						<field name='goods_uos_qty' sum='辅助数量合计'
@@ -533,7 +533,11 @@
 			parent='sell_order_menu_root' sequence='2'/>
 		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"
             parent="sell_order_menu_root" sequence="3"/>
-		<menuitem id='sell_customer_menu' action='core.customer_action' name="客户" parent='sell_order_menu_root' sequence='10'/>
-		<menuitem id='sell_goods_menu' name='商品' parent='sell_order_menu_root' action='goods.goods_action' sequence='20' />
+		<!-- 销售主数据 -->
+		<menuitem id='menu_sell_master' name='主数据' parent='sell_menu' sequence="2"/>
+		<menuitem id='sell_customer_menu' action='core.customer_action' name="客户" parent='menu_sell_master' sequence='10'/>
+		<menuitem id='sell_goods_menu' name='商品' parent='menu_sell_master' action='goods.goods_action' sequence='20' />
+		<!-- 销售报表 -->
+		<menuitem id="menu_sell_report" name="报表" parent="sell_menu" sequence="3"/>
     </data>
 </openerp>

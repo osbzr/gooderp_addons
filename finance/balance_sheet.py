@@ -19,13 +19,13 @@ class BalanceSheet(models.Model):
     balance = fields.Char(u'资产')
     line_num = fields.Char(u'行次')
     ending_balance = fields.Float(u'期末余额')
-    balance_formula = fields.Text(u'计算公式')
+    balance_formula = fields.Text(u'科目范围')
     beginning_balance = fields.Float(u'年初余额')
 
     balance_two = fields.Char(u'负债和所有者权益')
     line_num_two = fields.Char(u'行次')
     ending_balance_two = fields.Float(u'期末余额')
-    balance_two_formula = fields.Text(u'计算公式')
+    balance_two_formula = fields.Text(u'科目范围')
     beginning_balance_two = fields.Float(u'年初余额')
 
 
@@ -154,5 +154,5 @@ class ProfitStatement(models.Model):
     balance = fields.Char(u'项目')
     line_num = fields.Integer(u'行次')
     cumulative_occurrence_balance = fields.Float(u'本年累计金额')
-    occurrence_balance_formula = fields.Text(u'金额计算参数')
+    occurrence_balance_formula = fields.Text(u'科目范围')
     current_occurrence_balance = fields.Float(u'本月金额')
