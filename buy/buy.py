@@ -86,7 +86,7 @@ class buy_order(models.Model):
                             default='buy', states=READONLY_STATES)
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         default=_default_warehouse_dest,
-                                        ondelete='restrict')
+                                        ondelete='restrict', states=READONLY_STATES)
     invoice_by_receipt=fields.Boolean(string=u"按收货结算", default=True)
     line_ids = fields.One2many('buy.order.line', 'order_id', u'购货订单行',
                                states=READONLY_STATES, copy=True)
@@ -760,12 +760,66 @@ class buy_adjust(models.Model):
     @api.one
     def buy_adjust_done(self):
         '''审核采购调整单'''
-        pass
-
-    @api.one
-    def buy_adjust_draft(self):
-        '''反审核采购调整单'''
-        pass
+        if self.state == 'done':
+            raise except_orm(u'错误', u'请不要重复审核！')
+        if not self.line_ids:
+            raise except_orm(u'错误', u'请输入产品明细行！')
+        for line in self.line_ids:
+            if  line.price < 0:
+                raise except_orm(u'错误', u'产品单价不能小于0！')
+        buy_receipt = self.env['buy.receipt'].search(
+                    [('order_id', '=', self.order_id.id),
+                     ('state', '=', 'draft')])
+        if not buy_receipt:
+            raise except_orm(u'错误', u'采购入库单已全部入库，不能调整')
+        for line in self.line_ids:
+            origin_line = self.env['buy.order.line'].search(
+                        [('goods_id', '=', line.goods_id.id),
+                         ('attribute_id', '=', line.attribute_id.id),
+                         ('order_id', '=', self.order_id.id)])
+            if len(origin_line) > 1:
+                raise except_orm(u'错误', u'要调整的商品%s在原始单据中不唯一' % line.goods_id.name)
+            if origin_line:
+                origin_line.quantity += line.quantity # 调整后数量
+                origin_line.note = line.note
+                if origin_line.quantity_in > origin_line.quantity:
+                    raise except_orm(u'错误', u'%s调整后数量不能小于原订单已入库数量' % line.goods_id.name)
+                # 查找出原购货订单产生的草稿状态的入库单明细行，并更新它
+                move_line = self.env['wh.move.line'].search(
+                                [('buy_line_id', '=', origin_line.id),
+                                 ('state', '=', 'draft')])
+                if move_line:
+                    move_line.goods_qty += line.quantity
+                    move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
+                    move_line.note = line.note
+                else:
+                    raise except_orm(u'错误', u'商品%s已全部入库，建议新建购货订单' % line.goods_id.name)
+            else:
+                vals = {
+                    'order_id': self.order_id.id,
+                    'goods_id': line.goods_id.id,
+                    'attribute_id': line.attribute_id.id,
+                    'quantity': line.quantity,
+                    'uom_id': line.uom_id.id,
+                    'price': line.price,
+                    'discount_rate': line.discount_rate,
+                    'discount_amount': line.discount_amount,
+                    'tax_rate': line.tax_rate,
+                    'note': line.note or '',
+                }
+                new_line = self.env['buy.order.line'].create(vals)
+                receipt_line = []
+                if line.goods_id.force_batch_one:
+                    i = 0
+                    while i < line.quantity:
+                        i += 1
+                        receipt_line.append(
+                                    self.order_id.get_receipt_line(new_line, single=True))
+                else:
+                    receipt_line.append(self.order_id.get_receipt_line(new_line, single=False))
+                buy_receipt.line_in_ids = [(0, 0, li[0]) for li in receipt_line]
+        self.state = 'done'
+        self.approve_uid = self._uid
 
 
 class buy_adjust_line(models.Model):
@@ -797,10 +851,8 @@ class buy_adjust_line(models.Model):
                                    ondelete='restrict',
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
-    quantity = fields.Float(u'数量', default=1,
+    quantity = fields.Float(u'调整数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
-    quantity_in = fields.Float(u'已执行数量', copy=False,
-                               digits_compute=dp.get_precision('Quantity'))
     price = fields.Float(u'购货单价',
                          digits_compute=dp.get_precision('Amount'))
     price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount,

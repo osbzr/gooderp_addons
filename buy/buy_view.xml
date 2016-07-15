@@ -507,7 +507,9 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="order_id" required="1"/>
+                            <field name="order_id" required="1"
+                            	domain="[('state', '=', 'done'), ('type', '=', 'buy')]"
+                            	options="{'no_create': True}"/>
                         </group>
                         <group>
                         	<field name="date" required="1"/>
@@ -520,7 +522,6 @@
                             	groups='goods.multi_attrs_groups'
                             	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
                             <field name="quantity" sum="合计数量"/>
-                            <field name="quantity_in" readonly="1" sum="合计已入库数量"/>
                             <field name="uom_id"/>
                             <field name="price"/>
                             <field name="price_taxed" groups='buy.in_tax_groups'/>
