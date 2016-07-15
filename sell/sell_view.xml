@@ -533,6 +533,12 @@
 			parent='sell_order_menu_root' sequence='2'/>
 		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"
             parent="sell_order_menu_root" sequence="3"/>
+
+		<!-- 仓库菜单下增加菜单 -->
+		<menuitem id='sell_wh_delivery_menu' name='销售发货单' action='sell_delivery_action'
+			parent='warehouse.warehouse_order' sequence='1'/>
+		<menuitem id="sell_wh_return_menu" name='销售退货单' action="sell_return_action"
+            parent="warehouse.warehouse_order" sequence="2"/>
 		<!-- 销售主数据 -->
 		<menuitem id='menu_sell_master' name='主数据' parent='sell_menu' sequence="2"/>
 		<menuitem id='sell_customer_menu' action='core.customer_action' name="客户" parent='menu_sell_master' sequence='10'/>
