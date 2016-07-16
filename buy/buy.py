@@ -35,6 +35,53 @@ READONLY_STATES = {
         'done': [('readonly', True)],
     }
 
+class vendor_goods(models.Model):
+    _name = 'vendor.goods'
+
+    goods_id = fields.Many2one(
+        string=u'商品',
+        required=True,
+        comodel_name='goods',
+        ondelete='cascade',
+    )
+
+    vendor_id = fields.Many2one(
+        string=u'供应商',
+        required=True,
+        comodel_name='partner',
+        domain=[('s_category_id','!=',False)],
+        ondelete='cascade',
+    )
+    
+    price = fields.Float(u'供货价', digits_compute=dp.get_precision('Amount'))
+    
+    code = fields.Char(u'供应商产品编号')
+
+    name = fields.Char(u'供应商产品名称')
+
+    min_qty = fields.Float(u'最低订购量', digits_compute=dp.get_precision('Quantity'))
+    
+
+class partner(models.Model):
+    _inherit = 'partner'
+
+    goods_ids = fields.One2many(
+        string=u'供应产品',
+        comodel_name='vendor.goods',
+        inverse_name='vendor_id',
+    )
+
+
+class goods(models.Model):
+
+    _inherit = 'goods' 
+
+    vendor_ids = fields.One2many(
+        string=u'供应价格',
+        comodel_name='vendor.goods',
+        inverse_name='goods_id',
+    )
+
 
 class buy_order(models.Model):
     _name = "buy.order"
