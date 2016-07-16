@@ -47,9 +47,9 @@
 							<page string='高级'>
 								<group>
 									<group>
+									    <field name='price'/>
 										<field name='cost' groups='goods.view_cost_groups'/>
-										<field name='supplier_id' context="{'form_view_ref': 'core.supplier_address_form'}"/>
-                                        <field name='price'/>
+										<field name='supplier_id' context="{'form_view_ref': 'core.supplier_address_form'}" groups='goods.view_cost_groups'/>
 									</group>
 									<group>
 									    <field name='no_stock' groups='goods.no_stock_groups'/>
