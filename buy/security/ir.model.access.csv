@@ -9,3 +9,4 @@ access_supplier_statements_report,access_supplier_statements_report,model_suppli
 access_payment_plan,access_payment_plan,model_payment_plan,,1,1,1,1
 access_buy_adjust,access_buy_adjust,model_buy_adjust,,1,1,1,1
 access_buy_adjust_line,access_buy_adjust_line,model_buy_adjust_line,,1,1,1,1
+access_vendor_goods,access_vendor_goods,model_vendor_goods,,1,1,1,1
