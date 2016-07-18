@@ -41,6 +41,7 @@ class attribute(models.Model):
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         '''在many2one字段中支持按条形码搜索'''
         args = args or []
+        print '!@#name',name
         if name:
             goods_ids = self.search([('ean', 'ilike', name)])
             if goods_ids:

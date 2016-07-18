@@ -113,4 +113,19 @@ class test_period(TransactionCase):
         self.env['voucher.line'].onchange_account_id()
                                                     
 
+class test_finance_config_wizard (TransactionCase):
+
+    def test_default(self):
+        '''测试finance.config.settings默认值'''
+        voucher_date_setting = self.env['finance.config.settings'].set_default_voucher_date()
+        period_domain_setting = self.env['finance.config.settings'].set_default_period_domain()
+        auto_reset_setting = self.env['finance.config.settings'].set_default_auto_reset()
+        reset_period_setting = self.env['finance.config.settings'].set_default_reset_period()
+        reset_init_number_setting = self.env['finance.config.settings'].set_default_reset_init_number()
+
+
+
+
+
+
         

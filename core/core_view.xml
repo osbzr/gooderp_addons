@@ -156,6 +156,7 @@
 							<group>
 								<field name="code"/>
 								<field name="main_mobile"/>
+								<field name="tax_num"/>
 							</group>
 							<group>
 								<field name="c_category_id" required="1"/>
@@ -216,6 +217,8 @@
 							<group>
 								<field name="code"/>
 								<field name="main_mobile"/>
+								<field name="bank_name"/>
+								<field name="bank_num"/>
 							</group>
 							<group>
 								<field name="s_category_id" required="1"/>

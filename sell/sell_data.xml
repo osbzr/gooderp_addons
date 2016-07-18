@@ -34,6 +34,17 @@
             <field name="prefix">OUT/RETURN/</field>
             <field name="padding">5</field>
         </record>
+        <!-- 销售调整单序列号 -->
+        <record id="seq_type_sell_adjust" model="ir.sequence.type">
+            <field name="name">Sell Adjust</field>
+            <field name="code">sell.adjust</field>
+        </record>
+        <record id="seq_sell_adjust" model="ir.sequence">
+            <field name="name">Sell Adjust</field>
+            <field name="code">sell.adjust</field>
+            <field name="prefix">SA</field>
+            <field name="padding">5</field>
+        </record>
         <!--所有产品的价格策略-->
         <record id="pricing_10" model="pricing">
         	<field name="name">适用所有</field>

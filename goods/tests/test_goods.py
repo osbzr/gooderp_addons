@@ -32,6 +32,7 @@ class test_goods(TransactionCase):
 
     def test_name_search(self):
         '''测试goods的按名字和编号搜索'''
+        print '324ergb'
         mouse = self.env.ref('goods.mouse')
         # 使用name来搜索键盘
         result = self.env['goods'].name_search('鼠标')
