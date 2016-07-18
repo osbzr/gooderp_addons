@@ -96,7 +96,7 @@
         </record>
         <record id="reconcile_pay_to_pay" model="reconcile.order">
             <field name="partner_id" ref="core.jd"/>
-            <field name="to_partner_id" ref="core.yixun"/>
+            <field name="to_partner_id" ref="core.zt"/>
             <field name="business_type">pay_to_pay</field>
         </record>
         <record id="reconcile_get_to_get" model="reconcile.order">

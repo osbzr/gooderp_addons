@@ -99,7 +99,7 @@ class money_invoice(models.Model):
         self.write({'voucher_id': vouch_obj.id})
         if not self.category_id.account_id:
             raise except_orm(u'错误', u'请配置%s的会计科目' % (self.category_id.name))
-        partner_cat = self.partner_id.c_category_id or self.partner_id.s_category_id
+        partner_cat = self.category_id.type == 'income' and self.partner_id.c_category_id or self.partner_id.s_category_id
         partner_account_id = partner_cat.account_id.id
         if not partner_account_id:
             raise except_orm(u'错误', u'请配置%s的会计科目' % (partner_cat.name))
