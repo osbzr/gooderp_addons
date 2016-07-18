@@ -806,7 +806,12 @@ class buy_adjust(models.Model):
 
     @api.one
     def buy_adjust_done(self):
-        '''审核采购调整单'''
+        '''审核采购调整单：
+        当调整后数量 < 原单据中已入库数量，则报错；
+        当调整后数量 > 原单据中已入库数量，则更新原单据及入库单分单的数量；
+        当调整后数量 = 原单据中已入库数量，则更新原单据数量，删除入库单分单；
+        当新增产品时，则更新原单据及入库单分单明细行。
+        '''
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
         if not self.line_ids:
@@ -829,9 +834,9 @@ class buy_adjust(models.Model):
             if origin_line:
                 origin_line.quantity += line.quantity # 调整后数量
                 origin_line.note = line.note
-                if origin_line.quantity_in > origin_line.quantity:
+                if origin_line.quantity < origin_line.quantity_in:
                     raise except_orm(u'错误', u'%s调整后数量不能小于原订单已入库数量' % line.goods_id.name)
-                elif origin_line.quantity_in < origin_line.quantity:
+                elif origin_line.quantity > origin_line.quantity_in:
                     # 查找出原购货订单产生的草稿状态的入库单明细行，并更新它
                     move_line = self.env['wh.move.line'].search(
                                     [('buy_line_id', '=', origin_line.id),
