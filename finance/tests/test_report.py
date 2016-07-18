@@ -185,6 +185,12 @@ class test_checkout_wizard(TransactionCase):
         wizard.date='2014-12-28'
         wizard.onchange_period_id()
         wizard.button_checkout()
+        #反结账时下一期间已关闭
+        next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(wizard.period_id)
+        next_period.is_closed = True
+        with self.assertRaises(except_orm):
+            wizard.button_counter_checkout()
+        next_period.is_closed = False
         #重复反结账
         wizard.button_counter_checkout()
         with self.assertRaises(except_orm):
