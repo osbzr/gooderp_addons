@@ -831,16 +831,20 @@ class buy_adjust(models.Model):
                 origin_line.note = line.note
                 if origin_line.quantity_in > origin_line.quantity:
                     raise except_orm(u'错误', u'%s调整后数量不能小于原订单已入库数量' % line.goods_id.name)
-                # 查找出原购货订单产生的草稿状态的入库单明细行，并更新它
-                move_line = self.env['wh.move.line'].search(
-                                [('buy_line_id', '=', origin_line.id),
-                                 ('state', '=', 'draft')])
-                if move_line:
-                    move_line.goods_qty += line.quantity
-                    move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
-                    move_line.note = line.note
+                elif origin_line.quantity_in < origin_line.quantity:
+                    # 查找出原购货订单产生的草稿状态的入库单明细行，并更新它
+                    move_line = self.env['wh.move.line'].search(
+                                    [('buy_line_id', '=', origin_line.id),
+                                     ('state', '=', 'draft')])
+                    if move_line:
+                        move_line.goods_qty += line.quantity
+                        move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
+                        move_line.note = line.note
+                    else:
+                        raise except_orm(u'错误', u'商品%s已全部入库，建议新建购货订单' % line.goods_id.name)
+                # 调整后数量与已入库数量相等时，删除产生的入库单分单
                 else:
-                    raise except_orm(u'错误', u'商品%s已全部入库，建议新建购货订单' % line.goods_id.name)
+                    buy_receipt.unlink()
             else:
                 vals = {
                     'order_id': self.order_id.id,

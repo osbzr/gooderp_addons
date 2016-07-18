@@ -474,7 +474,7 @@ class test_buy_adjust(TransactionCase):
         with self.assertRaises(except_orm):
             adjust.buy_adjust_done()
 
-    def test_buy_adjust_done_quantity(self):
+    def test_buy_adjust_done_quantity_lt(self):
         '''审核采购调整单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
@@ -490,6 +490,26 @@ class test_buy_adjust(TransactionCase):
         })
         with self.assertRaises(except_orm):
             adjust.buy_adjust_done()
+
+    def test_buy_adjust_done_quantity_equal(self):
+        '''审核采购调整单:调整后数量6 == 原订单已入库数量 6，审核后将产生的入库单分单删除'''
+        buy_receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id)])
+        for line in buy_receipt.line_in_ids:
+            line.goods_qty = 6
+        buy_receipt.buy_receipt_done()
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': -4,
+                                })]
+        })
+        adjust.buy_adjust_done()
+        new_receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id),
+             ('state', '=', 'draft')])
+        self.assertTrue(not new_receipt)
 
     def test_buy_adjust_done_all_in(self):
         '''审核采购调整单'''
