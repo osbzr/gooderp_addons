@@ -667,6 +667,14 @@ class sell_adjust(models.Model):
                              default='draft')
     note = fields.Text(u'备注')
 
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(sell_adjust, self).unlink()
+
     @api.one
     def sell_adjust_done(self):
         '''审核销售调整单：

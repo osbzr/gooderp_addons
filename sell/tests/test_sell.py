@@ -490,6 +490,22 @@ class test_sell_adjust(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
+    def test_unlink(self):
+        '''测试删除已审核的销售调整单'''
+        adjust = self.env['sell.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.cable.id,
+                                 'quantity': 2,
+                                }),
+                         ]
+        })
+        adjust.sell_adjust_done()
+        with self.assertRaises(except_orm):
+            adjust.unlink()
+        # 删除草稿状态的销售调整单
+        new = adjust.copy()
+        new.unlink()
+
     def test_sell_adjust_done(self):
         '''审核销售调整单:正常情况'''
         # 正常情况下审核，新增产品鼠标（每批次为1的）、键盘（无批次的）

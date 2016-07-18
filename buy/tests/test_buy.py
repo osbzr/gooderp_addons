@@ -431,6 +431,23 @@ class test_buy_adjust(TransactionCase):
         self.mouse = self.env.ref('goods.mouse')
         self.cable = self.env.ref('goods.cable')
 
+    def test_unlink(self):
+        '''测试删除已审核的采购调整单'''
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': 3.0,
+                                }),
+                         ]
+        })
+        adjust.buy_adjust_done()
+        with self.assertRaises(except_orm):
+            adjust.unlink()
+        # 删除草稿状态的采购调整单
+        new = adjust.copy()
+        new.unlink()
+
     def test_buy_adjust_done(self):
         '''审核采购调整单:正常情况'''
         # 正常情况下审核，新增产品鼠标（每批次为1的）、网线（无批次的）
