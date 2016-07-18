@@ -351,9 +351,10 @@ class test_partner(TransactionCase):
     
     def test_partner_set_init(self):
         '''测试客户期初'''
-        partner = self.env.ref('core.jd')
-        partner.receivable_init = 1234567
-        partner.payable_init = 23456789
+        customer = self.env.ref('core.jd')
+        customer.receivable_init = 1234567
+        vendor = self.env.ref('core.lenovo')
+        vendor.payable_init = 23456789
         
 
 
