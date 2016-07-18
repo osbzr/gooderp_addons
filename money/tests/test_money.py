@@ -353,10 +353,8 @@ class test_partner(TransactionCase):
         '''测试客户期初'''
         customer = self.env.ref('core.jd')
         customer.receivable_init = 1234567
+        self.assertEqual(customer.receivable, customer.receivable_init)
+
         vendor = self.env.ref('core.lenovo')
         vendor.payable_init = 23456789
-        
-
-
-
-
+        self.assertEqual(vendor.payable, vendor.payable_init)
