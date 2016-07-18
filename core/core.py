@@ -393,6 +393,7 @@ class pricing(models.Model):
         if len(ccg_pricing) == 1:
             return ccg_pricing
         if len(ccg_pricing) > 1:
+            print 'qwdfb'
             raise except_orm(u'错误',
                              u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
                                                              goods.name,
