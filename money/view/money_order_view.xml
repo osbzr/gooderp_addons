@@ -165,6 +165,7 @@
                     <field name="amount"/>
                     <field name="reconciled"/>
                     <field name="to_reconcile"/>
+                    <field name="tax_amount"/>
                     <field name="date_due"/>
                 </tree>
             </field>

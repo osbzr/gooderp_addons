@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "中国-城市-县",
+    'name': "GOODERP 联系人地址模块",
     'author': "judy（开阖软件）",
-    'category': 'osbzr',
+    'category': 'gooderp',
     'depends': ['core'],
     "description": """
     """,
