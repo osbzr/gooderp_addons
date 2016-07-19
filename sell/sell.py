@@ -426,7 +426,7 @@ class sell_delivery(models.Model):
     order_id = fields.Many2one('sell.order', u'源单号', copy=False,
                                ondelete='cascade')
     invoice_id = fields.Many2one('money.invoice', u'发票号',
-                                 copy=False, ondelete='restrict')
+                                 copy=False, ondelete='set null')
     date_due = fields.Date(u'到期日期', copy=False, default=lambda self: fields.Date.context_today(self))
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
@@ -456,6 +456,7 @@ class sell_delivery(models.Model):
                                help=u"销售退货单的退款状态", select=True, copy=False)
     address = fields.Char(u'地址')
     mobile = fields.Char(u'手机')
+    modifying = fields.Boolean(u'差错修改中', default=False)
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
@@ -601,10 +602,39 @@ class sell_delivery(models.Model):
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.sell_move_id.approve_order()
         # 生成分拆单 FIXME:无法跳转到新生成的分单
-        if self.order_id:
+        if self.order_id and not self.modifying:
             return self.order_id.sell_generate_delivery()
 
         return True
+
+    @api.one
+    def sell_delivery_draft(self):
+        '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的源单、收款单及凭证'''
+        # 查找产生的收款单
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', self.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_draft()
+            line.money_id.unlink()
+        # 查找产生的源单
+        invoice_ids = self.env['money.invoice'].search(
+                [('id', '=', self.invoice_id.id)])
+        for invoice in invoice_ids:
+            invoice.money_invoice_draft()
+            invoice.unlink()
+        # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单
+        self.modifying = False
+        delivery_ids = self.search(
+            [('order_id', '=', self.order_id.id)])
+        if len(delivery_ids) > 1:
+            self.modifying = True
+        # 将源单中已执行数量清零
+        order = self.env['sell.order'].search(
+            [('id', '=', self.order_id.id)])
+        for line in order.line_ids:
+            line.quantity_out = 0
+        # 调用wh.move中反审核方法，更新审核人和审核状态
+        self.sell_move_id.cancel_approved_order()
 
 
 class wh_move_line(models.Model):
