@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from openerp.tests.common import TransactionCase
 from psycopg2 import IntegrityError
+from openerp.exceptions import except_orm
 
 
 class test_core(TransactionCase):
@@ -14,3 +15,5 @@ class test_core(TransactionCase):
     def test_res_currency(self):
         """测试阿拉伯数字转换称中文大写数字的方法"""
         self.env['res.currency'].rmb_upper(10000100.3)
+        # 测试输入value为负时的货币大写问题
+        self.env['res.currency'].rmb_upper(-10000100.3)
