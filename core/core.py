@@ -378,7 +378,7 @@ class pricing(models.Model):
             return warehouse_pricing
         if len(warehouse_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s 的价格策略不唯一'%(warehouse.name,
+                             u'适用于 %s,%s 的价格策略不唯一'%(warehouse.name,
                                                              date))
         # 客户类别,商品满足条件
         ccg_pricing = self.search([
@@ -393,7 +393,6 @@ class pricing(models.Model):
         if len(ccg_pricing) == 1:
             return ccg_pricing
         if len(ccg_pricing) > 1:
-            print 'qwdfb'
             raise except_orm(u'错误',
                              u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
                                                              goods.name,
