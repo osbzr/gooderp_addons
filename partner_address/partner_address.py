@@ -38,10 +38,22 @@ class all_county(models.Model):
     description = fields.Char(u'描述')
 
 
-class province_city_county(models.Model):
-    _name = 'province.city.county'
-    _rec_name = 'detail_address'
-    _description = u'省市县'
+class partner_address(models.Model):
+    _name = 'partner.address'
+    _description = u'业务伙伴的联系人地址'
+ 
+    partner_id = fields.Many2one('partner', u'业务伙伴')
+    contact_people = fields.Char(u'联系人')
+    mobile = fields.Char(u'手机')
+    phone = fields.Char(u'座机')
+    qq = fields.Char(u'QQ/微信')
+    province_id = fields.Many2one('country.state', u'省/市',
+                                  domain="[('country_id.name','=','中国')]")
+    city_id = fields.Many2one('all.city', u'市/区')
+    county_id = fields.Many2one('all.county', u'县/市')
+    town = fields.Char(u'乡镇')
+    detail_address = fields.Char(u'详细地址')
+    is_default_add = fields.Boolean(u'是否默认地址')
 
     @api.onchange('province_id')
     def onchange_province(self):
@@ -113,34 +125,6 @@ class province_city_county(models.Model):
             self.province_id = self.city_id.province_id.id
             return {'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
 
-    @api.multi
-    def name_get(self):
-        '''将省市县及详细地址拼接起来'''
-        res = []
-        for addr in self:
-            res.append((addr.id, u'%s%s%s%s' % (
-                addr.province_id.name, addr.city_id.city_name,
-                addr.county_id.county_name, addr.detail_address)))
-
-        return res
-
-    city_id = fields.Many2one('all.city', u'市/区')
-    county_id = fields.Many2one('all.county', u'县/市')
-    province_id = fields.Many2one('country.state', u'省/市',
-                                  domain="[('country_id.name','=','中国')]")
-    detail_address = fields.Char(u'详细地址')
-
-class partner_address(models.Model):
-    _name = 'partner.address'
-    _description = u'业务伙伴地址'
- 
-    partner_id = fields.Many2one('partner', u'业务伙伴')
-    contact_people = fields.Char(u'联系人')
-    mobile = fields.Char(u'手机')
-    phone = fields.Char(u'座机')
-    qq = fields.Char(u'QQ/MSN')
-    address_id = fields.Many2one('province.city.county', u'联系地址')
-    is_default_add = fields.Boolean(u'是否默认地址')
 
 class partner(models.Model):
     _inherit = 'partner'
@@ -158,15 +142,16 @@ class partner(models.Model):
                 self.mobile = child.mobile
                 self.phone = child.phone
                 self.qq = child.qq
-                address = '%s%s%s%s' % (child.address_id.province_id.name,
-                           child.address_id.city_id.city_name,
-                           child.address_id.county_id.county_name,
-                           child.address_id.detail_address)
+                address = '%s%s%s%s%s' % (child.province_id.name,
+                           child.city_id.city_name,
+                           child.county_id.county_name,
+                           child.town,
+                           child.detail_address)
                 self.address = address
 
     child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
     contact_people = fields.Char(u'联系人', compute='_compute_partner_address')
     mobile = fields.Char(u'手机', compute='_compute_partner_address')
     phone = fields.Char(u'座机', compute='_compute_partner_address')
-    qq = fields.Char(u'QQ/MSN', compute='_compute_partner_address')
+    qq = fields.Char(u'QQ/微信', compute='_compute_partner_address')
     address = fields.Char(u'送货地址', compute='_compute_partner_address')

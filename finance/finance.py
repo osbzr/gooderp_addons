@@ -300,6 +300,8 @@ class res_company(models.Model):
 
     profit_account = fields.Many2one('finance.account', u'本年利润科目', ondelete='restrict')
     remain_account = fields.Many2one('finance.account', u'未分配利润科目', ondelete='restrict')
+    import_tax_account = fields.Many2one('finance.account', u"进项税科目", ondelete='restrict')
+    output_tax_account = fields.Many2one('finance.account', u"销项税科目", ondelete='restrict')
 
 
 class bank_account(models.Model):

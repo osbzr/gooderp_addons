@@ -99,35 +99,56 @@ class money_invoice(models.Model):
         self.write({'voucher_id': vouch_obj.id})
         if not self.category_id.account_id:
             raise except_orm(u'错误', u'请配置%s的会计科目' % (self.category_id.name))
-        partner_cat = self.partner_id.c_category_id or self.partner_id.s_category_id
+        partner_cat = self.category_id.type == 'income' and self.partner_id.c_category_id or self.partner_id.s_category_id
         partner_account_id = partner_cat.account_id.id
         if not partner_account_id:
             raise except_orm(u'错误', u'请配置%s的会计科目' % (partner_cat.name))
         if self.category_id.type == 'income':
             vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
-                         'debit_account_id': partner_account_id
+                         'debit_account_id': partner_account_id, 'sell_tax_amount': self.tax_amount or 0,
                          })
 
         else:
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'源单',
-                         'amount': abs(self.amount), 'credit_account_id': partner_account_id,
+                         'amount': self.amount, 'credit_account_id': partner_account_id,
                          'debit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
-                         'partner_credit':self.partner_id.id,
+                         'partner_credit':self.partner_id.id, 'buy_tax_amount': self.tax_amount or 0,
                          })
         self.create_voucher_line(vals)
         return res
 
     @api.multi
     def create_voucher_line(self, vals):
+        debit = credit = vals.get('amount')
+        # 把税从金额中减去
+        if vals.get('buy_tax_amount'):
+            debit = vals.get('amount') - vals.get('buy_tax_amount')
+        if vals.get('sell_tax_amount'):
+            credit = vals.get('amount') - vals.get('sell_tax_amount')
+        # 借方行
         self.env['voucher.line'].create({
             'name': u"%s %s " % (vals.get('string'), vals.get('name')), 'account_id': vals.get('debit_account_id'),
-            'debit': vals.get('amount'), 'voucher_id': vals.get('vouch_obj_id'), 'partner_id': vals.get('partner_debit', ''),
+            'debit': debit, 'voucher_id': vals.get('vouch_obj_id'), 'partner_id': vals.get('partner_debit', ''),
         })
+        # 进项税行
+        if vals.get('buy_tax_amount'):
+            self.env['voucher.line'].create({
+                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'account_id': self.env.user.company_id.import_tax_account.id, 'debit': vals.get('buy_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
+            })
+        # 贷方行
         self.env['voucher.line'].create({
             'name': u"%s %s" % (vals.get('string'), vals.get('name')), 'partner_id': vals.get('partner_credit', ''),
-            'account_id': vals.get('credit_account_id'), 'credit': vals.get('amount'), 'voucher_id': vals.get('vouch_obj_id'),
+            'account_id': vals.get('credit_account_id'), 'credit': credit, 'voucher_id': vals.get('vouch_obj_id'),
         })
+        # 销项税行
+        if vals.get('sell_tax_amount'):
+            self.env['voucher.line'].create({
+                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'account_id': self.env.user.company_id.output_tax_account.id, 'credit': vals.get('sell_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
+        })
+
         return True
 
 

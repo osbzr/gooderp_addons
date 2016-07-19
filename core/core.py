@@ -104,6 +104,9 @@ class partner(models.Model):
                               digits_compute=dp.get_precision('Amount'))
     payable = fields.Float(u'应付余额', readonly=True,
                            digits_compute=dp.get_precision('Amount'))
+    tax_num = fields.Char(u'税务登记号')
+    bank_name = fields.Char(u'开户行')
+    bank_num = fields.Char(u'银行账号')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '业务伙伴不能重名')

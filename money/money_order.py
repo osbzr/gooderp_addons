@@ -100,6 +100,8 @@ class money_order(models.Model):
     reconciled = fields.Float(string=u'已核销预收款',
                               digits_compute=dp.get_precision('Amount'))
     origin_name = fields.Char(u'来源单号')
+    bank_name = fields.Char(u'开户行')
+    bank_num = fields.Char(u'银行账号')
 
     @api.onchange('date')
     def onchange_date(self):
@@ -126,6 +128,8 @@ class money_order(models.Model):
                                     ('partner_id', '=', self.partner_id.id),
                                     ('category_id.type', '=', 'expense'),
                                     ('to_reconcile', '!=', 0)])
+            self.bank_name = self.partner_id.bank_name
+            self.bank_num = self.partner_id.bank_num
         for invoice in money_invoice:
             source_lines.append({
                    'name': invoice.id,
@@ -257,6 +261,8 @@ class money_invoice(models.Model):
                               digits_compute=dp.get_precision('Amount'))
     to_reconcile = fields.Float(string=u'未核销金额', readonly=True,
                                 digits_compute=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
     date_due = fields.Date(string=u'到期日')
 
     @api.multi

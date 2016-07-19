@@ -431,6 +431,23 @@ class test_buy_adjust(TransactionCase):
         self.mouse = self.env.ref('goods.mouse')
         self.cable = self.env.ref('goods.cable')
 
+    def test_unlink(self):
+        '''测试删除已审核的采购调整单'''
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': 3.0,
+                                }),
+                         ]
+        })
+        adjust.buy_adjust_done()
+        with self.assertRaises(except_orm):
+            adjust.unlink()
+        # 删除草稿状态的采购调整单
+        new = adjust.copy()
+        new.unlink()
+
     def test_buy_adjust_done(self):
         '''审核采购调整单:正常情况'''
         # 正常情况下审核，新增产品鼠标（每批次为1的）、网线（无批次的）
@@ -474,7 +491,7 @@ class test_buy_adjust(TransactionCase):
         with self.assertRaises(except_orm):
             adjust.buy_adjust_done()
 
-    def test_buy_adjust_done_quantity(self):
+    def test_buy_adjust_done_quantity_lt(self):
         '''审核采购调整单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
@@ -491,9 +508,28 @@ class test_buy_adjust(TransactionCase):
         with self.assertRaises(except_orm):
             adjust.buy_adjust_done()
 
+    def test_buy_adjust_done_quantity_equal(self):
+        '''审核采购调整单:调整后数量6 == 原订单已入库数量 6，审核后将产生的入库单分单删除'''
+        buy_receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id)])
+        for line in buy_receipt.line_in_ids:
+            line.goods_qty = 6
+        buy_receipt.buy_receipt_done()
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                'attribute_id': self.keyboard_black.id,
+                                'quantity': -4,
+                                })]
+        })
+        adjust.buy_adjust_done()
+        new_receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id),
+             ('state', '=', 'draft')])
+        self.assertTrue(not new_receipt)
+
     def test_buy_adjust_done_all_in(self):
-        '''审核采购调整单'''
-        # 购货订单生成的采购入库单已全部入库，不能调整
+        '''审核采购调整单：购货订单生成的采购入库单已全部入库，审核时报错'''
         new_order = self.order.copy()
         new_order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
@@ -557,3 +593,58 @@ class test_buy_adjust(TransactionCase):
         })
         with self.assertRaises(except_orm):
             adjust.buy_adjust_done()
+
+
+class test_buy_adjust_line(TransactionCase):
+
+    def setUp(self):
+        super(test_buy_adjust_line, self).setUp()
+        # 采购 10个键盘 单价 50
+        self.order = self.env.ref('buy.buy_order_1')
+        self.order.buy_order_done()
+        self.keyboard = self.env.ref('goods.keyboard')
+        self.cable = self.env.ref('goods.cable')
+        self.adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.cable.id,
+                                 'quantity': 10,
+                                })]
+        })
+
+    def test_compute_using_attribute(self):
+        '''返回订单行中产品是否使用属性'''
+        for line in self.adjust.line_ids:
+            self.assertTrue(not line.using_attribute)
+            line.goods_id = self.keyboard
+            self.assertTrue(line.using_attribute)
+
+    def test_compute_all_amount(self):
+        '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
+        for line in self.adjust.line_ids:
+            line.price = 10
+            self.assertTrue(line.amount == 100)
+            self.assertTrue(line.tax_amount == 17)
+            self.assertTrue(line.price_taxed == 11.7)
+            self.assertTrue(line.subtotal == 117)
+
+    def test_onchange_goods_id(self):
+        '''当订单行的产品变化时，带出产品上的单位、成本'''
+        for line in self.adjust.line_ids:
+            line.goods_id = self.cable
+            line.onchange_goods_id()
+            self.assertTrue(line.uom_id.name == u'件')
+
+            # 测试价格是否是商品的成本
+            self.assertTrue(line.price == self.cable.cost)
+            # 测试不设置商品的成本时是否弹出警告
+            self.cable.cost = 0.0
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()
+
+    def test_onchange_discount_rate(self):
+        ''' 订单行优惠率改变时，改变优惠金额'''
+        for line in self.adjust.line_ids:
+            line.price = 10
+            line.discount_rate = 10
+            line.onchange_discount_rate()
+            self.assertTrue(line.discount_amount == 10)

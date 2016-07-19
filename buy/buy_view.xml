@@ -539,7 +539,6 @@
                 <form string="采购调整单">
                 <header>
                 	<button name="buy_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
-                	<button name="buy_adjust_draft" states="done" string="反审核" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
                 </header>
                 <sheet>
