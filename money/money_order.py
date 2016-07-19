@@ -261,6 +261,8 @@ class money_invoice(models.Model):
                               digits_compute=dp.get_precision('Amount'))
     to_reconcile = fields.Float(string=u'未核销金额', readonly=True,
                                 digits_compute=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
     date_due = fields.Date(string=u'到期日')
 
     @api.multi

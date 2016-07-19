@@ -624,11 +624,13 @@ class buy_receipt(models.Model):
         if not self.is_return:
             amount = self.amount
             this_reconcile = self.payment
+            tax_amount = sum(line.tax_amount for line in self.line_in_ids)
             if not self.invoice_by_receipt:
                 return False
         else:
             amount = -self.amount
             this_reconcile = -self.payment
+            tax_amount = - sum(line.tax_amount for line in self.line_out_ids)
         categ = self.env.ref('money.core_category_purchase')
         source_id = self.env['money.invoice'].create({
                 'move_id':self.buy_move_id.id, 
@@ -638,7 +640,8 @@ class buy_receipt(models.Model):
                 'date':fields.Date.context_today(self), 
                 'amount':amount, 
                 'reconciled':0, 
-                'to_reconcile':amount, 
+                'to_reconcile':amount,
+                'tax_amount': tax_amount,
                 'date_due':self.date_due, 
                 'state':'draft'})
         self.invoice_id = source_id.id

@@ -533,9 +533,11 @@ class sell_delivery(models.Model):
         if not self.is_return:
             amount = self.amount + self.partner_cost
             this_reconcile = self.receipt
+            tax_amount = sum(line.tax_amount for line in self.line_out_ids)
         else:
             amount = -(self.amount + self.partner_cost)
             this_reconcile = - self.receipt
+            tax_amount = - sum(line.tax_amount for line in self.line_in_ids)
         categ = self.env.ref('money.core_category_sale')
         source_id = self.env['money.invoice'].create({
             'move_id': self.sell_move_id.id,
@@ -546,6 +548,7 @@ class sell_delivery(models.Model):
             'amount': amount,
             'reconciled': 0,
             'to_reconcile': amount,
+            'tax_amount': tax_amount,
             'date_due': self.date_due,
             'state': 'draft',
         })

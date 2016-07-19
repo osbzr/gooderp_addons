@@ -1124,6 +1124,8 @@
         <record id="base.main_company" model="res.company">
             <field name="profit_account" ref='account_profit'/>
             <field name="remain_account" ref='account_remain'/>
+            <field name="import_tax_account" ref='small_business_chart2221002001'/>
+            <field name="output_tax_account" ref='small_business_chart2221002002'/>
         </record>
     </data>
 </openerp>
