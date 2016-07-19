@@ -476,28 +476,24 @@ class test_wh_move_line(TransactionCase):
 class test_pricing(TransactionCase):
     
     def test_miss_get_pricing_id(self):
-        '''测试定价侧率缺少输入的报错问题'''
-        partner = False
+        '''测试定价策略缺少输入的报错问题'''
         warehouse = self.env.ref('warehouse.hd_stock')
         goods = self.env.ref('goods.mouse')
         date = 20160101
+        partner = self.env.ref('core.zt')
         pricing = self.env['pricing']
         with self.assertRaises(except_orm):
-            pricing.get_pricing_id(partner, warehouse, goods, date)
-        partner = self.env.ref('core.zt')
+            pricing.get_pricing_id(False, warehouse, goods, date)
+        
 
-        warehouse = False
         with self.assertRaises(except_orm):
-            pricing.get_pricing_id(partner, warehouse, goods, date)
-        warehouse = self.env.ref('warehouse.hd_stock')
+            pricing.get_pricing_id(partner, False, goods, date)
 
-        goods = False
         with self.assertRaises(except_orm):
-            pricing.get_pricing_id(partner, warehouse, goods, date)
-        goods = self.env.ref('goods.mouse')
+            pricing.get_pricing_id(partner, warehouse, False, date)
 
     def test_good_pricing(self):
-        '''测试good_pricing定价策略不唯一的情况'''
+        '''测试定价输入商品名称、仓库、客户、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -524,7 +520,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
     def test_gc_pricing(self):
-        '''测试gc_pricing定价策略不唯一的情况'''
+        '''测试定价输入商品类别、仓库、客户、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -551,7 +547,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
     def test_pw_pricing(self):
-        '''测试pw_pricing定价策略不唯一的情况'''
+        '''测试定价输入仓库、客户、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -578,7 +574,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
     def test_wg_pricing(self):
-        '''测试wg_pricing定价策略不唯一的情况'''
+        '''测试定价输入商品名称、仓库、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -605,7 +601,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
     def test_w_gc_pricing(self):
-        '''测试w_gc_pricing定价策略不唯一的情况'''
+        '''测试定价输入商品类别、仓库、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -632,7 +628,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
     def test_warehouse_pricing(self):
-        '''测试warehouse_pricing定价策略不唯一的情况'''
+        '''测试定价输入仓库、日期时，定价策略不唯一的情况'''
         warehouse = self.env.ref('warehouse.bj_stock')
         date = 20160915
         pricing = self.env['pricing']
@@ -659,7 +655,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
     def test_ccg_pricing(self):
-        '''测试ccg_pricing定价策略不唯一的情况'''
+        '''测试定价输入商品名称、客户、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         goods = self.env.ref('goods.mouse')
@@ -686,7 +682,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
     def test_ccgc_pricing(self):
-        '''测试ccgc_pricing定价策略不唯一的情况'''
+        '''测试定价输入商品类别、客户、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -713,7 +709,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
     def test_partner_pricing(self):
-        '''测试partner_pricing定价策略不唯一的情况'''
+        '''测试定价输入客户、日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -740,7 +736,7 @@ class test_pricing(TransactionCase):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
     def test_all_goods_pricing(self):
-        '''测试partner_pricing定价策略不唯一的情况'''
+        '''测试定价只输入日期时，定价策略不唯一的情况'''
         pricing = self.env['pricing']
         partner = self.env.ref('core.jd')
         warehouse = self.env.ref('warehouse.bj_stock')
@@ -979,4 +975,3 @@ class test_sell_adjust_line(TransactionCase):
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)
-
