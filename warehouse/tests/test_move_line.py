@@ -67,18 +67,8 @@ class TestMoveLine(TransactionCase):
             lot_id=self.mouse_out_line.lot_id)
 
         self.assertEqual(cost_unit, self.mouse_out_line.lot_id.cost_unit)
-
-        self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
-        self.overage_in.approve_order()
-        self.assembly.approve_order()
-        results = self.mouse_out_line.copy_data()
-        _, cost_unit = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
-            self.mouse_out_line.warehouse_id, self.mouse_out_line.goods_qty)
-
-        self.assertEqual(results.get('cost_unit'), cost_unit)
-
-
-
+        
+       
     def test_get_matching_records_by_lot(self):
         # 批次号未审核的时候获取批次信息会报错
         with self.assertRaises(except_orm):
