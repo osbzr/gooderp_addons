@@ -229,11 +229,11 @@ class warehouse(models.Model):
     def get_warehouse_by_type(self, _type):
         '''返回指定类型的第一个仓库'''
         if not _type or _type not in map(lambda _type: _type[0], self.WAREHOUSE_TYPE):
-            raise except_orm(u'错误', u'仓库类型"%s"不在预先定义的type之中，请联系管理员' % _type)
+            raise except_orm(u'错误', u'仓库类型" % s"不在预先定义的type之中，请联系管理员' % _type)
 
         warehouses = self.search([('type', '=', _type)], limit=1, order='id asc')
         if not warehouses:
-            raise except_orm(u'错误', u'不存在该类型"%s"的仓库，请检查基础数据是否全部导入')
+            raise except_orm(u'错误', u'不存在该类型" % s"的仓库，请检查基础数据是否全部导入')
 
         return warehouses[0]
 
@@ -294,10 +294,10 @@ class pricing(models.Model):
             return good_pricing
         if len(good_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
-                                                             warehouse.name,
-                                                             goods.name,
-                                                             date))
+                             u'适用于%s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                                                  warehouse.name,
+                                                                  goods.name,
+                                                                  date))
         # 客户类别、仓库、产品类别满足条件
         gc_pricing = self.search([
                                   ('c_category_id','=',partner.c_category_id.id),
@@ -312,10 +312,10 @@ class pricing(models.Model):
             return gc_pricing
         if len(gc_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
-                                                             warehouse.name,
-                                                             goods.category_id.name,
-                                                             date))
+                             u'适用于 %s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                                                  warehouse.name,
+                                                                  goods.category_id.name,
+                                                                  date))
         # 客户类别、仓库满足条件
         pw_pricing = self.search([
                                   ('c_category_id','=',partner.c_category_id.id),
@@ -330,9 +330,9 @@ class pricing(models.Model):
             return pw_pricing
         if len(pw_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
-                                                             warehouse.name,
-                                                             date))
+                             u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                                                warehouse.name,
+                                                                date))
         # 仓库、商品满足
         wg_pricing = self.search([
                                       ('c_category_id','=',False),
@@ -347,9 +347,9 @@ class pricing(models.Model):
             return wg_pricing
         if len(wg_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s 的价格策略不唯一'%(warehouse.name,
-                                                             goods.name,
-                                                             date))
+                             u'适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name,
+                                                                goods.name,
+                                                                date))
         # 仓库，商品分类满足条件
         w_gc_pricing = self.search([
                                       ('c_category_id','=',False),
@@ -364,9 +364,9 @@ class pricing(models.Model):
             return w_gc_pricing
         if len(w_gc_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s 的价格策略不唯一'%(warehouse.name,
-                                                             goods.category_id.name,
-                                                             date))
+                             u'适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name,
+                                                                goods.category_id.name,
+                                                                date))
         # 仓库满足条件
         warehouse_pricing = self.search([
                                       ('c_category_id','=',False),
@@ -381,7 +381,7 @@ class pricing(models.Model):
             return warehouse_pricing
         if len(warehouse_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s 的价格策略不唯一'%(warehouse.name,
+                             u'适用于 %s,%s 的价格策略不唯一' % (warehouse.name,
                                                              date))
         # 客户类别,商品满足条件
         ccg_pricing = self.search([
@@ -397,9 +397,9 @@ class pricing(models.Model):
             return ccg_pricing
         if len(ccg_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
-                                                             goods.name,
-                                                             date))
+                             u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                                                goods.name,
+                                                                date))
         # 客户类别,产品分类满足条件
         ccgc_pricing = self.search([
                                       ('c_category_id','=',partner.c_category_id.id),
@@ -414,9 +414,9 @@ class pricing(models.Model):
             return ccgc_pricing
         if len(ccgc_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s,%s 的价格策略不唯一'%(partner.c_category_id.name,
-                                                             goods.category_id.name,
-                                                             date))
+                             u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                                                goods.category_id.name,
+                                                                date))
         # 客户类别满足条件
         partner_pricing = self.search([
                                       ('c_category_id','=',partner.c_category_id.id),
@@ -431,7 +431,7 @@ class pricing(models.Model):
             return partner_pricing
         if len(partner_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s,%s 的价格策略不唯一'%(partner.c_category_id.name,
+                             u'适用于 %s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                                              date))
         # 所有产品打折
         all_goods_pricing = self.search([
@@ -447,7 +447,7 @@ class pricing(models.Model):
             return all_goods_pricing
         if len(all_goods_pricing) > 1:
             raise except_orm(u'错误',
-                             u'适用于 %s 的价格策略不唯一'%(date))
+                             u'适用于 %s 的价格策略不唯一' % (date))
         # 如果日期范围内没有适用的价格策略，则返回空
         if len(good_pricing)+len(gc_pricing)+len(pw_pricing)+len(wg_pricing)\
                 +len(w_gc_pricing)+len(warehouse_pricing)+len(ccg_pricing)\
