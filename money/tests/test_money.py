@@ -46,6 +46,12 @@ class test_money_order(TransactionCase):
             self.env.ref('core.lenovo').payable,
             lenovo_payable - 2000 + 2000)
 
+    def test_money_order_draft_voucher_done(self):
+        ''' 测试收付款反审核 ：审核后的凭证先反审核再删除 '''
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.get_40000').voucher_id.voucher_done()
+        self.env.ref('money.get_40000').money_order_draft()
+
     def test_money_order_onchange(self):
         '''测试收付款onchange'''
         # onchange_date  'get','pay'

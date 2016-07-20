@@ -61,3 +61,15 @@ class test_invoice(TransactionCase):
                                                         'amount': 10.0})
         invoice_buy.money_invoice_done()
         invoice_buy.money_invoice_draft()
+
+    def test_money_invoice_draft_voucher_done(self):
+        '''发票生成的凭证已审核时，反审核发票'''
+        supplier= self.env.ref('core.lenovo')
+        supplier.s_category_id.account_id=self.env.ref("finance.account_ap").id
+        invoice_buy = self.env['money.invoice'].create({'name': 'buy_invoice', 'date': "2016-02-20",
+                                                        'partner_id':supplier.id,
+                                                        'category_id': self.env.ref('money.core_category_purchase').id,
+                                                        'amount': 10.0})
+        invoice_buy.money_invoice_done()
+        invoice_buy.voucher_id.voucher_done()
+        invoice_buy.money_invoice_draft()
