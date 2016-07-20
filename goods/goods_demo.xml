@@ -130,8 +130,8 @@
 			<field name="uos_id" ref="core.uom_pc"/>
 			<field name="conversion">1</field>
 			<field name="barcode">123456789</field>
-			<field name="cost">8000</field>
-			<field name="price">10000</field>
+			<field name="cost">9360</field>
+			<field name="price">11700</field>
 		</record>
 	</data>
 </openerp>

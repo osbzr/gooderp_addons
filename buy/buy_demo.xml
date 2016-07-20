@@ -13,7 +13,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.keyboard"/>
             <field name="order_id" ref="buy_order_1"/>
-            <field eval="50.0" name="price"/>
+            <field eval="58.5" name="price_taxed"/>
             <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
         </record>
@@ -29,7 +29,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.keyboard"/>
             <field name="order_id" ref="buy_order_1_same"/>
-            <field eval="50.0" name="price"/>
+            <field eval="58.5" name="price_taxed"/>
             <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
         </record>
@@ -48,7 +48,7 @@
             <field name="goods_id" ref="goods.cable"/>
             <field eval="50.0" name="goods_qty"/>
             <field name="type">out</field>
-            <field eval="0.3" name="price"/>
+            <field eval="1.17" name="price_taxed"/>
             <field model="wh.move" name="move_id" search="[('name', '=', u'WH_IN_RETURN_1604110001')]"/>
         </record>
         <!--退货订单无法生成退货单-->
@@ -64,7 +64,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.keyboard"/>
             <field name="order_id" ref="buy_return_order_1"/>
-            <field eval="50.0" name="price"/>
+            <field eval="58.5" name="price_taxed"/>
             <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
         </record>
@@ -79,7 +79,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.cable"/>
             <field name="order_id" ref="buy_return_order_1_same"/>
-            <field eval="50.0" name="price"/>
+            <field eval="58.5" name="price_taxed"/>
             <field eval="10.0" name="quantity"/>
         </record>
     </data>
