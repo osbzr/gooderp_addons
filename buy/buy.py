@@ -218,7 +218,7 @@ class buy_order(models.Model):
             raise except_orm(u'错误', u'请输入产品明细行！')
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
-                raise except_orm(u'错误', u'产品数量和产品含税单价不能小于0！')
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         if self.bank_account_id and not self.prepayment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.prepayment:
@@ -591,12 +591,12 @@ class buy_receipt(models.Model):
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
         for line in self.line_in_ids:
-            if line.goods_qty == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
-        
+            if line.goods_qty <= 0 or line.price_taxed < 0:
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+
         for line in self.line_out_ids:
-            if line.goods_qty == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
+            if line.goods_qty <= 0 or line.price_taxed < 0:
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         
         if self.bank_account_id and not self.payment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')

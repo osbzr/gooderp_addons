@@ -604,7 +604,7 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
         'order_id': new_order.id,
         'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                            'quantity': 3.0,
+                             'quantity': 3.0,
                             }),
                      ]
         })

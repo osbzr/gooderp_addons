@@ -154,7 +154,7 @@ class Test_sell(TransactionCase):
                 'warehouse_id': self.customer_warehouse_id.id,
                 'warehouse_dest_id': self.warehouse_id.id,
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 
-                                        'price': 100, 'goods_qty': 5})],
+                                        'price_taxed': 100, 'goods_qty': 5})],
                 'cost_line_ids': [(0, 0, {'partner_id': self.partner.id,
                                           'category_id': self.env.ref('core.cat_freight').id,
                                           'amount': 50})]}
