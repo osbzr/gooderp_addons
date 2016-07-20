@@ -298,12 +298,12 @@ class sell_order_line(models.Model):
         self.using_attribute = self.goods_id.attribute_ids and True or False
 
     @api.one
-    @api.depends('quantity', 'price', 'discount_amount', 'tax_rate')
+    @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
-        '''当订单行的数量、单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
+        '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
+        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
         tax_amt = amount * self.tax_rate * 0.01  # 税额
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
         self.amount = amount
         self.tax_amount = tax_amt
         self.subtotal = amount + tax_amt
@@ -320,10 +320,10 @@ class sell_order_line(models.Model):
                             digits_compute=dp.get_precision('Quantity'))
     quantity_out = fields.Float(u'已发货数量', copy=False,
                                 digits_compute=dp.get_precision('Quantity'))
-    price = fields.Float(u'销售单价',
+    price = fields.Float(u'销售单价', compute=_compute_all_amount,
+                         store=True, readonly=True,
                          digits_compute=dp.get_precision('Amount'))
-    price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount, 
-                               store=True, readonly=True,
+    price_taxed = fields.Float(u'含税单价',
                                digits_compute=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额')
