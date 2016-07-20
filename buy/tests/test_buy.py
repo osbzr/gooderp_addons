@@ -568,7 +568,6 @@ class test_buy_adjust(TransactionCase):
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
-                                   'price_taxed': 117,
                                    'attribute_id': self.keyboard_black.id,
                                    'quantity': 10,})
         new_order.buy_order_done()
@@ -594,7 +593,6 @@ class test_buy_adjust(TransactionCase):
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,
-                                   'price_taxed': 1.17,
                                    'quantity': 10})
         new_order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
@@ -606,7 +604,6 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
         'order_id': new_order.id,
         'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                             'price_taxed': 1.17,
                              'quantity': 3.0,
                             }),
                      ]
@@ -627,7 +624,6 @@ class test_buy_adjust_line(TransactionCase):
         self.adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                                 'price_taxed': 1.17,
                                  'quantity': 10,
                                 })]
         })
