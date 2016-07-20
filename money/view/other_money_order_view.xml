@@ -36,7 +36,8 @@
                     </div>
                     <group>
                         <group>
-				            <field name="partner_id"/>
+				            <field name="partner_id"
+				            	options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <group>
                             <field name="date"/>
