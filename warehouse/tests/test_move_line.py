@@ -77,8 +77,6 @@ class TestMoveLine(TransactionCase):
 
         self.assertEqual(results.get('cost_unit'), cost_unit)
 
-
-
     def test_get_matching_records_by_lot(self):
         # 批次号未审核的时候获取批次信息会报错
         with self.assertRaises(except_orm):

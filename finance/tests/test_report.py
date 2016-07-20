@@ -4,7 +4,7 @@ from openerp.exceptions import except_orm
 
 
 class test_report(TransactionCase):
-    
+
     def setUp(self):
         super(test_report, self).setUp()
         # 审核2015年12月和2016年1月的会计凭证
@@ -21,7 +21,7 @@ class test_report(TransactionCase):
                         'period_id':self.env.ref('finance.period_201512').id})
         month_end.button_checkout()
         '''
-
+        
     def test_trail_balance(self):
         ''' 测试科目余额表 '''
         #上一期间未结账报错
@@ -204,3 +204,4 @@ class test_checkout_wizard(TransactionCase):
         company_pro.remain_account = False
         with self.assertRaises(except_orm):
             wizard.button_checkout()
+    
