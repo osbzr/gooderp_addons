@@ -31,7 +31,7 @@ class Test_sell(TransactionCase):
                 'warehouse_id': self.customer_warehouse_id.id,
                 'warehouse_dest_id': self.warehouse_id.id,
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id,
-                                        'price': 100, 'goods_qty': 5})]}
+                                        'price_taxed': 100, 'goods_qty': 5})]}
 
         self.sell_delivery_obj = self.env['sell.delivery'].with_context({'is_return': True}).create(vals)
 
@@ -265,6 +265,8 @@ class test_sell_order_line(TransactionCase):
             line.goods_id = goods
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
+            # 测试价格是否是商品的销售价
+            self.assertTrue(line.price_taxed == goods.price)
                 
     def test_onchange_warehouse_id(self):
         '''仓库和商品带出价格策略的折扣率'''
@@ -972,7 +974,7 @@ class test_sell_adjust_line(TransactionCase):
     def test_compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变销货金额、税额、价税合计'''
         for line in self.adjust.line_ids:
-            line.price = 100
+            line.price_taxed = 117
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
             self.assertTrue(line.price_taxed == 117)
@@ -988,7 +990,7 @@ class test_sell_adjust_line(TransactionCase):
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
         for line in self.adjust.line_ids:
-            line.price = 100
+            line.price_taxed = 117
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)

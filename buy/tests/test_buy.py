@@ -167,9 +167,9 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(not line.using_attribute)
 
     def test_compute_all_amount(self):
-        '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
+        '''当订单行的数量、含税单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         for line in self.order.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
             self.assertTrue(line.price_taxed == 11.7)
@@ -184,7 +184,7 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.uom_id.name == u'件')
 
             # 测试价格是否是商品的成本
-            self.assertTrue(line.price == goods.cost)
+            self.assertTrue(line.price_taxed == goods.cost)
             # 测试不设置商品的成本时是否弹出警告
             goods.cost = 0.0
             with self.assertRaises(except_orm):
@@ -193,7 +193,7 @@ class test_buy_order_line(TransactionCase):
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
         for line in self.order.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)
@@ -502,7 +502,7 @@ class test_buy_adjust(TransactionCase):
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
                                 'attribute_id': self.keyboard_black.id,
                                 'quantity': 3,
-                                'price': -1,
+                                'price_taxed': -1,
                                 })]
         })
         with self.assertRaises(except_orm):
@@ -638,7 +638,7 @@ class test_buy_adjust_line(TransactionCase):
     def test_compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         for line in self.adjust.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
             self.assertTrue(line.price_taxed == 11.7)
@@ -652,7 +652,7 @@ class test_buy_adjust_line(TransactionCase):
             self.assertTrue(line.uom_id.name == u'件')
 
             # 测试价格是否是商品的成本
-            self.assertTrue(line.price == self.cable.cost)
+            self.assertTrue(line.price_taxed == self.cable.cost)
             # 测试不设置商品的成本时是否弹出警告
             self.cable.cost = 0.0
             with self.assertRaises(except_orm):
@@ -661,7 +661,7 @@ class test_buy_adjust_line(TransactionCase):
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
         for line in self.adjust.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)

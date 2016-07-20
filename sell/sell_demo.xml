@@ -12,7 +12,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.mouse"/>
             <field name="order_id" ref="sell_order_1"/>
-            <field eval="2400.0" name="price"/>
+            <field eval="2808.0" name="price_taxed"/>
             <field eval="17.0" name="tax_rate"/>
             <field eval="14400.0" name="discount_amount"/>
             <field eval="60.0" name="quantity"/>
@@ -28,7 +28,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.cable"/>
             <field name="order_id" ref="sell_order_2"/>
-            <field eval="10" name="price"/>
+            <field eval="11.7" name="price_taxed"/>
             <field eval="10" name="discount_amount"/>
             <field eval="10.0" name="quantity"/>
         </record>
@@ -44,7 +44,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.cable"/>
             <field name="order_id" ref="sell_order_3"/>
-            <field eval="10" name="price"/>
+            <field eval="11.7" name="price_taxed"/>
             <field eval="10" name="discount_amount"/>
             <field eval="10.0" name="quantity"/>
         </record>
@@ -60,7 +60,7 @@
             <field name="uom_id" ref="core.uom_pc"/>
             <field name="goods_id" ref="goods.cable"/>
             <field name="order_id" ref="sell_order_return"/>
-            <field eval="10" name="price"/>
+            <field eval="11.7" name="price_taxed"/>
             <field eval="10" name="discount_amount"/>
             <field eval="10.0" name="quantity"/>
         </record>

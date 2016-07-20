@@ -217,8 +217,8 @@ class buy_order(models.Model):
         if not self.line_ids:
             raise except_orm(u'错误', u'请输入产品明细行！')
         for line in self.line_ids:
-            if line.quantity <= 0 or line.price < 0:
-                raise except_orm(u'错误', u'产品数量和产品单价不能小于0！')
+            if line.quantity <= 0 or line.price_taxed < 0:
+                raise except_orm(u'错误', u'产品数量和产品含税单价不能小于0！')
         if self.bank_account_id and not self.prepayment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.prepayment:
@@ -272,7 +272,7 @@ class buy_order(models.Model):
                     'goods_qty': qty,
                     'uom_id': line.uom_id.id,
                     'cost_unit': line.price,
-                    'price': line.price,
+                    'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
                     'discount_amount': discount_amount,
                     'tax_rate': line.tax_rate,
@@ -450,13 +450,14 @@ class buy_order_line(models.Model):
             self.uom_id = self.goods_id.uom_id
             if not self.goods_id.cost:
                 raise except_orm(u'错误', u'请先设置商品的成本！')
-            self.price = self.goods_id.cost
+            self.price_taxed = self.goods_id.cost
 
     @api.one
-    @api.onchange('quantity', 'price', 'discount_rate')
+    @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        self.discount_amount = (self.quantity * self.price *
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.discount_amount = (self.quantity * price *
                                 self.discount_rate * 0.01)
 
 class buy_receipt(models.Model):
@@ -784,20 +785,20 @@ class wh_move_line(models.Model):
                 if not self.goods_id.cost:
                     raise except_orm(u'错误', u'请先设置商品的成本！')
                 self.tax_rate = self.env.user.company_id.import_tax_rate
-                self.price = self.goods_id.cost
+                self.price_taxed = self.goods_id.cost
                 # 如果是销售退货单行
                 if is_return:
                     self.tax_rate = self.env.user.company_id.output_tax_rate
-                    self.price = self.goods_id.price
+                    self.price_taxed = self.goods_id.price
             elif self.type == 'out':
                 self.tax_rate = self.env.user.company_id.output_tax_rate
-                self.price = self.goods_id.price
+                self.price_taxed = self.goods_id.price
                 # 如果是采购退货单行
                 if is_return:
                     if not self.goods_id.cost:
                         raise except_orm(u'错误', u'请先设置商品的成本！')
                     self.tax_rate = self.env.user.company_id.import_tax_rate
-                    self.price = self.goods_id.cost
+                    self.price_taxed = self.goods_id.cost
 
         return super(wh_move_line,self).onchange_goods_id()
 
@@ -857,8 +858,8 @@ class buy_adjust(models.Model):
         if not self.line_ids:
             raise except_orm(u'错误', u'请输入产品明细行！')
         for line in self.line_ids:
-            if  line.price < 0:
-                raise except_orm(u'错误', u'产品单价不能小于0！')
+            if  line.price_taxed < 0:
+                raise except_orm(u'错误', u'产品含税单价不能小于0！')
         buy_receipt = self.env['buy.receipt'].search(
                     [('order_id', '=', self.order_id.id),
                      ('state', '=', 'draft')])
@@ -897,7 +898,7 @@ class buy_adjust(models.Model):
                     'attribute_id': line.attribute_id.id,
                     'quantity': line.quantity,
                     'uom_id': line.uom_id.id,
-                    'price': line.price,
+                    'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
                     'discount_amount': line.discount_amount,
                     'tax_rate': line.tax_rate,
@@ -929,12 +930,12 @@ class buy_adjust_line(models.Model):
         self.using_attribute = self.goods_id.attribute_ids and True or False
 
     @api.one
-    @api.depends('quantity', 'price', 'discount_amount', 'tax_rate')
+    @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
+        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
         tax_amt = amount * self.tax_rate * 0.01  # 税额
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
         self.amount = amount
         self.tax_amount = tax_amt
         self.subtotal = amount + tax_amt
@@ -949,10 +950,10 @@ class buy_adjust_line(models.Model):
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
     quantity = fields.Float(u'调整数量', default=1,
                             digits_compute=dp.get_precision('Quantity'))
-    price = fields.Float(u'购货单价',
+    price = fields.Float(u'购货单价', compute=_compute_all_amount,
+                         store=True, readonly=True,
                          digits_compute=dp.get_precision('Amount'))
-    price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount,
-                               store=True, readonly=True,
+    price_taxed = fields.Float(u'含税单价',
                                digits_compute=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额',
@@ -977,11 +978,12 @@ class buy_adjust_line(models.Model):
             self.uom_id = self.goods_id.uom_id
             if not self.goods_id.cost:
                 raise except_orm(u'错误', u'请先设置商品的成本！')
-            self.price = self.goods_id.cost
+            self.price_taxed = self.goods_id.cost
 
     @api.one
-    @api.onchange('quantity', 'price', 'discount_rate')
+    @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        self.discount_amount = (self.quantity * self.price *
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.discount_amount = (self.quantity * price *
                                 self.discount_rate * 0.01)
