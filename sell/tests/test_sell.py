@@ -154,7 +154,7 @@ class Test_sell(TransactionCase):
                 'warehouse_id': self.customer_warehouse_id.id,
                 'warehouse_dest_id': self.warehouse_id.id,
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 
-                                        'price': 100, 'goods_qty': 5})],
+                                        'price_taxed': 100, 'goods_qty': 5})],
                 'cost_line_ids': [(0, 0, {'partner_id': self.partner.id,
                                           'category_id': self.env.ref('core.cat_freight').id,
                                           'amount': 50})]}
@@ -867,6 +867,7 @@ class test_sell_adjust(TransactionCase):
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,
+                                   'price_taxed': 1.17,
                                    'quantity': 10,})
         new_order.sell_order_done()
         delivery = self.env['sell.delivery'].search(
@@ -926,6 +927,7 @@ class test_sell_adjust(TransactionCase):
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
                                    'attribute_id': self.keyboard_white.id,
+                                   'price_taxed': 117,
                                    'quantity': 10})
         new_order.sell_order_done()
         delivery = self.env['sell.delivery'].search(
