@@ -13,8 +13,12 @@
 2.clone到本地
 
     git clone https://github.com/你的名字/gooderp_addons.git
- 
-3.增加远程分支（也就是osbzr的分支）名为osbzr到你本地。
+    
+3.切换到gooderp_addons项目目录
+
+    cd gooderp_addons/
+    
+4.增加远程分支（也就是osbzr的分支）名为osbzr到你本地。
 
     git remote add osbzr https://github.com/osbzr/gooderp_addons.git
     
