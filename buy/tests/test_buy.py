@@ -302,7 +302,7 @@ class test_buy_receipt(TransactionCase):
         self.assertTrue(not move.line_in_ids)
 
     def test_buy_receipt_done(self):
-        '''测试审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
+        '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
         # 结算账户余额
         bank_account = self.env.ref('core.alipay')
         bank_account.write({'balance': 1000000, })
@@ -360,6 +360,23 @@ class test_buy_receipt(TransactionCase):
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
+
+    def test_buy_receipt_draft(self):
+        '''反审核采购入库单/退货单'''
+        # 先审核入库单，再反审核
+        self.receipt.bank_account_id = self.bank_account.id
+        self.receipt.payment = 100
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 2
+        self.receipt.buy_receipt_done()
+        self.receipt.buy_receipt_draft()
+        # 修改入库单，再次审核，并不产生分单
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 3
+        self.receipt.buy_receipt_done()
+        receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', self.order.id)])
+        self.assertTrue(len(receipt) == 2)
 
     def test_scan_barcode(self):
         '''采购扫码出入库'''

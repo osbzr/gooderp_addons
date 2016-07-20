@@ -358,7 +358,7 @@ class test_sell_delivery(TransactionCase):
         self.assertTrue(not move.line_out_ids)
 
     def test_sell_delivery_done(self):
-        '''测试审核发货单/退货单'''
+        '''审核发货单/退货单'''
         # 销售发货单重复审核
         delivery = self.delivery.copy()
         delivery.sell_delivery_done()
@@ -374,6 +374,23 @@ class test_sell_delivery(TransactionCase):
             line.goods_qty = 0
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
+
+    def test_sell_delivery_draft(self):
+        '''反审核发货单/退货单'''
+        # 先审核发货单，再反审核
+        self.delivery.bank_account_id = self.bank_account.id
+        self.delivery.receipt = 5
+        for line in self.delivery.line_out_ids:
+            line.goods_qty = 8
+        self.delivery.sell_delivery_done()
+        self.delivery.sell_delivery_draft()
+        # 修改发货单，再次审核，并不产生分单
+        for line in self.delivery.line_out_ids:
+            line.goods_qty = 5
+        self.delivery.sell_delivery_done()
+        delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.assertTrue(len(delivery) == 2)
 
     def test_no_stock(self):
         ''' 测试虚拟商品出库 '''
