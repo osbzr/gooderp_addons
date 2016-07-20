@@ -64,7 +64,7 @@ class sell_order(models.Model):
     type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', 
                             default='sell', states=READONLY_STATES)
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
-                                   ondelete='restrict',
+                                   ondelete='restrict', states=READONLY_STATES,
                                    default=_default_warehouse)
     name = fields.Char(u'单据编号', select=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
@@ -154,8 +154,8 @@ class sell_order(models.Model):
         if not self.line_ids:
             raise except_orm(u'错误', u'请输入产品明细行！')
         for line in self.line_ids:
-            if line.quantity == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
+            if line.quantity <= 0 or line.price_taxed <= 0:
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于或等于0！' % line.goods_id.name)
         if self.bank_account_id and not self.pre_receipt:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.pre_receipt:
@@ -511,11 +511,11 @@ class sell_delivery(models.Model):
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
         for line in self.line_in_ids:
-            if line.goods_qty == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
+            if line.goods_qty <= 0 or line.price_taxed <= 0:
+                raise except_orm(u'错误', u'产品 %s 的数量和产品含税单价不能小于或等于0！' % line.goods_id.name)
         for line in self.line_out_ids:
-            if line.goods_qty == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
+            if line.goods_qty <= 0 or line.price_taxed <= 0:
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于或等于0！' % line.goods_id.name)
         if self.bank_account_id and not self.receipt:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
@@ -732,12 +732,12 @@ class sell_adjust(models.Model):
                          ('attribute_id', '=', line.attribute_id.id),
                          ('order_id', '=', self.order_id.id)])
             if len(origin_line) > 1:
-                raise except_orm(u'错误', u'要调整的商品%s在原始单据中不唯一' % line.goods_id.name)
+                raise except_orm(u'错误', u'要调整的商品 %s 在原始单据中不唯一' % line.goods_id.name)
             if origin_line:
                 origin_line.quantity += line.quantity # 调整后数量
                 origin_line.note = line.note
                 if origin_line.quantity < origin_line.quantity_out:
-                    raise except_orm(u'错误', u'%s调整后数量不能小于原订单已出库数量' % line.goods_id.name)
+                    raise except_orm(u'错误', u' %s 调整后数量不能小于原订单已出库数量' % line.goods_id.name)
                 elif origin_line.quantity > origin_line.quantity_out:
                     # 查找出原销货订单产生的草稿状态的发货单明细行，并更新它
                     move_line = self.env['wh.move.line'].search(
@@ -748,7 +748,7 @@ class sell_adjust(models.Model):
                         move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
                         move_line.note = line.note
                     else:
-                        raise except_orm(u'错误', u'商品%s已全部入库，建议新建购货订单' % line.goods_id.name)
+                        raise except_orm(u'错误', u'商品 %s 已全部入库，建议新建购货订单' % line.goods_id.name)
                 # 调整后数量与已出库数量相等时，删除产生的发货单分单
                 else:
                     delivery.unlink()
