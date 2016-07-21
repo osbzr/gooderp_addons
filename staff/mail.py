@@ -23,7 +23,7 @@ class mail_message(osv.Model):
             staff_bir = staff.birthday[5:]
             if now == staff_bir:
                 #创建一条祝福信息
-                values['subject'] = "生日快乐！"
+                values['subject'] = u"生日快乐！"
                 values['model'] = "mail.group"
                 values['body'] = staff.name + u"，祝你生日快乐!"
                 values['res_id'] = 1
