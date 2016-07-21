@@ -41,7 +41,7 @@ class MobileView(models.Model):
     domain = fields.Char('domain')
     limit = fields.Integer(u'初始数量', default=20)
     sequence = fields.Integer(u'排序', default=16)
-    using_wizard = fields.Boolean(compute='_get_using_wizard', string='启动wizard')
+    using_wizard = fields.Boolean(compute='_get_using_wizard', string=u'启动wizard')
     arch = fields.Text(u'XML视图', required=True)
 
     _sql_constraints = [
@@ -65,7 +65,7 @@ class MobileView(models.Model):
                     if len(item) != 2:
                         raise ValueError()
             except:
-                raise osv.except_osv(u'错误', '无法解析的selection属性%s' % attrib.get('selection'))
+                raise osv.except_osv(u'错误', u'无法解析的selection属性%s' % attrib.get('selection'))
 
     def _check_domain(self, model, domain):
         try:
@@ -87,7 +87,7 @@ class MobileView(models.Model):
                 if len(item) != 3:
                     raise ValueError()
         except:
-            raise osv.except_osv(u'错误', '无法解析的domain条件%s' % domain)
+            raise osv.except_osv(u'错误', u'无法解析的domain条件%s' % domain)
 
     def _check_model(self, model):
         try:
