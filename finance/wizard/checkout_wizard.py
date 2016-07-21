@@ -15,7 +15,7 @@ class checkout_wizard(models.TransientModel):
     @api.multi
     @api.onchange('date')
     def onchange_period_id(self):
-        self.period_id = self.env['finance.period'].get_period(self.date)
+        self.period_id = self.env['finance.period'].with_context(module_name='checkout_wizard').get_period(self.date)
 
     @api.multi
     def button_checkout(self):
