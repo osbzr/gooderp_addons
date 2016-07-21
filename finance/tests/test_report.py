@@ -14,6 +14,7 @@ class test_report(TransactionCase):
         self.env.ref('finance.voucher_12_1').voucher_done()
         
         self.period_id = self.env.ref('finance.period_201601').id
+        self.period_201411 = self.env.ref('finance.period_201411')
         ''' FIXME
         # 结转2015年12月的期间
         month_end = self.env['checkout.wizard'].create(
@@ -28,6 +29,8 @@ class test_report(TransactionCase):
         report = self.env['create.trial.balance.wizard'].create(
             {'period_id': self.period_id}
                     )
+        period_201411_wizard = self.env['create.trial.balance.wizard'].create(
+            {'period_id': self.period_201411.id})
         with self.assertRaises(except_orm):
             report.create_trial_balance()
         # 结转2015年12月的期间
@@ -37,6 +40,7 @@ class test_report(TransactionCase):
         month_end.button_checkout()
         #正常流程
         report.create_trial_balance()
+        period_201411_wizard.create_trial_balance()
 
     def test_vouchers_summary(self):
         ''' 测试总账和明细账'''
