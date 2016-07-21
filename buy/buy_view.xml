@@ -33,7 +33,8 @@
             <field name="supplier_id" position="after">
                 <field name="vendor_ids" colspan="2" nolabel="1" groups='goods.view_cost_groups'>
                         <tree string="goods" editable="bottom">
-                            <field name="vendor_id"/>
+                            <field name="vendor_id"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="price"/>
                             <field name="code"/>
                             <field name="name"/>
@@ -213,6 +214,7 @@
                 <form string="采购入库单">
                 <header>
                 	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>
@@ -237,6 +239,7 @@
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
                             <field name="money_state" readonly='1'/>
+                            <field name="modifying" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -280,7 +283,9 @@
 		                <page string="采购费用行">
 		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 		                		<tree string="Cost Lines" editable="bottom">
-		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
+		                			<field name="partner_id"
+		                				domain="[('s_category_id', '!=', False)]"
+		                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
 			                		<field name="category_id"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>
@@ -380,6 +385,7 @@
                 <form string="采购退货单">
                 <header>
                 	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>
@@ -403,6 +409,7 @@
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
                             <field name="return_state" readonly="1"/>
+                            <field name="modifying" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -667,7 +674,8 @@
         <menuitem id="menu_buy_return" name='采购退货单' action="buy_return_action"
             parent="menu_buy_manage" sequence="3"/>
         <menuitem id="menu_buy_adjust" name='采购调整单' action="buy_adjust_action"
-            parent="menu_buy_manage" sequence="4"/>
+            parent="menu_buy_manage" sequence="4"
+            groups='buy.buy_groups'/>
         
         <!-- 菜单加入仓库模块 -->
         <menuitem id="menu_wh_buy_receipt" name='采购入库单' action="buy_receipt_action"

@@ -167,9 +167,9 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(not line.using_attribute)
 
     def test_compute_all_amount(self):
-        '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
+        '''当订单行的数量、含税单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         for line in self.order.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
             self.assertTrue(line.price_taxed == 11.7)
@@ -184,7 +184,7 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.uom_id.name == u'件')
 
             # 测试价格是否是商品的成本
-            self.assertTrue(line.price == goods.cost)
+            self.assertTrue(line.price_taxed == goods.cost)
             # 测试不设置商品的成本时是否弹出警告
             goods.cost = 0.0
             with self.assertRaises(except_orm):
@@ -193,7 +193,7 @@ class test_buy_order_line(TransactionCase):
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
         for line in self.order.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)
@@ -302,7 +302,7 @@ class test_buy_receipt(TransactionCase):
         self.assertTrue(not move.line_in_ids)
 
     def test_buy_receipt_done(self):
-        '''测试审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
+        '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
         # 结算账户余额
         bank_account = self.env.ref('core.alipay')
         bank_account.write({'balance': 1000000, })
@@ -360,6 +360,23 @@ class test_buy_receipt(TransactionCase):
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
+
+    def test_buy_receipt_draft(self):
+        '''反审核采购入库单/退货单'''
+        # 先审核入库单，再反审核
+        self.receipt.bank_account_id = self.bank_account.id
+        self.receipt.payment = 100
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 2
+        self.receipt.buy_receipt_done()
+        self.receipt.buy_receipt_draft()
+        # 修改入库单，再次审核，并不产生分单
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 3
+        self.receipt.buy_receipt_done()
+        receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', self.order.id)])
+        self.assertTrue(len(receipt) == 2)
 
     def test_scan_barcode(self):
         '''采购扫码出入库'''
@@ -485,7 +502,7 @@ class test_buy_adjust(TransactionCase):
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
                                 'attribute_id': self.keyboard_black.id,
                                 'quantity': 3,
-                                'price': -1,
+                                'price_taxed': -1,
                                 })]
         })
         with self.assertRaises(except_orm):
@@ -587,7 +604,7 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
         'order_id': new_order.id,
         'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                            'quantity': 3.0,
+                             'quantity': 3.0,
                             }),
                      ]
         })
@@ -621,7 +638,7 @@ class test_buy_adjust_line(TransactionCase):
     def test_compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         for line in self.adjust.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
             self.assertTrue(line.price_taxed == 11.7)
@@ -635,7 +652,7 @@ class test_buy_adjust_line(TransactionCase):
             self.assertTrue(line.uom_id.name == u'件')
 
             # 测试价格是否是商品的成本
-            self.assertTrue(line.price == self.cable.cost)
+            self.assertTrue(line.price_taxed == self.cable.cost)
             # 测试不设置商品的成本时是否弹出警告
             self.cable.cost = 0.0
             with self.assertRaises(except_orm):
@@ -644,7 +661,7 @@ class test_buy_adjust_line(TransactionCase):
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
         for line in self.adjust.line_ids:
-            line.price = 10
+            line.price_taxed = 11.7
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)

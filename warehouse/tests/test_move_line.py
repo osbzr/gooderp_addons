@@ -209,7 +209,8 @@ class TestMoveLine(TransactionCase):
             self.mouse_in_line.check_availability()
 
     def test_name_search(self):
-        '''测试不输入数据时的name_search'''
-        result = self.env['wh.move.line'].name_search('', None, 'ilike', 100)
-        real_result = [(1, u'False \u603b\u4ed3 \u4f59 48.0'), (2, u'ms160301 \u603b\u4ed3 \u4f59 1.0'), (3, u'ms160302 \u603b\u4ed3 \u4f59 1.0'), (4, u'kb160000567 \u603b\u4ed3 \u4f59 600.0'), (5, u'False \u603b\u4ed3 \u4f59 12000.0'), (6, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 1.0'), (7, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 2.0'), (8, u'False \u603b\u4ed3 \u4f59 2.0'), (9, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 1.0'), (10, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 1.0'), (11, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 2.0'), (12, u'False \u603b\u4ed3 \u4f59 1.0'), (13, u'False \u603b\u4ed3 \u4f59 1.0'), (14, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 1.0'), (15, u'self001 \u603b\u4ed3 \u4f59 1.0'), (16, u'self002 \u603b\u4ed3 \u4f59 1.0'), (17, u'False \u603b\u4ed3 \u4f59 48.0'), (18, u'False \u603b\u4ed3 \u4f59 48.0'), (19, u'False \u603b\u4ed3 \u4f59 12.0'), (20, u'False \u603b\u4ed3 \u4f59 12.0'), (21, u'False \u4e0a\u6d77\u4ed3 \u4f59 120.0'), (22, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 4.0'), (23, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 12.0'), (24, u'False \u5176\u4ed6\u4ed3\u5e93 \u4f59 24.0'), (25, u'False \u603b\u4ed3 \u4f59 50.0')]
+        '''测试批号下拉的时候显示批次和剩余数量'''
+        move_line = self.env.ref('warehouse.wh_move_line_12')
+        result = self.env['wh.move.line'].name_search('ms160301')
+        real_result = [(move_line.id, move_line.lot + ' ' + move_line.warehouse_dest_id.name + u' 余 ' + str(move_line.goods_qty))]
         self.assertEqual(result, real_result)

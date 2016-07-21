@@ -161,10 +161,11 @@
     	<record id='sell_delivery_form' model='ir.ui.view'>
         	<field name='name'>sell.delivery.form</field>
         	<field name='model'>sell.delivery</field>
-        	<field name='arch' type='xml'> 
+        	<field name='arch' type='xml'>
             	<form string='销售发货单'>
             		<header>
-            			<button name='sell_delivery_done' states="draft" type='object' string='审核' class='oe_highlight'/>
+            			<button name='sell_delivery_done' states='draft' type='object' string='审核' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
             		<sheet>
@@ -187,10 +188,11 @@
 								<field name="is_return" invisible="1"/>
             				</group>
             				<group>
+            					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name='order_id' readonly='1'/>
             					<field name='invoice_id' readonly='1'/>
             					<field name="money_state" readonly="1"/>
-								<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+								<field name="modifying" invisible="1"/>
             				</group>
             			</group>
             			<notebook>
@@ -238,7 +240,9 @@
 			                <page string="销售费用行">
 			                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 			                		<tree string="Cost Lines" editable="bottom">
-			                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
+			                			<field name="partner_id"
+			                				domain="[('s_category_id', '!=', False)]"
+			                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
 				                		<field name="category_id"/>
 				                		<field name="amount"/>
 				                		<field name="note"/>
@@ -336,6 +340,7 @@
             	<form string='销售退货单'>
             		<header>
             			<button name='sell_delivery_done' states="draft" type='object' string='审核' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
             		<sheet>
@@ -361,6 +366,7 @@
             					<field name='order_id' readonly='1'/>
             					<field name='invoice_id' readonly='1'/>
             					<field name="return_state" readonly="1"/>
+            					<field name="modifying" invisible="1"/>
             				</group>
             			</group>
             			<notebook>
@@ -622,7 +628,8 @@
 		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"
             parent="sell_order_menu_root" sequence="3"/>
         <menuitem id="sell_adjust_menu" name='销售调整单' action="sell_adjust_action"
-            parent="sell_order_menu_root" sequence="4"/>
+            parent="sell_order_menu_root" sequence="4"
+            groups='sell.sell_groups'/>
 
 		<!-- 仓库菜单下增加菜单 -->
 		<menuitem id='sell_wh_delivery_menu' name='销售发货单' action='sell_delivery_action'

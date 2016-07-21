@@ -38,6 +38,8 @@ class money_order(models.Model):
     def money_order_draft(self):
         res = super(money_order, self).money_order_draft()
         voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
         voucher.unlink()
         return res
 
@@ -88,6 +90,8 @@ class money_invoice(models.Model):
     def money_invoice_draft(self):
         res = super(money_invoice, self).money_invoice_draft()
         voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
         voucher.unlink()
         return res
 

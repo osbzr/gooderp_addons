@@ -43,12 +43,12 @@ class wh_move_line(models.Model):
     }
 
     @api.one
-    @api.depends('goods_qty', 'price', 'discount_amount', 'tax_rate')
+    @api.depends('goods_qty', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
-        '''当订单行的数量、单价、折扣额、税率改变时，改变金额、税额、价税合计'''
+        '''当订单行的数量、含税单价、折扣额、税率改变时，改变金额、税额、价税合计'''
+        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         amount = self.goods_qty * self.price - self.discount_amount
         tax_amt = amount * self.tax_rate * 0.01
-        self.price_taxed = self.price * (100 - self.discount_rate) * 0.01 * (1 + self.tax_rate * 0.01)
         self.amount = amount
         self.tax_amount = tax_amt
         self.subtotal = amount + tax_amt
@@ -105,8 +105,10 @@ class wh_move_line(models.Model):
                                         )
     goods_qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'), default=1)
     goods_uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'), default=1)
-    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
-    price_taxed = fields.Float(u'含税单价', compute=_compute_all_amount, store=True, readonly=True,
+    price = fields.Float(u'单价', compute=_compute_all_amount,
+                         store=True, readonly=True,
+                         digits_compute=dp.get_precision('Amount'))
+    price_taxed = fields.Float(u'含税单价',
                                digits_compute=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额',
@@ -302,10 +304,11 @@ class wh_move_line(models.Model):
                 self.lot = self.lot_id.lot
 
     @api.one
-    @api.onchange('goods_qty', 'price', 'discount_rate')
+    @api.onchange('goods_qty', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        self.discount_amount = self.goods_qty * self.price * self.discount_rate * 0.01
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.discount_amount = self.goods_qty * price * self.discount_rate * 0.01
 
     @api.multi
     def unlink(self):

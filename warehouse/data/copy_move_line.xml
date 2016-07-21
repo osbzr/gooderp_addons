@@ -4,6 +4,9 @@
         <t t-jquery="tr.oe_list_header_columns > th:first" t-operation="before">
             <th t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
         </t>
+        <t t-jquery="tfoot > tr:first > td:first" t-operation="before">
+            <td t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
+        </t>
 	</t>
 
 	<tr t-name="ListView.row"

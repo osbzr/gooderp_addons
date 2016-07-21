@@ -31,7 +31,7 @@ class Test_sell(TransactionCase):
                 'warehouse_id': self.customer_warehouse_id.id,
                 'warehouse_dest_id': self.warehouse_id.id,
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id,
-                                        'price': 100, 'goods_qty': 5})]}
+                                        'price_taxed': 100, 'goods_qty': 5})]}
 
         self.sell_delivery_obj = self.env['sell.delivery'].with_context({'is_return': True}).create(vals)
 
@@ -154,7 +154,7 @@ class Test_sell(TransactionCase):
                 'warehouse_id': self.customer_warehouse_id.id,
                 'warehouse_dest_id': self.warehouse_id.id,
                 'line_in_ids': [(0, 0, {'goods_id': self.goods.id, 
-                                        'price': 100, 'goods_qty': 5})],
+                                        'price_taxed': 100, 'goods_qty': 5})],
                 'cost_line_ids': [(0, 0, {'partner_id': self.partner.id,
                                           'category_id': self.env.ref('core.cat_freight').id,
                                           'amount': 50})]}
@@ -265,6 +265,8 @@ class test_sell_order_line(TransactionCase):
             line.goods_id = goods
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
+            # 测试价格是否是商品的销售价
+            self.assertTrue(line.price_taxed == goods.price)
                 
     def test_onchange_warehouse_id(self):
         '''仓库和商品带出价格策略的折扣率'''
@@ -358,7 +360,7 @@ class test_sell_delivery(TransactionCase):
         self.assertTrue(not move.line_out_ids)
 
     def test_sell_delivery_done(self):
-        '''测试审核发货单/退货单'''
+        '''审核发货单/退货单'''
         # 销售发货单重复审核
         delivery = self.delivery.copy()
         delivery.sell_delivery_done()
@@ -374,6 +376,23 @@ class test_sell_delivery(TransactionCase):
             line.goods_qty = 0
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
+
+    def test_sell_delivery_draft(self):
+        '''反审核发货单/退货单'''
+        # 先审核发货单，再反审核
+        self.delivery.bank_account_id = self.bank_account.id
+        self.delivery.receipt = 5
+        for line in self.delivery.line_out_ids:
+            line.goods_qty = 8
+        self.delivery.sell_delivery_done()
+        self.delivery.sell_delivery_draft()
+        # 修改发货单，再次审核，并不产生分单
+        for line in self.delivery.line_out_ids:
+            line.goods_qty = 5
+        self.delivery.sell_delivery_done()
+        delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.assertTrue(len(delivery) == 2)
 
     def test_no_stock(self):
         ''' 测试虚拟商品出库 '''
@@ -955,7 +974,7 @@ class test_sell_adjust_line(TransactionCase):
     def test_compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变销货金额、税额、价税合计'''
         for line in self.adjust.line_ids:
-            line.price = 100
+            line.price_taxed = 117
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
             self.assertTrue(line.price_taxed == 117)
@@ -971,7 +990,7 @@ class test_sell_adjust_line(TransactionCase):
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
         for line in self.adjust.line_ids:
-            line.price = 100
+            line.price_taxed = 117
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)

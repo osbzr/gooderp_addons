@@ -28,7 +28,7 @@
             </field>
         </record>
 
-        <!--收款单form-->
+        <!--收/付款单form-->
         <record id="money_order_form" model="ir.ui.view">
             <field name="name">money.order.form</field>
             <field name="model">money.order</field>
@@ -49,10 +49,13 @@
                     </div>
                     <group>
                         <group>
-				            <field name="partner_id"/>
-				            <field name="bank_name" invisible="context.get('default_get', 0)"
+				            <field name="partner_id"
+				            	options="{'no_open': True, 'no_create': True}"/>
+				            <field name="bank_name"
+				            	invisible="context.get('default_get', 0)"
 				            	required="context.get('default_pay', 0)"/>
-				            <field name="bank_num" invisible="context.get('default_get', 0)"
+				            <field name="bank_num"
+				            	invisible="context.get('default_get', 0)"
 				            	required="context.get('default_pay', 0)"/>
                         </group>
                         <group>
