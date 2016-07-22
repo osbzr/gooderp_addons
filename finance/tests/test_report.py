@@ -170,6 +170,7 @@ class test_report(TransactionCase):
             balance_sheet_obj.cumulative_occurrence_balance_formula = ''
         report.create_profit_statement()
 
+
 class test_checkout_wizard(TransactionCase):
     
     def setUp(self):
@@ -240,4 +241,18 @@ class test_checkout_wizard(TransactionCase):
         company_pro.remain_account = False
         with self.assertRaises(except_orm):
             wizard.button_checkout()
+
+    def test_recreate_voucher_name(self):
+        '''按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）'''
+        # FIXME: 没有成功
+        auto_reset = self.env['ir.values'].set_default('finance.config.settings', 'default_auto_reset', True)
+        # self.env['finance.config.settings'].set_default_auto_reset(True)
+        print self.env['finance.config.settings'].default_auto_reset
+        # 结转2015年12月的期间
+        wizard = self.env['checkout.wizard'].create(
+                       {'date':'2015-12-31'})
+        self.voucher_15_12.voucher_done()
+        self.checkout_voucher.voucher_done()
+        wizard.button_checkout()
+
     

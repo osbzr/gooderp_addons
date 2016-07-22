@@ -34,10 +34,7 @@ class customer_statements_report(models.Model):
         pre_record = self.search([('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
         # 相邻的两条记录，partner不同，应收款余额重新计算
         if pre_record:
-            if pre_record.name != u'期初余额':
-                before_balance = pre_record.balance_amount
-            else:
-                before_balance = pre_record.amount
+            before_balance = pre_record.balance_amount
         else:
             before_balance = 0
         self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
