@@ -18,3 +18,13 @@ class test_core(TransactionCase):
         # 测试输入value为负时的货币大写问题
         self.assertTrue(self.env['res.currency'].rmb_upper(-10000100.3) == u'负壹仟万零壹佰元叁角整')
         
+class test_res_users(TransactionCase):
+    
+    def test_write(self):
+        '''修改管理员权限'''
+        user = self.env['res.users'].create({
+                'name': 'Demo User',
+                'login': 'email'
+                })
+        self.env.user.write({'name': 'adsf'})
+
