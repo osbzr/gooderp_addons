@@ -44,7 +44,6 @@ class test_goods(TransactionCase):
         result = self.env['goods'].name_search('001')
         self.assertEqual(result, real_result)
 
-
 class test_attributes(TransactionCase):
 
     def test_ean_search(self):

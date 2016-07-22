@@ -492,6 +492,12 @@ class test_wh_move_line(TransactionCase):
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 0)
 
+    def test_onchange_goods_id(self):
+        '''测试采购模块中商品的onchange,是否会带出默认库位和单价'''
+        # 销售退货单
+        for line in self.delivery_return.line_in_ids:
+            line.with_context({'default_is_return': True,
+                    'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
 class test_pricing(TransactionCase):
     
     def test_miss_get_pricing_id(self):
