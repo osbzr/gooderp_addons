@@ -506,14 +506,53 @@ class sell_delivery(models.Model):
         return super(sell_delivery, self).unlink()
 
     @api.one
+    def check_goods_qty(self, attribute, warehouse):
+        '''SQL来取指定产品，属性，仓库，的当前剩余数量'''
+        self.env.cr.execute('''
+            SELECT sum(line.qty_remaining) as qty
+            FROM wh_move_line line
+
+            WHERE line.warehouse_dest_id = %s
+              AND line.state = 'done'
+              AND line.attribute_id = %s
+        ''' % (warehouse.id,attribute.id,))
+
+        return self.env.cr.fetchone()
+
+
+    @api.one
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成源单和收款单'''
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
         for line in self.line_in_ids:
+            vals = {}
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise except_orm(u'错误', u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
         for line in self.line_out_ids:
+            vals={}
+            result = self.check_goods_qty(line.attribute_id, self.warehouse_id)
+            result =result[0][0] or 0
+            if line.goods_qty - result > 0 and not line.lot_id:
+                #在销售出库时如果临时缺货，自动生成一张盘盈入库单
+                #TODO 弹窗提个醒
+                vals.update({
+                        'type':'inventory',
+                        'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
+                        'warehouse_dest_id':line.warehouse_id.id,
+                        'line_in_ids':[(0, 0, {
+                                    'goods_id':line.goods_id.id,
+                                    'attribute_id':line.attribute_id.id,
+                                    'goods_uos_qty':line.goods_uos_qty - result/line.goods_id.conversion,
+                                    'uos_id':line.uos_id.id,
+                                    'goods_qty':line.goods_qty - result,
+                                    'uom_id':line.uom_id.id,
+                                    'cost_unit':line.goods_id.cost
+                                                }
+                                        )]
+                            })
+                auto_in = self.env['wh.in'].create(vals)
+                auto_in.approve_order()
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         if self.bank_account_id and not self.receipt:
