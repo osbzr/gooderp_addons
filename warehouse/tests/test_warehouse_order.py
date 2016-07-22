@@ -206,8 +206,3 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.type = 'inventory'
         self.others_in_2.onchange_type()
         self.assertTrue(self.others_in_2.warehouse_id == warehouse_inventory)
-
-
-
-
-
