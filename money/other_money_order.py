@@ -173,6 +173,7 @@ class other_money_order_line(models.Model):
                         domain="[('type', '=', context.get('type'))]")
     source_id = fields.Many2one('money.invoice',
                                 u'源单', ondelete='cascade')
+    auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
     amount = fields.Float(u'金额',
                         digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
