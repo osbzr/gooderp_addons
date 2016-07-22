@@ -275,6 +275,10 @@ class test_sell_order_line(TransactionCase):
         order=self.env.ref('sell.sell_order_1')
         order.partner_id = self.env.ref('core.yixun').id
         order_line.onchange_warehouse_id()
+
+        # 找不到价格策略时
+        order.date = False
+        order_line.onchange_warehouse_id()
         
 
 
@@ -489,6 +493,11 @@ class test_wh_move_line(TransactionCase):
             self.assertTrue(line.discount_rate == 0)
             line.with_context({'default_date':'2017-01-01',
                                'warehouse_type': 'customer',
+                'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
+            self.assertTrue(line.discount_rate == 0)
+
+            # 仓库类型不为客户仓时
+            line.with_context({'default_date':'2017-01-01',
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 0)
 

@@ -22,9 +22,13 @@ class test_res_users(TransactionCase):
     
     def test_write(self):
         '''修改管理员权限'''
-        user = self.env['res.users'].create({
-                'name': 'Demo User',
-                'login': 'email'
-                })
-        self.env.user.write({'name': 'adsf'})
+        user_demo = self.env.ref('base.user_demo')
+        user_demo.groups_id = [(4, self.env.ref('base.group_erp_manager').id)]
+        user_admin = self.env.ref('base.user_root')
+        env2 = self.env(self.env.cr, user_demo.id, self.env.context)
+        with self.assertRaises(except_orm):
+            user_admin.with_env(env2).name = 'adsf'
+        # with self.assertRaises(except_orm):
+        user_admin.groups_id = [(3, self.env.ref('base.group_erp_manager').id)]
+
 
