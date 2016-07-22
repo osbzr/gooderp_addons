@@ -207,3 +207,10 @@ class TestMoveLine(TransactionCase):
         self.mouse_in_line.warehouse_id = self.mouse_in_line.warehouse_dest_id
         with self.assertRaises(except_orm):
             self.mouse_in_line.check_availability()
+
+    def test_name_search(self):
+        '''测试批号下拉的时候显示批次和剩余数量'''
+        move_line = self.env.ref('warehouse.wh_move_line_12')
+        result = self.env['wh.move.line'].name_search('ms160301')
+        real_result = [(move_line.id, move_line.lot + ' ' + move_line.warehouse_dest_id.name + u' 余 ' + str(move_line.goods_qty))]
+        self.assertEqual(result, real_result)

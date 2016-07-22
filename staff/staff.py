@@ -57,7 +57,7 @@ class staff(models.Model):
     work_email = fields.Char(u'办公邮箱')
     work_phone = fields.Char(u'办公电话')
     user_id = fields.Many2one('res.users', u'对应用户')
-    image_medium = fields.Binary(string='头像', compute=_get_image)
+    image_medium = fields.Binary(string=u'头像', compute=_get_image)
     # 个人信息
     birthday = fields.Date(u'生日')
     identification_id = fields.Char(u'身份证号')

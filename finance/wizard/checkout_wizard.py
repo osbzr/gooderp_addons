@@ -15,7 +15,7 @@ class checkout_wizard(models.TransientModel):
     @api.multi
     @api.onchange('date')
     def onchange_period_id(self):
-        self.period_id = self.env['finance.period'].get_period(self.date)
+        self.period_id = self.env['finance.period'].with_context(module_name='checkout_wizard').get_period(self.date)
 
     @api.multi
     def button_checkout(self):
@@ -262,10 +262,10 @@ class checkout_wizard(models.TransientModel):
                     # 更新凭证号
                     voucher_id.write({'name': next_voucher_name})
                     last_voucher_number += 1
-            # update ir.sequence 起始凭证号 number_next
+            # update ir.sequence  number_next
             if last_voucher_number:
                 self.env.cr.execute("UPDATE ir_sequence SET suffix=%s WHERE id=%s ",
-                                    (seq_id.suffix, seq_id.id))
+                                    (seq_id.suffix or interpolated_suffix, seq_id.id))
                 self.env['ir.sequence']._alter_sequence(seq_id.id, seq_id.number_increment,
                                                         seq_id.number_next)
                 self.env.cr.commit()
