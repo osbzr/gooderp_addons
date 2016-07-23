@@ -33,7 +33,8 @@
             <field name="supplier_id" position="after">
                 <field name="vendor_ids" colspan="2" nolabel="1" groups='goods.view_cost_groups'>
                         <tree string="goods" editable="bottom">
-                            <field name="vendor_id"/>
+                            <field name="vendor_id"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="price"/>
                             <field name="code"/>
                             <field name="name"/>
@@ -282,7 +283,9 @@
 		                <page string="采购费用行">
 		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 		                		<tree string="Cost Lines" editable="bottom">
-		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
+		                			<field name="partner_id"
+		                				domain="[('s_category_id', '!=', False)]"
+		                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
 			                		<field name="category_id"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>

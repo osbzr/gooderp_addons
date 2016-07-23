@@ -67,18 +67,8 @@ class TestMoveLine(TransactionCase):
             lot_id=self.mouse_out_line.lot_id)
 
         self.assertEqual(cost_unit, self.mouse_out_line.lot_id.cost_unit)
-
-        self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
-        self.overage_in.approve_order()
-        self.assembly.approve_order()
-        results = self.mouse_out_line.copy_data()
-        _, cost_unit = self.mouse_out_line.goods_id.get_suggested_cost_by_warehouse(
-            self.mouse_out_line.warehouse_id, self.mouse_out_line.goods_qty)
-
-        self.assertEqual(results.get('cost_unit'), cost_unit)
-
-
-
+        
+       
     def test_get_matching_records_by_lot(self):
         # 批次号未审核的时候获取批次信息会报错
         with self.assertRaises(except_orm):
@@ -217,3 +207,10 @@ class TestMoveLine(TransactionCase):
         self.mouse_in_line.warehouse_id = self.mouse_in_line.warehouse_dest_id
         with self.assertRaises(except_orm):
             self.mouse_in_line.check_availability()
+
+    def test_name_search(self):
+        '''测试批号下拉的时候显示批次和剩余数量'''
+        move_line = self.env.ref('warehouse.wh_move_line_12')
+        result = self.env['wh.move.line'].name_search('ms160301')
+        real_result = [(move_line.id, move_line.lot + ' ' + move_line.warehouse_dest_id.name + u' 余 ' + str(move_line.goods_qty))]
+        self.assertEqual(result, real_result)

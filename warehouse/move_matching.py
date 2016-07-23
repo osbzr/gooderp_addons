@@ -51,34 +51,6 @@ class wh_move_line(models.Model):
     matching_out_ids = fields.One2many(
         'wh.move.matching', 'line_out_id', string=u'关联的出库')
 
-    @api.multi
-    def copy_data(self):
-        # TODO 奇怪，返回值似乎被wrapper了
-        self.ensure_one()
-        res = super(wh_move_line, self).copy_data()[0]
-
-        if res.get('warehouse_id') \
-                and res.get('warehouse_dest_id') \
-                and res.get('goods_id'):
-            warehouses = self.env['warehouse'].browse([
-                res.get('warehouse_id'),
-                res.get('warehouse_dest_id')])
-
-            if warehouses[0].type == 'stock' and warehouses[1].type != 'stock':
-                goods = self.env['goods'].browse(res.get('goods_id'))
-                attribute = res.get('attribute_id') \
-                    and self.env['attribute'].browse(res.get('attribute_id')) \
-                    or False
-
-                cost, cost_unit = goods.get_suggested_cost_by_warehouse(
-                    warehouses[0], res.get('goods_qty'), attribute=attribute)
-                res.update({
-                    'cost': cost,
-                    'cost_unit': cost_unit,
-                    'lot_id': False})
-
-        return res
-
     # 这样的function字段的使用方式需要验证一下
     @api.one
     @api.depends('goods_qty', 'matching_in_ids.qty', 'matching_in_ids.uos_qty')

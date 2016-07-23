@@ -189,7 +189,9 @@
                         </div>
                         <group>
                             <group>
-                                <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                	domain="[('c_category_id', '!=', False)]"
+                                	options="{'no_open': True, 'no_create': True}"/>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                             </group>
                             <group>
@@ -266,7 +268,9 @@
                         </div>
                         <group>
                             <group>
-                                <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                	domain="[('s_category_id', '!=', False)]"
+                                	options="{'no_open': True, 'no_create': True}"/>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                             </group>
                             <group>
@@ -338,7 +342,8 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                	options="{'no_open': True, 'no_create': True}"/>
                                 <field name='warehouse_id'/>
                             </group>
                             <group>

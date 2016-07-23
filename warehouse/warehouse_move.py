@@ -19,16 +19,12 @@ class wh_move(models.Model):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_type', 'stock'))
 
-        return self.env['warehouse'].browse()
-
     @api.model
     def _get_default_warehouse_dest(self):
         '''获取调入仓库'''
         if self.env.context.get('warehouse_dest_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_dest_type', 'stock'))
-
-        return self.env['warehouse'].browse()
 
     origin = fields.Char(u'源单类型', required=True)
     name = fields.Char(u'单据编号', copy=False, default='/')
@@ -98,7 +94,7 @@ class wh_move(models.Model):
                 if self.env[model_name].browse(order_id).is_return == True:
                     val['type'] = 'in'
                     for line in move.line_in_ids:
-                        line.price = line.goods_id.cost
+                        line.price_taxed = line.goods_id.cost
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
@@ -110,7 +106,7 @@ class wh_move(models.Model):
                 else:
                     val['type'] = 'out'
                     for line in move.line_out_ids:
-                        line.price = line.goods_id.price
+                        line.price_taxed = line.goods_id.price
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
@@ -125,7 +121,7 @@ class wh_move(models.Model):
                 if self.env[model_name].browse(order_id).is_return == True:
                     val['type'] = 'out'
                     for line in move.line_out_ids:
-                        line.price = line.goods_id.price
+                        line.price_taxed = line.goods_id.price
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
@@ -137,7 +133,7 @@ class wh_move(models.Model):
                 else:
                     val['type'] = 'in'
                     for line in move.line_in_ids:
-                        line.price = line.goods_id.cost
+                        line.price_taxed = line.goods_id.cost
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
@@ -179,7 +175,7 @@ class wh_move(models.Model):
               'uos_id': uos_id,
               'goods_qty': 1,
               'uom_id': uom_id,
-              'price': price,
+              'price_taxed': price,
               'cost_unit': cost_unit,
               'move_id': move.id})
             if create_line == False:
