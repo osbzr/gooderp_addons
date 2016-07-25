@@ -521,8 +521,7 @@ class sell_delivery(models.Model):
             return self.env.cr.fetchone()
         return False
 
-
-    @api.one
+    @api.multi
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成源单和收款单'''
         if self.state == 'done':
@@ -533,14 +532,15 @@ class sell_delivery(models.Model):
                 raise except_orm(u'错误', u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
         for line in self.line_out_ids:
             vals={}
-            result = self.check_goods_qty(line.attribute_id, self.warehouse_id)
-            if result:
-                result = result[0][0] or 0
+            result = False
+            if line.goods_id.no_stock:
+                continue
             else:
-                result = 0
+                result = self.check_goods_qty(line.attribute_id, self.warehouse_id)
+                if result:
+                    result = result[0][0] or 0
             if line.goods_qty - result > 0 and not line.lot_id:
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
-                #TODO 弹窗提个醒
                 vals.update({
                         'type':'inventory',
                         'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
@@ -556,8 +556,20 @@ class sell_delivery(models.Model):
                                                 }
                                         )]
                             })
-                auto_in = self.env['wh.in'].create(vals)
-                auto_in.approve_order()
+                msg = u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name
+                method = 'goods_inventery'
+                dic = {
+                    'name': u'警告',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'popup.wizard',
+                    'type': 'ir.actions.act_window',
+                    'context':{'method':method,
+                               'vals':vals,
+                               'msg':msg,},
+                    'target': 'new',
+                    }
+                return dic
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         if self.bank_account_id and not self.receipt:
@@ -566,7 +578,7 @@ class sell_delivery(models.Model):
             raise except_orm(u'警告！', u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount + self.partner_cost:
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
-
+        print '===here go===='
         if self.order_id:
             if not self.is_return:
                 line_ids = self.line_out_ids
