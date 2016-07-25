@@ -519,6 +519,7 @@ class sell_delivery(models.Model):
             ''' % (warehouse.id,attribute.id,))
     
             return self.env.cr.fetchone()
+        return False
 
 
     @api.one
@@ -533,7 +534,10 @@ class sell_delivery(models.Model):
         for line in self.line_out_ids:
             vals={}
             result = self.check_goods_qty(line.attribute_id, self.warehouse_id)
-            result =result[0][0] or 0
+            if result:
+                result = result[0][0] or 0
+            else:
+                result = 0
             if line.goods_qty - result > 0 and not line.lot_id:
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
                 #TODO 弹窗提个醒
