@@ -115,6 +115,14 @@ class voucher(models.Model):
                 raise except_orm(u'错误', u'不能删除已审核的凭证')
         return super(voucher, self).unlink()
 
+    # 重载write 方法
+    @api.multi
+    def write(self, vals):
+        if self.period_id.is_closed is True:
+            raise except_orm(u'错误', u'该会计期间已结账，凭证不能再修改！')
+        if self.state == 'done':
+            raise except_orm(u'错误', u'凭证已审核！修改请先反审核！')
+        return super(voucher, self).write(vals)
 
 class voucher_line(models.Model):
     '''凭证明细'''
