@@ -7,7 +7,7 @@ from openerp import models, fields, api
 from math import fabs
 ISODATEFORMAT = '%Y-%m-%d'
 ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
-
+import calendar
 
 class BalanceSheet(models.Model):
     """资产负债表"""
@@ -82,16 +82,23 @@ class create_balance_sheet_wizard(models.TransientModel):
                                      'ending_balance': fabs(self.compute_balance(balance_sheet_obj.balance_formula, self.period_id, current_period_field)),
                                      'beginning_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, period, year_begain_field),
                                      'ending_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, self.period_id, current_period_field)})
+        force_company = self._context.get('force_company')
+        if not force_company:
+            force_company = self.env.user.company_id.id
+        company_id = self.env['res.company'].search([('id', '=', force_company)])
+        days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
+        attachment_information = u'编制单位：' + company_id.name + u',,,,' + self.period_id.year\
+                                 + u'年' + self.period_id.month + u'月' + str(days) + u'日' + u',,,' + u'单位：元'
         return {     # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'资产负债表:' + self.period_id.name,
+            'name': u'资产负债表',
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'balance.sheet',
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],
-            'context': {'period_id': self.period_id.id, 'attachment_information': self.period_id.name},
+            'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
             'domain': [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])],
         }
 
@@ -107,16 +114,23 @@ class create_balance_sheet_wizard(models.TransientModel):
         for balance_sheet_obj in balance_sheet_objs:
             balance_sheet_obj.write({'cumulative_occurrence_balance': self.compute_profit(balance_sheet_obj.occurrence_balance_formula, self.period_id, year_begain_field),
                                      'current_occurrence_balance': self.compute_profit(balance_sheet_obj.occurrence_balance_formula, self.period_id, current_period_field)})
+        force_company = self._context.get('force_company')
+        if not force_company:
+            force_company = self.env.user.company_id.id
+        company_id = self.env['res.company'].search([('id', '=', force_company)])
+        days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
+        attachment_information = u'编制单位：' + company_id.name + u',,' + self.period_id.year\
+                                 + u'年' + self.period_id.month + u'月' + str(days) + u'日' + u',' + u'单位：元'
         return {      # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'利润表:' + self.period_id.name,
+            'name': u'利润表',
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'profit.statement',
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],
-            'context': {'period_id': self.period_id.id},
+            'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
             'domain': [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])],
         }
 
@@ -149,10 +163,10 @@ class create_balance_sheet_wizard(models.TransientModel):
 
 
 class ProfitStatement(models.Model):
-    """资产负债表"""
+    """利润表"""
     _name = "profit.statement"
     balance = fields.Char(u'项目')
-    line_num = fields.Integer(u'行次')
+    line_num = fields.Char(u'行次')
     cumulative_occurrence_balance = fields.Float(u'本年累计金额')
     occurrence_balance_formula = fields.Text(u'科目范围')
     current_occurrence_balance = fields.Float(u'本月金额')
