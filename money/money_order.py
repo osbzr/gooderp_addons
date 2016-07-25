@@ -267,6 +267,8 @@ class money_invoice(models.Model):
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
     date_due = fields.Date(string=u'到期日')
 
+    bill_number = fields.Char(u'发票号')
+
     @api.multi
     def money_invoice_done(self):
         for inv in self:

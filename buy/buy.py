@@ -443,14 +443,22 @@ class buy_order_line(models.Model):
     origin = fields.Char(u'销售单号')
 
     @api.one
-    @api.onchange('goods_id')
+    @api.onchange('goods_id', 'quantity')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本价'''
+        '''当订单行的产品变化时，带出产品上的单位、成本价。
+        在采购订单上选择供应商，自动带出供货价格，没有设置供货价的取成本价格。'''
+        if not self.order_id.partner_id:
+            raise except_orm(u'错误', u'请先选择一个供应商！')
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             if not self.goods_id.cost:
                 raise except_orm(u'错误', u'请先设置商品的成本！')
             self.price_taxed = self.goods_id.cost
+            for line in self.goods_id.vendor_ids:
+                if line.vendor_id == self.order_id.partner_id \
+                    and self.quantity >= line.min_qty:
+                    self.price_taxed = line.price
+                    break
 
     @api.one
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
@@ -777,6 +785,7 @@ class wh_move_line(models.Model):
     @api.multi
     @api.onchange('goods_id')
     def onchange_goods_id(self):
+        '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税、销项税'''
         if self.goods_id:
             partner_id = self.env.context.get('default_partner')
             partner = self.env['partner'].search([('id', '=', partner_id)])
