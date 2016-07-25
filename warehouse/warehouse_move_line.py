@@ -198,7 +198,7 @@ class wh_move_line(models.Model):
             line.prev_action_done()
             line.write({
                 'state': 'done',
-                'date': self.move_id.date,
+                'date': line.move_id.date,
             })
 
     def check_cancel(self):
