@@ -508,16 +508,17 @@ class sell_delivery(models.Model):
     @api.one
     def check_goods_qty(self, attribute, warehouse):
         '''SQL来取指定产品，属性，仓库，的当前剩余数量'''
-        self.env.cr.execute('''
-            SELECT sum(line.qty_remaining) as qty
-            FROM wh_move_line line
-
-            WHERE line.warehouse_dest_id = %s
-              AND line.state = 'done'
-              AND line.attribute_id = %s
-        ''' % (warehouse.id,attribute.id,))
-
-        return self.env.cr.fetchone()
+        if attribute:
+            self.env.cr.execute('''
+                SELECT sum(line.qty_remaining) as qty
+                FROM wh_move_line line
+    
+                WHERE line.warehouse_dest_id = %s
+                  AND line.state = 'done'
+                  AND line.attribute_id = %s
+            ''' % (warehouse.id,attribute.id,))
+    
+            return self.env.cr.fetchone()
 
 
     @api.one

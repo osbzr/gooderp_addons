@@ -164,6 +164,7 @@
                     <field name="name"/>
                     <field name="partner_id"/>
             		<field name="category_id"/>
+            		<field name="auxiliary_id"/>
                     <field name="date"/>
                     <field name="amount"/>
                     <field name="reconciled"/>

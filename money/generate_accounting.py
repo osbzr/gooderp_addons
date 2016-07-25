@@ -111,6 +111,7 @@ class money_invoice(models.Model):
             vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
                          'debit_account_id': partner_account_id, 'sell_tax_amount': self.tax_amount or 0,
+                         'credit_auxiliary_id':self.auxiliary_id.id,
                          })
 
         else:
@@ -118,6 +119,7 @@ class money_invoice(models.Model):
                          'amount': self.amount, 'credit_account_id': partner_account_id,
                          'debit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
                          'partner_credit':self.partner_id.id, 'buy_tax_amount': self.tax_amount or 0,
+                         'debit_auxiliary_id':self.auxiliary_id.id,
                          })
         self.create_voucher_line(vals)
         return res
@@ -134,6 +136,7 @@ class money_invoice(models.Model):
         self.env['voucher.line'].create({
             'name': u"%s %s " % (vals.get('string'), vals.get('name')), 'account_id': vals.get('debit_account_id'),
             'debit': debit, 'voucher_id': vals.get('vouch_obj_id'), 'partner_id': vals.get('partner_debit', ''),
+            'auxiliary_id':vals.get('debit_auxiliary_id',False)
         })
         # 进项税行
         if vals.get('buy_tax_amount'):
@@ -145,6 +148,7 @@ class money_invoice(models.Model):
         self.env['voucher.line'].create({
             'name': u"%s %s" % (vals.get('string'), vals.get('name')), 'partner_id': vals.get('partner_credit', ''),
             'account_id': vals.get('credit_account_id'), 'credit': credit, 'voucher_id': vals.get('vouch_obj_id'),
+            'auxiliary_id':vals.get('credit_auxiliary_id',False)
         })
         # 销项税行
         if vals.get('sell_tax_amount'):
@@ -180,7 +184,7 @@ class other_money_order(models.Model):
                 if not line.category_id.account_id:
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他收入单',
-
+                             'credit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount), 'credit_account_id': line.category_id.account_id.id,
                              'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': ''
                              })
@@ -190,7 +194,7 @@ class other_money_order(models.Model):
                 if not line.category_id.account_id:
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他支出单',
-
+                             'debit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount), 'credit_account_id': self.bank_id.account_id.id,
                              'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id
                              })
