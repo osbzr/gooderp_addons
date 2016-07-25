@@ -690,9 +690,4 @@ class test_payment(TransactionCase):
         line = self.order.pay_ids.create({
             'name': u'申请付款', 'amount_money': 10, 'buy_id': self.order.id
             })
-        print line.name, line.amount_money
         line.request_payment()
-
-
-
-
