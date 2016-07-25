@@ -393,6 +393,7 @@
                     <field name='date' />
                     <field name='warehouse_id'/>
                     <field name='warehouse_dest_id'/>
+					<field name='total_qty'/>
                     <field name='amount_total' />
                     <field name='create_uid' string='制单人' />
                     <field name='approve_uid' />

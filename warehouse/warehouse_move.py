@@ -11,6 +11,18 @@ class wh_move(models.Model):
         ('draft', u'草稿'),
         ('done', u'已审核'),
     ]
+    
+    @api.one
+    @api.depends('line_out_ids','line_in_ids')
+    def _compute_total_qty(self):
+        goods_total = 0
+        if self.line_in_ids:
+            # 入库产品总数
+            goods_total = sum(line.goods_qty for line in self.line_in_ids)
+        elif self.line_out_ids:
+            # 出库产品总数
+            goods_total = sum(line.goods_qty for line in self.line_out_ids)
+        self.total_qty = goods_total
 
     @api.model
     def _get_default_warehouse(self):
@@ -49,6 +61,7 @@ class wh_move(models.Model):
                                   domain=[('type', '=', 'in')],
                                   context={'type': 'in'}, copy=True)
     note = fields.Text(u'备注')
+    total_qty = fields.Integer(u'产品总数', compute=_compute_total_qty, store=True)
 
     @api.model
     def scan_barcode(self,model_name,barcode,order_id):

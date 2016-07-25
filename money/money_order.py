@@ -263,6 +263,8 @@ class money_invoice(models.Model):
                                 digits_compute=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', readonly=True,
                               digits_compute=dp.get_precision('Amount'))
+    
+    auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
     date_due = fields.Date(string=u'到期日')
 
     bill_number = fields.Char(u'发票号')
