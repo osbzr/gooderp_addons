@@ -34,12 +34,27 @@
 				</form>
 			</field>
 		</record>
+		<record id="core_category_search" model="ir.ui.view">
+            <field name="name">core.category.search</field>
+            <field name="model">core.category</field>
+            <field name="arch" type="xml">
+                <search string="类别">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter string="类型" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 		<record id="core_category_action" model="ir.actions.act_window">
 			<field name="name">类别</field>
 			<field name="res_model">core.category</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
+			<field name="search_view_id" ref="core_category_search"/>
 		</record>
 		<menuitem id='core_category_menu' name='类别' action='core_category_action' parent='config_data_menu' sequence='2'/>
 
@@ -54,12 +69,27 @@
 				</tree>
 			</field>
 		</record>
+		<record id="core_value_search" model="ir.ui.view">
+            <field name="name">core.value.search</field>
+            <field name="model">core.value</field>
+            <field name="arch" type="xml">
+                <search string="可选值">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter string="类型" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 		<record id="core_value_action" model="ir.actions.act_window">
 			<field name="name">可选值</field>
 			<field name="res_model">core.value</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
+			<field name="search_view_id" ref="core_value_search"/>
 		</record>
 		<menuitem id='core_value_menu' name='可选值' action='core_value_action' parent='config_data_menu' sequence='3'/>
 		<record id="core_value_menu" model="ir.ui.menu">
@@ -181,12 +211,29 @@
 				</tree>
 			</field>
 		</record>
+		<record id="customer_search" model="ir.ui.view">
+            <field name="name">customer.search</field>
+            <field name="model">partner</field>
+            <field name="arch" type="xml">
+                <search string="客户">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="c_category_id"/>
+                    <field name="main_mobile"/>
+                    <field name="receivable"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户类别" domain="[]" context="{'group_by':'c_category_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 		<record id="customer_action" model="ir.actions.act_window">
 			<field name="name">客户</field>
 			<field name="res_model">partner</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
+			<field name="search_view_id" ref="customer_search"/>
 			<field name="domain">[('c_category_id','!=',False)]</field>
 		</record>
 		<record id="customer_address_action_tree" model="ir.actions.act_window.view">
@@ -243,12 +290,29 @@
 				</tree>
 			</field>
 		</record>
+		<record id="vendor_search" model="ir.ui.view">
+            <field name="name">vendor.search</field>
+            <field name="model">partner</field>
+            <field name="arch" type="xml">
+                <search string="客户">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="s_category_id"/>
+                    <field name="main_mobile"/>
+                    <field name="payable"/>
+                    <group expand="0" string="分组">
+                        <filter string="供应商类别" domain="[]" context="{'group_by':'s_category_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 		<record id="vendor_action" model="ir.actions.act_window">
 			<field name="name">供应商</field>
 			<field name="res_model">partner</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
+			<field name="search_view_id" ref="vendor_search"/>
 			<field name="domain">[('s_category_id','!=',False)]</field>
 		</record>
 		<record id="supplier_address_action_tree" model="ir.actions.act_window.view">
@@ -315,11 +379,27 @@
 				</form>
 			</field>
 		</record>
+		<record id="service_search" model="ir.ui.view">
+            <field name="name">service.search</field>
+            <field name="model">service</field>
+            <field name="arch" type="xml">
+                <search string="服务">
+                    <field name="name"/>
+                    <field name="get_categ_id"/>
+                    <field name="pay_categ_id"/>
+                    <group expand="0" string="分组">
+                        <filter string="收入类别" domain="[]" context="{'group_by':'get_categ_id'}"/>
+                        <filter string="支出类别" domain="[]" context="{'group_by':'pay_categ_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 		<record id="service_action" model="ir.actions.act_window">
 			<field name="name">服务</field>
 			<field name="res_model">service</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
+			<field name="search_view_id" ref="service_search"/>
 		</record>
 
 		<!--定价策略-->
@@ -339,12 +419,35 @@
 				</tree>
 			</field>
 		</record>
+		<record id="pricing_search" model="ir.ui.view">
+            <field name="name">pricing.search</field>
+            <field name="model">pricing</field>
+            <field name="arch" type="xml">
+                <search string="定价策略">
+                    <field name="name"/>
+                    <field name="warehouse_id"/>
+                    <field name="c_category_id"/>
+                    <field name="goods_category_id"/>
+                    <field name="goods_id"/>
+                    <field name="active_date"/>
+                    <field name="deactive_date"/>
+                    <field name="discount_rate"/>
+                    <group expand="0" string="分组">
+                        <filter string="仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
+                        <filter string="客户类别" domain="[]" context="{'group_by':'c_category_id'}"/>
+                        <filter string="产品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
+                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 		<record id="action_pricing" model="ir.actions.act_window">
 			<field name="name">定价策略</field>
 			<field name="res_model">pricing</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
+			<field name="search_view_id" ref="pricing_search"/>
 		</record>
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
 
