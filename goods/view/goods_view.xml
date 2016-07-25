@@ -73,6 +73,9 @@
 					<field name='name'/>
 					<field name='code'/>
 					<field name='category_id'/>
+					<group expand="0" string="分组">
+                        <filter string="产品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
+                    </group>
 				</search>
 			</field>
 		</record>

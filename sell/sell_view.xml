@@ -119,6 +119,7 @@
                     <field name="state"/>
                     <field name="goods_state"/>
                     <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
                     <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
@@ -129,9 +130,9 @@
                     <filter name="sell" string="销货" domain="[('type','=','sell')]"/>
                     <filter name="return" string="退货" domain="[('type','=','return')]"/>
                     <group expand="0" string="分组">
-                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="要求交货日期" icon="terp-go-month" domain="[]" context="{'group_by':'delivery_date'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="要求交货日期" domain="[]" context="{'group_by':'delivery_date:day'}"/>
                     </group>
                 </search>
             </field>
@@ -295,6 +296,7 @@
                     <field name="state"/>
                     <field name="money_state"/>
                     <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
                     <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
@@ -302,9 +304,9 @@
                     <filter name="part paid" string="部分收款" domain="[('money_state','=',u'部分收款')]"/>
                     <filter name="all paid" string="全部收款" domain="[('money_state','=',u'全部收款')]"/>
                     <group expand="0" string="分组">
-                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
                     </group>
                 </search>
             </field>
@@ -456,6 +458,7 @@
                     <field name="state"/>
                     <field name="return_state"/>
                     <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
                     <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
@@ -463,9 +466,9 @@
                     <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
                     <filter name="all refund" string="全部退款" domain="[('return_state','=',u'全部退款')]"/>
                     <group expand="0" string="分组">
-                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
                     </group>
                 </search>
             </field>
@@ -548,6 +551,25 @@
             </field>
         </record>
 
+		<record id="sell_adjust_search" model="ir.ui.view">
+            <field name="name">sell.adjust.search</field>
+            <field name="model">sell.adjust</field>
+            <field name="arch" type="xml">
+                <search string="销售调整单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
     	<!--销货订单，销售发货单action-->
     	<record id='sell_order_action' model='ir.actions.act_window'>
         	<field name='name'>销货订单</field>
@@ -610,6 +632,7 @@
             <field name="name">销售调整单</field>
             <field name="res_model">sell.adjust</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="sell_adjust_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建销售调整单
