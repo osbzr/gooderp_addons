@@ -148,6 +148,7 @@
             		<field name="order_id"/>
             		<field name='staff_id'/>
             		<field name='partner_id'/>
+					<field name='total_qty'/>
             		<field name="amount"/>
             		<field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
@@ -321,6 +322,7 @@
             		<field name="order_id"/>
             		<field name='staff_id'/>
             		<field name='partner_id'/>
+					<field name='total_qty'/>
             		<field name="amount"/>
             		<field name='receipt'/>
             		<field name='date_due'/>
