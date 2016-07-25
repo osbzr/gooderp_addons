@@ -275,6 +275,10 @@ class test_sell_order_line(TransactionCase):
         order=self.env.ref('sell.sell_order_1')
         order.partner_id = self.env.ref('core.yixun').id
         order_line.onchange_warehouse_id()
+
+        # 找不到价格策略时
+        order.date = False
+        order_line.onchange_warehouse_id()
         
 
 
@@ -492,6 +496,17 @@ class test_wh_move_line(TransactionCase):
                 'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
             self.assertTrue(line.discount_rate == 0)
 
+            # 仓库类型不为客户仓时
+            line.with_context({'default_date':'2017-01-01',
+                'default_partner': self.delivery.partner_id.id}).onchange_warehouse_id()
+            self.assertTrue(line.discount_rate == 0)
+
+    def test_onchange_goods_id(self):
+        '''测试采购模块中商品的onchange,是否会带出默认库位和单价'''
+        # 销售退货单
+        for line in self.delivery_return.line_in_ids:
+            line.with_context({'default_is_return': True,
+                    'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
 class test_pricing(TransactionCase):
     
     def test_miss_get_pricing_id(self):

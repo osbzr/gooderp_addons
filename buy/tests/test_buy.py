@@ -49,6 +49,7 @@ class test_buy_order(TransactionCase):
              'warehouse_dest_type': 'stock'
              }).create({})
         self.assertTrue(order.warehouse_dest_id.type == 'stock')
+        self.env['buy.order'].create({})
 
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
@@ -361,6 +362,15 @@ class test_buy_receipt(TransactionCase):
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
 
+    def test_receipt_make_invoice(self):
+        '''审核入库单：不勾按收货结算时'''
+        self.order.buy_order_draft()
+        self.order.invoice_by_receipt = False
+        self.order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', self.order.id)])
+        receipt.buy_receipt_done()
+
     def test_buy_receipt_draft(self):
         '''反审核采购入库单/退货单'''
         # 先审核入库单，再反审核
@@ -419,6 +429,8 @@ class test_wh_move_line(TransactionCase):
     def test_onchange_goods_id(self):
         '''测试采购模块中商品的onchange,是否会带出默认库位和单价'''
         # 入库单行：修改鼠标成本为0，测试是否报错
+        for line in self.receipt.line_in_ids:
+            line.onchange_goods_id()
         self.goods_mouse.cost = 0.0
         for line in self.receipt.line_in_ids:
             line.goods_id = self.goods_mouse.id
@@ -665,3 +677,17 @@ class test_buy_adjust_line(TransactionCase):
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)
+
+
+class test_payment(TransactionCase):
+
+    def setUp(self):
+        super(test_payment, self).setUp()
+        self.order = self.env.ref('buy.buy_order_1')
+     
+    def test_request_payment(self):
+        '''付款申请'''
+        line = self.order.pay_ids.create({
+            'name': u'申请付款', 'amount_money': 10, 'buy_id': self.order.id
+            })
+        line.request_payment()

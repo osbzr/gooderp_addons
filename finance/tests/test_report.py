@@ -14,6 +14,9 @@ class test_report(TransactionCase):
         self.env.ref('finance.voucher_12_1').voucher_done()
         
         self.period_id = self.env.ref('finance.period_201601').id
+        self.period_201411 = self.env.ref('finance.period_201411')
+        self.period_201512 = self.env.ref('finance.period_201512')
+
         ''' FIXME
         # 结转2015年12月的期间
         month_end = self.env['checkout.wizard'].create(
@@ -28,6 +31,8 @@ class test_report(TransactionCase):
         report = self.env['create.trial.balance.wizard'].create(
             {'period_id': self.period_id}
                     )
+        period_201411_wizard = self.env['create.trial.balance.wizard'].create(
+            {'period_id': self.period_201411.id})
         with self.assertRaises(except_orm):
             report.create_trial_balance()
         # 结转2015年12月的期间
@@ -37,6 +42,7 @@ class test_report(TransactionCase):
         month_end.button_checkout()
         #正常流程
         report.create_trial_balance()
+        period_201411_wizard.create_trial_balance()
 
     def test_vouchers_summary(self):
         ''' 测试总账和明细账'''
@@ -78,6 +84,28 @@ class test_report(TransactionCase):
         report.create_vouchers_summary()
         report.create_general_ledger_account()
 
+    def test_get_initial_balance(self):
+        '''取得期初余额'''
+        wizard = self.env['create.vouchers.summary.wizard'].create(
+            {'period_begin_id': self.period_201411.id,
+             'period_end_id': self.period_201411.id,
+             'subject_name_id': self.env.ref('finance.account_fund').id,
+             'subject_name_end_id': self.env.ref('finance.account_fund').id,
+             }
+        )
+        wizard.get_initial_balance(False, self.period_201411, wizard.subject_name_id.id)
+
+    def test_get_current_occurrence_amount(self):
+        '''测试 本期的科目的 voucher_line的明细记录'''
+        wizard = self.env['create.vouchers.summary.wizard'].create(
+            {'period_begin_id': self.period_201512.id,
+             'period_end_id': self.period_201512.id,
+             'subject_name_id': self.env.ref('finance.account_cash').id,
+             'subject_name_end_id': self.env.ref('finance.account_bank').id,
+             })
+        wizard.get_current_occurrence_amount(self.period_201512, self.env.ref('finance.account_bank'))
+
+
     def test_view_detail_voucher(self):
         '''在明细账上查看凭证明细按钮'''
         report = self.env['create.vouchers.summary.wizard'].create(
@@ -99,6 +127,14 @@ class test_report(TransactionCase):
 
     def test_get_year_balance(self):
         '''根据期间和科目名称 计算出本期合计 和本年累计 (已经关闭的期间)'''
+        wizard = self.env['create.vouchers.summary.wizard'].create(
+            {'period_begin_id': self.period_201411.id,
+             'period_end_id': self.period_201411.id,
+             'subject_name_id': self.env.ref('finance.account_fund').id,
+             'subject_name_end_id': self.env.ref('finance.account_fund').id,
+             }
+        )
+        wizard.get_year_balance(self.period_201411, wizard.subject_name_id)
         voucher = self.env['checkout.wizard'].create({
                   'date':'2015-12-31'})
         voucher.onchange_period_id()
@@ -133,6 +169,7 @@ class test_report(TransactionCase):
         for balance_sheet_obj in balance_sheet_objs:
             balance_sheet_obj.cumulative_occurrence_balance_formula = ''
         report.create_profit_statement()
+
 
 class test_checkout_wizard(TransactionCase):
     
@@ -204,4 +241,18 @@ class test_checkout_wizard(TransactionCase):
         company_pro.remain_account = False
         with self.assertRaises(except_orm):
             wizard.button_checkout()
+
+    def test_recreate_voucher_name(self):
+        '''按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）'''
+        # FIXME: 没有成功
+        auto_reset = self.env['ir.values'].set_default('finance.config.settings', 'default_auto_reset', True)
+        # self.env['finance.config.settings'].set_default_auto_reset(True)
+        print self.env['finance.config.settings'].default_auto_reset
+        # 结转2015年12月的期间
+        wizard = self.env['checkout.wizard'].create(
+                       {'date':'2015-12-31'})
+        self.voucher_15_12.voucher_done()
+        self.checkout_voucher.voucher_done()
+        wizard.button_checkout()
+
     

@@ -13,7 +13,7 @@ BALANCE_DIRECTIONS_TYPE = [
     ('in', u'借'),
     ('out', u'贷')]
 
-MOUTH_SELECTION = [
+MONTH_SELECTION = [
     ('1', u'01'),
     ('2', u'02'),
     ('3', u'03'),
@@ -188,7 +188,7 @@ class finance_period(models.Model):
         compute='_compute_name', readonly=True, store=True)
     is_closed = fields.Boolean(u'已结账')
     year = fields.Char(u'会计年度', required=True)
-    month = fields.Selection(MOUTH_SELECTION, string=u'会计月份', required=True)
+    month = fields.Selection(MONTH_SELECTION, string=u'会计月份', required=True)
 
     @api.one
     @api.depends('year', 'month')
@@ -216,7 +216,7 @@ class finance_period(models.Model):
                 ('month', '=', int(date[5:7]))
             ])
             if period_id:
-                if period_id.is_closed:
+                if period_id.is_closed and self._context.get('module_name', False) != 'checkout_wizard':
                     raise except_orm(u'错误', u'此会计期间已关闭')
                 else:
                     return period_id
@@ -274,6 +274,7 @@ class finance_account(models.Model):
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
+        '''会计科目按名字和编号搜索'''
         args = args or []
         domain = []
         if name:
