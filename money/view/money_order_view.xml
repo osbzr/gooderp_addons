@@ -159,7 +159,7 @@
             <field name="name">money.invoice.tree</field>
             <field name="model">money.invoice</field>
             <field name="arch" type="xml">
-                <tree string="Source Order Line" create='false'>
+                <tree string="Source Order Line" editable='TOP'>
 					<field name="state" invisible="1"/>
                     <field name="name"/>
                     <field name="partner_id"/>
@@ -169,6 +169,9 @@
                     <field name="reconciled"/>
                     <field name="to_reconcile"/>
                     <field name="tax_amount"/>
+                    <button name="money_invoice_done" states="draft" string="审核" type="object"/>
+                    <button name="money_invoice_draft" states="done" string="反审核" type="object"/>
+                    <field name="bill_number"/>
                     <field name="date_due"/>
                 </tree>
             </field>
