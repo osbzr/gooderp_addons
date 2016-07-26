@@ -73,7 +73,8 @@ class wh_move_line(models.Model):
             self.warehouse_dest_id = self.env.ref('warehouse.warehouse_production').id
 
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade')
-    date = fields.Datetime(u'完成日期', copy=False)
+    date = fields.Date(u'完成日期', copy=False)
+    cost_time = fields.Datetime(u'审核时间', copy=False)
     type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),)
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft')
     goods_id = fields.Many2one('goods', string=u'产品', required=True,
@@ -199,6 +200,7 @@ class wh_move_line(models.Model):
             line.write({
                 'state': 'done',
                 'date': line.move_id.date,
+                'cost_time': fields.Datetime.now(self),
             })
 
     def check_cancel(self):

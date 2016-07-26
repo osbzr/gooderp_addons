@@ -17,10 +17,18 @@ class TestReport(TransactionCase):
         # 鼠标    总仓  ms160301    1     入库
         # 鼠标    总仓  ms160302    1     入库
         self.env['wh.in'].search([('name', '!=', 'WH/IN/16040004')]).approve_order()
+        # 先盘点产品，保证网线数量充足
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+
         self.env['wh.internal'].search([]).approve_order()
 
-        self.track_wizard = self.env['report.lot.track.wizard'].create({})
-        self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({})
+        self.track_wizard = self.env['report.lot.track.wizard'].create({
+                            'date_start': '2016-04-01',
+                            'date_end': '2016-04-03'})
+        self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({
+                            'date_start': '2016-04-01',
+                            'date_end': '2016-04-03'})
 
     def test_report_base(self):
         report_base = self.env['report.base'].create({})

@@ -537,8 +537,12 @@ class sell_delivery(models.Model):
                 continue
             else:
                 result = self.check_goods_qty(line.attribute_id, self.warehouse_id)
-                if result:
+                print 'rs:',result
+                if result[0]:
                     result = result[0][0] or 0
+                else:
+                    result = 0
+            print '结果：',result
             if line.goods_qty - result > 0 and not line.lot_id:
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
                 vals.update({
@@ -569,6 +573,7 @@ class sell_delivery(models.Model):
                                'msg':msg,},
                     'target': 'new',
                     }
+                print 'qqqqqqqqqqqq'
                 return dic
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
@@ -578,7 +583,6 @@ class sell_delivery(models.Model):
             raise except_orm(u'警告！', u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount + self.partner_cost:
             raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
-        print '===here go===='
         if self.order_id:
             if not self.is_return:
                 line_ids = self.line_out_ids
@@ -610,6 +614,7 @@ class sell_delivery(models.Model):
             'date_due': self.date_due,
             'state': 'draft',
         })
+        print '发票生成：',fields.Date.context_today(self),source_id.date
         self.invoice_id = source_id.id
         # 销售费用产生源单
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
