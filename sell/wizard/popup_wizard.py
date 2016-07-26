@@ -6,7 +6,8 @@ from openerp import models, fields, api
 class popup_wizard(models.TransientModel):
     _name = 'popup.wizard'
     
-    msg = fields.Text(u'消息',default= lambda self: self.env.context.get('msg'))
+    origin = fields.Char(u'来源单据', default= lambda self: self.env.context.get('origin'))
+    msg = fields.Text(u'消息', default= lambda self: self.env.context.get('msg'))
 
     @api.one
     def button_ok(self):

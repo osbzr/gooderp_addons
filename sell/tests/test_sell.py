@@ -544,14 +544,6 @@ class test_pricing(TransactionCase):
                                     ('deactive_date', '>=', date)
                                     ])
         cp = good_pricing.copy()
-        print self.env['pricing'].search([
-                                    ('c_category_id', '=', partner.c_category_id.id),
-                                    ('warehouse_id', '=', warehouse.id),
-                                    ('goods_id', '=', goods.id),
-                                    ('goods_category_id', '=', False),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)
-                                    ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
@@ -571,14 +563,6 @@ class test_pricing(TransactionCase):
                                   ('deactive_date','>=',date)
                                   ])
         cp = gc_pricing.copy()
-        print self.env['pricing'].search([
-                                  ('c_category_id','=',partner.c_category_id.id),
-                                  ('warehouse_id','=',warehouse.id),
-                                  ('goods_id','=',False),
-                                  ('goods_category_id','=',goods.category_id.id),
-                                  ('active_date','<=',date),
-                                  ('deactive_date','>=',date)
-                                  ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
@@ -598,14 +582,6 @@ class test_pricing(TransactionCase):
                                   ('deactive_date','>=',date)
                                   ])
         cp = pw_pricing.copy()
-        print self.env['pricing'].search([
-                                  ('c_category_id','=',partner.c_category_id.id),
-                                  ('warehouse_id','=',warehouse.id),
-                                  ('goods_id','=',False),
-                                  ('goods_category_id','=',False),
-                                  ('active_date','<=',date),
-                                  ('deactive_date','>=',date)
-                                  ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
@@ -625,14 +601,6 @@ class test_pricing(TransactionCase):
                                       ('deactive_date','>=',date)
                                       ])
         cp = wg_pricing.copy()
-        print self.env['pricing'].search([
-                                      ('c_category_id','=',False),
-                                      ('warehouse_id','=',warehouse.id),
-                                      ('goods_id','=',goods.id),
-                                      ('goods_category_id','=',False),
-                                      ('active_date','<=',date),
-                                      ('deactive_date','>=',date)
-                                      ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
@@ -652,14 +620,6 @@ class test_pricing(TransactionCase):
                                       ('deactive_date','>=',date)
                                       ])
         cp = w_gc_pricing.copy()
-        print self.env['pricing'].search([
-                                      ('c_category_id','=',False),
-                                      ('warehouse_id','=',warehouse.id),
-                                      ('goods_id','=',False),
-                                      ('goods_category_id','=',goods.category_id.id),
-                                      ('active_date','<=',date),
-                                      ('deactive_date','>=',date)
-                                      ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
@@ -679,14 +639,6 @@ class test_pricing(TransactionCase):
                                       ('deactive_date','>=',date)
                                       ])
         cp = warehouse_pricing.copy()
-        print self.env['pricing'].search([
-                                      ('c_category_id','=',False),
-                                      ('warehouse_id','=',warehouse.id),
-                                      ('goods_id','=',False),
-                                      ('goods_category_id','=',False),
-                                      ('active_date','<=',date),
-                                      ('deactive_date','>=',date)
-                                      ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
@@ -705,15 +657,7 @@ class test_pricing(TransactionCase):
                                       ('active_date','<=',date),
                                       ('deactive_date','>=',date)
                                       ])
-        cp = ccg_pricing.copy() 
-        print self.env['pricing'].search([
-                                      ('c_category_id','=',partner.c_category_id.id),
-                                      ('warehouse_id','=',False),
-                                      ('goods_id','=',goods.id),
-                                      ('goods_category_id','=',False),
-                                      ('active_date','<=',date),
-                                      ('deactive_date','>=',date)
-                                      ])
+        cp = ccg_pricing.copy()
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
     
@@ -733,14 +677,6 @@ class test_pricing(TransactionCase):
                                       ('deactive_date','>=',date)
                                       ])
         cp = ccgc_pricing.copy()
-        print self.env['pricing'].search([
-                                      ('c_category_id','=',partner.c_category_id.id),
-                                      ('warehouse_id','=',False),
-                                      ('goods_id','=',False),
-                                      ('goods_category_id','=',goods.category_id.id),
-                                      ('active_date','<=',date),
-                                      ('deactive_date','>=',date)
-                                      ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
@@ -760,14 +696,6 @@ class test_pricing(TransactionCase):
                                       ('deactive_date','>=',date)
                                       ])
         cp = partner_pricing.copy()
-        print self.env['pricing'].search([
-                                      ('c_category_id','=',partner.c_category_id.id),
-                                      ('warehouse_id','=',False),
-                                      ('goods_id','=',False),
-                                      ('goods_category_id','=',False),
-                                      ('active_date','<=',date),
-                                      ('deactive_date','>=',date)
-                                      ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 
@@ -787,14 +715,6 @@ class test_pricing(TransactionCase):
                                       ('deactive_date','>=',date)
                                       ])
         cp = all_goods_pricing.copy()
-        print self.env['pricing'].search([
-                                      ('c_category_id','=',False),
-                                      ('warehouse_id','=',False),
-                                      ('goods_id','=',False),
-                                      ('goods_category_id','=',False),
-                                      ('active_date','<=',date),
-                                      ('deactive_date','>=',date)
-                                      ])
         with self.assertRaises(except_orm):
             pricing.get_pricing_id(partner, warehouse, goods, date)
 

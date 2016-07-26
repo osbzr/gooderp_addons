@@ -10,7 +10,6 @@ class partner(models.Model):
 
     @api.multi
     def _set_receivable_init(self):
-        print 'we are in'
         if self.receivable_init:
             # 创建源单
             categ = self.env.ref('money.core_category_sale')
