@@ -47,7 +47,7 @@ class goods(models.Model):
 
                 domain.append(('id', 'not in', ignore))
 
-            move = self.env['wh.move.line'].search(domain, limit=1, order='date desc, id desc')
+            move = self.env['wh.move.line'].search(domain, limit=1, order='cost_time desc, id desc')
             if move:
                 return move.cost_unit
 
@@ -117,7 +117,7 @@ class goods(models.Model):
                 domain.append(('attribute_id', '=', attribute.id))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
-            lines = self.env['wh.move.line'].search(domain, order='date, id')
+            lines = self.env['wh.move.line'].search(domain, order='cost_time, id')
 
             qty_to_go, uos_qty_to_go, cost = qty, uos_qty, 0
             for line in lines:
