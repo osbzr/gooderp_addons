@@ -30,7 +30,6 @@ class test_customer_statements(TransactionCase):
     def setUp(self):
         '''客户账单向导及数据'''
         super(test_customer_statements, self).setUp()
-        print '00000000000000000'
         # 业务伙伴对账单向导: self._context.get('default_customer')
         self.statement = self.env['partner.statements.report.wizard'].create(
                     {'partner_id': self.env.ref('core.jd').id,
@@ -39,7 +38,6 @@ class test_customer_statements(TransactionCase):
         # 创建收款记录
         money_get = self.env.ref('money.get_40000')
         money_get.money_order_done()
-        print '1111111111'
         # 创建销售出货单记录
         self.env.ref('warehouse.wh_move_line_14').goods_uos_qty = 200
         self.env.ref('warehouse.wh_move_line_14').action_done()
@@ -64,7 +62,6 @@ class test_customer_statements(TransactionCase):
         receipt_return.sell_delivery_done()
         invoice_return = self.env['money.invoice'].search([('name','=',receipt_return.name)])
         invoice_return.money_invoice_done()
-        print '444444444444'
 
     def test_customer_statements_wizard(self):
         '''客户对账单向导'''

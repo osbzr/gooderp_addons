@@ -506,7 +506,7 @@ class sell_delivery(models.Model):
         return super(sell_delivery, self).unlink()
 
     @api.one
-    def check_goods_qty(self, attribute, warehouse):
+    def check_goods_qty(self, goods, attribute, warehouse):
         '''SQL来取指定产品，属性，仓库，的当前剩余数量'''
         if attribute:
             self.env.cr.execute('''
@@ -519,7 +519,19 @@ class sell_delivery(models.Model):
             ''' % (warehouse.id,attribute.id,))
     
             return self.env.cr.fetchone()
-        return False
+        elif goods:
+            self.env.cr.execute('''
+                SELECT sum(line.qty_remaining) as qty
+                FROM wh_move_line line
+    
+                WHERE line.warehouse_dest_id = %s
+                  AND line.state = 'done'
+                  AND line.goods_id = %s
+            ''' % (warehouse.id,goods.id,))
+            
+            return self.env.cr.fetchone()
+        else:
+            return False
 
     @api.multi
     def sell_delivery_done(self):
@@ -536,13 +548,11 @@ class sell_delivery(models.Model):
             if line.goods_id.no_stock:
                 continue
             else:
-                result = self.check_goods_qty(line.attribute_id, self.warehouse_id)
-                print 'rs:',result
+                result = self.check_goods_qty(line.goods_id, line.attribute_id, self.warehouse_id)
                 if result[0]:
                     result = result[0][0] or 0
                 else:
                     result = 0
-            print '结果：',result
             if line.goods_qty - result > 0 and not line.lot_id:
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
                 vals.update({
@@ -570,10 +580,10 @@ class sell_delivery(models.Model):
                     'type': 'ir.actions.act_window',
                     'context':{'method':method,
                                'vals':vals,
-                               'msg':msg,},
+                               'msg':msg,
+                               'origin':self.name,},
                     'target': 'new',
                     }
-                print 'qqqqqqqqqqqq'
                 return dic
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
@@ -614,7 +624,6 @@ class sell_delivery(models.Model):
             'date_due': self.date_due,
             'state': 'draft',
         })
-        print '发票生成：',fields.Date.context_today(self),source_id.date
         self.invoice_id = source_id.id
         # 销售费用产生源单
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
