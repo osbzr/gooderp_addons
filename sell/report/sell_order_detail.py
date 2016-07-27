@@ -16,7 +16,7 @@ class sell_order_detail(models.Model):
     goods_code = fields.Char(u'商品编码')
     goods_id = fields.Many2one('goods', u'商品名称')
     attribute = fields.Char(u'属性')
-    warehouse = fields.Char(u'仓库')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
     qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
     uom = fields.Char(u'单位')
     price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
@@ -39,7 +39,7 @@ class sell_order_detail(models.Model):
                     goods.code AS goods_code,
                     goods.id AS goods_id,
                     attr.name AS attribute,
-                    wh.name AS warehouse,
+                    wh.id AS warehouse_id,
                     (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
                         ELSE - wml.goods_qty END) AS qty,
                     uom.name AS uom,
@@ -67,7 +67,7 @@ class sell_order_detail(models.Model):
                   AND wh.type = 'stock'
 
                 GROUP BY wm.date, wm.name, origin, staff_id, partner_id,
-                    goods_code, goods.id, attribute, warehouse, uom,
+                    goods_code, goods.id, attribute, wh.id, uom,
                     qty, wml.price, wml.amount, tax_amount, subtotal, wml.note
                 )
         """)

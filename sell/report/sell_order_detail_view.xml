@@ -15,7 +15,7 @@
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
-                    <field name="warehouse" groups='warehouse.multi_warehouse_groups'/>
+                    <field name="warehouse_id" groups='warehouse.multi_warehouse_groups'/>
                     <field name="qty" sum="数量合计"/>
                     <field name="uom"/>
                     <field name="price"/>
@@ -32,7 +32,7 @@
             <field name="arch" type="xml">
                 <graph type='pivot'>
                     <field name='goods_id' type='row'/>
-                    <field name='warehouse' type='col'/>
+                    <field name='warehouse_id' type='col'/>
                     <field name='qty' type='measure' />
                 </graph>
             </field>

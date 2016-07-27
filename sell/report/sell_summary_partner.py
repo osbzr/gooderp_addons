@@ -77,6 +77,8 @@ class sell_summary_partner(models.Model):
             extra += 'AND goods.id = {goods_id}'
         if self.env.context.get('c_category_id'):
             extra += 'AND c_categ.id = {c_category_id}'
+        if self.env.context.get('warehouse_id'):
+            extra += 'AND wh.id = {warehouse_id}'
 
         return '''
         WHERE wml.state = 'done'
@@ -105,11 +107,13 @@ class sell_summary_partner(models.Model):
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
             'partner_id': context.get('partner_id') and
-            context.get('partner_id')[0] or '',
+                context.get('partner_id')[0] or '',
             'goods_id': context.get('goods_id') and
-            context.get('goods_id')[0] or '',
+                context.get('goods_id')[0] or '',
             'c_category_id': context.get('c_category_id') and
-            context.get('c_category_id')[0] or '',
+                context.get('c_category_id')[0] or '',
+            'warehouse_id': context.get('warehouse_id') and
+                context.get('warehouse_id')[0] or '',
         }
 
     def _compute_order(self, result, order):

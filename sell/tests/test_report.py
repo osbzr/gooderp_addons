@@ -139,10 +139,14 @@ class test_track_wizard(TransactionCase):
         self.track.partner_id = False
         self.track.staff_id = self.env.ref('core.lili').id
         self.track.button_ok()
+        # 按仓库搜索
+        self.track.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.track.button_ok()
         # 按日期搜索
         self.track.goods_id = False
         self.track.partner_id = False
         self.track.staff_id = False
+        self.track.warehouse_id = False
         self.track.button_ok()
  
     def test_view_detail(self):
@@ -202,10 +206,14 @@ class test_detail_wizard(TransactionCase):
         self.detail.partner_id = False
         self.detail.staff_id = self.env.ref('core.lili').id
         self.detail.button_ok()
+        # 按仓库搜索
+        self.detail.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.detail.button_ok()
         # 按日期搜索
         self.detail.goods_id = False
         self.detail.partner_id = False
         self.detail.staff_id = False
+        self.detail.warehouse_id = False
         self.detail.button_ok()
  
     def test_view_detail(self):
@@ -243,23 +251,7 @@ class test_goods_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             goods_wizard.button_ok()
-        # 按商品搜索
-        self.goods_wizard.goods_id = self.env.ref('goods.mouse').id
-        self.goods_wizard.button_ok()
-        # 按客户搜索
-        self.goods_wizard.goods_id = False
-        self.goods_wizard.partner_id = self.env.ref('core.jd').id
-        self.goods_wizard.button_ok()
-        # 按商品类别搜索
-        self.goods_wizard.goods_id = False
-        self.goods_wizard.partner_id = False
-        self.goods_wizard.goods_categ_id = \
-            self.env.ref('core.goods_category_1').id
-        self.goods_wizard.button_ok()
         # 按日期搜索
-        self.goods_wizard.goods_id = False
-        self.goods_wizard.partner_id = False
-        self.goods_wizard.goods_categ_id = False
         self.goods_wizard.button_ok()
  
     def test_goods_report(self):
@@ -272,6 +264,7 @@ class test_goods_wizard(TransactionCase):
         new_goods_wizard.partner_id = self.env.ref('core.jd').id
         new_goods_wizard.goods_categ_id = \
             self.env.ref('core.goods_category_1').id
+        new_goods_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         new_context = new_goods_wizard.button_ok().get('context')
         new_results = summary_goods.with_context(new_context).search_read(
                                                                   domain=[])
@@ -313,23 +306,7 @@ class test_partner_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             partner_wizard.button_ok()
-        # 按商品搜索
-        self.partner_wizard.goods_id = self.env.ref('goods.mouse').id
-        self.partner_wizard.button_ok()
-        # 按客户搜索
-        self.partner_wizard.goods_id = False
-        self.partner_wizard.partner_id = self.env.ref('core.jd').id
-        self.partner_wizard.button_ok()
-        # 按客户类别搜索
-        self.partner_wizard.goods_id = False
-        self.partner_wizard.partner_id = False
-        self.partner_wizard.c_category_id = \
-            self.env.ref('core.customer_category_1').id
-        self.partner_wizard.button_ok()
         # 按日期搜索
-        self.partner_wizard.goods_id = False
-        self.partner_wizard.partner_id = False
-        self.partner_wizard.c_category_id = False
         self.partner_wizard.button_ok()
  
     def test_partner_report(self):
@@ -342,6 +319,7 @@ class test_partner_wizard(TransactionCase):
         new_partner_wizard.partner_id = self.env.ref('core.jd').id
         c_category_id = self.env.ref('core.customer_category_1')    # 客户类别:一级客户
         new_partner_wizard.c_category_id = c_category_id.id
+        new_partner_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         new_context = new_partner_wizard.button_ok().get('context')
         new_results = summary_partner.with_context(new_context).search_read(
                                                                   domain=[])
@@ -381,23 +359,7 @@ class test_staff_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             staff_wizard.button_ok()
-        # 按销售人员搜索
-        self.staff_wizard.staff_id = self.env.ref('core.lili').id
-        self.staff_wizard.button_ok()
-        # 按商品搜索
-        self.staff_wizard.staff_id = False
-        self.staff_wizard.goods_id = self.env.ref('goods.cable').id
-        self.staff_wizard.button_ok()
-        # 按商品类别搜索
-        self.staff_wizard.staff_id = False
-        self.staff_wizard.goods_id = False
-        self.staff_wizard.goods_categ_id = \
-            self.env.ref('core.goods_category_1').id
-        self.staff_wizard.button_ok()
         # 按日期搜索
-        self.staff_wizard.staff_id = False
-        self.staff_wizard.goods_id = False
-        self.staff_wizard.goods_categ_id = False
         self.staff_wizard.button_ok()
  
     def test_staff_report(self):
@@ -411,6 +373,7 @@ class test_staff_wizard(TransactionCase):
         new_staff_wizard.goods_id = self.env.ref('goods.cable').id
         new_staff_wizard.goods_categ_id = \
             self.env.ref('core.goods_category_1').id
+        new_staff_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         new_context = new_staff_wizard.button_ok().get('context')
         new_results = summary_staff.with_context(new_context).search_read(
                                                                   domain=[])
@@ -483,10 +446,14 @@ class test_receipt_wizard(TransactionCase):
         self.receipt_wizard.partner_id = False
         self.receipt_wizard.staff_id = self.env.ref('core.lili').id
         self.receipt_wizard.button_ok()
+        # 按仓库搜索
+        self.receipt_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.receipt_wizard.button_ok()
         # 按日期搜索
         self.receipt_wizard.c_category_id = False
         self.receipt_wizard.partner_id = False
-        self.receipt_wizard.order_id = False
+        self.receipt_wizard.staff_id = False
+        self.receipt_wizard.warehouse_id = False
         self.receipt_wizard.button_ok()
  
     def test_view_detail(self):
