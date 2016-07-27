@@ -75,6 +75,26 @@
             </field>
         </record>
 
+		<!--其他收入/支出单 search 视图-->
+		<record id="other_money_order_search" model="ir.ui.view">
+            <field name="name">other.money.order.search</field>
+            <field name="model">other.money.order</field>
+            <field name="arch" type="xml">
+                <search string="其他收入/支出单 ">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="total_amount"/>
+                    <field name="state"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="往来单位" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <!-- 其他收入单 action -->
         <record id="other_money_receipt_action" model="ir.actions.act_window">
             <field name="name">其他收入单</field>

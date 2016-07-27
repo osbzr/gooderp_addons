@@ -23,7 +23,7 @@
         </record>
 
        	<record id="bank_account_tree_inherit" model="ir.ui.view">
-            <field name="name">bank_account_tree</field>
+            <field name="name">bank.account.tree.inherit</field>
             <field name="model">bank.account</field>
             <field name='inherit_id' ref='core.bank_account_tree' />
             <field name="arch" type="xml">
@@ -32,9 +32,22 @@
 				</field>
             </field>
         </record>
+        <record id="bank_account_search_inherit" model="ir.ui.view">
+            <field name="name">bank.account.search.inherit</field>
+            <field name="model">bank.account</field>
+            <field name='inherit_id' ref='core.bank_account_search' />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+					<field name="account_id"/>
+					<group expand="0" string="分组">
+                        <filter string="科目" domain="[]" context="{'group_by':'account_id'}"/>
+                    </group>
+				</field>
+            </field>
+        </record>
 
         <record id="money_order_form_inherit" model="ir.ui.view">
-            <field name="name">bank_account_tree</field>
+            <field name="name">money.order.form.inherit</field>
             <field name="model">money.order</field>
             <field name='inherit_id' ref='money.money_order_form' />
             <field name="arch" type="xml">

@@ -143,6 +143,15 @@
 				</tree>
 			</field>
 		</record>
+		<record id="uom_search" model="ir.ui.view">
+            <field name="name">uom.search</field>
+            <field name="model">uom</field>
+            <field name="arch" type="xml">
+                <search string="单位">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
 		<record id="uom_action" model="ir.actions.act_window">
 			<field name="name">单位</field>
 			<field name="res_model">uom</field>
@@ -160,6 +169,15 @@
 				</tree>
 			</field>
 		</record>
+		<record id="settle_mode_search" model="ir.ui.view">
+            <field name="name">settle.mode.search</field>
+            <field name="model">settle.mode</field>
+            <field name="arch" type="xml">
+                <search string="结算方式">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
 		<record id="settle_mode_action" model="ir.actions.act_window">
 			<field name="name">结算方式</field>
 			<field name="res_model">settle.mode</field>
@@ -340,6 +358,15 @@
 				</tree>
 			</field>
 		</record>
+		<record id="bank_account_search" model="ir.ui.view">
+            <field name="name">bank.account.search</field>
+            <field name="model">bank.account</field>
+            <field name="arch" type="xml">
+                <search string="账户">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
 		<record id="bank_account_action" model="ir.actions.act_window">
 			<field name="name">账户</field>
 			<field name="res_model">bank.account</field>
