@@ -22,6 +22,7 @@ class sell_order_track_wizard(models.TransientModel):
     partner_id = fields.Many2one('partner', u'客户')
     goods_id = fields.Many2one('goods', u'商品')
     staff_id = fields.Many2one('staff', u'销售员')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
@@ -37,6 +38,8 @@ class sell_order_track_wizard(models.TransientModel):
             domain.append(('order_id.partner_id', '=', self.partner_id.id))
         if self.staff_id:
             domain.append(('order_id.staff_id', '=', self.staff_id.id))
+        if self.warehouse_id:
+            domain.append(('order_id.warehouse_id', '=', self.warehouse_id.id))
 
         index = 0
         sum_qty = sum_amount = sum_not_out = 0  # 数量、金额、未出库数量合计
@@ -84,6 +87,7 @@ class sell_order_track_wizard(models.TransientModel):
                     'order_name': line.order_id.name,
                     'staff_id': line.order_id.staff_id.id,
                     'partner_id': line.order_id.partner_id.id,
+                    'warehouse_id': line.order_id.warehouse_id.id,
                     'goods_state': line.order_id.goods_state,
                     'qty': qty,
                     'amount': amount,

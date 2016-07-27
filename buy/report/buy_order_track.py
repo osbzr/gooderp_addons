@@ -15,6 +15,7 @@ class buy_order_track(models.TransientModel):
     date = fields.Date(u'订单日期')
     order_name = fields.Char(u'采购订单编号')
     partner_id = fields.Many2one('partner', u'供应商')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
     goods_state = fields.Char(u'状态')
     qty = fields.Float(u'数量',
                        digits_compute=dp.get_precision('Quantity'))

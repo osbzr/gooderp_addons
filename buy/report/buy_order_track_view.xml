@@ -15,6 +15,7 @@
                     <field name="date"/>
                     <field name="order_name"/>
                     <field name="partner_id"/>
+                    <field name="warehouse_dest_id"/>
                     <field name="goods_state"/>
                     <field name="qty"/>
                     <field name="amount"/>

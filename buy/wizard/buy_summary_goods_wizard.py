@@ -22,13 +22,15 @@ class buy_summary_goods_wizard(models.TransientModel):
     partner_id = fields.Many2one('partner', u'供应商')
     goods_id = fields.Many2one('goods', u'商品')
     goods_categ_id = fields.Many2one('core.category', u'商品类别')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
 
-        read_field = ['date_start', 'date_end', 'partner_id', 'goods_id', 'goods_categ_id']
+        read_field = ['date_start', 'date_end', 'partner_id',
+                      'goods_id', 'goods_categ_id', 'warehouse_dest_id']
         return {
             'name': u'采购汇总表（按商品）',
             'view_mode': 'tree',
