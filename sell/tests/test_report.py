@@ -446,9 +446,6 @@ class test_receipt_wizard(TransactionCase):
         self.receipt_wizard.partner_id = False
         self.receipt_wizard.staff_id = self.env.ref('core.lili').id
         self.receipt_wizard.button_ok()
-        # 按仓库搜索
-        self.receipt_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
-        self.receipt_wizard.button_ok()
         # 按日期搜索
         self.receipt_wizard.c_category_id = False
         self.receipt_wizard.partner_id = False

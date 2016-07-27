@@ -15,7 +15,7 @@ class sell_order_track(models.TransientModel):
     order_name = fields.Char(u'销售订单编号')
     staff_id = fields.Many2one('staff', u'销售员')
     partner_id = fields.Many2one('partner', u'客户')
-    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
     goods_state = fields.Char(u'状态')
     qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
     amount = fields.Float(u'销售额', digits_compute=dp.get_precision('Amount'))  # 商品的价税合计

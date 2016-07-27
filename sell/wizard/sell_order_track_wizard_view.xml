@@ -19,7 +19,7 @@
                             	options="{'no_open': True, 'no_create': True}"/>
                             <field name='staff_id'
                             	options="{'no_open': True, 'no_create': True}"/>
-                            <field name='warehouse_dest_id'
+                            <field name='warehouse_id'
                             	options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <footer>
