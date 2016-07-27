@@ -33,6 +33,18 @@
             </field>
         </record>
 
+		<!-- 仓库 -->
+		<record id="warehouse_search" model="ir.ui.view">
+            <field name="name">warehouse.search</field>
+            <field name="model">warehouse</field>
+            <field name="arch" type="xml">
+                <search string="仓库">
+                    <field name="name"/>
+                    <field name="code"/>
+                </search>
+            </field>
+        </record>
+
         <!-- 库存调拨 -->
         <record id='wh_move_line_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.tree</field>
@@ -251,6 +263,31 @@
             </field>
         </record>
 
+		<record id='wh_out_search' model='ir.ui.view'>
+            <field name='name'>wh.out.search</field>
+            <field name='model'>wh.out</field>
+            <field name='arch' type='xml'>
+                <search string='其他出库单'>
+                    <field name='name'/>
+                    <field name='warehouse_id'/>
+                    <field name='partner_id' string='客户'/>
+                    <field name='create_uid' string='制单人'/>
+                    <field name='approve_uid'/>
+                    <field name='amount_total'/>
+                    <field name='state'/>
+                    <filter name='draft' string='未审核' domain="[('state', '=', 'draft')]"/>
+                    <filter name='done' string='审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='others' string='其他出库' domain="[('type', '=', 'others')]"/>
+                    <filter name='inventory' string='盘亏' domain="[('type', '=', 'inventory')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="调出仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <!-- 其他入库单 -->
         <record id='wh_in_form' model='ir.ui.view'>
             <field name='name'>wh.in.form</field>
@@ -329,6 +366,31 @@
             </field>
         </record>
 
+		<record id='wh_in_search' model='ir.ui.view'>
+            <field name='name'>wh.in.search</field>
+            <field name='model'>wh.in</field>
+            <field name='arch' type='xml'>
+                <search string='其他入库单'>
+                    <field name='name'/>
+                    <field name='warehouse_dest_id'/>
+                    <field name='partner_id' string='供应商'/>
+                    <field name='create_uid' string='制单人'/>
+                    <field name='approve_uid'/>
+                    <field name='amount_total'/>
+                    <field name='state'/>
+                    <filter name='draft' string='未审核' domain="[('state', '=', 'draft')]"/>
+                    <filter name='done' string='审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='others' string='其他入库' domain="[('type', '=', 'others')]"/>
+                    <filter name='inventory' string='盘盈' domain="[('type', '=', 'inventory')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="调入仓库" domain="[]" context="{'group_by':'warehouse_dest_id'}"/>
+                        <filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <!-- 内部调拨 -->
         <record id='wh_internal_form' model='ir.ui.view'>
             <field name='name'>wh.internal.form</field>
@@ -400,6 +462,30 @@
                     <field name='note' />
                     <field name='state' />
                 </tree>
+            </field>
+        </record>
+
+		<record id='wh_internal_search' model='ir.ui.view'>
+            <field name='name'>wh.internal.search</field>
+            <field name='model'>wh.internal</field>
+            <field name='arch' type='xml'>
+                <search string='调拨单'>
+                    <field name='name'/>
+                    <field name='warehouse_id'/>
+                    <field name='warehouse_dest_id'/>
+					<field name='total_qty'/>
+                    <field name='amount_total'/>
+                    <field name='create_uid' string='制单人' />
+                    <field name='approve_uid'/>
+                    <field name='state'/>
+                    <filter name='draft' string='未审核' domain="[('state', '=', 'draft')]"/>
+                    <filter name='done' string='审核' domain="[('state', '=', 'done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="调出仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
+                        <filter string="调入仓库" domain="[]" context="{'group_by':'warehouse_dest_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+    	<!-- 模板 -->
         <record id='wh_bom_tree' model='ir.ui.view'>
             <field name='name'>wh.bom.tree</field>
             <field name='model'>wh.bom</field>
@@ -50,6 +51,19 @@
                         </group>
                     </sheet>
                 </form>
+            </field>
+        </record>
+
+		<record id="wh_bom_search" model="ir.ui.view">
+            <field name="name">wh.bom.search</field>
+            <field name="model">wh.bom</field>
+            <field name="arch" type="xml">
+                <search string="模板">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <filter name="assembly" string="组装单" domain="[('type','=','assembly')]"/>
+                    <filter name="disassembly" string="拆卸单" domain="[('type','=','disassembly')]"/>
+                </search>
             </field>
         </record>
 
