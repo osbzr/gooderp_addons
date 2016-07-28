@@ -558,7 +558,7 @@ class sell_delivery(models.Model):
                 vals.update({
                         'type':'inventory',
                         'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
-                        'warehouse_dest_id':line.warehouse_id.id,
+                        'warehouse_dest_id':self.warehouse_id.id,
                         'line_in_ids':[(0, 0, {
                                     'goods_id':line.goods_id.id,
                                     'attribute_id':line.attribute_id.id,
@@ -580,8 +580,7 @@ class sell_delivery(models.Model):
                     'type': 'ir.actions.act_window',
                     'context':{'method':method,
                                'vals':vals,
-                               'msg':msg,
-                               'origin':self.name,},
+                               'msg':msg,},
                     'target': 'new',
                     }
                 return dic
