@@ -7,6 +7,7 @@
             <field name="arch" type="xml">
                 <tree string="销量前十商品" create="false">
                     <field name="goods"/>
+                    <field name="warehouse"/>
                     <field name="qty" sum="基本数量合计"/>
                     <field name="amount" sum="销售收入合计"/>
                 </tree>

@@ -10,6 +10,7 @@ class sell_top_ten(models.Model):
     _description = u'销量前十商品'
 
     goods = fields.Char(u'商品名称')
+    warehouse = fields.Char(u'仓库')
     qty = fields.Float(u'基本数量', digits_compute=dp.get_precision('Quantity'))
     amount = fields.Float(u'销售收入', digits_compute=dp.get_precision('Amount'))
 
@@ -17,6 +18,7 @@ class sell_top_ten(models.Model):
         return '''
         SELECT MIN(wml.id) as id,
                 goods.name AS goods,
+                wh.name AS warehouse,
                 (SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
                     ELSE 0 END) -
                     SUM(CASE WHEN wm.origin = 'sell.delivery.return' THEN wml.goods_qty
@@ -32,19 +34,25 @@ class sell_top_ten(models.Model):
         FROM wh_move_line AS wml
             LEFT JOIN wh_move wm ON wml.move_id = wm.id
             LEFT JOIN goods ON wml.goods_id = goods.id
+            LEFT JOIN warehouse AS wh ON wml.warehouse_id = wh.id
         '''
 
     def where_sql(self, sql_type='out'):
+        extra = ''
+        if self.env.context.get('warehouse_id'):
+            print '111111'
+            extra += 'AND wh.id = {warehouse_id}'
         return '''
         WHERE wml.state = 'done'
           AND wml.date >= '{date_start}'
           AND wml.date < '{date_end}'
           AND wm.origin like 'sell.delivery%%'
-        '''
+          %s
+        ''' % extra
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY goods
+        GROUP BY goods, warehouse
         '''
 
     def order_sql(self, sql_type='out'):
@@ -60,6 +68,8 @@ class sell_top_ten(models.Model):
         return {
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
+            'warehouse_id': context.get('warehouse_id') and
+                context.get('warehouse_id')[0] or '',
         }
 
     def collect_data_by_sql(self, sql_type='out'):

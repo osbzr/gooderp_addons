@@ -13,6 +13,7 @@
                 	<field name="staff_id"/>
                 	<field name="type"/>
                     <field name="date"/>
+                    <field name="warehouse_id"/>
                     <field name="order_name"/>
                     <field name="sell_amount" sum="销售金额合计"/>
                     <field name="discount_amount" sum="优惠金额合计" groups='sell.sell_discount_groups'/>
