@@ -31,7 +31,6 @@
             <field name="arch" type="xml">
                 <search string="科目">
                 	<field name="name" filter_domain="['|', ('name', 'ilike', self),('code', 'ilike', self)]"/>
-                    <!-- <field name="code"/> -->
                     <group expand="0" string="分组">
                         <filter string="类型" domain="[]" context="{'group_by':'costs_types'}"/>
                         <filter string="辅助核算" domain="[]" context="{'group_by':'auxiliary_financing'}"/>
@@ -68,8 +67,7 @@
             <field name="model">auxiliary.financing</field>
             <field name="arch" type="xml">
                 <search string="辅助核算">
-                	<field name="name"/>
-                    <field name="code"/>
+                	<field name="name" filter_domain="['|', ('name', 'ilike', self),('code', 'ilike', self)]"/>
                     <group expand="0" string="分组">
                         <filter string="分类" domain="[]" context="{'group_by':'type'}"/>
                     </group>
