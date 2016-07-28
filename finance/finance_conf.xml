@@ -25,6 +25,21 @@
             </field>
         </record>
 
+		<record id="finance_account_search" model="ir.ui.view">
+            <field name="name">finance.account.search</field>
+            <field name="model">finance.account</field>
+            <field name="arch" type="xml">
+                <search string="科目">
+                	<field name="name" filter_domain="['|', ('name', 'ilike', self),('code', 'ilike', self)]"/>
+                    <!-- <field name="code"/> -->
+                    <group expand="0" string="分组">
+                        <filter string="类型" domain="[]" context="{'group_by':'costs_types'}"/>
+                        <filter string="辅助核算" domain="[]" context="{'group_by':'auxiliary_financing'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="finance_account_action" model="ir.actions.act_window">
             <field name="name">会计科目</field>
             <field name="res_model">finance.account</field>
@@ -45,6 +60,20 @@
                     <field name="name"/>
                     <field name="type"/>
                 </tree>
+            </field>
+        </record>
+
+		<record id="auxiliary_financing_search" model="ir.ui.view">
+            <field name="name">auxiliary.financing.search</field>
+            <field name="model">auxiliary.financing</field>
+            <field name="arch" type="xml">
+                <search string="辅助核算">
+                	<field name="name"/>
+                    <field name="code"/>
+                    <group expand="0" string="分组">
+                        <filter string="分类" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 
@@ -69,6 +98,19 @@
                     <field name="month" attrs="{'readonly': [('is_closed','=',True)]}"/>
                     <field name="is_closed" readonly='1'/>
                 </tree>
+            </field>
+        </record>
+        <record id="finance_period_search" model="ir.ui.view">
+            <field name="name">finance.period.search</field>
+            <field name="model">finance.period</field>
+            <field name="arch" type="xml">
+                <search string="会计期间">
+                	<filter name='unclosed' string='未结账' domain="[('is_closed', '=', False)]"/>
+                    <filter name='closed' string='已结账' domain="[('is_closed', '=', True)]"/>
+                    <group expand="0" string="分组">
+                        <filter string="会计年度" domain="[]" context="{'group_by':'year'}"/>
+                    </group>
+                </search>
             </field>
         </record>
         <record id="period_action" model="ir.actions.act_window">

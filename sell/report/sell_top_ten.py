@@ -40,7 +40,6 @@ class sell_top_ten(models.Model):
     def where_sql(self, sql_type='out'):
         extra = ''
         if self.env.context.get('warehouse_id'):
-            print '111111'
             extra += 'AND wh.id = {warehouse_id}'
         return '''
         WHERE wml.state = 'done'

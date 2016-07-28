@@ -73,6 +73,31 @@
             </field>
         </record>
 
+        <!-- 库存调拨 -->
+        <record id='wh_move_line_search' model='ir.ui.view'>
+            <field name='name'>wh.move.line.search</field>
+            <field name='model'>wh.move.line</field>
+            <field name='arch' type='xml'>
+                <search string='库存调拨'>
+                    <field name='move_id'/>
+                    <field name='goods_id'/>
+                    <field name='lot'/>
+                    <field name='warehouse_id'/>
+                    <field name='warehouse_dest_id'/>
+                    <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
+                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='out' string='出库' domain="[('type', '=', 'out')]"/>
+                    <filter name='in' string='入库' domain="[('type', '=', 'in')]"/>
+                    <group expand="0" string="分组">
+                    	<filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                        <filter string="调出仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
+                        <filter string="调入仓库" domain="[]" context="{'group_by':'warehouse_dest_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
 		<!-- 其他出库单明细 -->
         <record id='wh_move_line_out_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.out.tree</field>
@@ -275,8 +300,8 @@
                     <field name='approve_uid'/>
                     <field name='amount_total'/>
                     <field name='state'/>
-                    <filter name='draft' string='未审核' domain="[('state', '=', 'draft')]"/>
-                    <filter name='done' string='审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
+                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
                     <filter name='others' string='其他出库' domain="[('type', '=', 'others')]"/>
                     <filter name='inventory' string='盘亏' domain="[('type', '=', 'inventory')]"/>
                     <group expand="0" string="分组">
@@ -378,8 +403,8 @@
                     <field name='approve_uid'/>
                     <field name='amount_total'/>
                     <field name='state'/>
-                    <filter name='draft' string='未审核' domain="[('state', '=', 'draft')]"/>
-                    <filter name='done' string='审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
+                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
                     <filter name='others' string='其他入库' domain="[('type', '=', 'others')]"/>
                     <filter name='inventory' string='盘盈' domain="[('type', '=', 'inventory')]"/>
                     <group expand="0" string="分组">
@@ -478,8 +503,8 @@
                     <field name='create_uid' string='制单人' />
                     <field name='approve_uid'/>
                     <field name='state'/>
-                    <filter name='draft' string='未审核' domain="[('state', '=', 'draft')]"/>
-                    <filter name='done' string='审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
+                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
                     <group expand="0" string="分组">
                         <filter string="调出仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
                         <filter string="调入仓库" domain="[]" context="{'group_by':'warehouse_dest_id'}"/>
