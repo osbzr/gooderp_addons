@@ -435,6 +435,8 @@ class test_sell_top_ten_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             wizard.button_ok()
+        # 日期默认值
+        self.wizard_obj.create({})
 
     def test_goods_report(self):
         '''测试销量前十商品报表'''
@@ -450,3 +452,42 @@ class test_sell_top_ten_wizard(TransactionCase):
 
         self.assertEqual(len(results), 1)
         self.assertEqual(len(new_results), 1)
+
+
+class test_popup_wizard(TransactionCase):
+    '''发货单缺货向导'''
+
+    def setUp(self):
+        ''' 准备数据 '''
+        super(test_popup_wizard, self).setUp()
+        self.order = self.env.ref('sell.sell_order_2')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+        self.hd_stock = self.env.ref('warehouse.hd_stock')
+        self.warehouse_inventory = self.env.ref('warehouse.warehouse_inventory')
+
+    def test_button_ok(self):
+        '''缺货向导的确认按钮'''
+        self.delivery.sell_delivery_done()
+        inv_line = {}
+        for line in self.delivery.line_out_ids:
+            inv_line = {
+                'goods_id':line.goods_id.id,
+                'attribute_id':line.attribute_id.id,
+                'goods_uos_qty':line.goods_uos_qty,
+                'uos_id':line.uos_id.id,
+                'goods_qty':line.goods_qty,
+                'uom_id':line.uom_id.id,
+                'cost_unit':line.goods_id.cost
+            }
+        self.env['popup.wizard'].create({}).with_context({
+            'method': 'goods_inventery',
+            'vals': {'type': 'inventory',
+                     'warehouse_id': self.warehouse_inventory.id,
+                     'warehouse_dest_id': self.hd_stock.id,
+                     'line_in_ids':[(0, 0, inv_line)],
+                     },
+            'active_id': self.delivery.id,
+            'active_model': 'sell.delivery',
+        }).button_ok()
