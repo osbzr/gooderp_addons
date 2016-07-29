@@ -12,6 +12,7 @@ class buy_payment(models.TransientModel):
     partner_id = fields.Many2one('partner', u'供应商')
     type = fields.Char(u'业务类别')
     date = fields.Date(u'单据日期')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
     order_name = fields.Char(u'单据编号')
     purchase_amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))
     discount_amount = fields.Float(u'优惠金额', digits_compute=dp.get_precision('Amount'))

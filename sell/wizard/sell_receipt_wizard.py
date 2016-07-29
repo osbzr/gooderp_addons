@@ -24,6 +24,7 @@ class sell_receipt_wizard(models.TransientModel):
                                     context={'type': 'customer'})
     partner_id = fields.Many2one('partner', u'客户')
     staff_id = fields.Many2one('staff', u'销售员')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
@@ -42,6 +43,8 @@ class sell_receipt_wizard(models.TransientModel):
             cond.append(('partner_id', '=', self.partner_id.id))
         if self.staff_id:
             cond.append(('staff_id', '=', self.staff_id.id))
+        if self.warehouse_id:
+            cond.append(('warehouse_id', '=', self.warehouse_id.id))
         delivery_obj = self.env['sell.delivery']
         count = sum_receipt_rate = 0
         for delivery in delivery_obj.search(cond, order='partner_id'):
@@ -78,6 +81,7 @@ class sell_receipt_wizard(models.TransientModel):
                 'type': order_type,
                 'date': delivery.date,
                 'order_name': delivery.name,
+                'warehouse_id': delivery.warehouse_id.id,
                 'sell_amount': sell_amount,
                 'discount_amount': discount_amount,
                 'amount': amount,

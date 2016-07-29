@@ -2,29 +2,7 @@
 from openerp.tests.common import TransactionCase
 from openerp.exceptions import except_orm
 
-class test_report(TransactionCase):
-    def setUp(self):
-        super(test_report, self).setUp()
-        ''' 准备报表数据 '''
-        order = self.env.ref('sell.sell_order_1')
-        order.sell_order_done()
-        receipt = self.env['sell.delivery'].search([('order_id','=',order.id)])
-        #receipt.sell_delivery_done()
-        
-    def test_report(self):
-        ''' 测试销售报表 '''
-        
-        '''
-        # 执行向导
-        track = self.env['sell.order.track.wizard'].create({})
-        # 输出报表
-        track.button_ok()
-        
-        # 执行向导
-        detail = self.env['sell.order.detail.wizard'].create({})
-        # 输出报表
-        detail.button_ok()
-        '''
+
 class test_customer_statements(TransactionCase):
     '''测试客户对账单'''
     def setUp(self):
@@ -127,28 +105,15 @@ class test_track_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             track.button_ok()
-        # 按产品搜索
+        # 按日期搜索
+        self.track.button_ok()
+        # 按产品、客户、销售员、仓库搜索
         self.track.goods_id = self.env.ref('goods.mouse').id
-        self.track.button_ok()
-        # 按客户搜索
-        self.track.goods_id = False
         self.track.partner_id = self.env.ref('core.yixun').id
-        self.track.button_ok()
-        # 按销售员搜索
-        self.track.goods_id = False
-        self.track.partner_id = False
         self.track.staff_id = self.env.ref('core.lili').id
-        self.track.button_ok()
-        # 按仓库搜索
         self.track.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.track.button_ok()
-        # 按日期搜索
-        self.track.goods_id = False
-        self.track.partner_id = False
-        self.track.staff_id = False
-        self.track.warehouse_id = False
-        self.track.button_ok()
- 
+
     def test_view_detail(self):
         '''测试销售订单跟踪表  查看明细按钮'''
         self.track.button_ok()
@@ -194,28 +159,15 @@ class test_detail_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             detail.button_ok()
-        # 按产品搜索
+        # 按日期搜索
+        self.detail.button_ok()
+        # 按产品、客户、销售员、仓库搜索
         self.detail.goods_id = self.env.ref('goods.mouse').id
-        self.detail.button_ok()
-        # 按客户搜索
-        self.detail.goods_id = False
         self.detail.partner_id = self.env.ref('core.yixun').id
-        self.detail.button_ok()
-        # 按销售员搜索
-        self.detail.goods_id = False
-        self.detail.partner_id = False
         self.detail.staff_id = self.env.ref('core.lili').id
-        self.detail.button_ok()
-        # 按仓库搜索
         self.detail.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.detail.button_ok()
-        # 按日期搜索
-        self.detail.goods_id = False
-        self.detail.partner_id = False
-        self.detail.staff_id = False
-        self.detail.warehouse_id = False
-        self.detail.button_ok()
- 
+
     def test_view_detail(self):
         '''测试销售订单明细表  查看明细按钮'''
         self.detail.button_ok()
@@ -253,7 +205,7 @@ class test_goods_wizard(TransactionCase):
             goods_wizard.button_ok()
         # 按日期搜索
         self.goods_wizard.button_ok()
- 
+
     def test_goods_report(self):
         '''测试销售汇总表（按商品）报表'''
         summary_goods = self.env['sell.summary.goods'].create({})
@@ -270,7 +222,7 @@ class test_goods_wizard(TransactionCase):
                                                                   domain=[])
         self.assertEqual(len(results), 1)
         self.assertEqual(len(new_results), 0)
- 
+
     def test_view_detail(self):
         '''销售汇总表（按商品）  查看明细按钮'''
         summary_goods = self.env['sell.summary.goods'].create({})
@@ -283,7 +235,7 @@ class test_goods_wizard(TransactionCase):
 
 class test_partner_wizard(TransactionCase):
     '''测试销售汇总表（按客户）向导'''
- 
+
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_partner_wizard, self).setUp()
@@ -296,7 +248,7 @@ class test_partner_wizard(TransactionCase):
         self.delivery.sell_delivery_done()
         self.partner_wizard_obj = self.env['sell.summary.partner.wizard']
         self.partner_wizard = self.partner_wizard_obj.create({})
- 
+
     def test_button_ok(self):
         '''销售汇总表（按客户）向导确认按钮'''
         # 日期报错
@@ -308,7 +260,7 @@ class test_partner_wizard(TransactionCase):
             partner_wizard.button_ok()
         # 按日期搜索
         self.partner_wizard.button_ok()
- 
+
     def test_partner_report(self):
         '''测试销售汇总表（按客户）报表'''
         summary_partner = self.env['sell.summary.partner'].create({})
@@ -323,7 +275,7 @@ class test_partner_wizard(TransactionCase):
         new_context = new_partner_wizard.button_ok().get('context')
         new_results = summary_partner.with_context(new_context).search_read(
                                                                   domain=[])
- 
+
     def test_view_detail(self):
         '''销售汇总表（按客户）  查看明细按钮'''
         summary_partner = self.env['sell.summary.partner'].create({})
@@ -332,11 +284,11 @@ class test_partner_wizard(TransactionCase):
         for line in results:
             summary_line = summary_partner.browse(line['id'])
             summary_line.with_context(context).view_detail()
- 
- 
+
+
 class test_staff_wizard(TransactionCase):
     '''测试销售汇总表（按销售人员）向导'''
- 
+
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_staff_wizard, self).setUp()
@@ -349,7 +301,7 @@ class test_staff_wizard(TransactionCase):
         self.delivery.sell_delivery_done()
         self.staff_wizard_obj = self.env['sell.summary.staff.wizard']
         self.staff_wizard = self.staff_wizard_obj.create({})
- 
+
     def test_button_ok(self):
         '''销售汇总表（按销售人员）向导确认按钮'''
         # 日期报错
@@ -361,13 +313,13 @@ class test_staff_wizard(TransactionCase):
             staff_wizard.button_ok()
         # 按日期搜索
         self.staff_wizard.button_ok()
- 
+
     def test_staff_report(self):
         '''测试销售汇总表（按销售人员）报表'''
         summary_staff = self.env['sell.summary.staff'].create({})
         context = self.staff_wizard.button_ok().get('context')
         results = summary_staff.with_context(context).search_read(domain=[])
- 
+
         new_staff_wizard = self.staff_wizard.copy()
         new_staff_wizard.staff_id = self.env.ref('core.lili').id
         new_staff_wizard.goods_id = self.env.ref('goods.cable').id
@@ -377,7 +329,7 @@ class test_staff_wizard(TransactionCase):
         new_context = new_staff_wizard.button_ok().get('context')
         new_results = summary_staff.with_context(new_context).search_read(
                                                                   domain=[])
- 
+
     def test_view_detail(self):
         '''销售汇总表（按销售人员）  查看明细按钮'''
         summary_staff = self.env['sell.summary.staff'].create({})
@@ -386,8 +338,8 @@ class test_staff_wizard(TransactionCase):
         for line in results:
             summary_line = summary_staff.browse(line['id'])
             summary_line.with_context(context).view_detail()
- 
- 
+
+
 class test_receipt_wizard(TransactionCase):
     '''测试销售收款一览表向导'''
  
@@ -396,7 +348,7 @@ class test_receipt_wizard(TransactionCase):
         super(test_receipt_wizard, self).setUp()
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
- 
+
         # 销货订单产生发货单，并审核发货单产生收款单
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
@@ -406,7 +358,7 @@ class test_receipt_wizard(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.delivery.receipt = 2.0
         self.delivery.sell_delivery_done()
- 
+
         # 销货订单产生发货单，并审核发货单，优惠后金额和本次收款均为0
         new_delivery = self.delivery.copy()
         new_delivery.discount_amount = (new_delivery.amount
@@ -414,7 +366,7 @@ class test_receipt_wizard(TransactionCase):
         new_delivery.receipt = 0
         new_delivery.bank_account_id = False
         new_delivery.sell_delivery_done()
- 
+
         # 销货订单产生退货单，并审核退货单
         self.order_return = self.env.ref('sell.sell_order_return')
         self.order_return.sell_order_done()
@@ -423,7 +375,7 @@ class test_receipt_wizard(TransactionCase):
         self.delivery_return.sell_delivery_done()
         self.receipt_wizard_obj = self.env['sell.receipt.wizard']
         self.receipt_wizard = self.receipt_wizard_obj.create({})
- 
+
     def test_button_ok(self):
         '''测试销售收款一览表  确认按钮'''
         # 日期报错
@@ -433,26 +385,16 @@ class test_receipt_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             receipt_wizard.button_ok()
-        # 按客户类别搜索
+        # 按日期搜索
+        self.receipt_wizard.button_ok()
+        # 按客户类别、客户、销售员、仓库搜索
         self.receipt_wizard.c_category_id = \
             self.env.ref('core.customer_category_1').id
-        self.receipt_wizard.button_ok()
-        # 按客户搜索
-        self.receipt_wizard.c_category_id = False
         self.receipt_wizard.partner_id = self.env.ref('core.jd').id
-        self.receipt_wizard.button_ok()
-        # 按销售员搜索
-        self.receipt_wizard.c_category_id = False
-        self.receipt_wizard.partner_id = False
         self.receipt_wizard.staff_id = self.env.ref('core.lili').id
+        self.receipt_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.receipt_wizard.button_ok()
-        # 按日期搜索
-        self.receipt_wizard.c_category_id = False
-        self.receipt_wizard.partner_id = False
-        self.receipt_wizard.staff_id = False
-        self.receipt_wizard.warehouse_id = False
-        self.receipt_wizard.button_ok()
- 
+
     def test_view_detail(self):
         '''测试销售收款一览表  查看明细按钮'''
         self.receipt_wizard.button_ok()
@@ -464,11 +406,11 @@ class test_receipt_wizard(TransactionCase):
                                 [('order_name', '=', self.delivery_return.name)])
         for line in receipt_line2:
             line.view_detail()
- 
- 
+
+
 class test_sell_top_ten_wizard(TransactionCase):
     '''测试销量前十商品向导'''
- 
+
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_sell_top_ten_wizard, self).setUp()
@@ -483,7 +425,7 @@ class test_sell_top_ten_wizard(TransactionCase):
         self.wizard = self.wizard_obj.create({
                              'date_start': '2016-1-01',
                              'date_end': '2016-12-12',})
- 
+
     def test_button_ok(self):
         '''销量前十商品向导确认按钮'''
         # 日期报错
@@ -493,11 +435,18 @@ class test_sell_top_ten_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             wizard.button_ok()
- 
+
     def test_goods_report(self):
         '''测试销量前十商品报表'''
         summary_top_ten = self.env['sell.top.ten'].create({})
         context = self.wizard.button_ok().get('context')
         results = summary_top_ten.with_context(context).search_read(domain=[])
- 
+
+        new_wizard = self.wizard.copy()
+        new_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        new_context = new_wizard.button_ok().get('context')
+        new_results = summary_top_ten.with_context(new_context).search_read(
+                                                                  domain=[])
+
         self.assertEqual(len(results), 1)
+        self.assertEqual(len(new_results), 1)

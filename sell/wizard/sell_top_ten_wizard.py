@@ -21,6 +21,7 @@ class sell_top_ten_wizard(models.TransientModel):
 
     date_start = fields.Date(u'开始日期', default=_default_date_start)
     date_end = fields.Date(u'结束日期', default=_default_date_end)
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
@@ -32,5 +33,5 @@ class sell_top_ten_wizard(models.TransientModel):
             'view_mode': 'tree',
             'res_model': 'sell.top.ten',
             'type': 'ir.actions.act_window',
-            'context': self.read(['date_start', 'date_end'])[0],
+            'context': self.read(['date_start', 'date_end', 'warehouse_id'])[0],
         }

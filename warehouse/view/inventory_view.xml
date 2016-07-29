@@ -105,7 +105,15 @@
             <field name='model'>wh.inventory</field>
             <field name='arch' type='xml'>
                 <search string='盘点表' >
+                	<field name='name'/>
+                    <field name='warehouse_id'/>
+                    <field name='goods'/>
                     <filter string="未完成" domain="[('state','!=','done')]" name="not_done_inventory_filter"/>
+                    <group expand="0" string="分组">
+                        <filter string="仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
+                        <filter string="产品" domain="[]" context="{'group_by':'goods'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
                 </search>
             </field>
         </record>
