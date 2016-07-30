@@ -54,6 +54,8 @@ class TestReport(TransactionCase):
 
         self.assertEqual(results, real_results)
         self.assertEqual(self.track_wizard.open_report().get('res_model'), 'report.lot.track')
+        # 测试wizard默认日期
+        self.env['report.lot.track.wizard'].create({})
 
         # 测试商品收发明细表的wizard
         self.assertEqual(self.transceive_wizard.onchange_date()[0], {})
@@ -67,6 +69,8 @@ class TestReport(TransactionCase):
 
         self.assertEqual(results, real_results)
         self.assertEqual(self.transceive_wizard.open_report().get('res_model'), 'report.stock.transceive')
+        # 测试wizard默认日期
+        self.env['report.stock.transceive.wizard'].create({})
 
     def test_lot_track_search_read(self):
         lot_track = self.env['report.lot.track'].create({})
