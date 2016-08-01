@@ -184,6 +184,10 @@ class test_sell_order(TransactionCase):
              }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
 
+    def test_onchange_partner_id(self):
+        '''选择客户带出其默认地址信息'''
+        self.order.onchange_partner_id()
+
     def test_unlink(self):
         '''测试删除已审核的销货订单'''
         self.order.sell_order_done()
@@ -300,6 +304,10 @@ class test_sell_delivery(TransactionCase):
 
         self.bank_account = self.env.ref('core.alipay')
         self.bank_account.balance = 10000
+
+    def test_onchange_partner_id(self):
+        '''选择客户带出其默认地址信息'''
+        self.delivery.onchange_partner_id()
 
     def test_get_sell_money_state(self):
         '''测试返回收款状态'''

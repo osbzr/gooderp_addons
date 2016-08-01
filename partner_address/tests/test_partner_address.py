@@ -15,7 +15,7 @@ class test_partner_address(TransactionCase):
                     [('id', '=', self.partner_id.id)])
         self.partner.write({'child_ids':
             [(0, 0,
-              {'contact_people': u'小东',
+              {'contact': u'小东',
                'mobile': '1385559999',
                }
             )]
@@ -177,7 +177,7 @@ class test_partner(TransactionCase):
         # 有联系人地址child_ids，并为默认地址时
         partner.write({'child_ids':
             [(0, 0,
-              {'contact_people': u'小东',
+              {'contact': u'小东',
                'province_id': self.province_id.id,
                'city_id': self.city_id.id,
                'county_id': self.county_id.id,
@@ -193,7 +193,7 @@ class test_partner(TransactionCase):
             child.is_default_add = True
 
         partner._compute_partner_address()
-        self.assertEqual(partner.contact_people, u'小东')
+        self.assertEqual(partner.contact, u'小东')
         self.assertEqual(partner.mobile, u'1385559999')
         self.assertEqual(partner.phone, u'55558888')
         self.assertEqual(partner.qq, u'11116666')

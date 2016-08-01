@@ -8,7 +8,7 @@
             <field name='inherit_id' ref='core.customer_tree'/>
             <field name="arch" type="xml">
                 <field name="name" position="after">
-                	<field name="contact_people"/>
+                	<field name="contact"/>
                 	<field name="mobile"/>
                 	<field name="phone"/>
                 	<field name="qq"/>
@@ -26,7 +26,7 @@
                 <xpath expr="//group" position="after">
                     <field name="child_ids">
                     	<tree string="联系人地址" editable="bottom">
-	                    	<field name="contact_people"/>
+	                    	<field name="contact"/>
 	                    	<field name="mobile"/>
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>
@@ -49,7 +49,7 @@
             <field name='inherit_id' ref='core.vendor_tree'/>
             <field name="arch" type="xml">
                 <field name="name" position="after">
-                	<field name="contact_people"/>
+                	<field name="contact"/>
                 	<field name="mobile"/>
                 	<field name="phone"/>
                 	<field name="qq"/>
@@ -67,7 +67,7 @@
                 <xpath expr="//group" position="after">
                     <field name="child_ids">
                     	<tree string="联系人地址" editable="bottom">
-	                    	<field name="contact_people" required="1"/>
+	                    	<field name="contact" required="1"/>
 	                    	<field name="mobile" required="1"/>
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>

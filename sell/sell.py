@@ -52,6 +52,9 @@ class sell_order(models.Model):
 
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES)
+    contact = fields.Char(u'联系人', states=READONLY_STATES)
+    address = fields.Char(u'地址', states=READONLY_STATES)
+    mobile = fields.Char(u'手机', states=READONLY_STATES)
     staff_id = fields.Many2one('staff', u'销售员',
                             ondelete='restrict', states=READONLY_STATES)
     date = fields.Date(u'单据日期', states=READONLY_STATES,
@@ -91,6 +94,15 @@ class sell_order(models.Model):
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
+
+    @api.one
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        '''选择客户带出其默认地址信息'''
+        if self.partner_id:
+            self.contact = self.partner_id.contact
+            self.address = self.partner_id.address
+            self.mobile = self.partner_id.mobile
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -455,9 +467,19 @@ class sell_delivery(models.Model):
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
                                store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
-    address = fields.Char(u'地址')
-    mobile = fields.Char(u'手机')
+    contact = fields.Char(u'联系人', states=READONLY_STATES)
+    address = fields.Char(u'地址', states=READONLY_STATES)
+    mobile = fields.Char(u'手机', states=READONLY_STATES)
     modifying = fields.Boolean(u'差错修改中', default=False)
+
+    @api.one
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        '''选择客户带出其默认地址信息'''
+        if self.partner_id:
+            self.contact = self.partner_id.contact
+            self.address = self.partner_id.address
+            self.mobile = self.partner_id.mobile
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
