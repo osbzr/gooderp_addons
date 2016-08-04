@@ -73,6 +73,7 @@ class wh_move(models.Model):
         if not att and not goods:
             raise osv.except_osv(u'错误', u'该产品不存在')
         else:
+            conversion = att and att.goods_id.conversion or goods.conversion
             if model_name in ['wh.out','wh.in']:
                 move = self.env[model_name].browse(order_id).move_id
             # 在其他出库单上扫描条码
@@ -83,10 +84,12 @@ class wh_move(models.Model):
                     # 如果产品属性上存在条码，且明细行上已经存在该产品，则数量累加
                     if att and line.attribute_id.id == att.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
                     # 如果产品上存在条码，且明细行上已经存在该产品，则数量累加
                     elif goods and line.goods_id.id == goods.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
             # 在其他入库单上扫描条码
             if model_name == 'wh.in':
@@ -96,10 +99,12 @@ class wh_move(models.Model):
                     # 如果产品属性上存在条码
                     if att and line.attribute_id.id == att.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
                     # 如果产品上存在条码
                     elif goods and line.goods_id.id == goods.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
             #销售出入库单的二维码
             if model_name == 'sell.delivery':
@@ -111,10 +116,12 @@ class wh_move(models.Model):
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                 else:
                     val['type'] = 'out'
@@ -123,10 +130,12 @@ class wh_move(models.Model):
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
             #采购出入库单的二维码
             if model_name == 'buy.receipt':
@@ -138,10 +147,12 @@ class wh_move(models.Model):
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                 else:
                     val['type'] = 'in'
@@ -150,10 +161,12 @@ class wh_move(models.Model):
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
             if att:
                 goods_id = att.goods_id.id
