@@ -17,10 +17,10 @@ class wh_move_matching(models.Model):
         ondelete='set null', required=True, index=True)
     qty = fields.Float(
         u'数量',
-        digits_compute=dp.get_precision('Quantity'), required=True)
+        digits=dp.get_precision('Quantity'), required=True)
     uos_qty = fields.Float(
         u'辅助数量',
-        digits_compute=dp.get_precision('Quantity'), required=True)
+        digits=dp.get_precision('Quantity'), required=True)
 
     def create_matching(self, line_in_id, line_out_id, qty, uos_qty):
         res = {
@@ -39,11 +39,11 @@ class wh_move_line(models.Model):
     qty_remaining = fields.Float(
         compute='_get_qty_remaining',
         string=u'剩余数量',
-        digits_compute=dp.get_precision('Quantity'),
+        digits=dp.get_precision('Quantity'),
         index=True, store=True, readonly=True)
     uos_qty_remaining = fields.Float(
         compute='_get_qty_remaining', string=u'剩余辅助数量',
-        digits_compute=dp.get_precision('Quantity'),
+        digits=dp.get_precision('Quantity'),
         index=True, store=True, readonly=True)
 
     matching_in_ids = fields.One2many(

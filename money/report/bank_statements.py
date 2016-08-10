@@ -28,12 +28,12 @@ class bank_statements_report(models.Model):
     date = fields.Date(string=u'日期', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     get = fields.Float(string=u'收入', readonly=True,
-                       digits_compute=dp.get_precision('Amount'))
+                       digits=dp.get_precision('Amount'))
     pay = fields.Float(string=u'支出', readonly=True,
-                       digits_compute=dp.get_precision('Amount'))
+                       digits=dp.get_precision('Amount'))
     balance = fields.Float(string=u'账户余额',
                            compute='_compute_balance', readonly=True,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
     note = fields.Char(string=u'备注', readonly=True)
 

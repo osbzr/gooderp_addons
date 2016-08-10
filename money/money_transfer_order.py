@@ -103,7 +103,7 @@ class money_transfer_order_line(models.Model):
     in_bank_id = fields.Many2one('bank.account', string=u'转入账户',
                                  required=True, ondelete='restrict')
     amount = fields.Float(string=u'金额',
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     mode_id = fields.Many2one('settle.mode', string=u'结算方式',
                               ondelete='restrict')
     number = fields.Char(string=u'结算号')
