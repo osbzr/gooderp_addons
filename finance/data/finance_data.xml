@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    <data >
+    <data  noupdate="1">
         <!--创建系统启用日期所属会计期间-->
         <function model="finance.period" name="init_period"/>
 
@@ -255,39 +255,69 @@
             <field name='balance_directions'>out</field>
         </record>
 
-        <record id="small_business_chart2221001" model='finance.account'>
-            <field name='code'>2221001</field>
-            <field name='name'>应交税费-未交增值税</field>
-            <field name='costs_types'>debt</field>
-            <field name='balance_directions'>out</field>
-        </record>
-      <!--  <record id="small_business_chart2221002" model='finance.account'>
-            <field name='code'>2221002</field>
-            <field name='name'>应交税费-增值税</field>
-            <field name='costs_types'>debt</field>
-            <field name='balance_directions'>out</field>
-        </record>  -->
-        <record id="small_business_chart2221002001" model='finance.account'>
-            <field name='code'>2221002001</field>
+        <record id="small_business_chart2221001001" model='finance.account'>
+            <field name='code'>2221001001</field>
             <field name='name'>应交税费-增值税-进项税额</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
-        <record id="small_business_chart2221002002" model='finance.account'>
-            <field name='code'>2221002002</field>
+        <record id="small_business_chart2221001002" model='finance.account'>
+            <field name='code'>2221001002</field>
+            <field name='name'>应交税费-增值税-己交税金</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221001003" model='finance.account'>
+            <field name='code'>2221001003</field>
+            <field name='name'>应交税费-增值税-转出未交增值税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221001004" model='finance.account'>
+            <field name='code'>2221001004</field>
+            <field name='name'>应交税费-增值税-减免税款</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221001005" model='finance.account'>
+            <field name='code'>2221001005</field>
             <field name='name'>应交税费-增值税-销项税额</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
-        <record id="small_business_chart2221002003" model='finance.account'>
-            <field name='code'>2221002003</field>
+        <record id="small_business_chart2221001006" model='finance.account'>
+            <field name='code'>2221001006</field>
+            <field name='name'>应交税费-增值税-出口退税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221001007" model='finance.account'>
+            <field name='code'>2221001007</field>
             <field name='name'>应交税费-增值税-进项税额转出</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
-        <record id="small_business_chart2221002004" model='finance.account'>
-            <field name='code'>2221002004</field>
+        <record id="small_business_chart2221001008" model='finance.account'>
+            <field name='code'>2221001008</field>
+            <field name='name'>应交税费-增值税-出口抵减内销产品应纳税额</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221001009" model='finance.account'>
+            <field name='code'>2221001009</field>
+            <field name='name'>应交税费-增值税-转出多交增值税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221001010" model='finance.account'>
+            <field name='code'>2221001010</field>
             <field name='name'>应交税费-增值税-待抵扣增值税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221002" model='finance.account'>
+            <field name='code'>2221002</field>
+            <field name='name'>应交税费-未交增值税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
@@ -305,42 +335,84 @@
         </record>
         <record id="small_business_chart2221005" model='finance.account'>
             <field name='code'>2221005</field>
-            <field name='name'>应交税费-土地增值税</field>
+            <field name='name'>应交税费-应交资源税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221006" model='finance.account'>
             <field name='code'>2221006</field>
-            <field name='name'>应交税费-城市维护建设税</field>
+            <field name='name'>应交税费-土地增值税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221007" model='finance.account'>
             <field name='code'>2221007</field>
-            <field name='name'>应交税费-个人所得税</field>
+            <field name='name'>应交税费-城市维护建设税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221008" model='finance.account'>
             <field name='code'>2221008</field>
-            <field name='name'>应交税费-教育附加</field>
+            <field name='name'>应交税费-应交房产税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221008" model='finance.account'>
+            <field name='code'>2221008</field>
+            <field name='name'>应交税费-应交房产税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221009" model='finance.account'>
             <field name='code'>2221009</field>
-            <field name='name'>应交税费-所得税</field>
+            <field name='name'>应交税费-应交土地使用税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221010" model='finance.account'>
             <field name='code'>2221010</field>
-            <field name='name'>应交税费-水利建设基金</field>
+            <field name='name'>应交税费-应交车船使用税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221011" model='finance.account'>
             <field name='code'>2221011</field>
+            <field name='name'>应交税费-个人所得税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221012" model='finance.account'>
+            <field name='code'>2221012</field>
+            <field name='name'>应交税费-教育附加</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221013" model='finance.account'>
+            <field name='code'>2221013</field>
+            <field name='name'>应交税费-矿产资源补偿费</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221014" model='finance.account'>
+            <field name='code'>2221014</field>
+            <field name='name'>应交税费-应交保险保障基金</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221015" model='finance.account'>
+            <field name='code'>2221015</field>
+            <field name='name'>应交税费-所得税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221016" model='finance.account'>
+            <field name='code'>2221016</field>
+            <field name='name'>应交税费-水利建设基金</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221017" model='finance.account'>
+            <field name='code'>2221017</field>
             <field name='name'>应交税费-地方教育附加</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
@@ -528,178 +600,261 @@
         </record>
         <record id='account_expense_sale' model='finance.account'>
             <field name='code'>560101</field>
-            <field name='name'>销售费用-差旅费</field>
+            <field name='name'>销售费用-职工薪酬</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale2' model='finance.account'>
             <field name='code'>560102</field>
-            <field name='name'>销售费用-运输费</field>
+            <field name='name'>销售费用-劳务费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale3' model='finance.account'>
             <field name='code'>560103</field>
-            <field name='name'>销售费用-装卸费</field>
+            <field name='name'>销售费用-咨询顾问费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale4' model='finance.account'>
             <field name='code'>560104</field>
-            <field name='name'>销售费用-包装费</field>
+            <field name='name'>销售费用-招待费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale5' model='finance.account'>
             <field name='code'>560105</field>
-            <field name='name'>销售费用-保险费</field>
+            <field name='name'>销售费用-广告费和业务宣传费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale6' model='finance.account'>
             <field name='code'>560106</field>
-            <field name='name'>销售费用-展览费</field>
+            <field name='name'>销售费用-佣金和手续费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale7' model='finance.account'>
             <field name='code'>560107</field>
-            <field name='name'>销售费用-广告费</field>
+            <field name='name'>销售费用-资产折旧摊销费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale8' model='finance.account'>
             <field name='code'>560108</field>
-            <field name='name'>销售费用-业务费</field>
+            <field name='name'>销售费用-财产损耗、盘亏及毁损损失</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale9' model='finance.account'>
+            <field name='code'>560109</field>
+            <field name='name'>销售费用-办公费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale10' model='finance.account'>
+            <field name='code'>560110</field>
+            <field name='name'>销售费用-董事会费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale11' model='finance.account'>
+            <field name='code'>560111</field>
+            <field name='name'>销售费用-租赁费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale12' model='finance.account'>
+            <field name='code'>560112</field>
+            <field name='name'>销售费用-诉讼费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale13' model='finance.account'>
+            <field name='code'>560113</field>
+            <field name='name'>销售费用-差旅费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale14' model='finance.account'>
+            <field name='code'>560114</field>
+            <field name='name'>销售费用-保险费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale15' model='finance.account'>
+            <field name='code'>560115</field>
+            <field name='name'>销售费用-运输、仓储费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale16' model='finance.account'>
+            <field name='code'>560116</field>
+            <field name='name'>销售费用-修理费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale17' model='finance.account'>
+            <field name='code'>560117</field>
+            <field name='name'>销售费用-包装费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale18' model='finance.account'>
+            <field name='code'>560118</field>
+            <field name='name'>销售费用-技术转让费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale19' model='finance.account'>
+            <field name='code'>560119</field>
+            <field name='name'>销售费用-研究费用</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale20' model='finance.account'>
+            <field name='code'>560120</field>
+            <field name='name'>销售费用-各项税费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale21' model='finance.account'>
+            <field name='code'>560121</field>
+            <field name='name'>销售费用-其他费用</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
 
-
         <record id='small_business_chart5602001' model='finance.account'>
             <field name='code'>5602001</field>
-            <field name='name'>管理费用-工资</field>
+            <field name='name'>管理费用-职工薪酬</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602002' model='finance.account'>
             <field name='code'>5602002</field>
-            <field name='name'>管理费用-开办费</field>
+            <field name='name'>管理费用-劳务费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602003' model='finance.account'>
             <field name='code'>5602003</field>
-            <field name='name'>管理费用-办公费</field>
+            <field name='name'>管理费用-咨询顾问费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602004' model='finance.account'>
             <field name='code'>5602004</field>
-            <field name='name'>管理费用-会议费</field>
+            <field name='name'>管理费用-招待费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602005' model='finance.account'>
             <field name='code'>5602005</field>
-            <field name='name'>管理费用-交通费</field>
+            <field name='name'>管理费用-广告费和业务宣传费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602006' model='finance.account'>
             <field name='code'>5602006</field>
-            <field name='name'>管理费用-业务招待费</field>
+            <field name='name'>管理费用-佣金和手续费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602007' model='finance.account'>
             <field name='code'>5602007</field>
-            <field name='name'>管理费用-福利费</field>
+            <field name='name'>管理费用-资产折旧摊销费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602008' model='finance.account'>
             <field name='code'>5602008</field>
-            <field name='name'>管理费用-停车费</field>
+            <field name='name'>管理费用-财产损耗、盘亏及毁损损失</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602009' model='finance.account'>
             <field name='code'>5602009</field>
-            <field name='name'>管理费用-差旅费</field>
+            <field name='name'>管理费用-办公费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602010' model='finance.account'>
             <field name='code'>5602010</field>
-            <field name='name'>管理费用-快递费</field>
+            <field name='name'>管理费用-董事会费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602011' model='finance.account'>
             <field name='code'>5602011</field>
-            <field name='name'>管理费用-汽油费</field>
+            <field name='name'>管理费用-租赁费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602012' model='finance.account'>
             <field name='code'>5602012</field>
-            <field name='name'>管理费用-通讯费</field>
+            <field name='name'>管理费用-诉讼费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602013' model='finance.account'>
             <field name='code'>5602013</field>
-            <field name='name'>管理费用-维修费</field>
+            <field name='name'>管理费用-差旅费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602014' model='finance.account'>
             <field name='code'>5602014</field>
-            <field name='name'>管理费用-过路过桥费</field>
+            <field name='name'>管理费用-保险费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602015' model='finance.account'>
             <field name='code'>5602015</field>
-            <field name='name'>管理费用-物业费</field>
+            <field name='name'>管理费用-运输、仓储费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602016' model='finance.account'>
             <field name='code'>5602016</field>
-            <field name='name'>管理费用-折旧费</field>
+            <field name='name'>管理费用-修理费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602017' model='finance.account'>
             <field name='code'>5602017</field>
-            <field name='name'>管理费用-清洁用品</field>
+            <field name='name'>管理费用-包装费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='small_business_chart5602018' model='finance.account'>
+            <field name='code'>5602018</field>
+            <field name='name'>管理费用-技术转让费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602019' model='finance.account'>
             <field name='code'>5602019</field>
-            <field name='name'>管理费用-印花税</field>
+            <field name='name'>管理费用-研究费用</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602020' model='finance.account'>
             <field name='code'>5602020</field>
-            <field name='name'>管理费用-残保金</field>
+            <field name='name'>管理费用-各项税费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602021' model='finance.account'>
             <field name='code'>5602021</field>
-            <field name='name'>管理费用-水利建设基金</field>
+            <field name='name'>管理费用-其他费用</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
 
         <record id='small_business_chart5603001' model='finance.account'>
             <field name='code'>5603001</field>
-            <field name='name'>财务费用-手续费</field>
+            <field name='name'>财务费用-手续及维护年费</field>
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1056,7 +1211,7 @@
         <record id='pl_11' model='profit.statement'>
             <field name='balance'>销售费用</field>
             <field name='line_num'>11</field>
-            <field name='occurrence_balance_formula'>5601</field>
+            <field name='occurrence_balance_formula'>5601~5601999</field>
         </record>
         <record id='pl_14' model='profit.statement'>
             <field name='balance'>管理费用</field>
@@ -1066,7 +1221,7 @@
         <record id='pl_18' model='profit.statement'>
             <field name='balance'>财务费用</field>
             <field name='line_num'>18</field>
-            <field name='occurrence_balance_formula'>5603~5603999999</field>
+            <field name='occurrence_balance_formula'>5603~5603999</field>
         </record>
         <record id='pl_19' model='profit.statement'>
             <field name='balance'>其中：利息费用（收入以“-”号填列）</field>
@@ -1124,8 +1279,8 @@
         <record id="base.main_company" model="res.company">
             <field name="profit_account" ref='account_profit'/>
             <field name="remain_account" ref='account_remain'/>
-            <field name="import_tax_account" ref='small_business_chart2221002001'/>
-            <field name="output_tax_account" ref='small_business_chart2221002002'/>
+            <field name="import_tax_account" ref='small_business_chart2221001001'/>
+            <field name="output_tax_account" ref='small_business_chart2221001005'/>
         </record>
     </data>
 </openerp>
