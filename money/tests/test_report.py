@@ -11,7 +11,7 @@ class test_report(TransactionCase):
         last_balance = self.env.ref('core.comm').balance
         self.env.ref('money.other_get_60').other_money_done()
         tax_rate = self.env.ref('base.main_company').import_tax_rate
-        self.assertEqual(self.env.ref('core.comm').balance, last_balance + 60.0 * (1 + tax_rate * 0.01))
+        self.assertAlmostEqual(self.env.ref('core.comm').balance, last_balance + 60.0 * (1 + tax_rate * 0.01))
         # 生成转账单记录
         self.env.ref('money.transfer_300').money_transfer_done()
         # 执行向导
