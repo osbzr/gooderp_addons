@@ -50,10 +50,10 @@ class other_money_order(models.Model):
         return super(other_money_order, self).unlink()
 
     @api.one
-    @api.depends('line_ids.amount')
+    @api.depends('line_ids.amount', 'line_ids.tax_amount')
     def _compute_total_amount(self):
         # 计算应付金额/应收金额
-        self.total_amount = sum(line.amount for line in self.line_ids)
+        self.total_amount = sum((line.amount + line.tax_amount) for line in self.line_ids)
 
     state = fields.Selection([
                           ('draft', u'未审核'),
@@ -165,6 +165,12 @@ class other_money_order_line(models.Model):
             self.category_id = self.service.pay_categ_id.id
         self.amount = self.service.price
 
+    @api.one
+    @api.depends('amount', 'tax_rate')
+    def _compute_tax_amount(self):
+        '''当订单行的金额、税率改变时，改变税额'''
+        self.tax_amount = self.amount * self.tax_rate * 0.01
+
     other_money_id = fields.Many2one('other.money.order',
                                 u'其他收支', ondelete='cascade')
     service = fields.Many2one('service', u'服务', ondelete='restrict')
@@ -176,4 +182,9 @@ class other_money_order_line(models.Model):
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
     amount = fields.Float(u'金额',
                         digits_compute=dp.get_precision('Amount'))
+    tax_rate = fields.Float(u'税率(%)',
+                            default=lambda self:self.env.user.company_id.import_tax_rate)
+    tax_amount = fields.Float(u'税额', compute=_compute_tax_amount,
+                              store=True, readonly=True,
+                              digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
