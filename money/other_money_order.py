@@ -69,7 +69,7 @@ class other_money_order(models.Model):
     name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/')
     total_amount = fields.Float(string=u'金额', compute='_compute_total_amount',
                                 store=True, readonly=True,
-                                digits_compute=dp.get_precision('Amount'))
+                                digits=dp.get_precision('Amount'))
     bank_id = fields.Many2one('bank.account', string=u'结算账户',
                               required=True, ondelete='restrict',
                               readonly=True, states={'draft': [('readonly', False)]})
@@ -181,10 +181,10 @@ class other_money_order_line(models.Model):
                                 u'源单', ondelete='cascade')
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
     amount = fields.Float(u'金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)',
                             default=lambda self:self.env.user.company_id.import_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_tax_amount,
                               store=True, readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')

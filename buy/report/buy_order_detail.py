@@ -17,12 +17,12 @@ class buy_order_detail(models.Model):
     goods_id = fields.Many2one('goods', u'商品名称')
     attribute = fields.Char(u'属性')
     warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
-    qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
+    qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     uom = fields.Char(u'单位')
-    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
-    amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))  # 商品的购货金额
-    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
-    subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
+    price = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    amount = fields.Float(u'采购金额', digits=dp.get_precision('Amount'))  # 商品的购货金额
+    tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
     def init(self, cr):

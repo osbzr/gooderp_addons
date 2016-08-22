@@ -77,12 +77,12 @@ class sell_order(models.Model):
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES, 
                                    track_visibility='always',
-                                   digits_compute=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     amount = fields.Float(string=u'优惠后金额', store=True, readonly=True,
                         compute='_compute_amount', track_visibility='always',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     pre_receipt = fields.Float(u'预收款', states=READONLY_STATES,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
                                       ondelete='restrict')
     approve_uid = fields.Many2one('res.users', u'审核人', copy=False,
@@ -329,26 +329,26 @@ class sell_order_line(models.Model):
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
     quantity = fields.Float(u'数量', default=1,
-                            digits_compute=dp.get_precision('Quantity'))
+                            digits=dp.get_precision('Quantity'))
     quantity_out = fields.Float(u'已发货数量', copy=False,
-                                digits_compute=dp.get_precision('Quantity'))
+                                digits=dp.get_precision('Quantity'))
     price = fields.Float(u'销售单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits_compute=dp.get_precision('Amount'))
+                         digits=dp.get_precision('Amount'))
     price_taxed = fields.Float(u'含税单价',
-                               digits_compute=dp.get_precision('Amount'))
+                               digits=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额')
     amount = fields.Float(u'金额', compute=_compute_all_amount, 
                           store=True, readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)',default=lambda self:self.env.user.company_id.output_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, 
                               readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, 
                             store=True, readonly=True,
-                            digits_compute=dp.get_precision('Amount'))
+                            digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
     @api.one
@@ -443,22 +443,22 @@ class sell_delivery(models.Model):
     date_due = fields.Date(u'到期日期', copy=False, default=lambda self: fields.Date.context_today(self))
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
-                            digits_compute=dp.get_precision('Amount'))
+                            digits=dp.get_precision('Amount'))
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount, 
                           store=True, readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     partner_cost = fields.Float(u'客户承担费用',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     receipt = fields.Float(u'本次收款', states=READONLY_STATES,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
     bank_account_id = fields.Many2one('bank.account',
                                       u'结算账户', ondelete='restrict')
     debt = fields.Float(u'本次欠款', compute=_compute_all_amount, 
                         store=True, readonly=True, copy=False,
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     total_debt = fields.Float(u'总欠款', compute=_compute_all_amount, 
                               store=True, readonly=True, copy=False,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', 
                                     copy=False)
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
@@ -901,25 +901,25 @@ class sell_adjust_line(models.Model):
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
     quantity = fields.Float(u'调整数量', default=1,
-                            digits_compute=dp.get_precision('Quantity'))
+                            digits=dp.get_precision('Quantity'))
     price = fields.Float(u'销售单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits_compute=dp.get_precision('Amount'))
+                         digits=dp.get_precision('Amount'))
     price_taxed = fields.Float(u'含税单价',
-                               digits_compute=dp.get_precision('Amount'))
+                               digits=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额',
-                                   digits_compute=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     amount = fields.Float(u'金额', compute=_compute_all_amount,
                           store=True, readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
                             store=True, readonly=True,
-                            digits_compute=dp.get_precision('Amount'))
+                            digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
     @api.one

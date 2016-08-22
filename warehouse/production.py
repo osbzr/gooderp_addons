@@ -22,7 +22,7 @@ class wh_assembly(models.Model):
         'wh.bom', u'模板', domain=[('type', '=', 'assembly')],
         context={'type': 'assembly'}, ondelete='restrict')
     fee = fields.Float(
-        u'组装费用', digits_compute=dp.get_precision('Amount'))
+        u'组装费用', digits=dp.get_precision('Amount'))
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -208,7 +208,7 @@ class wh_disassembly(models.Model):
         'wh.bom', u'模板', domain=[('type', '=', 'disassembly')],
         context={'type': 'disassembly'}, ondelete='restrict')
     fee = fields.Float(
-        u'拆卸费用', digits_compute=dp.get_precision('Amount'))
+        u'拆卸费用', digits=dp.get_precision('Amount'))
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -406,4 +406,4 @@ class wh_bom_line(osv.osv):
         default=lambda self: self.env.context.get('type'))
     goods_id = fields.Many2one('goods', u'产品', default=1, ondelete='restrict')
     goods_qty = fields.Float(
-        u'数量', digits_compute=dp.get_precision('Quantity'))
+        u'数量', digits=dp.get_precision('Quantity'))

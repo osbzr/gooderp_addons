@@ -101,9 +101,9 @@ class partner(models.Model):
                                     domain=[('type', '=', 'supplier')],
                                     context={'type': 'supplier'})
     receivable = fields.Float(u'应收余额', readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     payable = fields.Float(u'应付余额', readonly=True,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
     tax_num = fields.Char(u'税务登记号')
     bank_name = fields.Char(u'开户行')
     bank_num = fields.Char(u'银行账号')
@@ -153,7 +153,7 @@ class goods(models.Model):
     conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
     cost = fields.Float(u'成本',
                         required=True,
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '产品不能重名')
@@ -249,7 +249,7 @@ class bank_account(models.Model):
     _name = 'bank.account'
     name = fields.Char(u'名称', required=True)
     balance = fields.Float(u'余额', readonly=True,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '账户不能重名')

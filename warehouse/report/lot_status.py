@@ -17,8 +17,8 @@ class report_lot_status(models.Model):
     status = fields.Char(u'状态')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')
-    qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
-    uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'))
+    qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
+    uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'))
 
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'report_lot_status')

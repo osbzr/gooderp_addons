@@ -16,14 +16,14 @@ class buy_summary_goods(models.Model):
     goods = fields.Char(u'商品名称')
     attribute = fields.Char(u'属性')
     warehouse_dest = fields.Char(u'仓库')
-    qty_uos = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'))
+    qty_uos = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'))
     uos = fields.Char(u'辅助单位')
-    qty = fields.Float(u'基本数量', digits_compute=dp.get_precision('Quantity'))
+    qty = fields.Float(u'基本数量', digits=dp.get_precision('Quantity'))
     uom = fields.Char(u'基本单位')
-    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
-    amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))
-    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
-    subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
+    price = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    amount = fields.Float(u'采购金额', digits=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''

@@ -136,8 +136,8 @@ class voucher_line(models.Model):
     account_id = fields.Many2one(
         'finance.account', u'会计科目',
         ondelete='restrict', required=True)
-    debit = fields.Float(u'借方金额', digits_compute=dp.get_precision(u'金额'))
-    credit = fields.Float(u'贷方金额', digits_compute=dp.get_precision(u'金额'))
+    debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'))
+    credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'))
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict')
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     auxiliary_id = fields.Many2one(
