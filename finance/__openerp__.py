@@ -21,7 +21,9 @@
         'trial_balance.xml',
         'report/report_voucher.xml',
         'balance_sheet.xml',
-
+        'asset.xml',
+        'data/asset_data.xml',
+        'before_account.xml',
     ],
     'demo': [
         'tests/finance_demo.xml',

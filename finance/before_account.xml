@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+        <!--初始化会计凭证-->
+		<menuitem id='before_account_home_menu' name='初始化' parent='finance_menu' sequence='20'/>
+
+		<record id='before_account_tree' model='ir.ui.view'>
+			<field name='name'>before_account.tree</field>
+			<field name='model'>before.account</field>
+			<field name='arch' type='xml'>
+				<tree string='会计初始化凭证'>
+                    <field name='name' string = "摘要"/>
+                    <field name='date'/>
+					<field name='period_id'/>
+				</tree>
+			</field>
+		</record>
+
+        <record id='before_account_form' model='ir.ui.view'>
+			<field name='name'>before_account.form</field>
+			<field name='model'>before.account</field>
+			<field name='arch' type='xml'>
+                <form string="会计初始化凭证证">
+	                <header>
+	                	<button name='asset_done' states="draft" string="审核" type="object" class="oe_highlight"/>
+                        <button name='before_asset' states="draft" string="引入固定资产" type="object" class="oe_highlight"/>
+                        <button name='before_warehouse' states="draft" string="引入物料库存" type="object" class="oe_highlight"/>
+                        <button name='before_partner' states="draft" string="引入应收应付" type="object" class="oe_highlight"/>
+                        <button name='before_capital' states="draft" string="引入资金" type="object" class="oe_highlight"/>
+	                	<button name='asset_draft' states="done" string="反审核" type="object"/>
+	                    <field name="state" widget="statusbar" readonly="1"/>
+	                </header>
+			    	<sheet>
+                        <group>
+                            <group>
+                                <field name='name' string = "摘要"/>
+                                <field name="date"/>
+                                <field name="period_id"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="初始明细行">
+                                <field name="line_ids">
+                                     <tree string="初始明细行" editable="bottom">
+                                         <field name="account_id"/>
+                                         <field name="partner_id"/>
+                                         <field name="debit" sum="借方合计"/>
+                                         <field name="credit" sum="贷方合计"/>
+                                         <field name="cate" string="来源" />
+                                     </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+        <record id="before_account_home_action" model="ir.actions.act_window">
+            <field name="name">会计初始化凭证</field>
+            <field name="res_model">before.account</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id='before_account' action='before_account_home_action' parent='before_account_home_menu' sequence='10'/>
+
+        <record id="warehouse_tree" model="ir.ui.view">
+            <field name="name">warehouse.tree</field>
+            <field name="model">warehouse</field>
+            <field name="inherit_id" ref="warehouse.warehouse_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="account_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="bank_account_tree" model="ir.ui.view">
+            <field name="name">bank.account.tree</field>
+            <field name="model">bank.account</field>
+            <field name="inherit_id" ref="core.bank_account_tree"/>
+            <field name="arch" type="xml">
+                <field name="balance" position="after">
+                    <field name="before"/>
+                </field>
+            </field>
+        </record>
+
+	</data>
+</openerp>

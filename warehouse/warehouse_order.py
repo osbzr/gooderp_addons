@@ -75,6 +75,7 @@ class wh_in(models.Model):
     type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
                                 store=True, readonly=True, digits=dp.get_precision('Amount'))
+    before = fields.Boolean(u'初始化')
 
     @api.multi
     @inherits()
