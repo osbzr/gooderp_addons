@@ -23,6 +23,7 @@ class sell_order_detail(models.Model):
     amount = fields.Float(u'销售收入', digits_compute=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
+    margin = fields.Float(u'毛利', digits_compute=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
     def init(self, cr):
@@ -50,6 +51,8 @@ class sell_order_detail(models.Model):
                         ELSE - wml.tax_amount END) AS tax_amount,
                     (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.subtotal
                         ELSE - wml.subtotal END) AS subtotal,
+                    (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                        ELSE - wml.goods_qty END) * (wml.price - wml.cost) AS margin,
                     wml.note AS note
 
                 FROM wh_move_line AS wml
@@ -68,7 +71,7 @@ class sell_order_detail(models.Model):
 
                 GROUP BY wm.date, wm.name, origin, staff_id, partner_id,
                     goods_code, goods.id, attribute, wh.id, uom,
-                    qty, wml.price, wml.amount, tax_amount, subtotal, wml.note
+                    qty, wml.price, wml.amount, tax_amount, subtotal, margin, wml.note
                 )
         """)
 
