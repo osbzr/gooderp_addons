@@ -31,6 +31,7 @@ MONTH_SELECTION = [
 class voucher(models.Model):
     '''新建凭证'''
     _name = 'voucher'
+    _inherit = ['mail.thread']
     _order = 'period_id , name desc'
 
     @api.model
@@ -51,17 +52,20 @@ class voucher(models.Model):
     document_word_id = fields.Many2one(
         'document.word', u'凭证字', ondelete='restrict', required=True,
         default=lambda self: self.env.ref('finance.document_word_1'))
-    date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date)
-    name = fields.Char(u'凭证号')
+    date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date,
+                       track_visibility = 'always')
+    name = fields.Char(u'凭证号', track_visibility='always')
     att_count = fields.Integer(u'附单据', default=1)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
-    amount_text = fields.Float(u'总计', compute='_compute_amount', store=True)
+    amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
+                               track_visibility='always')
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核')], u'状态', default='draft')
+                              ('done', u'已审核')], u'状态', default='draft',
+                             track_visibility='always')
     is_checkout = fields.Boolean(u'结账凭证')
 
     @api.one
