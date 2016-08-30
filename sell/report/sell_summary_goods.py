@@ -39,10 +39,14 @@ class sell_summary_goods(models.Model):
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
                     ELSE - wml.goods_qty END) AS qty,
                 uom.name AS uom,
-                SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
-                    ELSE - wml.amount END)
-                    / SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
-                    ELSE - wml.goods_qty END) AS price,
+                (CASE WHEN SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                    ELSE - wml.goods_qty END) = 0 THEN 0
+                ELSE
+                    SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
+                        ELSE - wml.amount END)
+                        / SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                        ELSE - wml.goods_qty END)
+                END) AS price,
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
                     ELSE - wml.amount END) AS amount,
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.tax_amount
