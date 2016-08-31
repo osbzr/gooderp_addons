@@ -195,6 +195,13 @@ class report_base(models.Model):
 
         return result
 
+    @api.model
+    def search_count(self, domain):
+        result = self.get_data_from_cache(sql_type='out')
+        result = self._compute_domain(result, domain)
+
+        return len(result)
+
     @api.multi
     def read(self, fields=None, context=None, load='_classic_read'):
         res = []
