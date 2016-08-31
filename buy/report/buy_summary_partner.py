@@ -44,10 +44,14 @@ class buy_summary_partner(models.Model):
                 SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.goods_qty
                     ELSE - wml.goods_qty END) AS qty,
                 uom.name AS uom,
-                SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.amount
-                    ELSE - wml.amount END)
-                    / SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.goods_qty
-                    ELSE - wml.goods_qty END) AS price,
+                (CASE WHEN SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.goods_qty
+                    ELSE - wml.goods_qty END) = 0 THEN 0
+                ELSE
+                    SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.amount
+                        ELSE - wml.amount END)
+                        / SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.goods_qty
+                        ELSE - wml.goods_qty END)
+                END) AS price,
                 SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.amount
                     ELSE - wml.amount END) AS amount,
                 SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.tax_amount
