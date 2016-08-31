@@ -24,11 +24,13 @@ class ReportDocx(report_sxw):
             cr, uid, [('report_name', '=', self.name[7:])], context=context)
 
         if report_ids:
-            report_xml = report_obj.browse(
+            report_obj = report_obj.browse(
                 cr, uid, report_ids[0], context=context)
-            self.title = report_xml.name
-            if report_xml.report_type == 'docx':
+            self.title = report_obj.name
+            if report_obj.report_type == 'docx':
+                self.model = self.pool.get(report_obj.report_name).browse(cr, uid, ids, context=context)
                 return self.create_source_docx(cr, uid, ids, context)
+
         return super(ReportDocx, self).create(cr, uid, ids, data, context)
 
     def create_source_docx(self, cr, uid, ids, context=None):
