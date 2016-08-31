@@ -175,7 +175,12 @@ class TestReport(TransactionCase):
             (u'键鼠套装', u'总仓', 0, 96),
         ]
         results = stock_transceive.with_context(context).search_read(domain=[])
+        length = stock_transceive.with_context(context).search_count(domain=[])
         self.assertEqual(len(results), len(real_results))
+        self.assertEqual(len(results), length)
+
+        instance = stock_transceive.with_context(context).browse(results[0].get('id'))
+        self.assertEqual(instance.read(['warehouse'])[0].get('warehouse'), results[0].get('warehouse'))
 
         for result in results:
             result = (

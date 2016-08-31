@@ -37,7 +37,7 @@
 							</group>
 							<group>
 	            				<div>
-	            					<field name='image' widget='image' 
+	            					<field name='image' widget='image'
 	            						class="oe_right oe_avatar"
 	            						options='{"preview_image": "image", "size": [500, 500]}'/>
 	            				</div>
@@ -74,7 +74,7 @@
 					<field name='code'/>
 					<field name='category_id'/>
 					<group expand="0" string="分组">
-                        <filter string="产品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
+                        <filter string="产品类别" domain="[]" context="{'group_by':'category_id'}"/>
                     </group>
 				</search>
 			</field>
