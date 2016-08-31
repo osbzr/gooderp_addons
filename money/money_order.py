@@ -79,7 +79,7 @@ class money_order(models.Model):
     note = fields.Text(string=u'备注')
     discount_amount = fields.Float(string=u'整单折扣', readonly=True,
                                    states={'draft': [('readonly', False)]},
-                                   digits_compute=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收付款单行', readonly=True,
                                states={'draft': [('readonly', False)]})
@@ -89,16 +89,16 @@ class money_order(models.Model):
     type = fields.Selection(TYPE_SELECTION, string=u'类型',
                             default=lambda self: self._context.get('type'))
     amount = fields.Float(string=u'总金额', compute='_compute_advance_payment',
-                          digits_compute=dp.get_precision('Amount'),
+                          digits=dp.get_precision('Amount'),
                           store=True, readonly=True)
     advance_payment = fields.Float(string=u'本次预收/付款',
                                    compute='_compute_advance_payment',
-                                   digits_compute=dp.get_precision('Amount'),
+                                   digits=dp.get_precision('Amount'),
                                    store=True, readonly=True)
     to_reconcile = fields.Float(string=u'未核销预收款',
-                                digits_compute=dp.get_precision('Amount'))
+                                digits=dp.get_precision('Amount'))
     reconciled = fields.Float(string=u'已核销预收款',
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     origin_name = fields.Char(u'来源单号')
     bank_name = fields.Char(u'开户行')
     bank_num = fields.Char(u'银行账号')
@@ -230,7 +230,7 @@ class money_order_line(models.Model):
     bank_id = fields.Many2one('bank.account', string=u'结算账户',
                               required=True, ondelete='restrict')
     amount = fields.Float(string=u'金额',
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     mode_id = fields.Many2one('settle.mode', string=u'结算方式',
                               ondelete='restrict')
     number = fields.Char(string=u'结算号')
@@ -256,13 +256,13 @@ class money_invoice(models.Model):
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self))
     amount = fields.Float(string=u'单据金额', readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     reconciled = fields.Float(string=u'已核销金额', readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     to_reconcile = fields.Float(string=u'未核销金额', readonly=True,
-                                digits_compute=dp.get_precision('Amount'))
+                                digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
     date_due = fields.Date(string=u'到期日')
@@ -320,13 +320,13 @@ class source_order_line(models.Model):
                                   required=True, ondelete='restrict')
     date = fields.Date(string=u'单据日期')
     amount = fields.Float(string=u'单据金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     reconciled = fields.Float(string=u'已核销金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     to_reconcile = fields.Float(string=u'未核销金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     this_reconcile = fields.Float(string=u'本次核销金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     date_due = fields.Date(string=u'到期日')
 
 
@@ -548,13 +548,13 @@ class advance_payment(models.Model):
                     copy=False, required=True, ondelete='cascade')
     date = fields.Date(string=u'单据日期')
     amount = fields.Float(string=u'单据金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     reconciled = fields.Float(string=u'已核销金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     to_reconcile = fields.Float(string=u'未核销金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     this_reconcile = fields.Float(string=u'本次核销金额',
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
 
 
 class cost_line(models.Model):
@@ -569,5 +569,5 @@ class cost_line(models.Model):
                                   domain="[('type', '=', 'other_pay')]")
     amount = fields.Float(u'金额',
                           required=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')

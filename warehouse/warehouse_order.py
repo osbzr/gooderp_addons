@@ -22,7 +22,7 @@ class wh_out(models.Model):
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
     type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits_compute=dp.get_precision('Amount'))
+                                store=True, readonly=True, digits=dp.get_precision('Amount'))
 
     @api.multi
     @inherits(res_back=False)
@@ -74,7 +74,7 @@ class wh_in(models.Model):
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
     type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits_compute=dp.get_precision('Amount'))
+                                store=True, readonly=True, digits=dp.get_precision('Amount'))
 
     @api.multi
     @inherits()
@@ -121,7 +121,7 @@ class wh_internal(osv.osv):
 
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits_compute=dp.get_precision('Amount'))
+                                store=True, readonly=True, digits=dp.get_precision('Amount'))
 
     @api.multi
     @inherits()

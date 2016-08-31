@@ -16,13 +16,13 @@ class popup_wizard(models.TransientModel):
         active_id = self.env.context.get('active_id')
         active_model = self.env.context.get('active_model')
         if method == 'goods_inventery':
-            self.goods_inventery(vals)
-            self.env[active_model].browse(active_id).sell_delivery_done()
+            self.goods_inventery(vals, active_model, active_id)
     
     @api.one
-    def goods_inventery(self, vals):
+    def goods_inventery(self, vals, active_model, active_id):
         auto_in = self.env['wh.in'].create(vals)
         auto_in.approve_order()
+        self.env[active_model].browse(active_id).sell_delivery_done()
 
 
 

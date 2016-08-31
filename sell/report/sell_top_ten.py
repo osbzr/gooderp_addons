@@ -11,8 +11,8 @@ class sell_top_ten(models.Model):
 
     goods = fields.Char(u'商品名称')
     warehouse = fields.Char(u'仓库')
-    qty = fields.Float(u'基本数量', digits_compute=dp.get_precision('Quantity'))
-    amount = fields.Float(u'销售收入', digits_compute=dp.get_precision('Amount'))
+    qty = fields.Float(u'基本数量', digits=dp.get_precision('Quantity'))
+    amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
