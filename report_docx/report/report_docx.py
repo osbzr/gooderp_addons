@@ -63,6 +63,8 @@ class ReportDocx(report_sxw):
             The return value of this module should be a list with
             report data.
         """
+
+        return self.model
         return [{}]
 
     def _generate_reports(
@@ -181,7 +183,7 @@ class ReportDocx(report_sxw):
             template_path, base64.b64decode(action.template_file.datas))
 
         doc = DocxTemplate(template_path)
-        doc.render(data)
+        doc.render({'obj': data})
         doc.save(convert_path)
 
     def _convert_docx_to_pdf(
