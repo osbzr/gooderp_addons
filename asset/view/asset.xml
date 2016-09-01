@@ -2,7 +2,9 @@
 <openerp>
 	<data>
         <!--固定资产-->
-		<menuitem id='asset_home_menu' name='固定资产' parent='finance_menu' sequence='15'/>
+        <menuitem id='account_asset_menu' name='资产管理'/>
+
+		<menuitem id='asset_home_menu' name='固定资产' parent='account_asset_menu' sequence='15'/>
 
 		<record id='asset_tree' model='ir.ui.view'>
 			<field name='name'>asset.tree</field>
@@ -14,10 +16,10 @@
 					<field name='name'/>
 					<field name='cost'/>
 					<field name='tax'/>
-					<field name='surplus_value'/>
 					<field name='no_depreciation'/>
 					<field name='depreciation_number'/>
 					<field name='attribute'/>
+                    <field name='state'/>
 				</tree>
 			</field>
 		</record>
@@ -35,7 +37,7 @@
                             <field name="period_id"/>
                             <field name="clean_cost"/>
                             <field name="residual_income"/>
-                            <field name="account_income"/>
+                            <field name="bank_account"/>
                             <field name="sell_tax_amount"/>
                         </group>
                     </group>
@@ -68,13 +70,12 @@
             	<form>
             		<group>
                         <group>
-                            <field name="date"/>
+                            <field name="chang_date"/>
                             <field name="period_id"/>
                             <field name="chang_cost"/>
                             <field name="chang_depreciation_number"/>
                             <field name="chang_tax"/>
-                            <field name="chang_account"/>
-                            <field name="partner_id"/>
+                            <field name="chang_partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
                         </group>
                     </group>
 
@@ -120,16 +121,16 @@
                                 <field name="period_id"/>
                             </group>
                             <group>
-                                <field name="partner_id"/>
+                                <field name="partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                                <field name="bank_account"/>
                                 <field name="no_depreciation"/>
                                 <field name="other_system" groups='core.master_groups'/>
                                 <field name="attribute"/>
                             </group>
                             <group>
-                                <field name="goods_id"/>
                                 <field name="cost"/>
                                 <field name="tax"/>
-                                <field name="money"/>
+                                <field name="amount"/>
                                 <field name="depreciation_value2"/>
                                 <field name="surplus_value"/>
                                 <field name="depreciation_number"/>
