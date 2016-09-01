@@ -331,6 +331,7 @@ class CreateChangWizard(models.TransientModel):
                                            'chang_after':asset.cost,'chang_name':u'原值变更','order_id':asset.id
             })
         asset.depreciation_number = asset.depreciation_number + self.chang_depreciation_number
+        asset.depreciation_value = asset.depreciation_value + asset.attribute.depreciation_value * self.chang_cost / 100
         if self.chang_depreciation_number:
             self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,'chang_before':chang_before_depreciation_number,
                                            'chang_after':asset.depreciation_number,'chang_name':u'折旧期间变更','order_id':asset.id
