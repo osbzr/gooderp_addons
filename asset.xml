@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+        <!--固定资产-->
+        <menuitem id='account_asset_menu' name='资产管理'/>
+
+		<menuitem id='asset_home_menu' name='固定资产' parent='account_asset_menu' sequence='15'/>
+
+		<record id='asset_tree' model='ir.ui.view'>
+			<field name='name'>asset.tree</field>
+			<field name='model'>asset</field>
+			<field name='arch' type='xml'>
+				<tree string='固定资产'>
+                    <field name='code'/>
+                    <field name='date'/>
+					<field name='name'/>
+					<field name='cost'/>
+					<field name='tax'/>
+					<field name='no_depreciation'/>
+					<field name='depreciation_number'/>
+					<field name='attribute'/>
+                    <field name='state'/>
+				</tree>
+			</field>
+		</record>
+
+                <!--固定资产清理-->
+
+        <record id="create_clean_wizard_form" model="ir.ui.view">
+            <field name="name">create.clean.wizard</field>
+            <field name="model">create.clean.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+                        <group>
+                            <field name="date"/>
+                            <field name="period_id"/>
+                            <field name="clean_cost"/>
+                            <field name="residual_income"/>
+                            <field name="bank_account"/>
+                            <field name="sell_tax_amount"/>
+                        </group>
+                    </group>
+
+					<button name="create_clean_account"  string="生成清理凭证" type="object" class="oe_highlight"/>
+                    或者
+                    <button string="取消" class="oe_link" special="cancel"/>
+            	</form>
+            </field>
+        </record>
+
+
+        <record id="create_clean_action" model="ir.actions.act_window">
+            <field name="name">固定资产清理</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">create.clean.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="create_clean_wizard_form"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+
+        <!--固定资产变更-->
+
+        <record id="create_chang_wizard_form" model="ir.ui.view">
+            <field name="name">create.chang.wizard</field>
+            <field name="model">create.chang.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+                        <group>
+                            <field name="chang_date"/>
+                            <field name="period_id"/>
+                            <field name="chang_cost"/>
+                            <field name="chang_depreciation_number"/>
+                            <field name="chang_tax"/>
+                            <field name="chang_partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                        </group>
+                    </group>
+
+					<button name="create_chang_account"  string="生成变更凭证" type="object" class="oe_highlight"/>
+                    或者
+                    <button string="取消" class="oe_link" special="cancel"/>
+            	</form>
+            </field>
+        </record>
+
+
+        <record id="create_chang_action" model="ir.actions.act_window">
+            <field name="name">固定资产变更</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">create.chang.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="create_chang_wizard_form"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+
+        <record id='asset_form' model='ir.ui.view'>
+			<field name='name'>asset.form</field>
+			<field name='model'>asset</field>
+			<field name='arch' type='xml'>
+                <form string="固定资产">
+	                <header>
+	                	<button name='asset_done' states="draft" string="审核" type="object" class="oe_highlight"/>
+	                	<button name='asset_draft' states="done" string="反审核" type="object"/>
+                        <button name="%(create_clean_action)d" string="清理固定资产" type="action" class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                        <button name="%(create_chang_action)d" string="变更固定资产" type="action" class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'done')]}"/>
+	                    <field name="state" widget="statusbar" readonly="1"/>
+	                </header>
+			    	<sheet>
+                        <group>
+                            <group>
+                                <field name='code'/>
+                                <field name="date"/>
+                                <field name="name"/>
+                                <field name="period_id"/>
+                            </group>
+                            <group>
+                                <field name="partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                                <field name="bank_account"/>
+                                <field name="no_depreciation"/>
+                                <field name="other_system" groups='core.master_groups'/>
+                                <field name="attribute"/>
+                            </group>
+                            <group>
+                                <field name="cost"/>
+                                <field name="tax"/>
+                                <field name="amount"/>
+                                <field name="depreciation_value2"/>
+                                <field name="surplus_value"/>
+                                <field name="depreciation_number"/>
+                                <field name="depreciation_value"/>
+                            </group>
+                            <group>
+                                <field name="account_asset"/>
+                                <field name="account_credit"/>
+                                <field name="account_depreciation"/>
+                                <field name="account_depreciation2"/>
+                                <field name="cost_depreciation"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="折旧明细行">
+                                <field name="line_ids">
+                                     <tree string="折旧行" editable="bottom" create='0'>
+                                         <field name="date"/>
+                                         <field name="period_id"/>
+                                         <field name="cost_depreciation" sum="合计折旧"/>
+                                     </tree>
+                                </field>
+                            </page>
+                            <page string="变更明细">
+                                 <field name="chang_ids">
+                                      <tree string="变更明细" editable="bottom" create='0'>
+                                          <field name="date"/>
+                                          <field name="period_id"/>
+                                          <field name="chang_name"/>
+                                          <field name="chang_before"/>
+                                          <field name="chang_after"/>
+                                          <field name="create_uid" string="变更人"/>
+                                      </tree>
+                                 </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+        <record id="asset_action" model="ir.actions.act_window">
+            <field name="name">固定资产</field>
+            <field name="res_model">asset</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id='asset_line_tree' model='ir.ui.view'>
+			<field name='name'>asset.line.tree</field>
+			<field name='model'>asset.line</field>
+			<field name='arch' type='xml'>
+				<tree string='固定资产折旧明细' create='0'>
+                    <field name='code'/>
+					<field name='name'/>
+					<field name='period_id'/>
+					<field name='cost_depreciation' string="本期折旧额"/>
+					<field name='no_depreciation'/>
+				</tree>
+			</field>
+		</record>
+
+        <record id="asset_line_tree_filter" model="ir.ui.view">
+            <field name="name">asset.line.select</field>
+            <field name="model">asset.line</field>
+            <field name="arch" type="xml">
+                <search string="固定资产折旧分类">
+                    <field name="period_id"/>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <group expand="0" string="Group By">
+                        <filter string="固定资产名称" domain="[]" context="{'group_by':'name'}"/>
+                        <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+
+
+        <record id="asset_line_action" model="ir.actions.act_window">
+            <field name="name">固定资产折旧明细</field>
+            <field name="res_model">asset.line</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='asset_menu' action='asset_action' parent='asset_home_menu' sequence='10'/>
+
+
+        <menuitem id='asset_line_menu' action='asset_line_action' parent='asset_home_menu' sequence='10'/>
+
+
+        <!--固定资产折旧-->
+
+        <record id="create_depreciation_wizard_form" model="ir.ui.view">
+            <field name="name">create.depreciation.wizard.form</field>
+            <field name="model">create.depreciation.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+                        <group>
+                            <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 30%%"/>
+                        </group>
+                    </group>
+
+					<button name="create_depreciation"  string="查看折旧明细表" type="object" class="oe_highlight"/>
+                    或者
+                    <button string="取消" class="oe_link" special="cancel"/>
+            	</form>
+            </field>
+        </record>
+
+      <act_window id="create_depreciation_action"
+        name='固定资产折旧'
+        res_model="create.depreciation.wizard"
+        multi="True"
+        view_type="form"
+        view_mode="form"
+        target="new"
+        />
+
+        <menuitem id='create_depreciation_menu' action='create_depreciation_action' parent='asset_home_menu' sequence='22'/>
+
+
+	</data>
+</openerp>

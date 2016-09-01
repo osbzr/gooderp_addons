@@ -339,6 +339,7 @@
                                 <field name='type' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='warehouse_dest_id'/>
                                 <field name='warehouse_id' invisible='1'/>
+                                <field name='before'/>
                             </group>
                         </group>
 
