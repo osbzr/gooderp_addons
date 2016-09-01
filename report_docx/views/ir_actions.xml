@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="act_report_xml_view" model="ir.ui.view">
+            <field name="name">ir.actions.report.xml.template</field>
+            <field name="model">ir.actions.report.xml</field>
+            <field name="inherit_id" ref="base.act_report_xml_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='attachment']" position="after">
+                    <field name="template_file" attrs="{'invisible':[('report_type','!=', 'docx')]}"/>
+                    <field name="output_type" attrs="{'invisible':[('report_type','!=', 'docx')]}"/>
+                    <field name="watermark_string" attrs="{'invisible':['|', ('report_type','!=', 'docx'), ('output_type','=','docx')]}"/>
+                    <field name="watermark_template" attrs="{'invisible':['|',('report_type','!=', 'docx'), ('output_type','=','docx')]}"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>
