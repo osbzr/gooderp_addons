@@ -24,6 +24,7 @@ class sell_summary_staff(models.Model):
     amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
+    margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
@@ -53,7 +54,10 @@ class sell_summary_staff(models.Model):
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.tax_amount
                     ELSE - wml.tax_amount END) AS tax_amount,
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.subtotal
-                    ELSE - wml.subtotal END) AS subtotal
+                    ELSE - wml.subtotal END) AS subtotal,
+                (SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
+                    ELSE - wml.amount END) - SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                    ELSE - wml.goods_qty END) * wml.cost) AS margin
         '''
 
     def from_sql(self, sql_type='out'):
@@ -95,7 +99,7 @@ class sell_summary_staff(models.Model):
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY staff,goods_code,goods,attribute,warehouse,uos,uom
+        GROUP BY staff,goods_code,goods,attribute,warehouse,uos,uom,wml.cost
         '''
 
     def order_sql(self, sql_type='out'):

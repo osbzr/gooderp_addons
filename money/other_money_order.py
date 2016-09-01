@@ -27,8 +27,8 @@ class other_money_order(models.Model):
     _description = u'其他收入/其他支出'
 
     TYPE_SELECTION = [
-        ('other_pay', u'其他收入'),
-        ('other_get', u'其他支出'),
+        ('other_pay', u'其他支出'),
+        ('other_get', u'其他收入'),
     ]
 
     @api.model

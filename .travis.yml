@@ -22,6 +22,7 @@ install:
   - travis_install_nightly
   - pip install xlrd
   - pip install xlutils
+  - pip install docxtpl
 
 script:
   - travis_run_tests
