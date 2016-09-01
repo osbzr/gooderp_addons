@@ -71,7 +71,7 @@ class sell_order_detail(models.Model):
 
                 GROUP BY wm.date, wm.name, origin, staff_id, partner_id,
                     goods_code, goods.id, attribute, wh.id, uom,
-                    qty, wml.price, wml.amount, tax_amount, subtotal, margin, wml.note
+                    qty, wml.price, wml.amount, wml.cost, tax_amount, subtotal, margin, wml.note
                 )
         """)
 
