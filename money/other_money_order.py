@@ -165,9 +165,8 @@ class other_money_order_line(models.Model):
             self.category_id = self.service.pay_categ_id.id
         self.amount = self.service.price
 
-    @api.one
-    @api.depends('amount', 'tax_rate')
-    def _compute_tax_amount(self):
+    @api.onchange('amount', 'tax_rate')
+    def onchange_tax_amount(self):
         '''当订单行的金额、税率改变时，改变税额'''
         self.tax_amount = self.amount * self.tax_rate * 0.01
 
@@ -184,7 +183,6 @@ class other_money_order_line(models.Model):
                         digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)',
                             default=lambda self:self.env.user.company_id.import_tax_rate)
-    tax_amount = fields.Float(u'税额', compute=_compute_tax_amount,
-                              store=True, readonly=True,
+    tax_amount = fields.Float(u'税额',
                               digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')

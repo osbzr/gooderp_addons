@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['base', 'mail'],
+    'depends': ['base'],
     'demo': [
              'tests/staff_demo.xml'
         ],
