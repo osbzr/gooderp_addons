@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<openerp>
+    <data >
+        <record id="small_business_chart160101" model='finance.account'>
+            <field name='code'>1601</field>
+            <field name='name'>固定资产</field>
+            <field name='costs_types'>assets</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="small_business_chart410101" model='finance.account'>
+            <field name='code'>410101</field>
+            <field name='name'>制造费用－折旧费</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="small_business_chart530101" model='finance.account'>
+            <field name='code'>530101</field>
+            <field name='name'>营业外收入－固定资产清理</field>
+            <field name='costs_types'>in</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart571101" model='finance.account'>
+            <field name='code'>571101</field>
+            <field name='name'>营业外支出－固定资产清理</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="small_business_chart170101" model='finance.account'>
+            <field name='code'>170101</field>
+            <field name='name'>无形资产-土地</field>
+            <field name='costs_types'>assets</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="small_business_chart170201" model='finance.account'>
+            <field name='code'>170201</field>
+            <field name='name'>累计摊销－土地</field>
+            <field name='costs_types'>assets</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='small_business_chart5602022' model='finance.account'>
+            <field name='code'>5602022</field>
+            <field name='name'>管理费用-土地摊销</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
+
+        <!-- 固定资产分类 -->
+        <record id="machinery_equipment" model='asset.category'>
+            <field name='name'>机器设备</field>
+            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='small_business_chart160101'/>
+            <field name='account_depreciation' ref='small_business_chart410101'/>
+            <field name='depreciation_number'>120</field>
+            <field name='depreciation_value'>5</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="transport_tool" model='asset.category'>
+            <field name='name'>运输工具</field>
+            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='small_business_chart160101'/>
+            <field name='account_depreciation' ref='small_business_chart410101'/>
+            <field name='depreciation_number'>48</field>
+            <field name='depreciation_value'>5</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="electronic_equipment" model='asset.category'>
+            <field name='name'>电子设备</field>
+            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='small_business_chart160101'/>
+            <field name='account_depreciation' ref='small_business_chart410101'/>
+            <field name='depreciation_number'>48</field>
+            <field name='depreciation_value'>5</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="production_tool" model='asset.category'>
+            <field name='name'>生产工具</field>
+            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='small_business_chart160101'/>
+            <field name='account_depreciation' ref='small_business_chart410101'/>
+            <field name='depreciation_number'>60</field>
+            <field name='depreciation_value'>5</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="office_furniture" model='asset.category'>
+            <field name='name'>办公家具</field>
+            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='small_business_chart160101'/>
+            <field name='account_depreciation' ref='small_business_chart410101'/>
+            <field name='depreciation_number'>60</field>
+            <field name='depreciation_value'>5</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="house" model='asset.category'>
+            <field name='name'>房屋</field>
+            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='small_business_chart160101'/>
+            <field name='account_depreciation' ref='small_business_chart410101'/>
+            <field name='depreciation_number'>240</field>
+            <field name='depreciation_value'>5</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="no_tax_house" model='asset.category'>
+            <field name='name'>非房产税房产</field>
+            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='small_business_chart160101'/>
+            <field name='account_depreciation' ref='small_business_chart410101'/>
+            <field name='depreciation_number'>240</field>
+            <field name='depreciation_value'>5</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="land" model='asset.category'>
+            <field name='name'>土地</field>
+            <field name='account_depreciation2' ref='small_business_chart170201'/>
+            <field name='account_asset' ref='small_business_chart170101'/>
+            <field name='account_depreciation' ref='small_business_chart5602022'/>
+            <field name='depreciation_number'>600</field>
+            <field name='depreciation_value'>0</field>
+            <field name='clean_income' ref='small_business_chart530101'/>
+            <field name='clean_costs' ref='small_business_chart571101'/>
+        </record>
+        <record id="asset" model='core.category'>
+            <field name='name'>固定资产</field>
+            <field name='account_id' ref='small_business_chart160101'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="asset_clean_get" model='core.category'>
+            <field name='name'>固定资产清理收入</field>
+            <field name='account_id' ref='small_business_chart530101'/>
+            <field name='type'>other_get</field>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="asset_clean_pay" model='core.category'>
+            <field name='name'>固定资产清理费用</field>
+            <field name='account_id' ref='small_business_chart571101'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
+    </data>
+</openerp>
