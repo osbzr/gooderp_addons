@@ -22,6 +22,7 @@ class buy_order_track_wizard(models.TransientModel):
     partner_id = fields.Many2one('partner', u'供应商')
     goods_id = fields.Many2one('goods', u'商品')
     order_id = fields.Many2one('buy.order', u'订单号')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
@@ -40,6 +41,8 @@ class buy_order_track_wizard(models.TransientModel):
             domain.append(('order_id.partner_id', '=', self.partner_id.id))
         if self.order_id:
             domain.append(('order_id.id', '=', self.order_id.id))
+        if self.warehouse_dest_id:
+            domain.append(('order_id.warehouse_dest_id', '=', self.warehouse_dest_id.id))
 
         index = 0
         sum_qty = sum_amount = sum_not_in = 0   # 数量、金额、未入库数量合计
@@ -91,6 +94,7 @@ class buy_order_track_wizard(models.TransientModel):
                 'date': line.order_id.date,
                 'order_name': line.order_id.name,
                 'partner_id': line.order_id.partner_id.id,
+                'warehouse_dest_id': line.order_id.warehouse_dest_id.id,
                 'goods_state': line.order_id.goods_state,
                 'qty': qty,
                 'amount': amount,

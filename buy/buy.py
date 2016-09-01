@@ -53,13 +53,13 @@ class vendor_goods(models.Model):
         ondelete='cascade',
     )
     
-    price = fields.Float(u'供货价', digits_compute=dp.get_precision('Amount'))
+    price = fields.Float(u'供货价', digits=dp.get_precision('Amount'))
     
     code = fields.Char(u'供应商产品编号')
 
     name = fields.Char(u'供应商产品名称')
 
-    min_qty = fields.Float(u'最低订购量', digits_compute=dp.get_precision('Quantity'))
+    min_qty = fields.Float(u'最低订购量', digits=dp.get_precision('Quantity'))
     
 
 class partner(models.Model):
@@ -139,15 +139,15 @@ class buy_order(models.Model):
                                states=READONLY_STATES, copy=True)
     note = fields.Text(u'备注')
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
-                                 digits_compute=dp.get_precision('Amount'))
+                                 digits=dp.get_precision('Amount'))
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                                    track_visibility='always',
-                                   digits_compute=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     amount = fields.Float(u'优惠后金额', store=True, readonly=True,
                           compute='_compute_amount', track_visibility='always',
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     prepayment = fields.Float(u'预付款', states=READONLY_STATES,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
                                       ondelete='restrict')
     approve_uid = fields.Many2one('res.users', u'审核人',
@@ -218,7 +218,7 @@ class buy_order(models.Model):
             raise except_orm(u'错误', u'请输入产品明细行！')
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
-                raise except_orm(u'错误', u'产品数量和产品含税单价不能小于0！')
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         if self.bank_account_id and not self.prepayment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.prepayment:
@@ -417,40 +417,48 @@ class buy_order_line(models.Model):
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
     quantity = fields.Float(u'数量', default=1,
-                            digits_compute=dp.get_precision('Quantity'))
+                            digits=dp.get_precision('Quantity'))
     quantity_in = fields.Float(u'已执行数量', copy=False,
-                               digits_compute=dp.get_precision('Quantity'))
+                               digits=dp.get_precision('Quantity'))
     price = fields.Float(u'购货单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits_compute=dp.get_precision('Amount'))
+                         digits=dp.get_precision('Amount'))
     price_taxed = fields.Float(u'含税单价',
-                               digits_compute=dp.get_precision('Amount'))
+                               digits=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额',
-                                   digits_compute=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     amount = fields.Float(u'金额', compute=_compute_all_amount,
                           store=True, readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
                             store=True, readonly=True,
-                            digits_compute=dp.get_precision('Amount'))
+                            digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
     # TODO:放到单独模块中 sell_to_buy many2one 到sell.order
     origin = fields.Char(u'销售单号')
 
     @api.one
-    @api.onchange('goods_id')
+    @api.onchange('goods_id', 'quantity')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本价'''
+        '''当订单行的产品变化时，带出产品上的单位、成本价。
+        在采购订单上选择供应商，自动带出供货价格，没有设置供货价的取成本价格。'''
+        if not self.order_id.partner_id:
+            raise except_orm(u'错误', u'请先选择一个供应商！')
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             if not self.goods_id.cost:
                 raise except_orm(u'错误', u'请先设置商品的成本！')
             self.price_taxed = self.goods_id.cost
+            for line in self.goods_id.vendor_ids:
+                if line.vendor_id == self.order_id.partner_id \
+                    and self.quantity >= line.min_qty:
+                    self.price_taxed = line.price
+                    break
 
     @api.one
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
@@ -517,18 +525,18 @@ class buy_receipt(models.Model):
     date_due = fields.Date(u'到期日期', copy=False)
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
-                                   digits_compute=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     invoice_by_receipt=fields.Boolean(string=u"按收货结算",default=True)
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
                           store=True, readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     payment = fields.Float(u'本次付款', states=READONLY_STATES,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
     bank_account_id = fields.Many2one('bank.account', u'结算账户', 
                                       ondelete='restrict')
     debt = fields.Float(u'本次欠款', compute=_compute_all_amount,
                         store=True, readonly=True, copy=False,
-                        digits_compute=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'))
     cost_line_ids = fields.One2many('cost.line', 'buy_id', u'采购费用', copy=False)
     money_state = fields.Char(u'付款状态', compute=_get_buy_money_state,
                               store=True, default=u'未付款',
@@ -591,12 +599,12 @@ class buy_receipt(models.Model):
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
         for line in self.line_in_ids:
-            if line.goods_qty == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
-        
+            if line.goods_qty <= 0 or line.price_taxed < 0:
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+
         for line in self.line_out_ids:
-            if line.goods_qty == 0:
-                raise except_orm(u'错误', u'请输入产品数量！')
+            if line.goods_qty <= 0 or line.price_taxed < 0:
+                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         
         if self.bank_account_id and not self.payment:
             raise except_orm(u'警告！', u'结算账户不为空时，需要输入付款额！')
@@ -772,11 +780,12 @@ class wh_move_line(models.Model):
     buy_line_id = fields.Many2one('buy.order.line',
                                   u'购货单行', ondelete='cascade')
     share_cost = fields.Float(u'采购费用',
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
 
     @api.multi
     @api.onchange('goods_id')
     def onchange_goods_id(self):
+        '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税、销项税'''
         if self.goods_id:
             partner_id = self.env.context.get('default_partner')
             partner = self.env['partner'].search([('id', '=', partner_id)])
@@ -949,25 +958,25 @@ class buy_adjust_line(models.Model):
                                    domain="[('goods_id', '=', goods_id)]")
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
     quantity = fields.Float(u'调整数量', default=1,
-                            digits_compute=dp.get_precision('Quantity'))
+                            digits=dp.get_precision('Quantity'))
     price = fields.Float(u'购货单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits_compute=dp.get_precision('Amount'))
+                         digits=dp.get_precision('Amount'))
     price_taxed = fields.Float(u'含税单价',
-                               digits_compute=dp.get_precision('Amount'))
+                               digits=dp.get_precision('Amount'))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额',
-                                   digits_compute=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     amount = fields.Float(u'金额', compute=_compute_all_amount,
                           store=True, readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
                             store=True, readonly=True,
-                            digits_compute=dp.get_precision('Amount'))
+                            digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
     @api.one

@@ -16,14 +16,15 @@ class sell_summary_staff(models.Model):
     goods = fields.Char(u'商品名称')
     attribute = fields.Char(u'属性')
     warehouse = fields.Char(u'仓库')
-    qty_uos = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'))
+    qty_uos = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'))
     uos = fields.Char(u'辅助单位')
-    qty = fields.Float(u'基本数量', digits_compute=dp.get_precision('Quantity'))
+    qty = fields.Float(u'基本数量', digits=dp.get_precision('Quantity'))
     uom = fields.Char(u'基本单位')
-    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
-    amount = fields.Float(u'销售收入', digits_compute=dp.get_precision('Amount'))
-    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
-    subtotal = fields.Float(u'价税合计', digits_compute=dp.get_precision('Amount'))
+    price = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
+    subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
+    margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
@@ -40,16 +41,23 @@ class sell_summary_staff(models.Model):
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
                     ELSE - wml.goods_qty END) AS qty,
                 uom.name AS uom,
-                SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
-                    ELSE - wml.amount END)
-                    / SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
-                    ELSE - wml.goods_qty END) AS price,
+                (CASE WHEN SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                    ELSE - wml.goods_qty END) = 0 THEN 0
+                ELSE
+                    SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
+                        ELSE - wml.amount END)
+                        / SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                        ELSE - wml.goods_qty END)
+                END) AS price,
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
                     ELSE - wml.amount END) AS amount,
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.tax_amount
                     ELSE - wml.tax_amount END) AS tax_amount,
                 SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.subtotal
-                    ELSE - wml.subtotal END) AS subtotal
+                    ELSE - wml.subtotal END) AS subtotal,
+                (SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
+                    ELSE - wml.amount END) - SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                    ELSE - wml.goods_qty END) * wml.cost) AS margin
         '''
 
     def from_sql(self, sql_type='out'):
@@ -77,6 +85,8 @@ class sell_summary_staff(models.Model):
             extra += 'AND goods.id = {goods_id}'
         if self.env.context.get('goods_categ_id'):
             extra += 'AND categ.id = {goods_categ_id}'
+        if self.env.context.get('warehouse_id'):
+            extra += 'AND wh.id = {warehouse_id}'
 
         return '''
         WHERE wml.state = 'done'
@@ -89,7 +99,7 @@ class sell_summary_staff(models.Model):
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY staff,goods_code,goods,attribute,warehouse,uos,uom
+        GROUP BY staff,goods_code,goods,attribute,warehouse,uos,uom,wml.cost
         '''
 
     def order_sql(self, sql_type='out'):
@@ -105,11 +115,13 @@ class sell_summary_staff(models.Model):
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
             'staff_id': context.get('staff_id') and
-            context.get('staff_id')[0] or '',
+                context.get('staff_id')[0] or '',
             'goods_id': context.get('goods_id') and
-            context.get('goods_id')[0] or '',
+                context.get('goods_id')[0] or '',
             'goods_categ_id': context.get('goods_categ_id') and
-            context.get('goods_categ_id')[0] or '',
+                context.get('goods_categ_id')[0] or '',
+            'warehouse_id': context.get('warehouse_id') and
+                context.get('warehouse_id')[0] or '',
         }
 
     def _compute_order(self, result, order):

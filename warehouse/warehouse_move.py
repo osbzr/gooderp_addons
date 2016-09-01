@@ -11,6 +11,18 @@ class wh_move(models.Model):
         ('draft', u'草稿'),
         ('done', u'已审核'),
     ]
+    
+    @api.one
+    @api.depends('line_out_ids','line_in_ids')
+    def _compute_total_qty(self):
+        goods_total = 0
+        if self.line_in_ids:
+            # 入库产品总数
+            goods_total = sum(line.goods_qty for line in self.line_in_ids)
+        elif self.line_out_ids:
+            # 出库产品总数
+            goods_total = sum(line.goods_qty for line in self.line_out_ids)
+        self.total_qty = goods_total
 
     @api.model
     def _get_default_warehouse(self):
@@ -19,16 +31,12 @@ class wh_move(models.Model):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_type', 'stock'))
 
-        return self.env['warehouse'].browse()
-
     @api.model
     def _get_default_warehouse_dest(self):
         '''获取调入仓库'''
         if self.env.context.get('warehouse_dest_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_dest_type', 'stock'))
-
-        return self.env['warehouse'].browse()
 
     origin = fields.Char(u'源单类型', required=True)
     name = fields.Char(u'单据编号', copy=False, default='/')
@@ -53,6 +61,7 @@ class wh_move(models.Model):
                                   domain=[('type', '=', 'in')],
                                   context={'type': 'in'}, copy=True)
     note = fields.Text(u'备注')
+    total_qty = fields.Integer(u'产品总数', compute=_compute_total_qty, store=True)
 
     @api.model
     def scan_barcode(self,model_name,barcode,order_id):
@@ -64,6 +73,7 @@ class wh_move(models.Model):
         if not att and not goods:
             raise osv.except_osv(u'错误', u'该产品不存在')
         else:
+            conversion = att and att.goods_id.conversion or goods.conversion
             if model_name in ['wh.out','wh.in']:
                 move = self.env[model_name].browse(order_id).move_id
             # 在其他出库单上扫描条码
@@ -74,10 +84,12 @@ class wh_move(models.Model):
                     # 如果产品属性上存在条码，且明细行上已经存在该产品，则数量累加
                     if att and line.attribute_id.id == att.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
                     # 如果产品上存在条码，且明细行上已经存在该产品，则数量累加
                     elif goods and line.goods_id.id == goods.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
             # 在其他入库单上扫描条码
             if model_name == 'wh.in':
@@ -87,10 +99,12 @@ class wh_move(models.Model):
                     # 如果产品属性上存在条码
                     if att and line.attribute_id.id == att.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
                     # 如果产品上存在条码
                     elif goods and line.goods_id.id == goods.id:
                         line.goods_qty += 1
+                        line.goods_uos_qty = line.goods_qty / conversion
                         create_line = True
             #销售出入库单的二维码
             if model_name == 'sell.delivery':
@@ -98,26 +112,30 @@ class wh_move(models.Model):
                 if self.env[model_name].browse(order_id).is_return == True:
                     val['type'] = 'in'
                     for line in move.line_in_ids:
-                        line.price = line.goods_id.cost
+                        line.price_taxed = line.goods_id.cost
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                 else:
                     val['type'] = 'out'
                     for line in move.line_out_ids:
-                        line.price = line.goods_id.price
+                        line.price_taxed = line.goods_id.price
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
             #采购出入库单的二维码
             if model_name == 'buy.receipt':
@@ -125,26 +143,30 @@ class wh_move(models.Model):
                 if self.env[model_name].browse(order_id).is_return == True:
                     val['type'] = 'out'
                     for line in move.line_out_ids:
-                        line.price = line.goods_id.price
+                        line.price_taxed = line.goods_id.price
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                 else:
                     val['type'] = 'in'
                     for line in move.line_in_ids:
-                        line.price = line.goods_id.cost
+                        line.price_taxed = line.goods_id.cost
                         # 如果产品属性上存在条码
                         if att and line.attribute_id.id == att.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
                         # 如果产品上存在条码
                         elif goods and line.goods_id.id == goods.id:
                             line.goods_qty += 1
+                            line.goods_uos_qty = line.goods_qty / conversion
                             create_line = True
             if att:
                 goods_id = att.goods_id.id
@@ -179,7 +201,7 @@ class wh_move(models.Model):
               'uos_id': uos_id,
               'goods_qty': 1,
               'uom_id': uom_id,
-              'price': price,
+              'price_taxed': price,
               'cost_unit': cost_unit,
               'move_id': move.id})
             if create_line == False:

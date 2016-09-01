@@ -14,7 +14,7 @@
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
-                    <field name="warehouse_dest" groups='warehouse.multi_warehouse_groups'/>
+                    <field name="warehouse_dest_id" groups='warehouse.multi_warehouse_groups'/>
                     <field name="qty" sum="数量合计"/>
                     <field name="uom"/>
                     <field name="price"/>

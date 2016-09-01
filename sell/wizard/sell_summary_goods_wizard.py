@@ -22,6 +22,7 @@ class sell_summary_goods_wizard(models.TransientModel):
     partner_id = fields.Many2one('partner', u'客户')
     goods_id = fields.Many2one('goods', u'商品')
     goods_categ_id = fields.Many2one('core.category', u'商品类别')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
@@ -33,5 +34,7 @@ class sell_summary_goods_wizard(models.TransientModel):
             'view_mode': 'tree',
             'res_model': 'sell.summary.goods',
             'type': 'ir.actions.act_window',
-            'context': self.read(['date_start', 'date_end', 'partner_id', 'goods_id', 'goods_categ_id'])[0],
+            'context': self.read(['date_start', 'date_end',
+                                  'partner_id', 'goods_id',
+                                  'goods_categ_id', 'warehouse_id'])[0],
         }

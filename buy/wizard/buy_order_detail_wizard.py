@@ -22,6 +22,7 @@ class buy_order_detail_wizard(models.TransientModel):
     partner_id = fields.Many2one('partner', u'供应商')
     goods_id = fields.Many2one('goods', u'商品')
     order_id = fields.Many2one('buy.receipt', u'单据编号')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
@@ -41,6 +42,8 @@ class buy_order_detail_wizard(models.TransientModel):
             buy_receipt = self.env['buy.receipt'].search(
                                 [('id', '=', self.order_id.id)])
             domain.append(('id', '=', buy_receipt.buy_move_id.id))
+        if self.warehouse_dest_id:
+            domain.append(('warehouse_dest_id', '=', self.warehouse_dest_id.id))
 
         view = self.env.ref('buy.buy_order_detail_tree')
         return {

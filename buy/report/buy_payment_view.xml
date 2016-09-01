@@ -12,6 +12,7 @@
                 		attrs="{'invisible': [('partner_id', '=', False)]}"/>
                 	<field name="type"/>
                     <field name="date"/>
+                    <field name="warehouse_dest_id"/>
                     <field name="order_name"/>
                     <field name="purchase_amount" sum="采购金额合计"/>
                     <field name="discount_amount" sum="优惠金额合计" groups='buy.buy_discount_groups'/>

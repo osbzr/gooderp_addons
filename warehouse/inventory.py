@@ -260,17 +260,17 @@ class wh_inventory_line(models.Model):
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
     uos_id = fields.Many2one('uom', u'辅助单位', ondelete='restrict')
     real_qty = fields.Float(
-        u'系统库存', digits_compute=dp.get_precision('Quantity'))
+        u'系统库存', digits=dp.get_precision('Quantity'))
     real_uos_qty = fields.Float(
-        u'系统辅助单位库存', digits_compute=dp.get_precision('Quantity'))
+        u'系统辅助单位库存', digits=dp.get_precision('Quantity'))
     inventory_qty = fields.Float(
-        u'盘点库存', digits_compute=dp.get_precision('Quantity'))
+        u'盘点库存', digits=dp.get_precision('Quantity'))
     inventory_uos_qty = fields.Float(
-        u'盘点辅助单位库存', digits_compute=dp.get_precision('Quantity'))
+        u'盘点辅助单位库存', digits=dp.get_precision('Quantity'))
     difference_qty = fields.Float(
-        u'盘盈盘亏', digits_compute=dp.get_precision('Quantity'))
+        u'盘盈盘亏', digits=dp.get_precision('Quantity'))
     difference_uos_qty = fields.Float(
-        u'辅助单位盘盈盘亏', digits_compute=dp.get_precision('Quantity'))
+        u'辅助单位盘盈盘亏', digits=dp.get_precision('Quantity'))
 
     def check_difference_identical(self):
         if self.difference_qty * self.difference_uos_qty < 0:

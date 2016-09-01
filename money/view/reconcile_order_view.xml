@@ -9,6 +9,7 @@
                 <tree string="Reconcile Order">
                     <field name="name"/>
                     <field name="date"/>
+                    <field name="partner_id"/>
                     <field name="state"/>
                 </tree>
             </field>
@@ -33,7 +34,8 @@
                     </div>
                     <group>
                         <group>
-				            <field name="partner_id"/>
+				            <field name="partner_id"
+				            	options="{'no_open': True, 'no_create': True}"/>
 				            <field name="business_type"/>
                         </group>
                         <group>
@@ -76,6 +78,25 @@
 	                <field name="note" nolabel="1" placeholder="备注信息……"/>
                 </sheet>
                 </form>
+            </field>
+        </record>
+
+		<!--核销单 search 视图-->
+		<record id="reconcile_order_search" model="ir.ui.view">
+            <field name="name">reconcile.order.search</field>
+            <field name="model">reconcile.order</field>
+            <field name="arch" type="xml">
+                <search string="核销单 ">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 

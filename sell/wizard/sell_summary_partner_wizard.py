@@ -24,12 +24,14 @@ class sell_summary_partner_wizard(models.TransientModel):
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     domain=[('type', '=', 'customer')],
                                     context={'type': 'customer'})
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
-        read_fields = ['date_start', 'date_end', 'partner_id', 'goods_id', 'c_category_id']
+        read_fields = ['date_start', 'date_end', 'partner_id',
+                       'goods_id', 'c_category_id', 'warehouse_id']
         return {
             'name': u'销售汇总表（按客户）',
             'view_mode': 'tree',

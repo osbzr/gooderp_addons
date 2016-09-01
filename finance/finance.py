@@ -13,7 +13,7 @@ BALANCE_DIRECTIONS_TYPE = [
     ('in', u'借'),
     ('out', u'贷')]
 
-MOUTH_SELECTION = [
+MONTH_SELECTION = [
     ('1', u'01'),
     ('2', u'02'),
     ('3', u'03'),
@@ -31,6 +31,7 @@ MOUTH_SELECTION = [
 class voucher(models.Model):
     '''新建凭证'''
     _name = 'voucher'
+    _inherit = ['mail.thread']
     _order = 'period_id , name desc'
 
     @api.model
@@ -51,17 +52,20 @@ class voucher(models.Model):
     document_word_id = fields.Many2one(
         'document.word', u'凭证字', ondelete='restrict', required=True,
         default=lambda self: self.env.ref('finance.document_word_1'))
-    date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date)
-    name = fields.Char(u'凭证号')
+    date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date,
+                       track_visibility = 'always')
+    name = fields.Char(u'凭证号', track_visibility='always')
     att_count = fields.Integer(u'附单据', default=1)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
-    amount_text = fields.Float(u'总计', compute='_compute_amount', store=True)
+    amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
+                               track_visibility='always')
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核')], u'状态', default='draft')
+                              ('done', u'已审核')], u'状态', default='draft',
+                             track_visibility='always')
     is_checkout = fields.Boolean(u'结账凭证')
 
     @api.one
@@ -115,6 +119,17 @@ class voucher(models.Model):
                 raise except_orm(u'错误', u'不能删除已审核的凭证')
         return super(voucher, self).unlink()
 
+    # 重载write 方法
+    @api.multi
+    def write(self, vals):
+        if self.period_id.is_closed is True:
+            raise except_orm(u'错误', u'该会计期间已结账，凭证不能再修改！')
+        if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
+            return super(voucher, self).write(vals)
+        else:
+            if self.state == 'done':
+                raise except_orm(u'错误', u'凭证已审核！修改请先反审核！')
+        return super(voucher, self).write(vals)
 
 class voucher_line(models.Model):
     '''凭证明细'''
@@ -125,8 +140,8 @@ class voucher_line(models.Model):
     account_id = fields.Many2one(
         'finance.account', u'会计科目',
         ondelete='restrict', required=True)
-    debit = fields.Float(u'借方金额', digits_compute=dp.get_precision(u'金额'))
-    credit = fields.Float(u'贷方金额', digits_compute=dp.get_precision(u'金额'))
+    debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'))
+    credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'))
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict')
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     auxiliary_id = fields.Many2one(
@@ -188,7 +203,7 @@ class finance_period(models.Model):
         compute='_compute_name', readonly=True, store=True)
     is_closed = fields.Boolean(u'已结账')
     year = fields.Char(u'会计年度', required=True)
-    month = fields.Selection(MOUTH_SELECTION, string=u'会计月份', required=True)
+    month = fields.Selection(MONTH_SELECTION, string=u'会计月份', required=True)
 
     @api.one
     @api.depends('year', 'month')
@@ -216,7 +231,7 @@ class finance_period(models.Model):
                 ('month', '=', int(date[5:7]))
             ])
             if period_id:
-                if period_id.is_closed:
+                if period_id.is_closed and self._context.get('module_name', False) != 'checkout_wizard':
                     raise except_orm(u'错误', u'此会计期间已关闭')
                 else:
                     return period_id
@@ -274,6 +289,7 @@ class finance_account(models.Model):
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
+        '''会计科目按名字和编号搜索'''
         args = args or []
         domain = []
         if name:

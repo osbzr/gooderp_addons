@@ -22,6 +22,7 @@ class sell_order_detail_wizard(models.TransientModel):
     partner_id = fields.Many2one('partner', u'客户')
     goods_id = fields.Many2one('goods', u'产品')
     staff_id = fields.Many2one('staff', u'销售员')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
@@ -39,6 +40,8 @@ class sell_order_detail_wizard(models.TransientModel):
             domain.append(('partner_id', '=', self.partner_id.id))
         if self.staff_id:
             domain.append(('staff_id', '=', self.staff_id.id))
+        if self.warehouse_id:
+            domain.append(('warehouse_id', '=', self.warehouse_id.id))
 
         view = self.env.ref('sell.sell_order_detail_tree')
         graph_view = self.env.ref('sell.sell_order_detail_graph')

@@ -19,6 +19,8 @@
                             	options="{'no_open': True, 'no_create': True}"/>
                             <field name="order_id"
                             	options="{'no_open': True, 'no_create': True}"/>
+                            <field name='warehouse_dest_id'
+                            	options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <footer>
                             <button name="button_ok" type="object" string="确定" class="oe_highlight"/>

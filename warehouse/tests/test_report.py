@@ -17,10 +17,18 @@ class TestReport(TransactionCase):
         # 鼠标    总仓  ms160301    1     入库
         # 鼠标    总仓  ms160302    1     入库
         self.env['wh.in'].search([('name', '!=', 'WH/IN/16040004')]).approve_order()
+        # 先盘点产品，保证网线数量充足
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+
         self.env['wh.internal'].search([]).approve_order()
 
-        self.track_wizard = self.env['report.lot.track.wizard'].create({})
-        self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({})
+        self.track_wizard = self.env['report.lot.track.wizard'].create({
+                            'date_start': '2016-04-01',
+                            'date_end': '2016-04-03'})
+        self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({
+                            'date_start': '2016-04-01',
+                            'date_end': '2016-04-03'})
 
     def test_report_base(self):
         report_base = self.env['report.base'].create({})
@@ -46,6 +54,8 @@ class TestReport(TransactionCase):
 
         self.assertEqual(results, real_results)
         self.assertEqual(self.track_wizard.open_report().get('res_model'), 'report.lot.track')
+        # 测试wizard默认日期
+        self.env['report.lot.track.wizard'].create({})
 
         # 测试商品收发明细表的wizard
         self.assertEqual(self.transceive_wizard.onchange_date()[0], {})
@@ -59,6 +69,8 @@ class TestReport(TransactionCase):
 
         self.assertEqual(results, real_results)
         self.assertEqual(self.transceive_wizard.open_report().get('res_model'), 'report.stock.transceive')
+        # 测试wizard默认日期
+        self.env['report.stock.transceive.wizard'].create({})
 
     def test_lot_track_search_read(self):
         lot_track = self.env['report.lot.track'].create({})
@@ -163,7 +175,12 @@ class TestReport(TransactionCase):
             (u'键鼠套装', u'总仓', 0, 96),
         ]
         results = stock_transceive.with_context(context).search_read(domain=[])
+        length = stock_transceive.with_context(context).search_count(domain=[])
         self.assertEqual(len(results), len(real_results))
+        self.assertEqual(len(results), length)
+
+        instance = stock_transceive.with_context(context).browse(results[0].get('id'))
+        self.assertEqual(instance.read(['warehouse'])[0].get('warehouse'), results[0].get('warehouse'))
 
         for result in results:
             result = (

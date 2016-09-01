@@ -49,6 +49,7 @@ class test_buy_order(TransactionCase):
              'warehouse_dest_type': 'stock'
              }).create({})
         self.assertTrue(order.warehouse_dest_id.type == 'stock')
+        self.env['buy.order'].create({})
 
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
@@ -158,6 +159,7 @@ class test_buy_order_line(TransactionCase):
     def setUp(self):
         super(test_buy_order_line, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        self.cable = self.env.ref('goods.cable')
 
     def test_compute_using_attribute(self):
         '''返回订单行中产品是否使用属性'''
@@ -172,23 +174,41 @@ class test_buy_order_line(TransactionCase):
             line.price_taxed = 11.7
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
-            self.assertTrue(line.price_taxed == 11.7)
+            self.assertAlmostEqual(line.price_taxed, 11.7)
             self.assertTrue(line.subtotal == 117)
 
     def test_onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、成本'''
-        goods = self.env.ref('goods.cable')
         for line in self.order.line_ids:
-            line.goods_id = goods
+            line.goods_id = self.cable
             line.onchange_goods_id()
             self.assertTrue(line.uom_id.name == u'件')
 
             # 测试价格是否是商品的成本
-            self.assertTrue(line.price_taxed == goods.cost)
+            self.assertTrue(line.price_taxed == self.cable.cost)
             # 测试不设置商品的成本时是否弹出警告
-            goods.cost = 0.0
+            self.cable.cost = 0.0
             with self.assertRaises(except_orm):
                 line.onchange_goods_id()
+
+    def test_onchange_goods_id_vendor(self):
+        '''当订单行的产品变化时，带出产品上供应商价'''
+        # 添加网线的供应商价
+        self.cable.vendor_ids.create({
+                'goods_id': self.cable.id,
+                'vendor_id': self.env.ref('core.lenovo').id,
+                'price': 2,})
+        # 不选择供应商时，应弹出警告
+        self.order.partner_id = False
+        for line in self.order.line_ids:
+            with self.assertRaises(except_orm):
+                line.onchange_goods_id()
+        # 选择供应商联想，得到供应商价
+        self.order.partner_id = self.env.ref('core.lenovo')
+        for line in self.order.line_ids:
+            line.goods_id = self.cable
+            line.onchange_goods_id()
+            self.assertTrue(line.price_taxed == 2)
 
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''
@@ -361,6 +381,15 @@ class test_buy_receipt(TransactionCase):
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
 
+    def test_receipt_make_invoice(self):
+        '''审核入库单：不勾按收货结算时'''
+        self.order.buy_order_draft()
+        self.order.invoice_by_receipt = False
+        self.order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+                       [('order_id', '=', self.order.id)])
+        receipt.buy_receipt_done()
+
     def test_buy_receipt_draft(self):
         '''反审核采购入库单/退货单'''
         # 先审核入库单，再反审核
@@ -417,8 +446,10 @@ class test_wh_move_line(TransactionCase):
         self.goods_mouse = self.browse_ref('goods.mouse')
 
     def test_onchange_goods_id(self):
-        '''测试采购模块中商品的onchange,是否会带出默认库位和单价'''
+        '''测试采购模块中商品的onchange,是否会带出单价'''
         # 入库单行：修改鼠标成本为0，测试是否报错
+        for line in self.receipt.line_in_ids:
+            line.onchange_goods_id()
         self.goods_mouse.cost = 0.0
         for line in self.receipt.line_in_ids:
             line.goods_id = self.goods_mouse.id
@@ -604,7 +635,7 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
         'order_id': new_order.id,
         'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                            'quantity': 3.0,
+                             'quantity': 3.0,
                             }),
                      ]
         })
@@ -665,3 +696,17 @@ class test_buy_adjust_line(TransactionCase):
             line.discount_rate = 10
             line.onchange_discount_rate()
             self.assertTrue(line.discount_amount == 10)
+
+
+class test_payment(TransactionCase):
+
+    def setUp(self):
+        super(test_payment, self).setUp()
+        self.order = self.env.ref('buy.buy_order_1')
+     
+    def test_request_payment(self):
+        '''付款申请'''
+        line = self.order.pay_ids.create({
+            'name': u'申请付款', 'amount_money': 10, 'buy_id': self.order.id
+            })
+        line.request_payment()

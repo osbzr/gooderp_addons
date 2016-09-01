@@ -41,22 +41,13 @@ class test_detail_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             detail.button_ok()
-        # 按产品搜索
-        self.detail.goods_id = self.env.ref('goods.mouse').id
-        self.detail.button_ok()
-        # 按供应商搜索
-        self.detail.goods_id = False
-        self.detail.partner_id = self.env.ref('core.lenovo').id
-        self.detail.button_ok()
-        # 按单据编号搜索
-        self.detail.goods_id = False
-        self.detail.partner_id = False
-        self.detail.order_id = self.receipt.id
-        self.detail.button_ok()
         # 按日期搜索
-        self.detail.goods_id = False
-        self.detail.partner_id = False
-        self.detail.order_id = False
+        self.detail.button_ok()
+        # 按产品、供应商、单据编号、仓库搜索
+        self.detail.goods_id = self.env.ref('goods.mouse').id
+        self.detail.partner_id = self.env.ref('core.lenovo').id
+        self.detail.order_id = self.receipt.id
+        self.detail.warehouse_dest_id = self.env.ref('warehouse.hd_stock').id
         self.detail.button_ok()
 
     def test_view_detail(self):
@@ -113,22 +104,13 @@ class test_track_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             track.button_ok()
-        # 按产品搜索
-        self.track.goods_id = self.env.ref('goods.mouse').id
-        self.track.button_ok()
-        # 按供应商搜索
-        self.track.goods_id = False
-        self.track.partner_id = self.env.ref('core.lenovo').id
-        self.track.button_ok()
-        # 按订单号搜索
-        self.track.goods_id = False
-        self.track.partner_id = False
-        self.track.order_id = self.order.id
-        self.track.button_ok()
         # 按日期搜索
-        self.track.goods_id = False
-        self.track.partner_id = False
-        self.track.order_id = False
+        self.track.button_ok()
+        # 按产品、供应商、订单号、仓库搜索
+        self.track.goods_id = self.env.ref('goods.mouse').id
+        self.track.partner_id = self.env.ref('core.lenovo').id
+        self.track.order_id = self.order.id
+        self.track.warehouse_dest_id = self.env.ref('warehouse.hd_stock').id
         self.track.button_ok()
 
     def test_view_detail(self):
@@ -175,16 +157,14 @@ class test_payment_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             payment.button_ok()
+        # 按日期搜索
+        self.payment.button_ok()
         # 按供应商类别,供应商，采购单号搜索
         s_category_id = self.env.ref('core.supplier_category_1').id
         self.payment.s_category_id = s_category_id
         self.payment.partner_id = self.env.ref('core.lenovo').id
         self.payment.order_id = self.env.ref('buy.buy_order_1').id
-        self.payment.button_ok()
-        # 按日期搜索
-        self.payment.s_category_id = False
-        self.payment.partner_id = False
-        self.payment.order_id = False
+        self.payment.warehouse_dest_id = self.env.ref('warehouse.hd_stock').id
         self.payment.button_ok()
 
     def test_view_detail(self):
@@ -225,6 +205,7 @@ class test_goods_wizard(TransactionCase):
         self.goods_mouse = self.env.ref('goods.mouse')
         self.core_lenovo = self.env.ref('core.lenovo')
         self.goods_categ = self.env.ref('core.goods_category_1')
+        self.hd_stock = self.env.ref('warehouse.hd_stock')
 
     def test_button_ok(self):
         '''采购汇总表（按商品）向导确认按钮'''
@@ -235,22 +216,7 @@ class test_goods_wizard(TransactionCase):
                              })
         with self.assertRaises(except_orm):
             goods_wizard.button_ok()
-        # 按商品搜索
-        self.goods_wizard.goods_id = self.goods_mouse.id
-        self.goods_wizard.button_ok()
-        # 按供应商搜索
-        self.goods_wizard.goods_id = False
-        self.goods_wizard.partner_id = self.core_lenovo.id
-        self.goods_wizard.button_ok()
-        # 按商品类别搜索
-        self.goods_wizard.goods_id = False
-        self.goods_wizard.partner_id = False
-        self.goods_wizard.goods_categ_id = self.goods_categ.id
-        self.goods_wizard.button_ok()
         # 按日期搜索
-        self.goods_wizard.goods_id = False
-        self.goods_wizard.partner_id = False
-        self.goods_wizard.goods_categ_id = False
         self.goods_wizard.button_ok()
 
     def test_goods_report(self):
@@ -262,6 +228,7 @@ class test_goods_wizard(TransactionCase):
         new_wizard.goods_id = self.goods_mouse.id
         new_wizard.partner_id = self.core_lenovo.id
         new_wizard.goods_categ_id = self.goods_categ.id
+        new_wizard.warehouse_dest_id = self.hd_stock.id
         new_context = new_wizard.button_ok().get('context')
         new_results = summary_goods.with_context(new_context).search_read(
                                                                   domain=[])
@@ -325,6 +292,8 @@ class test_partner_wizard(TransactionCase):
         new_wizard.partner_id = self.env.ref('core.lenovo').id
         new_wizard.s_category_id = \
             self.env.ref('core.supplier_category_1').id
+        new_wizard.warehouse_dest_id = \
+            self.env.ref('warehouse.hd_stock').id
         new_context = new_wizard.button_ok().get('context')
         new_results = summary_partner.with_context(new_context).search_read(
                                                                     domain=[])

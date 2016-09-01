@@ -36,7 +36,8 @@
                     </div>
                     <group>
                         <group>
-				            <field name="partner_id"/>
+				            <field name="partner_id"
+				            	options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <group>
                             <field name="date"/>
@@ -46,7 +47,10 @@
                     	<tree string="其他收支单明细" editable="bottom">
                     		<field name="service" groups="core.service_groups"/>
                     		<field name="category_id" required="1"/>
+                    		<field name="auxiliary_id"/>
                             <field name="amount" sum="合计"/>
+                            <field name="tax_rate" groups="money.tax_groups"/>
+                            <field name="tax_amount" groups="money.tax_groups" sum="合计"/>
                             <field name="note"/>
                             <field name="source_id" invisible='1'/>
                        </tree>
@@ -70,6 +74,26 @@
 		            </group>
                 </sheet>
                 </form>
+            </field>
+        </record>
+
+		<!--其他收入/支出单 search 视图-->
+		<record id="other_money_order_search" model="ir.ui.view">
+            <field name="name">other.money.order.search</field>
+            <field name="model">other.money.order</field>
+            <field name="arch" type="xml">
+                <search string="其他收入/支出单 ">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="total_amount"/>
+                    <field name="state"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="往来单位" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 

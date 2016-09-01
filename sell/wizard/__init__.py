@@ -6,3 +6,4 @@ import sell_summary_partner_wizard
 import sell_summary_staff_wizard
 import sell_receipt_wizard
 import sell_top_ten_wizard
+import popup_wizard

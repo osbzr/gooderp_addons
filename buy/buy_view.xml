@@ -33,7 +33,8 @@
             <field name="supplier_id" position="after">
                 <field name="vendor_ids" colspan="2" nolabel="1" groups='goods.view_cost_groups'>
                         <tree string="goods" editable="bottom">
-                            <field name="vendor_id"/>
+                            <field name="vendor_id"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="price"/>
                             <field name="code"/>
                             <field name="name"/>
@@ -128,20 +129,22 @@
 
                     <field name="note" placeholder="暂无备注信息"/>
                     <group>
-                        <group col="6" colspan="6">
+                        <group>
                             <field name="discount_rate" groups='buy.buy_discount_groups'/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                         </group>
+                        <group>
+                        	<field name="prepayment" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
+                        	<field name="bank_account_id" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
+                        </group>
                     </group>
                     <group>
                         <group>
-                        	<field name="prepayment" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="create_uid" readonly="1" string="制单人"/>
                             <field name="approve_uid" readonly="1"/>
                         </group>
                     	<group>
-                    		<field name="bank_account_id" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="create_date" readonly="1" string="录单时间"/>
                             <field name="write_date" readonly="1" string="最后修改时间"/>
                         </group>
@@ -166,7 +169,8 @@
                     <field name="state"/>
                     <field name="goods_state"/>
                     <field name="create_uid" string="制单人"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not in" string="未入库" domain="[('goods_state','=',u'未入库')]"/>
@@ -176,9 +180,9 @@
                     <filter name="buy" string="购货" domain="[('type','=','buy')]"/>
                     <filter name="return" string="退货" domain="[('type','=','return')]"/>
                     <group expand="0" string="分组">
-                        <filter string="供应商" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="要求交货日期" icon="terp-go-month" domain="[]" context="{'group_by':'planned_date'}"/>
+                        <filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="要求交货日期" domain="[]" context="{'group_by':'planned_date:day'}"/>
                     </group>
                 </search>
             </field>
@@ -264,6 +268,7 @@
 		                            <field name="uom_id"/>
 		                            <field name="price"/>
 		                            <field name="price_taxed" groups='buy.in_tax_groups'/>
+				 					<field name='cost_unit'/>
 		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
 		                            <field name="discount_amount" groups='buy.buy_line_discount_groups' readonly="0" sum="合计折扣额"/>
 		                            <field name="amount" string="购货金额" sum="合计金额"/>
@@ -282,7 +287,9 @@
 		                <page string="采购费用行">
 		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 		                		<tree string="Cost Lines" editable="bottom">
-		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
+		                			<field name="partner_id"
+		                				domain="[('s_category_id', '!=', False)]"
+		                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
 			                		<field name="category_id"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>
@@ -293,16 +300,14 @@
 		            </notebook>
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
-                        <group col="8" colspan="8">
+                        <group>
                             <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
-                            <field name="payment" attrs="{'readonly': [('state','!=','draft')],
-                                                'invisible': [('invoice_by_receipt','=',False)]}"/>
                         </group>
-                    </group>
-                    <group>
-                        <group col="6" colspan="6">
+                        <group>
+                        	<field name="payment" attrs="{'readonly': [('state','!=','draft')],
+                                                'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')],
                                                         'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="debt"/>
@@ -338,16 +343,17 @@
                     <field name="state"/>
                     <field name="money_state"/>
                     <field name="create_uid" string="制单人"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not paid" string="未付款" domain="[('money_state','=',u'未付款')]"/>
                     <filter name="part paid" string="部分付款" domain="[('money_state','=',u'部分付款')]"/>
                     <filter name="all paid" string="全部付款" domain="[('money_state','=',u'全部付款')]"/>
                     <group expand="0" string="分组">
-                        <filter string="供应商" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                        <filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
                     </group>
                 </search>
             </field>
@@ -461,15 +467,13 @@
 		            </notebook>
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
-                        <group col="8" colspan="8">
+                        <group>
                             <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
-                            <field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
                         </group>
-                    </group>
-                    <group>
-                        <group col="6" colspan="6">
+                        <group>
+                        	<field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="debt"/>
                         </group>
@@ -504,16 +508,17 @@
                     <field name="state"/>
                     <field name="return_state"/>
                     <field name="create_uid" string="制单人"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
                     <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
                     <filter name="all refund" string="全部退款" domain="[('return_state','=',u'全部退款')]"/>
                     <group expand="0" string="分组">
-                        <filter string="供应商" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                        <filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
                     </group>
                 </search>
             </field>
@@ -597,6 +602,25 @@
             </field>
         </record>
 
+		<record id="buy_adjust_search" model="ir.ui.view">
+            <field name="name">buy.adjust.search</field>
+            <field name="model">buy.adjust</field>
+            <field name="arch" type="xml">
+                <search string="采购调整单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <!-- 购货管理 action -->
 
         <record id="buy_order_action" model="ir.actions.act_window">
@@ -656,6 +680,7 @@
             <field name="name">采购调整单</field>
             <field name="res_model">buy.adjust</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="buy_adjust_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建采购调整单

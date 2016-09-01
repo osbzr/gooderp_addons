@@ -282,6 +282,15 @@ class test_other_money_order_line(TransactionCase):
             self.assertTrue(line.category_id.id == self.service_1.pay_categ_id.id)
             self.assertTrue(line.amount == 500)
 
+    def test_compute_tax_amount(self):
+        '''当订单行的金额、税率改变时，改变税额'''
+        # 其他收入单
+        for line in self.get_order.line_ids:
+            line.service = self.service_1   # 咨询服务
+            line.amount = 1000
+            line.tax_rate = 17
+            self.assertTrue(line.tax_amount == 170)
+
 
 class test_money_transfer_order(TransactionCase):
     '''测试其他资金转账单'''

@@ -43,7 +43,7 @@ class partner_address(models.Model):
     _description = u'业务伙伴的联系人地址'
  
     partner_id = fields.Many2one('partner', u'业务伙伴')
-    contact_people = fields.Char(u'联系人')
+    contact = fields.Char(u'联系人')
     mobile = fields.Char(u'手机')
     phone = fields.Char(u'座机')
     qq = fields.Char(u'QQ/微信')
@@ -138,7 +138,7 @@ class partner(models.Model):
             return {}
         for child in self.child_ids:
             if child.is_default_add:
-                self.contact_people = child.contact_people
+                self.contact = child.contact
                 self.mobile = child.mobile
                 self.phone = child.phone
                 self.qq = child.qq
@@ -150,7 +150,7 @@ class partner(models.Model):
                 self.address = address
 
     child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
-    contact_people = fields.Char(u'联系人', compute='_compute_partner_address')
+    contact = fields.Char(u'联系人', compute='_compute_partner_address')
     mobile = fields.Char(u'手机', compute='_compute_partner_address')
     phone = fields.Char(u'座机', compute='_compute_partner_address')
     qq = fields.Char(u'QQ/微信', compute='_compute_partner_address')

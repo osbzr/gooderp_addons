@@ -24,13 +24,14 @@ class sell_summary_staff_wizard(models.TransientModel):
     goods_categ_id = fields.Many2one('core.category', u'商品类别',
                                      domain=[('type', '=', 'goods')],
                                      context={'type': 'goods'})
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
 
     @api.multi
     def button_ok(self):
         if self.date_end < self.date_start:
             raise except_orm(u'错误', u'开始日期不能大于结束日期！')
         read_fields = ['date_start', 'date_end', 'staff_id',
-                       'goods_id', 'goods_categ_id']
+                       'goods_id', 'goods_categ_id', 'warehouse_id']
         return {
             'name': u'销售汇总表（按销售人员）',
             'view_mode': 'tree',

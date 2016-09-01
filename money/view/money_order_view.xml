@@ -13,7 +13,7 @@
         <menuitem id='settle_mode_menu' name='结算方式' action='core.settle_mode_action'
         	parent='menu_money_setting' groups='core.settle_mode_groups' sequence='3'/>
 
-		<!--收款单tree-->
+		<!--收/付款单tree-->
     	<record id="money_order_tree" model="ir.ui.view">
             <field name="name">money.order.tree</field>
             <field name="model">money.order</field>
@@ -22,13 +22,13 @@
                     <field name="name" string="单据编号"/>
                     <field name="date"/>
                     <field name="partner_id"/>
-                    <field name="advance_payment"/>
+                    <field name="amount"/>
                     <field name="state"/>
                 </tree>
             </field>
         </record>
 
-        <!--收款单form-->
+        <!--收/付款单form-->
         <record id="money_order_form" model="ir.ui.view">
             <field name="name">money.order.form</field>
             <field name="model">money.order</field>
@@ -49,10 +49,13 @@
                     </div>
                     <group>
                         <group>
-				            <field name="partner_id"/>
-				            <field name="bank_name" invisible="context.get('default_get', 0)"
+				            <field name="partner_id"
+				            	options="{'no_open': True, 'no_create': True}"/>
+				            <field name="bank_name"
+				            	invisible="context.get('default_get', 0)"
 				            	required="context.get('default_pay', 0)"/>
-				            <field name="bank_num" invisible="context.get('default_get', 0)"
+				            <field name="bank_num"
+				            	invisible="context.get('default_get', 0)"
 				            	required="context.get('default_pay', 0)"/>
                         </group>
                         <group>
@@ -100,6 +103,26 @@
 		            </group>
                 </sheet>
                 </form>
+            </field>
+        </record>
+
+		<!--收/付款单 search 视图-->
+		<record id="money_order_search" model="ir.ui.view">
+            <field name="name">money.order.search</field>
+            <field name="model">money.order</field>
+            <field name="arch" type="xml">
+                <search string="收/付款单">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="amount"/>
+                    <field name="state"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 
@@ -156,21 +179,41 @@
             <field name="name">money.invoice.tree</field>
             <field name="model">money.invoice</field>
             <field name="arch" type="xml">
-                <tree string="Source Order Line" editable='TOP'>
-					<field name="state" invisible="1"/>
+                <tree string="Money Invoice" editable='TOP'>
+                    <field name="state" invisible="1"/>
                     <field name="name"/>
                     <field name="partner_id"/>
             		<field name="category_id"/>
+            		<field name="auxiliary_id"/>
                     <field name="date"/>
                     <field name="amount"/>
                     <field name="reconciled"/>
                     <field name="to_reconcile"/>
                     <field name="tax_amount"/>
                     <button name="money_invoice_done" states="draft" string="审核" type="object"/>
-                    <button name="money_invoice_draft" states="done" string="反审核" type="object"/>
                     <field name="bill_number"/>
                     <field name="date_due"/>
                 </tree>
+            </field>
+        </record>
+        <!--源单 search 视图-->
+    	<record id="money_invoice_search" model="ir.ui.view">
+            <field name="name">money.invoice.search</field>
+            <field name="model">money.invoice</field>
+            <field name="arch" type="xml">
+                <search string="源单">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+            		<field name="category_id"/>
+                    <field name="amount"/>
+                    <field name="state"/>
+                    <group expand="0" string="分组">
+                        <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="类别" domain="[]" context="{'group_by':'category_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 

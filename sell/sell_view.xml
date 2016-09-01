@@ -39,6 +39,9 @@
             					<field name='partner_id' required='1'
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            					<field name='contact'/>
+            				    <field name='address'/>
+            				    <field name='mobile'/>
             					<field name='staff_id'/>
             					<field name='date'/>
             					<field name='warehouse_id'/>
@@ -75,24 +78,22 @@
 				 				</field>
 				 				<field name="note" placeholder="暂无备注信息"/>
 				 				<group>
-                        			<group col="6" colspan="6">
+                        			<group>
 										<field name="discount_rate" groups='sell.sell_discount_groups'/>
 										<field name="discount_amount" groups='sell.sell_discount_groups'/>
                             			<field name="amount"/>
                         			</group>
-                    			</group>
-                    			<group>
                         			<group>
 										<field name="pre_receipt"/>
-                        			</group>
-                        			<group>
                             			<field name="bank_account_id"/>
                         			</group>
                     			</group>
                     			<group>
-                        			<group col="8" colspan="2">
+                        			<group>
                             			<field name="create_uid" readonly="1" string="制单人"/>
                             			<field name="approve_uid" readonly="1"/>
+                            		</group>
+                        			<group>
                             			<field name="create_date" readonly="1" string="录单时间"/>
                             			<field name="write_date" readonly="1" string="最后修改时间"/>
                         			</group>
@@ -119,7 +120,8 @@
                     <field name="state"/>
                     <field name="goods_state"/>
                     <field name="create_uid" string="制单人"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not out" string="未出库" domain="[('goods_state','=',u'未出库')]"/>
@@ -129,9 +131,9 @@
                     <filter name="sell" string="销货" domain="[('type','=','sell')]"/>
                     <filter name="return" string="退货" domain="[('type','=','return')]"/>
                     <group expand="0" string="分组">
-                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="要求交货日期" icon="terp-go-month" domain="[]" context="{'group_by':'delivery_date'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="要求交货日期" domain="[]" context="{'group_by':'delivery_date:day'}"/>
                     </group>
                 </search>
             </field>
@@ -148,6 +150,7 @@
             		<field name="order_id"/>
             		<field name='staff_id'/>
             		<field name='partner_id'/>
+					<field name='total_qty'/>
             		<field name="amount"/>
             		<field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
@@ -179,6 +182,7 @@
             						attrs="{'readonly': [('state','!=','draft')]}"
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            				    <field name='contact'/>
             				    <field name="address"/>
             				    <field name="mobile"/>
             					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -240,7 +244,9 @@
 			                <page string="销售费用行">
 			                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 			                		<tree string="Cost Lines" editable="bottom">
-			                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
+			                			<field name="partner_id"
+			                				domain="[('s_category_id', '!=', False)]"
+			                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
 				                		<field name="category_id"/>
 				                		<field name="amount"/>
 				                		<field name="note"/>
@@ -293,16 +299,17 @@
                     <field name="state"/>
                     <field name="money_state"/>
                     <field name="create_uid" string="制单人"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not paid" string="未收款" domain="[('money_state','=',u'未收款')]"/>
                     <filter name="part paid" string="部分收款" domain="[('money_state','=',u'部分收款')]"/>
                     <filter name="all paid" string="全部收款" domain="[('money_state','=',u'全部收款')]"/>
                     <group expand="0" string="分组">
-                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
                     </group>
                 </search>
             </field>
@@ -319,6 +326,7 @@
             		<field name="order_id"/>
             		<field name='staff_id'/>
             		<field name='partner_id'/>
+					<field name='total_qty'/>
             		<field name="amount"/>
             		<field name='receipt'/>
             		<field name='date_due'/>
@@ -352,6 +360,9 @@
             						attrs="{'readonly': [('state','!=','draft')]}"
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            					<field name='contact'/>
+            				    <field name="address"/>
+            				    <field name="mobile"/>
             					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="warehouse_dest_id"/>
@@ -389,6 +400,7 @@
 				 						<field name='goods_qty' sum='数量合计'/>
 				 						<field name='uom_id'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
+				 						<field name='cost_unit'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
 				 						<field name='amount' string='销售金额' sum='金额合计'/>
@@ -454,16 +466,17 @@
                     <field name="state"/>
                     <field name="return_state"/>
                     <field name="create_uid" string="制单人"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
                     <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
                     <filter name="all refund" string="全部退款" domain="[('return_state','=',u'全部退款')]"/>
                     <group expand="0" string="分组">
-                        <filter string="客户" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="订单日期" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter string="到期日" icon="terp-go-month" domain="[]" context="{'group_by':'date_due'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
                     </group>
                 </search>
             </field>
@@ -546,6 +559,25 @@
             </field>
         </record>
 
+		<record id="sell_adjust_search" model="ir.ui.view">
+            <field name="name">sell.adjust.search</field>
+            <field name="model">sell.adjust</field>
+            <field name="arch" type="xml">
+                <search string="销售调整单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
     	<!--销货订单，销售发货单action-->
     	<record id='sell_order_action' model='ir.actions.act_window'>
         	<field name='name'>销货订单</field>
@@ -608,6 +640,7 @@
             <field name="name">销售调整单</field>
             <field name="res_model">sell.adjust</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="sell_adjust_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建销售调整单

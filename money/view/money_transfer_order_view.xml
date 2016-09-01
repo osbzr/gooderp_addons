@@ -61,6 +61,24 @@
             </field>
         </record>
 
+		<!--资金转账单 search 视图-->
+		<record id="money_transfer_order_search" model="ir.ui.view">
+            <field name="name">money.transfer.order.search</field>
+            <field name="model">money.transfer.order</field>
+            <field name="arch" type="xml">
+                <search string="资金转账单">
+                    <field name="name"/>
+                    <field name="create_uid" string='制单人'/>
+                    <field name="state"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <!-- 资金转账单action -->
         <record id="money_transfer_order_action" model="ir.actions.act_window">
             <field name="name">资金转账单</field>

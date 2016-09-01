@@ -44,6 +44,16 @@ class test_goods(TransactionCase):
         result = self.env['goods'].name_search('001')
         self.assertEqual(result, real_result)
 
+    def test_create(self):
+        '''导入产品时，如果辅助单位为空，则用计量单位来填充它'''
+        goods = self.env['goods'].create({
+            'name': u'显示器',
+            'category_id': self.env.ref('core.goods_category_1').id,
+            'uom_id': self.env.ref('core.uom_pc').id,
+            'conversion': 1,
+            'cost': 1000,
+            })
+        self.assertTrue(goods.uos_id.id == self.env.ref('core.uom_pc').id)
 
 class test_attributes(TransactionCase):
 

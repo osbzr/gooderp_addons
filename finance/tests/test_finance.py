@@ -109,6 +109,12 @@ class test_period(TransactionCase):
             line.onchange_account_id()
             line.account_id = self.env.ref('finance.small_business_chart2211004').id
             line.onchange_account_id()
+            line.account_id = self.env.ref('finance.account_goods').id
+            line.account_id.auxiliary_financing = 'goods'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'member'
+            line.onchange_account_id()
+
         #这么写覆盖到了，但是这什么逻辑=。=
         self.env['voucher.line'].onchange_account_id()
                                                     
@@ -124,8 +130,21 @@ class test_finance_config_wizard (TransactionCase):
         reset_init_number_setting = self.env['finance.config.settings'].set_default_reset_init_number()
 
 
+class test_finance_account(TransactionCase):
 
+    def setUp(self):
+        super(test_finance_account, self).setUp()
+        self.cash = self.env.ref('finance.account_cash')
 
+    def test_name_get(self):
+        name = self.cash.name_get()
+        real_name = '%s %s' % (self.cash.code, self.cash.name)
+        self.assertTrue(name[0][1] == real_name)
 
+    def test_name_search(self):
+        '''会计科目按名字和编号搜索'''
+        result = self.env['finance.account'].name_search('库存现金')
+        real_result = [(self.cash.id,
+                        self.cash.code + ' ' + self.cash.name)]
 
-        
+        self.assertEqual(result, real_result)

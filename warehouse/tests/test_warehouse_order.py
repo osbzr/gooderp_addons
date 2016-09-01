@@ -193,3 +193,16 @@ class TestWarehouseOrder(TransactionCase):
         line = order.line_in_ids[0]
         self.assertTrue(line.warehouse_dest_id == hd_stock)
         self.env['wh.in'].create({'type': 'others'})
+
+    def test_onchange_type(self):
+        '''当业务类别变化时，调入库位也发生变化'''
+        # 其它出库单
+        self.others_out.type = 'inventory'
+        warehouse_inventory = self.browse_ref('warehouse.warehouse_inventory')
+        self.others_out.onchange_type()
+        self.assertTrue(self.others_out.warehouse_dest_id == warehouse_inventory)
+
+        # 其它入库单
+        self.others_in_2.type = 'inventory'
+        self.others_in_2.onchange_type()
+        self.assertTrue(self.others_in_2.warehouse_id == warehouse_inventory)
