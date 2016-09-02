@@ -28,7 +28,7 @@ openerp.home_page = function(instance, local) {
                              <div class='container' style='margin-bottom: 20px;'>\
                                  <div class='row'>\
                                      <div class='col-sm-6 col-sm-offset-3 feature-bg text-center '>\
-                                        <h1 class='feature-title' style='color:rgb(109,188,245)'>实时报表详情</h1> \
+                                        <h1 class='feature-title' style='color:rgb(109,188,245)'>实时报表</h1> \
                                     </div>\
                                      <div class='col-xs-12 col-sm-12 news right_div'>\
                                      </div>\
