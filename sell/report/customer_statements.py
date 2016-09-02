@@ -26,7 +26,7 @@ class customer_statements_report(models.Model):
     _name = "customer.statements.report"
     _description = u"客户对账单"
     _auto = False
-    _order = 'date'
+    _order = 'id, date'
 
     @api.one
     @api.depends('amount', 'pay_amount', 'partner_id')
@@ -82,7 +82,23 @@ class customer_statements_report(models.Model):
                     move_id
             FROM
                 (
-                SELECT m.partner_id,
+                SELECT p.id AS partner_id,
+                        '期初余额' AS name,
+                        p.create_date AS date,
+                        p.create_date AS done_date,
+                        0 AS sale_amount,
+                        0 AS benefit_amount,
+                        0 AS fee,
+                        p.receivable_init AS amount,
+                        0 AS pay_amount,
+                        0 AS discount_money,
+                        0 AS balance_amount,
+                        '' AS note,
+                        0 AS move_id
+                FROM partner AS p
+                WHERE p.receivable_init > 0 AND p.c_category_id != 0
+               UNION ALL
+               SELECT m.partner_id,
                         m.name,
                         m.date,
                         m.write_date AS done_date,

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import openerp.addons.decimal_precision as dp
+
 from openerp import fields, models, api, tools
 
 
@@ -8,7 +9,7 @@ class supplier_statements_report(models.Model):
     _name = "supplier.statements.report"
     _description = u"供应商对账单"
     _auto = False
-    _order = 'date'
+    _order = 'id, date'
 
     @api.one
     @api.depends('amount', 'pay_amount', 'partner_id')
@@ -37,7 +38,7 @@ class supplier_statements_report(models.Model):
     pay_amount = fields.Float(string=u'实际付款金额', readonly=True,
                               digits=dp.get_precision('Amount'))
     discount_money = fields.Float(string=u'付款折扣', readonly=True,
-                              digits=dp.get_precision('Amount'))
+                                  digits=dp.get_precision('Amount'))
     balance_amount = fields.Float(
         string=u'应付款余额',
         compute='_compute_balance_amount',
@@ -67,6 +68,21 @@ class supplier_statements_report(models.Model):
                     move_id
             FROM
                 (
+                SELECT p.id AS partner_id,
+                        '期初余额' AS name,
+                        p.create_date AS date,
+                        p.create_date AS done_date,
+                        0 AS purchase_amount,
+                        0 AS benefit_amount,
+                        p.payable_init AS amount,
+                        0 AS pay_amount,
+                        0 AS discount_money,
+                        0 AS balance_amount,
+                        '' AS note,
+                        0 AS move_id
+                FROM partner AS p
+                WHERE p.payable_init > 0 AND p.s_category_id != 0
+                UNION ALL
                 SELECT m.partner_id,
                         m.name,
                         m.date,
@@ -168,15 +184,15 @@ class supplier_statements_report_with_goods(models.TransientModel):
     price = fields.Float(u'单价',
                          digits=dp.get_precision('Amount'))
     discount_amount = fields.Float(u'折扣额',
-                                digits=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'))
     without_tax_amount = fields.Float(u'不含税金额',
-                                digits=dp.get_precision('Amount'))
+                                      digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额',
                               digits=dp.get_precision('Amount'))
     order_amount = fields.Float(string=u'采购金额', readonly=True,
                                 digits=dp.get_precision('Amount'))  # 采购
     benefit_amount = fields.Float(string=u'优惠金额', readonly=True,
-                                digits=dp.get_precision('Amount'))
+                                  digits=dp.get_precision('Amount'))
     fee = fields.Float(string=u'客户承担费用', readonly=True,
                        digits=dp.get_precision('Amount'))
     amount = fields.Float(string=u'应付金额', readonly=True,
@@ -184,7 +200,7 @@ class supplier_statements_report_with_goods(models.TransientModel):
     pay_amount = fields.Float(string=u'实际付款金额', readonly=True,
                               digits=dp.get_precision('Amount'))
     discount_money = fields.Float(string=u'付款折扣', readonly=True,
-                              digits=dp.get_precision('Amount'))
+                                  digits=dp.get_precision('Amount'))
     balance_amount = fields.Float(string=u'应付款余额', readonly=True,
                                   digits=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)

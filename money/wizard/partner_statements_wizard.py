@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from openerp.exceptions import except_orm
 from openerp import fields, models, api
+import datetime
 
 class partner_statements_report_wizard(models.TransientModel):
     _name = "partner.statements.report.wizard"
@@ -12,7 +13,7 @@ class partner_statements_report_wizard(models.TransientModel):
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True)
     from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date)  # 默认公司启用日期
-    to_date = fields.Date(string=u'结束日期', required=True, default=lambda self: fields.Date.context_today(self))  # 默认当前日期
+    to_date = fields.Date(string=u'结束日期', required=True, default=datetime.datetime.now() + datetime.timedelta(days = 1))  # 默认当前日期
 
     @api.multi
     def partner_statements_without_goods(self):
