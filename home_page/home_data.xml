@@ -68,9 +68,6 @@
 		    <field name="domain" ></field>
 		    <field name="note_one" >库存总量</field>
 		    <field name="compute_field_one" ref="warehouse.field_report_stock_balance_goods_qty"/>
-		    <field name="compute_field_two" ref="warehouse.field_report_stock_balance_cost"/>
-		    <field name="note_two" >库存成本</field>
-		    
 		</record>
 
         <record id="top_2" model="home.page">
@@ -90,8 +87,6 @@
 		    <field name="context" >{}</field>
 		   	<field name="note_one" >供应商应付款</field>
 		    <field name="compute_field_one" ref="core.field_partner_payable"/>
-		    <field name="compute_field_two" ref="core.field_partner_receivable"/>
-		    <field name="note_two" >客户应收款</field>
 		</record>
 
         <record id="top_4" model="home.page">
@@ -111,8 +106,6 @@
 		    <field name="context" >{}</field>
 		    <field name="note_one" >销售收入</field>
 		    <field name="compute_field_one" ref="sell.field_sell_order_amount"/>
-		    <field name="compute_field_two" ref="sell.field_sell_order_discount_amount"/>
-		    <field name="note_two" >折扣金额</field>
 		</record>
 
 		<record id="left_1" model="home.page">

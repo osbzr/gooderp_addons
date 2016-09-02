@@ -50,13 +50,10 @@
                         
                         <field name="domain" atts="{'required':[('menu_type','in',('top','left')]}"/> 
                         <field name="compute_field_one" atts="{'required':[('menu_type','=','top')]}"/> 
-                        <field name="note_one" atts="{'required':[('menu_type','=','main')]}"/> 
-
-                        <field name="compute_field_two"/> 
-                        <field name="note_two"/> 
+                        <field name="note_one" atts="{'required':[('menu_type','=','main')]}"/>
                         <field name="compute_type" /> 
                         <field name="context" atts="{'required':[('menu_type','in',('top','left'))]}"/>
-
+                        <field name="is_active"/>
                     </group>
                 </form>
             </field>
