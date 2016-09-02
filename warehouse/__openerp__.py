@@ -38,6 +38,7 @@
         'view/warehouse_view.xml',
         'view/inventory_view.xml',
         'view/production_view.xml',
+        'report/report_data.xml',
         'report/stock_balance_view.xml',
         'report/stock_transceive_view.xml',
         'report/lot_status_view.xml',

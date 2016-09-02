@@ -9,13 +9,13 @@ import report_docx
 class IrActionReportDocx(models.Model):
     _inherit = 'ir.actions.report.xml'
 
-    @api.model
-    def _check_selection_field_value(self, field, value):
-        if field == 'report_type' and value == 'docx':
-            return
-
-        return super(IrActionReportDocx, self)._check_selection_field_value(
-            field, value)
+    # @api.model
+    # def _check_selection_field_value(self, field, value):
+    #     if field == 'report_type' and value == 'docx':
+    #         return
+    #
+    #     return super(IrActionReportDocx, self)._check_selection_field_value(
+    #         field, value)
 
     def _lookup_report(self, cr, name):
         cr.execute("SELECT * FROM ir_act_report_xml WHERE report_name=%s", (name,))
