@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='report_wh_out' model='ir.actions.report.xml'>
+            <field name='name'>其他出库单</field>
+            <field name='model'>wh.out</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.out</field>
+            <field name='template_file'>warehouse/template/wh.out.docx</field>
+        </record>
+
+        <record id='report_wh_out_action' model='ir.values'>
+            <field name='name'>其他出库单打印</field>
+            <field name='model_id' ref="warehouse.model_wh_out" />
+            <field name='model'>wh.out</field>
+            <field name='key2'>client_print_multi</field>
+            <field name='action_id' ref='warehouse.report_wh_out' />
+            <field name="value" eval="'ir.actions.report.xml,' + str(ref('report_wh_out'))" />
+        </record>
+    </data>
+</openerp>
