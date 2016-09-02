@@ -366,7 +366,7 @@ class CreateDepreciationWizard(models.TransientModel):
     def create_depreciation(self):
         vouch_obj = self.env['voucher'].create({'date': fields.Date.context_today(self)})
         res = {}
-        for asset in self.env['asset'].search([('no_depreciation', '=', False)]):
+        for asset in self.env['asset'].search([('no_depreciation', '=', False), ('period_id','!=', self.period_id.id)]):
             if self.period_id not in asset.line_ids.period_id:
                 cost_depreciation = asset.cost_depreciation
                 total = sum(line.cost_depreciation for line in asset.line_ids) + asset.depreciation_value
