@@ -63,9 +63,9 @@ class money_transfer_order(models.Model):
         for transfer in self:
             if not transfer.line_ids:
                 raise except_orm('错误', '请先输入转账金额')
-            if transfer.line_ids.out_bank_id == transfer.line_ids.in_bank_id:
-                raise except_orm('错误', '转出账户与转入账户不能相同')
             for line in transfer.line_ids:
+                if line.out_bank_id == line.in_bank_id:
+                    raise except_orm('错误', '转出账户与转入账户不能相同')
                 if line.amount < 0:
                     raise except_orm('错误', '转账金额必须大于0')
                 if line.amount == 0:
