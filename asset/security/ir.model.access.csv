@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_asset_category,asset_category,model_asset_category,,1,1,1,1
+access_asset,asset,model_asset,,1,1,1,1
+access_asset_line,asset_line,model_asset_line,,1,1,1,1
+access_chang_line,chang_line,model_chang_line,,1,1,1,1
