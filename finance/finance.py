@@ -140,6 +140,9 @@ class voucher_line(models.Model):
     account_id = fields.Many2one(
         'finance.account', u'会计科目',
         ondelete='restrict', required=True)
+    currency_amount = fields.Float(u'外币金额', digits=dp.get_precision(u'金额'))
+    currency_id = fields.Many2one('res.currency', u'外币币别', ondelete='restrict')
+    exchange_rate = fields.Float(u'汇率')
     debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'))
     credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'))
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict')
@@ -272,6 +275,8 @@ class finance_account(models.Model):
         ('in', u'收入类'),
         ('out', u'费用类')
     ], u'类型', required="1")
+    currency_id = fields.Many2one('res.currency', u'外币币别')
+    exchange = fields.Boolean(u'是否期末调汇')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', u'科目名称必须唯一!'),
@@ -322,7 +327,15 @@ class res_company(models.Model):
 
 class bank_account(models.Model):
     _inherit = 'bank.account'
+
+    @api.one
+    @api.depends('account_id')
+    def _compute_currency_id(self):
+        self.currency_id = self.account_id.currency_id.id
+
     account_id = fields.Many2one('finance.account', u'科目')
+    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
+    currency_amount = fields.Float(u'外币金额', digits=dp.get_precision(u'金额'), readonly=True)
 
 
 class core_category(models.Model):

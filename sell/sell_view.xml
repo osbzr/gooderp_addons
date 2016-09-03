@@ -18,6 +18,7 @@
                     <field name="approve_uid"/>
                     <field name='state'/>
             		<field name='goods_state'/>
+					<field name='currency_id'/>
             	</tree>
         	</field>
     	</record>
@@ -51,6 +52,7 @@
             					<field name='name' readonly='1'/>
             					<field name='type' widget='radio'/>
             					<field name='goods_state' readonly='1'/>
+								<field name='currency_id' readonly='1'/>
 							</group>
             			</group>
             			<notebook>
@@ -67,7 +69,8 @@
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
-				 						<field name='amount' sum='金额合计'/>
+				 						<field name='currency_amount' sum='外币合计'/>
+										<field name='amount' sum='金额合计'/>
 				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
                  						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
@@ -196,6 +199,7 @@
             					<field name='order_id' readonly='1'/>
             					<field name='invoice_id' readonly='1'/>
             					<field name="money_state" readonly="1"/>
+								<field name="currency_id" readonly="1"/>
 								<field name="modifying" invisible="1"/>
             				</group>
             			</group>

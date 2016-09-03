@@ -51,14 +51,14 @@ class money_order(models.Model):
             if not line.bank_id.account_id:
                 raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
             self.env['voucher.line'].create({
-                'name': u"%s收款单%s" % (partner.name, name), 'account_id': line.bank_id.account_id.id, 'debit': line.amount,
-                'voucher_id': vouch_obj.id, 'partner_id': ''
+                'name': u"%s收款单%s" % (partner.name, name), 'account_id': line.bank_id.account_id.id, 'debit': line.amount * line.currency_id.rate_silent,
+                'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': line.currency_id.id, 'currency_amount': line.amount, 'exchange_rate': line.currency_id.rate_silent
             })
             if partner.c_category_id:
                 partner_account_id = partner.c_category_id.account_id.id
             self.env['voucher.line'].create({
-                'name': u"%s收款单%s " % (partner.name, name), 'account_id': partner_account_id, 'credit': line.amount,
-                'voucher_id': vouch_obj.id, 'partner_id': partner.id
+                'name': u"%s收款单%s " % (partner.name, name), 'account_id': partner_account_id, 'credit': line.amount * line.currency_id.rate_silent,
+                'voucher_id': vouch_obj.id, 'partner_id': partner.id, 'currency_id': line.currency_id.id, 'currency_amount': line.amount, 'exchange_rate': line.currency_id.rate_silent
             })
         return vouch_obj
 
@@ -111,7 +111,7 @@ class money_invoice(models.Model):
             vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
                          'debit_account_id': partner_account_id, 'sell_tax_amount': self.tax_amount or 0,
-                         'credit_auxiliary_id':self.auxiliary_id.id,
+                         'credit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate_silent or 0,
                          })
 
         else:
@@ -119,24 +119,29 @@ class money_invoice(models.Model):
                          'amount': self.amount, 'credit_account_id': partner_account_id,
                          'debit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
                          'partner_credit':self.partner_id.id, 'buy_tax_amount': self.tax_amount or 0,
-                         'debit_auxiliary_id':self.auxiliary_id.id,
+                         'debit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate_silent or 0,
                          })
         self.create_voucher_line(vals)
         return res
 
     @api.multi
     def create_voucher_line(self, vals):
-        debit = credit = vals.get('amount')
+        if vals.get('currency_id') == self.env.user.company_id.currency_id.id :
+            debit = credit = vals.get('amount')
+        else :
+            debit = credit = vals.get('amount') * vals.get('rate_silent')
+            sell_tax_amount = vals.get('sell_tax_amount') * vals.get('rate_silent')
         # 把税从金额中减去
         if vals.get('buy_tax_amount'):
             debit = vals.get('amount') - vals.get('buy_tax_amount')
         if vals.get('sell_tax_amount'):
-            credit = vals.get('amount') - vals.get('sell_tax_amount')
+            credit = vals.get('amount') - sell_tax_amount
         # 借方行
+        print vals.get('currency_id')
         self.env['voucher.line'].create({
             'name': u"%s %s " % (vals.get('string'), vals.get('name')), 'account_id': vals.get('debit_account_id'),
             'debit': debit, 'voucher_id': vals.get('vouch_obj_id'), 'partner_id': vals.get('partner_debit', ''),
-            'auxiliary_id':vals.get('debit_auxiliary_id',False)
+            'auxiliary_id':vals.get('debit_auxiliary_id',False),'currency_id':vals.get('currency_id'),'currency_amount': vals.get('amount')
         })
         # 进项税行
         if vals.get('buy_tax_amount'):
@@ -158,7 +163,7 @@ class money_invoice(models.Model):
                 raise except_orm(u'错误', u'请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目' )
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('string'), vals.get('name')),
-                'account_id': self.env.user.company_id.output_tax_account.id, 'credit': vals.get('sell_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
+                'account_id': self.env.user.company_id.output_tax_account.id, 'credit': sell_tax_amount, 'voucher_id': vals.get('vouch_obj_id'),
         })
 
         return True
