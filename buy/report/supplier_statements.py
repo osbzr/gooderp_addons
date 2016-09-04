@@ -68,21 +68,6 @@ class supplier_statements_report(models.Model):
                     move_id
             FROM
                 (
-                SELECT p.id AS partner_id,
-                        '期初余额' AS name,
-                        p.create_date AS date,
-                        p.create_date AS done_date,
-                        0 AS purchase_amount,
-                        0 AS benefit_amount,
-                        p.payable_init AS amount,
-                        0 AS pay_amount,
-                        0 AS discount_money,
-                        0 AS balance_amount,
-                        '' AS note,
-                        0 AS move_id
-                FROM partner AS p
-                WHERE p.payable_init > 0 AND p.s_category_id != 0
-                UNION ALL
                 SELECT m.partner_id,
                         m.name,
                         m.date,
@@ -97,6 +82,22 @@ class supplier_statements_report(models.Model):
                         NULL AS move_id
                 FROM money_order AS m
                 WHERE m.type = 'pay' AND m.state = 'done'
+                UNION ALL
+                SELECT  mi.partner_id,
+                        mi.name,
+                        mi.date,
+                        mi.create_date AS done_date,
+                        0 AS purchase_amount,
+                        0 AS benefit_amount,
+                        mi.amount,
+                        0 AS pay_amount,
+                        0 AS discount_money,
+                        0 AS balance_amount,
+                        Null AS note,
+                        mi.move_id
+                FROM money_invoice AS mi
+                LEFT JOIN core_category AS c ON mi.category_id = c.id
+                WHERE c.type = 'expense' AND mi.state = 'done' AND mi.name = '期初应付余额'
                 UNION ALL
                 SELECT  mi.partner_id,
                         mi.name,
