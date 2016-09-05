@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+        <record id="template_1" model="report.template">
+            <field name="model_name">balance.sheet</field>
+            <field name="file_address">finance/template/balance_sheet_tempalte.xls</field>
+        </record>
+    </data>
+</openerp>

@@ -43,16 +43,16 @@
                 <form string="首页设置">
                     <group>
                         <field name="sequence" invisible="1"/>
-                        <field name="action" atts="{'required':[('menu_type','=','main')]}"/>
+                        <field name="action" attrs="{'required':[('menu_type','=','all_business')]}"/>
                         <field name="view_id" domain="[('type', '=', 'tree')]"/>
-                        <field name="image"  widget="image" atts="{'required':[('menu_type','=','main')]}"/>
                         <field name="menu_type" required='1'/>
-                        
-                        <field name="domain" atts="{'required':[('menu_type','in',('top','left')]}"/> 
-                        <field name="compute_field_one" atts="{'required':[('menu_type','=','top')]}"/> 
-                        <field name="note_one" atts="{'required':[('menu_type','=','main')]}"/>
+                        <field name="report_type_id" attrs="{'invisible':[('menu_type','!=','report')],'required':[('menu_type','=','report')]}"
+                        widget="selection"/>
+                        <field name="domain" atts="{'required':[('menu_type','in',('all_business','amount_summary')]}"/>
+                        <field name="compute_field_one" attrs="{'required':[('menu_type','=','top')]}"/>
+                        <field name="note_one" attrs="{'required':[('menu_type','=','main')]}"/>
                         <field name="compute_type" /> 
-                        <field name="context" atts="{'required':[('menu_type','in',('top','left'))]}"/>
+                        <field name="context" attrs="{'required':[('menu_type','in',('top','left'))]}"/>
                         <field name="is_active"/>
                     </group>
                 </form>
@@ -65,8 +65,27 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-
-        <menuitem id="financial_home_action_mnue" name="设置主页元素" parent="home_page_menu_two"
+        <menuitem id="financial_home_action_menu" name="设置主页元素" parent="home_page_menu_two"
             action="financial_home_action" sequence='20'/>
+
+        <record model="ir.ui.view" id="home_report_type_tree">
+            <field name="name">financial_home_tree</field>
+            <field name="model">home.report.type</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="首页报表分类" editable="bottom">
+                    <field name="sequence" />
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="home_report_type_action">
+            <field name="name">首页报表分类</field>
+            <field name="res_model">home.report.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+        <menuitem id="home_report_type_menu" name="报表分类" parent="home_page_menu_two"
+            action="home_report_type_action" sequence='30'/>
     </data>
 </openerp>

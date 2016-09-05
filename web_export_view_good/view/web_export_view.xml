@@ -14,12 +14,12 @@
             <field name="model">report.template</field>
             <field name="arch" type="xml">
                 <tree string="报表模板" editable='bottom'>
-                    <field name="model"/>
+                    <field name="model_id"/>
+                    <field name="model_name" readonly="1"/>
                     <field name="file_address"/>
                 </tree>
             </field>
         </record>
-
         <record id="report_template_action" model="ir.actions.act_window">
             <field name="name">报表模板</field>
             <field name="res_model">report.template</field>

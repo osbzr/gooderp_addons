@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 groups_home_page_access_01,groups_home_page_access_01,model_home_page,,1,1,1,1
+groups_model_home_report_type_access_01,groups_model_home_report_type_access_01,model_home_report_type,,1,1,1,1
