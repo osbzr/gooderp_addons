@@ -6,7 +6,7 @@ from openerp.tests import common
 import openerp
 import os
 import base64
-from openerp.addons.report_docx_module.models.parser \
+from openerp.addons.report_docx.models.parser \
     import ReportDocxReport, ReportDocxParser
 
 
