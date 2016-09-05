@@ -102,23 +102,6 @@ class customer_statements_report(models.Model):
                         mi.name,
                         mi.date,
                         mi.create_date AS done_date,
-                        0 AS sale_amount,
-                        0 AS benefit_amount,
-                        0 AS fee,
-                        mi.amount,
-                        0 AS pay_amount,
-                        0 as discount_money,
-                        0 AS balance_amount,
-                        Null AS note,
-                        mi.move_id
-                FROM money_invoice AS mi
-                LEFT JOIN core_category AS c ON mi.category_id = c.id
-                WHERE c.type = 'income' AND mi.state = 'done' AND mi.name = '期初应收余额'
-                UNION ALL
-                SELECT  mi.partner_id,
-                        mi.name,
-                        mi.date,
-                        mi.create_date AS done_date,
                         sd.amount + sd.discount_amount AS sale_amount,
                         sd.discount_amount AS benefit_amount,
                         sd.partner_cost AS fee,
@@ -130,7 +113,7 @@ class customer_statements_report(models.Model):
                         mi.move_id
                 FROM money_invoice AS mi
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
-                JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
+                LEFT JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
                 WHERE c.type = 'income' AND mi.state = 'done'
                 ) AS ps)
         """)
