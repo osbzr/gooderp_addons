@@ -127,7 +127,7 @@ class voucher(models.Model):
         if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
             return super(voucher, self).write(vals)
         else:
-            if self.state == 'done':
+            if self.state == 'done' and (not vals.get('name', False)):
                 raise except_orm(u'错误', u'凭证已审核！修改请先反审核！')
         return super(voucher, self).write(vals)
 

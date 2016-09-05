@@ -143,6 +143,8 @@ class checkout_wizard(models.TransientModel):
                     'period_id': self.period_id.id,
                 })
                 trial_wizard.create_trial_balance()
+                # 按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）
+                self.recreate_voucher_name(self.period_id)
                 # 关闭会计期间
                 self.period_id.is_closed = True
                 # 如果下一个会计期间没有，则创建。
@@ -154,8 +156,6 @@ class checkout_wizard(models.TransientModel):
                     else:
                         self.env['finance.period'].create({'year': self.period_id.year,
                                                            'month': str(int(self.period_id.month) + 1),})
-                # 按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）
-                self.recreate_voucher_name(self.period_id)
                 # 显示凭证
                 view = self.env.ref('finance.voucher_form')
                 if voucher_line or year_account:
