@@ -3,6 +3,7 @@
 import openerp.addons.decimal_precision as dp
 
 from openerp import fields, models, api, tools
+from openerp.exceptions import except_orm
 
 
 class supplier_statements_report(models.Model):
@@ -123,32 +124,34 @@ class supplier_statements_report(models.Model):
 
         # 采购退货单、入库单
         buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        if buy.is_return:
-            view = self.env.ref('buy.buy_return_form')
-            return {
-                'name': u'采购退货单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'buy.receipt',
-                'type': 'ir.actions.act_window',
-                'res_id': buy.id,
-                'context': {'type': 'pay'}
-            }
-        else:
-            view = self.env.ref('buy.buy_receipt_form')
-            return {
-                'name': u'采购入库单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'buy.receipt',
-                'type': 'ir.actions.act_window',
-                'res_id': buy.id,
-                'context': {'type': 'pay'}
-            }
+        if buy:
+            if buy.is_return:
+                view = self.env.ref('buy.buy_return_form')
+                return {
+                    'name': u'采购退货单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'buy.receipt',
+                    'type': 'ir.actions.act_window',
+                    'res_id': buy.id,
+                    'context': {'type': 'pay'}
+                }
+            else:
+                view = self.env.ref('buy.buy_receipt_form')
+                return {
+                    'name': u'采购入库单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'buy.receipt',
+                    'type': 'ir.actions.act_window',
+                    'res_id': buy.id,
+                    'context': {'type': 'pay'}
+                }
+        raise except_orm(u'错误！', u'您不能查看期初余额的源单！')
 
 
 class supplier_statements_report_with_goods(models.TransientModel):
@@ -211,31 +214,34 @@ class supplier_statements_report_with_goods(models.TransientModel):
 
         # 采购退货单、入库单
         buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        if buy.is_return:
-            view = self.env.ref('buy.buy_return_form')
-            return {
-                'name': u'采购退货单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'buy.receipt',
-                'type': 'ir.actions.act_window',
-                'res_id': buy.id,
-                'context': {'type': 'pay'}
-            }
-        else:
-            view = self.env.ref('buy.buy_receipt_form')
-            return {
-                'name': u'采购入库单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'buy.receipt',
-                'type': 'ir.actions.act_window',
-                'res_id': buy.id,
-                'context': {'type': 'pay'}
-            }
+        if buy:
+            if buy.is_return:
+                view = self.env.ref('buy.buy_return_form')
+                return {
+                    'name': u'采购退货单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'buy.receipt',
+                    'type': 'ir.actions.act_window',
+                    'res_id': buy.id,
+                    'context': {'type': 'pay'}
+                }
+            else:
+                view = self.env.ref('buy.buy_receipt_form')
+                return {
+                    'name': u'采购入库单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'buy.receipt',
+                    'type': 'ir.actions.act_window',
+                    'res_id': buy.id,
+                    'context': {'type': 'pay'}
+                }
+
+        raise except_orm(u'错误！', u'您不能查看期初余额的源单！')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
