@@ -58,7 +58,7 @@ class Test_sell(TransactionCase):
 
         self.order.sell_order_done()
         # 计算字段的测试
-        self.assertEqual(self.order.amount, 151600.00)
+        self.assertEqual(self.order.amount, 168448.00)
         # 正常的反审核
         self.order.sell_order_draft()
 
@@ -84,27 +84,25 @@ class Test_sell(TransactionCase):
         # sell.order onchange test
         self.order.discount_rate = 10
         self.order.onchange_discount_rate()
-        self.assertEqual(self.order.discount_amount, 15163.2)
+        self.assertEqual(self.order.discount_amount, 16848.0)
 #         self.order.unlink()
 
     def test_sale_order_line_compute(self):
         """测试销售订单的on_change 和 计算字段"""
 
         # sell_order_line 的计算字段的测试
-        self.assertEqual(self.sell_order_line.amount, 90)  # tax_amount subtotal
+        self.assertEqual(self.sell_order_line.amount, 101.7)  # tax_amount subtotal
         self.assertEqual(self.sell_order_line.tax_rate, 17.0)
         self.assertEqual(self.sell_order_line.tax_amount, 15.3)
-        self.assertEqual(self.sell_order_line.subtotal, 105.3)
+        self.assertEqual(self.sell_order_line.subtotal, 117.0)
 
         # onchange test
-        self.sell_order_line.goods_id = self.env.ref('goods.mouse')
         # 折扣率 on_change 变化
         self.sell_order_line.discount_rate = 20
         # 通过onchange来改变 goods_id
-#         self.sell_order_line.onchange_goods_id()
         self.sell_order_line.onchange_discount_rate()
 
-        self.assertEqual(self.sell_order_line.amount, 80)
+        self.assertEqual(self.sell_order_line.amount, 103.4)
 
     def test_sell_delivery(self):
         """ 销售订单中 on_change 及计算字段"""
@@ -114,8 +112,8 @@ class Test_sell(TransactionCase):
         sell_delivery.onchange_discount_rate()
 
         self.assertEqual(sell_delivery.money_state, u'未收款')
-        self.assertEqual(sell_delivery.discount_amount, 10.53)
-        self.assertEqual(sell_delivery.amount, 94.77)
+        self.assertAlmostEqual(sell_delivery.discount_amount, 11.7)
+        self.assertEqual(sell_delivery.amount, 105.3)
 
         # 销售发货单 的确认
         sell_delivery.receipt = 22
@@ -132,7 +130,7 @@ class Test_sell(TransactionCase):
         # 退货单折扣率测试
         self.sell_delivery_obj.discount_rate = 10
         self.sell_delivery_obj.onchange_discount_rate()
-        self.assertEqual(self.sell_delivery_obj.discount_amount, 45)
+        self.assertEqual(self.sell_delivery_obj.discount_amount, 50)
         #  结算账户 需要输入付款额 测试
         self.sell_delivery_obj.bank_account_id = self.bank.id
         self.receipt = False

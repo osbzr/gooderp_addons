@@ -49,9 +49,9 @@ class wh_move_line(models.Model):
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         amount = self.goods_qty * self.price - self.discount_amount
         tax_amt = amount * self.tax_rate * 0.01
-        self.amount = amount
         self.tax_amount = tax_amt
-        self.subtotal = amount + tax_amt
+        self.subtotal = self.goods_qty * self.price_taxed
+        self.amount = self.subtotal - tax_amt
 
     @api.one
     @api.depends('goods_id')
