@@ -31,7 +31,17 @@ class TrialBalance(models.Model):
 class CreateTrialBalanceWizard(models.TransientModel):
     """生成科目余额表的 向导 根据输入的期间"""
     _name = "create.trial.balance.wizard"
-    period_id = fields.Many2one('finance.period', string=u'会计期间')
+
+    @api.model
+    def _default_period_id(self):
+        """
+        默认是当前会计期间
+        :return: 当前会计期间的对象
+        """
+        return self.env['finance.period'].get_date_now_period_id()
+
+    period_id = fields.Many2one('finance.period', default=_default_period_id, string=u'会计期间')
+
 
     @api.multi
     def compute_last_period_id(self, period_id):
@@ -175,10 +185,35 @@ class CreateTrialBalanceWizard(models.TransientModel):
 class CreateVouchersSummaryWizard(models.TransientModel):
     """创建 明细账或者总账的向导 """
     _name = "create.vouchers.summary.wizard"
-    period_begin_id = fields.Many2one('finance.period', string=u'开始期间')
-    period_end_id = fields.Many2one('finance.period', string=u'结束期间')
-    subject_name_id = fields.Many2one('finance.account', string=u'科目名称 从')
-    subject_name_end_id = fields.Many2one('finance.account', string=u'到')
+
+    @api.model
+    def _default_end_period_id(self):
+        """
+        默认是当前会计期间
+        :return: 当前会计期间的对象
+        """
+        return self.env['finance.period'].get_date_now_period_id()
+
+    @api.model
+    def _default_begin_period_id(self):
+        """
+            默认是当前会计期间
+            :return: 当前会计期间的对象
+            """
+        return self.env['finance.period'].get_year_fist_period_id()
+
+    @api.model
+    def _default_subject_name_id(self):
+        return self.env['finance.account'].get_smallest_code_account()
+
+    @api.model
+    def _default_subject_name_end_id(self):
+        return self.env['finance.account'].get_max_code_account()
+
+    period_begin_id = fields.Many2one('finance.period', string=u'开始期间', default=_default_begin_period_id)
+    period_end_id = fields.Many2one('finance.period', string=u'结束期间', default=_default_end_period_id)
+    subject_name_id = fields.Many2one('finance.account', string=u'科目名称 从', default=_default_subject_name_id)
+    subject_name_end_id = fields.Many2one('finance.account', string=u'到', default=_default_subject_name_end_id)
 
     @api.multi
     @api.onchange('period_begin_id', 'period_end_id')
@@ -449,8 +484,17 @@ class CreateVouchersSummaryWizard(models.TransientModel):
 class VouchersSummary(models.TransientModel):
     """明细帐"""
     _name = 'vouchers.summary'
+
+    @api.model
+    def _default_period_id(self):
+        """
+        默认是当前会计期间
+        :return: 当前会计期间的对象
+        """
+        return self.env['finance.period'].get_date_now_period_id()
+
     date = fields.Date(u'日期')
-    period_id = fields.Many2one('finance.period', string=u'会计期间')
+    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id)
     voucher_id = fields.Many2one('voucher', u'凭证字号')
     summary = fields.Char(u'摘要')
     direction = fields.Char(u'方向')
@@ -479,7 +523,16 @@ class VouchersSummary(models.TransientModel):
 class GeneralLedgerAccount(models.TransientModel):
     """总账"""
     _name = 'general.ledger.account'
-    period_id = fields.Many2one('finance.period', string=u'会计期间')
+
+    @api.model
+    def _default_period_id(self):
+        """
+        默认是当前会计期间
+        :return: 当前会计期间的对象
+        """
+        return self.env['finance.period'].get_date_now_period_id()
+
+    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id)
     summary = fields.Char(u'摘要')
     direction = fields.Char(u'方向')
     debit = fields.Float(u'借方金额')

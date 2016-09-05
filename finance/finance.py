@@ -222,6 +222,29 @@ class finance_period(models.Model):
         if not period_id:
             return self.create({'year': current_date[0:4],
                                 'month': str(int(current_date[5:7])), })
+    @api.multi
+    def get_date_now_period_id(self):
+        """
+        默认是当前会计期间
+        :return: 当前会计期间的对象 如果不存在则返回 False
+        """
+        datetime_str = datetime.now().strftime("%Y-%m-%d")
+        datetime_str_list = datetime_str.split('-')
+        period_row = self.env['finance.period'].search(
+            [('year', '=', datetime_str_list[0]), ('month', '=', str(int(datetime_str_list[1])))])
+        return period_row and period_row[0]
+
+    @api.multi
+    def get_year_fist_period_id(self):
+        """
+            获取本年创建过的第一个会计期间
+            :return: 当前会计期间的对象 如果不存在则返回 False
+            """
+        datetime_str = datetime.now().strftime("%Y-%m-%d")
+        datetime_str_list = datetime_str.split('-')
+        period_row = self.env['finance.period'].search(
+            [('year', '=', datetime_str_list[0])],order='month')
+        return period_row and period_row[0]
 
     @api.multi
     def get_period(self, date):
@@ -296,6 +319,18 @@ class finance_account(models.Model):
             domain = ['|', ('code', '=ilike', name + '%'), ('name', operator, name)]
         accounts = self.search(domain + args, limit=limit)
         return accounts.name_get()
+
+    @api.multi
+    def get_smallest_code_account(self):
+        finance_account_row = self.search([],order='code')
+        return finance_account_row and finance_account_row[0]
+
+
+    @api.multi
+    def get_max_code_account(self):
+        finance_account_row = self.search([],order='code desc')
+        return finance_account_row and finance_account_row[0]
+
 
 class auxiliary_financing(models.Model):
     '''辅助核算'''
