@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from openerp.exceptions import except_orm
 from openerp import fields, models, api
+import datetime
 
 class partner_statements_report_wizard(models.TransientModel):
     _name = "partner.statements.report.wizard"
