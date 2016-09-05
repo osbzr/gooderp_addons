@@ -26,7 +26,7 @@ class customer_statements_report(models.Model):
     _name = "customer.statements.report"
     _description = u"客户对账单"
     _auto = False
-    _order = 'date'
+    _order = 'id, date'
 
     @api.one
     @api.depends('amount', 'pay_amount', 'partner_id')
@@ -82,7 +82,7 @@ class customer_statements_report(models.Model):
                     move_id
             FROM
                 (
-                SELECT m.partner_id,
+               SELECT m.partner_id,
                         m.name,
                         m.date,
                         m.write_date AS done_date,
@@ -113,7 +113,7 @@ class customer_statements_report(models.Model):
                         mi.move_id
                 FROM money_invoice AS mi
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
-                JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
+                LEFT JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
                 WHERE c.type = 'income' AND mi.state = 'done'
                 ) AS ps)
         """)
