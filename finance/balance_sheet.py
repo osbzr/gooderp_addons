@@ -156,7 +156,7 @@ class create_balance_sheet_wizard(models.TransientModel):
                     total_sum = sum(subject_vals_out)-sum(subject_vals_in)
                 else:
                     if subject_vals_in:
-                        total_sum = sum(subject_vals_in)
+                        total_sum = -sum(subject_vals_in)
                     else:
                         total_sum = sum(subject_vals_out)
             return total_sum
