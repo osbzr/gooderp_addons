@@ -66,7 +66,8 @@ class money_order(models.Model):
     @api.one
     @api.depends('partner_id')
     def _compute_currency_id(self):
-        self.currency_id = self.partner_id.c_category_id.account_id.currency_id.id or self.partner_id.s_category_id.account_id.currency_id.id
+        partner_currency_id = self.partner_id.c_category_id.account_id.currency_id.id or self.partner_id.s_category_id.account_id.currency_id.id
+        self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
 
 
     state = fields.Selection([
@@ -234,8 +235,9 @@ class money_order_line(models.Model):
     @api.one
     @api.depends('bank_id')
     def _compute_currency_id(self):
-        self.currency_id = self.bank_id.account_id.currency_id.id
-        print self.currency_id.id,self.money_id.currency_id.id
+        partner_currency_id = self.bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
+        self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
+        print self.currency_id
         if self.bank_id and self.currency_id.id != self.money_id.currency_id.id :
             raise ValidationError(u'结算帐户与业务伙伴币别不一致')
 

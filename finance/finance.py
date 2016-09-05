@@ -142,7 +142,7 @@ class voucher_line(models.Model):
         ondelete='restrict', required=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision(u'金额'))
     currency_id = fields.Many2one('res.currency', u'外币币别', ondelete='restrict')
-    exchange_rate = fields.Float(u'汇率')
+    rate_silent = fields.Float(u'汇率')
     debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'))
     credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'))
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict')
