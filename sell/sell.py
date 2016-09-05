@@ -316,9 +316,9 @@ class sell_order_line(models.Model):
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
         tax_amt = amount * self.tax_rate * 0.01  # 税额
-        self.amount = amount
         self.tax_amount = tax_amt
-        self.subtotal = amount + tax_amt
+        self.subtotal = self.quantity * self.price_taxed
+        self.amount = self.subtotal - tax_amt
 
     order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
                                required=True, ondelete='cascade')
@@ -888,9 +888,9 @@ class sell_adjust_line(models.Model):
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
         tax_amt = amount * self.tax_rate * 0.01  # 税额
-        self.amount = amount
         self.tax_amount = tax_amt
-        self.subtotal = amount + tax_amt
+        self.subtotal = self.quantity * self.price_taxed
+        self.amount = self.subtotal - tax_amt
 
     order_id = fields.Many2one('sell.adjust', u'订单编号', select=True,
                                required=True, ondelete='cascade')
