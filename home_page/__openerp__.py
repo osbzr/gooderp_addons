@@ -1,11 +1,12 @@
 {
     'name': 'GoodErp 首页设置',
     'version': '1.0',
+    'author': "开阖-静静gilbert@osbzr.com",
     'summary': '首页配置',
     'category': 'Tools',
     'description':
         """
-
+        用于实现可配置的首页系统.
         """,
     'data': [
         'security/groups.xml',

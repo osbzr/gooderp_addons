@@ -2,13 +2,7 @@
 
 from openerp import models, fields, api
 from openerp.exceptions import except_orm
-from datetime import datetime
-import calendar
 from math import fabs
-
-ISODATEFORMAT = '%Y-%m-%d'
-ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
-
 
 class TrialBalance(models.Model):
     """科目余额表"""
@@ -40,7 +34,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         """
         return self.env['finance.period'].get_date_now_period_id()
 
-    period_id = fields.Many2one('finance.period', default=_default_period_id, string=u'会计期间')
+    period_id = fields.Many2one('finance.period', default=_default_period_id, string=u'会计期间',help=u'限定生成期间的范围')
 
 
     @api.multi
@@ -212,8 +206,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
 
     period_begin_id = fields.Many2one('finance.period', string=u'开始期间', default=_default_begin_period_id)
     period_end_id = fields.Many2one('finance.period', string=u'结束期间', default=_default_end_period_id)
-    subject_name_id = fields.Many2one('finance.account', string=u'科目名称 从', default=_default_subject_name_id)
-    subject_name_end_id = fields.Many2one('finance.account', string=u'到', default=_default_subject_name_end_id)
+    subject_name_id = fields.Many2one('finance.account', string=u'科目名称 从', default=_default_subject_name_id,help=u'默认是所有科目的最小code')
+    subject_name_end_id = fields.Many2one('finance.account', string=u'到', default=_default_subject_name_end_id,help=u'默认是所有科目的最小code')
 
     @api.multi
     @api.onchange('period_begin_id', 'period_end_id')
@@ -255,7 +249,10 @@ class CreateVouchersSummaryWizard(models.TransientModel):
 
     @api.multi
     def judgment_lending(self, balance, balance_credit, balance_debit):
-        """根据明细账的借贷 金额 判断出本条记录的余额 及方向，balance 为上一条记录余额"""
+        """根据明细账的借贷 金额 判断出本条记录的余额 及方向，balance 为上一条记录余额
+            传入参数 余额 ,贷方,借方
+            :return:返回一个tuple (借贷平借贷方向 ,余额)
+        """
         balance += balance_debit - balance_credit
         if balance > 0:
             direction = u'借'
@@ -268,7 +265,10 @@ class CreateVouchersSummaryWizard(models.TransientModel):
 
     @api.multi
     def get_year_balance(self, period, subject_name):
-        """根据期间和科目名称 计算出本期合计 和本年累计 (已经关闭的期间)"""
+        """根据期间和科目名称 计算出本期合计 和本年累计 (已经关闭的期间)
+        :param period 期间 subject_name 科目object
+        return: [本期合计dict,本年合计dict ]
+        """
         vals_dict = {}
         trial_balance_obj = self.env['trial.balance'].search([('period_id', '=', period.id), ('subject_name_id', '=', subject_name.id)])
         if trial_balance_obj:
@@ -496,8 +496,8 @@ class VouchersSummary(models.TransientModel):
     date = fields.Date(u'日期')
     period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id)
     voucher_id = fields.Many2one('voucher', u'凭证字号')
-    summary = fields.Char(u'摘要')
-    direction = fields.Char(u'方向')
+    summary = fields.Char(u'摘要',help=u'从凭证中获取到对应的摘要')
+    direction = fields.Char(u'方向',help=u'会计术语,主要方向借`贷`平')
     debit = fields.Float(u'借方金额')
     credit = fields.Float(u'贷方金额')
     balance = fields.Float(u'余额')
@@ -532,9 +532,9 @@ class GeneralLedgerAccount(models.TransientModel):
         """
         return self.env['finance.period'].get_date_now_period_id()
 
-    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id)
+    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id,help=u'记录本条记录的期间!')
     summary = fields.Char(u'摘要')
-    direction = fields.Char(u'方向')
+    direction = fields.Char(u'方向',help=u'会计术语,主要方向借`贷`平')
     debit = fields.Float(u'借方金额')
     credit = fields.Float(u'贷方金额')
     balance = fields.Float(u'余额')
