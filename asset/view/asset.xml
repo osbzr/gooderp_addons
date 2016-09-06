@@ -105,7 +105,7 @@
                 <form string="固定资产">
 	                <header>
 	                	<button name='asset_done' states="draft" string="审核" type="object" class="oe_highlight"/>
-	                	<button name='asset_draft' states="done" string="反审核" type="object"/>
+	                	<button name='asset_draft' states="done" string="反审核" type="object" invisible="1"/>
                         <button name="%(create_clean_action)d" string="清理固定资产" type="action" class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         <button name="%(create_chang_action)d" string="变更固定资产" type="action" class="btn-primary"
@@ -162,6 +162,7 @@
                                           <field name="chang_name"/>
                                           <field name="chang_before"/>
                                           <field name="chang_after"/>
+                                          <field name="partner_id"/>
                                           <field name="create_uid" string="变更人"/>
                                       </tree>
                                  </field>
@@ -234,7 +235,8 @@
             	<form>
             		<group>
                         <group>
-                            <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 30%%"/>
+                            <field name="date" style="width: 30%%"/>
+                            <field name="period_id"  style="width: 30%%"/>
                         </group>
                     </group>
 
