@@ -62,14 +62,18 @@ class voucher(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
-                               track_visibility='always')
+                               track_visibility='always',help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核')], u'状态', default='draft',
-                             track_visibility='always')
-    is_checkout = fields.Boolean(u'结账凭证')
+                             track_visibility='always',help=u'凭证所属状态!')
+    is_checkout = fields.Boolean(u'结账凭证',help=u'是否是结账凭证!')
 
     @api.one
     def voucher_done(self):
+        """
+        审核 凭证按钮 所调用的方法
+        :return: 主要是把 凭证的 state改变
+        """
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
         if self.period_id.is_closed is True:
