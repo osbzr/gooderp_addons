@@ -672,7 +672,6 @@ class test_buy_adjust_line(TransactionCase):
             line.price_taxed = 11.7
             self.assertTrue(line.amount == 100)
             self.assertTrue(line.tax_amount == 17)
-            self.assertTrue(line.price_taxed == 11.7)
             self.assertTrue(line.subtotal == 117)
 
     def test_onchange_goods_id(self):

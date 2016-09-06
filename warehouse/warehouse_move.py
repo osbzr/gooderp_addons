@@ -71,7 +71,7 @@ class wh_move(models.Model):
         goods = self.env['goods'].search([('barcode', '=', barcode)])
 
         if not att and not goods:
-            raise osv.except_osv(u'错误', u'该产品不存在')
+            raise osv.except_osv(u'错误', u'ean为  %s 的产品不存在' % (barcode))
         else:
             conversion = att and att.goods_id.conversion or goods.conversion
             if model_name in ['wh.out','wh.in']:

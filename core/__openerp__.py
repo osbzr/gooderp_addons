@@ -10,7 +10,9 @@
     'depends': ['base',
                 'web_menu_create',
                 'decimal_precision',
-                'web_readonly_bypass'],
+                'web_readonly_bypass',
+                'mail',
+                'web_export_view_good'],
     'demo': [
         'core_demo.xml',
         ],

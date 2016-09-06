@@ -24,7 +24,7 @@
     'author': 'jeff@osbzr.com,flora@osbzr.com',
     'website': 'https://www.osbzr.com',
     'description': '''gooderp销售实例，通过安装gooderp模块展示openerp的销售流程''',
-    'depends': ['mail', 'core', 'warehouse', 'money', 'partner_address'],
+    'depends': ['core', 'warehouse', 'money', 'partner_address'],
     'data': [
             'sell_data.xml',
             'security/groups.xml',

@@ -13,6 +13,7 @@
         'security/ir.model.access.csv',
         'data/finance_voucher_data.xml',
         'data/finance_data.xml',
+        'data/finance_export_template_data.xml',
         'res_config_view.xml',
         'finance_conf.xml',
         'wizard/checkout_wizard.xml',

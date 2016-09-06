@@ -232,8 +232,6 @@ openerp.web_export_view_good = function (instance) {
           	       operation_message[3]=_t(now_day.trim());
 				           export_rows.push(operation_message);
                    if (self.view.dataset.context.attachment_information !==undefined){
-                    //export_rows.push([])
-                    //export_rows.push([self.view.dataset.context.attachment_information]);}
                        var arr = self.view.dataset.context.attachment_information.split(",");
                        var newArray = [];//new Array();
                        for ( var i = 0; i < arr.length; i++) {

@@ -323,25 +323,28 @@ class sell_order_line(models.Model):
     @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
-        if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
-            print '+++++++cny+++++++',self.order_id.currency_id.rate_silent
-            self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
-            amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
-            tax_amt = amount * self.tax_rate * 0.01  # 税额
-            self.amount = amount
-            self.tax_amount = tax_amt
-            self.subtotal = amount + tax_amt
-            self.currency_amount = 0
-        else :
-            print '+++++++++usd++++++++++',self.order_id.currency_id.rate_silent
-            rate_silent = self.order_id.currency_id.rate_silent
-            currency_amount = self.quantity * self.price_taxed - self.discount_amount
-            print rate_silent,currency_amount
-            self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
-            self.amount = currency_amount * rate_silent
-            self.tax_amount = self.amount * self.tax_rate * 0.01
-            self.subtotal = self.amount + self.tax_amount
+        if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id: 
+            print '+++++++cny+++++++',self.order_id.currency_id.rate_silent 
+            self.price = self.price_taxed / (1 + self.tax_rate * 0.01) 
+            amount = self.quantity * self.price - self.discount_amount  # 折扣后金额 
+            self.price = self.price_taxed / (1 + self.tax_rate * 0.01) 
+            amount = self.quantity * self.price - self.discount_amount  # 折扣后金额 
+            tax_amt = amount * self.tax_rate * 0.01  # 税额 
+            self.tax_amount = tax_amt 
+            self.subtotal = self.quantity * self.price_taxed 
+            self.amount = self.subtotal - tax_amt
+        else : 
+            print '+++++++++usd++++++++++',
+            self.order_id.currency_id.rate_silent 
+            rate_silent = self.order_id.currency_id.rate_silent 
+            currency_amount = self.quantity * self.price_taxed - self.discount_amount 
+            print rate_silent,currency_amount 
+            self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01) 
+            self.amount = currency_amount * rate_silent 
+            self.tax_amount = self.amount * self.tax_rate * 0.01 
+            self.subtotal = self.amount + self.tax_amount 
             self.currency_amount = currency_amount
+
 
     order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
                                required=True, ondelete='cascade')
@@ -916,9 +919,9 @@ class sell_adjust_line(models.Model):
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
         tax_amt = amount * self.tax_rate * 0.01  # 税额
-        self.amount = amount
         self.tax_amount = tax_amt
-        self.subtotal = amount + tax_amt
+        self.subtotal = self.quantity * self.price_taxed
+        self.amount = self.subtotal - tax_amt
 
     order_id = fields.Many2one('sell.adjust', u'订单编号', select=True,
                                required=True, ondelete='cascade')

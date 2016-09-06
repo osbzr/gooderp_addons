@@ -2,7 +2,7 @@
 
 from openerp import models, fields, api
 # from openerp.exceptions import except_orm
-# from datetime import datetime
+from datetime import datetime
 # import calendar
 from math import fabs
 ISODATEFORMAT = '%Y-%m-%d'
@@ -42,7 +42,15 @@ class create_balance_sheet_wizard(models.TransientModel):
             domain = []
         return domain
 
-    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain)
+    @api.model
+    def _default_period_id(self):
+        """
+        默认是当前会计期间
+        :return: 当前会计期间的对象
+        """
+        return self.env['finance.period'].get_date_now_period_id()
+
+    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain,default=_default_period_id)
 
     @api.multi
     def compute_balance(self, parameter_str, period_id, compute_field_list):
@@ -156,7 +164,7 @@ class create_balance_sheet_wizard(models.TransientModel):
                     total_sum = sum(subject_vals_out)-sum(subject_vals_in)
                 else:
                     if subject_vals_in:
-                        total_sum = sum(subject_vals_in)
+                        total_sum = -sum(subject_vals_in)
                     else:
                         total_sum = sum(subject_vals_out)
             return total_sum
