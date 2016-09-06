@@ -60,12 +60,14 @@
                         </group>
                         <group>
                             <field name="date"/>
+                            <field name="currency_id"/>
                         </group>
                     </group>
                     <label string="收/付款行"/>
                     <field name="line_ids">
                     	<tree string="Money Order Lines" editable="bottom">
                     		<field name="bank_id"/>
+                            <field name="currency_id"/>
                             <field name="amount" sum="合计"/>       		
                             <field name="mode_id" groups='core.settle_mode_groups'/>
                             <field name="number" groups='core.settle_mode_groups'/>
@@ -186,6 +188,7 @@
             		<field name="category_id"/>
             		<field name="auxiliary_id"/>
                     <field name="date"/>
+                    <field name="currency_id"/>
                     <field name="amount"/>
                     <field name="reconciled"/>
                     <field name="to_reconcile"/>

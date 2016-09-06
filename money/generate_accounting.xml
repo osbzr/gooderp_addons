@@ -29,6 +29,8 @@
             <field name="arch" type="xml">
                 <field name="name" position="after">
 					<field name="account_id"/>
+                    <field name="currency_id"/>
+                    <field name="currency_amount"/>
 				</field>
             </field>
         </record>
