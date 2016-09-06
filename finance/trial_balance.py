@@ -2,13 +2,7 @@
 
 from openerp import models, fields, api
 from openerp.exceptions import except_orm
-from datetime import datetime
-import calendar
 from math import fabs
-
-ISODATEFORMAT = '%Y-%m-%d'
-ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
-
 
 class TrialBalance(models.Model):
     """科目余额表"""

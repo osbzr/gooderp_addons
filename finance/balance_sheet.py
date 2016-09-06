@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api
-# from openerp.exceptions import except_orm
-from datetime import datetime
-# import calendar
 from math import fabs
-ISODATEFORMAT = '%Y-%m-%d'
-ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
 import calendar
 
 class BalanceSheet(models.Model):
