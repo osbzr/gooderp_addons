@@ -14,6 +14,11 @@ class test_supplier_statements(TransactionCase):
             'partner_id': self.env.ref('core.lenovo').id,
             'from_date': '2016-01-01',
             'to_date': '2016-11-01'}).with_context({'default_supplier': True})
+
+        # 供应商期初余额，查看源单应报错
+        self.env.ref('core.lenovo').payable_init = 1000
+        partner = self.env['partner'].search([('id', '=', self.env.ref('core.lenovo').id)])
+
         # 创建付款记录
         money_get = self.env.ref('money.get_40000')
         money_get.money_order_done()
@@ -63,12 +68,26 @@ class test_supplier_statements(TransactionCase):
         # 查看不带商品明细源单
         self.statement.partner_statements_without_goods()
         supplier_statement = self.env['supplier.statements.report'].search([])
-        for record in supplier_statement:
-            record.find_source_order()
+        supplier_statement_init = self.env['supplier.statements.report'].search([('move_id', '=', False),
+                                                                                 ('amount', '!=', 0)])
+        # 如果对账单中是期初余额行，点击查看按钮应报错
+        with self.assertRaises(except_orm):
+            supplier_statement_init.find_source_order()
+
+        for report in list(set(supplier_statement) - set(supplier_statement_init)):
+            report.find_source_order()
+
         # 查看带商品明细源单
         self.statement.partner_statements_with_goods()
         objGoods = self.env['supplier.statements.report.with.goods']
-        supplier_statement_goods = objGoods.search([])
-        for record in supplier_statement_goods:
-            self.assertNotEqual(str(record.balance_amount), 'kaihe11')
-            record.find_source_order()
+        supplier_statement_goods = objGoods.search([('name', '!=', False)])
+        supplier_statement_goods_init = objGoods.search([('move_id', '=', False),
+                                                         ('amount', '!=', 0)])
+
+        # 如果对账单中是期初余额行，点击查看按钮应报错
+        with self.assertRaises(except_orm):
+            supplier_statement_goods_init.find_source_order()
+
+        for report in list(set(supplier_statement_goods) - set(supplier_statement_goods_init)):
+            self.assertNotEqual(str(report.balance_amount), 'kaihe11')
+            report.find_source_order()

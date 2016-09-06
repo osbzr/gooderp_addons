@@ -13,6 +13,9 @@ class test_customer_statements(TransactionCase):
                     {'partner_id': self.env.ref('core.jd').id,
                     'from_date': '2016-01-01',
                     'to_date': '2016-11-01'}).with_context({'default_customer': True})
+
+        # 客户期初余额，查看源单应报错
+        self.env.ref('core.jd').receivable_init = 1000
         # 创建收款记录
         money_get = self.env.ref('money.get_40000')
         money_get.money_order_done()
@@ -56,14 +59,28 @@ class test_customer_statements(TransactionCase):
         # 查看客户对账单明细不带商品明细
         self.statement.partner_statements_without_goods()
         customer_statement = self.env['customer.statements.report'].search([])
-        for record in customer_statement:
-            record.find_source_order()
+        customer_statement_init = self.env['customer.statements.report'].search([('move_id', '=', False),
+                                                                                 ('amount', '!=', 0)])
+        # 如果对账单中是期初余额行，点击查看按钮应报错
+        with self.assertRaises(except_orm):
+            customer_statement_init.find_source_order()
+
+        for report in list(set(customer_statement) - set(customer_statement_init)):
+            report.find_source_order()
+
         # 查看客户对账单带商品明细
         self.statement.partner_statements_with_goods()
-        customer_statement_goods = self.env['customer.statements.report.with.goods'].search([])
-        for statement in customer_statement_goods:
-            self.assertNotEqual(str(statement.balance_amount), 'kaihe11')
-            statement.find_source_order()
+        customer_statement_goods = self.env['customer.statements.report.with.goods'].search([('name', '!=', False)])
+        customer_statement_goods_init = self.env['customer.statements.report.with.goods'].search([('move_id', '=', False),
+                                                         ('amount', '!=', 0)])
+
+        # 如果对账单中是期初余额行，点击查看按钮应报错
+        with self.assertRaises(except_orm):
+            customer_statement_goods_init.find_source_order()
+
+        for report in list(set(customer_statement_goods) - set(customer_statement_goods_init)):
+            self.assertNotEqual(str(report.balance_amount), 'kaihe11')
+            report.find_source_order()
 
 
 class test_track_wizard(TransactionCase):

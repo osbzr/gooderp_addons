@@ -1,32 +1,31 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api
-# from openerp.exceptions import except_orm
-# from datetime import datetime
-# import calendar
 from math import fabs
-ISODATEFORMAT = '%Y-%m-%d'
-ISODATETIMEFORMAT = "%Y-%m-%d %H:%M:%S"
 import calendar
 
 class BalanceSheet(models.Model):
-    """资产负债表"""
+    """资产负债表模板
+    模板用来定义最终输出的 资产负债表的格式,
+     每行的 科目的顺序 科目的大分类的所属的子科目的顺序
+    -- 本模板适合中国会计使用.
+    """
 
     _name = "balance.sheet"
     _order = "line"
 
-    line = fields.Integer(u'序号', required=True)
+    line = fields.Integer(u'序号', required=True, help=u'资产负债表的行次')
     balance = fields.Char(u'资产')
-    line_num = fields.Char(u'行次')
+    line_num = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
     ending_balance = fields.Float(u'期末余额')
-    balance_formula = fields.Text(u'科目范围')
+    balance_formula = fields.Text(u'科目范围', help=u'设定本行的资产负债表的科目范围!例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
     beginning_balance = fields.Float(u'年初余额')
 
     balance_two = fields.Char(u'负债和所有者权益')
-    line_num_two = fields.Char(u'行次')
+    line_num_two = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
     ending_balance_two = fields.Float(u'期末余额')
-    balance_two_formula = fields.Text(u'科目范围')
-    beginning_balance_two = fields.Float(u'年初余额')
+    balance_two_formula = fields.Text(u'科目范围', help=u'设定本行的资产负债表的科目范围!例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    beginning_balance_two = fields.Float(u'年初余额', help=u'报表行本年的年余额')
 
 
 class create_balance_sheet_wizard(models.TransientModel):
@@ -35,6 +34,10 @@ class create_balance_sheet_wizard(models.TransientModel):
 
     @api.model
     def _default_period_domain(self):
+        """
+        用来设定期间的 可选的范围(这个是一个范围)
+        :return: domai条件
+        """
         period_domain_setting = self.env['ir.values'].get_default('finance.config.settings', 'default_period_domain')
         if period_domain_setting == 'cannot':
             domain = [('is_closed', '!=', False)]
@@ -42,7 +45,16 @@ class create_balance_sheet_wizard(models.TransientModel):
             domain = []
         return domain
 
-    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain)
+    @api.model
+    def _default_period_id(self):
+        """
+        默认是当前会计期间
+        :return: 当前会计期间的对象
+        """
+        return self.env['finance.period'].get_date_now_period_id()
+
+    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain,
+                                default=_default_period_id, help=u'用来设定报表的期间')
 
     @api.multi
     def compute_balance(self, parameter_str, period_id, compute_field_list):
@@ -171,10 +183,14 @@ class create_balance_sheet_wizard(models.TransientModel):
 
 
 class ProfitStatement(models.Model):
-    """利润表"""
+    """利润表模板
+        模板主要用来定义项目的 科目范围,
+        然后根据科目的范围得到科目范围内的科目 的利润
+
+    """
     _name = "profit.statement"
-    balance = fields.Char(u'项目')
-    line_num = fields.Char(u'行次')
-    cumulative_occurrence_balance = fields.Float(u'本年累计金额')
-    occurrence_balance_formula = fields.Text(u'科目范围')
-    current_occurrence_balance = fields.Float(u'本月金额')
+    balance = fields.Char(u'项目', help=u'报表的行次的总一个名称')
+    line_num = fields.Char(u'行次', help=u'生成报表的行次')
+    cumulative_occurrence_balance = fields.Float(u'本年累计金额', help=u'本年利润金额!')
+    occurrence_balance_formula = fields.Text(u'科目范围', help=u'设定本行的利润的科目范围!例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    current_occurrence_balance = fields.Float(u'本月金额', help=u'本月的利润的金额!')

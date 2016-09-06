@@ -35,17 +35,23 @@ import datetime
 import StringIO
 import re
 import xlutils.copy
-
+from openerp.tools import misc
 
 class ReportTemplate(models.Model):
     _name = "report.template"
-    model = fields.Many2one('ir.model', u'模块')
+    model_id = fields.Many2one('ir.model',u'模型')
     file_address = fields.Char(u'模板文件路径')
+    model_name = fields.Char(u'模型名称')
+
+    @api.onchange('model_id')
+    def _onchange_model_id(self):
+        if self.model_id:
+            self.model_name = self.model_id.model
 
     @api.model
     def get_time(self, model):
         ISOTIMEFORMAT = "%Y-%m-%d"
-        report_model = self.env['report.template'].search([('model.name', '=', model)])
+        report_model = self.env['report.template'].search([('model_name', '=', model)])
         file_address = report_model.file_address or False
         return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address)
 
@@ -98,7 +104,7 @@ class ExcelExportView(ExcelExport,):
 
     def from_data(self, fields, rows, file_address):
         if file_address:
-            bk = xlrd.open_workbook(file_address, formatting_info=True)
+            bk = xlrd.open_workbook(misc.file_open(file_address).name, formatting_info=True)
             workbook = xlutils.copy.copy(bk)
             worksheet = workbook.get_sheet(0)
             for i, fieldname in enumerate(fields):
@@ -114,7 +120,6 @@ class ExcelExportView(ExcelExport,):
             base_style = xlwt.easyxf('align: wrap yes')
             date_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD')
             datetime_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD HH:mm:SS')
-
             for row_index, row in enumerate(rows):
                 for cell_index, cell_value in enumerate(row):
                     cell_style = base_style

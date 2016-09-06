@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-        <!--固定资产-->
-        <menuitem id='account_asset_menu' name='资产管理'/>
-
-		<menuitem id='asset_home_menu' name='固定资产' parent='account_asset_menu' sequence='15'/>
 
 		<record id='asset_tree' model='ir.ui.view'>
 			<field name='name'>asset.tree</field>
@@ -105,7 +101,7 @@
                 <form string="固定资产">
 	                <header>
 	                	<button name='asset_done' states="draft" string="审核" type="object" class="oe_highlight"/>
-	                	<button name='asset_draft' states="done" string="反审核" type="object"/>
+	                	<button name='asset_draft' states="done" string="反审核" type="object" invisible="1"/>
                         <button name="%(create_clean_action)d" string="清理固定资产" type="action" class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         <button name="%(create_chang_action)d" string="变更固定资产" type="action" class="btn-primary"
@@ -162,6 +158,7 @@
                                           <field name="chang_name"/>
                                           <field name="chang_before"/>
                                           <field name="chang_after"/>
+                                          <field name="partner_id"/>
                                           <field name="create_uid" string="变更人"/>
                                       </tree>
                                  </field>
@@ -218,13 +215,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>
-
-        <menuitem id='asset_menu' action='asset_action' parent='asset_home_menu' sequence='10'/>
-
-
-        <menuitem id='asset_line_menu' action='asset_line_action' parent='asset_home_menu' sequence='10'/>
-
-
         <!--固定资产折旧-->
 
         <record id="create_depreciation_wizard_form" model="ir.ui.view">
@@ -234,7 +224,8 @@
             	<form>
             		<group>
                         <group>
-                            <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 30%%"/>
+                            <field name="date" style="width: 30%%"/>
+                            <field name="period_id"  style="width: 30%%"/>
                         </group>
                     </group>
 
@@ -254,8 +245,38 @@
         target="new"
         />
 
-        <menuitem id='create_depreciation_menu' action='create_depreciation_action' parent='asset_home_menu' sequence='22'/>
+        <record id='asset.category_tree' model='ir.ui.view'>
+			<field name='name'>asset.category.tree</field>
+			<field name='model'>asset.category</field>
+			<field name='arch' type='xml'>
+				<tree string='固定资产分类'>
+					<field name='name'/>
+					<field name='account_depreciation2'/>
+					<field name='account_asset'/>
+					<field name='account_depreciation'/>
+                    <field name='depreciation_number'/>
+					<field name='depreciation_value'/>
+					<field name='clean_income'/>
+                    <field name='clean_costs'/>
+				</tree>
+			</field>
+		</record>
 
+        <record id="asset_category_action" model="ir.actions.act_window">
+            <field name="name">固定资产分类</field>
+            <field name="res_model">asset.category</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+        </record>
 
+        <menuitem id='asset_home_menu_finance' name='固定资产' action="asset_action"
+                  parent='finance.voucher_home_menu' sequence='11'/>
+
+        <menuitem id='asset_line_menu_finance' name="固定资产折旧明细"
+                  action='asset_line_action' parent='finance.voucher_books_menu' sequence='11'/>
+        <menuitem id='create_depreciation_menu_finance' name="资产折旧"
+                  action='create_depreciation_action' parent='finance.checkout_menu' sequence='11'/>
+        <menuitem id='asset_category_finance' name="固定资产分类"
+                  action='asset_category_action' parent='finance.finance_setting_menu' sequence='31'/>
 	</data>
 </openerp>
