@@ -65,11 +65,11 @@ class money_transfer_order(models.Model):
                 raise except_orm('错误', '请先输入转账金额')
             for line in transfer.line_ids:
                 company_currency_id = self.env.user.company_id.currency_id.id
-                out_currency_id = line.out_bank_id.account_id.currency_id.id or company_currency_id 
-                in_currency_id = line.in_bank_id.account_id.currency_id.id or company_currency_id 
+                out_currency_id = line.out_bank_id.account_id.currency_id.id or company_currency_id
+                in_currency_id = line.in_bank_id.account_id.currency_id.id or company_currency_id
 
-                if line.out_bank_id == line.in_bank_id: 
-                raise except_orm('错误', '转出账户与转入账户不能相同')
+                if line.out_bank_id == line.in_bank_id :
+                    raise except_orm('错误', '转出账户与转入账户不能相同')
                 if line.amount < 0:
                     raise except_orm('错误', '转账金额必须大于0')
                 if line.amount == 0:
