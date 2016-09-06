@@ -10,6 +10,7 @@ openerp.home_page = function(instance, local) {
             self.$el.append("<div id='main' class='main'>\
                              </div>\
                     </div>")
+            /*首页分为三块  样式进行显示 分别是 数据统计  业务总览 实时报表 */
             var top_top_fist_1 ="<div class='class='section m-t-lg m-b-lg top_div'>\
                                     <div class='container'>\
                                             <div class='row'>\
@@ -37,6 +38,7 @@ openerp.home_page = function(instance, local) {
                                   </div>"
             new instance.web.Model("home.page").call("get_action_url").then(function(result){
                 var index=0;
+                /* 三块 可以选择性的不显示某个 模块 */
                 self.result_top=result['top']
                 if(self.result_top){
                      self.$el.find('.main').append(top_top_fist_1);
@@ -48,6 +50,7 @@ openerp.home_page = function(instance, local) {
                     self.$el.find('.main_div').append(center_main_table);
                     self.result_main = result['main']
                 }
+                /* 第一块的视图的构建 及跳转的逻辑 */
                 for(var j=0;j<self.result_main.length;j++){
                     var result_one=self.result_main[index]
                     var center_html_str="<div class='col-sm-3 col-xs-6'><div class='feature-item text-center'>\
@@ -72,7 +75,7 @@ openerp.home_page = function(instance, local) {
                     }
                     index++;
                 }
-
+                /* 第er块的视图的构建 及跳转的逻辑 */
                 self.result_top.length/4 > 1?row_num=3 :row_num=parseInt(12/self.result_top.length);
                 for(var i=0;i< self.result_top.length;i++){
                     var top_date = self.result_top[i][0].split('  ');
@@ -105,6 +108,7 @@ openerp.home_page = function(instance, local) {
                 if(self.result_quick){
                      self.$el.find('.main').append(top_top_last_1);
                 }
+                /* 第san块的视图的构建 及跳转的逻辑 */
                 for(var i=0;i< self.result_quick.length;i++){
                     var left_big_html_str = "<div class='col-xs-12 col-md-3 right_small_div_"+i+"'><a>\
                                 <h3>" + (self.result_quick[i][0].split(';'))[1] + "</h3></a></div>"
