@@ -328,13 +328,13 @@ class CreateChangWizard(models.TransientModel):
             chang_account = self.env['voucher.line'].search(['&',('voucher_id', '=', money_invoice.voucher_id.id),('debit', '=', self.chang_cost)])
             chang_account.write({'account_id': asset.account_asset.id})
             self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,'chang_before':chang_before_cost,
-                                           'chang_after':asset.cost,'chang_name':u'原值变更','order_id':asset.id
+                                           'chang_after':asset.cost,'chang_name':u'原值变更','order_id':asset.id,'partner_id':self.chang_partner_id.id
             })
         asset.depreciation_number = asset.depreciation_number + self.chang_depreciation_number
         asset.depreciation_value = asset.depreciation_value + asset.attribute.depreciation_value * self.chang_cost / 100
         if self.chang_depreciation_number:
             self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,'chang_before':chang_before_depreciation_number,
-                                           'chang_after':asset.depreciation_number,'chang_name':u'折旧期间变更','order_id':asset.id
+                                           'chang_after':asset.depreciation_number,'chang_name':u'折旧期间变更','order_id':asset.id,'partner_id':self.chang_partner_id.id
             })
 
 class asset_line(models.Model):
@@ -361,12 +361,22 @@ class asset_line(models.Model):
 class CreateDepreciationWizard(models.TransientModel):
     """生成每月折旧的向导 根据输入的期间"""
     _name = "create.depreciation.wizard"
-    period_id = fields.Many2one('finance.period', string=u'会计期间')
+
+    @api.one
+    @api.depends('date')
+    def _compute_period_id(self):
+        self.period_id = self.env['finance.period'].get_period(self.date)
+
+    date = fields.Date(u'记帐日期', required=True)
+    period_id = fields.Many2one(
+        'finance.period',
+        u'会计期间',
+        compute='_compute_period_id', ondelete='restrict', store=True)
     @api.multi
     def create_depreciation(self):
-        vouch_obj = self.env['voucher'].create({'date': fields.Date.context_today(self)})
+        vouch_obj = self.env['voucher'].create({'date': self.date})
         res = {}
-        for asset in self.env['asset'].search([('no_depreciation', '=', False)]):
+        for asset in self.env['asset'].search([('no_depreciation', '=', False), ('period_id','!=', self.period_id.id)]):
             if self.period_id not in asset.line_ids.period_id:
                 cost_depreciation = asset.cost_depreciation
                 total = sum(line.cost_depreciation for line in asset.line_ids) + asset.depreciation_value
@@ -395,13 +405,14 @@ class CreateDepreciationWizard(models.TransientModel):
                             })
                 '''折旧明细行'''
                 self.env['asset.line'].create({
+                     'date': self.date,
                      'order_id': asset.id,
-                     'date': fields.Date.context_today(self),
+                     'period_id': self.period_id.id,
                      'cost_depreciation': cost_depreciation,
                      'name':asset.name,
                      'code':asset.code,
-                     'no_depreciation':asset.surplus_value - total - cost_depreciation
-                                          })
+                     'no_depreciation':asset.surplus_value - total - cost_depreciation,
+                    })
 
         for account_id,val in res.iteritems():
             self.env['voucher.line'].create(dict(val,account_id = account_id))
@@ -431,3 +442,4 @@ class chang_line(models.Model):
     chang_before = fields.Float(u'变更前')
     chang_after = fields.Float(u'变更后')
     chang_money_invoice = fields.Many2one('money.invoice', u'对应源单', readonly=True, ondelete='restrict')
+    partner_id = fields.Many2one('partner', u'变更单位')

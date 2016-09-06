@@ -19,10 +19,9 @@
 #
 ##############################################################################
 
-from openerp.exceptions import except_orm
+from openerp.exceptions import except_orm, ValidationError
 import openerp.addons.decimal_precision as dp
 from openerp import fields, models, api
-
 
 class money_order(models.Model):
     _name = 'money.order'
@@ -64,6 +63,13 @@ class money_order(models.Model):
         self.advance_payment = amount - this_reconcile + self.discount_amount
         self.amount = amount
 
+    @api.one
+    @api.depends('partner_id')
+    def _compute_currency_id(self):
+        partner_currency_id = self.partner_id.c_category_id.account_id.currency_id.id or self.partner_id.s_category_id.account_id.currency_id.id
+        self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
+
+
     state = fields.Selection([
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
@@ -77,6 +83,7 @@ class money_order(models.Model):
                        states={'draft': [('readonly', False)]})
     name = fields.Char(string=u'单据编号', copy=False, readonly=True)
     note = fields.Text(string=u'备注')
+    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
     discount_amount = fields.Float(string=u'整单折扣', readonly=True,
                                    states={'draft': [('readonly', False)]},
                                    digits=dp.get_precision('Amount'))
@@ -225,6 +232,15 @@ class money_order_line(models.Model):
     _name = 'money.order.line'
     _description = u'收付款单明细'
 
+    @api.one
+    @api.depends('bank_id')
+    def _compute_currency_id(self):
+        partner_currency_id = self.bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
+        self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
+        print self.currency_id
+        if self.bank_id and self.currency_id.id != self.money_id.currency_id.id :
+            raise ValidationError(u'结算帐户与业务伙伴币别不一致')
+
     money_id = fields.Many2one('money.order', string=u'收付款单',
                                ondelete='cascade')
     bank_id = fields.Many2one('bank.account', string=u'结算账户',
@@ -233,8 +249,10 @@ class money_order_line(models.Model):
                           digits=dp.get_precision('Amount'))
     mode_id = fields.Many2one('settle.mode', string=u'结算方式',
                               ondelete='restrict')
+    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
     number = fields.Char(string=u'结算号')
     note = fields.Char(string=u'备注')
+
 
 
 class money_invoice(models.Model):
@@ -266,7 +284,7 @@ class money_invoice(models.Model):
     
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
     date_due = fields.Date(string=u'到期日')
-
+    currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True)
     bill_number = fields.Char(u'发票号')
 
     @api.multi
