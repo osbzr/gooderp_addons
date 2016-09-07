@@ -32,7 +32,7 @@ class money_order(models.Model):
             vouch_obj = self.create_money_order_get_voucher(self.line_ids, self.partner_id, self.name)
             vouch_obj.voucher_done()
         else:
-            vouch_obj = self.create_money_order_pay_voucher(self.line_ids, self.partner_id, self.name)\
+            vouch_obj = self.create_money_order_pay_voucher(self.line_ids, self.partner_id, self.name)
             vouch_obj.voucher_done()
         return res
 
