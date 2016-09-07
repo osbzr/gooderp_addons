@@ -139,6 +139,32 @@ class voucher_line(models.Model):
     '''凭证明细'''
     _name = 'voucher.line'
 
+    @api.model
+    def _default_get(self, fields):
+        data = super(voucher_line, self).default_get(fields)
+        move_obj = self.env['voucher']
+        total = 0.0
+        context= self._context
+        if  context.get('line_ids'):
+            for move_line_dict in move_obj.resolve_2many_commands('line_ids', context.get('line_ids')):
+                data['name'] = data.get('name') or move_line_dict.get('name')
+                data['partner_id'] = data.get('partner_id') or move_line_dict.get('partner_id')
+                data['account_id'] = data.get('account_id') or move_line_dict.get('account_id')
+                data['auxiliary_id'] = data.get('auxiliary_id') or move_line_dict.get('auxiliary_id')
+                data['goods_id'] = data.get('goods_id') or move_line_dict.get('goods_id')
+                total += move_line_dict.get('debit', 0.0) - move_line_dict.get('credit', 0.0)
+            data['debit'] = total < 0 and -total or 0.0
+            data['credit'] = total > 0 and total or 0.0
+        return data
+
+    @api.model
+    def default_get(self, fields):
+        data = self._default_get(fields)
+        for f in data.keys():
+            if f not in fields:
+                del data[f]
+        return data
+
     voucher_id = fields.Many2one('voucher', u'对应凭证', ondelete='cascade')
     name = fields.Char(u'摘要', required=True)
     account_id = fields.Many2one(
