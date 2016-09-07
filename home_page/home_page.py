@@ -24,7 +24,7 @@ class home_page(models.Model):
                                     help=u'对于所选的计算字段的计算方式!注:目前只支持sum')
     context = fields.Char(u'动作的上下文', help=u'对应跳转视图传进去的参数!')
     is_active = fields.Boolean(u'是否可用', default=True, help=u'为了方便调试,首页美观性,或临时性替换首页元素!')
-    report_type_id = fields.Many2one('home.report.type', string='报表类别', help=u'类型为 实时报表时 要选择报表类别,可以对不同类型的报表进行分组!')
+    report_type_id = fields.Many2one('home.report.type', string=u'报表类别', help=u'类型为 实时报表时 要选择报表类别,可以对不同类型的报表进行分组!')
 
     @api.onchange('action')
     def onchange_action(self):

@@ -199,6 +199,8 @@ class checkout_wizard(models.TransientModel):
     def recreate_voucher_name(self, period_id):
         # 取重排凭证设置
         # 是否重置凭证号
+        context = dict(self.env.context or {})
+        context['call_module'] = "checkout_wizard"
         auto_reset = self.env['ir.values'].get_default('finance.config.settings', 'default_auto_reset')
         # 重置凭证间隔:年  月
         reset_period = self.env['ir.values'].get_default('finance.config.settings', 'default_reset_period')
@@ -218,6 +220,8 @@ class checkout_wizard(models.TransientModel):
             last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_id)
             if reset_period == 'year':
                 if last_period:
+                    if not last_period.is_closed:
+                        raise except_orm(u'错误', u'上一个期间%s未结账' % last_period.name)
                     if period_id.year != last_period.year:
                         # 按年，而且是第一个会计期间
                         last_voucher_number = reset_init_number
@@ -226,7 +230,10 @@ class checkout_wizard(models.TransientModel):
                         last_period_voucher_name = voucher_obj.search([('period_id', '=', last_period.id)],
                                                                       order="create_date desc", limit=1).name
                         # 凭证号转换为数字
-                        last_voucher_number = int(filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
+                        if last_period_voucher_name:  # 上一期间是否有凭证？
+                            last_voucher_number = int(filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
+                        else:
+                            raise except_orm(u'错误', u'请核实上一个期间：%s是否有凭证！' % last_period.name)
                 else:
                     last_voucher_number = reset_init_number
                 # 产生凭证号前后缀
@@ -243,7 +250,7 @@ class checkout_wizard(models.TransientModel):
                     next_voucher_name = interpolated_prefix + '%%0%sd' % seq_id.padding % last_voucher_number + interpolated_suffix
                     last_voucher_number += 1
                     # 更新凭证号
-                    voucher_id.write({'name': next_voucher_name})
+                    voucher_id.with_context(context).write({'name': next_voucher_name})
             # 按月重置
             else:
                 last_voucher_number = reset_init_number
@@ -260,7 +267,7 @@ class checkout_wizard(models.TransientModel):
                     # 产生凭证号
                     next_voucher_name = interpolated_prefix + '%%0%sd' % seq_id.padding % last_voucher_number + interpolated_suffix
                     # 更新凭证号
-                    voucher_id.write({'name': next_voucher_name})
+                    voucher_id.with_context(context).write({'name': next_voucher_name})
                     last_voucher_number += 1
             # update ir.sequence  number_next
             if last_voucher_number:
