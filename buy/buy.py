@@ -608,7 +608,7 @@ class buy_receipt(models.Model):
                         batch_one_list_wh.append((move_line.goods_id.id, move_line.lot))
 
             if (line.goods_id.id, line.lot) in batch_one_list_wh:
-                raise except_orm(u'错误', u'仓库已存在相同批号的产品！')
+                raise except_orm(u'错误', u'仓库已存在相同序列号的产品！')
 
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
@@ -617,7 +617,7 @@ class buy_receipt(models.Model):
                 batch_one_list.append((line.goods_id.id, line.lot))
 
         if len(batch_one_list) > len(set(batch_one_list)):
-            raise except_orm(u'错误', u'不能创建相同批号的产品！')
+            raise except_orm(u'错误', u'不能创建相同序列号的产品！')
 
         for line in self.line_out_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
