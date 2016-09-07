@@ -13,6 +13,11 @@
         <menuitem id='settle_mode_menu' name='结算方式' action='core.settle_mode_action'
         	parent='menu_money_setting' groups='core.settle_mode_groups' sequence='3'/>
 
+        <menuitem id='customer_menu' action='core.customer_action' name="客户" 
+            parent='menu_money_setting' sequence='4'/>
+        <menuitem id='vendor_menu' action='core.vendor_action' name="供应商" 
+            parent='menu_money_setting' sequence='5'/>
+
 		<!--收/付款单tree-->
     	<record id="money_order_tree" model="ir.ui.view">
             <field name="name">money.order.tree</field>
