@@ -76,8 +76,13 @@ class test_track_wizard(TransactionCase):
         order_2.buy_order_done()
         receipt_2 = self.env['buy.receipt'].search(
                     [('order_id', '=', order_2.id)])
+        line_lists = []
         for line in receipt_2.line_in_ids:
-            line.goods_qty = 5
+            if line.id not in line_lists:
+                line.lot = 'mouse_lot_' + str(line.id)
+                line.goods_qty = 5
+            line_lists.append(line.id)
+
         receipt_2.buy_receipt_done()
         receipt_3 = self.env['buy.receipt'].search(
                     [('order_id', '=', order_2.id), ('state', '=', 'draft')])

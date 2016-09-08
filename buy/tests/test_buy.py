@@ -381,6 +381,43 @@ class test_buy_receipt(TransactionCase):
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
 
+    def test_wrong_receipt_done_lot_unique_current(self):
+        '''审核时，当前入库单行之间同一产品批号不能相同'''
+        receipt = self.env['buy.receipt'].create({
+            'partner_id': self.env.ref('core.lenovo').id,
+            'date': '2016-09-01',
+            'date_due': '2016-09-05',
+            'warehouse_dest_id': self.env.ref('warehouse.bj_stock').id,
+            'line_in_ids': [
+                (0, 0, {
+                    'goods_id': self.env.ref('goods.mouse').id,
+                    'lot': 'lot_1',
+                    'goods_qty': 1.0}),
+                (0, 0, {
+                    'goods_id': self.env.ref('goods.mouse').id,
+                    'lot': 'lot_1',
+                    'goods_qty': 1.0})
+            ]
+        })
+        with self.assertRaises(except_orm):
+            receipt.buy_receipt_done()
+
+    def test_wrong_receipt_done_lot_unique_wh(self):
+        '''审核时，当前入库单行与仓库里同一产品批号不能相同'''
+        receipt = self.env['buy.receipt'].create({
+            'partner_id': self.env.ref('core.lenovo').id,
+            'date': '2016-09-01',
+            'date_due': '2016-09-05',
+            'warehouse_dest_id': self.env.ref('warehouse.bj_stock').id,
+            'line_in_ids': [(0, 0, {
+                'goods_id': self.env.ref('goods.mouse').id,
+                'lot': 'lot_1',
+                'goods_qty': 1.0,
+                'state': 'done'})]
+        })
+        with self.assertRaises(except_orm):
+            receipt.buy_receipt_done()
+
     def test_receipt_make_invoice(self):
         '''审核入库单：不勾按收货结算时'''
         self.order.buy_order_draft()

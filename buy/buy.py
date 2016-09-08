@@ -598,9 +598,26 @@ class buy_receipt(models.Model):
     def _wrong_receipt_done(self):
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
+        batch_one_list_wh = []
+        batch_one_list = []
+        for line in self.line_in_ids:
+            if line.goods_id.force_batch_one:
+                wh_move_lines = self.env['wh.move.line'].search([('state', '=', 'done'), ('type', '=', 'in'), ('goods_id', '=', line.goods_id.id)])
+                for move_line in wh_move_lines:
+                    if (move_line.goods_id.id, move_line.lot) not in batch_one_list_wh and move_line.lot:
+                        batch_one_list_wh.append((move_line.goods_id.id, move_line.lot))
+
+            if (line.goods_id.id, line.lot) in batch_one_list_wh:
+                raise except_orm(u'错误', u'仓库已存在相同序列号的产品！')
+
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+            if line.goods_id.force_batch_one:
+                batch_one_list.append((line.goods_id.id, line.lot))
+
+        if len(batch_one_list) > len(set(batch_one_list)):
+            raise except_orm(u'错误', u'不能创建相同序列号的产品！')
 
         for line in self.line_out_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
