@@ -42,7 +42,7 @@ class attribute(models.Model):
         '''在many2one字段中支持按条形码搜索'''
         args = args or []
         if name:
-            goods_ids = self.search([('ean', 'ilike', name)])
+            goods_ids = self.search([('ean', '=', name)])
             if goods_ids:
                 return goods_ids.name_get()
         return super(attribute, self).name_search(

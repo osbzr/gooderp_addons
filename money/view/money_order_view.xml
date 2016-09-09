@@ -238,7 +238,7 @@
         <menuitem id="menu_money_payment_action" action="money_payment_action" parent="menu_money_manage" sequence="2"/>
 		<!-- 源单menu -->
 		<menuitem id="menu_money_invoice_action" action="money_invoice_action"
-			parent="menu_money_manage" sequence="3"
+			name="结算单" parent="menu_money_manage" sequence="3"
 			groups='money.reconcile_groups'/>
 	</data>
 </openerp>
