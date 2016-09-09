@@ -1,13 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        <template id="assets_backend" name="petstore_assets" inherit_id="web.assets_backend">
-            <xpath expr="." position="inside">
-                <script type="text/javascript" src="/finance/static/src/js/balance_sheet.js"/>
-            </xpath>
-        </template>
-
-
         <record id="profit_statement_tree" model="ir.ui.view">
             <field name="name">profit_statement_tree</field>
             <field name="model">profit.statement</field>

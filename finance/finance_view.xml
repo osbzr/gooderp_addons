@@ -82,6 +82,10 @@
                     <field name="att_count"/>
                     <field name="period_id"/>
                     <field name="amount_text"/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'name'}"/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'account_id'}"/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'debit'}"/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'credit'}"/>
                     <field name = "state" invisible="1" />
                 </tree>
             </field>
