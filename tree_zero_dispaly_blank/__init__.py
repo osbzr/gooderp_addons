@@ -2,7 +2,7 @@
 # ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2015 Gilbert Yuan(开阖出品) (<gilbert@osbzr.com>).
+#    Copyright (C) 2015 开阖静静(开阖出品) (<gilbert@osbzr.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as

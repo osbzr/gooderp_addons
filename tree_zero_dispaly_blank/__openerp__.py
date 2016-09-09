@@ -20,20 +20,21 @@
 ##############################################################################
 
 {
-    'name': "会计中数字用中文表示",
+    'name': "零显示为空(tree页面)",
     'version': '1.0',
     'summary': """
             
     """,
     'category': 'osbzr',
     'author': "开阖静静<gilbert@osbzr.com>(开阖出品)",
-    "depends": ['web', 'core'],
+    "depends": ['web'],
     'description':
     """
-    主要实现一个widget 使得阿拉伯数字在页面上显示为中文.
+    在tree上面为零的显示为空(次模块为全局设置,安装后就自动启用功能,无需加参数控制!)
+    注意:此模块功能 有可能 和其他tree 上 float 字段 上的 widegt显示 冲突!
     """,
     'data': [
-        'num_to_china.xml',
+        'tree_zero_dispaly_blank.xml',
     ],
     'installable': True,
 }

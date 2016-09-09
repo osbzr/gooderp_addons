@@ -6,7 +6,7 @@ openerp.tree_zero_dispaly_blank = function(session) {
 
     instance.web.list.Column.include({
         _format: function(row_data, options) {
-            if (!parseFloat(String(row_data[this.id]['value']))) {
+            if (!parseFloat(row_data[this.id]['value'])) {
                 return '';
             }
             return this._super.apply(this, arguments);
