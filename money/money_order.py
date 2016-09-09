@@ -195,7 +195,8 @@ class money_order(models.Model):
                     move = self.env['buy.receipt'].search([('invoice_id', '=', source.name.id)])
                 else:
                     move = self.env['sell.delivery'].search([('invoice_id', '=', source.name.id)])
-                move.order_id.amount_executed = abs(source.name.reconciled)
+                if move.order_id:
+                    move.order_id.amount_executed = abs(source.name.reconciled)
 
             order.state = 'done'
         return True
@@ -232,7 +233,8 @@ class money_order(models.Model):
                     move = self.env['buy.receipt'].search([('invoice_id', '=', source.name.id)])
                 else:
                     move = self.env['sell.delivery'].search([('invoice_id', '=', source.name.id)])
-                move.order_id.amount_executed = 0
+                if move.order_id:
+                    move.order_id.amount_executed = 0
 
             order.state = 'draft'
         return True
