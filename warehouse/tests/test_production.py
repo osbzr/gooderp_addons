@@ -8,6 +8,9 @@ class TestProduction(TransactionCase):
     def setUp(self):
         super(TestProduction, self).setUp()
 
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         self.assembly = self.browse_ref('warehouse.wh_assembly_ass0')
         self.assembly_mutli = self.browse_ref('warehouse.wh_assembly_ass1')
 

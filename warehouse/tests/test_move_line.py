@@ -99,6 +99,9 @@ class TestMoveLine(TransactionCase):
                 self.mouse_out_line.lot_id.qty_remaining + 10)
 
     def test_attribute(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_wh_in_attribute').date = '2016-02-06'
+
         attribute_in = self.browse_ref('warehouse.wh_in_wh_in_attribute')
 
         white_iphone = self.browse_ref('warehouse.wh_move_line_iphone_in_1')

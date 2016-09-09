@@ -7,6 +7,8 @@ class test_buy_order(TransactionCase):
 
     def setUp(self):
         super(test_buy_order, self).setUp()
+        # 给buy_order_1中的产品“键盘”的分类设置科目
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.order = self.env.ref('buy.buy_order_1')
         self.order.bank_account_id = False
 
@@ -223,12 +225,14 @@ class test_buy_receipt(TransactionCase):
 
     def setUp(self):
         super(test_buy_receipt, self).setUp()
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.order = self.env.ref('buy.buy_order_1')
         self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
         self.return_receipt = self.env.ref('buy.buy_receipt_return_1')
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -578,6 +582,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_quantity_lt(self):
         '''审核采购调整单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         for line in buy_receipt.line_in_ids:
@@ -595,6 +600,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_quantity_equal(self):
         '''审核采购调整单:调整后数量6 == 原订单已入库数量 6，审核后将产生的入库单分单删除'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         for line in buy_receipt.line_in_ids:
@@ -615,6 +621,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_all_in(self):
         '''审核采购调整单：购货订单生成的采购入库单已全部入库，审核时报错'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
@@ -633,6 +640,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_more_same_line(self):
         '''审核采购调整单：查找到购货订单中多行同一产品，不能调整'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
@@ -658,6 +666,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_goods_done(self):
         '''审核采购调整单:原始单据中一行产品已全部入库，另一行没有'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,

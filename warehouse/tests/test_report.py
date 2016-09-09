@@ -8,6 +8,12 @@ class TestReport(TransactionCase):
     def setUp(self):
         super(TestReport, self).setUp()
 
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_wh_in_attribute').date = '2016-02-06'
+
         # 产品    仓库  批号         数量   类型
         # 键鼠套装 总仓              96    入库
         # 网线    总仓              11928 入库
@@ -74,6 +80,7 @@ class TestReport(TransactionCase):
 
     def test_lot_track_search_read(self):
         lot_track = self.env['report.lot.track'].create({})
+        self.track_wizard.date_start = '2016-02-01'
         context = self.track_wizard.open_report().get('context')
 
         real_results = [
@@ -130,6 +137,7 @@ class TestReport(TransactionCase):
 
     def test_lot_track_read_group(self):
         lot_track = self.env['report.lot.track'].create({})
+        self.track_wizard.date_start = '2016-02-01'
         context = self.track_wizard.open_report().get('context')
 
         results = lot_track.with_context(context).read_group([], [], groupby=['goods'])
@@ -164,6 +172,7 @@ class TestReport(TransactionCase):
 
     def test_stock_transceive_search_read(self):
         stock_transceive = self.env['report.stock.transceive'].create({})
+        self.transceive_wizard.date_start = '2016-02-01'
         context = self.transceive_wizard.open_report().get('context')
 
         real_results = [
