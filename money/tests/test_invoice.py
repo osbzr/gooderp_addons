@@ -71,5 +71,4 @@ class test_invoice(TransactionCase):
                                                         'category_id': self.env.ref('money.core_category_purchase').id,
                                                         'amount': 10.0})
         invoice_buy.money_invoice_done()
-        invoice_buy.voucher_id.voucher_done()
         invoice_buy.money_invoice_draft()

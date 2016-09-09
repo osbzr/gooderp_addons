@@ -207,6 +207,8 @@ class other_money_order(models.Model):
     def other_money_draft(self):
         res = super(other_money_order, self).other_money_draft()
         voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
         voucher.unlink()
         return res
 
@@ -305,5 +307,7 @@ class money_transfer_order(models.Model):
     def money_transfer_draft(self):
         res = super(money_transfer_order, self).money_transfer_draft()
         voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
         voucher.unlink()
         return res
