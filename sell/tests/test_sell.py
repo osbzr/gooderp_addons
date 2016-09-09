@@ -38,12 +38,7 @@ class Test_sell(TransactionCase):
         self.order_2.sell_order_done()
         self.sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
         self.sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT)})
-        # 销售退货订单审核，退货出库单审核
-        return_receipt = self.env.ref('sell.sell_order_return')
-        return_receipt.sell_order_done()
-        receipt = self.env['sell.delivery'].search(
-                  [('order_id', '=', return_receipt.id)])
-        receipt.sell_delivery_done()
+
     def test_sell(self):
         ''' 测试销售订单  '''
         # 正常销售订单
@@ -62,9 +57,6 @@ class Test_sell(TransactionCase):
         # 正常的反审核
         self.order.sell_order_draft()
 
-        # with self.assertRaises(except_orm):
-        #     self.order_2.sell_order_draft()
-
         for goods_state in [(u'未出库', 0), (u'部分出库', 1), (u'全部出库', 10000)]:
             self.order.line_ids.write({'quantity_out': goods_state[1]})
             self.assertEqual(self.order.goods_state, goods_state[0])
@@ -76,16 +68,10 @@ class Test_sell(TransactionCase):
                 self.order.sell_order_done()
                 self.order.sell_order_draft()
 
-        # # 销售退货单的测试
-        # #
-        # self.order_3.write({'type': "return"})
-        # self.order_3.sell_order_done()
-
         # sell.order onchange test
         self.order.discount_rate = 10
         self.order.onchange_discount_rate()
         self.assertEqual(self.order.discount_amount, 16848.0)
-#         self.order.unlink()
 
     def test_sale_order_line_compute(self):
         """测试销售订单的on_change 和 计算字段"""
@@ -133,7 +119,7 @@ class Test_sell(TransactionCase):
         self.assertEqual(self.sell_delivery_obj.discount_amount, 50)
         #  结算账户 需要输入付款额 测试
         self.sell_delivery_obj.bank_account_id = self.bank.id
-        self.receipt = False
+        self.sell_delivery_obj.receipt = False
         with self.assertRaises(except_orm):
             self.sell_delivery_obj.sell_delivery_done()
 
