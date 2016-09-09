@@ -187,6 +187,7 @@ class asset(models.Model):
                      'buy_tax_amount': self.tax or 0
                      })
                 self.env['money.invoice'].create_voucher_line(vals)
+                vouch_obj.voucher_done()
 
         self.state = 'done'
 
@@ -281,6 +282,7 @@ class CreateCleanWizard(models.TransientModel):
                      'credit': asset.cost, 'account_id': asset.account_asset.id,
                      'auxiliary_id': False
                      })
+        vouch_obj.voucher_done()
 
 class CreateChangWizard(models.TransientModel):
     '''固定资产变更'''
@@ -416,11 +418,11 @@ class CreateDepreciationWizard(models.TransientModel):
 
         for account_id,val in res.iteritems():
             self.env['voucher.line'].create(dict(val,account_id = account_id))
-            print account_id,val
 
         if not vouch_obj.line_ids :
             vouch_obj.unlink()
             raise except_orm(u'错误', u'本期所有固定资产都已折旧！')
+        vouch_obj.voucher_done()
 
 class chang_line(models.Model):
     _name = 'chang.line'

@@ -29,9 +29,11 @@ class money_order(models.Model):
     def money_order_done(self):
         res = super(money_order, self).money_order_done()
         if self.type == 'get':
-            self.create_money_order_get_voucher(self.line_ids, self.partner_id, self.name)
+            vouch_obj = self.create_money_order_get_voucher(self.line_ids, self.partner_id, self.name)
+            vouch_obj.voucher_done()
         else:
-            self.create_money_order_pay_voucher(self.line_ids, self.partner_id, self.name)
+            vouch_obj = self.create_money_order_pay_voucher(self.line_ids, self.partner_id, self.name)
+            vouch_obj.voucher_done()
         return res
 
     @api.multi
@@ -130,6 +132,7 @@ class money_invoice(models.Model):
                          'debit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate_silent or 0,
                          })
         self.create_voucher_line(vals)
+        vouch_obj.voucher_done()
         return res
 
     @api.multi
@@ -204,6 +207,8 @@ class other_money_order(models.Model):
     def other_money_draft(self):
         res = super(other_money_order, self).other_money_draft()
         voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
         voucher.unlink()
         return res
 
@@ -235,6 +240,7 @@ class other_money_order(models.Model):
                              'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id
                              })
                 self.env['money.invoice'].create_voucher_line(vals)
+        vouch_obj.voucher_done()
         return res
 
 
@@ -294,11 +300,14 @@ class money_transfer_order(models.Model):
                          'debit_account_id': line.in_bank_id.account_id.id,
                          })
                 self.env['money.invoice'].create_voucher_line(vals)
+        vouch_obj.voucher_done()
         return res
 
     @api.multi
     def money_transfer_draft(self):
         res = super(money_transfer_order, self).money_transfer_draft()
         voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
         voucher.unlink()
         return res

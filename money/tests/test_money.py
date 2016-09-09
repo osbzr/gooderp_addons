@@ -49,7 +49,6 @@ class test_money_order(TransactionCase):
     def test_money_order_draft_voucher_done(self):
         ''' 测试收付款反审核 ：审核后的凭证先反审核再删除 '''
         self.env.ref('money.get_40000').money_order_done()
-        self.env.ref('money.get_40000').voucher_id.voucher_done()
         self.env.ref('money.get_40000').money_order_draft()
 
     def test_money_order_onchange(self):
