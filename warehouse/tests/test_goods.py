@@ -8,7 +8,9 @@ class TestGoods(TransactionCase):
     ''' 测试和仓库相关的产品的有关逻辑 '''
     def setUp(self):
         super(TestGoods, self).setUp()
-
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
         # 总部仓库
         self.hd_warehouse = self.browse_ref('warehouse.hd_stock')
         self.others_in = self.browse_ref('warehouse.wh_in_whin1')

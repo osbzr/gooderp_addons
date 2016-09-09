@@ -547,6 +547,7 @@ class buy_receipt(models.Model):
                                help=u"采购退货单的退款状态",
                                select=True, copy=False)
     modifying = fields.Boolean(u'差错修改中', default=False)
+    voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True)
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
@@ -711,7 +712,7 @@ class buy_receipt(models.Model):
                                  'category_id':categ.id, 
                                  'date':source_id[0].date, 
                                  'amount':amount, 
-                                 'reconciled':0.0, 
+                                 'reconciled':0.0,
                                  'to_reconcile':amount, 
                                  'this_reconcile':this_reconcile})
             rec = self.with_context(type='pay')
@@ -728,6 +729,60 @@ class buy_receipt(models.Model):
                     'to_reconcile':amount, 
                     'state':'draft'})
             money_order.money_order_done()
+
+    @api.one
+    def create_voucher(self):
+        '''
+        借： 商品分类对应的会计科目 一般是库存商品
+        贷：类型为支出的类别对应的会计科目 一般是材料采购
+
+        当一张入库单有多个产品的时候，按对应科目汇总生成多个借方凭证行。
+
+        采购退货单生成的金额为负
+        '''
+        vouch_id = self.env['voucher'].create({'date': self.date})
+
+        sum = 0
+        if not self.is_return:
+            for line in self.line_in_ids:
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': line.goods_id.category_id.account_id.id,
+                    'debit': line.amount,
+                    'voucher_id': vouch_id.id,
+                    'goods_id': line.goods_id.id,
+                })
+                sum += line.amount
+
+            category_expense = self.env.ref('money.core_category_purchase')
+            self.env['voucher.line'].create({
+                'name': self.name,
+                'account_id': category_expense.account_id.id,
+                'credit': sum,
+                'voucher_id': vouch_id.id,
+            })
+        if self.is_return:
+            for line in self.line_out_ids:
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': line.goods_id.category_id.account_id.id,
+                    'debit': -line.amount,
+                    'voucher_id': vouch_id.id,
+                    'goods_id': line.goods_id.id,
+                })
+                sum += line.amount
+
+            category_expense = self.env.ref('money.core_category_purchase')
+            self.env['voucher.line'].create({
+                'name': self.name,
+                'account_id': category_expense.account_id.id,
+                'credit': -sum,
+                'voucher_id': vouch_id.id,
+            })
+
+        self.voucher_id = vouch_id
+        return vouch_id
+
     @api.one
     def buy_receipt_done(self):
         '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
@@ -736,6 +791,9 @@ class buy_receipt(models.Model):
 
         #将收货/退货数量写入订单行
         self._line_qty_write()
+
+        # 创建入库的会计凭证
+        self.create_voucher()
 
         # 入库单/退货单 生成源单
         source_id = self._receipt_make_invoice()
@@ -777,6 +835,10 @@ class buy_receipt(models.Model):
             line.quantity_in = 0
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.buy_move_id.cancel_approved_order()
+
+        # 反审核采购入库单时删除对应的入库凭证
+        if self.voucher_id:
+            self.voucher_id.unlink()
 
     @api.one
     def buy_share_cost(self):

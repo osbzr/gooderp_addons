@@ -10,6 +10,10 @@ class Test_sell(TransactionCase):
 
     def setUp(self):
         super(Test_sell, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         self.order = self.env.ref('sell.sell_order_1')
 
         self.order_2 = self.env.ref('sell.sell_order_2')
@@ -289,6 +293,10 @@ class test_sell_delivery(TransactionCase):
     def setUp(self):
         '''准备基本数据'''
         super(test_sell_delivery, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
@@ -730,6 +738,10 @@ class test_sell_adjust(TransactionCase):
     def setUp(self):
         '''销售调整单准备基本数据'''
         super(test_sell_adjust, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         # 销货订单 10个 网线
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()

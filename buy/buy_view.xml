@@ -241,6 +241,7 @@
                             <field name="name" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
+                            <field name='voucher_id'/>
                             <field name="money_state" readonly='1'/>
                             <field name="modifying" invisible="1"/>
                         </group>
@@ -411,6 +412,7 @@
                             <field name="name" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
+                            <field name='voucher_id'/>
                             <field name="return_state" readonly="1"/>
                             <field name="modifying" invisible="1"/>
                         </group>

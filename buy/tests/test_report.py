@@ -9,6 +9,10 @@ class test_detail_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_detail_wizard, self).setUp()
+        # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+        # 给buy_order_1中的产品“键盘”的分类设置科目
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
@@ -66,7 +70,11 @@ class test_track_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_track_wizard, self).setUp()
+        # 给产品的分类设置科目
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
         order_2 = self.order.copy()
@@ -132,6 +140,9 @@ class test_payment_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_payment_wizard, self).setUp()
+        # 给buy_order_1中的产品“键盘”的分类设置科目
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
@@ -191,6 +202,9 @@ class test_goods_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_goods_wizard, self).setUp()
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
@@ -261,6 +275,9 @@ class test_partner_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_partner_wizard, self).setUp()
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
