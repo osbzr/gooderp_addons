@@ -118,6 +118,17 @@ class buy_order(models.Model):
 
         return self.env['warehouse'].browse()
 
+    @api.one
+    @api.depends('amount', 'amount_executed')
+    def _get_money_state(self):
+        '''计算购货订单付款/退款状态'''
+        if self.amount_executed == 0:
+            self.money_state = (self.type == 'buy') and u'未付款' or u'未退款'
+        elif self.amount_executed < self.amount:
+            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
+        elif self.amount_executed == self.amount:
+            self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
+
     partner_id = fields.Many2one('partner', u'供应商', states=READONLY_STATES,
                                  ondelete='restrict')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
@@ -160,6 +171,12 @@ class buy_order(models.Model):
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
     pay_ids=fields.One2many("payment.plan","buy_id",string=u"付款计划")
+    amount_executed = fields.Float(u'已执行金额',
+                                   help=u'入库单已付款金额或退货单已退款金额')
+    money_state = fields.Char(u'付/退款状态',
+                              compute=_get_money_state,
+                              store=True,
+                              help=u'购货订单生成的采购入库单或退货单的付/退款状态')
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')

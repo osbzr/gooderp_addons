@@ -57,6 +57,17 @@ class sell_order(models.Model):
 
         return self.env['warehouse'].browse()
 
+    @api.one
+    @api.depends('amount', 'amount_executed')
+    def _get_money_state(self):
+        '''计算销货订单收款/退款状态'''
+        if self.amount_executed == 0:
+            self.money_state = (self.type == 'sell') and u'未收款' or u'未退款'
+        elif self.amount_executed < self.amount:
+            self.money_state = (self.type == 'sell') and u'部分收款' or u'部分退款'
+        elif self.amount_executed == self.amount:
+            self.money_state = (self.type == 'sell') and u'全部收款' or u'全部退款'
+
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES)
     contact = fields.Char(u'联系人', states=READONLY_STATES)
@@ -100,6 +111,12 @@ class sell_order(models.Model):
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
+    amount_executed = fields.Float(u'已执行金额',
+                                   help=u'发货单已收款金额或退货单已退款金额')
+    money_state = fields.Char(u'收/退款状态',
+                              compute=_get_money_state,
+                              store=True,
+                              help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止')
     currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
 
