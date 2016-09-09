@@ -658,7 +658,7 @@ class sell_delivery(models.Model):
             'name': self.name,
             'partner_id': self.partner_id.id,
             'category_id': categ.id,
-            'date': fields.Date.context_today(self),
+            'date': self.date,
             'amount': amount,
             'reconciled': 0,
             'to_reconcile': amount,
@@ -676,7 +676,7 @@ class sell_delivery(models.Model):
                     'name': self.name,
                     'partner_id': line.partner_id.id,
                     'category_id': line.category_id.id,
-                    'date': fields.Date.context_today(self),
+                    'date': self.date,
                     'amount': line.amount,
                     'reconciled': 0.0,
                     'to_reconcile': line.amount,
@@ -704,7 +704,7 @@ class sell_delivery(models.Model):
             rec = self.with_context(type='get')
             money_order = rec.env['money.order'].create({
                 'partner_id': self.partner_id.id,
-                'date': fields.Date.context_today(self),
+                'date': self.date,
                 'line_ids': [(0, 0, line) for line in money_lines],
                 'source_ids': [(0, 0, line) for line in source_lines],
                 'type': 'get',
