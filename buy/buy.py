@@ -777,7 +777,7 @@ class buy_receipt(models.Model):
             line.money_id.unlink()
         # 查找产生的源单
         invoice_ids = self.env['money.invoice'].search(
-                [('id', '=', self.invoice_id.id)])
+                [('name', '=', self.invoice_id.name)])
         for invoice in invoice_ids:
             invoice.money_invoice_draft()
             invoice.unlink()
