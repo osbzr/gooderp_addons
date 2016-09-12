@@ -181,7 +181,6 @@ class sell_order(models.Model):
                                 'state': 'draft',
                                 'origin_name':self.name,
                             })
-            money_order.money_order_done()
 
     @api.one
     def sell_order_done(self):
@@ -730,7 +729,6 @@ class sell_delivery(models.Model):
                 'to_reconcile': amount,
                 'state': 'draft',
             })
-            money_order.money_order_done()
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.sell_move_id.approve_order()
         # 生成分拆单 FIXME:无法跳转到新生成的分单

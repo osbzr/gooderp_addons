@@ -224,7 +224,6 @@ class buy_order(models.Model):
                                 'state': 'draft',
                                 'origin_name':self.name,
                             })
-            money_order.money_order_done()
 
     @api.one
     def buy_order_done(self):
@@ -745,7 +744,6 @@ class buy_receipt(models.Model):
                     'reconciled':this_reconcile, 
                     'to_reconcile':amount, 
                     'state':'draft'})
-            money_order.money_order_done()
 
     @api.one
     def create_voucher(self):
