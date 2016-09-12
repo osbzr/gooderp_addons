@@ -189,14 +189,6 @@ class money_order(models.Model):
                 source.name.to_reconcile = source.to_reconcile
                 source.name.reconciled = (source.reconciled + 
                                           source.this_reconcile)
-                # 将已核销金额写回到购货/销货订单中的已执行金额
-                move = False
-                if order.type == 'pay':
-                    move = self.env['buy.receipt'].search([('invoice_id', '=', source.name.id)])
-                else:
-                    move = self.env['sell.delivery'].search([('invoice_id', '=', source.name.id)])
-                if move.order_id:
-                    move.order_id.amount_executed = abs(source.name.reconciled)
 
             order.state = 'done'
         return True
@@ -227,14 +219,6 @@ class money_order(models.Model):
                                             source.this_reconcile)
                 source.name.reconciled = (source.reconciled - 
                                           source.this_reconcile)
-                # 将购货/销货订单中的已执行金额清零
-                move = False
-                if order.type == 'pay':
-                    move = self.env['buy.receipt'].search([('invoice_id', '=', source.name.id)])
-                else:
-                    move = self.env['sell.delivery'].search([('invoice_id', '=', source.name.id)])
-                if move.order_id:
-                    move.order_id.amount_executed = 0
 
             order.state = 'draft'
         return True

@@ -51,6 +51,34 @@ class test_buy_order(TransactionCase):
         self.assertTrue(order.warehouse_dest_id.type == 'stock')
         self.env['buy.order'].create({})
 
+    def test_get_money_state(self):
+        '''计算购货订单付款/退款状态'''
+        self.order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+                  [('order_id', '=', self.order.id)])
+        # 入库单不付款，购货订单付款状态应该为未付款
+        receipt.buy_receipt_done()
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'未付款')
+        # 入库单总金额为585，本次付500，购货订单付款状态应该为部分付款
+        receipt.buy_receipt_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        receipt.payment = 500
+        receipt.bank_account_id = bank_account
+        receipt.buy_receipt_done()
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'部分付款')
+        # 入库单总金额为585，本次付585，购货订单付款状态应该为全部付款
+        receipt.buy_receipt_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        receipt.payment = 585
+        receipt.bank_account_id = bank_account
+        receipt.buy_receipt_done()
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'全部付款')
+
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
         self.order.buy_order_done()
