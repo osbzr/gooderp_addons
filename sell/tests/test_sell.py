@@ -172,6 +172,39 @@ class test_sell_order(TransactionCase):
              }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
 
+    def test_get_money_state(self):
+        '''计算销货订单收款/退款状态'''
+        order2 = self.env.ref('sell.sell_order_2')
+        order2.sell_order_done()
+        delivery = self.env['sell.delivery'].search(
+                  [('order_id', '=', order2.id)])
+        # 发货单产品在仓库中不足，需盘点入库以保证审核通过
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        # 发货单不付款，销货订单收款状态应该为未收款
+        delivery.sell_delivery_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'未收款')
+        # 发货单总金额为 85，本次收款 50，销货订单收款状态应该为部分收款
+        delivery.sell_delivery_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        delivery.receipt = 50
+        delivery.bank_account_id = bank_account.id
+        delivery.sell_delivery_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'部分收款')
+        # 发货单总金额为 85，本次收款 85，销货订单收款状态应该为全部收款
+        delivery.sell_delivery_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        delivery.receipt = 85
+        delivery.bank_account_id = bank_account.id
+        delivery.sell_delivery_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'全部收款')
+
     def test_onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
         self.order.onchange_partner_id()

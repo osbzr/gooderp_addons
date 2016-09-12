@@ -57,6 +57,17 @@ class sell_order(models.Model):
 
         return self.env['warehouse'].browse()
 
+    @api.one
+    @api.depends('amount', 'amount_executed')
+    def _get_money_state(self):
+        '''计算销货订单收款/退款状态'''
+        if self.amount_executed == 0:
+            self.money_state = (self.type == 'sell') and u'未收款' or u'未退款'
+        elif self.amount_executed < self.amount:
+            self.money_state = (self.type == 'sell') and u'部分收款' or u'部分退款'
+        elif self.amount_executed == self.amount:
+            self.money_state = (self.type == 'sell') and u'全部收款' or u'全部退款'
+
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES)
     contact = fields.Char(u'联系人', states=READONLY_STATES)
@@ -100,6 +111,12 @@ class sell_order(models.Model):
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
+    amount_executed = fields.Float(u'已执行金额',
+                                   help=u'发货单已收款金额或退货单已退款金额')
+    money_state = fields.Char(u'收/退款状态',
+                              compute=_get_money_state,
+                              store=True,
+                              help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止')
     currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
 
@@ -733,7 +750,7 @@ class sell_delivery(models.Model):
             line.money_id.unlink()
         # 查找产生的源单
         invoice_ids = self.env['money.invoice'].search(
-                [('id', '=', self.invoice_id.id)])
+                [('name', '=', self.invoice_id.name)])
         for invoice in invoice_ids:
             invoice.money_invoice_draft()
             invoice.unlink()
@@ -793,6 +810,35 @@ class money_invoice(models.Model):
     move_id = fields.Many2one('wh.move', string=u'出入库单',
                               readonly=True, ondelete='cascade')
 
+
+class money_order(models.Model):
+    _inherit = 'money.order'
+
+    @api.multi
+    def money_order_done(self):
+        ''' 将已核销金额写回到销货订单中的已执行金额 '''
+        res = super(money_order, self).money_order_done()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'get':
+                move = self.env['sell.delivery'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = abs(source.name.reconciled)
+        return res
+
+    @api.multi
+    def money_order_draft(self):
+        ''' 将销货订单中的已执行金额清零'''
+        res = super(money_order, self).money_order_draft()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'get':
+                move = self.env['sell.delivery'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = 0
+        return res
 
 
 class sell_adjust(models.Model):
