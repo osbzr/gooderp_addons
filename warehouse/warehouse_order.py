@@ -147,12 +147,15 @@ class wh_in(models.Model):
         })
 
         self.voucher_id = vouch_id
+        self.voucher_id.voucher_done()
         return vouch_id
 
     @api.one
     def delete_voucher(self):
         # 反审核入库单时删除对应的入库凭证
         if self.voucher_id:
+            if self.voucher_id.state == 'done':
+                self.voucher_id.voucher_draft()
             self.voucher_id.unlink()
 
 
