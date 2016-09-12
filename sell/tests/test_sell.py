@@ -175,6 +175,7 @@ class test_sell_order(TransactionCase):
         delivery = self.env['sell.delivery'].search(
                   [('order_id', '=', order2.id)])
         # 发货单产品在仓库中不足，需盘点入库以保证审核通过
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         # 发货单不付款，销货订单收款状态应该为未收款
