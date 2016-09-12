@@ -63,12 +63,14 @@ class sell_receipt_wizard(models.TransientModel):
             # 如果是退货则金额均取反
             if not delivery.is_return:
                 order_type = u'普通销售'
+                warehouse = delivery.warehouse_id
             elif delivery.is_return:
                 order_type = u'销售退回'
                 sell_amount = - sell_amount
                 discount_amount = - discount_amount
                 amount = - amount
                 partner_cost = - partner_cost
+                warehouse = delivery.warehouse_dest_id
             # 计算回款率
             if (amount + partner_cost) == 0 and receipt == 0:
                 receipt_rate = 100
@@ -81,7 +83,7 @@ class sell_receipt_wizard(models.TransientModel):
                 'type': order_type,
                 'date': delivery.date,
                 'order_name': delivery.name,
-                'warehouse_id': delivery.warehouse_id.id,
+                'warehouse_id': warehouse.id,
                 'sell_amount': sell_amount,
                 'discount_amount': discount_amount,
                 'amount': amount,

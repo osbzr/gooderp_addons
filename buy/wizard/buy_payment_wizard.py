@@ -59,11 +59,13 @@ class buy_payment_wizard(models.TransientModel):
             # 如果是退货则金额均取反
             if not receipt.is_return:
                 order_type = u'普通采购'
+                warehouse = receipt.warehouse_dest_id
             elif receipt.is_return:
                 order_type = u'采购退回'
                 purchase_amount = - purchase_amount
                 discount_amount = - discount_amount
                 amount = - amount
+                warehouse = receipt.warehouse_id
             # 计算付款率
             if amount == 0 and payment == 0:
                 payment_rate = 100
@@ -74,7 +76,7 @@ class buy_payment_wizard(models.TransientModel):
                 'partner_id': receipt.partner_id.id,
                 'type': order_type,
                 'date': receipt.date,
-                'warehouse_dest_id': receipt.warehouse_dest_id.id,
+                'warehouse_dest_id': warehouse.id,
                 'order_name': receipt.name,
                 'purchase_amount': purchase_amount,
                 'discount_amount': discount_amount,
