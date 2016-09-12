@@ -798,6 +798,7 @@ class buy_receipt(models.Model):
             })
 
         self.voucher_id = vouch_id
+        self.voucher_id.voucher_done()
         return vouch_id
 
     @api.one
@@ -855,6 +856,8 @@ class buy_receipt(models.Model):
 
         # 反审核采购入库单时删除对应的入库凭证
         if self.voucher_id:
+            if self.voucher_id.state == 'done':
+                self.voucher_id.voucher_draft()
             self.voucher_id.unlink()
 
     @api.one
