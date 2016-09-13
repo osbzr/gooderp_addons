@@ -95,6 +95,8 @@
 	                <group>
                     	<group>
 		                	<field name="discount_amount" groups="money.reconcile_groups"/>
+                            <field name="discount_account_id" attrs="{'required': [('discount_amount', '!=', 0)]}"
+                                   groups="money.reconcile_groups"/>
 		                </group>
 		                <group>	
 		                	<field name="advance_payment" groups="money.reconcile_groups"/>

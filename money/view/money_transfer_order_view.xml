@@ -1,69 +1,81 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-		<!--资金转账单tree-->
-    	<record id="money_transfer_order_tree" model="ir.ui.view">
+        <!--资金转账单tree-->
+        <record id="money_transfer_order_tree" model="ir.ui.view">
             <field name="name">money.transfer.order.tree</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
                 <tree string="Money Transfer Order">
                     <field name="name"/>
                     <field name="date"/>
-					<field name="state"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
 
-		<!--资金转账单form-->
+        <!--资金转账单form-->
         <record id="money_transfer_order_form" model="ir.ui.view">
             <field name="name">money.transfer.order.form</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
                 <form string="Money Transfer Order">
-				<header>
-					<button name="money_transfer_done" states="draft" string="审核" type="object" class="oe_highlight"/>
-					<button name="money_transfer_draft" states="done" string="反审核" type="object"/>
-					<field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
-				</header>
-                <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" class="oe_inline" readonly="1"/>
-                        </h1>
-                    </div>
-                    <group>
+                    <header>
+                        <button name="money_transfer_done" states="draft" string="审核" type="object"
+                                class="oe_highlight"/>
+                        <button name="money_transfer_draft" states="done" string="反审核" type="object"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" class="oe_inline" readonly="1"/>
+                            </h1>
+                        </div>
                         <group>
-                            <field name="date"/>
+                            <group>
+                                <field name="date"/>
+                                <field name="voucher_id"/>
+                            </group>
                         </group>
-                    </group>
-                    <field name="line_ids">
-                    	<tree string="Money Transfer Order Lines" editable="bottom">
-                    		<field name="out_bank_id"/>
-                    		<field name="in_bank_id"/>
-                            <field name="currency_amount" sum="外币合计"/>
-                            <field name="amount" sum="合计"/>
-                            <field name="mode_id" groups='core.settle_mode_groups'/>
-                            <field name="number" groups='core.settle_mode_groups'/>
-                            <field name="note"/>
-                       </tree>
-                    </field>
-	                <field name="note" nolabel="1" placeholder="备注信息……"/>
-	                 <group>
-                    	<group>
-                    	    <field name="create_uid" string="制单人" readonly="1"/>
-		                	<field name="create_date" string="录单时间" readonly="1"/>
-		                </group>
-		                <group>	
-		                	<field name="write_date" string="最后修改时间"  readonly="1"/>
-		                </group>
-		            </group>
-                </sheet>
+                        <field name="line_ids">
+                            <tree string="Money Transfer Order Lines" editable="bottom">
+                                <field name="out_bank_id"/>
+                                <field name="in_bank_id"/>
+                                <field name="currency_amount" sum="外币合计"/>
+                                <field name="amount" sum="合计"/>
+                                <field name="mode_id" groups='core.settle_mode_groups'/>
+                                <field name="number" groups='core.settle_mode_groups'/>
+                                <field name="note"/>
+                            </tree>
+                        </field>
+                        <group>
+                            <group>
+                                <field name="discount_amount" groups="money.reconcile_groups"/>
+                            </group>
+                            <group>
+                                <field name="discount_account_id"
+                                       attrs="{'required': [('discount_amount', '!=', 0)]}"
+                                       groups="money.reconcile_groups"/>
+                            </group>
+                        </group>
+                        <field name="note" nolabel="1" placeholder="备注信息……"/>
+                        <group>
+                            <group>
+                                <field name="create_uid" string="制单人" readonly="1"/>
+                                <field name="create_date" string="录单时间" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="write_date" string="最后修改时间" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
                 </form>
             </field>
         </record>
 
-		<!--资金转账单 search 视图-->
-		<record id="money_transfer_order_search" model="ir.ui.view">
+        <!--资金转账单 search 视图-->
+        <record id="money_transfer_order_search" model="ir.ui.view">
             <field name="name">money.transfer.order.search</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
@@ -87,14 +99,15 @@
             <field name="res_model">money.transfer.order</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                点击创建资金转账单
-              </p>
+                <p class="oe_view_nocontent_create">
+                    点击创建资金转账单
+                </p>
             </field>
         </record>
 
-		<!-- 资金转账单menu -->
-        <menuitem id="menu_money_transfer_order_action" action="money_transfer_order_action" parent="menu_money_manage" sequence="7"/>
-	</data>
+        <!-- 资金转账单menu -->
+        <menuitem id="menu_money_transfer_order_action" action="money_transfer_order_action" parent="menu_money_manage"
+                  sequence="7"/>
+    </data>
 </openerp>
 	

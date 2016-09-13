@@ -44,10 +44,12 @@ class partner(models.Model):
 
     receivable_init = fields.Float(u'应收期初', 
                                    digits=dp.get_precision('Amount'),
-                                   inverse=_set_receivable_init)
+                                   inverse=_set_receivable_init,
+                                   help=u'客户的应收期初余额')
     payable_init = fields.Float(u'应付期初', 
                            digits=dp.get_precision('Amount'),
-                           inverse=_set_payable_init)
+                           inverse=_set_payable_init,
+                        help=u'供应商的应付期初余额')
 
 
     @api.multi
