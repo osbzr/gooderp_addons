@@ -21,7 +21,7 @@ class finance_config_wizard(osv.osv_memory):
     # 凭证号重置设置  此部分参与了步科的设计
     default_auto_reset = fields.Boolean(u'是否重置凭证号', default=False, )
     default_reset_period = fields.Selection([('year', u'每年'), ('month', u'每月')], u'重置间隔', required=True,
-                                            default='year')
+                                            default='month')
     default_reset_init_number = fields.Integer(u'重置后起始数字', required=True, default=1, help=u"重置后，起始编号的数字，例从1起：1，2，3....")
 
     # 资产负债表 利润表

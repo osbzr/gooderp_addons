@@ -9,6 +9,11 @@ class TestWarehouseOrder(TransactionCase):
     def setUp(self):
         super(TestWarehouseOrder, self).setUp()
 
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
         self.overage_in_cable = self.browse_ref('warehouse.wh_move_line_14')
 
@@ -46,6 +51,7 @@ class TestWarehouseOrder(TransactionCase):
         self.others_out_2.approve_order()
 
     def test_approve(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
 
         # 此时其他入库单的others_in的剩余数量应该为0
         self.assertEqual(self.others_in_cable.qty_remaining, 0)
@@ -105,6 +111,7 @@ class TestWarehouseOrder(TransactionCase):
         self.assertTrue(not self.others_out.exists())
 
     def test_cancel_approve(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
 
         # 存在已经被匹配的出库时入库无法被取消
         with self.assertRaises(except_orm):
@@ -150,6 +157,7 @@ class TestWarehouseOrder(TransactionCase):
             self.others_in.approve_order()
 
     def test_origin(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.assertEqual(self.others_in.origin, 'wh.in.others')
         self.assertEqual(self.others_out.origin, 'wh.out.others')
         self.assertEqual(self.internal.origin, 'wh.internal')
@@ -170,6 +178,7 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_get_default_warehouse(self):
         '''获取调出仓库'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         order = self.env['wh.out'].with_context({
              'warehouse_type': 'stock'
         }).create({'type': 'others',
@@ -183,6 +192,7 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_get_default_warehouse_dest(self):
         '''获取调入仓库'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         order = self.env['wh.in'].with_context({
              'warehouse_dest_type': 'stock'
         }).create({'type': 'others',

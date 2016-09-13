@@ -7,6 +7,8 @@ class test_buy_order(TransactionCase):
 
     def setUp(self):
         super(test_buy_order, self).setUp()
+        # 给buy_order_1中的产品“键盘”的分类设置科目
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.order = self.env.ref('buy.buy_order_1')
         self.order.bank_account_id = False
 
@@ -50,6 +52,34 @@ class test_buy_order(TransactionCase):
              }).create({})
         self.assertTrue(order.warehouse_dest_id.type == 'stock')
         self.env['buy.order'].create({})
+
+    def test_get_money_state(self):
+        '''计算购货订单付款/退款状态'''
+        self.order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+                  [('order_id', '=', self.order.id)])
+        # 入库单不付款，购货订单付款状态应该为未付款
+        receipt.buy_receipt_done()
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'未付款')
+        # 入库单总金额为585，本次付500，购货订单付款状态应该为部分付款
+        receipt.buy_receipt_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        receipt.payment = 500
+        receipt.bank_account_id = bank_account
+        receipt.buy_receipt_done()
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'部分付款')
+        # 入库单总金额为585，本次付585，购货订单付款状态应该为全部付款
+        receipt.buy_receipt_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        receipt.payment = 585
+        receipt.bank_account_id = bank_account
+        receipt.buy_receipt_done()
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'全部付款')
 
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
@@ -223,12 +253,14 @@ class test_buy_receipt(TransactionCase):
 
     def setUp(self):
         super(test_buy_receipt, self).setUp()
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.order = self.env.ref('buy.buy_order_1')
         self.order.bank_account_id = False
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
                        [('order_id', '=', self.order.id)])
         self.return_receipt = self.env.ref('buy.buy_receipt_return_1')
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -380,6 +412,43 @@ class test_buy_receipt(TransactionCase):
         for line in receipt.line_in_ids:
             self.assertTrue(line.share_cost == 100)
             self.assertTrue(line.using_attribute)
+
+    def test_wrong_receipt_done_lot_unique_current(self):
+        '''审核时，当前入库单行之间同一产品批号不能相同'''
+        receipt = self.env['buy.receipt'].create({
+            'partner_id': self.env.ref('core.lenovo').id,
+            'date': '2016-09-01',
+            'date_due': '2016-09-05',
+            'warehouse_dest_id': self.env.ref('warehouse.bj_stock').id,
+            'line_in_ids': [
+                (0, 0, {
+                    'goods_id': self.env.ref('goods.mouse').id,
+                    'lot': 'lot_1',
+                    'goods_qty': 1.0}),
+                (0, 0, {
+                    'goods_id': self.env.ref('goods.mouse').id,
+                    'lot': 'lot_1',
+                    'goods_qty': 1.0})
+            ]
+        })
+        with self.assertRaises(except_orm):
+            receipt.buy_receipt_done()
+
+    def test_wrong_receipt_done_lot_unique_wh(self):
+        '''审核时，当前入库单行与仓库里同一产品批号不能相同'''
+        receipt = self.env['buy.receipt'].create({
+            'partner_id': self.env.ref('core.lenovo').id,
+            'date': '2016-09-01',
+            'date_due': '2016-09-05',
+            'warehouse_dest_id': self.env.ref('warehouse.bj_stock').id,
+            'line_in_ids': [(0, 0, {
+                'goods_id': self.env.ref('goods.mouse').id,
+                'lot': 'lot_1',
+                'goods_qty': 1.0,
+                'state': 'done'})]
+        })
+        with self.assertRaises(except_orm):
+            receipt.buy_receipt_done()
 
     def test_receipt_make_invoice(self):
         '''审核入库单：不勾按收货结算时'''
@@ -541,6 +610,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_quantity_lt(self):
         '''审核采购调整单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         for line in buy_receipt.line_in_ids:
@@ -558,6 +628,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_quantity_equal(self):
         '''审核采购调整单:调整后数量6 == 原订单已入库数量 6，审核后将产生的入库单分单删除'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         for line in buy_receipt.line_in_ids:
@@ -578,6 +649,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_all_in(self):
         '''审核采购调整单：购货订单生成的采购入库单已全部入库，审核时报错'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
@@ -596,6 +668,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_more_same_line(self):
         '''审核采购调整单：查找到购货订单中多行同一产品，不能调整'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
@@ -621,6 +694,7 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_goods_done(self):
         '''审核采购调整单:原始单据中一行产品已全部入库，另一行没有'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,

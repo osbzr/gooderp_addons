@@ -8,6 +8,10 @@ class test_customer_statements(TransactionCase):
     def setUp(self):
         '''客户账单向导及数据'''
         super(test_customer_statements, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         # 业务伙伴对账单向导: self._context.get('default_customer')
         self.statement = self.env['partner.statements.report.wizard'].create(
                     {'partner_id': self.env.ref('core.jd').id,
@@ -21,6 +25,7 @@ class test_customer_statements(TransactionCase):
         money_get.money_order_done()
         # 创建销售出货单记录
         self.env.ref('warehouse.wh_move_line_14').goods_uos_qty = 200
+        self.env.ref('warehouse.wh_move_line_14').production_date = '2016-02-04'
         self.env.ref('warehouse.wh_move_line_14').action_done()
         sell_order = self.env.ref('sell.sell_order_2')
         sell_order.sell_order_done()
@@ -89,6 +94,10 @@ class test_track_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_track_wizard, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         # 补足产品网线的数量
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
@@ -133,6 +142,9 @@ class test_track_wizard(TransactionCase):
 
     def test_view_detail(self):
         '''测试销售订单跟踪表  查看明细按钮'''
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+
         self.track.button_ok()
         goods_id = self.env.ref('goods.cable').id
         track_line = self.env['sell.order.track'].search([('goods_id', '=', goods_id)])
@@ -145,6 +157,10 @@ class test_detail_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_detail_wizard, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         # 补足产品网线的数量
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
@@ -170,6 +186,9 @@ class test_detail_wizard(TransactionCase):
 
     def test_button_ok(self):
         '''测试销售订单明细表  确认按钮'''
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+
         detail = self.detail_obj.create({
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
@@ -201,6 +220,10 @@ class test_goods_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_goods_wizard, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('sell.sell_order_2')
@@ -256,6 +279,10 @@ class test_partner_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_partner_wizard, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('sell.sell_order_2')
@@ -309,6 +336,8 @@ class test_staff_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_staff_wizard, self).setUp()
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('sell.sell_order_2')
@@ -363,6 +392,10 @@ class test_receipt_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_receipt_wizard, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -395,6 +428,9 @@ class test_receipt_wizard(TransactionCase):
 
     def test_button_ok(self):
         '''测试销售收款一览表  确认按钮'''
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+
         # 日期报错
         receipt_wizard = self.receipt_wizard_obj.create({
                              'date_start': '2016-11-01',
@@ -415,6 +451,8 @@ class test_receipt_wizard(TransactionCase):
     def test_view_detail(self):
         '''测试销售收款一览表  查看明细按钮'''
         self.receipt_wizard.button_ok()
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+
         receipt_line = self.env['sell.receipt'].search(
                                 [('order_name', '=', self.delivery.name)])
         for line in receipt_line:
@@ -431,6 +469,10 @@ class test_sell_top_ten_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_sell_top_ten_wizard, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('sell.sell_order_2')
@@ -486,6 +528,9 @@ class test_popup_wizard(TransactionCase):
 
     def test_button_ok(self):
         '''缺货向导的确认按钮'''
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+
         self.delivery.sell_delivery_done()
         inv_line = {}
         for line in self.delivery.line_out_ids:

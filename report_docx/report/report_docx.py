@@ -45,7 +45,7 @@ class ReportDocx(report_sxw):
             doc.render({'obj': data})
             doc.save(temp_out_file)
 
-            with open(temp_out_file, 'r') as input_stream:
+            with open(temp_out_file, 'rb') as input_stream:
                 report_stream = input_stream.read()
         except Exception:
             raise Exception

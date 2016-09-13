@@ -10,6 +10,10 @@ class Test_sell(TransactionCase):
 
     def setUp(self):
         super(Test_sell, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         self.order = self.env.ref('sell.sell_order_1')
 
         self.order_2 = self.env.ref('sell.sell_order_2')
@@ -38,12 +42,7 @@ class Test_sell(TransactionCase):
         self.order_2.sell_order_done()
         self.sell_delivery = self.env['sell.delivery'].search([('order_id', '=', self.order_2.id)])
         self.sell_delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT)})
-        # 销售退货订单审核，退货出库单审核
-        return_receipt = self.env.ref('sell.sell_order_return')
-        return_receipt.sell_order_done()
-        receipt = self.env['sell.delivery'].search(
-                  [('order_id', '=', return_receipt.id)])
-        receipt.sell_delivery_done()
+
     def test_sell(self):
         ''' 测试销售订单  '''
         # 正常销售订单
@@ -62,9 +61,6 @@ class Test_sell(TransactionCase):
         # 正常的反审核
         self.order.sell_order_draft()
 
-        # with self.assertRaises(except_orm):
-        #     self.order_2.sell_order_draft()
-
         for goods_state in [(u'未出库', 0), (u'部分出库', 1), (u'全部出库', 10000)]:
             self.order.line_ids.write({'quantity_out': goods_state[1]})
             self.assertEqual(self.order.goods_state, goods_state[0])
@@ -76,16 +72,10 @@ class Test_sell(TransactionCase):
                 self.order.sell_order_done()
                 self.order.sell_order_draft()
 
-        # # 销售退货单的测试
-        # #
-        # self.order_3.write({'type': "return"})
-        # self.order_3.sell_order_done()
-
         # sell.order onchange test
         self.order.discount_rate = 10
         self.order.onchange_discount_rate()
         self.assertEqual(self.order.discount_amount, 16848.0)
-#         self.order.unlink()
 
     def test_sale_order_line_compute(self):
         """测试销售订单的on_change 和 计算字段"""
@@ -133,7 +123,7 @@ class Test_sell(TransactionCase):
         self.assertEqual(self.sell_delivery_obj.discount_amount, 50)
         #  结算账户 需要输入付款额 测试
         self.sell_delivery_obj.bank_account_id = self.bank.id
-        self.receipt = False
+        self.sell_delivery_obj.receipt = False
         with self.assertRaises(except_orm):
             self.sell_delivery_obj.sell_delivery_done()
 
@@ -181,6 +171,39 @@ class test_sell_order(TransactionCase):
              'warehouse_type': 'stock'
              }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
+
+    def test_get_money_state(self):
+        '''计算销货订单收款/退款状态'''
+        order2 = self.env.ref('sell.sell_order_2')
+        order2.sell_order_done()
+        delivery = self.env['sell.delivery'].search(
+                  [('order_id', '=', order2.id)])
+        # 发货单产品在仓库中不足，需盘点入库以保证审核通过
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        # 发货单不付款，销货订单收款状态应该为未收款
+        delivery.sell_delivery_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'未收款')
+        # 发货单总金额为 85，本次收款 50，销货订单收款状态应该为部分收款
+        delivery.sell_delivery_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        delivery.receipt = 50
+        delivery.bank_account_id = bank_account.id
+        delivery.sell_delivery_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'部分收款')
+        # 发货单总金额为 85，本次收款 85，销货订单收款状态应该为全部收款
+        delivery.sell_delivery_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        delivery.receipt = 85
+        delivery.bank_account_id = bank_account.id
+        delivery.sell_delivery_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'全部收款')
 
     def test_onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
@@ -289,6 +312,10 @@ class test_sell_delivery(TransactionCase):
     def setUp(self):
         '''准备基本数据'''
         super(test_sell_delivery, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
@@ -730,6 +757,10 @@ class test_sell_adjust(TransactionCase):
     def setUp(self):
         '''销售调整单准备基本数据'''
         super(test_sell_adjust, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
         # 销货订单 10个 网线
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()

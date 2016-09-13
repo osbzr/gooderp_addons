@@ -127,6 +127,8 @@ class voucher(models.Model):
     # 重载write 方法
     @api.multi
     def write(self, vals):
+        if self.env.context.get('call_module', False) == "checkout_wizard":
+            return super(voucher, self).write(vals)
         if self.period_id.is_closed is True:
             raise except_orm(u'错误', u'该会计期间已结账，凭证不能再修改！')
         if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
@@ -171,11 +173,17 @@ class voucher_line(models.Model):
     account_id = fields.Many2one(
         'finance.account', u'会计科目',
         ondelete='restrict', required=True)
+
     debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'),help='每条凭证行中只能记录借方金额或者贷方金额中的一个，\
     一张凭证中所有的凭证行的借方余额，必须等于贷方余额！')
     credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'),help='每条凭证行中只能记录借方金额或者贷方金额中的一个，\
     一张凭证中所有的凭证行的借方余额，必须等于贷方余额！')
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', help='凭证行的对应的往来单位')
+
+    currency_amount = fields.Float(u'外币金额', digits=dp.get_precision(u'金额'))
+    currency_id = fields.Many2one('res.currency', u'外币币别', ondelete='restrict')
+    rate_silent = fields.Float(u'汇率')
+
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     auxiliary_id = fields.Many2one(
         'auxiliary.financing', u'辅助核算',help='辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\
@@ -330,6 +338,8 @@ class finance_account(models.Model):
         ('in', u'收入类'),
         ('out', u'费用类')
     ], u'类型', required="1")
+    currency_id = fields.Many2one('res.currency', u'外币币别')
+    exchange = fields.Boolean(u'是否期末调汇')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', u'科目名称必须唯一!'),
@@ -393,8 +403,14 @@ class res_company(models.Model):
 
 class bank_account(models.Model):
     _inherit = 'bank.account'
-    account_id = fields.Many2one('finance.account', u'科目', help=u'科目')
+    @api.one
+    @api.depends('account_id')
+    def _compute_currency_id(self):
+        self.currency_id = self.account_id.currency_id.id
 
+    account_id = fields.Many2one('finance.account', u'科目')
+    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
+    currency_amount = fields.Float(u'外币金额', digits=dp.get_precision(u'金额'), readonly=True)
 
 class core_category(models.Model):
     _inherit = 'core.category'

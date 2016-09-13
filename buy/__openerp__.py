@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['core', 'warehouse', 'money'],
+    'depends': ['core', 'warehouse', 'money', 'finance'],
     'data': [
         'buy_data.xml',
         'security/groups.xml',

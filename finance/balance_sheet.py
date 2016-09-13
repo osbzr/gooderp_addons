@@ -154,21 +154,29 @@ class create_balance_sheet_wizard(models.TransientModel):
             subject_vals_in = []
             subject_vals_out = []
             total_sum = 0
+            sign_in = False
+            sign_out = False
             if len(parameter_str_list) == 1:
                 subject_ids = self.env['finance.account'].search([('code', '=', parameter_str_list[0])])
             else:
                 subject_ids = self.env['finance.account'].search([('code', '>=', parameter_str_list[0]), ('code', '<=', parameter_str_list[1])])
+            if subject_ids:   # 本行计算科目借贷方向
+                for line in subject_ids:
+                    if line.balance_directions == 'in':
+                        sign_in = True
+                    if line.balance_directions == 'out':
+                        sign_out = True
             trial_balances = self.env['trial.balance'].search([('subject_name_id', 'in', [subject.id for subject in subject_ids]), ('period_id', '=', period_id.id)])
             for trial_balance in trial_balances:
                 if trial_balance.subject_name_id.balance_directions == 'in':
                     subject_vals_in.append(trial_balance[compute_field_list[0]])
                 elif trial_balance.subject_name_id.balance_directions == 'out':
                     subject_vals_out.append(trial_balance[compute_field_list[1]])
-                if subject_vals_in and subject_vals_out:
+                if sign_out and sign_in:    # 方向有借且有贷
                     total_sum = sum(subject_vals_out)-sum(subject_vals_in)
                 else:
                     if subject_vals_in:
-                        total_sum = -sum(subject_vals_in)
+                        total_sum = sum(subject_vals_in)
                     else:
                         total_sum = sum(subject_vals_out)
             return total_sum

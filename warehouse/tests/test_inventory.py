@@ -7,6 +7,10 @@ class TestInventory(TransactionCase):
     def setUp(self):
         super(TestInventory, self).setUp()
 
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
+
         self.others_in = self.browse_ref('warehouse.wh_in_whin1')
         self.others_in_2 = self.browse_ref('warehouse.wh_in_whin3')
 

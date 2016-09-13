@@ -118,6 +118,17 @@ class buy_order(models.Model):
 
         return self.env['warehouse'].browse()
 
+    @api.one
+    @api.depends('amount', 'amount_executed')
+    def _get_money_state(self):
+        '''计算购货订单付款/退款状态'''
+        if self.amount_executed == 0:
+            self.money_state = (self.type == 'buy') and u'未付款' or u'未退款'
+        elif self.amount_executed < self.amount:
+            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
+        elif self.amount_executed == self.amount:
+            self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
+
     partner_id = fields.Many2one('partner', u'供应商', states=READONLY_STATES,
                                  ondelete='restrict')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
@@ -160,6 +171,12 @@ class buy_order(models.Model):
                               help=u"购货订单的收货状态", select=True, copy=False)
     cancelled = fields.Boolean(u'已终止')
     pay_ids=fields.One2many("payment.plan","buy_id",string=u"付款计划")
+    amount_executed = fields.Float(u'已执行金额',
+                                   help=u'入库单已付款金额或退货单已退款金额')
+    money_state = fields.Char(u'付/退款状态',
+                              compute=_get_money_state,
+                              store=True,
+                              help=u'购货订单生成的采购入库单或退货单的付/退款状态')
 
     @api.one
     @api.onchange('discount_rate', 'line_ids')
@@ -547,6 +564,7 @@ class buy_receipt(models.Model):
                                help=u"采购退货单的退款状态",
                                select=True, copy=False)
     modifying = fields.Boolean(u'差错修改中', default=False)
+    voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True)
 
     @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
@@ -598,9 +616,26 @@ class buy_receipt(models.Model):
     def _wrong_receipt_done(self):
         if self.state == 'done':
             raise except_orm(u'错误', u'请不要重复审核！')
+        batch_one_list_wh = []
+        batch_one_list = []
+        for line in self.line_in_ids:
+            if line.goods_id.force_batch_one:
+                wh_move_lines = self.env['wh.move.line'].search([('state', '=', 'done'), ('type', '=', 'in'), ('goods_id', '=', line.goods_id.id)])
+                for move_line in wh_move_lines:
+                    if (move_line.goods_id.id, move_line.lot) not in batch_one_list_wh and move_line.lot:
+                        batch_one_list_wh.append((move_line.goods_id.id, move_line.lot))
+
+            if (line.goods_id.id, line.lot) in batch_one_list_wh:
+                raise except_orm(u'错误', u'仓库已存在相同序列号的产品！')
+
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+            if line.goods_id.force_batch_one:
+                batch_one_list.append((line.goods_id.id, line.lot))
+
+        if len(batch_one_list) > len(set(batch_one_list)):
+            raise except_orm(u'错误', u'不能创建相同序列号的产品！')
 
         for line in self.line_out_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
@@ -694,7 +729,7 @@ class buy_receipt(models.Model):
                                  'category_id':categ.id, 
                                  'date':source_id[0].date, 
                                  'amount':amount, 
-                                 'reconciled':0.0, 
+                                 'reconciled':0.0,
                                  'to_reconcile':amount, 
                                  'this_reconcile':this_reconcile})
             rec = self.with_context(type='pay')
@@ -711,6 +746,61 @@ class buy_receipt(models.Model):
                     'to_reconcile':amount, 
                     'state':'draft'})
             money_order.money_order_done()
+
+    @api.one
+    def create_voucher(self):
+        '''
+        借： 商品分类对应的会计科目 一般是库存商品
+        贷：类型为支出的类别对应的会计科目 一般是材料采购
+
+        当一张入库单有多个产品的时候，按对应科目汇总生成多个借方凭证行。
+
+        采购退货单生成的金额为负
+        '''
+        vouch_id = self.env['voucher'].create({'date': self.date})
+
+        sum = 0
+        if not self.is_return:
+            for line in self.line_in_ids:
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': line.goods_id.category_id.account_id.id,
+                    'debit': line.amount,
+                    'voucher_id': vouch_id.id,
+                    'goods_id': line.goods_id.id,
+                })
+                sum += line.amount
+
+            category_expense = self.env.ref('money.core_category_purchase')
+            self.env['voucher.line'].create({
+                'name': self.name,
+                'account_id': category_expense.account_id.id,
+                'credit': sum,
+                'voucher_id': vouch_id.id,
+            })
+        if self.is_return:
+            for line in self.line_out_ids:
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': line.goods_id.category_id.account_id.id,
+                    'debit': -line.amount,
+                    'voucher_id': vouch_id.id,
+                    'goods_id': line.goods_id.id,
+                })
+                sum += line.amount
+
+            category_expense = self.env.ref('money.core_category_purchase')
+            self.env['voucher.line'].create({
+                'name': self.name,
+                'account_id': category_expense.account_id.id,
+                'credit': -sum,
+                'voucher_id': vouch_id.id,
+            })
+
+        self.voucher_id = vouch_id
+        self.voucher_id.voucher_done()
+        return vouch_id
+
     @api.one
     def buy_receipt_done(self):
         '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
@@ -719,6 +809,9 @@ class buy_receipt(models.Model):
 
         #将收货/退货数量写入订单行
         self._line_qty_write()
+
+        # 创建入库的会计凭证
+        self.create_voucher()
 
         # 入库单/退货单 生成源单
         source_id = self._receipt_make_invoice()
@@ -743,7 +836,7 @@ class buy_receipt(models.Model):
             line.money_id.unlink()
         # 查找产生的源单
         invoice_ids = self.env['money.invoice'].search(
-                [('id', '=', self.invoice_id.id)])
+                [('name', '=', self.invoice_id.name)])
         for invoice in invoice_ids:
             invoice.money_invoice_draft()
             invoice.unlink()
@@ -760,6 +853,12 @@ class buy_receipt(models.Model):
             line.quantity_in = 0
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.buy_move_id.cancel_approved_order()
+
+        # 反审核采购入库单时删除对应的入库凭证
+        if self.voucher_id:
+            if self.voucher_id.state == 'done':
+                self.voucher_id.voucher_draft()
+            self.voucher_id.unlink()
 
     @api.one
     def buy_share_cost(self):
@@ -824,6 +923,37 @@ class money_invoice(models.Model):
 
     move_id = fields.Many2one('wh.move', string=u'出入库单',
                               readonly=True, ondelete='cascade')
+
+
+class money_order(models.Model):
+    _inherit = 'money.order'
+
+    @api.multi
+    def money_order_done(self):
+        ''' 将已核销金额写回到购货订单中的已执行金额 '''
+        res = super(money_order, self).money_order_done()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'pay':
+                move = self.env['buy.receipt'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = abs(source.name.reconciled)
+        return res
+
+    @api.multi
+    def money_order_draft(self):
+        ''' 将购货订单中的已执行金额清零'''
+        res = super(money_order, self).money_order_draft()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'pay':
+                move = self.env['buy.receipt'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = 0
+        return res
+
 
 class buy_adjust(models.Model):
     _name = "buy.adjust"

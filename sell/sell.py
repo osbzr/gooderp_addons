@@ -42,6 +42,13 @@ class sell_order(models.Model):
             else:
                 self.goods_state = u'全部出库'
 
+    @api.one
+    @api.depends('partner_id')
+    def _compute_currency_id(self):
+        self.currency_id = self.partner_id.c_category_id.account_id.currency_id.id or self.partner_id.s_category_id.account_id.currency_id.id
+        if not self.currency_id :
+            self.currency_id = self.env.user.company_id.currency_id.id
+
     @api.model
     def _default_warehouse(self):
         if self.env.context.get('warehouse_type'):
@@ -49,6 +56,17 @@ class sell_order(models.Model):
                         self.env.context.get('warehouse_type'))
 
         return self.env['warehouse'].browse()
+
+    @api.one
+    @api.depends('amount', 'amount_executed')
+    def _get_money_state(self):
+        '''计算销货订单收款/退款状态'''
+        if self.amount_executed == 0:
+            self.money_state = (self.type == 'sell') and u'未收款' or u'未退款'
+        elif self.amount_executed < self.amount:
+            self.money_state = (self.type == 'sell') and u'部分收款' or u'部分退款'
+        elif self.amount_executed == self.amount:
+            self.money_state = (self.type == 'sell') and u'全部收款' or u'全部退款'
 
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES)
@@ -93,7 +111,14 @@ class sell_order(models.Model):
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
+    amount_executed = fields.Float(u'已执行金额',
+                                   help=u'发货单已收款金额或退货单已退款金额')
+    money_state = fields.Char(u'收/退款状态',
+                              compute=_get_money_state,
+                              store=True,
+                              help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止')
+    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
 
     @api.one
     @api.onchange('partner_id')
@@ -264,6 +289,7 @@ class sell_order(models.Model):
                 'note': self.note,
                 'discount_rate': self.discount_rate,
                 'discount_amount': self.discount_amount,
+                'currency_id': self.currency_id.id
             })
             view_id = self.env['ir.model.data']\
                     .xmlid_to_res_id('sell.sell_delivery_form')
@@ -282,6 +308,7 @@ class sell_order(models.Model):
                 'note': self.note,
                 'discount_rate': self.discount_rate,
                 'discount_amount': self.discount_amount,
+                'currency_id': self.currency_id.id
             })
             view_id = self.env['ir.model.data']\
                     .xmlid_to_res_id('sell.sell_return_form')
@@ -313,15 +340,27 @@ class sell_order_line(models.Model):
     @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
-        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
-        amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
-        tax_amt = amount * self.tax_rate * 0.01  # 税额
-        self.tax_amount = tax_amt
-        self.subtotal = self.quantity * self.price_taxed
-        self.amount = self.subtotal - tax_amt
+        if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id :
+            self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
+            amount = self.quantity * self.price - self.discount_amount  # 折扣后金额 
+            tax_amt = amount * self.tax_rate * 0.01  # 税额 
+            self.tax_amount = tax_amt
+            self.subtotal = self.quantity * self.price_taxed
+            self.amount = self.subtotal - tax_amt
+        else :
+            rate_silent = self.order_id.currency_id.rate_silent or self.env.user.company_id.currency_id.rate_silent
+            currency_amount = self.quantity * self.price_taxed - self.discount_amount
+            self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
+            self.amount = currency_amount * rate_silent
+            self.tax_amount = self.amount * self.tax_rate * 0.01
+            self.subtotal = self.amount + self.tax_amount
+            self.currency_amount = currency_amount
 
     order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
                                required=True, ondelete='cascade')
+    currency_amount = fields.Float(u'外币金额', compute=_compute_all_amount,
+                          store=True, readonly=True,
+                          digits=dp.get_precision(u'金额'))
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
     attribute_id = fields.Many2one('attribute', u'属性',
@@ -334,9 +373,8 @@ class sell_order_line(models.Model):
                                 digits=dp.get_precision('Quantity'))
     price = fields.Float(u'销售单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits=dp.get_precision('Amount'))
-    price_taxed = fields.Float(u'含税单价',
-                               digits=dp.get_precision('Amount'))
+                         digits=(12, 6))
+    price_taxed = fields.Float(u'含税单价',digits=(12, 6))
     discount_rate = fields.Float(u'折扣率%')
     discount_amount = fields.Float(u'折扣额')
     amount = fields.Float(u'金额', compute=_compute_all_amount, 
@@ -381,7 +419,6 @@ class sell_order_line(models.Model):
         price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = self.quantity * price \
                 * self.discount_rate * 0.01
-
 
 class sell_delivery(models.Model):
     _name = 'sell.delivery'
@@ -431,6 +468,7 @@ class sell_delivery(models.Model):
             elif self.invoice_id.reconciled == self.invoice_id.amount:
                 self.return_state = u'全部退款'
 
+    currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True)
     sell_move_id = fields.Many2one('wh.move', u'发货单', required=True, 
                                    ondelete='cascade')
     is_return = fields.Boolean(u'是否退货', default=lambda self: \
@@ -637,13 +675,14 @@ class sell_delivery(models.Model):
             'name': self.name,
             'partner_id': self.partner_id.id,
             'category_id': categ.id,
-            'date': fields.Date.context_today(self),
+            'date': self.date,
             'amount': amount,
             'reconciled': 0,
             'to_reconcile': amount,
             'tax_amount': tax_amount,
             'date_due': self.date_due,
             'state': 'draft',
+            'currency_id': self.currency_id.id
         })
         self.invoice_id = source_id.id
         # 销售费用产生源单
@@ -654,12 +693,13 @@ class sell_delivery(models.Model):
                     'name': self.name,
                     'partner_id': line.partner_id.id,
                     'category_id': line.category_id.id,
-                    'date': fields.Date.context_today(self),
+                    'date': self.date,
                     'amount': line.amount,
                     'reconciled': 0.0,
                     'to_reconcile': line.amount,
                     'date_due': self.date_due,
                     'state': 'draft',
+                    'currency_id': self.currency_id.id
                 })
         # 生成收款单
         if self.receipt:
@@ -681,7 +721,7 @@ class sell_delivery(models.Model):
             rec = self.with_context(type='get')
             money_order = rec.env['money.order'].create({
                 'partner_id': self.partner_id.id,
-                'date': fields.Date.context_today(self),
+                'date': self.date,
                 'line_ids': [(0, 0, line) for line in money_lines],
                 'source_ids': [(0, 0, line) for line in source_lines],
                 'type': 'get',
@@ -710,7 +750,7 @@ class sell_delivery(models.Model):
             line.money_id.unlink()
         # 查找产生的源单
         invoice_ids = self.env['money.invoice'].search(
-                [('id', '=', self.invoice_id.id)])
+                [('name', '=', self.invoice_id.name)])
         for invoice in invoice_ids:
             invoice.money_invoice_draft()
             invoice.unlink()
@@ -766,9 +806,39 @@ class cost_line(models.Model):
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
 
+
     move_id = fields.Many2one('wh.move', string=u'出入库单',
                               readonly=True, ondelete='cascade')
 
+
+class money_order(models.Model):
+    _inherit = 'money.order'
+
+    @api.multi
+    def money_order_done(self):
+        ''' 将已核销金额写回到销货订单中的已执行金额 '''
+        res = super(money_order, self).money_order_done()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'get':
+                move = self.env['sell.delivery'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = abs(source.name.reconciled)
+        return res
+
+    @api.multi
+    def money_order_draft(self):
+        ''' 将销货订单中的已执行金额清零'''
+        res = super(money_order, self).money_order_draft()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'get':
+                move = self.env['sell.delivery'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = 0
+        return res
 
 
 class sell_adjust(models.Model):
