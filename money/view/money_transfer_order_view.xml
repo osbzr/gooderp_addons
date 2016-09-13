@@ -35,6 +35,7 @@
                         <group>
                             <group>
                                 <field name="date"/>
+                                <field name="voucher_id"/>
                             </group>
                         </group>
                         <field name="line_ids">
@@ -54,7 +55,7 @@
                             </group>
                             <group>
                                 <field name="discount_account_id"
-                                       attrs="{'required': [('discount_amount', '!=', False)]}"
+                                       attrs="{'required': [('discount_amount', '!=', 0)]}"
                                        groups="money.reconcile_groups"/>
                             </group>
                         </group>

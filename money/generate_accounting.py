@@ -23,7 +23,8 @@ from openerp.exceptions import except_orm
 
 class money_order(models.Model):
     _inherit = 'money.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'收付款单审核时生成的对应凭证')
 
     @api.multi
     def money_order_done(self):
@@ -207,7 +208,8 @@ class money_order(models.Model):
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'结算单审核时生成的对应凭证')
 
     @api.multi
     def money_invoice_draft(self):
@@ -314,7 +316,8 @@ class money_invoice(models.Model):
 
 class other_money_order(models.Model):
     _inherit = 'other.money.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'其他收支单审核时生成的对应凭证')
 
     @api.multi
     def other_money_draft(self):
@@ -359,7 +362,8 @@ class other_money_order(models.Model):
 
 class money_transfer_order(models.Model):
     _inherit = 'money.transfer.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'资金转账单审核时生成的对应凭证')
 
     '''外币转外币暂时不做，只处理外币转本位币'''
     @api.multi
