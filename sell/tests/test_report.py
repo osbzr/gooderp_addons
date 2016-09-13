@@ -408,6 +408,11 @@ class test_receipt_wizard(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.delivery.receipt = 2.0
         self.delivery.sell_delivery_done()
+        # 查找产生的收款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', self.delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
 
         # 销货订单产生发货单，并审核发货单，优惠后金额和本次收款均为0
         new_delivery = self.delivery.copy()
