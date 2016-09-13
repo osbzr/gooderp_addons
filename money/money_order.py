@@ -87,6 +87,8 @@ class money_order(models.Model):
     discount_amount = fields.Float(string=u'整单折扣', readonly=True,
                                    states={'draft': [('readonly', False)]},
                                    digits=dp.get_precision('Amount'))
+    discount_account_id = fields.Many2one('finance.account', u'折扣科目',
+                                       help=u'收付款单审核生成凭证时，折扣额对应的科目')
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收付款单行', readonly=True,
                                states={'draft': [('readonly', False)]})

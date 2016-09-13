@@ -124,33 +124,80 @@ class test_money_order(TransactionCase):
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
 
-    def test_other_money_order_voucher(self):
+    def test_money_order_voucher(self):
+        invoice = self.env['money.invoice'].create({
+            'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
+            'name': 'invoice/2016001',
+            'category_id': self.env.ref('money.core_category_sale').id,
+            'amount': 200.0,
+            'reconciled': 0,
+            'to_reconcile': 200.0,
+            'date_due': '2016-09-07'})
         # get  银行账户没设置科目
         money1 = self.env['money.order'].with_context({'type': 'get'}) \
             .create({
                 'partner_id': self.env.ref('core.jd').id,
                 'name': 'GET/2016001', 'date': "2016-02-20",
-                'note': 'zxy note',
+                'note': 'note',
                 'line_ids': [(0, 0, {
                     'bank_id': self.env.ref('core.comm').id,
                     'amount': 200.0, 'note': 'money note'})],
                 'type': 'get'})
+        money1.discount_account_id = self.env.ref('finance.small_business_chart5603001').id
+        money1.discount_amount = 10
+        money1.money_order_done()
         money1.line_ids[0].bank_id.account_id = False
         with self.assertRaises(except_orm):
             money1.money_order_done()
+        # 测试 get 存在 source行 和 折扣生成凭证
+        money1.money_order_draft()
+        money1.update({'source_ids': [(0, 0, {
+                    'name': invoice.id,
+                    'category_id': self.env.ref('money.core_category_sale').id,
+                    'date': '2016-02-20',
+                    'amount': 210.0,
+                    'reconciled': 0,
+                    'to_reconcile': 210.0,
+                    'this_reconcile': 210.0,
+                    'date_due': '2016-09-07'})],
+                    })
+        money1.discount_amount = 10
+        money1.line_ids[0].bank_id.account_id = self.env.ref('finance.account_bank').id
+        money1.money_order_done()
+        # pay
+        invoice.partner_id = self.env.ref('core.lenovo').id
         money2 = self.env['money.order'].with_context({'type': 'pay'}) \
             .create({
-                'partner_id': self.env.ref('core.jd').id,
-                'name': 'GET/2016001', 'date': "2016-02-20",
-                'note': 'zxy note',
+                'partner_id': self.env.ref('core.lenovo').id,
+                'name': 'PAY/2016001', 'date': "2016-02-20",
+                'note': 'note',
                 'line_ids': [(0, 0, {
                     'bank_id': self.env.ref('core.comm').id,
                     'amount': 200.0, 'note': 'money note'})],
                 'type': 'pay'})
+        money2.discount_account_id = self.env.ref('finance.small_business_chart5603002').id
+        money2.discount_amount = 10
+        money2.money_order_done()
         # pay  银行账户没设置科目
         money2.line_ids[0].bank_id.account_id = False
         with self.assertRaises(except_orm):
             money2.money_order_done()
+        # 测试 pay 存在 source行 和 折扣生成凭证
+        money2.money_order_draft()
+        money2.update({'source_ids': [(0, 0, {
+            'name': invoice.id,
+            'category_id': self.env.ref('money.core_category_purchase').id,
+            'date': '2016-02-20',
+            'amount': 210.0,
+            'reconciled': 0,
+            'to_reconcile': 210.0,
+            'this_reconcile': 210.0,
+            'date_due': '2016-09-07'})],
+                       })
+
+        money2.discount_amount = 10
+        money2.line_ids[0].bank_id.account_id = self.env.ref('finance.account_bank').id
+        money2.money_order_done()
 
 
 class test_other_money_order(TransactionCase):
