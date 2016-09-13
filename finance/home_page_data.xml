@@ -1,8 +1,6 @@
-
 <?xml version="1.0"?>
 <openerp>
     <data noupdate="1">
-
          <record id="home_report_type_finance" model="home.report.type">
 			<field name="sequence">1</field>
 		    <field name="name" >会计</field>
