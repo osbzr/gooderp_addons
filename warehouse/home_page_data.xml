@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="home_report_type_ware_house" model="home.report.type">
+			<field name="sequence">5</field>
+		    <field name="name" >仓库</field>
+		</record>
+        <record id="report_stock_transceive_wizard_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="report_stock_transceive_wizard_action"/>
+		    <field name="menu_type">report</field>
+			<field name="report_type_id" ref="home_report_type_ware_house"/>
+		    <field name="note_one" >商品收发明细表</field>
+		</record>
+        <record id="report_lot_track_wizard_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="report_lot_track_wizard_action"/>
+		    <field name="menu_type">report</field>
+			<field name="report_type_id" ref="home_report_type_ware_house"/>
+		    <field name="note_one" >批号跟踪表</field>
+		</record>
+        <record id="wh_move_line_action_all_business_1" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="wh_move_line_action"/>
+		    <field name="menu_type">all_business</field>
+			<field name="report_type_id" ref="home_report_type_ware_house"/>
+		    <field name="domain" >[]</field>
+		    <field name="context" >{}</field>
+		    <field name="note_one" >库存调拨</field>
+		</record>
+    </data>
+</openerp>

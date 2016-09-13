@@ -51,25 +51,29 @@ openerp.home_page = function(instance, local) {
                     self.result_main = result['main']
                 }
                 /* 第一块的视图的构建 及跳转的逻辑 */
+                self.result_main.length/4 > 1?row_num=3 :row_num=parseInt(12/self.result_main.length);
                 for(var j=0;j<self.result_main.length;j++){
                     var result_one=self.result_main[index]
-                    var center_html_str="<div class='col-sm-3 col-xs-6'><div class='feature-item text-center'>\
+                    var center_html_str="<div class='col-sm-"+row_num+" col-xs-6'><div class='feature-item text-center'>\
                         <p  class='btn btn-primary btn-lg oe_main_link_"+index+"' id='"+index+"'>"+result_one[0]+"</p>\
                         </div><div>"
 
                     self.$el.find('.feature-list').append(center_html_str);
                     if (result_one[0]!=result_one[1]){
                         self.$(".oe_main_link_"+index+"").click(function() {
+                            var view_mode =  _.contains((self.result_main[this.id])[1].split(','),'tree')? 'list':'form'
+                            var views = _.contains((self.result_main[this.id])[1].split(','),'tree')?[[self.result_main[this.id][6],
+                                'list'],[false, 'form']]:[[self.result_main[this.id][6], 'form']]
                              self.do_action({
                                 type: 'ir.actions.act_window',
                                 res_model: (self.result_main[this.id])[2],
-                                view_mode: 'list',
+                                view_mode:view_mode,
                                 name:self.result_main[this.id][7],
                                 view_type: self.result_main[this.id][1],
-                                views: [[self.result_main[this.id][6], 'list'],[false, 'form']],
+                                views:views,
                                 domain:self.result_main[this.id][3],
                                 context:self.result_main[this.id][5],
-                                target: 'current',
+                                target: self.result_main[this.id][8],
                             });
                         });
                     }
@@ -90,15 +94,18 @@ openerp.home_page = function(instance, local) {
                               </button><p class='m-t-sm'></p></div>");
                         self.$el.find('.top_div').append(left_html_str);
                         self.$(".oe_top_link_"+i+"").click(function() {
+                            var view_mode =  _.contains((self.result_top[this.id])[1].split(','),'tree')? 'list':'form'
+                            var views = _.contains((self.result_top[this.id])[1].split(','),'tree')?[[self.result_top[this.id][5],
+                                'list'],[false, 'form']]:[[self.result_top[this.id][5], 'form']]
                              self.do_action({
                                 type: 'ir.actions.act_window',
                                 res_model: (self.result_top[this.id])[2],
-                                view_mode: 'list',
-                                views: [[self.result_top[this.id][5], 'list'],[false, 'form']],
+                                view_mode: view_mode,
+                                views: views,
                                 domain:self.result_top[this.id][3],
                                 context:self.result_top[this.id][4],
                                 name:self.result_top[this.id][6],
-                                target: 'current',
+                                target: self.result_top[this.id][7],
                             });
                         });
                     }
@@ -120,15 +127,18 @@ openerp.home_page = function(instance, local) {
                         self.$('.oe_quick_link_' +index_last + "").click(function () {
                             index_list = ($(this).attr("data-id")).split('_')
                             index_vals = self.result_quick[parseInt(index_list[0])][1]
+                            var view_mode =  _.contains(index_vals[parseInt(index_list[1])][1].split(','),'tree')? 'list':'form'
+                            var views = _.contains(index_vals[parseInt(index_list[1])][1].split(','),'tree')?[[index_vals[parseInt(index_list[1])][5],
+                                    'list'],[false, 'form']]:[[index_vals[parseInt(index_list[1])][5], 'form']]
                             self.do_action({
                                 type: 'ir.actions.act_window',
                                 res_model: index_vals[parseInt(index_list[1])][2],
-                                view_mode: 'list',
+                                view_mode: view_mode,
                                 name: index_vals[parseInt(index_list[1])][6],
-                                views: [[index_vals[parseInt(index_list[1])][5], 'list'], [false, 'form']],
+                                views: views,
                                 domain: index_vals[parseInt(index_list[1])][3],
                                 context: index_vals[parseInt(index_list[1])][4],
-                                target: 'current',
+                                target: index_vals[parseInt(index_list[1])][7],
                             });
                         });
                         index_last ++;

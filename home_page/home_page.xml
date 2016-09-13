@@ -8,9 +8,12 @@
             </xpath>
         </template>
 
-        <menuitem id="mail.mail_feeds_main" groups='-base.group_user,home_page.group_mail'/>
 
-        <menuitem id="main_home_menu" name="首页" groups='group_all_manager'/>
+        <menuitem name="Messaging"
+          id="mail.mail_feeds_main"
+          groups="base.group_user"
+          sequence="100"/>
+        <menuitem id="main_home_menu" name="首页" sequence="5"/>
 
         <menuitem id="home_page_menu_two" name="首页"
             parent="main_home_menu" />
@@ -53,6 +56,7 @@
                         <field name="note_one" attrs="{'required':[('menu_type','=','main')]}"/>
                         <field name="compute_type" /> 
                         <field name="context" attrs="{'required':[('menu_type','in',('top','left'))]}"/>
+                         <field name="group_ids"  widget="many2many_tags" />
                         <field name="is_active"/>
                     </group>
                 </form>

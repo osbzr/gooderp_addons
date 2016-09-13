@@ -14,6 +14,5 @@
             <field name="type">expense</field>
              <field name="account_id" ref="finance.small_business_chart1401"/>
         </record>
-        
     </data>
 </openerp>
