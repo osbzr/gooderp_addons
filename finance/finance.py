@@ -51,15 +51,16 @@ class voucher(models.Model):
 
     document_word_id = fields.Many2one(
         'document.word', u'凭证字', ondelete='restrict', required=True,
-        default=lambda self: self.env.ref('finance.document_word_1'))
+        default=lambda self: self.env.ref('finance.document_word_1'), help=u'“收款凭证”，凭证字就是“收”\n“付款凭证”，凭证字就是“付”\
+        “转帐凭证”，凭证字就是“转”\n“记款凭证”，凭证字就是“记” (可以不用以上三种凭证字，就用记字也可以)')
     date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date,
-                       track_visibility = 'always')
-    name = fields.Char(u'凭证号', track_visibility='always')
-    att_count = fields.Integer(u'附单据', default=1)
+                       track_visibility='always', help=u'本张凭证创建的时间！')
+    name = fields.Char(u'凭证号', track_visibility='always', help=u'本张凭证发生日期对应的，会计期间！')
+    att_count = fields.Integer(u'附单据', default=1, help='原始凭证的张数！')
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
-        compute='_compute_period_id', ondelete='restrict', store=True)
+        compute='_compute_period_id', ondelete='restrict', store=True, help=u'本张凭证发生日期对应的，会计期间！')
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
                                track_visibility='always',help=u'凭证金额')
@@ -168,23 +169,28 @@ class voucher_line(models.Model):
         return data
 
     voucher_id = fields.Many2one('voucher', u'对应凭证', ondelete='cascade')
-    name = fields.Char(u'摘要', required=True)
+    name = fields.Char(u'摘要', required=True, help='描述本条凭证行的缘由！')
     account_id = fields.Many2one(
         'finance.account', u'会计科目',
         ondelete='restrict', required=True)
+
+    debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'),help='每条凭证行中只能记录借方金额或者贷方金额中的一个，\
+    一张凭证中所有的凭证行的借方余额，必须等于贷方余额！')
+    credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'),help='每条凭证行中只能记录借方金额或者贷方金额中的一个，\
+    一张凭证中所有的凭证行的借方余额，必须等于贷方余额！')
+    partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', help='凭证行的对应的往来单位')
+
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision(u'金额'))
     currency_id = fields.Many2one('res.currency', u'外币币别', ondelete='restrict')
     rate_silent = fields.Float(u'汇率')
-    debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'))
-    credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'))
-    partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict')
+
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     auxiliary_id = fields.Many2one(
-        'auxiliary.financing', u'辅助核算',
-        ondelete='restrict')
+        'auxiliary.financing', u'辅助核算',help='辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\
+        以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现',ondelete='restrict')
     date = fields.Date(compute='_compute_voucher_date', store=True, string=u'凭证日期')
-    state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核')], compute='_compute_voucher_state', store=True, string=u'状态')
+    state = fields.Selection([('draft', u'草稿'),('done', u'已审核')], compute='_compute_voucher_state',
+                             store=True, string=u'状态')
 
     @api.one
     @api.depends('voucher_id.date')
@@ -236,9 +242,9 @@ class finance_period(models.Model):
     name = fields.Char(
         u'会计期间',
         compute='_compute_name', readonly=True, store=True)
-    is_closed = fields.Boolean(u'已结账')
-    year = fields.Char(u'会计年度', required=True)
-    month = fields.Selection(MONTH_SELECTION, string=u'会计月份', required=True)
+    is_closed = fields.Boolean(u'已结账',help='这个字段用于标识期间是否已结账，已结账的期间不能生成会计凭证！')
+    year = fields.Char(u'会计年度', required=True,help='会计期间对应的年份')
+    month = fields.Selection(MONTH_SELECTION, string=u'会计月份', required=True,help='会计期间对应的月份')
 
     @api.one
     @api.depends('year', 'month')
@@ -305,7 +311,7 @@ class document_word(models.Model):
     '''凭证字'''
     _name = 'document.word'
     name = fields.Char(u'凭证字')
-    print_title = fields.Char(u'打印标题')
+    print_title = fields.Char(u'打印标题',help='凭证在打印时的显示的标题')
 
 
 class finance_account(models.Model):
@@ -315,14 +321,16 @@ class finance_account(models.Model):
 
     name = fields.Char(u'名称', required="1")
     code = fields.Char(u'编码', required="1")
-    balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向', required="1")
+    balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向', required="1", help=u'借方余额大于贷方余\
+    额，则方向为借，反之则为贷！')
     auxiliary_financing = fields.Selection([('partner', u'客户'),
                                             ('supplier', u'供应商'),
                                             ('member', u'个人'),
                                             ('project', u'项目'),
                                             ('department', u'部门'),
                                             ('goods', u'存货'),
-                                            ], u'辅助核算')
+                                            ], u'辅助核算', help=u'辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\n\
+                                            以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现')
     costs_types = fields.Selection([
         ('assets', U'资产'),
         ('debt', U'负债'),
@@ -386,15 +394,15 @@ class res_company(models.Model):
     '''继承公司对象,添加字段'''
     _inherit = 'res.company'
 
-    profit_account = fields.Many2one('finance.account', u'本年利润科目', ondelete='restrict')
-    remain_account = fields.Many2one('finance.account', u'未分配利润科目', ondelete='restrict')
-    import_tax_account = fields.Many2one('finance.account', u"进项税科目", ondelete='restrict')
+    profit_account = fields.Many2one('finance.account', u'本年利润科目', ondelete='restrict', help=u'本年利润科目,本年中盈利的科目！在结转时会用到!')
+    remain_account = fields.Many2one('finance.account', u'未分配利润科目', ondelete='restrict', help=u'未分配利润科目！')
+    import_tax_account = fields.Many2one('finance.account', u"进项税科目", ondelete='restrict', help=u'进项税额，是指纳税人购进货物\
+    、加工修理修配劳务、服务、无形资产或者不动产，支付或者负担的增值税额。')
     output_tax_account = fields.Many2one('finance.account', u"销项税科目", ondelete='restrict')
 
 
 class bank_account(models.Model):
     _inherit = 'bank.account'
-
     @api.one
     @api.depends('account_id')
     def _compute_currency_id(self):
@@ -404,7 +412,6 @@ class bank_account(models.Model):
     currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision(u'金额'), readonly=True)
 
-
 class core_category(models.Model):
     _inherit = 'core.category'
-    account_id = fields.Many2one('finance.account', u'科目')
+    account_id = fields.Many2one('finance.account', u'科目', help=u'科目')

@@ -23,6 +23,7 @@
         'trial_balance.xml',
         'report/report_voucher.xml',
         'balance_sheet.xml',
+        'home_page_data.xml',
     ],
     'demo': [
         'tests/finance_demo.xml',

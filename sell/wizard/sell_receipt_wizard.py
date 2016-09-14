@@ -17,14 +17,20 @@ class sell_receipt_wizard(models.TransientModel):
     def _default_date_end(self):
         return date.today()
 
-    date_start = fields.Date(u'开始日期', default=_default_date_start)
-    date_end = fields.Date(u'结束日期', default=_default_date_end)
+    date_start = fields.Date(u'开始日期', default=_default_date_start,
+                             help=u'报表汇总的开始日期，默认为公司启用日期')
+    date_end = fields.Date(u'结束日期', default=_default_date_end,
+                           help=u'报表汇总的结束日期，默认为当前日期')
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     domain=[('type', '=', 'customer')],
-                                    context={'type': 'customer'})
-    partner_id = fields.Many2one('partner', u'客户')
-    staff_id = fields.Many2one('staff', u'销售员')
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
+                                    context={'type': 'customer'},
+                                    help=u'按指定客户类别进行统计')
+    partner_id = fields.Many2one('partner', u'客户',
+                                 help=u'按指定客户进行统计')
+    staff_id = fields.Many2one('staff', u'销售员',
+                               help=u'按指定销售员进行统计')
+    warehouse_id = fields.Many2one('warehouse', u'仓库',
+                                   help=u'按指定仓库进行统计')
 
     @api.multi
     def button_ok(self):
