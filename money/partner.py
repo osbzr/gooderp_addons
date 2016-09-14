@@ -83,27 +83,20 @@ class bank_account(models.Model):
     def _set_init_balance(self):
         if self.init_balance:
             # 资金期初 生成 其他收入
-            categ = self.env['core.category'].search([('name', '=', '期初')])
-            # 如果 ‘期初’ 类型不存在，生成 ‘期初’ 类型
-            if not categ:
-                categ = self.env['core.category'].create({
-                    'name': '期初',
-                    'type': 'other_get',
-                    'account_id': self.env.ref('finance.account_init').id
-                })
-
-            self.env['other.money.order'].create({
+            other_money_init = self.env['other.money.order'].create({
                 'name': "期初",
                 'type': 'other_get',
                 'bank_id': self.id,
                 'date': self.env.user.company_id.start_date,
                 'line_ids': [(0, 0, {
-                    'category_id': categ.id,
+                    'category_id': self.env.ref('money.core_category_init').id,
                     'amount': self.init_balance,
                     'tax_rate': 0,
                 })],
                 'state': 'draft'
             })
+            # 审核 其他收入单
+            other_money_init.other_money_done()
 
     init_balance = fields.Float(u'期初',
                                digits=dp.get_precision('Amount'),
