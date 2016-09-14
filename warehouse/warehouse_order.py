@@ -19,10 +19,13 @@ class wh_out(models.Model):
         ('others', u'其他出库'),
     ]
 
-    move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
-    type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others')
+    move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
+                              help=u'其他出库单对应的移库单')
+    type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others',
+                            help=u'类别: 盘亏,其他出库')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits=dp.get_precision('Amount'))
+                                store=True, readonly=True, digits=dp.get_precision('Amount'),
+                                help=u'该出库单的出库金额总和')
 
     @api.multi
     @inherits(res_back=False)
@@ -71,12 +74,16 @@ class wh_in(models.Model):
         ('others', u'其他入库'),
     ]
 
-    move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
-    type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others')
+    move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
+                              help=u'其他入库单对应的移库单')
+    type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others',
+                            help=u'类别: 盘盈,其他入库')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits=dp.get_precision('Amount'))
+                                store=True, readonly=True, digits=dp.get_precision('Amount'),
+                                help=u'该入库单的入库金额总和')
     voucher_id = fields.Many2one('voucher', u'入库凭证',
-                                 readonly=True)
+                                 readonly=True,
+                                 help=u'该入库单的审核后生成的入库凭证')
 
     @api.multi
     @inherits()
@@ -167,9 +174,11 @@ class wh_internal(osv.osv):
         'wh.move': 'move_id',
     }
 
-    move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade')
+    move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
+                              help=u'调拨单对应的移库单')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits=dp.get_precision('Amount'))
+                                store=True, readonly=True, digits=dp.get_precision('Amount'),
+                                help=u'该调拨单的出库金额总和')
 
     @api.multi
     @inherits()

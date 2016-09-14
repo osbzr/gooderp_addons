@@ -72,59 +72,91 @@ class wh_move_line(models.Model):
         if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly') and self.type == 'out':
             self.warehouse_dest_id = self.env.ref('warehouse.warehouse_production').id
 
-    move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade')
-    date = fields.Date(u'完成日期', copy=False)
-    cost_time = fields.Datetime(u'审核时间', copy=False)
-    type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),)
-    state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft')
+    move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade',
+                              help=u'出库/入库/移库单行对应的移库单')
+    date = fields.Date(u'完成日期', copy=False,
+                       help=u'单据完成日期')
+    cost_time = fields.Datetime(u'审核时间', copy=False,
+                                help=u'单据审核时间')
+    type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),
+                            help=u'类型：出库、入库 或者 内部调拨')
+    state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft',
+                             help=u'状态标识，新建时状态为草稿;审核后状态为已审核')
     goods_id = fields.Many2one('goods', string=u'产品', required=True,
-                               index=True, ondelete='restrict')
-    using_attribute = fields.Boolean(compute='_compute_using_attribute', string=u'使用属性')
-    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
-    using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理')
-    force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1')
-    lot = fields.Char(u'批号')
-    lot_id = fields.Many2one('wh.move.line', u'批号')
+                               index=True, ondelete='restrict',
+                               help=u'该单据行对应的产品')
+    using_attribute = fields.Boolean(compute='_compute_using_attribute', string=u'使用属性',
+                                     help=u'该单据行对应的产品是否存在属性，存在True否则False')
+    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
+                                   help=u'该单据行对应的产品的属性')
+    using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理',
+                                 help=u'该单据行对应的产品是否使用批号管理')
+    force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1',
+                                     help=u'该单据行对应的产品是否每批号数量为1,是True否则False')
+    lot = fields.Char(u'批号',
+                      help=u'该单据行对应的产品的批号，一般是入库单行')
+    lot_id = fields.Many2one('wh.move.line', u'批号',
+                             help=u'该单据行对应的产品的批号，一般是出库单行')
     lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'批号数量',
-                           digits=dp.get_precision('Quantity'))
+                           digits=dp.get_precision('Quantity'),
+                           help=u'该单据行对应的产品批号的商品剩余数量')
     lot_uos_qty = fields.Float(u'批号辅助数量',
-                           digits=dp.get_precision('Quantity'))
-    production_date = fields.Date(u'生产日期', default=fields.Date.context_today)
-    shelf_life = fields.Integer(u'保质期(天)')
-    valid_date = fields.Date(u'有效期至')
-    uom_id = fields.Many2one('uom', string=u'单位', ondelete='restrict')
-    uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict')
+                           digits=dp.get_precision('Quantity'),
+                               help=u'该单据行对应的产品的批号辅助数量')
+    production_date = fields.Date(u'生产日期', default=fields.Date.context_today,
+                                  help=u'产品的生产日期')
+    shelf_life = fields.Integer(u'保质期(天)',
+                                help=u'产品的保质期(天)')
+    valid_date = fields.Date(u'有效期至',
+                             help=u'产品的有效期')
+    uom_id = fields.Many2one('uom', string=u'单位', ondelete='restrict',
+                             help=u'产品的计量单位')
+    uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict',
+                             help=u'产品的辅助单位')
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict',
                                    store=True,
                                    compute=_get_line_warehouse,
-                                   )
+                                   help=u'单据的来源仓库')
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         ondelete='restrict',
                                         store=True,
                                         compute=_get_line_warehouse_dest,
-                                        )
-    goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'), default=1)
-    goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'), default=1)
+                                        help=u'单据的目的仓库')
+    goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'), default=1,
+                             help=u'产品的数量')
+    goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),
+                                 default=1, help=u'产品的辅助数量')
     price = fields.Float(u'单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits=dp.get_precision('Amount'))
+                         digits=dp.get_precision('Amount'),
+                         help=u'产品的单价')
     price_taxed = fields.Float(u'含税单价',
-                               digits=dp.get_precision('Amount'))
-    discount_rate = fields.Float(u'折扣率%')
+                               digits=dp.get_precision('Amount'),
+                               help=u'产品的含税单价')
+    discount_rate = fields.Float(u'折扣率%',
+                                 help=u'单据的折扣率%')
     discount_amount = fields.Float(u'折扣额',
-                                   digits=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'),
+                                   help=u'单据的折扣额')
     amount = fields.Float(u'金额',compute=_compute_all_amount, store=True, readonly=True,
-                          digits=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)')
+                          digits=dp.get_precision('Amount'),
+                          help=u'单据的金额,计算得来')
+    tax_rate = fields.Float(u'税率(%)',
+                            help=u'单据的税率(%)')
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, readonly=True,
-                              digits=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'),
+                              help=u'单据的税额,有单价×数量×税率计算得来')
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, store=True, readonly=True,
-                            digits=dp.get_precision('Amount'))
-    note = fields.Text(u'备注')
-    cost_unit = fields.Float(u'单位成本', digits=dp.get_precision('Amount'))
+                            digits=dp.get_precision('Amount'),
+                            help=u'价税合计,有不含税金额+税额计算得来')
+    note = fields.Text(u'备注',
+                       help=u'可以为该单据添加一些需要的标识信息')
+    cost_unit = fields.Float(u'单位成本', digits=dp.get_precision('Amount'),
+                             help=u'入库/出库单位成本')
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
-                        digits=dp.get_precision('Amount'), store=True)
+                        digits=dp.get_precision('Amount'), store=True,
+                        help=u'入库/出库成本')
 
     @api.one
     @api.depends('cost_unit', 'goods_qty')

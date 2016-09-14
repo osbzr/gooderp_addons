@@ -718,6 +718,16 @@ class sell_delivery(models.Model):
             for line in line_ids:
                 line.sell_line_id.quantity_out += line.goods_qty
 
+        # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
+        if not self.is_return:
+            amount = self.amount + self.partner_cost
+            if amount + self.partner_id.receivable > self.partner_id.credit_limit:
+                raise except_orm(u'警告！', u'本次发货金额 + 客户应收余额 不能大于客户信用额度！')
+            self.partner_id.credit_limit -= amount # 更新客户信用额度
+        else:
+            amount = self.amount + self.partner_cost
+            self.partner_id.credit_limit += amount
+
         # 发库单/退货单 生成源单
         if not self.is_return:
             amount = self.amount + self.partner_cost
@@ -799,6 +809,17 @@ class sell_delivery(models.Model):
     @api.one
     def sell_delivery_draft(self):
         '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的源单、收款单及凭证'''
+
+        # 发库单/退货单 计算客户的 本次退货金额+客户应收余额 是否小于客户信用额度， 否则报错
+        if not self.is_return:
+            amount = self.amount + self.partner_cost
+            self.partner_id.credit_limit += amount  # 更新客户信用额度
+        else:
+            amount = self.amount + self.partner_cost
+            if amount + self.partner_id.receivable > self.partner_id.credit_limit:
+                raise except_orm(u'警告！', u'本次退货金额 + 客户应收余额 不能大于客户信用额度！')
+            self.partner_id.credit_limit -= amount
+
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(
                 [('name', '=', self.invoice_id.id)])

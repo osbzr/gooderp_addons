@@ -19,10 +19,14 @@ class report_lot_track_wizard(models.TransientModel):
 
         return (next_month - timedelta(days=1)).strftime('%Y-%m-%d')
 
-    date_start = fields.Date(u'开始日期', default=_default_date_start)
-    date_end = fields.Date(u'结束日期', default=_default_date_end)
-    warehouse = fields.Char(u'仓库')
-    goods = fields.Char(u'产品')
+    date_start = fields.Date(u'开始日期', default=_default_date_start,
+                             help=u'查看本次报表的开始日期')
+    date_end = fields.Date(u'结束日期', default=_default_date_end,
+                           help=u'查看本次报表的结束日期')
+    warehouse = fields.Char(u'仓库',
+                            help=u'本次报表查看的仓库')
+    goods = fields.Char(u'产品',
+                        help=u'本次报表查看的产品')
 
     @api.one
     @api.onchange('date_start', 'date_end')

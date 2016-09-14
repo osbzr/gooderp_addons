@@ -205,6 +205,7 @@
 								<field name="code"/>
 								<field name="main_mobile"/>
 								<field name="tax_num"/>
+								<field name="credit_limit"/>
 							</group>
 							<group>
 								<field name="c_category_id" required="1"/>

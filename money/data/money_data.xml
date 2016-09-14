@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data noupdate="1">
+    <data noupdate="0">
         <!-- 收入类型：销售 -->
         <record id="core_category_sale" model="core.category">
             <field name="name">销售</field>
@@ -13,6 +13,13 @@
             <field name="name">采购</field>
             <field name="type">expense</field>
              <field name="account_id" ref="finance.small_business_chart1401"/>
+        </record>
+
+        <!-- 其他支出：期初 -->
+        <record id="core_category_init" model="core.category">
+            <field name="name">期初</field>
+            <field name="type">other_get</field>
+             <field name="account_id" ref="finance.account_init"/>
         </record>
     </data>
 </openerp>
