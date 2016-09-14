@@ -43,6 +43,7 @@ class vendor_goods(models.Model):
         required=True,
         comodel_name='goods',
         ondelete='cascade',
+        help=u'商品',
     )
 
     vendor_id = fields.Many2one(
@@ -51,15 +52,22 @@ class vendor_goods(models.Model):
         comodel_name='partner',
         domain=[('s_category_id','!=',False)],
         ondelete='cascade',
+        help=u'供应商',
     )
     
-    price = fields.Float(u'供货价', digits=dp.get_precision('Amount'))
+    price = fields.Float(u'供货价',
+                         digits=dp.get_precision('Amount'),
+                         help=u'供应商提供的价格')
     
-    code = fields.Char(u'供应商产品编号')
+    code = fields.Char(u'供应商产品编号',
+                       help=u'供应商提供的产品编号')
 
-    name = fields.Char(u'供应商产品名称')
+    name = fields.Char(u'供应商产品名称',
+                       help=u'供应商提供的产品名称')
 
-    min_qty = fields.Float(u'最低订购量', digits=dp.get_precision('Quantity'))
+    min_qty = fields.Float(u'最低订购量',
+                           digits=dp.get_precision('Quantity'),
+                           help=u'采购产品时，大于或等于最低订购量时，产品的价格才取该行的供货价')
     
 
 class partner(models.Model):
@@ -69,6 +77,7 @@ class partner(models.Model):
         string=u'供应产品',
         comodel_name='vendor.goods',
         inverse_name='vendor_id',
+        help=u'供应商供应的产品价格列表',
     )
 
 
@@ -80,6 +89,7 @@ class goods(models.Model):
         string=u'供应价格',
         comodel_name='vendor.goods',
         inverse_name='goods_id',
+        help=u'各供应商提供的基于最低订购量的供货价格列表',
     )
 
 
@@ -486,7 +496,7 @@ class buy_order_line(models.Model):
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
                               digits=dp.get_precision('Amount'),
-                              help=u'税额')
+                              help=u'由税率计算得出')
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
                             store=True, readonly=True,
                             digits=dp.get_precision('Amount'),
@@ -978,7 +988,7 @@ class money_invoice(models.Model):
 
     move_id = fields.Many2one('wh.move', string=u'出入库单',
                               readonly=True, ondelete='cascade',
-                              help=u'审核时产生的入库凭证')
+                              help=u'生成此发票的出入库单号')
 
 
 class money_order(models.Model):
@@ -1028,7 +1038,7 @@ class buy_adjust(models.Model):
                        help=u'调整单创建日期，默认是当前日期')
     line_ids = fields.One2many('buy.adjust.line', 'order_id', u'调整单行',
                                states=READONLY_STATES, copy=True,
-                               help=u'调整单明细行')
+                               help=u'调整单明细行，不允许为空')
     approve_uid = fields.Many2one('res.users', u'审核人',
                             copy=False, ondelete='restrict',
                             help=u'审核调整单的人')
@@ -1152,19 +1162,19 @@ class buy_adjust_line(models.Model):
     attribute_id = fields.Many2one('attribute', u'属性',
                                    ondelete='restrict',
                                    domain="[('goods_id', '=', goods_id)]",
-                                   help=u'商品属性')
+                                   help=u'商品的属性，当商品有属性时，该字段必输')
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
                              help=u'商品计量单位')
     quantity = fields.Float(u'调整数量', default=1,
                             digits=dp.get_precision('Quantity'),
-                            help=u'输入调整数量，可正可负')
+                            help=u'相对于原单据对应明细行的调整数量，可正可负')
     price = fields.Float(u'购货单价', compute=_compute_all_amount,
                          store=True, readonly=True,
                          digits=dp.get_precision('Amount'),
-                         help=u'商品购货单价')
+                         help=u'不含税单价，由含税单价计算得出')
     price_taxed = fields.Float(u'含税单价',
                                digits=dp.get_precision('Amount'),
-                               help=u'商品含税单价')
+                               help=u'含税单价，取自商品成本')
     discount_rate = fields.Float(u'折扣率%',
                                  help=u'折扣率')
     discount_amount = fields.Float(u'折扣额',
@@ -1179,7 +1189,7 @@ class buy_adjust_line(models.Model):
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
                               digits=dp.get_precision('Amount'),
-                              help=u'税额')
+                              help=u'由税率计算得出')
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
                             store=True, readonly=True,
                             digits=dp.get_precision('Amount'),

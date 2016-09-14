@@ -7,7 +7,8 @@ class popup_wizard(models.TransientModel):
     _name = 'popup.wizard'
     _description = u'发货单缺货向导'
     
-    msg = fields.Text(u'消息', default= lambda self: self.env.context.get('msg'))
+    msg = fields.Text(u'消息', default= lambda self: self.env.context.get('msg'),
+                      help=u'发货单缺货信息')
 
     @api.one
     def button_ok(self):
