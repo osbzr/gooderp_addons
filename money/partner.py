@@ -80,6 +80,37 @@ class bank_account(models.Model):
     _description = u'查看账户对账单'
 
     @api.multi
+    def _set_init_balance(self):
+        if self.init_balance:
+            # 资金期初 生成 其他收入
+            categ = self.env['core.category'].search([('name', '=', '期初')])
+            # 如果 ‘期初’ 类型不存在，生成 ‘期初’ 类型
+            if not categ:
+                categ = self.env['core.category'].create({
+                    'name': '期初',
+                    'type': 'other_get',
+                    'account_id': self.env.ref('finance.account_init').id
+                })
+
+            self.env['other.money.order'].create({
+                'name': "期初",
+                'type': 'other_get',
+                'bank_id': self.id,
+                'date': self.env.user.company_id.start_date,
+                'line_ids': [(0, 0, {
+                    'category_id': categ.id,
+                    'amount': self.init_balance,
+                    'tax_rate': 0,
+                })],
+                'state': 'draft'
+            })
+
+    init_balance = fields.Float(u'期初',
+                               digits=dp.get_precision('Amount'),
+                               inverse=_set_init_balance,
+                               help=u'资金的期初余额')
+
+    @api.multi
     def bank_statements(self):
         self.ensure_one()
         view = self.env.ref('money.bank_statements_report_wizard_form')

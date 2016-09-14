@@ -420,3 +420,11 @@ class test_partner(TransactionCase):
         vendor = self.env.ref('core.lenovo')
         vendor.payable_init = 23456789
         self.assertEqual(vendor.payable, vendor.payable_init)
+
+    def test_bank_set_init(self):
+        '''测试资金期初'''
+        bank = self.env.ref('core.comm')
+        bank.init_balance = 1111
+        other_money = self.env['other.money.order'].search([('name','=','期初'),('bank_id','=',bank.id)])
+        other_money.other_money_done()
+        self.assertEqual(bank.balance, bank.init_balance)
