@@ -150,7 +150,7 @@ class goods(models.Model):
                                   context={'type': 'goods'}, required=True)
     uom_id = fields.Many2one('uom', ondelete='restrict', string=u'计量单位', required=True)
     uos_id = fields.Many2one('uom', ondelete='restrict', string=u'辅助单位')
-    conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1)
+    conversion = fields.Float(u'转化率(1辅助单位等于多少计量单位)', default=1, help=u'转化率就是计量单位和辅助单位的互换的比例！')
     cost = fields.Float(u'成本',
                         required=True,
                         digits=dp.get_precision('Amount'))
@@ -455,7 +455,7 @@ class pricing(models.Model):
             return False
             
 
-    name=fields.Char(u'描述')
+    name=fields.Char(u'描述', help=u'描述!')
     warehouse_id = fields.Many2one('warehouse',u'仓库')
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',
@@ -468,7 +468,7 @@ class pricing(models.Model):
     goods_id = fields.Many2one('goods',u'产品')
     active_date = fields.Date(u'开始日期', required=True)
     deactive_date = fields.Date(u'终止日期', required=True)
-    discount_rate = fields.Float(u'折扣率%')
+    discount_rate = fields.Float(u'折扣率%', help=u'产品的价格 × 折扣率 = 产品的实际价格 !')
 
 
 class res_currency(models.Model):
@@ -480,6 +480,8 @@ class res_currency(models.Model):
         人民币大写
         来自：http://topic.csdn.net/u/20091129/20/b778a93d-9f8f-4829-9297-d05b08a23f80.html
         传入浮点类型的值返回 unicode 字符串
+        :param 传入阿拉伯数字
+        :return 返回值是对应阿拉伯数字的绝对值的中文数字
         """
         rmbmap = [u"零", u"壹", u"贰", u"叁", u"肆", u"伍", u"陆", u"柒", u"捌", u"玖"]
         unit = [u"分", u"角", u"元", u"拾", u"佰", u"仟", u"万", u"拾", u"佰", u"仟", u"亿",

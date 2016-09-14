@@ -25,6 +25,7 @@
         'report/buy_payment_view.xml',
         'report/supplier_statements_view.xml',
         'security/ir.model.access.csv',
+        'home_page_data.xml'
         ],
     'demo': [
              'buy_demo.xml',
