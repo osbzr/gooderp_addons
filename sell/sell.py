@@ -831,7 +831,8 @@ class wh_move_line(models.Model):
     _description = u'销售发货单行'
 
     sell_line_id = fields.Many2one('sell.order.line', u'销货单行',
-                                   ondelete='cascade')
+                                   ondelete='cascade',
+                                   help=u'对应的销货订单行')
 
     @api.one
     @api.onchange('warehouse_id','goods_id')
@@ -857,7 +858,8 @@ class cost_line(models.Model):
     _inherit = 'cost.line'
 
     sell_id = fields.Many2one('sell.delivery', u'出库单号',
-                              ondelete='cascade')
+                              ondelete='cascade',
+                              help=u'与销售费用相关联的出库单号')
 
 
 class money_invoice(models.Model):
@@ -865,8 +867,8 @@ class money_invoice(models.Model):
 
 
     move_id = fields.Many2one('wh.move', string=u'出入库单',
-                              readonly=True, ondelete='cascade')
-
+                              readonly=True, ondelete='cascade',
+                              help=u'生成此发票的出入库单号')
 
 class money_order(models.Model):
     _inherit = 'money.order'
@@ -904,20 +906,27 @@ class sell_adjust(models.Model):
     _description = u"销售调整单"
     _order = 'date desc, id desc'
 
-    name = fields.Char(u'单据编号', copy=False)
+    name = fields.Char(u'单据编号', copy=False,
+                       help=u'调整单编号，保存时可自动生成')
     order_id = fields.Many2one('sell.order', u'原始单据', states=READONLY_STATES,
-                             copy=False, ondelete='restrict')
+                             copy=False, ondelete='restrict',
+                             help=u'要调整的原始销货订单')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       select=True, copy=False)
+                       select=True, copy=False,
+                       help=u'调整单创建日期，默认是当前日期')
     line_ids = fields.One2many('sell.adjust.line', 'order_id', u'调整单行',
-                               states=READONLY_STATES, copy=True)
+                               states=READONLY_STATES, copy=True,
+                               help=u'调整单明细行，不允许为空')
     approve_uid = fields.Many2one('res.users', u'审核人',
-                            copy=False, ondelete='restrict')
+                            copy=False, ondelete='restrict',
+                            help=u'审核调整单的人')
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态',
                              select=True, copy=False,
-                             default='draft')
-    note = fields.Text(u'备注')
+                             default='draft',
+                             help=u'调整单审核状态')
+    note = fields.Text(u'备注',
+                       help=u'单据备注')
 
     @api.multi
     def unlink(self):
@@ -1020,34 +1029,49 @@ class sell_adjust_line(models.Model):
         self.amount = self.subtotal - tax_amt
 
     order_id = fields.Many2one('sell.adjust', u'订单编号', select=True,
-                               required=True, ondelete='cascade')
-    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
-    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
+                               required=True, ondelete='cascade',
+                               help=u'关联的调整单编号')
+    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
+                               help=u'商品')
+    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute,
+                                     help=u'商品是否使用属性')
     attribute_id = fields.Many2one('attribute', u'属性',
                                    ondelete='restrict',
-                                   domain="[('goods_id', '=', goods_id)]")
-    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
+                                   domain="[('goods_id', '=', goods_id)]",
+                                   help=u'商品的属性，当商品有属性时，该字段必输')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
+                             help=u'商品计量单位')
     quantity = fields.Float(u'调整数量', default=1,
-                            digits=dp.get_precision('Quantity'))
+                            digits=dp.get_precision('Quantity'),
+                            help=u'相对于原单据对应明细行的调整数量，可正可负')
     price = fields.Float(u'销售单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits=dp.get_precision('Amount'))
+                         digits=dp.get_precision('Amount'),
+                         help=u'不含税单价，由含税单价计算得出')
     price_taxed = fields.Float(u'含税单价',
-                               digits=dp.get_precision('Amount'))
-    discount_rate = fields.Float(u'折扣率%')
+                               digits=dp.get_precision('Amount'),
+                               help=u'含税单价，取自商品零售价')
+    discount_rate = fields.Float(u'折扣率%',
+                         help=u'折扣率')
     discount_amount = fields.Float(u'折扣额',
-                                   digits=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'),
+                                   help=u'输入折扣率后自动计算得出，也可手动输入折扣额')
     amount = fields.Float(u'金额', compute=_compute_all_amount,
                           store=True, readonly=True,
-                          digits=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
+                          digits=dp.get_precision('Amount'),
+                          help=u'金额  = 价税合计  - 税额')
+    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate,
+                            help=u'默认值取公司销项税率')
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
-                              digits=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'),
+                              help=u'由税率计算得出')
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
                             store=True, readonly=True,
-                            digits=dp.get_precision('Amount'))
-    note = fields.Char(u'备注')
+                            digits=dp.get_precision('Amount'),
+                            help=u'含税单价 乘以 数量')
+    note = fields.Char(u'备注',
+                       help=u'本行备注')
 
     @api.one
     @api.onchange('goods_id')
