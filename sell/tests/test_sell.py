@@ -10,7 +10,7 @@ class Test_sell(TransactionCase):
 
     def setUp(self):
         super(Test_sell, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -168,6 +168,7 @@ class test_sell_order(TransactionCase):
 
     def setUp(self):
         super(test_sell_order, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_1')
 
     def test_default_warehouse(self):
@@ -328,7 +329,7 @@ class test_sell_delivery(TransactionCase):
     def setUp(self):
         '''准备基本数据'''
         super(test_sell_delivery, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -454,6 +455,12 @@ class test_sell_delivery(TransactionCase):
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
 
+    def test_sell_delivery_done_raise_credit_limit(self):
+        '''审核发货单/退货单 客户的 本次发货金额+客户应收余额 不能大于客户信用额度'''
+        self.delivery.amount = 20000000
+        with self.assertRaises(except_orm):
+            self.delivery.sell_delivery_done()
+
     def test_sell_delivery_draft(self):
         '''反审核发货单/退货单'''
         # 先审核发货单，再反审核
@@ -470,6 +477,12 @@ class test_sell_delivery(TransactionCase):
         delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
         self.assertTrue(len(delivery) == 2)
+
+    def test_sell_delivery_draft_raise_credit_limit(self):
+        '''审核发货单/退货单 客户的 本次退货金额 + 客户应收余额 不能大于客户信用额度'''
+        self.return_delivery.amount = 1000000
+        with self.assertRaises(except_orm):
+            self.return_delivery.sell_delivery_draft()
 
     def test_no_stock(self):
         ''' 测试虚拟商品出库 '''
@@ -508,6 +521,7 @@ class test_wh_move_line(TransactionCase):
     def setUp(self):
         '''准备基本数据'''
         super(test_wh_move_line, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
         self.sell_return = self.browse_ref('sell.sell_order_return')
         self.sell_return.sell_order_done()
         self.delivery_return = self.env['sell.delivery'].search(
@@ -797,7 +811,7 @@ class test_sell_adjust(TransactionCase):
     def setUp(self):
         '''销售调整单准备基本数据'''
         super(test_sell_adjust, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 

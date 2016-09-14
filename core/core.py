@@ -108,6 +108,9 @@ class partner(models.Model):
     bank_name = fields.Char(u'开户行')
     bank_num = fields.Char(u'银行账号')
 
+    credit_limit = fields.Float(u'信用额度',
+                                help=u'客户购买产品时，本次发货金额+客户应收余额要小于客户信用额度')
+
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '业务伙伴不能重名')
     ]
