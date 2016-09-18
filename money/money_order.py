@@ -195,9 +195,9 @@ class money_order(models.Model):
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable -= total
+                order.partner_id.payable -= total + self.discount_amount
             else:
-                order.partner_id.receivable -= total
+                order.partner_id.receivable -= total + self.discount_amount
 
             # 更新源单的未核销金额、已核销金额
             for source in order.source_ids:
@@ -230,9 +230,10 @@ class money_order(models.Model):
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable += total
+                order.partner_id.payable += total + self.discount_amount
+
             else:
-                order.partner_id.receivable += total
+                order.partner_id.receivable += total + self.discount_amount
 
             for source in order.source_ids:
                 source.name.to_reconcile = (source.to_reconcile +
