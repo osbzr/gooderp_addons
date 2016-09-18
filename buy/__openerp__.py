@@ -24,6 +24,7 @@
         'report/buy_summary_partner_view.xml',
         'report/buy_payment_view.xml',
         'report/supplier_statements_view.xml',
+        'report/report_data.xml',
         'security/ir.model.access.csv',
         'home_page_data.xml'
         ],

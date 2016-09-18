@@ -123,6 +123,7 @@ class sell_order(models.Model):
                              help=u"销货订单的审核状态", select=True, 
                              copy=False, default='draft')
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
+                              default=u'未出库',
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
     amount_executed = fields.Float(u'已执行金额',
