@@ -55,7 +55,7 @@ class voucher(models.Model):
         “转帐凭证”，凭证字就是“转”\n“记款凭证”，凭证字就是“记” (可以不用以上三种凭证字，就用记字也可以)')
     date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date,
                        track_visibility='always', help=u'本张凭证创建的时间！')
-    name = fields.Char(u'凭证号', track_visibility='always', help=u'本张凭证发生日期对应的，会计期间！')
+    name = fields.Char(u'凭证号', track_visibility='always')
     att_count = fields.Integer(u'附单据', default=1, help='原始凭证的张数！')
     period_id = fields.Many2one(
         'finance.period',
