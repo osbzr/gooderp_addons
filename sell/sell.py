@@ -724,10 +724,8 @@ class sell_delivery(models.Model):
             amount = self.amount + self.partner_cost
             if amount + self.partner_id.receivable > self.partner_id.credit_limit:
                 raise except_orm(u'警告！', u'本次发货金额 + 客户应收余额 不能大于客户信用额度！')
-            self.partner_id.credit_limit -= amount # 更新客户信用额度
         else:
             amount = self.amount + self.partner_cost
-            self.partner_id.credit_limit += amount
 
         # 发库单/退货单 生成源单
         if not self.is_return:
@@ -814,12 +812,10 @@ class sell_delivery(models.Model):
         # 发库单/退货单 计算客户的 本次退货金额+客户应收余额 是否小于客户信用额度， 否则报错
         if not self.is_return:
             amount = self.amount + self.partner_cost
-            self.partner_id.credit_limit += amount  # 更新客户信用额度
         else:
             amount = self.amount + self.partner_cost
             if amount + self.partner_id.receivable > self.partner_id.credit_limit:
                 raise except_orm(u'警告！', u'本次退货金额 + 客户应收余额 不能大于客户信用额度！')
-            self.partner_id.credit_limit -= amount
 
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(

@@ -247,7 +247,6 @@ class test_checkout_wizard(TransactionCase):
         # FIXME: 没有成功
         auto_reset = self.env['ir.values'].set_default('finance.config.settings', 'default_auto_reset', True)
         # self.env['finance.config.settings'].set_default_auto_reset(True)
-        print self.env['finance.config.settings'].default_auto_reset
         # 结转2015年12月的期间
         wizard = self.env['checkout.wizard'].create(
                        {'date':'2015-12-31'})
