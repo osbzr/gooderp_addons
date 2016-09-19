@@ -47,11 +47,9 @@ class wh_move_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变金额、税额、价税合计'''
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
-        amount = self.goods_qty * self.price - self.discount_amount
-        tax_amt = amount * self.tax_rate * 0.01
-        self.tax_amount = tax_amt
-        self.subtotal = self.goods_qty * self.price_taxed
-        self.amount = self.subtotal - tax_amt
+        self.amount = self.goods_qty * self.price - self.discount_amount  # 折扣后金额
+        self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
+        self.subtotal = self.amount + self.tax_amount
 
     @api.one
     @api.depends('goods_id')
