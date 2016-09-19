@@ -53,9 +53,12 @@
                                 <field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
                                 <field name='goods_id' groups='finance.group_account_goods'/>
                                 <field name='auxiliary_id'/>
-                                <field name='currency_id'  options="{'no_create': True}"/>
-                                <field name='currency_amount'  sum='外币合计'/>
-                                <field name='rate_silent'/>
+                                <field name='currency_id'  options="{'no_create': True}"
+                                	 groups='finance.group_multi_currency'/>
+                                <field name='currency_amount'  sum='外币合计'
+                                	 groups='finance.group_multi_currency'/>
+                                <field name='rate_silent'
+                                	 groups='finance.group_multi_currency'/>
                                 <field name='debit' sum='借方合计'/>
                                 <field name='credit' sum='贷方合计'/>
                             </tree>
@@ -140,9 +143,12 @@
                     <field name='account_id'/>
                     <field name='partner_id'/>
                     <field name='goods_id'/>
-                    <field name='currency_id'/>
-                    <field name='currency_amount'  sum='外币合计'/>
-                    <field name='rate_silent'/>
+                    <field name='currency_id'
+                    	 groups='finance.group_multi_currency'/>
+                    <field name='currency_amount'  sum='外币合计'
+                    	 groups='finance.group_multi_currency'/>
+                    <field name='rate_silent'
+                    	 groups='finance.group_multi_currency'/>
                     <field name='auxiliary_id'/>
                     <field name='debit' sum='借方合计'/>
                     <field name='credit' sum='贷方合计'/>
