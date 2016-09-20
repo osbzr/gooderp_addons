@@ -73,5 +73,41 @@
                 	</button>
                 </field>
         </record>
+        <!-- 组装单打印 -->
+        <record id='report_wh_assembly' model='ir.actions.report.xml'>
+            <field name='name'>组装单</field>
+            <field name='model'>wh.assembly</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.assembly</field>
+            <field name='template_file'>warehouse/template/wh.assembly.docx</field>
+        </record>
+        <record id='wh_assembly_form_print_inherit' model='ir.ui.view'>
+            <field name='name'>wh.assembly.form</field>
+            <field name='model'>wh.assembly</field>
+            <field name='inherit_id' ref='warehouse.wh_assembly_form'/>
+                <field name='arch' type='xml'>
+                	<button name='update_bom' position='after'>
+                		<button name='%(warehouse.report_wh_assembly)d' type='action' string='打印' class='oe_highlight' states='done' />
+                	</button>
+                </field>
+        </record>
+        <!-- 拆卸单打印 -->
+        <record id='report_wh_disassembly' model='ir.actions.report.xml'>
+            <field name='name'>拆卸单</field>
+            <field name='model'>wh.disassembly</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.disassembly</field>
+            <field name='template_file'>warehouse/template/wh.disassembly.docx</field>
+        </record>
+        <record id='wh_disassembly_form_print_inherit' model='ir.ui.view'>
+            <field name='name'>wh.disassembly.form</field>
+            <field name='model'>wh.disassembly</field>
+            <field name='inherit_id' ref='warehouse.wh_disassembly_form'/>
+                <field name='arch' type='xml'>
+                	<button name='update_bom' position='after'>
+                		<button name='%(warehouse.report_wh_disassembly)d' type='action' string='打印' class='oe_highlight' states='done' />
+                	</button>
+                </field>
+        </record>
     </data>
 </openerp>
