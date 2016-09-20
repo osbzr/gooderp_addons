@@ -342,8 +342,9 @@ class other_money_order(models.Model):
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他收入单',
                              'credit_auxiliary_id':line.auxiliary_id,
-                             'amount': abs(line.amount), 'credit_account_id': line.category_id.account_id.id,
-                             'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': ''
+                             'amount': abs(line.amount + line.tax_amount), 'credit_account_id': line.category_id.account_id.id,
+                             'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': '',
+                             'buy_tax_amount': line.tax_amount or 0,
                              })
                 self.env['money.invoice'].create_voucher_line(vals)
         else:
@@ -352,8 +353,9 @@ class other_money_order(models.Model):
                     raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他支出单',
                              'debit_auxiliary_id':line.auxiliary_id,
-                             'amount': abs(line.amount), 'credit_account_id': self.bank_id.account_id.id,
-                             'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id
+                             'amount': abs(line.amount + line.tax_amount), 'credit_account_id': self.bank_id.account_id.id,
+                             'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id,
+                             'sell_tax_amount': line.tax_amount or 0,
                              })
                 self.env['money.invoice'].create_voucher_line(vals)
         vouch_obj.voucher_done()
