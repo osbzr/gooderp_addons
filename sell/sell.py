@@ -870,6 +870,19 @@ class wh_move_line(models.Model):
             else:
                 self.discount_rate = 0
 
+    @api.multi
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        '''当订单行的产品变化时，带出产品上的零售价，以及公司的销项税'''
+        if self.goods_id:
+            is_return = self.env.context.get('default_is_return')
+            # 如果是销售发货单行 或 销售退货单行
+            if (self.type == 'out' and not is_return) or (self.type == 'in' and is_return):
+                self.tax_rate = self.env.user.company_id.output_tax_rate
+                self.price_taxed = self.goods_id.price
+
+        return super(wh_move_line,self).onchange_goods_id()
+
 class cost_line(models.Model):
     _inherit = 'cost.line'
 

@@ -589,7 +589,7 @@ class test_wh_move_line(TransactionCase):
             self.assertTrue(line.discount_rate == 0)
 
     def test_onchange_goods_id(self):
-        '''测试采购模块中商品的onchange,是否会带出单价'''
+        '''测试销售模块中商品的onchange,是否会带出单价'''
         # 销售退货单
         for line in self.delivery_return.line_in_ids:
             line.with_context({'default_is_return': True,
