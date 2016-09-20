@@ -25,6 +25,7 @@
         'view/partner_view.xml',
         'generate_accounting.xml',
         'home_page_data.xml',
+        'report/report_data.xml',
     ],
     'demo': [
         'money_demo.xml',
