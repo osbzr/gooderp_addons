@@ -9,10 +9,6 @@
         </template>
 
 
-        <menuitem name="Messaging"
-          id="mail.mail_feeds_main"
-          groups="base.group_user"
-          sequence="100"/>
         <menuitem id="main_home_menu" name="首页" sequence="5"/>
 
         <menuitem id="home_page_menu_two" name="首页"

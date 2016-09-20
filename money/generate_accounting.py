@@ -23,16 +23,17 @@ from openerp.exceptions import except_orm
 
 class money_order(models.Model):
     _inherit = 'money.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'收付款单审核时生成的对应凭证')
 
     @api.multi
     def money_order_done(self):
         res = super(money_order, self).money_order_done()
         if self.type == 'get':
-            vouch_obj = self.create_money_order_get_voucher(self.line_ids, self.partner_id, self.name)
+            vouch_obj = self.create_money_order_get_voucher(self.line_ids, self.source_ids, self.partner_id, self.name)
             vouch_obj.voucher_done()
         else:
-            vouch_obj = self.create_money_order_pay_voucher(self.line_ids, self.partner_id, self.name)
+            vouch_obj = self.create_money_order_pay_voucher(self.line_ids, self.source_ids, self.partner_id, self.name)
             vouch_obj.voucher_done()
         return res
 
@@ -46,55 +47,169 @@ class money_order(models.Model):
         return res
 
     @api.multi
-    def create_money_order_get_voucher(self, line_ids, partner, name):
+    def create_money_order_get_voucher(self, line_ids, source_ids, partner, name):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         self.write({'voucher_id': vouch_obj.id})
-        for line in line_ids:
-            if not line.bank_id.account_id:
-                raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
-            vouch_credit_line = self.env['voucher.line'].create({
-                'name': u"%s收款单%s" % (partner.name, name), 'account_id': line.bank_id.account_id.id, 'debit': line.amount * (line.currency_id.rate_silent or 1),
-                'voucher_id': vouch_obj.id, 'partner_id': '',
-            })
+
+        if not source_ids:
+            # first_line_flag = True
+            for line in line_ids:
+                if not line.bank_id.account_id:
+                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                vouch_debit_line = self.env['voucher.line'].create({
+                    'name': u"收款单%s" % (name),
+                    'account_id': line.bank_id.account_id.id,
+                    'debit': line.amount,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': '',
+                })
+                if partner.c_category_id:
+                    partner_account_id = partner.c_category_id.account_id.id
+                vouch_credit_line = self.env['voucher.line'].create({
+                    'name': u"%s收款单%s " % (partner.name, name),
+                    'account_id': partner_account_id,
+                    'credit': line.amount * (line.currency_id.rate_silent or 1),
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': partner.id,
+                })
+                if line.currency_id.id != self.env.user.company_id.currency_id.id:
+                    vouch_credit_line.write({'currency_id': line.currency_id.id,
+                                             'currency_amount': line.amount,
+                                             'rate_silent': line.currency_id.rate_silent})
+                    vouch_debit_line.write({'currency_id': line.currency_id.id,
+                                            'currency_amount': line.amount,
+                                            'rate_silent': line.currency_id.rate_silent
+                                            })
+                # # 折扣行生成凭证
+                # if self.discount_amount != 0 and first_line_flag:
+                #     first_line_flag = False
+                #     self.env['voucher.line'].create({
+                #         'name': u"%s收款单%s 折扣" % (partner.name, name),
+                #         'account_id': self.discount_account_id.id,
+                #         'debit': self.discount_amount,
+                #         'voucher_id': vouch_obj.id,
+                #         'partner_id': self.partner_id.id,
+                #     })
+                #
+                #     vouch_debit_line.debit += self.discount_amount
+
+        if source_ids:
+            for line in line_ids:
+                if not line.bank_id.account_id:
+                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                vouch_debit_line = self.env['voucher.line'].create({
+                    'name': u"收款单%s" % (name),
+                    'account_id': line.bank_id.account_id.id,
+                    'debit': line.amount,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': '',
+                })
+
             if partner.c_category_id:
                 partner_account_id = partner.c_category_id.account_id.id
-            vouch_debit_line = self.env['voucher.line'].create({
-                'name': u"%s收款单%s " % (partner.name, name), 'account_id': partner_account_id, 'credit': line.amount * (line.currency_id.rate_silent or 1),
-                'voucher_id': vouch_obj.id, 'partner_id': partner.id,
-            })
-            if line.currency_id.id != self.env.user.company_id.currency_id.id:
-                vouch_credit_line.write({'currency_id': line.currency_id.id, 'currency_amount': line.amount, 'rate_silent': line.currency_id.rate_silent})
-                vouch_debit_line.write({'currency_id': line.currency_id.id, 'currency_amount': line.amount, 'rate_silent': line.currency_id.rate_silent})
+            for source in source_ids:
+                self.env['voucher.line'].create({
+                    'name': u"%s收款单%s" % (partner.name, name),
+                    'account_id': partner_account_id,
+                    'credit': source.this_reconcile,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': self.partner_id.id,
+                })
+
+            if self.discount_amount != 0:
+                self.env['voucher.line'].create({
+                    'name': u"%s收款单%s 折扣" % (partner.name, name),
+                    'account_id': self.discount_account_id.id,
+                    'debit': self.discount_amount,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': self.partner_id.id,
+                })
 
         return vouch_obj
 
     @api.multi
-    def create_money_order_pay_voucher(self, line_ids, partner, name):
+    def create_money_order_pay_voucher(self, line_ids, source_ids, partner, name):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         self.write({'voucher_id': vouch_obj.id})
-        for line in line_ids:
-            if not line.bank_id.account_id:
-                raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
-            vouch_credit_line = self.env['voucher.line'].create({
-                'name': u"收款单%s" % (name), 'account_id': line.bank_id.account_id.id, 'credit': line.amount,
-                'voucher_id': vouch_obj.id, 'partner_id': '',
-            })
+        if not source_ids:
+            # first_line_flag = True
+            for line in line_ids:
+                if not line.bank_id.account_id:
+                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                vouch_credit_line = self.env['voucher.line'].create({
+                    'name': u"付款单%s" % (name),
+                    'account_id': line.bank_id.account_id.id,
+                    'credit': line.amount,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': '',
+                })
+                if partner.s_category_id:
+                    partner_account_id = partner.s_category_id.account_id.id
+                vouch_debit_line = self.env['voucher.line'].create({
+                    'name': u"付款单%s" % (name),
+                    'account_id': partner_account_id,
+                    'debit': line.amount + self.discount_amount or 0,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': partner.id
+                })
+                if line.currency_id.id != self.env.user.company_id.currency_id.id:
+                    vouch_credit_line.write({'currency_id': line.currency_id.id,
+                                             'currency_amount': line.amount,
+                                             'rate_silent': line.currency_id.rate_silent})
+                    vouch_debit_line.write({'currency_id': line.currency_id.id,
+                                            'currency_amount': line.amount,
+                                            'rate_silent': line.currency_id.rate_silent})
+
+                # if self.discount_amount != 0 and first_line_flag:
+                #     first_line_flag = False
+                #     self.env['voucher.line'].create({
+                #         'name': u"%s付款单%s 折扣" % (partner.name, name),
+                #         'account_id': self.discount_account_id.id,
+                #         'credit': self.discount_amount,
+                #         'voucher_id': vouch_obj.id,
+                #         'partner_id': self.partner_id.id,
+                #     })
+                #     vouch_credit_line.credit += self.discount_amount
+
+        if source_ids:
+            for line in line_ids:
+                if not line.bank_id.account_id:
+                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                vouch_credit_line = self.env['voucher.line'].create({
+                    'name': u"付款单%s" % (name),
+                    'account_id': line.bank_id.account_id.id,
+                    'credit': line.amount,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': '',
+                })
+
             if partner.s_category_id:
                 partner_account_id = partner.s_category_id.account_id.id
-            vouch_debit_line = self.env['voucher.line'].create({
-                'name': u"付款单 %s " % (name), 'account_id': partner_account_id, 'debit': line.amount,
-                'voucher_id': vouch_obj.id, 'partner_id': partner.id
-            })
-            if line.currency_id.id != self.env.user.company_id.currency_id.id:
-                vouch_credit_line.write({'currency_id': line.currency_id.id, 'currency_amount': line.amount, 'rate_silent': line.currency_id.rate_silent})
-                vouch_debit_line.write({'currency_id': line.currency_id.id, 'currency_amount': line.amount, 'rate_silent': line.currency_id.rate_silent})
+            for source in source_ids:
+                self.env['voucher.line'].create({
+                    'name': u"%s付款单%s" % (partner.name, name),
+                    'account_id': partner_account_id,
+                    'debit': source.this_reconcile,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': self.partner_id.id,
+                })
+
+            if self.discount_amount != 0:
+                self.env['voucher.line'].create({
+                    'name': u"%s付款单%s 折扣" % (partner.name, name),
+                    'account_id': self.discount_account_id.id,
+                    'credit': self.discount_amount,
+                    'voucher_id': vouch_obj.id,
+                    'partner_id': self.partner_id.id,
+                })
 
         return vouch_obj
 
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'结算单审核时生成的对应凭证')
 
     @api.multi
     def money_invoice_draft(self):
@@ -201,7 +316,8 @@ class money_invoice(models.Model):
 
 class other_money_order(models.Model):
     _inherit = 'other.money.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'其他收支单审核时生成的对应凭证')
 
     @api.multi
     def other_money_draft(self):
@@ -246,7 +362,8 @@ class other_money_order(models.Model):
 
 class money_transfer_order(models.Model):
     _inherit = 'money.transfer.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 help=u'资金转账单审核时生成的对应凭证')
 
     '''外币转外币暂时不做，只处理外币转本位币'''
     @api.multi
@@ -300,6 +417,16 @@ class money_transfer_order(models.Model):
                          'debit_account_id': line.in_bank_id.account_id.id,
                          })
                 self.env['money.invoice'].create_voucher_line(vals)
+
+        # if self.discount_amount > 0:
+        #     self.env['voucher.line'].create({
+        #         'name': u"其他转账单%s" % (self.name),
+        #         'account_id': self.discount_account_id.id,
+        #         'credit': self.discount_amount,
+        #         'voucher_id': vouch_obj.id,
+        #         'partner_id': '',
+        #     })
+
         vouch_obj.voucher_done()
         return res
 

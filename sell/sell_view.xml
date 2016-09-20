@@ -19,7 +19,8 @@
                     <field name='state'/>
             		<field name='goods_state'/>
             		<field name="money_state"/>
-					<field name='currency_id'/>
+					<field name='currency_id'
+						 groups='finance.group_multi_currency'/>
             	</tree>
         	</field>
     	</record>
@@ -50,11 +51,11 @@
             				</group>
             				<group>
             					<field name='delivery_date'/>
-            					<field name='name' readonly='1'/>
             					<field name='type' widget='radio'/>
             					<field name='goods_state' readonly='1'/>
             					<field name='money_state' readonly='1'/>
-								<field name='currency_id' readonly='1'/>
+								<field name='currency_id' readonly='1'
+									 groups='finance.group_multi_currency'/>
 							</group>
             			</group>
             			<notebook>
@@ -71,7 +72,8 @@
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
-				 						<field name='currency_amount' sum='外币合计'/>
+				 						<field name='currency_amount' sum='外币合计'
+				 							 groups='finance.group_multi_currency'/>
 										<field name='amount' sum='金额合计'/>
 				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
                  						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
@@ -202,7 +204,8 @@
             					<field name='order_id' readonly='1'/>
             					<field name='invoice_id' readonly='1'/>
             					<field name="money_state" readonly="1"/>
-								<field name="currency_id" readonly="1"/>
+								<field name="currency_id" readonly="1"
+									 groups='finance.group_multi_currency'/>
 								<field name="modifying" invisible="1"/>
             				</group>
             			</group>
@@ -378,7 +381,6 @@
             				</group>
             				<group>
             					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
-            					<field name='name' readonly='1'/>
             					<field name='order_id' readonly='1'/>
             					<field name='invoice_id' readonly='1'/>
             					<field name="return_state" readonly="1"/>

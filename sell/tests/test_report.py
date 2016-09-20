@@ -94,7 +94,7 @@ class test_track_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_track_wizard, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -157,7 +157,7 @@ class test_detail_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_detail_wizard, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -220,7 +220,7 @@ class test_goods_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_goods_wizard, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -279,6 +279,7 @@ class test_partner_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_partner_wizard, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
 
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
@@ -336,6 +337,7 @@ class test_staff_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_staff_wizard, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -408,6 +410,11 @@ class test_receipt_wizard(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.delivery.receipt = 2.0
         self.delivery.sell_delivery_done()
+        # 查找产生的收款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', self.delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
 
         # 销货订单产生发货单，并审核发货单，优惠后金额和本次收款均为0
         new_delivery = self.delivery.copy()
@@ -469,7 +476,7 @@ class test_sell_top_ten_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_sell_top_ten_wizard, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -519,6 +526,7 @@ class test_popup_wizard(TransactionCase):
     def setUp(self):
         ''' 准备数据 '''
         super(test_popup_wizard, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(

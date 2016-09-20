@@ -41,18 +41,18 @@ class sell_order_detail(models.Model):
                     goods.id AS goods_id,
                     attr.name AS attribute,
                     wh.id AS warehouse_id,
-                    (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                    SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
                         ELSE - wml.goods_qty END) AS qty,
                     uom.name AS uom,
                     wml.price AS price,
-                    (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
+                    SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
                         ELSE - wml.amount END) AS amount,
-                    (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.tax_amount
+                    SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.tax_amount
                         ELSE - wml.tax_amount END) AS tax_amount,
-                    (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.subtotal
+                    SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.subtotal
                         ELSE - wml.subtotal END) AS subtotal,
-                    (CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
-                        ELSE - wml.goods_qty END) * (wml.price - wml.cost) AS margin,
+                    SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
+                        ELSE - wml.goods_qty END) * (wml.price - wml.cost_unit) AS margin,
                     wml.note AS note
 
                 FROM wh_move_line AS wml
@@ -71,7 +71,7 @@ class sell_order_detail(models.Model):
 
                 GROUP BY wm.date, wm.name, origin, staff_id, partner_id,
                     goods_code, goods.id, attribute, wh.id, uom,
-                    qty, wml.price, wml.amount, wml.cost, tax_amount, subtotal, margin, wml.note
+                    wml.price, wml.cost_unit, wml.note
                 )
         """)
 

@@ -89,7 +89,6 @@
                         </group>
                         <group>
                         	<field name="planned_date" required="1"/>
-                            <field name="name" readonly="1" invisible="1"/>
                             <field name="type" widget="radio"/>
                             <field name="goods_state" readonly="1"/>
                             <field name="money_state" readonly="1"/>
@@ -241,7 +240,6 @@
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="name" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
                             <field name='voucher_id'/>
@@ -412,7 +410,6 @@
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="name" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>
                             <field name='voucher_id'/>

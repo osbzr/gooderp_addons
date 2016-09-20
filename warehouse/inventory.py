@@ -21,18 +21,32 @@ class wh_inventory(models.Model):
         ('done', u'完成'),
     ]
 
-    date = fields.Date(u'日期', default=fields.Date.context_today)
-    name = fields.Char(u'名称', copy=False, default='/')
-    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True)
-    goods = fields.Char(u'产品')
-    uos_not_zero = fields.Boolean(u'辅助数量不为0')
-    out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False)
-    in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False)
+    date = fields.Date(u'日期', default=fields.Date.context_today,
+                       help=u'盘点单创建日期，默认为当前天')
+    name = fields.Char(u'名称', copy=False, default='/',
+                       help=u'单据编号，创建时会自动生成')
+    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True,
+                                   help=u'盘点单盘点的仓库')
+    goods = fields.Char(u'产品',
+                        help=u'盘点单盘点的产品')
+    uos_not_zero = fields.Boolean(u'辅助数量不为0',
+                                  help=u'True: 盘点单盘点的是系统辅助单位库存或系统库存不为0;'
+                                       u'False: 盘点单盘点的是系统库存不为0的情况。')
+    out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False,
+                             help=u'盘亏生成的其他出库单单据')
+    in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False,
+                            help=u'盘盈生成的其他入库单单据')
     state = fields.Selection(
-        INVENTORY_STATE, u'状态', copy=False, default='draft')
+        INVENTORY_STATE, u'状态', copy=False, default='draft',
+        help=u'盘点单状态，新建时状态为草稿;'
+             u'点击查询后为审核后状态为查询中;'
+             u'有盘亏盘盈时生成的其他出入库单没有审核时状态为待确认盘盈盘亏;'
+             u'盘亏盘盈生成的其他出入库单审核后状态为完成')
     line_ids = fields.One2many(
-        'wh.inventory.line', 'inventory_id', u'明细', copy=False)
-    note = fields.Text(u'备注')
+        'wh.inventory.line', 'inventory_id', u'明细', copy=False,
+        help=u'盘点单的明细行')
+    note = fields.Text(u'备注',
+                       help=u'可以为该单据添加一些需要的标识信息')
 
     @api.multi
     def requery_inventory(self):
@@ -244,33 +258,51 @@ class wh_inventory_line(models.Model):
         ('nothing', u'不做处理'),
     ]
 
-    inventory_id = fields.Many2one('wh.inventory', u'盘点', ondelete='cascade')
-    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True, ondelete='restrict')
-    goods_id = fields.Many2one('goods', u'产品', required=True, ondelete='restrict')
-    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
+    inventory_id = fields.Many2one('wh.inventory', u'盘点', ondelete='cascade',
+                                   help=u'盘点单行对应的盘点单')
+    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True, ondelete='restrict',
+                                   help=u'盘点单行对应的仓库')
+    goods_id = fields.Many2one('goods', u'产品', required=True, ondelete='restrict',
+                               help=u'盘点单行对应的产品')
+    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
+                                   help=u'盘点单行对应的产品的属性')
     using_batch = fields.Boolean(
-        related='goods_id.using_batch', string=u'批号管理')
+        related='goods_id.using_batch', string=u'批号管理',
+        help=u'盘点单行对应的产品是否使用批号管理，是True否则False')
     force_batch_one = fields.Boolean(
-        related='goods_id.force_batch_one', string=u'每批号数量为1')
-    lot = fields.Char(u'批号')
-    new_lot = fields.Char(u'盘盈批号')
+        related='goods_id.force_batch_one', string=u'每批号数量为1',
+        help=u'盘点单行对应的产品是否使用每批号数量为1，是True否则False')
+    lot = fields.Char(u'批号',
+                      help=u'盘点单行对应的产品批号')
+    new_lot = fields.Char(u'盘盈批号',
+                          help=u'盘点单行对应的产品盘盈批号')
     new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号',
-                                ondelete='restrict')
-    lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing')
-    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
-    uos_id = fields.Many2one('uom', u'辅助单位', ondelete='restrict')
+                                ondelete='restrict',
+                                 help=u'盘点单行对应的产品盘亏批号')
+    lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing',
+                                help=u'批号类型: 出库、入库、不做处理')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
+                             help=u'盘点单行对应的产品的计量单位')
+    uos_id = fields.Many2one('uom', u'辅助单位', ondelete='restrict',
+                             help=u'盘点单行对应的产品的辅助单位')
     real_qty = fields.Float(
-        u'系统库存', digits=dp.get_precision('Quantity'))
+        u'系统库存', digits=dp.get_precision('Quantity'),
+        help=u'盘点单行对应的产品的系统库存')
     real_uos_qty = fields.Float(
-        u'系统辅助单位库存', digits=dp.get_precision('Quantity'))
+        u'系统辅助单位库存', digits=dp.get_precision('Quantity'),
+        help=u'盘点单行对应的产品的系统辅助单位库存')
     inventory_qty = fields.Float(
-        u'盘点库存', digits=dp.get_precision('Quantity'))
+        u'盘点库存', digits=dp.get_precision('Quantity'),
+        help=u'盘点单行对应的产品的盘点库存')
     inventory_uos_qty = fields.Float(
-        u'盘点辅助单位库存', digits=dp.get_precision('Quantity'))
+        u'盘点辅助单位库存', digits=dp.get_precision('Quantity'),
+        help=u'盘点单行对应的产品的盘点辅助单位库存')
     difference_qty = fields.Float(
-        u'盘盈盘亏', digits=dp.get_precision('Quantity'))
+        u'盘盈盘亏', digits=dp.get_precision('Quantity'),
+        help=u'盘点单行对应的产品的盘盈盘亏数量')
     difference_uos_qty = fields.Float(
-        u'辅助单位盘盈盘亏', digits=dp.get_precision('Quantity'))
+        u'辅助单位盘盈盘亏', digits=dp.get_precision('Quantity'),
+        help = u'盘点单行对应的产品的辅助单位盘盈盘亏数量')
 
     def check_difference_identical(self):
         if self.difference_qty * self.difference_uos_qty < 0:
@@ -355,7 +387,8 @@ class wh_inventory_line(models.Model):
 class wh_out(models.Model):
     _inherit = 'wh.out'
 
-    inventory_ids = fields.One2many('wh.inventory', 'out_id', u'盘点单')
+    inventory_ids = fields.One2many('wh.inventory', 'out_id', u'盘点单',
+                                    help=u'其他出库单行对应的盘点单行，盘亏的情况')
 
     @api.multi
     def approve_order(self):
@@ -376,7 +409,8 @@ class wh_out(models.Model):
 class wh_in(models.Model):
     _inherit = 'wh.in'
 
-    inventory_ids = fields.One2many('wh.inventory', 'in_id', u'盘点单')
+    inventory_ids = fields.One2many('wh.inventory', 'in_id', u'盘点单',
+                                    help=u'其他入库单行对应的盘点单行，盘盈的情况')
 
     @api.multi
     def approve_order(self):
