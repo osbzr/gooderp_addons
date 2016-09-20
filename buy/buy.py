@@ -946,32 +946,17 @@ class wh_move_line(models.Model):
     @api.multi
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税、销项税'''
+        '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税'''
         if self.goods_id:
-            partner_id = self.env.context.get('default_partner')
-            partner = self.env['partner'].search([('id', '=', partner_id)])
             is_return = self.env.context.get('default_is_return')
-            if self.type == 'in':
-                if not self.goods_id.cost:
-                    raise except_orm(u'错误', u'请先设置商品的成本！')
+            if not self.goods_id.cost:
+                raise except_orm(u'错误', u'请先设置商品的成本！')
+            # 如果是采购入库单行 或 采购退货单行
+            if (self.type == 'in' and not is_return) or (self.type == 'out' and is_return):
                 self.tax_rate = self.env.user.company_id.import_tax_rate
                 self.price_taxed = self.goods_id.cost
-                # 如果是销售退货单行
-                if is_return:
-                    self.tax_rate = self.env.user.company_id.output_tax_rate
-                    self.price_taxed = self.goods_id.price
-            elif self.type == 'out':
-                self.tax_rate = self.env.user.company_id.output_tax_rate
-                self.price_taxed = self.goods_id.price
-                # 如果是采购退货单行
-                if is_return:
-                    if not self.goods_id.cost:
-                        raise except_orm(u'错误', u'请先设置商品的成本！')
-                    self.tax_rate = self.env.user.company_id.import_tax_rate
-                    self.price_taxed = self.goods_id.cost
 
         return super(wh_move_line,self).onchange_goods_id()
-
 
 
 class cost_line(models.Model):
