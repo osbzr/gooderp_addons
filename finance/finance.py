@@ -286,7 +286,7 @@ class finance_period(models.Model):
         period_row = self.env['finance.period'].search(
             [('year', '=', datetime_str_list[0])])
         period_list = sorted(map(int, [period.month for period in period_row]))
-        if not period_list[0]:
+        if not period_row[0]:
             raise except_orm(u'错误', u'会计期间不存在！')
         fist_period = self.search([('year', '=', datetime_str_list[0]), ('month', '=', period_list[0])], order='name')
         return fist_period
