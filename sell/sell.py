@@ -202,6 +202,7 @@ class sell_order(models.Model):
                                 'state': 'draft',
                                 'origin_name':self.name,
                             })
+            money_order.money_order_done()
 
     @api.one
     def sell_order_done(self):
@@ -720,8 +721,9 @@ class sell_delivery(models.Model):
         # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
         if not self.is_return:
             amount = self.amount + self.partner_cost
-            if amount + self.partner_id.receivable > self.partner_id.credit_limit:
-                raise except_orm(u'警告！', u'本次发货金额 + 客户应收余额 不能大于客户信用额度！')
+            if self.partner_id.credit_limit != 0:
+                if amount - self.receipt + self.partner_id.receivable > self.partner_id.credit_limit:
+                    raise except_orm(u'警告！', u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！')
         else:
             amount = self.amount + self.partner_cost
 
@@ -795,6 +797,8 @@ class sell_delivery(models.Model):
                 'to_reconcile': amount,
                 'state': 'draft',
             })
+            money_order.money_order_done()
+
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.sell_move_id.approve_order()
         # 生成分拆单 FIXME:无法跳转到新生成的分单
@@ -806,15 +810,6 @@ class sell_delivery(models.Model):
     @api.one
     def sell_delivery_draft(self):
         '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的源单、收款单及凭证'''
-
-        # 发库单/退货单 计算客户的 本次退货金额+客户应收余额 是否小于客户信用额度， 否则报错
-        if not self.is_return:
-            amount = self.amount + self.partner_cost
-        else:
-            amount = self.amount + self.partner_cost
-            if amount + self.partner_id.receivable > self.partner_id.credit_limit:
-                raise except_orm(u'警告！', u'本次退货金额 + 客户应收余额 不能大于客户信用额度！')
-
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(
                 [('name', '=', self.invoice_id.id)])
