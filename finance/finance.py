@@ -284,8 +284,12 @@ class finance_period(models.Model):
         datetime_str = datetime.now().strftime("%Y-%m-%d")
         datetime_str_list = datetime_str.split('-')
         period_row = self.env['finance.period'].search(
-            [('year', '=', datetime_str_list[0])],order='month')
-        return period_row and period_row[0]
+            [('year', '=', datetime_str_list[0])])
+        period_list = sorted(map(int, [period.month for period in period_row]))
+        if not period_row[0]:
+            raise except_orm(u'错误', u'会计期间不存在！')
+        fist_period = self.search([('year', '=', datetime_str_list[0]), ('month', '=', period_list[0])], order='name')
+        return fist_period
 
     @api.multi
     def get_period(self, date):
