@@ -8,6 +8,7 @@ from datetime import datetime
 # 字段只读状态
 READONLY_STATES = {
         'done': [('readonly', True)],
+        'clean': [('readonly', True)],
     }
 
 class asset_category(models.Model):
@@ -189,6 +190,14 @@ class asset(models.Model):
                 self.env['money.invoice'].create_voucher_line(vals)
 
         self.state = 'done'
+
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state != 'draft':
+                raise except_orm(u'错误', u'不能删除已审核的单据')
+
+        return super(asset, self).unlink()
 
     @api.one
     def asset_draft(self):
