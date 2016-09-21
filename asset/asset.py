@@ -197,6 +197,14 @@ class asset(models.Model):
             raise except_orm(u'错误', u'该会计期间已结账！不能反审核')
         '''生成凭证'''
 
+    @api.multi
+    def unlink(self):
+        for asset in self:
+            if asset.state != 'draft':
+                raise except_orm(u'错误', u'只能删除草稿状态的固定资产')
+
+        return super(asset, self).unlink()
+
 
 class CreateCleanWizard(models.TransientModel):
     '''固定资产清理'''
