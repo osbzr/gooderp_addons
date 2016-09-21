@@ -155,20 +155,18 @@ class asset(models.Model):
                         'tax_amount': self.tax
                 })
                 self.write({'money_invoice': money_invoice.id})
-                print self.cost,money_invoice.voucher_id.id
                 '''变化科目'''
                 chang_account = self.env['voucher.line'].search(['&',('voucher_id', '=', money_invoice.voucher_id.id),('debit', '=', self.cost)])
                 chang_account.write({'account_id': self.account_asset.id})
 
             elif self.bank_account and self.account_credit.id == self.bank_account.account_id.id :
                 category_id = self.env.ref('asset.asset').id
-                other_money_order = self.env['other.money.order'].create({
+                rec = self.with_context(type='other_pay')
+                other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': self.partner_id,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_pay',
-                    'context' : 'other_pay'
                 })
                 self.write({'other_money_order': other_money_order.id})
                 self.env['other.money.order.line'].create({
