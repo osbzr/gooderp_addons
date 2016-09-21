@@ -50,7 +50,8 @@ class sell_receipt_wizard(models.TransientModel):
         if self.staff_id:
             cond.append(('staff_id', '=', self.staff_id.id))
         if self.warehouse_id:
-            cond.append(('warehouse_id', '=', self.warehouse_id.id))
+            cond += ['|',('warehouse_id', '=', self.warehouse_id.id),
+                     ('warehouse_dest_id', '=', self.warehouse_id.id)]
         delivery_obj = self.env['sell.delivery']
         count = sum_receipt_rate = 0
         for delivery in delivery_obj.search(cond, order='partner_id'):
