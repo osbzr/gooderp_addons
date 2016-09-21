@@ -108,11 +108,6 @@ class Test_sell(TransactionCase):
         # 销售发货单 的确认
         sell_delivery.receipt = 22
         sell_delivery.sell_delivery_done()
-        # 查找产生的收款单，然后审核
-        source_line = self.env['source.order.line'].search(
-                [('name', '=', sell_delivery.invoice_id.id)])
-        for line in source_line:
-            line.money_id.money_order_done()
 
         self.assertEqual(sell_delivery.money_state, u'部分收款')
 
@@ -199,11 +194,6 @@ class test_sell_order(TransactionCase):
         delivery.receipt = 50
         delivery.bank_account_id = bank_account.id
         delivery.sell_delivery_done()
-        # 查找产生的收款单，然后审核
-        source_line = self.env['source.order.line'].search(
-                [('name', '=', delivery.invoice_id.id)])
-        for line in source_line:
-            line.money_id.money_order_done()
 
         order2._get_money_state()
         self.assertTrue(order2.money_state == u'部分收款')
@@ -214,11 +204,6 @@ class test_sell_order(TransactionCase):
         delivery.receipt = 73.3
         delivery.bank_account_id = bank_account.id
         delivery.sell_delivery_done()
-        # 查找产生的收款单，然后审核
-        source_line = self.env['source.order.line'].search(
-                [('name', '=', delivery.invoice_id.id)])
-        for line in source_line:
-            line.money_id.money_order_done()
         order2._get_money_state()
         self.assertTrue(order2.money_state == u'全部收款')
 
@@ -363,11 +348,7 @@ class test_sell_delivery(TransactionCase):
         delivery.receipt = delivery.amount - 1
         delivery.bank_account_id = self.bank_account
         delivery.sell_delivery_done()
-        # 查找产生的收款单，然后审核
-        source_line = self.env['source.order.line'].search(
-                [('name', '=', delivery.invoice_id.id)])
-        for line in source_line:
-            line.money_id.money_order_done()
+
         # 判断状态
         delivery._get_sell_money_state()
         self.assertEqual(delivery.money_state, u'部分收款')
@@ -377,11 +358,7 @@ class test_sell_delivery(TransactionCase):
         delivery.receipt = delivery.amount
         delivery.bank_account_id = self.bank_account
         delivery.sell_delivery_done()
-        # 查找产生的收款单，然后审核
-        source_line = self.env['source.order.line'].search(
-                [('name', '=', delivery.invoice_id.id)])
-        for line in source_line:
-            line.money_id.money_order_done()
+
         # 判断状态
         delivery._get_sell_money_state()
         self.assertEqual(delivery.money_state, u'全部收款')
@@ -398,11 +375,7 @@ class test_sell_delivery(TransactionCase):
         return_delivery.receipt = return_delivery.amount - 1
         return_delivery.bank_account_id = self.bank_account
         return_delivery.sell_delivery_done()
-        # 查找产生的收款单，然后审核
-        source_line = self.env['source.order.line'].search(
-                [('name', '=', return_delivery.invoice_id.id)])
-        for line in source_line:
-            line.money_id.money_order_done()
+
         # 判断状态
         return_delivery._get_sell_return_state()
         self.assertEqual(return_delivery.return_state, u'部分退款')
@@ -412,11 +385,6 @@ class test_sell_delivery(TransactionCase):
         return_delivery.receipt = return_delivery.amount
         return_delivery.bank_account_id = self.bank_account
         return_delivery.sell_delivery_done()
-        # 查找产生的收款单，然后审核
-        source_line = self.env['source.order.line'].search(
-                [('name', '=', return_delivery.invoice_id.id)])
-        for line in source_line:
-            line.money_id.money_order_done()
         # 判断状态
         return_delivery._get_sell_return_state()
         self.assertEqual(return_delivery.return_state, u'全部退款')
@@ -477,12 +445,6 @@ class test_sell_delivery(TransactionCase):
         delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
         self.assertTrue(len(delivery) == 2)
-
-    def test_sell_delivery_draft_raise_credit_limit(self):
-        '''审核发货单/退货单 客户的 本次退货金额 + 客户应收余额 不能大于客户信用额度'''
-        self.return_delivery.amount = 1000000
-        with self.assertRaises(except_orm):
-            self.return_delivery.sell_delivery_draft()
 
     def test_no_stock(self):
         ''' 测试虚拟商品出库 '''
