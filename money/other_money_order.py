@@ -104,12 +104,21 @@ class other_money_order(models.Model):
         '''
         self.line_ids = []
         lines = []
-        for invoice in self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id), ('to_reconcile', '!=', 0)]):
+        if self.type == 'other_pay':
+            invoices = self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id),
+                                                            ('to_reconcile', '!=', 0),
+                                                            ('category_id.type', '=', 'other_pay')])
+        if self.type == 'other_get':
+            invoices = self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id),
+                                                            ('to_reconcile', '!=', 0),
+                                                            ('category_id.type', '=', 'other_get')])
+        for invoice in invoices:
             lines.append((0, 0, {
                 'category_id': invoice.category_id.id,
                 'source_id': invoice.id,
                 'amount': invoice.to_reconcile,
                                    }))
+
         self.line_ids = lines
 
     @api.multi

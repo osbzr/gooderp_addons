@@ -300,6 +300,23 @@ class test_other_money_order(TransactionCase):
         with self.assertRaises(except_orm):
             other.other_money_done()
 
+    def test_other_money_order_partner_onchange(self):
+        self.env.ref('money.get_40000').money_order_done() 
+        invoice = self.env['money.invoice'].create({
+                                          'name': 'WH/IN/00001111',
+                                          'partner_id': self.env.ref('core.lenovo').id,
+                                          'category_id': self.env.ref('core.cat_freight').id,
+                                          'date': '2016-02-20',
+                                          'amount': 100,
+                                          'to_reconcile': 100,
+                                          })
+        invoice.money_invoice_done()
+        other = self.env['other.money.order'].with_context({'type': 'other_pay'}).create({
+                                            'partner_id': self.env.ref('core.jd').id,
+                                            'date': "2016-02-20",
+                                            'bank_id': self.env.ref('core.comm').id,
+                                            })
+        other.partner_id = self.env.ref('core.lenovo').id
 
 class test_other_money_order_line(TransactionCase):
     ''' 测试其他收支单明细 '''
