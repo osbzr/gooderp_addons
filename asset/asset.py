@@ -196,17 +196,40 @@ class asset(models.Model):
     def unlink(self):
         for order in self:
             if order.state != 'draft':
-                raise except_orm(u'错误', u'不能删除已审核的单据')
-
-        return super(asset, self).unlink()
+                raise except_orm(u'错误', u'不能删除非草稿的单据')
+            order.asset_draft()
+            order.unlink()
 
     @api.one
     def asset_draft(self):
         if self.state == 'draft':
             raise except_orm(u'错误', u'请不要重复反审核！')
+        if self.line_ids :
+            raise except_orm(u'错误', u'已折旧不能反审核！')
+        if self.chang_ids :
+            raise except_orm(u'错误', u'已变更不能反审核！')
         if self.period_id.is_closed is True:
             raise except_orm(u'错误', u'该会计期间已结账！不能反审核')
-        '''生成凭证'''
+        self.state = 'draft'
+        '''删掉凭证'''
+        if self.voucher_id:
+            voucher, self.voucher_id = self.voucher_id, False
+            if voucher.state == 'done':
+                voucher.voucher_draft()
+            voucher.unlink()
+        '''删掉其他应付款单'''
+        if self.other_money_order:
+            other_money_order, self.other_money_order = self.other_money_order, False
+            if other_money_order.state == 'done':
+                other_money_order.other_money_draft()
+            other_money_order.unlink()
+        '''删掉源单'''
+        if self.money_invoice:
+            money_invoice, self.money_invoice = self.money_invoice, False
+            if money_invoice.state == 'done':
+                money_invoice.money_invoice_draft()
+            money_invoice.unlink()
+
 
 
 class CreateCleanWizard(models.TransientModel):
