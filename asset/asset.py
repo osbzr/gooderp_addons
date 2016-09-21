@@ -227,13 +227,12 @@ class CreateCleanWizard(models.TransientModel):
         asset.state = 'clean'
         '''按发票收入生成收入单'''
         get_category_id = self.env.ref('asset.asset_clean_get').id
-        other_money_order = self.env['other.money.order'].create({
+        rec = self.with_context(type='other_get')
+        other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': None,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_get',
-                    'context' : 'other_get'
                 })
         self.env['other.money.order.line'].create({
                     'other_money_id': other_money_order.id,
@@ -245,13 +244,12 @@ class CreateCleanWizard(models.TransientModel):
         '''按费用生成支出单'''
         if self.clean_cost :
             pay_category_id = self.env.ref('asset.asset_clean_pay').id
-            other_money_order = self.env['other.money.order'].create({
+            rec = self.with_context(type='other_pay')
+            other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': None,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_pay',
-                    'context' : 'other_pay'
                 })
             self.env['other.money.order.line'].create({
                     'other_money_id': other_money_order.id,
