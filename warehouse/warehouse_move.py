@@ -38,30 +38,42 @@ class wh_move(models.Model):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_dest_type', 'stock'))
 
-    origin = fields.Char(u'源单类型', required=True)
-    name = fields.Char(u'单据编号', copy=False, default='/')
-    state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft')
-    partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict')
-    date = fields.Date(u'单据日期', required=True, copy=False, default=fields.Date.context_today)
+    origin = fields.Char(u'源单类型', required=True,
+                         help=u'源单类型')
+    name = fields.Char(u'单据编号', copy=False, default='/',
+                       help=u'单据编号，创建时会自动生成')
+    state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft',
+                             help=u'移库单状态标识，新建时状态为未审核;审核后状态为已审核')
+    partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict',
+                                 help=u'该单据对应的业务伙伴')
+    date = fields.Date(u'单据日期', required=True, copy=False, default=fields.Date.context_today,
+                       help=u'单据创建日期，默认为当前天')
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict',
                                    required=True,
-                                   default=_get_default_warehouse)
+                                   default=_get_default_warehouse,
+                                   help=u'移库单的来源仓库')
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         ondelete='restrict',
                                         required=True,
-                                        default=_get_default_warehouse_dest)
+                                        default=_get_default_warehouse_dest,
+                                        help=u'移库单的目的仓库')
     approve_uid = fields.Many2one('res.users', u'审核人',
-                                  copy=False, ondelete='restrict')
+                                  copy=False, ondelete='restrict',
+                                  help=u'移库单的审核人')
     approve_date = fields.Datetime(u'审核日期', copy=False)
     line_out_ids = fields.One2many('wh.move.line', 'move_id', u'出库明细',
                                    domain=[('type', '=', 'out')],
-                                   context={'type': 'out'}, copy=True)
+                                   context={'type': 'out'}, copy=True,
+                                   help=u'出库类型的移库单对应的出库明细')
     line_in_ids = fields.One2many('wh.move.line', 'move_id', u'入库明细',
                                   domain=[('type', '=', 'in')],
-                                  context={'type': 'in'}, copy=True)
-    note = fields.Text(u'备注')
-    total_qty = fields.Integer(u'产品总数', compute=_compute_total_qty, store=True)
+                                  context={'type': 'in'}, copy=True,
+                                  help=u'入库类型的移库单对应的入库明细')
+    note = fields.Text(u'备注',
+                       help=u'可以为该单据添加一些需要的标识信息')
+    total_qty = fields.Integer(u'产品总数', compute=_compute_total_qty, store=True,
+                               help=u'该移库单的入/出库明细行包含的产品总数')
 
     @api.model
     def scan_barcode(self,model_name,barcode,order_id):

@@ -53,6 +53,48 @@ class test_buy_order(TransactionCase):
         self.assertTrue(order.warehouse_dest_id.type == 'stock')
         self.env['buy.order'].create({})
 
+    def test_get_money_state(self):
+        '''计算购货订单付款/退款状态'''
+        self.order.buy_order_done()
+        receipt = self.env['buy.receipt'].search(
+                  [('order_id', '=', self.order.id)])
+        # 入库单不付款，购货订单付款状态应该为未付款
+        receipt.buy_receipt_done()
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'未付款')
+
+        # 入库单总金额为585，本次付500，购货订单付款状态应该为部分付款
+        receipt.buy_receipt_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        receipt.payment = 500
+        receipt.bank_account_id = bank_account
+        receipt.buy_receipt_done()
+        # 查找产生的付款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', receipt.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'部分付款')
+
+        # 入库单总金额为585，本次付585，购货订单付款状态应该为全部付款
+        receipt.buy_receipt_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        receipt.payment = 585
+        receipt.bank_account_id = bank_account
+        receipt.buy_receipt_done()
+        # 查找产生的付款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', receipt.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
+        self.order._get_money_state()
+        self.assertTrue(self.order.money_state == u'全部付款')
+
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
         self.order.buy_order_done()
@@ -254,6 +296,12 @@ class test_buy_receipt(TransactionCase):
         receipt.payment = receipt.amount - 1
         receipt.bank_account_id = self.bank_account
         receipt.buy_receipt_done()
+        # 查找产生的付款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', receipt.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         receipt._get_buy_money_state()
         self.assertTrue(receipt.money_state == u'部分付款')
 
@@ -261,6 +309,12 @@ class test_buy_receipt(TransactionCase):
         receipt.payment = receipt.amount
         receipt.bank_account_id = self.bank_account
         receipt.buy_receipt_done()
+        # 查找产生的付款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', receipt.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         receipt._get_buy_money_state()
         self.assertTrue(receipt.money_state == u'全部付款')
 
@@ -275,6 +329,12 @@ class test_buy_receipt(TransactionCase):
         return_receipt.payment = return_receipt.amount - 1
         return_receipt.bank_account_id = self.bank_account
         return_receipt.buy_receipt_done()
+        # 查找产生的付款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', return_receipt.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         return_receipt._get_buy_return_state()
         self.assertTrue(return_receipt.return_state == u'部分退款')
 
@@ -282,6 +342,12 @@ class test_buy_receipt(TransactionCase):
         return_receipt.payment = return_receipt.amount
         return_receipt.bank_account_id = self.bank_account
         return_receipt.buy_receipt_done()
+        # 查找产生的付款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', return_receipt.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         return_receipt._get_buy_return_state()
         self.assertTrue(return_receipt.return_state == u'全部退款')
 

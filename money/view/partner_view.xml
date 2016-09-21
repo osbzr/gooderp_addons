@@ -2,11 +2,14 @@
 <openerp>
     <data>
         <!--继承账户 tree，添加"查看现金银行报表"按钮-->
-		<record id="bank_account_tree_inherit" model="ir.ui.view">
+		<record id="bank_account_tree_inherit_first" model="ir.ui.view">
             <field name="name">bank.account.tree.inherit</field>
             <field name="model">bank.account</field>
             <field name='inherit_id' ref='core.bank_account_tree' />
             <field name="arch" type="xml">
+                <field name="balance" position="before">
+                    <field name="init_balance"/>
+				</field>
                 <field name="balance" position="after">
                     <button name="bank_statements" type="object" string="查看现金银行报表" icon="terp-stock_zoom" class="oe_highlight"/>
 				</field>

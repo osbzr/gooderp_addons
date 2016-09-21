@@ -23,7 +23,9 @@
         'wizard/other_money_statements_wizard_view.xml',
         'security/ir.model.access.csv',
         'view/partner_view.xml',
-        'generate_accounting.xml'
+        'generate_accounting.xml',
+        'home_page_data.xml',
+        'report/report_data.xml',
     ],
     'demo': [
         'money_demo.xml',

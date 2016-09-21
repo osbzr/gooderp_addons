@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!-- 采购入库单打印 -->
+        <record id='report_buy_receipt_in' model='ir.actions.report.xml'>
+            <field name='name'>采购入库单</field>
+            <field name='model'>buy.receipt</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>buy.receipt.in</field>
+            <field name='template_file'>buy/template/buy.receipt.in.docx</field>
+        </record>
+        <record id="buy_receipt_form_print_inherit" model="ir.ui.view">
+            <field name="name">buy.receipt.form</field>
+            <field name="model">buy.receipt</field>
+            <field name='inherit_id' ref='buy.buy_receipt_form'/>
+            <field name="arch" type="xml">
+                <button name="buy_receipt_draft" position="after">
+                    <button name="%(buy.report_buy_receipt_in)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+		<!-- 采购退货单打印 -->
+        <record id='report_buy_receipt_out' model='ir.actions.report.xml'>
+            <field name='name'>采购退货单</field>
+            <field name='model'>buy.receipt</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>buy.receipt.out</field>
+            <field name='template_file'>buy/template/buy.receipt.out.docx</field>
+        </record>
+        <record id="buy_return_form_print_inherit" model="ir.ui.view">
+            <field name="name">buy.return.form</field>
+            <field name="model">buy.receipt</field>
+            <field name='inherit_id' ref='buy.buy_return_form'/>
+            <field name="arch" type="xml">
+                <button name="buy_receipt_draft" position="after">
+                    <button name="%(buy.report_buy_receipt_out)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+        <!-- 购货订单打印 -->
+        <record id='report_buy_order' model='ir.actions.report.xml'>
+            <field name='name'>购货订单</field>
+            <field name='model'>buy.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>buy.order</field>
+            <field name='template_file'>buy/template/buy.order.docx</field>
+        </record>
+        <record id="buy_order_form_print_inherit" model="ir.ui.view">
+            <field name="name">buy.order.form</field>
+            <field name="model">buy.order</field>
+            <field name='inherit_id' ref='buy.buy_order_form'/>
+            <field name="arch" type="xml">
+                <button name="buy_order_draft" position="after">
+                    <button name="%(buy.report_buy_order)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+        <!-- 采购调整单打印 -->
+        <record id='report_buy_adjust' model='ir.actions.report.xml'>
+            <field name='name'>采购调整单</field>
+            <field name='model'>buy.adjust</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>buy.adjust</field>
+            <field name='template_file'>buy/template/buy.adjust.docx</field>
+        </record>
+        <record id="buy_adjust_form_print_inherit" model="ir.ui.view">
+            <field name="name">buy.adjust.form</field>
+            <field name="model">buy.adjust</field>
+            <field name='inherit_id' ref='buy.buy_adjust_form'/>
+            <field name="arch" type="xml">
+                <button name="buy_adjust_done" position="after">
+                    <button name="%(buy.report_buy_adjust)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+    </data>
+</openerp>

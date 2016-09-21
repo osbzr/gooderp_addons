@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+         <record id="home_report_type_finance" model="home.report.type">
+			<field name="sequence">1</field>
+		    <field name="name" >会计</field>
+		</record>
+
+        <record id="create_trial_balance_wizard_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="create_trial_balance_wizard_action"/>
+		    <field name="menu_type">report</field>
+			<field name="report_type_id" ref="home_report_type_finance"/>
+		    <field name="note_one" >科目余额表</field>
+		</record>
+
+        <record id="create_balance_sheet_wizard_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="create_balance_sheet_wizard_action"/>
+		    <field name="menu_type">report</field>
+            <field name="context">{'balance_sheet': True}</field>
+			<field name="report_type_id" ref="home_report_type_finance"/>
+		    <field name="note_one" >资产负债表</field>
+		</record>
+        <record id="profit_statement_tree_wizard_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="profit_statement_tree_wizard_action"/>
+		    <field name="menu_type">report</field>
+            <field name="context">{'profit_statement': True}</field>
+			<field name="report_type_id" ref="home_report_type_finance"/>
+		    <field name="note_one" >利润表</field>
+		</record>
+           <record id="pcreate_vouchers_summary_wizard_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="create_vouchers_summary_wizard_action"/>
+		    <field name="menu_type">report</field>
+            <field name="context">{'create_vouchers_summary':True}</field>
+			<field name="report_type_id" ref="home_report_type_finance"/>
+		    <field name="note_one" >科目明细帐明细账 </field>
+		</record>
+        <record id="create_ledger_account_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="create_ledger_account_action"/>
+		    <field name="menu_type">report</field>
+            <field name="context">{'create_general_ledger_account': True}</field>
+			<field name="report_type_id" ref="home_report_type_finance"/>
+		    <field name="note_one" >科目总账 </field>
+		</record>
+    </data>
+</openerp>

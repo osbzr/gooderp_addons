@@ -17,12 +17,18 @@ class buy_payment_wizard(models.TransientModel):
     def _default_date_end(self):
         return date.today()
 
-    date_start = fields.Date(u'开始日期', default=_default_date_start)
-    date_end = fields.Date(u'结束日期', default=_default_date_end)
-    s_category_id = fields.Many2one('core.category', u'供应商类别')
-    partner_id = fields.Many2one('partner', u'供应商')
-    order_id = fields.Many2one('buy.receipt', u'采购单号')
-    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
+    date_start = fields.Date(u'开始日期', default=_default_date_start,
+                             help=u'报表汇总的开始日期，默认为公司启用日期')
+    date_end = fields.Date(u'结束日期', default=_default_date_end,
+                             help=u'报表汇总的结束日期，默认为当前日期')
+    s_category_id = fields.Many2one('core.category', u'供应商类别',
+                             help=u'按指定供应商类别进行统计')
+    partner_id = fields.Many2one('partner', u'供应商',
+                             help=u'按指定供应商进行统计')
+    order_id = fields.Many2one('buy.receipt', u'采购单号',
+                             help=u'按指定采购单号进行统计')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库',
+                             help=u'按指定仓库进行统计')
 
     @api.multi
     def button_ok(self):
@@ -59,11 +65,13 @@ class buy_payment_wizard(models.TransientModel):
             # 如果是退货则金额均取反
             if not receipt.is_return:
                 order_type = u'普通采购'
+                warehouse = receipt.warehouse_dest_id
             elif receipt.is_return:
                 order_type = u'采购退回'
                 purchase_amount = - purchase_amount
                 discount_amount = - discount_amount
                 amount = - amount
+                warehouse = receipt.warehouse_id
             # 计算付款率
             if amount == 0 and payment == 0:
                 payment_rate = 100
@@ -74,7 +82,7 @@ class buy_payment_wizard(models.TransientModel):
                 'partner_id': receipt.partner_id.id,
                 'type': order_type,
                 'date': receipt.date,
-                'warehouse_dest_id': receipt.warehouse_dest_id.id,
+                'warehouse_dest_id': warehouse.id,
                 'order_name': receipt.name,
                 'purchase_amount': purchase_amount,
                 'discount_amount': discount_amount,

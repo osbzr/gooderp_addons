@@ -20,5 +20,6 @@
             <field name='name'>记</field>
             <field name='print_title'>记账凭证</field>
         </record>
+
     </data>
 </openerp>

@@ -19,9 +19,12 @@ class sell_top_ten_wizard(models.TransientModel):
     def _default_date_end(self):
         return date.today()
 
-    date_start = fields.Date(u'开始日期', default=_default_date_start)
-    date_end = fields.Date(u'结束日期', default=_default_date_end)
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
+    date_start = fields.Date(u'开始日期', default=_default_date_start,
+                             help=u'报表汇总的开始日期，默认为一周前日期')
+    date_end = fields.Date(u'结束日期', default=_default_date_end,
+                           help=u'报表汇总的结束日期，默认为当前日期')
+    warehouse_id = fields.Many2one('warehouse', u'仓库',
+                                   help=u'按指定仓库进行统计')
 
     @api.multi
     def button_ok(self):

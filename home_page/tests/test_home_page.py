@@ -11,6 +11,6 @@ class test_home_page(TransactionCase):
     def test_onchange_action(self):
     	'''测试 onchange_action '''
     	result = self.env.ref('home_page.top_9').onchange_action()
-    	real_result = {'domain': {'view_id': [('model', '=', u'sell.order'), ('type', '=', 'tree')]}}
+    	real_result = {'domain': {'view_id': [('model', '=', u'res.partner'), ('type', '=', 'tree')]}}
     	self.assertTrue(result == real_result)
         

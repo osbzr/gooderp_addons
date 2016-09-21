@@ -204,8 +204,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     def _default_subject_name_end_id(self):
         return self.env['finance.account'].get_max_code_account()
 
-    period_begin_id = fields.Many2one('finance.period', string=u'开始期间', default=_default_begin_period_id)
-    period_end_id = fields.Many2one('finance.period', string=u'结束期间', default=_default_end_period_id)
+    period_begin_id = fields.Many2one('finance.period', string=u'开始期间', default=_default_begin_period_id,help=u'默认是本年第一个期间')
+    period_end_id = fields.Many2one('finance.period', string=u'结束期间', default=_default_end_period_id,help=u'默认是当前期间')
     subject_name_id = fields.Many2one('finance.account', string=u'科目名称 从', default=_default_subject_name_id,help=u'默认是所有科目的最小code')
     subject_name_end_id = fields.Many2one('finance.account', string=u'到', default=_default_subject_name_end_id,help=u'默认是所有科目的最小code')
 
@@ -493,14 +493,15 @@ class VouchersSummary(models.TransientModel):
         """
         return self.env['finance.period'].get_date_now_period_id()
 
-    date = fields.Date(u'日期')
-    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id)
-    voucher_id = fields.Many2one('voucher', u'凭证字号')
+    date = fields.Date(u'日期', help=u'日期')
+    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id, help=u'会计期间')
+    voucher_id = fields.Many2one('voucher', u'凭证字号', help=u'凭证字号')
     summary = fields.Char(u'摘要',help=u'从凭证中获取到对应的摘要')
-    direction = fields.Char(u'方向',help=u'会计术语,主要方向借`贷`平')
-    debit = fields.Float(u'借方金额')
-    credit = fields.Float(u'贷方金额')
-    balance = fields.Float(u'余额')
+    direction = fields.Char(u'方向',help=u'会计术语,主要方向借、贷、平, 当借方金额大于贷方金额 方向为借\n\
+     ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
+    debit = fields.Float(u'借方金额', help=u'借方金额')
+    credit = fields.Float(u'贷方金额', help=u'贷方金额')
+    balance = fields.Float(u'余额',help=u'一般显示为正数，计算方式：当方向为借时 余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')
 
     @api.multi
     def view_detail_voucher(self):
@@ -533,8 +534,9 @@ class GeneralLedgerAccount(models.TransientModel):
         return self.env['finance.period'].get_date_now_period_id()
 
     period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id,help=u'记录本条记录的期间!')
-    summary = fields.Char(u'摘要')
-    direction = fields.Char(u'方向',help=u'会计术语,主要方向借`贷`平')
-    debit = fields.Float(u'借方金额')
-    credit = fields.Float(u'贷方金额')
-    balance = fields.Float(u'余额')
+    summary = fields.Char(u'摘要',help=u'')
+    direction = fields.Char(u'方向',help=u'会计术语,主要方向借、贷、平, 当借方金额大于贷方金额 方向为借\n\
+     ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
+    debit = fields.Float(u'借方金额',help=u'借方金额')
+    credit = fields.Float(u'贷方金额',help=u'贷方金额')
+    balance = fields.Float(u'余额',help=u'一般显示为正数，计算方式：当方向为借时 余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')

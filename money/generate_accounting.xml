@@ -29,8 +29,10 @@
             <field name="arch" type="xml">
                 <field name="name" position="after">
 					<field name="account_id"/>
-                    <field name="currency_id"/>
-                    <field name="currency_amount"/>
+                    <field name="currency_id"
+                    	 groups='finance.group_multi_currency'/>
+                    <field name="currency_amount"
+                    	 groups='finance.group_multi_currency'/>
 				</field>
             </field>
         </record>

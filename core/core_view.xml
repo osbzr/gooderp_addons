@@ -205,6 +205,7 @@
 								<field name="code"/>
 								<field name="main_mobile"/>
 								<field name="tax_num"/>
+								<field name="credit_limit"/>
 							</group>
 							<group>
 								<field name="c_category_id" required="1"/>
@@ -481,5 +482,7 @@
 		<record model="ir.ui.menu" id="base.menu_administration">
             <field name="groups_id" eval="[(3, ref('base.group_erp_manager'))]"/>
         </record>
+		<menuitem id="home_page.main_home_menu" name="首页" groups="home_page.group_all_manager"/>
+		<menuitem id="mail.mail_feeds_main" groups='-base.group_user,home_page.group_mail'/>
     </data>
 </openerp>

@@ -39,15 +39,15 @@ class buy_order_detail(models.Model):
                     goods.id AS goods_id,
                     attr.name AS attribute,
                     wh.id AS warehouse_dest_id,
-                    (CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.goods_qty
+                    SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.goods_qty
                         ELSE - wml.goods_qty END) AS qty,
                     uom.name AS uom,
                     wml.price AS price,
-                    (CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.amount
+                    SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.amount
                         ELSE - wml.amount END) AS amount,
-                    (CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.tax_amount
+                    SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.tax_amount
                         ELSE - wml.tax_amount END) AS tax_amount,
-                    (CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.subtotal
+                    SUM(CASE WHEN wm.origin = 'buy.receipt.buy' THEN wml.subtotal
                         ELSE - wml.subtotal END) AS subtotal,
                     wml.note AS note
 
@@ -67,7 +67,7 @@ class buy_order_detail(models.Model):
 
                 GROUP BY wm.date, wm.name, origin, partner_id,
                     goods_code, goods.id, attribute, wh.id, uom,
-                    qty, wml.price, wml.amount, tax_amount, subtotal, wml.note
+                    wml.price, wml.note
                 )
         """)
 

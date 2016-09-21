@@ -46,16 +46,27 @@ class money_transfer_order(models.Model):
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
                            ], string=u'状态', readonly=True,
-                             default='draft', copy=False)
-    name = fields.Char(string=u'单据编号', copy=False, default='/')
+                             default='draft', copy=False,
+                        help=u'收付款单状态标识，新建时状态为未审核;审核后状态为已审核')
+    name = fields.Char(string=u'单据编号', copy=False, default='/',
+                       help=u'单据编号，创建时会自动生成')
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
-                       states={'draft': [('readonly', False)]})
+                       states={'draft': [('readonly', False)]},
+                       help=u'单据创建日期')
     note = fields.Text(string=u'备注', readonly=True,
-                       states={'draft': [('readonly', False)]})
+                       states={'draft': [('readonly', False)]},
+                       help=u'可以为该单据添加一些需要的标识信息')
     line_ids = fields.One2many('money.transfer.order.line', 'transfer_id',
                                string=u'资金转账单行', readonly=True,
-                               states={'draft': [('readonly', False)]})
+                               states={'draft': [('readonly', False)]},
+                               help=u'资金转账单明细行')
+    discount_amount = fields.Float(string=u'折扣', readonly=True,
+                                   states={'draft': [('readonly', False)]},
+                                   digits=dp.get_precision('Amount'),
+                                   help=u'资金转换时，待抹去的零头数据')
+    discount_account_id = fields.Many2one('finance.account', u'折扣科目',
+                                      help=u'资金转换单审核生成凭证时，折扣额对应的科目')
 
     @api.multi
     def money_transfer_done(self):
@@ -114,16 +125,23 @@ class money_transfer_order_line(models.Model):
     _description = u'资金转账单明细'
 
     transfer_id = fields.Many2one('money.transfer.order',
-                                  string=u'资金转账单', ondelete='cascade')
+                                  string=u'资金转账单', ondelete='cascade',
+                                  help=u'资金转账单行对应的资金转账单')
     out_bank_id = fields.Many2one('bank.account', string=u'转出账户',
-                                  required=True, ondelete='restrict')
+                                  required=True, ondelete='restrict',
+                                  help=u'资金转账单行上的转出账户')
     in_bank_id = fields.Many2one('bank.account', string=u'转入账户',
-                                 required=True, ondelete='restrict')
+                                 required=True, ondelete='restrict',
+                                 help=u'资金转账单行上的转入账户')
     currency_amount = fields.Float(string=u'外币金额',
-                          digits=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'),
+                                help=u'转出账户转出的外币金额')
     amount = fields.Float(string=u'金额',
-                          digits=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'),
+                          help=u'转入账户的金额')
     mode_id = fields.Many2one('settle.mode', string=u'结算方式',
-                              ondelete='restrict')
-    number = fields.Char(string=u'结算号')
-    note = fields.Char(string=u'备注')
+                              ondelete='restrict',
+                              help=u'结算方式：支票、信用卡等')
+    number = fields.Char(string=u'结算号', help=u'本次结算号')
+    note = fields.Char(string=u'备注',
+                       help=u'可以为该单据添加一些需要的标识信息')

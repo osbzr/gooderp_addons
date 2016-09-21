@@ -11,16 +11,20 @@ class wh_move_matching(models.Model):
 
     line_in_id = fields.Many2one(
         'wh.move.line', u'入库',
-        ondelete='set null', required=True, index=True)
+        ondelete='set null', required=True, index=True,
+        help=u'入库单行')
     line_out_id = fields.Many2one(
         'wh.move.line', u'出库',
-        ondelete='set null', required=True, index=True)
+        ondelete='set null', required=True, index=True,
+        help=u'出库单行')
     qty = fields.Float(
         u'数量',
-        digits=dp.get_precision('Quantity'), required=True)
+        digits=dp.get_precision('Quantity'), required=True,
+        help=u'出库单行产品的数量')
     uos_qty = fields.Float(
         u'辅助数量',
-        digits=dp.get_precision('Quantity'), required=True)
+        digits=dp.get_precision('Quantity'), required=True,
+        help=u'出库单行产品的辅助数量')
 
     def create_matching(self, line_in_id, line_out_id, qty, uos_qty):
         res = {
@@ -40,16 +44,20 @@ class wh_move_line(models.Model):
         compute='_get_qty_remaining',
         string=u'剩余数量',
         digits=dp.get_precision('Quantity'),
-        index=True, store=True, readonly=True)
+        index=True, store=True, readonly=True,
+        help=u'产品的剩余数量')
     uos_qty_remaining = fields.Float(
         compute='_get_qty_remaining', string=u'剩余辅助数量',
         digits=dp.get_precision('Quantity'),
-        index=True, store=True, readonly=True)
+        index=True, store=True, readonly=True,
+        help=u'产品的剩余辅助数量')
 
     matching_in_ids = fields.One2many(
-        'wh.move.matching', 'line_in_id', string=u'关联的入库')
+        'wh.move.matching', 'line_in_id', string=u'关联的入库',
+        help=u'关联的入库单行')
     matching_out_ids = fields.One2many(
-        'wh.move.matching', 'line_out_id', string=u'关联的出库')
+        'wh.move.matching', 'line_out_id', string=u'关联的出库',
+        help=u'关联的出库单行')
 
     # 这样的function字段的使用方式需要验证一下
     @api.one
