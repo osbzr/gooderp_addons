@@ -199,8 +199,8 @@ class asset(models.Model):
 
     @api.multi
     def unlink(self):
-        for asset in self:
-            if asset.state != 'draft':
+        for record in self:
+            if record.state != 'draft':
                 raise except_orm(u'错误', u'只能删除草稿状态的固定资产')
 
         return super(asset, self).unlink()
