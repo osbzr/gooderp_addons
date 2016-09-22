@@ -24,12 +24,6 @@ class wh_move(models.Model):
             goods_total = sum(line.goods_qty for line in self.line_out_ids)
         self.total_qty = goods_total
 
-    @api.one
-    @api.onchange('line_out_ids')
-    def onchange_goods_qty(self):
-        print self.env.context,"+++++++++++="
-
-
     @api.model
     def _get_default_warehouse(self):
         '''获取调出仓库'''
