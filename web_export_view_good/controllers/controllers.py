@@ -52,7 +52,7 @@ class ReportTemplate(models.Model):
     @api.model
     def get_time(self, model):
         ISOTIMEFORMAT = "%Y-%m-%d"
-        report_model = self.env['report.template'].search([('model_name', '=', model)])
+        report_model = self.env['report.template'].search([('model_name', '=', model)], limit=1)
         file_address = report_model.file_address or False
         return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address)
 
