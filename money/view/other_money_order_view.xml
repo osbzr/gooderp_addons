@@ -59,7 +59,6 @@
                             <field name="tax_rate" groups="money.tax_groups"/>
                             <field name="tax_amount" groups="money.tax_groups" sum="合计"/>
                             <field name="note"/>
-                            <field name="source_id" invisible='1'/>
                        </tree>
                     </field>
                     <group>
