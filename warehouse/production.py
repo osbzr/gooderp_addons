@@ -215,6 +215,9 @@ class wh_disassembly(models.Model):
     fee = fields.Float(
         u'拆卸费用', digits=dp.get_precision('Amount'),
         help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
+    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False)
+    goods_id = fields.Many2one('goods', string=u'组合件产品')
+    goods_qty = fields.Float(u'组合件数量',default=1, digits=dp.get_precision('Quantity'))
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -297,6 +300,43 @@ class wh_disassembly(models.Model):
         return res
 
     @api.one
+    @api.onchange('goods_qty')
+    def onchange_goods_qty(self):
+        warehouse_id = self.env['warehouse'].search(
+            [('type', '=', 'stock')], limit=1)
+        line_out_ids,line_in_ids = [],[]
+        parent_line = self.bom_id.line_parent_ids
+        if warehouse_id and self.bom_id and parent_line and self.bom_id.line_child_ids:
+            cost, cost_unit = parent_line.goods_id \
+                 .get_suggested_cost_by_warehouse(
+                 warehouse_id, parent_line.goods_qty)
+            line_out_ids.append({
+                 'goods_id': parent_line.goods_id,
+                 'warehouse_id': self.env[
+                     'warehouse'].get_warehouse_by_type('production'),
+                 'warehouse_dest_id': warehouse_id,
+                 'uom_id': parent_line.goods_id.uom_id,
+                 'goods_qty': self.goods_qty,
+                 'product_uos_qty': 1,
+                 'cost_unit': cost_unit,
+                 'cost': cost,
+             })
+
+            line_in_ids = [{
+                            'goods_id': line.goods_id,
+                            'warehouse_id': warehouse_id,
+                            'warehouse_dest_id': self.env[
+                                'warehouse'].get_warehouse_by_type('production'),
+                            'uom_id': line.goods_id.uom_id,
+                            'goods_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty,
+                            'product_uos_qty': 1,
+                        } for line in self.bom_id.line_child_ids]
+
+        self.line_in_ids = False
+        self.line_out_ids = False
+        self.line_out_ids = line_out_ids or False
+        self.line_in_ids = line_in_ids or False
+
     @api.onchange('bom_id')
     def onchange_bom(self):
         line_out_ids, line_in_ids = [], []
@@ -316,6 +356,7 @@ class wh_disassembly(models.Model):
                         'warehouse_dest_id': warehouse_id,
                         'uom_id': line.goods_id.uom_id,
                         'goods_qty': line.goods_qty,
+                        'product_uos_qty': 1,
                         'cost_unit': cost_unit,
                         'cost': cost,
                     })
@@ -327,6 +368,7 @@ class wh_disassembly(models.Model):
                     'warehouse'].get_warehouse_by_type('production'),
                 'uom_id': line.goods_id.uom_id,
                 'goods_qty': line.goods_qty,
+                'product_uos_qty': 1,
             } for line in self.bom_id.line_child_ids]
 
             self.line_in_ids = False
@@ -334,6 +376,13 @@ class wh_disassembly(models.Model):
 
         self.line_out_ids = line_out_ids or False
         self.line_in_ids = line_in_ids or False
+        if len(line_out_ids) == 1 and line_out_ids:
+            self.is_many_to_many_combinations = False
+            self.goods_id = line_out_ids[0].get("goods_id")
+            domain = {'goods_id': [('id', '=', self.goods_id.id)]}
+            return {'domain': domain}
+        elif len(line_out_ids) > 1:
+            self.is_many_to_many_combinations = True
 
     @api.multi
     def update_bom(self):
