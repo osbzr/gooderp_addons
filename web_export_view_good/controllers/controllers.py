@@ -41,10 +41,10 @@ class ReportTemplate(models.Model):
     _name = "report.template"
     model_id = fields.Many2one('ir.model',u'模型')
     file_address = fields.Char(u'模板文件路径')
-    model_name = fields.Char(u'模型名称')
+    model_name = fields.Char(u'模型名称', compute='_compute_model_name')
 
-    @api.onchange('model_id')
-    def _onchange_model_id(self):
+    @api.depends('model_id')
+    def _compute_model_name(self):
         if self.model_id:
             self.model_name = self.model_id.model
 

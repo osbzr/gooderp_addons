@@ -2,8 +2,8 @@
 <openerp>
     <data noupdate="1">
         <record id="template_1" model="report.template">
-            <field name="model_name">balance.sheet</field>
-            <field name="file_address">finance/template/balance_sheet_tempalte.xls</field>
+            <field name="model_id"  ref="finance.model_balance_sheet" />
+            <field name="file_address">finance/xls/balance_sheet.xls</field>
         </record>
     </data>
 </openerp>
