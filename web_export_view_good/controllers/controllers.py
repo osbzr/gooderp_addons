@@ -41,17 +41,18 @@ class ReportTemplate(models.Model):
     _name = "report.template"
     model_id = fields.Many2one('ir.model',u'模型')
     file_address = fields.Char(u'模板文件路径')
-    model_name = fields.Char(u'模型名称')
+    model_name = fields.Char(u'模型名称', compute='_compute_model_name')
 
-    @api.onchange('model_id')
-    def _onchange_model_id(self):
+    @api.one
+    @api.depends('model_id')
+    def _compute_model_name(self):
         if self.model_id:
             self.model_name = self.model_id.model
 
     @api.model
     def get_time(self, model):
         ISOTIMEFORMAT = "%Y-%m-%d"
-        report_model = self.env['report.template'].search([('model_name', '=', model)])
+        report_model = self.env['report.template'].search([('model_name', '=', model)], limit=1)
         file_address = report_model.file_address or False
         return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address)
 
