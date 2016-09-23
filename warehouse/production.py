@@ -77,6 +77,12 @@ class wh_assembly(models.Model):
 
         return True
 
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+                             'uom_id': self.goods_id.uom_id.id,'uos_id':self.goods_id.uos_id.id}]
+        if self.line_out_ids:
+            self.line_out_ids[0].onchange_goods_id()
     @api.one
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -95,7 +101,7 @@ class wh_assembly(models.Model):
         warehouse_id = self.env['warehouse'].search(
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
-            line_in_ids = [{ 'goods_id': line.goods_id,
+            line_in_ids = [{'goods_id': line.goods_id,
                                'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
                                    'production'),
                                'warehouse_dest_id': warehouse_id,
@@ -124,8 +130,10 @@ class wh_assembly(models.Model):
                 })
             self.line_in_ids = False
             self.line_out_ids = False
-        self.line_out_ids = line_out_ids
-        self.line_in_ids = line_in_ids
+            self.line_out_ids = line_out_ids
+            self.line_in_ids = line_in_ids
+        else:
+            self.line_in_ids[0].goods_qty = self.goods_qty
 
     @api.one
     def check_parent_length(self):
@@ -371,6 +379,12 @@ class wh_disassembly(models.Model):
 
         return res
 
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+                              'uos_id':self.goods_id.uos_id.id,'uom_id': self.goods_id.uom_id.id}]
+        self.line_out_ids[0].onchange_goods_id()
+
     @api.one
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -416,11 +430,12 @@ class wh_disassembly(models.Model):
                             'product_uos_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty/line.goods_id.conversion,
                             'uos_id':line.goods_id.uos_id.id,
                         } for line in self.bom_id.line_child_ids]
-
-        self.line_in_ids = False
-        self.line_out_ids = False
-        self.line_out_ids = line_out_ids or False
-        self.line_in_ids = line_in_ids or False
+            self.line_in_ids = False
+            self.line_out_ids = False
+            self.line_out_ids = line_out_ids or False
+            self.line_in_ids = line_in_ids or False
+        elif self.goods_id:
+            self.line_out_ids[0].goods_qty = self.goods_qty
 
     @api.onchange('bom_id')
     def onchange_bom(self):
