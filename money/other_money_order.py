@@ -161,9 +161,6 @@ class other_money_order_line(models.Model):
                         u'类别', ondelete='restrict',
                         domain="[('type', '=', context.get('type'))]",
                         help=u'类型：运费、咨询费等')
-#     source_id = fields.Many2one('money.invoice',
-#                                 u'源单', ondelete='cascade',
-#                                 help=u'其他收支单行上的源单')
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算',
                                    help=u'其他收支单行上的辅助核算')
     amount = fields.Float(u'金额',
