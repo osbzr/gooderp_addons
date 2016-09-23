@@ -60,8 +60,6 @@ class IterDataModelProxy(object):
         self.length = len(data)
         self.current = 0
 
-        print self.data, self.length, self.current
-
     def next(self):
         if self.current >= self.length:
             raise StopIteration()
@@ -103,8 +101,8 @@ class ReportDocx(report_sxw):
             doc.save(temp_out_file)
 
             with open(temp_out_file, 'rb') as input_stream:
-                print input_stream.read()
                 report_stream = input_stream.read()
+
         except Exception:
             raise Exception
         finally:
