@@ -40,7 +40,26 @@ class money_order(models.Model):
         else:
             values.update({'name': self.env['ir.sequence'].get('get.order')})
 
+        # 创建时查找该业务伙伴是否存在 未审核 状态下的收付款单
+        orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
+                                                 ('state', '=', 'draft')])
+        for order in orders:
+            if order:
+                raise except_orm(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
+
         return super(money_order, self).create(values)
+
+    @api.multi
+    def write(self, values):
+        # 保存时查找该业务伙伴是否存在 未审核 状态下的收付款单
+        if values.get('partner_id'):
+            orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
+                                                     ('state', '=', 'draft')])
+            for order in orders:
+                if order:
+                    raise except_orm(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
+
+        return super(money_order, self).write(values)
 
     @api.multi
     def unlink(self):
