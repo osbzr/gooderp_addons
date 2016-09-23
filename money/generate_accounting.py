@@ -344,7 +344,7 @@ class other_money_order(models.Model):
                              'credit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount + line.tax_amount), 'credit_account_id': line.category_id.account_id.id,
                              'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': '',
-                             'buy_tax_amount': line.tax_amount or 0,
+                             'sell_tax_amount': line.tax_amount or 0,
                              })
                 self.env['money.invoice'].create_voucher_line(vals)
         else:
@@ -355,7 +355,7 @@ class other_money_order(models.Model):
                              'debit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount + line.tax_amount), 'credit_account_id': self.bank_id.account_id.id,
                              'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id,
-                             'sell_tax_amount': line.tax_amount or 0,
+                             'buy_tax_amount': line.tax_amount or 0,
                              })
                 self.env['money.invoice'].create_voucher_line(vals)
         vouch_obj.voucher_done()
