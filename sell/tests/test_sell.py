@@ -29,6 +29,10 @@ class Test_sell(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
+
         vals = {'partner_id': self.partner.id,
                 'is_return': True,
                 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
@@ -165,6 +169,10 @@ class test_sell_order(TransactionCase):
         super(test_sell_order, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_1')
+
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
 
     def test_default_warehouse(self):
         '''新建销货订单时调出仓库的默认值'''
@@ -317,6 +325,10 @@ class test_sell_delivery(TransactionCase):
         self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
 
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()

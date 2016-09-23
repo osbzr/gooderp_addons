@@ -124,6 +124,20 @@ class test_money_order(TransactionCase):
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
 
+    def test_money_order_create_raise_exists_error(self):
+        # 同一业务伙伴存在两个未审核的付款单，报错
+        with self.assertRaises(except_orm):
+            self.env['money.order'].with_context({'type': 'get'}) \
+            .create({
+                    'partner_id': self.env.ref('core.jd').id,
+                    'name': 'GET/201600111',
+                    'date': "2016-02-20",
+                    'type': 'get'
+                    })
+
+        with self.assertRaises(except_orm):
+            self.env.ref('money.pay_2000').partner_id = self.env.ref('core.jd').id
+
     def test_money_order_voucher(self):
         invoice = self.env['money.invoice'].create({
             'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
@@ -133,6 +147,9 @@ class test_money_order(TransactionCase):
             'reconciled': 0,
             'to_reconcile': 200.0,
             'date_due': '2016-09-07'})
+        # 把业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
         # get  银行账户没设置科目
         money1 = self.env['money.order'].with_context({'type': 'get'}) \
             .create({
