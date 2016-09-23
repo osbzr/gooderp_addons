@@ -26,6 +26,9 @@ class wh_assembly(models.Model):
     fee = fields.Float(
         u'组装费用', digits=dp.get_precision('Amount'),
         help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
+    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False)
+    goods_id = fields.Many2one('goods', string=u'组合件产品')
+    goods_qty = fields.Float(u'组合件数量',default=1, digits=dp.get_precision('Quantity'))
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -71,6 +74,40 @@ class wh_assembly(models.Model):
             assembly.apportion_cost(cost)
 
         return True
+
+    @api.one
+    @api.onchange('goods_qty')
+    def onchange_goods_qty(self):
+        line_out_ids, line_in_ids = [], []
+        warehouse_id = self.env['warehouse'].search(
+            [('type', '=', 'stock')], limit=1)
+        if self.bom_id:
+            line_in_ids = [{ 'goods_id': line.goods_id,
+                               'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
+                                   'production'),
+                               'warehouse_dest_id': warehouse_id,
+                               'uom_id': line.goods_id.uom_id,
+                               'goods_qty': self.goods_qty,
+                           } for line in self.bom_id.line_parent_ids]
+            parent_line_goods_qty = self.bom_id.line_parent_ids[0].goods_qty
+            for line in self.bom_id.line_child_ids:
+                cost, cost_unit = line.goods_id. \
+                    get_suggested_cost_by_warehouse(
+                    warehouse_id[0], line.goods_qty / parent_line_goods_qty * self.goods_qty)
+                line_out_ids.append({
+                    'goods_id': line.goods_id,
+                    'warehouse_id': warehouse_id,
+                    'warehouse_dest_id': self.env[
+                        'warehouse'].get_warehouse_by_type('production'),
+                    'uom_id': line.goods_id.uom_id,
+                    'goods_qty':  line.goods_qty / parent_line_goods_qty * self.goods_qty,
+                    'cost_unit': cost_unit,
+                    'cost': cost,
+                })
+            self.line_in_ids = False
+            self.line_out_ids = False
+        self.line_out_ids = line_out_ids
+        self.line_in_ids = line_in_ids
 
     @api.one
     def check_parent_length(self):
@@ -142,10 +179,10 @@ class wh_assembly(models.Model):
                         'cost_unit': cost_unit,
                         'cost': cost,
                     })
-
             self.line_in_ids = False
             self.line_out_ids = False
-
+        else:
+            self.goods_qty=1
         self.line_out_ids = line_out_ids
         # /openerp-china/openerp/fields.py[1664]行添加的参数
         # 调用self.line_in_ids = line_in_ids的时候，此时会为其额外添加一个参数(6, 0, [])
@@ -153,6 +190,14 @@ class wh_assembly(models.Model):
         # 此时，上一步赋值的数据将会被直接删除，（不确定是bug，还是特性）
         self.line_in_ids = line_in_ids
 
+        if len(line_in_ids) == 1 and line_in_ids:
+            self.is_many_to_many_combinations = False
+            self.goods_qty = line_in_ids[0].get("goods_qty")
+            self.goods_id = line_in_ids[0].get("goods_id")
+            domain = {'goods_id': [('id', '=', self.goods_id.id)]}
+            return {'domain': domain}
+        elif len(line_in_ids) > 1:
+            self.is_many_to_many_combinations = True
     @api.multi
     def update_bom(self):
         for assembly in self:
@@ -309,7 +354,7 @@ class wh_disassembly(models.Model):
         if warehouse_id and self.bom_id and parent_line and self.bom_id.line_child_ids:
             cost, cost_unit = parent_line.goods_id \
                  .get_suggested_cost_by_warehouse(
-                 warehouse_id, parent_line.goods_qty)
+                 warehouse_id, self.goods_qty)
             line_out_ids.append({
                  'goods_id': parent_line.goods_id,
                  'warehouse_id': self.env[
@@ -373,11 +418,14 @@ class wh_disassembly(models.Model):
 
             self.line_in_ids = False
             self.line_out_ids = False
+        else:
+            self.goods_qty=1
 
         self.line_out_ids = line_out_ids or False
         self.line_in_ids = line_in_ids or False
         if len(line_out_ids) == 1 and line_out_ids:
             self.is_many_to_many_combinations = False
+            self.goods_qty = line_out_ids[0].get("goods_qty")
             self.goods_id = line_out_ids[0].get("goods_id")
             domain = {'goods_id': [('id', '=', self.goods_id.id)]}
             return {'domain': domain}
