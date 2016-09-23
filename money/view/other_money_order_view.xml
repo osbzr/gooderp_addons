@@ -36,23 +36,29 @@
                     </div>
                     <group>
                         <group>
-				            <field name="partner_id"
-				            	options="{'no_open': True, 'no_create': True}"/>
+							<field name='type' invisible='1'/>
+							<field name="partner_id"
+								options="{'no_open': True, 'no_create': True}"
+								attrs="{'invisible': [('type','=','other_pay')]}"
+								domain="[('c_category_id', '!=', False)]"/>
+							<field name="partner_id"
+								options="{'no_open': True, 'no_create': True}"
+								attrs="{'invisible': [('type','=','other_get')]}"
+								domain="[('s_category_id', '!=', False)]"/>
                         </group>
                         <group>
                             <field name="date"/>
                         </group>
                     </group>
-                    <field name="line_ids" context="{'type': type}">
+                    <field name="line_ids" context="{'order_type': type}">
                     	<tree string="其他收支单明细" editable="bottom">
                     		<field name="service" groups="core.service_groups"/>
-                    		<field name="category_id" required="1"/>
+							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"/>
                     		<field name="auxiliary_id"/>
                             <field name="amount" sum="合计"/>
                             <field name="tax_rate" groups="money.tax_groups"/>
                             <field name="tax_amount" groups="money.tax_groups" sum="合计"/>
                             <field name="note"/>
-                            <field name="source_id" invisible='1'/>
                        </tree>
                     </field>
                     <group>
