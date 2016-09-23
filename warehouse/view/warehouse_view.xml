@@ -121,7 +121,7 @@
                     	groups='goods.auxiliary_unit_groups'
                     	attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
                     <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                    <field name='goods_qty'
+                    <field name='goods_qty' sum='1'
                     	widget='float_limit'
                     	options="{'field': 'lot_qty'}"
                     	attrs="{'readonly': [('force_batch_one', '=', True)]}" />
