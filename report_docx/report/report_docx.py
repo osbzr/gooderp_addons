@@ -52,6 +52,10 @@ class DataModelProxy(object):
         '''支持迭代器行为'''
         return IterDataModelProxy(self.data)
 
+    def __str__(self):
+        '''支持直接在word 上写 many2one 字段'''
+        return self.data and self.data.display_name or ''
+
 
 class IterDataModelProxy(object):
     '''迭代器类，用 next 函数支持 for in 操作'''
@@ -95,16 +99,14 @@ class ReportDocx(report_sxw):
         temp_out_file = os.path.join(foldname, 'temp_out_%s.docx' % os.getpid())
 
         report_stream = ''
-        try:
-            doc = DocxTemplate(misc.file_open(report.template_file).name)
-            doc.render({'obj': data})
-            doc.save(temp_out_file)
+        doc = DocxTemplate(misc.file_open(report.template_file).name)
+        doc.render({'obj': data})
+        doc.save(temp_out_file)
 
-            with open(temp_out_file, 'rb') as input_stream:
-                report_stream = input_stream.read()
-        finally:
-            os.remove(temp_out_file)
+        with open(temp_out_file, 'rb') as input_stream:
+            report_stream = input_stream.read()
 
+        os.remove(temp_out_file)
         return (report_stream, report.report_type)
 
     def get_docx_data(self, cr, uid, ids, report, context):
