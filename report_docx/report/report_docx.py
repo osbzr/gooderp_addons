@@ -102,9 +102,6 @@ class ReportDocx(report_sxw):
 
             with open(temp_out_file, 'rb') as input_stream:
                 report_stream = input_stream.read()
-
-        except Exception:
-            raise Exception
         finally:
             os.remove(temp_out_file)
 
