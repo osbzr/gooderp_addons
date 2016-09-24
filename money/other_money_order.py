@@ -59,27 +59,36 @@ class other_money_order(models.Model):
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
                            ], string=u'状态', readonly=True,
-                             default='draft', copy=False)
+                             default='draft', copy=False,
+                        help=u'其他收单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位',
                                  readonly=True, ondelete='restrict',
-                                 states={'draft': [('readonly', False)]})
+                                 states={'draft': [('readonly', False)]},
+                                 help=u'单据对应的业务伙伴，单据审核时会影响他的应收应付余额')
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
-                       states={'draft': [('readonly', False)]})
-    name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/')
+                       states={'draft': [('readonly', False)]},
+                       help=u'单据创建日期')
+    name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/',
+                       help=u'单据编号，创建时会根据类型自动生成')
     total_amount = fields.Float(string=u'金额', compute='_compute_total_amount',
                                 store=True, readonly=True,
-                                digits=dp.get_precision('Amount'))
+                                digits=dp.get_precision('Amount'),
+                                help=u'本次其他收支的总金额')
     bank_id = fields.Many2one('bank.account', string=u'结算账户',
                               required=True, ondelete='restrict',
-                              readonly=True, states={'draft': [('readonly', False)]})
+                              readonly=True, states={'draft': [('readonly', False)]},
+                              help=u'本次其他收支的结算账户')
     line_ids = fields.One2many('other.money.order.line', 'other_money_id',
                                string=u'收支单行', readonly=True,
-                               states={'draft': [('readonly', False)]})
+                               states={'draft': [('readonly', False)]},
+                            help = u'其他收支单明细行')
     type = fields.Selection(TYPE_SELECTION, string=u'类型', readonly=True,
                             default=lambda self: self._context.get('type'),
-                            states={'draft': [('readonly', False)]})
-    note = fields.Text(u'备注')
+                            states={'draft': [('readonly', False)]},
+                            help=u'类型：其他收入 或者 其他支出')
+    note = fields.Text(u'备注',
+                       help=u'可以为该单据添加一些需要的标识信息')
 
     @api.onchange('date')
     def onchange_date(self):
@@ -171,18 +180,27 @@ class other_money_order_line(models.Model):
         self.tax_amount = self.amount * self.tax_rate * 0.01
 
     other_money_id = fields.Many2one('other.money.order',
-                                u'其他收支', ondelete='cascade')
-    service = fields.Many2one('service', u'服务', ondelete='restrict')
+                                u'其他收支', ondelete='cascade',
+                                help=u'其他收支单行对应的其他收支单')
+    service = fields.Many2one('service', u'服务', ondelete='restrict',
+                              help=u'其他收支单行上对应的服务')
     category_id = fields.Many2one('core.category',
                         u'类别', ondelete='restrict',
-                        domain="[('type', '=', context.get('type'))]")
+                        domain="[('type', '=', context.get('type'))]",
+                        help=u'类型：运费、咨询费等')
     source_id = fields.Many2one('money.invoice',
-                                u'源单', ondelete='cascade')
-    auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算')
+                                u'源单', ondelete='cascade',
+                                help=u'其他收支单行上的源单')
+    auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算',
+                                   help=u'其他收支单行上的辅助核算')
     amount = fields.Float(u'金额',
-                        digits=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'),
+                        help=u'其他收支单行上的金额')
     tax_rate = fields.Float(u'税率(%)',
-                            default=lambda self:self.env.user.company_id.import_tax_rate)
+                            default=lambda self:self.env.user.company_id.import_tax_rate,
+                            help=u'其他收支单行上的税率')
     tax_amount = fields.Float(u'税额',
-                              digits=dp.get_precision('Amount'))
-    note = fields.Char(u'备注')
+                              digits=dp.get_precision('Amount'),
+                              help=u'其他收支单行上的税额')
+    note = fields.Char(u'备注',
+                       help=u'可以为该单据添加一些需要的标识信息')

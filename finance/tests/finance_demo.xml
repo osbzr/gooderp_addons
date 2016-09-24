@@ -32,6 +32,14 @@
             <field name='year'>2016</field>
             <field name='month'>3</field>
         </record>
+        <record id='period_201604' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>4</field>
+        </record>
+        <record id='period_201611' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>11</field>
+        </record>
         <!--凭证-->
         <!-- 2015年12月的凭证 -->
         <record id='voucher_12' model='voucher'>

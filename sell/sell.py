@@ -57,13 +57,29 @@ class sell_order(models.Model):
 
         return self.env['warehouse'].browse()
 
+    @api.one
+    @api.depends('amount', 'amount_executed')
+    def _get_money_state(self):
+        '''计算销货订单收款/退款状态'''
+        if self.amount_executed == 0:
+            self.money_state = (self.type == 'sell') and u'未收款' or u'未退款'
+        elif self.amount_executed < self.amount:
+            self.money_state = (self.type == 'sell') and u'部分收款' or u'部分退款'
+        elif self.amount_executed == self.amount:
+            self.money_state = (self.type == 'sell') and u'全部收款' or u'全部退款'
+
     partner_id = fields.Many2one('partner', u'客户',
-                            ondelete='restrict', states=READONLY_STATES)
-    contact = fields.Char(u'联系人', states=READONLY_STATES)
-    address = fields.Char(u'地址', states=READONLY_STATES)
-    mobile = fields.Char(u'手机', states=READONLY_STATES)
+                            ondelete='restrict', states=READONLY_STATES,
+                                 help=u'签约合同的客户')
+    contact = fields.Char(u'联系人', states=READONLY_STATES,
+                                 help=u'客户方的联系人')
+    address = fields.Char(u'地址', states=READONLY_STATES,
+                                 help=u'联系地址')
+    mobile = fields.Char(u'手机', states=READONLY_STATES,
+                                 help=u'联系手机')
     staff_id = fields.Many2one('staff', u'销售员',
-                            ondelete='restrict', states=READONLY_STATES)
+                            ondelete='restrict', states=READONLY_STATES,
+                                 help=u'单据负责人')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        select=True, copy=False, help=u"默认是订单创建日期")
@@ -72,36 +88,58 @@ class sell_order(models.Model):
         default=lambda self: fields.Date.context_today(self),
         select=True, copy=False, help=u"订单的要求交货日期")
     type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', 
-                            default='sell', states=READONLY_STATES)
+                            default='sell', states=READONLY_STATES,
+                            help=u'销货订单的类型，分为销货或退货')
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict', states=READONLY_STATES,
-                                   default=_default_warehouse)
+                                   default=_default_warehouse,
+                                   help=u'产品将从该仓库调出')
     name = fields.Char(u'单据编号', select=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
     line_ids = fields.One2many('sell.order.line', 'order_id', u'销货订单行',
-                               states=READONLY_STATES, copy=True)
-    note = fields.Text(u'备注')
-    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
+                               states=READONLY_STATES, copy=True,
+                               help=u'销货订单的明细行，不能为空')
+    note = fields.Text(u'备注', help=u'单据备注')
+    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
+                                 help=u'整单优惠率')
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES, 
                                    track_visibility='always',
-                                   digits=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'),
+                                   help=u'整单优惠金额，可由优惠率自动计算出来，也可手动输入')
     amount = fields.Float(string=u'优惠后金额', store=True, readonly=True,
                         compute='_compute_amount', track_visibility='always',
-                        digits=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'),
+                        help=u'总金额减去优惠金额')
     pre_receipt = fields.Float(u'预收款', states=READONLY_STATES,
-                           digits=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'),
+                           help=u'输入预收款审核销货订单，会产生一张收款单')
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
-                                      ondelete='restrict')
+                                      ondelete='restrict',
+                                      help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
     approve_uid = fields.Many2one('res.users', u'审核人', copy=False,
-                                  ondelete='restrict')
+                                  ondelete='restrict',
+                                  help=u'审核单据的人')
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态', readonly=True,
                              help=u"销货订单的审核状态", select=True, 
                              copy=False, default='draft')
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
+                              default=u'未出库',
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
-    cancelled = fields.Boolean(u'已终止')
-    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id', store=True, readonly=True)
+    amount_executed = fields.Float(u'已执行金额',
+                                   help=u'发货单已收款金额或退货单已退款金额')
+    money_state = fields.Char(u'收/退款状态',
+                              compute=_get_money_state,
+                              store=True,
+                              help=u'销货订单生成的发货单或退货单的收/退款状态')
+    cancelled = fields.Boolean(u'已终止',
+                               help=u'该单据是否已终止')
+    currency_id = fields.Many2one('res.currency',
+                                  u'外币币别',
+                                  compute='_compute_currency_id',
+                                  store=True,
+                                  readonly=True,
+                                  help=u'外币币别')
 
     @api.one
     @api.onchange('partner_id')
@@ -164,7 +202,6 @@ class sell_order(models.Model):
                                 'state': 'draft',
                                 'origin_name':self.name,
                             })
-            money_order.money_order_done()
 
     @api.one
     def sell_order_done(self):
@@ -327,11 +364,9 @@ class sell_order_line(models.Model):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
         if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id :
             self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
-            amount = self.quantity * self.price - self.discount_amount  # 折扣后金额 
-            tax_amt = amount * self.tax_rate * 0.01  # 税额 
-            self.tax_amount = tax_amt
-            self.subtotal = self.quantity * self.price_taxed
-            self.amount = self.subtotal - tax_amt
+            self.amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
+            self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
+            self.subtotal = self.amount + self.tax_amount
         else :
             rate_silent = self.order_id.currency_id.rate_silent or self.env.user.company_id.currency_id.rate_silent
             currency_amount = self.quantity * self.price_taxed - self.discount_amount
@@ -342,37 +377,55 @@ class sell_order_line(models.Model):
             self.currency_amount = currency_amount
 
     order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
-                               required=True, ondelete='cascade')
+                               required=True, ondelete='cascade',
+                               help=u'关联订单的编号')
     currency_amount = fields.Float(u'外币金额', compute=_compute_all_amount,
                           store=True, readonly=True,
-                          digits=dp.get_precision(u'金额'))
-    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
-    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
+                          digits=dp.get_precision(u'金额'),
+                          help=u'外币金额')
+    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
+                               help=u'商品')
+    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute,
+                               help=u'商品是否使用属性')
     attribute_id = fields.Many2one('attribute', u'属性',
                                    ondelete='restrict', 
-                                   domain="[('goods_id', '=', goods_id)]")
-    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
+                                   domain="[('goods_id', '=', goods_id)]",
+                                   help=u'商品的属性，当商品有属性时，该字段必输')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
+                             help=u'商品计量单位')
     quantity = fields.Float(u'数量', default=1,
-                            digits=dp.get_precision('Quantity'))
-    quantity_out = fields.Float(u'已发货数量', copy=False,
-                                digits=dp.get_precision('Quantity'))
+                            digits=dp.get_precision('Quantity'),
+                            help=u'下单数量')
+    quantity_out = fields.Float(u'已执行数量', copy=False,
+                                digits=dp.get_precision('Quantity'),
+                                help=u'销货订单产生的发货单/退货单已执行数量')
     price = fields.Float(u'销售单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits=(12, 6))
-    price_taxed = fields.Float(u'含税单价',digits=(12, 6))
-    discount_rate = fields.Float(u'折扣率%')
-    discount_amount = fields.Float(u'折扣额')
+                         digits=(12, 6),
+                         help=u'不含税单价，由含税单价计算得出')
+    price_taxed = fields.Float(u'含税单价',digits=(12, 6),
+                         help=u'含税单价，取商品零售价')
+    discount_rate = fields.Float(u'折扣率%',
+                                   help=u'折扣率')
+    discount_amount = fields.Float(u'折扣额',
+                                   help=u'输入折扣率后自动计算得出，也可手动输入折扣额')
     amount = fields.Float(u'金额', compute=_compute_all_amount, 
                           store=True, readonly=True,
-                          digits=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)',default=lambda self:self.env.user.company_id.output_tax_rate)
+                          digits=dp.get_precision('Amount'),
+                          help=u'金额  = 价税合计  - 税额')
+    tax_rate = fields.Float(u'税率(%)',
+                            default=lambda self:self.env.user.company_id.output_tax_rate,
+                            help=u'默认值取公司销项税率')
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, 
                               readonly=True,
-                              digits=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'),
+                              help=u'税额')
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, 
                             store=True, readonly=True,
-                            digits=dp.get_precision('Amount'))
-    note = fields.Char(u'备注')
+                            digits=dp.get_precision('Amount'),
+                            help=u'含税单价 乘以 数量')
+    note = fields.Char(u'备注',
+                       help=u'本行备注')
 
     @api.one
     @api.onchange('goods_id')
@@ -453,47 +506,68 @@ class sell_delivery(models.Model):
             elif self.invoice_id.reconciled == self.invoice_id.amount:
                 self.return_state = u'全部退款'
 
-    currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True)
+    currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True,
+                                  help=u'外币币别')
     sell_move_id = fields.Many2one('wh.move', u'发货单', required=True, 
-                                   ondelete='cascade')
+                                   ondelete='cascade',
+                                   help=u'发货单号')
     is_return = fields.Boolean(u'是否退货', default=lambda self: \
-                               self.env.context.get('is_return'))
-    staff_id = fields.Many2one('staff', u'销售员', ondelete='restrict')
+                               self.env.context.get('is_return'),
+                               help=u'是否为退货类型')
+    staff_id = fields.Many2one('staff', u'销售员', ondelete='restrict',
+                               help=u'单据负责人')
     order_id = fields.Many2one('sell.order', u'源单号', copy=False,
-                               ondelete='cascade')
+                               ondelete='cascade',
+                               help=u'产生发货单/退货单的销货订单')
     invoice_id = fields.Many2one('money.invoice', u'发票号',
-                                 copy=False, ondelete='set null')
-    date_due = fields.Date(u'到期日期', copy=False, default=lambda self: fields.Date.context_today(self))
-    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES)
+                                 copy=False, ondelete='set null',
+                                 help=u'产生的发票号')
+    date_due = fields.Date(u'到期日期', copy=False,
+                           default=lambda self: fields.Date.context_today(self),
+                           help=u'收款截止日期')
+    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
+                                 help=u'整单优惠率')
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
-                            digits=dp.get_precision('Amount'))
+                            digits=dp.get_precision('Amount'),
+                            help=u'整单优惠金额，可由优惠率自动计算得出，也可手动输入')
     amount = fields.Float(u'优惠后金额', compute=_compute_all_amount, 
                           store=True, readonly=True,
-                          digits=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'),
+                          help=u'总金额减去优惠金额')
     partner_cost = fields.Float(u'客户承担费用',
-                        digits=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'),
+                        help=u'客户承担费用')
     receipt = fields.Float(u'本次收款', states=READONLY_STATES,
-                           digits=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'),
+                           help=u'本次收款金额')
     bank_account_id = fields.Many2one('bank.account',
-                                      u'结算账户', ondelete='restrict')
+                                      u'结算账户', ondelete='restrict',
+                                      help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
     debt = fields.Float(u'本次欠款', compute=_compute_all_amount, 
                         store=True, readonly=True, copy=False,
-                        digits=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Amount'),
+                        help=u'本次欠款金额')
     total_debt = fields.Float(u'总欠款', compute=_compute_all_amount, 
                               store=True, readonly=True, copy=False,
-                              digits=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'),
+                              help=u'该客户的总欠款金额')
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', 
-                                    copy=False)
+                                    copy=False,
+                                    help=u'销售费用明细行')
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
                               store=True, default=u'未收款',
                               help=u"销售发货单的收款状态", select=True, copy=False)
     return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
                                store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
-    contact = fields.Char(u'联系人', states=READONLY_STATES)
-    address = fields.Char(u'地址', states=READONLY_STATES)
-    mobile = fields.Char(u'手机', states=READONLY_STATES)
-    modifying = fields.Boolean(u'差错修改中', default=False)
+    contact = fields.Char(u'联系人', states=READONLY_STATES,
+                          help=u'客户方的联系人')
+    address = fields.Char(u'地址', states=READONLY_STATES,
+                          help=u'联系地址')
+    mobile = fields.Char(u'手机', states=READONLY_STATES,
+                         help=u'联系手机')
+    modifying = fields.Boolean(u'差错修改中', default=False,
+                               help=u'是否处于差错修改中')
 
     @api.one
     @api.onchange('partner_id')
@@ -645,6 +719,14 @@ class sell_delivery(models.Model):
             for line in line_ids:
                 line.sell_line_id.quantity_out += line.goods_qty
 
+        # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
+        if not self.is_return:
+            amount = self.amount + self.partner_cost
+            if amount + self.partner_id.receivable > self.partner_id.credit_limit:
+                raise except_orm(u'警告！', u'本次发货金额 + 客户应收余额 不能大于客户信用额度！')
+        else:
+            amount = self.amount + self.partner_cost
+
         # 发库单/退货单 生成源单
         if not self.is_return:
             amount = self.amount + self.partner_cost
@@ -715,7 +797,6 @@ class sell_delivery(models.Model):
                 'to_reconcile': amount,
                 'state': 'draft',
             })
-            money_order.money_order_done()
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.sell_move_id.approve_order()
         # 生成分拆单 FIXME:无法跳转到新生成的分单
@@ -727,6 +808,15 @@ class sell_delivery(models.Model):
     @api.one
     def sell_delivery_draft(self):
         '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的源单、收款单及凭证'''
+
+        # 发库单/退货单 计算客户的 本次退货金额+客户应收余额 是否小于客户信用额度， 否则报错
+        if not self.is_return:
+            amount = self.amount + self.partner_cost
+        else:
+            amount = self.amount + self.partner_cost
+            if amount + self.partner_id.receivable > self.partner_id.credit_limit:
+                raise except_orm(u'警告！', u'本次退货金额 + 客户应收余额 不能大于客户信用额度！')
+
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(
                 [('name', '=', self.invoice_id.id)])
@@ -735,7 +825,7 @@ class sell_delivery(models.Model):
             line.money_id.unlink()
         # 查找产生的源单
         invoice_ids = self.env['money.invoice'].search(
-                [('id', '=', self.invoice_id.id)])
+                [('name', '=', self.invoice_id.name)])
         for invoice in invoice_ids:
             invoice.money_invoice_draft()
             invoice.unlink()
@@ -759,7 +849,8 @@ class wh_move_line(models.Model):
     _description = u'销售发货单行'
 
     sell_line_id = fields.Many2one('sell.order.line', u'销货单行',
-                                   ondelete='cascade')
+                                   ondelete='cascade',
+                                   help=u'对应的销货订单行')
 
     @api.one
     @api.onchange('warehouse_id','goods_id')
@@ -781,11 +872,25 @@ class wh_move_line(models.Model):
             else:
                 self.discount_rate = 0
 
+    @api.multi
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        '''当订单行的产品变化时，带出产品上的零售价，以及公司的销项税'''
+        if self.goods_id:
+            is_return = self.env.context.get('default_is_return')
+            # 如果是销售发货单行 或 销售退货单行
+            if (self.type == 'out' and not is_return) or (self.type == 'in' and is_return):
+                self.tax_rate = self.env.user.company_id.output_tax_rate
+                self.price_taxed = self.goods_id.price
+
+        return super(wh_move_line,self).onchange_goods_id()
+
 class cost_line(models.Model):
     _inherit = 'cost.line'
 
     sell_id = fields.Many2one('sell.delivery', u'出库单号',
-                              ondelete='cascade')
+                              ondelete='cascade',
+                              help=u'与销售费用相关联的出库单号')
 
 
 class money_invoice(models.Model):
@@ -793,8 +898,37 @@ class money_invoice(models.Model):
 
 
     move_id = fields.Many2one('wh.move', string=u'出入库单',
-                              readonly=True, ondelete='cascade')
+                              readonly=True, ondelete='cascade',
+                              help=u'生成此发票的出入库单号')
 
+class money_order(models.Model):
+    _inherit = 'money.order'
+
+    @api.multi
+    def money_order_done(self):
+        ''' 将已核销金额写回到销货订单中的已执行金额 '''
+        res = super(money_order, self).money_order_done()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'get':
+                move = self.env['sell.delivery'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = abs(source.name.reconciled)
+        return res
+
+    @api.multi
+    def money_order_draft(self):
+        ''' 将销货订单中的已执行金额清零'''
+        res = super(money_order, self).money_order_draft()
+        move = False
+        for source in self.source_ids:
+            if self.type == 'get':
+                move = self.env['sell.delivery'].search(
+                    [('invoice_id', '=', source.name.id)])
+                if move.order_id:
+                    move.order_id.amount_executed = 0
+        return res
 
 
 class sell_adjust(models.Model):
@@ -803,20 +937,27 @@ class sell_adjust(models.Model):
     _description = u"销售调整单"
     _order = 'date desc, id desc'
 
-    name = fields.Char(u'单据编号', copy=False)
+    name = fields.Char(u'单据编号', copy=False,
+                       help=u'调整单编号，保存时可自动生成')
     order_id = fields.Many2one('sell.order', u'原始单据', states=READONLY_STATES,
-                             copy=False, ondelete='restrict')
+                             copy=False, ondelete='restrict',
+                             help=u'要调整的原始销货订单')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       select=True, copy=False)
+                       select=True, copy=False,
+                       help=u'调整单创建日期，默认是当前日期')
     line_ids = fields.One2many('sell.adjust.line', 'order_id', u'调整单行',
-                               states=READONLY_STATES, copy=True)
+                               states=READONLY_STATES, copy=True,
+                               help=u'调整单明细行，不允许为空')
     approve_uid = fields.Many2one('res.users', u'审核人',
-                            copy=False, ondelete='restrict')
+                            copy=False, ondelete='restrict',
+                            help=u'审核调整单的人')
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态',
                              select=True, copy=False,
-                             default='draft')
-    note = fields.Text(u'备注')
+                             default='draft',
+                             help=u'调整单审核状态')
+    note = fields.Text(u'备注',
+                       help=u'单据备注')
 
     @api.multi
     def unlink(self):
@@ -912,41 +1053,54 @@ class sell_adjust_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
-        amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
-        tax_amt = amount * self.tax_rate * 0.01  # 税额
-        self.tax_amount = tax_amt
-        self.subtotal = self.quantity * self.price_taxed
-        self.amount = self.subtotal - tax_amt
+        self.amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
+        self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
+        self.subtotal = self.amount + self.tax_amount
 
     order_id = fields.Many2one('sell.adjust', u'订单编号', select=True,
-                               required=True, ondelete='cascade')
-    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
-    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute)
+                               required=True, ondelete='cascade',
+                               help=u'关联的调整单编号')
+    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
+                               help=u'商品')
+    using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute,
+                                     help=u'商品是否使用属性')
     attribute_id = fields.Many2one('attribute', u'属性',
                                    ondelete='restrict',
-                                   domain="[('goods_id', '=', goods_id)]")
-    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict')
+                                   domain="[('goods_id', '=', goods_id)]",
+                                   help=u'商品的属性，当商品有属性时，该字段必输')
+    uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
+                             help=u'商品计量单位')
     quantity = fields.Float(u'调整数量', default=1,
-                            digits=dp.get_precision('Quantity'))
+                            digits=dp.get_precision('Quantity'),
+                            help=u'相对于原单据对应明细行的调整数量，可正可负')
     price = fields.Float(u'销售单价', compute=_compute_all_amount,
                          store=True, readonly=True,
-                         digits=dp.get_precision('Amount'))
+                         digits=dp.get_precision('Amount'),
+                         help=u'不含税单价，由含税单价计算得出')
     price_taxed = fields.Float(u'含税单价',
-                               digits=dp.get_precision('Amount'))
-    discount_rate = fields.Float(u'折扣率%')
+                               digits=dp.get_precision('Amount'),
+                               help=u'含税单价，取自商品零售价')
+    discount_rate = fields.Float(u'折扣率%',
+                         help=u'折扣率')
     discount_amount = fields.Float(u'折扣额',
-                                   digits=dp.get_precision('Amount'))
+                                   digits=dp.get_precision('Amount'),
+                                   help=u'输入折扣率后自动计算得出，也可手动输入折扣额')
     amount = fields.Float(u'金额', compute=_compute_all_amount,
                           store=True, readonly=True,
-                          digits=dp.get_precision('Amount'))
-    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate)
+                          digits=dp.get_precision('Amount'),
+                          help=u'金额  = 价税合计  - 税额')
+    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate,
+                            help=u'默认值取公司销项税率')
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,
-                              digits=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'),
+                              help=u'由税率计算得出')
     subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
                             store=True, readonly=True,
-                            digits=dp.get_precision('Amount'))
-    note = fields.Char(u'备注')
+                            digits=dp.get_precision('Amount'),
+                            help=u'含税单价 乘以 数量')
+    note = fields.Char(u'备注',
+                       help=u'本行备注')
 
     @api.one
     @api.onchange('goods_id')

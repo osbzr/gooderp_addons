@@ -10,7 +10,7 @@ class Test_sell(TransactionCase):
 
     def setUp(self):
         super(Test_sell, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -57,7 +57,7 @@ class Test_sell(TransactionCase):
 
         self.order.sell_order_done()
         # 计算字段的测试
-        self.assertEqual(self.order.amount, 168448.00)
+        self.assertEqual(self.order.amount, 151600.00)
         # 正常的反审核
         self.order.sell_order_draft()
 
@@ -75,16 +75,16 @@ class Test_sell(TransactionCase):
         # sell.order onchange test
         self.order.discount_rate = 10
         self.order.onchange_discount_rate()
-        self.assertEqual(self.order.discount_amount, 16848.0)
+        self.assertEqual(self.order.discount_amount, 15163.2)
 
     def test_sale_order_line_compute(self):
         """测试销售订单的on_change 和 计算字段"""
 
         # sell_order_line 的计算字段的测试
-        self.assertEqual(self.sell_order_line.amount, 101.7)  # tax_amount subtotal
+        self.assertEqual(self.sell_order_line.amount, 90.0)  # tax_amount subtotal
         self.assertEqual(self.sell_order_line.tax_rate, 17.0)
         self.assertEqual(self.sell_order_line.tax_amount, 15.3)
-        self.assertEqual(self.sell_order_line.subtotal, 117.0)
+        self.assertEqual(self.sell_order_line.subtotal, 105.3)
 
         # onchange test
         # 折扣率 on_change 变化
@@ -92,7 +92,7 @@ class Test_sell(TransactionCase):
         # 通过onchange来改变 goods_id
         self.sell_order_line.onchange_discount_rate()
 
-        self.assertEqual(self.sell_order_line.amount, 103.4)
+        self.assertEqual(self.sell_order_line.amount, 80.0)
 
     def test_sell_delivery(self):
         """ 销售订单中 on_change 及计算字段"""
@@ -102,12 +102,17 @@ class Test_sell(TransactionCase):
         sell_delivery.onchange_discount_rate()
 
         self.assertEqual(sell_delivery.money_state, u'未收款')
-        self.assertAlmostEqual(sell_delivery.discount_amount, 11.7)
-        self.assertEqual(sell_delivery.amount, 105.3)
+        self.assertAlmostEqual(sell_delivery.discount_amount, 10.53)
+        self.assertEqual(sell_delivery.amount, 94.77)
 
         # 销售发货单 的确认
         sell_delivery.receipt = 22
         sell_delivery.sell_delivery_done()
+        # 查找产生的收款单，然后审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', sell_delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
 
         self.assertEqual(sell_delivery.money_state, u'部分收款')
 
@@ -120,7 +125,7 @@ class Test_sell(TransactionCase):
         # 退货单折扣率测试
         self.sell_delivery_obj.discount_rate = 10
         self.sell_delivery_obj.onchange_discount_rate()
-        self.assertEqual(self.sell_delivery_obj.discount_amount, 50)
+        self.assertEqual(self.sell_delivery_obj.discount_amount, 45.0)
         #  结算账户 需要输入付款额 测试
         self.sell_delivery_obj.bank_account_id = self.bank.id
         self.sell_delivery_obj.receipt = False
@@ -163,6 +168,7 @@ class test_sell_order(TransactionCase):
 
     def setUp(self):
         super(test_sell_order, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_1')
 
     def test_default_warehouse(self):
@@ -171,6 +177,50 @@ class test_sell_order(TransactionCase):
              'warehouse_type': 'stock'
              }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
+
+    def test_get_money_state(self):
+        '''计算销货订单收款/退款状态'''
+        order2 = self.env.ref('sell.sell_order_2')
+        order2.sell_order_done()
+        delivery = self.env['sell.delivery'].search(
+                  [('order_id', '=', order2.id)])
+        # 发货单产品在仓库中不足，需盘点入库以保证审核通过
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        # 发货单不付款，销货订单收款状态应该为未收款
+        delivery.sell_delivery_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'未收款')
+        # 发货单总金额为 73.3，本次收款 50，销货订单收款状态应该为部分收款
+        delivery.sell_delivery_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        delivery.receipt = 50
+        delivery.bank_account_id = bank_account.id
+        delivery.sell_delivery_done()
+        # 查找产生的收款单，然后审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'部分收款')
+        # 发货单总金额为 73.3，本次收款 73.3，销货订单收款状态应该为全部收款
+        delivery.sell_delivery_draft()
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        delivery.receipt = 73.3
+        delivery.bank_account_id = bank_account.id
+        delivery.sell_delivery_done()
+        # 查找产生的收款单，然后审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        order2._get_money_state()
+        self.assertTrue(order2.money_state == u'全部收款')
 
     def test_onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
@@ -279,7 +329,7 @@ class test_sell_delivery(TransactionCase):
     def setUp(self):
         '''准备基本数据'''
         super(test_sell_delivery, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
@@ -313,6 +363,12 @@ class test_sell_delivery(TransactionCase):
         delivery.receipt = delivery.amount - 1
         delivery.bank_account_id = self.bank_account
         delivery.sell_delivery_done()
+        # 查找产生的收款单，然后审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         delivery._get_sell_money_state()
         self.assertEqual(delivery.money_state, u'部分收款')
 
@@ -321,6 +377,12 @@ class test_sell_delivery(TransactionCase):
         delivery.receipt = delivery.amount
         delivery.bank_account_id = self.bank_account
         delivery.sell_delivery_done()
+        # 查找产生的收款单，然后审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         delivery._get_sell_money_state()
         self.assertEqual(delivery.money_state, u'全部收款')
 
@@ -336,6 +398,12 @@ class test_sell_delivery(TransactionCase):
         return_delivery.receipt = return_delivery.amount - 1
         return_delivery.bank_account_id = self.bank_account
         return_delivery.sell_delivery_done()
+        # 查找产生的收款单，然后审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', return_delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         return_delivery._get_sell_return_state()
         self.assertEqual(return_delivery.return_state, u'部分退款')
 
@@ -344,6 +412,12 @@ class test_sell_delivery(TransactionCase):
         return_delivery.receipt = return_delivery.amount
         return_delivery.bank_account_id = self.bank_account
         return_delivery.sell_delivery_done()
+        # 查找产生的收款单，然后审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', return_delivery.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
+        # 判断状态
         return_delivery._get_sell_return_state()
         self.assertEqual(return_delivery.return_state, u'全部退款')
 
@@ -381,6 +455,12 @@ class test_sell_delivery(TransactionCase):
         with self.assertRaises(except_orm):
             self.return_delivery.sell_delivery_done()
 
+    def test_sell_delivery_done_raise_credit_limit(self):
+        '''审核发货单/退货单 客户的 本次发货金额+客户应收余额 不能大于客户信用额度'''
+        self.delivery.amount = 20000000
+        with self.assertRaises(except_orm):
+            self.delivery.sell_delivery_done()
+
     def test_sell_delivery_draft(self):
         '''反审核发货单/退货单'''
         # 先审核发货单，再反审核
@@ -397,6 +477,12 @@ class test_sell_delivery(TransactionCase):
         delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
         self.assertTrue(len(delivery) == 2)
+
+    def test_sell_delivery_draft_raise_credit_limit(self):
+        '''审核发货单/退货单 客户的 本次退货金额 + 客户应收余额 不能大于客户信用额度'''
+        self.return_delivery.amount = 1000000
+        with self.assertRaises(except_orm):
+            self.return_delivery.sell_delivery_draft()
 
     def test_no_stock(self):
         ''' 测试虚拟商品出库 '''
@@ -435,6 +521,7 @@ class test_wh_move_line(TransactionCase):
     def setUp(self):
         '''准备基本数据'''
         super(test_wh_move_line, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
         self.sell_return = self.browse_ref('sell.sell_order_return')
         self.sell_return.sell_order_done()
         self.delivery_return = self.env['sell.delivery'].search(
@@ -502,7 +589,7 @@ class test_wh_move_line(TransactionCase):
             self.assertTrue(line.discount_rate == 0)
 
     def test_onchange_goods_id(self):
-        '''测试采购模块中商品的onchange,是否会带出单价'''
+        '''测试销售模块中商品的onchange,是否会带出单价'''
         # 销售退货单
         for line in self.delivery_return.line_in_ids:
             line.with_context({'default_is_return': True,
@@ -724,7 +811,7 @@ class test_sell_adjust(TransactionCase):
     def setUp(self):
         '''销售调整单准备基本数据'''
         super(test_sell_adjust, self).setUp()
-
+        self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 

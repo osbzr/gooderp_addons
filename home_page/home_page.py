@@ -24,7 +24,8 @@ class home_page(models.Model):
                                     help=u'对于所选的计算字段的计算方式!注:目前只支持sum')
     context = fields.Char(u'动作的上下文', help=u'对应跳转视图传进去的参数!')
     is_active = fields.Boolean(u'是否可用', default=True, help=u'为了方便调试,首页美观性,或临时性替换首页元素!')
-    report_type_id = fields.Many2one('home.report.type', string=u'报表类别', help=u'类型为 实时报表时 要选择报表类别,可以对不同类型的报表进行分组!')
+    report_type_id = fields.Many2one('home.report.type', string='报表类别', help=u'类型为 实时报表时 要选择报表类别,可以对不同类型的报表进行分组!')
+    group_ids = fields.Many2many('res.groups','home_page_group_rel','home_page_id','group_id',string='用户组')
 
     @api.onchange('action')
     def onchange_action(self):
@@ -43,36 +44,34 @@ class home_page(models.Model):
         """
         action_url_lsit = {'main': [], 'top': [], 'right': {}}
 
+        user_row = self.env['res.users'].browse(self._uid)
         action_list = self.env['home.page'].search([(1, '=', 1), ('sequence', '!=', 0),('is_active','=',True)], order='sequence')
         for action in action_list:
-            if action:
-                res_model_objs = self.env[action.action.res_model].search(eval(action.domain or '[]'))
-                if action.menu_type == 'all_business':
-                    action_url_lsit['main'].append([action.note_one, action.action.view_mode, action.action.res_model,
-                                                    action.action.domain, action.id, action.action.context,
-                                                    action.view_id.id, action.action.name])
-                elif action.menu_type == 'amount_summary':
-
-                    if action.compute_field_one:
-                        field_compute, note = "", ""
+            if list(set([group.id for group in action.group_ids]).intersection(set([group.id for group in user_row.groups_id]))) or not [group.id for group in action.group_ids]:
+                if action:
+                    if action.menu_type == 'all_business':
+                        action_url_lsit['main'].append([action.note_one, action.action.view_mode, action.action.res_model,
+                                                        action.action.domain, action.id, action.action.context,
+                                                        action.view_id.id, action.action.name,action.action.target])
+                    elif action.menu_type == 'amount_summary':
+                        res_model_objs = self.env[action.action.res_model].search(eval(action.domain or '[]'))
+                        note = "A  B"
                         if action.compute_field_one:
-                            field_compute = action.compute_field_one.name
-                            note = action.note_one
-                        note = "%s  %s" % (note, sum([res_model_obj[field_compute] for res_model_obj in res_model_objs]))
-
+                            field_compute, note = "", ""
+                            if action.compute_field_one:
+                                field_compute = action.compute_field_one.name
+                                note = action.note_one
+                            note = "%s  %s" % (note, sum([res_model_obj[field_compute] for res_model_obj in res_model_objs]))
+                        action_url_lsit['top'].append([note, action.action.view_mode, action.action.res_model, action.domain,
+                                                       action.context, action.view_id.id, action.action.name,action.action.target])
                     else:
-                        note = "%s  %s" % (action.note_one, sum([1 for res_model_obj in res_model_objs]))
-
-                    action_url_lsit['top'].append([note, action.action.view_mode, action.action.res_model, action.domain,
-                                                   action.context, action.view_id.id, action.action.name])
-                else:
-                    vals_list = ["%s   " % (action.note_one),
-                     action.action.view_mode, action.action.res_model,
-                     action.domain, action.context, action.view_id.id, action.action.name]
-                    type_sequence_str = "%s;%s" % (action.report_type_id.sequence, action.report_type_id.name)
-                    if action_url_lsit['right'].get(type_sequence_str):
-                        action_url_lsit['right'][type_sequence_str].append(vals_list)
-                    else:
-                        action_url_lsit['right'].update({type_sequence_str:[vals_list]})
+                        vals_list = ["%s   " % (action.note_one),
+                         action.action.view_mode, action.action.res_model,
+                         action.domain, action.context, action.view_id.id, action.action.name,action.action.target]
+                        type_sequence_str = "%s;%s" % (action.report_type_id.sequence, action.report_type_id.name)
+                        if action_url_lsit['right'].get(type_sequence_str):
+                            action_url_lsit['right'][type_sequence_str].append(vals_list)
+                        else:
+                            action_url_lsit['right'].update({type_sequence_str:[vals_list]})
         action_url_lsit['right'] = sorted(action_url_lsit['right'].items(), key=lambda d: d[0])
         return action_url_lsit

@@ -10,8 +10,8 @@
         <menuitem id="menu_finance_setting_default" name="默认设置" parent="finance_setting_menu"
                   action="view_finance_config_setting_action" sequence="0"/>
 
-        <menuitem action="base.action_currency_form" id="menu_action_currency_form" parent="finance_setting_menu" name = '币别'
-                  sequence="13" groups="base.group_multi_currency"/>
+        <menuitem action="base.action_currency_form" id="menu_action_currency_form" parent="finance_setting_menu" name='币别'
+                  sequence="13" groups="finance.group_multi_currency"/>
 
         <!--会计科目-->
         <record id="finance_account_tree" model="ir.ui.view">
@@ -21,7 +21,7 @@
                 <tree editable="TOP" string="科目">
                     <field name="code"/>
                     <field name="name"/>
-                    <field name="currency_id"/>
+                    <field name="currency_id" groups='finance.group_multi_currency'/>
                     <field name="exchange"/>
                     <field name="costs_types"/>
                     <field name="balance_directions"/>

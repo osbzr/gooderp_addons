@@ -159,6 +159,11 @@ class test_payment_wizard(TransactionCase):
         new_receipt.bank_account_id = False
         new_receipt.buy_receipt_done()
         self.receipt.buy_receipt_done()
+        # 查找产生的付款单，并审核
+        source_line = self.env['source.order.line'].search(
+                [('name', '=', self.receipt.invoice_id.id)])
+        for line in source_line:
+            line.money_id.money_order_done()
         self.receipt_return = self.browse_ref('buy.buy_receipt_return_1')
         self.receipt_return.buy_receipt_done()
         self.payment_obj = self.env['buy.payment.wizard']

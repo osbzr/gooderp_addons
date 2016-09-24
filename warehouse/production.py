@@ -17,12 +17,15 @@ class wh_assembly(models.Model):
     }
 
     move_id = fields.Many2one(
-        'wh.move', u'移库单', required=True, index=True, ondelete='cascade')
+        'wh.move', u'移库单', required=True, index=True, ondelete='cascade',
+        help=u'组装单对应的移库单')
     bom_id = fields.Many2one(
         'wh.bom', u'模板', domain=[('type', '=', 'assembly')],
-        context={'type': 'assembly'}, ondelete='restrict')
+        context={'type': 'assembly'}, ondelete='restrict',
+        help=u'组装单对应的模板')
     fee = fields.Float(
-        u'组装费用', digits=dp.get_precision('Amount'))
+        u'组装费用', digits=dp.get_precision('Amount'),
+        help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -203,12 +206,15 @@ class wh_disassembly(models.Model):
     }
 
     move_id = fields.Many2one(
-        'wh.move', u'移库单', required=True, index=True, ondelete='cascade')
+        'wh.move', u'移库单', required=True, index=True, ondelete='cascade',
+        help=u'拆卸单对应的移库单')
     bom_id = fields.Many2one(
         'wh.bom', u'模板', domain=[('type', '=', 'disassembly')],
-        context={'type': 'disassembly'}, ondelete='restrict')
+        context={'type': 'disassembly'}, ondelete='restrict',
+        help=u'拆卸单对应的模板')
     fee = fields.Float(
-        u'拆卸费用', digits=dp.get_precision('Amount'))
+        u'拆卸费用', digits=dp.get_precision('Amount'),
+        help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -381,15 +387,19 @@ class wh_bom(osv.osv):
         ('disassembly', u'拆卸单'),
     ]
 
-    name = fields.Char(u'模板名称')
+    name = fields.Char(u'模板名称',
+                       help=u'组装/拆卸模板名称')
     type = fields.Selection(
-        BOM_TYPE, u'类型', default=lambda self: self.env.context.get('type'))
+        BOM_TYPE, u'类型', default=lambda self: self.env.context.get('type'),
+        help=u'类型: 组装单、拆卸单')
     line_parent_ids = fields.One2many(
         'wh.bom.line', 'bom_id', u'组合件', domain=[('type', '=', 'parent')],
-        context={'type': 'parent'}, copy=True)
+        context={'type': 'parent'}, copy=True,
+        help=u'模板对应的组合件行')
     line_child_ids = fields.One2many(
         'wh.bom.line', 'bom_id', u'子件', domain=[('type', '=', 'child')],
-        context={'type': 'child'}, copy=True)
+        context={'type': 'child'}, copy=True,
+        help=u'模板对应的子件行')
 
 
 class wh_bom_line(osv.osv):
@@ -400,10 +410,14 @@ class wh_bom_line(osv.osv):
         ('child', u'子间'),
     ]
 
-    bom_id = fields.Many2one('wh.bom', u'模板', ondelete='cascade')
+    bom_id = fields.Many2one('wh.bom', u'模板', ondelete='cascade',
+                             help=u'子件行/组合件行对应的模板')
     type = fields.Selection(
         BOM_LINE_TYPE, u'类型',
-        default=lambda self: self.env.context.get('type'))
-    goods_id = fields.Many2one('goods', u'产品', default=1, ondelete='restrict')
+        default=lambda self: self.env.context.get('type'),
+        help=u'类型: 组合件、子间')
+    goods_id = fields.Many2one('goods', u'产品', default=1, ondelete='restrict',
+                               help=u'子件行/组合件行上的产品')
     goods_qty = fields.Float(
-        u'数量', digits=dp.get_precision('Quantity'))
+        u'数量', digits=dp.get_precision('Quantity'),
+        help=u'子件行/组合件行上的产品数量')
