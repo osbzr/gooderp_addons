@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '8.0.0.1',
-    'depends': ['core', 'base', 'finance'],
+    'depends': ['core', 'base', 'finance', 'report_docx'],
     'data': [
         'data/money_data.xml',
         'security/groups.xml',

@@ -124,6 +124,20 @@ class test_money_order(TransactionCase):
         with self.assertRaises(except_orm):
             self.env.ref('money.pay_2000').money_order_done()
 
+    def test_money_order_create_raise_exists_error(self):
+        # 同一业务伙伴存在两个未审核的付款单，报错
+        with self.assertRaises(except_orm):
+            self.env['money.order'].with_context({'type': 'get'}) \
+            .create({
+                    'partner_id': self.env.ref('core.jd').id,
+                    'name': 'GET/201600111',
+                    'date': "2016-02-20",
+                    'type': 'get'
+                    })
+
+        with self.assertRaises(except_orm):
+            self.env.ref('money.pay_2000').partner_id = self.env.ref('core.jd').id
+
     def test_money_order_voucher(self):
         invoice = self.env['money.invoice'].create({
             'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
@@ -133,6 +147,9 @@ class test_money_order(TransactionCase):
             'reconciled': 0,
             'to_reconcile': 200.0,
             'date_due': '2016-09-07'})
+        # 把业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
         # get  银行账户没设置科目
         money1 = self.env['money.order'].with_context({'type': 'get'}) \
             .create({
@@ -246,15 +263,10 @@ class test_other_money_order(TransactionCase):
                 'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
                 'bank_id': self.env.ref('core.comm').id,
                 'line_ids': [(0, 0, {
-                    'source_id': invoice.id,
                     'category_id': self.env.ref('money.core_category_sale').id,
                     'amount': 10.0})]})
         other.onchange_date()
-        # 执行other_money_done中存在source_id的情况
-        with self.assertRaises(except_orm):  # 执行amount大于源单的未核销金额时的if
-            other.other_money_done()
-        # 执行amount不大于源单的未核销金额
-        invoice.to_reconcile = 10.0
+
         other.other_money_done()
         other.other_money_draft()
         # onchange_date 执行type=other_pay
@@ -266,8 +278,7 @@ class test_other_money_order(TransactionCase):
                 'partner_id': self.env.ref('core.lenovo').id,
                 'bank_id': self.env.ref('core.comm').id})
         other.onchange_date()
-        # onchange_partner
-        self.env.ref('money.other_get_60').onchange_partner()
+
         # 测试其他收支单金额<0,执行if报错
         other = self.env['other.money.order'].create({
             'partner_id': self.env.ref('core.jd').id,
@@ -293,7 +304,6 @@ class test_other_money_order(TransactionCase):
                 'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
                     'bank_id': self.env.ref('core.comm').id,
                     'line_ids': [(0, 0, {
-                        'source_id': invoice.id,
                         'category_id': self.env.ref('money.core_category_sale').id,
                         'amount': 10.0})]})
         other.line_ids[0].category_id.account_id = False

@@ -24,6 +24,7 @@
         'report/report_voucher.xml',
         'balance_sheet.xml',
         'home_page_data.xml',
+        'voucher_template.xml',
     ],
     'demo': [
         'tests/finance_demo.xml',

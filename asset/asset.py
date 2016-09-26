@@ -155,20 +155,18 @@ class asset(models.Model):
                         'tax_amount': self.tax
                 })
                 self.write({'money_invoice': money_invoice.id})
-                print self.cost,money_invoice.voucher_id.id
                 '''变化科目'''
                 chang_account = self.env['voucher.line'].search(['&',('voucher_id', '=', money_invoice.voucher_id.id),('debit', '=', self.cost)])
                 chang_account.write({'account_id': self.account_asset.id})
 
             elif self.bank_account and self.account_credit.id == self.bank_account.account_id.id :
                 category_id = self.env.ref('asset.asset').id
-                other_money_order = self.env['other.money.order'].create({
+                rec = self.with_context(type='other_pay')
+                other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': self.partner_id,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_pay',
-                    'context' : 'other_pay'
                 })
                 self.write({'other_money_order': other_money_order.id})
                 self.env['other.money.order.line'].create({
@@ -199,6 +197,14 @@ class asset(models.Model):
             raise except_orm(u'错误', u'该会计期间已结账！不能反审核')
         '''生成凭证'''
 
+    @api.multi
+    def unlink(self):
+        for record in self:
+            if record.state != 'draft':
+                raise except_orm(u'错误', u'只能删除草稿状态的固定资产')
+
+        return super(asset, self).unlink()
+
 
 class CreateCleanWizard(models.TransientModel):
     '''固定资产清理'''
@@ -227,13 +233,12 @@ class CreateCleanWizard(models.TransientModel):
         asset.state = 'clean'
         '''按发票收入生成收入单'''
         get_category_id = self.env.ref('asset.asset_clean_get').id
-        other_money_order = self.env['other.money.order'].create({
+        rec = self.with_context(type='other_get')
+        other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': None,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_get',
-                    'context' : 'other_get'
                 })
         self.env['other.money.order.line'].create({
                     'other_money_id': other_money_order.id,
@@ -245,13 +250,12 @@ class CreateCleanWizard(models.TransientModel):
         '''按费用生成支出单'''
         if self.clean_cost :
             pay_category_id = self.env.ref('asset.asset_clean_pay').id
-            other_money_order = self.env['other.money.order'].create({
+            rec = self.with_context(type='other_pay')
+            other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': None,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_pay',
-                    'context' : 'other_pay'
                 })
             self.env['other.money.order.line'].create({
                     'other_money_id': other_money_order.id,

@@ -97,35 +97,13 @@ class other_money_order(models.Model):
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
-    @api.onchange('partner_id')
-    def onchange_partner(self):
-        '''
-        根据所选业务伙伴源单填充行
-        '''
-        self.line_ids = []
-        lines = []
-        for invoice in self.env['money.invoice'].search([('partner_id', '=', self.partner_id.id), ('to_reconcile', '!=', 0)]):
-            lines.append((0, 0, {
-                'category_id': invoice.category_id.id,
-                'source_id': invoice.id,
-                'amount': invoice.to_reconcile,
-                                   }))
-        self.line_ids = lines
-
     @api.multi
     def other_money_done(self):
         '''其他收支单的审核按钮'''
         for other in self:
             if other.total_amount <= 0:
                 raise except_orm(u'错误', u'金额应该大于0')
-            for line in other.line_ids:
-                # 针对源单付款，则更新源单和供应商应付
-                if line.source_id:
-                    if line.amount > line.source_id.to_reconcile:
-                        raise except_orm(u'错误', u'核销金额大于源单未核销金额')
-                    else:
-                        line.source_id.to_reconcile -= line.amount
-                        other.partner_id.payable -= line.amount
+
             # 根据单据类型更新账户余额
             if other.type == 'other_pay':
                 if other.bank_id.balance < other.total_amount:
@@ -140,11 +118,6 @@ class other_money_order(models.Model):
     def other_money_draft(self):
         '''其他收支单的反审核按钮'''
         for other in self:
-            for line in other.line_ids:
-                # 针对源单付款，则更新源单和供应商应付
-                if line.source_id:
-                    line.source_id.to_reconcile += line.amount
-                    other.partner_id.payable += line.amount
             # 根据单据类型更新账户余额
             if other.type == 'other_pay':
                 other.bank_id.balance += other.total_amount
@@ -188,9 +161,6 @@ class other_money_order_line(models.Model):
                         u'类别', ondelete='restrict',
                         domain="[('type', '=', context.get('type'))]",
                         help=u'类型：运费、咨询费等')
-    source_id = fields.Many2one('money.invoice',
-                                u'源单', ondelete='cascade',
-                                help=u'其他收支单行上的源单')
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算',
                                    help=u'其他收支单行上的辅助核算')
     amount = fields.Float(u'金额',

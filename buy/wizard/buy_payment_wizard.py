@@ -48,7 +48,8 @@ class buy_payment_wizard(models.TransientModel):
         if self.order_id:
             cond.append(('name', '=', self.order_id.id))
         if self.warehouse_dest_id:
-            cond.append(('order_id.warehouse_dest_id', '=', self.warehouse_dest_id.id))
+            cond += ['|',('buy_move_id.warehouse_dest_id', '=', self.warehouse_dest_id.id),
+                     ('buy_move_id.warehouse_id', '=', self.warehouse_dest_id.id)]
         receipt_obj = self.env['buy.receipt']
         count = sum_payment_rate = 0    # 行数及所有行的付款率之和
         for receipt in receipt_obj.search(cond, order='partner_id,date'):
