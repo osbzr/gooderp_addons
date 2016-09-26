@@ -90,6 +90,8 @@ class other_money_order(models.Model):
     note = fields.Text(u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
 
+    is_init = fields.Boolean(u'初始化应收应付', help=u'此单是否为初始化单')
+
     @api.onchange('date')
     def onchange_date(self):
         if self._context.get('type') == 'other_get':

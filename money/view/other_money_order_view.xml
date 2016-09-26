@@ -12,6 +12,7 @@
                     <field name="partner_id"/>
                     <field name="total_amount"/>
                     <field name="state"/>
+                    <field name="is_init" invisible="1"/>
                 </tree>
             </field>
         </record>

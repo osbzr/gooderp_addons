@@ -61,6 +61,7 @@
                                 	 groups='finance.group_multi_currency'/>
                                 <field name='debit' sum='借方合计'/>
                                 <field name='credit' sum='贷方合计'/>
+                                <field name='init_obj' invisible="1"/>
                             </tree>
                         </field>
                         <group>
@@ -153,6 +154,7 @@
                     <field name='debit' sum='借方合计'/>
                     <field name='credit' sum='贷方合计'/>
                     <field name='state'/>
+                    <field name='init_obj' invisible="1"/>
                 </tree>
             </field>
         </record>
