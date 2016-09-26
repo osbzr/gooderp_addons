@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <openerp>
 	<data>
+		<template id="assets_backend" name="Core" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/core/static/src/js/core.js"></script>
+                <link rel="stylesheet" href="/core/static/src/css/style.css"/>
+            </xpath>
+        </template>
+
 		<!--根菜单-->
 		<menuitem id='setting_menu' name='配置' groups="core.master_groups"/>
 		<menuitem id='config_data_menu' name='基本配置' parent='setting_menu' sequence='20'/>

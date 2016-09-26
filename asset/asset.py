@@ -71,7 +71,7 @@ class asset(models.Model):
     amount = fields.Float(u'价税合计', digits=dp.get_precision(u'金额'), store=True, compute='_get_amount')
     bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict', states=READONLY_STATES)
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', states=READONLY_STATES)
-    other_system = fields.Boolean(u'初始化固定资产', states=READONLY_STATES)
+    is_init = fields.Boolean(u'初始化固定资产', states=READONLY_STATES)
     no_depreciation = fields.Boolean(u'不折旧')
     attribute = fields.Many2one('asset.category', u'固定资产分类', ondelete='restrict', required=True, states=READONLY_STATES)
     depreciation_value2 = fields.Float(u'以前折旧', digits=dp.get_precision(u'金额'), required=True, states=READONLY_STATES)
@@ -139,7 +139,7 @@ class asset(models.Model):
         if self.depreciation_value2 < 0 :
             raise except_orm(u'错误', u'以前折旧必须大于0！')
         '''非初始化固定资产生成凭证'''
-        if not self.other_system :
+        if not self.is_init :
             vals = {}
             if self.partner_id and self.partner_id.s_category_id.account_id.id == self.account_credit.id :
                 categ = self.env.ref('money.core_category_purchase')
@@ -156,20 +156,18 @@ class asset(models.Model):
                         'tax_amount': self.tax
                 })
                 self.write({'money_invoice': money_invoice.id})
-                print self.cost,money_invoice.voucher_id.id
                 '''变化科目'''
                 chang_account = self.env['voucher.line'].search(['&',('voucher_id', '=', money_invoice.voucher_id.id),('debit', '=', self.cost)])
                 chang_account.write({'account_id': self.account_asset.id})
 
             elif self.bank_account and self.account_credit.id == self.bank_account.account_id.id :
                 category_id = self.env.ref('asset.asset').id
-                other_money_order = self.env['other.money.order'].create({
+                rec = self.with_context(type='other_pay')
+                other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': self.partner_id,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_pay',
-                    'context' : 'other_pay'
                 })
                 self.write({'other_money_order': other_money_order.id})
                 self.env['other.money.order.line'].create({
@@ -231,6 +229,14 @@ class asset(models.Model):
             money_invoice.unlink()
 
 
+    @api.multi
+    def unlink(self):
+        for record in self:
+            if record.state != 'draft':
+                raise except_orm(u'错误', u'只能删除草稿状态的固定资产')
+
+        return super(asset, self).unlink()
+
 
 class CreateCleanWizard(models.TransientModel):
     '''固定资产清理'''
@@ -259,13 +265,12 @@ class CreateCleanWizard(models.TransientModel):
         asset.state = 'clean'
         '''按发票收入生成收入单'''
         get_category_id = self.env.ref('asset.asset_clean_get').id
-        other_money_order = self.env['other.money.order'].create({
+        rec = self.with_context(type='other_get')
+        other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': None,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_get',
-                    'context' : 'other_get'
                 })
         self.env['other.money.order.line'].create({
                     'other_money_id': other_money_order.id,
@@ -277,13 +282,12 @@ class CreateCleanWizard(models.TransientModel):
         '''按费用生成支出单'''
         if self.clean_cost :
             pay_category_id = self.env.ref('asset.asset_clean_pay').id
-            other_money_order = self.env['other.money.order'].create({
+            rec = self.with_context(type='other_pay')
+            other_money_order = rec.env['other.money.order'].create({
                     'state': 'draft',
                     'partner_id': None,
                     'date': self.date,
                     'bank_id': self.bank_account.id,
-                    'type': 'other_pay',
-                    'context' : 'other_pay'
                 })
             self.env['other.money.order.line'].create({
                     'other_money_id': other_money_order.id,
@@ -477,3 +481,40 @@ class chang_line(models.Model):
     chang_after = fields.Float(u'变更后')
     chang_money_invoice = fields.Many2one('money.invoice', u'对应源单', readonly=True, ondelete='restrict')
     partner_id = fields.Many2one('partner', u'变更单位')
+
+class voucher(models.Model):
+    _inherit = 'voucher'
+
+    @api.one
+    def before_asset(self):
+        '''删除以前引入的固定资产内容'''
+        for line in self.line_ids :
+            if line.init_obj == 'asset':
+                line.unlink()
+
+        '''引入固定资产初始化单据'''
+        res = {}
+        for asset in self.env['asset'].search([('other_system', '=', True)]):
+            cost = asset.cost
+            depreciation_value2 = asset.depreciation_value2
+            '''固定资产'''
+            if asset.account_asset.id not in res:
+                res[asset.account_asset.id] = {'credit':0,'debit': 0,'cate':'asset'}
+
+            val = res[asset.account_asset.id]
+            val.update({'debit':val.get('debit') + cost,
+                        'account_id': asset.account_asset.id,
+                        'order_id': self.id,
+                        })
+            '''累计折旧'''
+            if asset.account_depreciation2.id not in res:
+                res[asset.account_depreciation2.id] = {'credit':0,'debit': 0,'cate':'asset'}
+
+            val = res[asset.account_depreciation2.id]
+            val.update({'credit':val.get('credit') + depreciation_value2,
+                        'account_id': asset.account_depreciation2.id,
+                        'order_id': self.id,
+                        })
+
+        for account_id,val in res.iteritems():
+            self.env['voucher.line'].create(dict(val,account_id = account_id))

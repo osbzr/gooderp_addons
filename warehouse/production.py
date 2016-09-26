@@ -26,7 +26,12 @@ class wh_assembly(models.Model):
     fee = fields.Float(
         u'组装费用', digits=dp.get_precision('Amount'),
         help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
-
+    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False, help="通用情况是一对多的组合,当为False时\
+                            视图只能选则一个产品作为组合件,(选择模板后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
+                            不会自动影响子件的数量")
+    goods_id = fields.Many2one('goods', string=u'组合件产品')
+    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'), help="(选择使用模板后)当更改这个数量的时候后\
+                                                                                              自动的改变相应的子件的数量")
     def apportion_cost(self, cost):
         for assembly in self:
             if not assembly.line_in_ids:
@@ -71,6 +76,64 @@ class wh_assembly(models.Model):
             assembly.apportion_cost(cost)
 
         return True
+
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+                             'uom_id': self.goods_id.uom_id.id,'uos_id':self.goods_id.uos_id.id}]
+        if self.line_out_ids:
+            self.line_out_ids[0].onchange_goods_id()
+    @api.one
+    @api.onchange('goods_qty')
+    def onchange_goods_qty(self):
+        """
+        改变产品数量时(wh_assembly 中的goods_qty) 根据模板的 数量的比例及成本价的计算
+        算出新的组合件或者子件的 数量 (line.goods_qty / parent_line_goods_qty * self.goods_qty
+        line.goods_qty 子件产品数量
+        parent_line_goods_qty 模板组合件产品数量
+        self.goods_qty 所要的组合件的产品数量
+        line.goods_qty /parent_line_goods_qty 得出子件和组合件的比例
+        line.goods_qty / parent_line_goods_qty * self.goods_qty 得出子件实际的数量的数量
+        )
+        :return:line_out_ids ,line_in_ids
+        """
+        line_out_ids, line_in_ids = [], []
+        warehouse_id = self.env['warehouse'].search(
+            [('type', '=', 'stock')], limit=1)
+        if self.bom_id:
+            line_in_ids = [{'goods_id': line.goods_id,
+                               'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
+                                   'production'),
+                               'warehouse_dest_id': warehouse_id,
+                               'uom_id': line.goods_id.uom_id,
+                               'goods_qty': self.goods_qty,
+                               'product_uos_qty': self.goods_qty / line.goods_id.conversion,
+                               'uos_id': line.goods_id.uos_id.id,
+                           } for line in self.bom_id.line_parent_ids]
+            parent_line_goods_qty = self.bom_id.line_parent_ids[0].goods_qty
+            for line in self.bom_id.line_child_ids:
+                cost, cost_unit = line.goods_id. \
+                    get_suggested_cost_by_warehouse(
+                    warehouse_id[0], line.goods_qty / parent_line_goods_qty * self.goods_qty)
+                local_goods_qty = line.goods_qty / parent_line_goods_qty * self.goods_qty
+                line_out_ids.append({
+                    'goods_id': line.goods_id,
+                    'warehouse_id': warehouse_id,
+                    'warehouse_dest_id': self.env[
+                        'warehouse'].get_warehouse_by_type('production'),
+                    'uom_id': line.goods_id.uom_id,
+                    'goods_qty':  local_goods_qty,
+                    'cost_unit': cost_unit,
+                    'cost': cost,
+                    'product_uos_qty': local_goods_qty/ line.goods_id.conversion,
+                    'uos_id': line.goods_id.uos_id.id,
+                })
+            self.line_in_ids = False
+            self.line_out_ids = False
+            self.line_out_ids = line_out_ids
+            self.line_in_ids = line_in_ids
+        else:
+            self.line_in_ids[0].goods_qty = self.goods_qty
 
     @api.one
     def check_parent_length(self):
@@ -125,6 +188,8 @@ class wh_assembly(models.Model):
                 'warehouse_dest_id': warehouse_id,
                 'uom_id': line.goods_id.uom_id,
                 'goods_qty': line.goods_qty,
+                'product_uos_qty': line.goods_qty / line.goods_id.conversion,
+                'uos_id': line.goods_id.uos_id.id,
             } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
@@ -141,11 +206,13 @@ class wh_assembly(models.Model):
                         'goods_qty': line.goods_qty,
                         'cost_unit': cost_unit,
                         'cost': cost,
+                        'product_uos_qty': self.goods_qty / line.goods_id.conversion,
+                        'uos_id': line.goods_id.uos_id.id,
                     })
-
             self.line_in_ids = False
             self.line_out_ids = False
-
+        else:
+            self.goods_qty=1
         self.line_out_ids = line_out_ids
         # /openerp-china/openerp/fields.py[1664]行添加的参数
         # 调用self.line_in_ids = line_in_ids的时候，此时会为其额外添加一个参数(6, 0, [])
@@ -153,6 +220,16 @@ class wh_assembly(models.Model):
         # 此时，上一步赋值的数据将会被直接删除，（不确定是bug，还是特性）
         self.line_in_ids = line_in_ids
 
+        if len(line_in_ids) == 1 and line_in_ids:
+            """当模板中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
+                使试图只能在 many2one中选择一个产品(并且只能选择在模板中的产品),并且回写数量"""
+            self.is_many_to_many_combinations = False
+            self.goods_qty = line_in_ids[0].get("goods_qty")
+            self.goods_id = line_in_ids[0].get("goods_id")
+            domain = {'goods_id': [('id', '=', self.goods_id.id)]}
+            return {'domain': domain}
+        elif len(line_in_ids) > 1:
+            self.is_many_to_many_combinations = True
     @api.multi
     def update_bom(self):
         for assembly in self:
@@ -215,6 +292,12 @@ class wh_disassembly(models.Model):
     fee = fields.Float(
         u'拆卸费用', digits=dp.get_precision('Amount'),
         help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
+    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False,help="通用情况是一对多的组合,当为False时\
+                            视图只能选则一个产品作为组合件,(选择模板后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
+                            不会自动影响子件的数量")
+    goods_id = fields.Many2one('goods', string=u'组合件产品')
+    goods_qty = fields.Float(u'组合件数量',default=1, digits=dp.get_precision('Quantity'),help="(选择使用模板后)当更改这个数量的时候后\
+                                                                                          自动的改变相应的子件的数量")
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -296,7 +379,64 @@ class wh_disassembly(models.Model):
 
         return res
 
+    @api.onchange('goods_id')
+    def onchange_goods_id(self):
+        self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+                              'uos_id':self.goods_id.uos_id.id,'uom_id': self.goods_id.uom_id.id}]
+        self.line_out_ids[0].onchange_goods_id()
+
     @api.one
+    @api.onchange('goods_qty')
+    def onchange_goods_qty(self):
+        """
+        改变产品数量时(wh_assembly 中的goods_qty) 根据模板的 数量的比例及成本价的计算
+        算出新的组合件或者子件的 数量 (line.goods_qty / parent_line_goods_qty * self.goods_qty
+        line.goods_qty 子件产品数量
+        parent_line_goods_qty 模板组合件产品数量
+        self.goods_qty 所要的组合件的产品数量
+        line.goods_qty /parent_line_goods_qty 得出子件和组合件的比例
+        line.goods_qty / parent_line_goods_qty * self.goods_qty 得出子件实际的数量的数量
+        )
+        :return:line_out_ids ,line_in_ids
+        """
+        warehouse_id = self.env['warehouse'].search(
+            [('type', '=', 'stock')], limit=1)
+        line_out_ids,line_in_ids = [],[]
+        parent_line = self.bom_id.line_parent_ids
+        if warehouse_id and self.bom_id and parent_line and self.bom_id.line_child_ids:
+            cost, cost_unit = parent_line.goods_id \
+                 .get_suggested_cost_by_warehouse(
+                 warehouse_id, self.goods_qty)
+            line_out_ids.append({
+                 'goods_id': parent_line.goods_id,
+                 'warehouse_id': self.env[
+                     'warehouse'].get_warehouse_by_type('production'),
+                 'warehouse_dest_id': warehouse_id,
+                 'uom_id': parent_line.goods_id.uom_id,
+                 'goods_qty': self.goods_qty,
+                 'product_uos_qty': self.goods_qty/parent_line.goods_id.conversion,
+                 'uos_id':parent_line.goods_id.uos_id.id,
+                 'cost_unit': cost_unit,
+                 'cost': cost,
+             })
+
+            line_in_ids = [{
+                            'goods_id': line.goods_id,
+                            'warehouse_id': warehouse_id,
+                            'warehouse_dest_id': self.env[
+                                'warehouse'].get_warehouse_by_type('production'),
+                            'uom_id': line.goods_id.uom_id,
+                            'goods_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty,
+                            'product_uos_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty/line.goods_id.conversion,
+                            'uos_id':line.goods_id.uos_id.id,
+                        } for line in self.bom_id.line_child_ids]
+            self.line_in_ids = False
+            self.line_out_ids = False
+            self.line_out_ids = line_out_ids or False
+            self.line_in_ids = line_in_ids or False
+        elif self.goods_id:
+            self.line_out_ids[0].goods_qty = self.goods_qty
+
     @api.onchange('bom_id')
     def onchange_bom(self):
         line_out_ids, line_in_ids = [], []
@@ -316,6 +456,8 @@ class wh_disassembly(models.Model):
                         'warehouse_dest_id': warehouse_id,
                         'uom_id': line.goods_id.uom_id,
                         'goods_qty': line.goods_qty,
+                        'product_uos_qty': line.goods_qty/line.goods_id.conversion,
+                        'uos_id':line.goods_id.uos_id.id,
                         'cost_unit': cost_unit,
                         'cost': cost,
                     })
@@ -327,13 +469,27 @@ class wh_disassembly(models.Model):
                     'warehouse'].get_warehouse_by_type('production'),
                 'uom_id': line.goods_id.uom_id,
                 'goods_qty': line.goods_qty,
+                'product_uos_qty': line.goods_qty/line.goods_id.conversion,
+                'uos_id':line.goods_id.uos_id.id,
             } for line in self.bom_id.line_child_ids]
 
             self.line_in_ids = False
             self.line_out_ids = False
+        else:
+            self.goods_qty=1
 
         self.line_out_ids = line_out_ids or False
         self.line_in_ids = line_in_ids or False
+        if len(line_out_ids) == 1 and line_out_ids:
+            """当模板中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
+             使试图只能在 many2one中选择一个产品(并且只能选择在模板中的产品),并且回写数量"""
+            self.is_many_to_many_combinations = False
+            self.goods_qty = line_out_ids[0].get("goods_qty")
+            self.goods_id = line_out_ids[0].get("goods_id")
+            domain = {'goods_id': [('id', '=', self.goods_id.id)]}
+            return {'domain': domain}
+        elif len(line_out_ids) > 1:
+            self.is_many_to_many_combinations = True
 
     @api.multi
     def update_bom(self):

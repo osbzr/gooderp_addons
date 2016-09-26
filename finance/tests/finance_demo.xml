@@ -191,5 +191,8 @@
         <record id="core.comm" model="bank.account">
            <field name="account_id" ref="finance.account_bank"/>
         </record>
+        <record id="core.goods_category_1" model="core.category">
+            <field name="account_id" ref="finance.account_goods"/>
+        </record>
     </data>
 </openerp>

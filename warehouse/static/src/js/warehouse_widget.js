@@ -155,25 +155,37 @@ openerp.warehouse = function(instance) {
             });
         },
     });
-    
+
     instance.web.FormView.include({
     	load_form: function() {
     		var self = this,
     		    res = this._super.apply(this, arguments);
-    		
-    		return res.then(function() {
-    			self.$el.on('keydown', '.ge_scan_barcode', function(event) {
-    				if (event.keyCode === 13){
-    					new instance.web.Model("wh.move").call("scan_barcode",[self.model,$(this).val(),self.datarecord.id]).then(
-    						function() {
-                        		self.reload();
-                        		self.$el.find('input').val('');
-    						}
-    					);
-    				}
-    			})
-    		});
+
+            self.$el.on('keydown', '.ge_scan_barcode', function(event) {
+                if (event.keyCode === 13) {
+                    var $this = $(this);
+                    return self.save().done(function(result) {
+                        self.trigger("save", result);
+                        self.reload().then(function() {
+                            self.to_view_mode();
+                            var menu = instance.webclient.menu;
+                            if (menu) {
+                                menu.do_reload_needaction();
+                            }
+                        }).then(function() {
+                			new instance.web.Model("wh.move").call("scan_barcode",[self.model, $this.val(), self.datarecord.id]).then(
+        						function() {
+                            		self.reload();
+                            		self.$el.find('input').val('');
+        						}
+        					);
+                        }).then(function() {
+                            $this.focus();
+                        })
+                    });
+                }
+            })
     	},
     });
-    
+
 };

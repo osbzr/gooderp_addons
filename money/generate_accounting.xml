@@ -77,7 +77,7 @@
             <field name="model">other.money.order</field>
             <field name='inherit_id' ref='money.other_money_order_form' />
             <field name="arch" type="xml">
-                <field name="partner_id" position="after">
+                <field name="date" position="after">
                     <field name="voucher_id"/>
                 </field>
             </field>

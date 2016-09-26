@@ -103,9 +103,9 @@
                     	groups='goods.multi_attrs_groups' />
                     <field name='lot'
                     	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
-                    <field name='goods_uos_qty' sum='1'
+                    <field name='goods_uos_qty'
                     	groups='goods.auxiliary_unit_groups'
-                    	attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
+                    	attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1'/>
                     <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1' />
                     <field name='uom_id' required='1' />
@@ -136,14 +136,17 @@
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='warehouse_id' />
                                 <field name='bom_id' options="{'no_create': 1}" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='goods_id' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
+                                <field name='goods_qty' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
                             </group>
                             <group>
                                 <field name='fee' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='warehouse_dest_id' />
+                                <field name='is_many_to_many_combinations' />
                             </group>
                         </group>
 
-                        <group string='组合件'>
+                        <group string='组合件' attrs="{'invisible': [('is_many_to_many_combinations', '!=', True)]}">
                             <field nolabel='1' name='line_in_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_in_assembly_tree',
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
@@ -237,14 +240,17 @@
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='warehouse_id' />
                                 <field name='bom_id' options="{'no_create': 1}" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='goods_id' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
+                                <field name='goods_qty' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
                             </group>
                             <group>
                                 <field name='fee' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='warehouse_dest_id' />
+                                <field name='is_many_to_many_combinations' />
                             </group>
                         </group>
 
-                        <group string='组合件'>
+                        <group string='组合件' attrs="{'invisible':[('is_many_to_many_combinations','!=',True)]}">
                             <field nolabel='1' name='line_out_ids' context="{
                                 'tree_view_ref': 'warehouse.wh_move_line_out_tree',
                                 'lot': True,
@@ -254,7 +260,7 @@
 
                         <group string='子件'>
                             <field nolabel='1' name='line_in_ids' context="{
-                                'tree_view_ref': 'warehouse.wh_move_line_in_assembly_tree',
+                                'tree_view_ref': 'warehouse.wh_move_line_in_assembly_tree'
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 

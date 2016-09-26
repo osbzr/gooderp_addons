@@ -218,22 +218,25 @@ class checkout_wizard(models.TransientModel):
             voucher_obj = self.env['voucher']
             # 按年重置
             last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_id)
+            last_voucher_number = 0
             if reset_period == 'year':
                 if last_period:
-                    if not last_period.is_closed:
-                        raise except_orm(u'错误', u'上一个期间%s未结账' % last_period.name)
-                    if period_id.year != last_period.year:
-                        # 按年，而且是第一个会计期间
-                        last_voucher_number = reset_init_number
-                    else:
-                        # 查找上一期间最后凭证号
-                        last_period_voucher_name = voucher_obj.search([('period_id', '=', last_period.id)],
-                                                                      order="create_date desc", limit=1).name
-                        # 凭证号转换为数字
-                        if last_period_voucher_name:  # 上一期间是否有凭证？
-                            last_voucher_number = int(filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
+                    while last_period and last_voucher_number < 1:
+                        if not last_period.is_closed:
+                            raise except_orm(u'错误', u'上一个期间%s未结账' % last_period.name)
+                        if period_id.year != last_period.year:
+                            # 按年，而且是第一个会计期间
+                            last_voucher_number = reset_init_number
                         else:
-                            raise except_orm(u'错误', u'请核实上一个期间：%s是否有凭证！' % last_period.name)
+                            # 查找上一期间最后凭证号
+                            last_period_voucher_name = voucher_obj.search([('period_id', '=', last_period.id)],
+                                                                          order="create_date desc", limit=1).name
+                            # 凭证号转换为数字
+                            if last_period_voucher_name:  # 上一期间是否有凭证？
+                                last_voucher_number = int(filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
+                            #else:
+                            #    raise except_orm(u'错误', u'请核实上一个期间：%s是否有凭证！' % last_period.name)
+                            last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(last_period)
                 else:
                     last_voucher_number = reset_init_number
                 # 产生凭证号前后缀
