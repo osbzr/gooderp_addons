@@ -55,7 +55,7 @@ class DataModelProxy(object):
             if field and field.type in ('integer', 'float'):
                 return 0
 
-        return ''
+        return temp or ''
 
     def __getattr__(self, key):
         temp = getattr(self.data, key)
