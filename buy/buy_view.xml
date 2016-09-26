@@ -711,6 +711,9 @@
 		<menuitem id="menu_buy_master" name="主数据" parent="menu_buy_root" sequence="2"/>
         <menuitem id='buy_vendor_menu' action='core.vendor_action' name="供应商" parent='menu_buy_master' sequence='10'/>
 		<menuitem id='buy_goods_menu' name='商品' parent='menu_buy_master' action='goods.goods_action' sequence='20' />
+        <record id="buy_goods_menu" model="ir.ui.menu">
+			<field name="create_tag">1</field>
+		</record>
 		<!-- 采购报表 -->
 		<menuitem id="menu_buy_report" name="报表" parent="menu_buy_root" sequence="3"/>
 	</data>
