@@ -13,7 +13,7 @@ class IssueCostWizard(models.TransientModel):
         return {
             'view_mode': 'tree',
             'views': [(view.id, 'tree')],
-            'res_model': 'wh.move.line',
+            'res_model': 'month.product.cost',
             'type': 'ir.actions.act_window',
             'domain': [('period_id', '=', self.period_id.id)]
         }
