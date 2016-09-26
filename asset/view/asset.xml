@@ -120,7 +120,7 @@
                                 <field name="partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
                                 <field name="bank_account"/>
                                 <field name="no_depreciation"/>
-                                <field name="other_system" groups='core.master_groups'/>
+                                <field name="is_init" groups='core.master_groups'/>
                                 <field name="attribute"/>
                             </group>
                             <group>
