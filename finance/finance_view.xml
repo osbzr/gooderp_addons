@@ -44,6 +44,7 @@
                                 <field name="date"/>
                                 <field name="period_id"  options="{'no_open':True,'no_create':True}"/>
                                 <field name="att_count"/>
+                                <field name="is_init" invisible="1" />
                             </group>
                         </group>
                         <field name="line_ids" context="{'line_ids':line_ids}">
@@ -90,7 +91,8 @@
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'account_id'}"/>
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'debit'}"/>
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'credit'}"/>
-                    <field name = "state" invisible="1" />
+                    <field name="state" invisible="1" />
+                    <field name="is_init" invisible="1" />
                 </tree>
             </field>
         </record>

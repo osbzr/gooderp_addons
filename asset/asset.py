@@ -486,7 +486,7 @@ class voucher(models.Model):
     _inherit = 'voucher'
 
     @api.one
-    def before_asset(self):
+    def init_asset(self):
         '''删除以前引入的固定资产内容'''
         for line in self.line_ids :
             if line.init_obj == 'asset':
@@ -494,7 +494,7 @@ class voucher(models.Model):
 
         '''引入固定资产初始化单据'''
         res = {}
-        for asset in self.env['asset'].search([('other_system', '=', True)]):
+        for asset in self.env['asset'].search([('is_init', '=', True)]):
             cost = asset.cost
             depreciation_value2 = asset.depreciation_value2
             '''固定资产'''
@@ -504,7 +504,9 @@ class voucher(models.Model):
             val = res[asset.account_asset.id]
             val.update({'debit':val.get('debit') + cost,
                         'account_id': asset.account_asset.id,
-                        'order_id': self.id,
+                        'voucher_id': self.id,
+                        'init_obj': 'asset',
+                        'name': '固定资产 期初'
                         })
             '''累计折旧'''
             if asset.account_depreciation2.id not in res:
@@ -513,8 +515,11 @@ class voucher(models.Model):
             val = res[asset.account_depreciation2.id]
             val.update({'credit':val.get('credit') + depreciation_value2,
                         'account_id': asset.account_depreciation2.id,
-                        'order_id': self.id,
+                        'voucher_id': self.id,
+                        'init_obj': 'asset',
+                        'name': '固定资产 期初'
                         })
 
         for account_id,val in res.iteritems():
-            self.env['voucher.line'].create(dict(val,account_id = account_id))
+            self.env['voucher.line'].create(dict(val,account_id = account_id),
+                                            )
