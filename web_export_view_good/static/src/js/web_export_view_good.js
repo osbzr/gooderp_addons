@@ -228,8 +228,8 @@ openerp.web_export_view_good = function (instance) {
               	   for (var i=0;i<operation_message.length;i++){operation_message[i]=" ";}
           	       operation_message[0]=_t( "操作人");
           	       operation_message[1]=_t(self.getParent().session.username);
-          	       operation_message[2]= _t("操作时间");
-          	       operation_message[3]=_t(now_day.trim());
+          	       operation_message[operation_message.length-2]= _t("操作时间");
+          	       operation_message[operation_message.length-1]=_t(now_day.trim());
 				           export_rows.push(operation_message);
                    if (self.view.dataset.context.attachment_information !==undefined){
                        var arr = self.view.dataset.context.attachment_information.split(",");
