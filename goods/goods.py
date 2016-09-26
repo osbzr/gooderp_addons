@@ -15,6 +15,10 @@ class goods(models.Model):
     price = fields.Float(u'零售价')
     barcode = fields.Char(u'条形码')
 
+    _sql_constraints = [
+        ('barcode_uniq', 'unique(barcode)', u'条形码不能重复'),
+    ]
+
     @api.one
     @api.onchange('uom_id')
     def onchange_uom(self):
