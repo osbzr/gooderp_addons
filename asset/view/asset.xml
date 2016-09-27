@@ -14,7 +14,7 @@
 					<field name='tax'/>
 					<field name='no_depreciation'/>
 					<field name='depreciation_number'/>
-					<field name='attribute'/>
+					<field name='category_id'/>
                     <field name='state'/>
 				</tree>
 			</field>
@@ -121,13 +121,13 @@
                                 <field name="bank_account"/>
                                 <field name="no_depreciation"/>
                                 <field name="is_init" groups='core.master_groups'/>
-                                <field name="attribute"/>
+                                <field name="category_id"/>
                             </group>
                             <group>
                                 <field name="cost"/>
                                 <field name="tax"/>
                                 <field name="amount"/>
-                                <field name="depreciation_value2"/>
+                                <field name="depreciation_previous"/>
                                 <field name="surplus_value"/>
                                 <field name="depreciation_number"/>
                                 <field name="depreciation_value"/>
@@ -136,7 +136,7 @@
                                 <field name="account_asset"/>
                                 <field name="account_credit"/>
                                 <field name="account_depreciation"/>
-                                <field name="account_depreciation2"/>
+                                <field name="account_accumulated_depreciation"/>
                                 <field name="cost_depreciation"/>
                             </group>
                         </group>
@@ -251,7 +251,7 @@
 			<field name='arch' type='xml'>
 				<tree string='固定资产分类'>
 					<field name='name'/>
-					<field name='account_depreciation2'/>
+					<field name='account_accumulated_depreciation'/>
 					<field name='account_asset'/>
 					<field name='account_depreciation'/>
                     <field name='depreciation_number'/>
