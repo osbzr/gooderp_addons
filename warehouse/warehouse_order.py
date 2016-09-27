@@ -188,7 +188,7 @@ class wh_in(models.Model):
                 for vouch_obj_line in vouch_obj_lines:
                     vouch_obj_line.unlink()
             else:
-                self.voucher.unlink()
+                self.voucher_id.unlink()
 
 
 class wh_internal(osv.osv):
