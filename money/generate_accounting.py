@@ -217,15 +217,35 @@ class money_invoice(models.Model):
         voucher, self.voucher_id = self.voucher_id, False
         if voucher.state == 'done':
             voucher.voucher_draft()
-        voucher.unlink()
+        #始初化单反审核只删除明细行
+        if self.is_init:
+            vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
+            vouch_obj_lines = self.env['voucher.line'].search([
+                '&',
+                '&',
+                ('voucher_id', '=', vouch_obj.id),
+                ('partner_id', '=', self.partner_id.id),
+                ('init_obj', '=', 'money_invoice'),])
+            for vouch_obj_line in vouch_obj_lines:
+                vouch_obj_line.unlink()
+        else:
+            voucher.unlink()
         return res
 
     @api.multi
     def money_invoice_done(self):
         res = super(money_invoice, self).money_invoice_done()
         vals = {}
-        vouch_obj = self.env['voucher'].create({'date': self.date})
-        self.write({'voucher_id': vouch_obj.id})
+        # 初始化单的话，先找是否有初始化凭证，没有则新建一个
+        if self.is_init:
+            vouch_obj = self.env['voucher'].search([('is_init', '=', True)])
+            if not vouch_obj:
+                vouch_obj = self.env['voucher'].create({'date': self.date})
+            self.write({'voucher_id': vouch_obj.id})
+            vouch_obj.is_init = True
+        else:
+            vouch_obj = self.env['voucher'].create({'date': self.date})
+            self.write({'voucher_id': vouch_obj.id})
         if not self.category_id.account_id:
             raise except_orm(u'错误', u'请配置%s的会计科目' % (self.category_id.name))
         partner_cat = self.category_id.type == 'income' and self.partner_id.c_category_id or self.partner_id.s_category_id
@@ -238,7 +258,6 @@ class money_invoice(models.Model):
                          'debit_account_id': partner_account_id, 'sell_tax_amount': self.tax_amount or 0,
                          'credit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate_silent or 0,
                          })
-
         else:
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': partner_account_id,
@@ -246,8 +265,19 @@ class money_invoice(models.Model):
                          'partner_credit':self.partner_id.id, 'buy_tax_amount': self.tax_amount or 0,
                          'debit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate_silent or 0,
                          })
+        if self.is_init:
+            vals.update({'init_obj': 'money_invoice',})
         self.create_voucher_line(vals)
-        vouch_obj.voucher_done()
+        # 删除初始非需要的凭证明细行
+        if self.is_init:
+            vouch_line_ids = self.env['voucher.line'].search([
+                '&',
+                ('account_id', '=', self.category_id.account_id.id),
+                ('init_obj', '=', 'money_invoice')])
+            for vouch_line_id in vouch_line_ids:
+                vouch_line_id.unlink()
+        else:
+            vouch_obj.voucher_done()
         return res
 
     @api.multi
@@ -267,16 +297,26 @@ class money_invoice(models.Model):
         currency_id = vals.get('currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id :
             self.env['voucher.line'].create({
-            'name': u"%s %s " % (vals.get('string'), vals.get('name')), 'account_id': vals.get('debit_account_id'),
-            'debit': debit, 'voucher_id': vals.get('vouch_obj_id'), 'partner_id': vals.get('partner_debit', ''),
-            'auxiliary_id':vals.get('debit_auxiliary_id',False),
-            'currency_id':vals.get('currency_id'),'currency_amount': vals.get('amount'),'rate_silent':vals.get('rate_silent') or debit/vals.get('amount')
+                'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                'account_id': vals.get('debit_account_id'),
+                'debit': debit,
+                'voucher_id': vals.get('vouch_obj_id'),
+                'partner_id': vals.get('partner_debit', ''),
+                'auxiliary_id':vals.get('debit_auxiliary_id',False),
+                'currency_id':vals.get('currency_id'),
+                'currency_amount': vals.get('amount'),
+                'rate_silent':vals.get('rate_silent') or debit/vals.get('amount'),
+                'init_obj':vals.get('init_obj',False),
             })
         else :
             self.env['voucher.line'].create({
-            'name': u"%s %s " % (vals.get('string'), vals.get('name')), 'account_id': vals.get('debit_account_id'),
-            'debit': debit, 'voucher_id': vals.get('vouch_obj_id'), 'partner_id': vals.get('partner_debit', ''),
-            'auxiliary_id':vals.get('debit_auxiliary_id',False),
+                'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                'account_id': vals.get('debit_account_id'),
+                'debit': debit,
+                'voucher_id': vals.get('vouch_obj_id'),
+                'partner_id': vals.get('partner_debit', ''),
+                'auxiliary_id':vals.get('debit_auxiliary_id',False),
+                'init_obj':vals.get('init_obj',False),
             })
         # 进项税行
         if vals.get('buy_tax_amount'):
@@ -290,17 +330,25 @@ class money_invoice(models.Model):
         currency_id = vals.get('currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id :
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('string'), vals.get('name')), 'partner_id': vals.get('partner_credit', ''),
-                'account_id': vals.get('credit_account_id'), 'credit': credit, 'voucher_id': vals.get('vouch_obj_id'),
+                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'partner_id': vals.get('partner_credit', ''),
+                'account_id': vals.get('credit_account_id'),
+                'credit': credit,
+                'voucher_id': vals.get('vouch_obj_id'),
                 'auxiliary_id':vals.get('credit_auxiliary_id',False),
                 'currency_amount': vals.get('amount'),
                 'rate_silent':vals.get('rate_silent') or credit/vals.get('amount'),'currency_id':vals.get('currency_id'),
+                'init_obj':vals.get('init_obj',False),
             })
         else:
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('string'), vals.get('name')), 'partner_id': vals.get('partner_credit', ''),
-                'account_id': vals.get('credit_account_id'), 'credit': credit, 'voucher_id': vals.get('vouch_obj_id'),
-                'auxiliary_id':vals.get('credit_auxiliary_id',False)
+                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'partner_id': vals.get('partner_credit', ''),
+                'account_id': vals.get('credit_account_id'),
+                'credit': credit,
+                'voucher_id': vals.get('vouch_obj_id'),
+                'auxiliary_id':vals.get('credit_auxiliary_id',False),
+                'init_obj':vals.get('init_obj',False),
             })
         # 销项税行
         if vals.get('sell_tax_amount'):
@@ -325,15 +373,35 @@ class other_money_order(models.Model):
         voucher, self.voucher_id = self.voucher_id, False
         if voucher.state == 'done':
             voucher.voucher_draft()
-        voucher.unlink()
+        #始初化单反审核只删除明细行
+        if self.is_init:
+            vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
+            vouch_obj_lines = self.env['voucher.line'].search([
+                '&',
+                '&',
+                ('voucher_id', '=', vouch_obj.id),
+                ('account_id', '=', self.bank_id.account_id.id),
+                ('init_obj', '=', 'other_money_order-%s' % (self.id))])
+            for vouch_obj_line in vouch_obj_lines:
+                vouch_obj_line.unlink()
+        else:
+            voucher.unlink()
         return res
 
     @api.multi
     def other_money_done(self):
         res = super(other_money_order, self).other_money_done()
         vals = {}
-        vouch_obj = self.env['voucher'].create({'date': self.date})
-        self.write({'voucher_id': vouch_obj.id})
+        # 初始化单的话，先找是否有初始化凭证，没有则新建一个
+        if self.is_init:
+            vouch_obj = self.env['voucher'].search([('is_init', '=', True)])
+            if not vouch_obj:
+                vouch_obj = self.env['voucher'].create({'date': self.date})
+            self.write({'voucher_id': vouch_obj.id})
+            vouch_obj.is_init = True
+        else:
+            vouch_obj = self.env['voucher'].create({'date': self.date})
+            self.write({'voucher_id': vouch_obj.id})
         if not self.bank_id.account_id:
             raise except_orm(u'错误', u'请配置%s的会计科目' % (self.bank_id.name))
         if self.type == 'other_get':
@@ -346,6 +414,8 @@ class other_money_order(models.Model):
                              'debit_account_id': self.bank_id.account_id.id, 'partner_credit': self.partner_id.id, 'partner_debit': '',
                              'sell_tax_amount': line.tax_amount or 0,
                              })
+                if self.is_init:
+                    vals.update({'init_obj': 'other_money_order-%s' % (self.id),})
                 self.env['money.invoice'].create_voucher_line(vals)
         else:
             for line in self.line_ids:
@@ -357,8 +427,21 @@ class other_money_order(models.Model):
                              'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': self.partner_id.id,
                              'buy_tax_amount': line.tax_amount or 0,
                              })
+                if self.is_init:
+                    vals.update({'init_obj': 'other_money_order-%s' % (self.id),})
                 self.env['money.invoice'].create_voucher_line(vals)
-        vouch_obj.voucher_done()
+        # 删除初始非需要的凭证明细行
+        if self.is_init:
+            print 'aaaaaaaaaaaaa'
+            vouch_line_ids = self.env['voucher.line'].search([
+                '&',
+                ('account_id', '!=', self.bank_id.account_id.id),
+                ('init_obj', '=', 'other_money_order-%s' % (self.id))])
+            print 'bbbbbbbbb',vouch_line_ids
+            for vouch_line_id in vouch_line_ids:
+                vouch_line_id.unlink()
+        else:
+            vouch_obj.voucher_done()
         return res
 
 

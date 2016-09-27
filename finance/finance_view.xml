@@ -44,6 +44,7 @@
                                 <field name="date"/>
                                 <field name="period_id"  options="{'no_open':True,'no_create':True}"/>
                                 <field name="att_count"/>
+                                <field name="is_init" invisible="1" />
                             </group>
                         </group>
                         <field name="line_ids" context="{'line_ids':line_ids}">
@@ -61,6 +62,7 @@
                                 	 groups='finance.group_multi_currency'/>
                                 <field name='debit' sum='借方合计'/>
                                 <field name='credit' sum='贷方合计'/>
+                                <field name='init_obj' invisible="1"/>
                             </tree>
                         </field>
                         <group>
@@ -89,7 +91,8 @@
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'account_id'}"/>
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'debit'}"/>
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'credit'}"/>
-                    <field name = "state" invisible="1" />
+                    <field name="state" invisible="1" />
+                    <field name="is_init" invisible="1" />
                 </tree>
             </field>
         </record>
@@ -153,6 +156,7 @@
                     <field name='debit' sum='借方合计'/>
                     <field name='credit' sum='贷方合计'/>
                     <field name='state'/>
+                    <field name='init_obj' invisible="1"/>
                 </tree>
             </field>
         </record>
@@ -166,5 +170,29 @@
         </record>
 
         <menuitem id='voucher_line_menu' action='voucher_line_action' parent='voucher_books_menu' sequence='10' />
+
+        <record id="chang_voucher_name_tree" model="ir.ui.view">
+            <field name="name">chang.voucher.name.tree</field>
+            <field name="model">chang.voucher.name</field>
+            <field name="arch" type="xml">
+				<tree string='凭证变更记录' create='0'>
+                    <field name="period_id"/>
+                    <field name="before_voucher_name"/>
+                    <field name="after_voucher_name"/>
+                    <field name="write_date" string="变更日期"/>
+				</tree>
+			</field>
+        </record>
+
+        <record id="chang_voucher_name_action" model="ir.actions.act_window">
+            <field name="name">凭证变更记录</field>
+            <field name="res_model">chang.voucher.name</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='chang_voucher_name_menu_finance' name="月末凭证变更记录"
+                  action='chang_voucher_name_action' parent='finance.checkout_menu' sequence='11'/>
     </data>
 </openerp>

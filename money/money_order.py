@@ -346,6 +346,7 @@ class money_invoice(models.Model):
                                   help=u'原始单据对应的外币币别')
     bill_number = fields.Char(u'发票号',
                               help=u'结算单对应的会计凭证号')
+    is_init = fields.Boolean(u'是否初始化单')
 
     @api.multi
     def money_invoice_done(self):

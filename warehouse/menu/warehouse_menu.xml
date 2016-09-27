@@ -15,6 +15,9 @@
 		<!-- 主数据 -->
 		<menuitem id='warehouse_master' name='主数据' parent='warehouse_root' sequence='2' />
 		<menuitem id='goods.goods_menu' name='商品' parent='warehouse_master' action='goods.goods_action' sequence='1' />
+        <record id="goods.goods_menu" model="ir.ui.menu">
+			<field name="create_tag">1</field>
+		</record>
 		<menuitem id='wh_bom_menu' name='模板' action='wh_bom_action' parent='warehouse_master' sequence='2' groups='warehouse.assembly_groups' />
 
         <!-- 设置 -->
