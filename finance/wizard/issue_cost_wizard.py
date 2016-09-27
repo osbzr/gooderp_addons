@@ -132,7 +132,8 @@ class MonthProductCost(models.Model):
             voucher_line_data_list.append(
                 [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
         if voucher_line_data_list:
-            voucher_id = self.env['voucher'].create({'period_id': period_id.id, 'line_ids': voucher_line_data_list})
+            voucher_id = self.env['voucher'].create({'period_id': period_id.id, 'line_ids': voucher_line_data_list,
+                                                     'is_checkout':True})
             voucher_id.voucher_done()
 
     @api.multi
