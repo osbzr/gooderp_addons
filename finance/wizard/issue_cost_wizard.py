@@ -32,10 +32,6 @@ class MonthProductCost(models.Model):
     current_period_remaining_qty = fields.Float(string='本期剩余数量')
     current_period_remaining_cost = fields.Float(string='剩余数量成本')
 
-    @api.multi
-    def get_period_begin_qty_cost(self):
-        pass
-
     # 使用SQL来取得指定产品情况下的库存数量
     @api.multi
     def get_stock_qty(self, period_id):
@@ -100,13 +96,11 @@ class MonthProductCost(models.Model):
         sum_goods_qty = goods_qty_cost.get('period_begin_qty', 0) - \
                         goods_qty_cost.get('current_period_out_qty', 0) + \
                         goods_qty_cost.get('current_period_in_qty', 0)
-        sum_goods_cost = goods_qty_cost.get('period_begin_qty', 0) * goods_qty_cost.get('period_begin_cost', 0) - \
-                         goods_qty_cost.get('current_period_out_qty', 0) * goods_qty_cost.get('current_period_out_cost',
-                                                                                              0) + \
-                         goods_qty_cost.get('current_period_in_qty', 0) * goods_qty_cost.get('current_period_in_cost',
-                                                                                             0)
+        sum_goods_cost =goods_qty_cost.get('period_begin_cost', 0) - \
+                       goods_qty_cost.get('current_period_out_cost',0) + \
+                        goods_qty_cost.get('current_period_in_cost',0)
         return {'current_period_remaining_qty': sum_goods_qty,
-                'current_period_remaining_cost': sum_goods_qty and sum_goods_cost * 1.0 / sum_goods_qty or 0}
+                'current_period_remaining_cost': sum_goods_cost}
 
     @api.multi
     def compute_balance_price(self, data_dcit):
@@ -143,23 +137,28 @@ class MonthProductCost(models.Model):
 
     @api.multi
     def data_structure(self, list_dict_data, period_id):
+        """
+
+        :param list_dict_data:
+        :param period_id:
+        :return:
+        """
         month_product_cost_dict = {}
-        for dcit_goods in list_dict_data:
-            vals = {}
-            period_begin_qty_cost = self.get_goods_last_period_remaining_qty(period_id, dcit_goods.get('goods_id'))
-            if dcit_goods.get('goods_id') not in month_product_cost_dict:
-                vals = {'goods_id': dcit_goods.get('goods_id'), 'period_id': period_id.id,
+        for dict_goods in list_dict_data:
+            period_begin_qty_cost = self.get_goods_last_period_remaining_qty(period_id, dict_goods.get('goods_id'))
+            if dict_goods.get('goods_id') not in month_product_cost_dict:
+                vals = {'goods_id': dict_goods.get('goods_id'), 'period_id': period_id.id,
                         'period_begin_qty': period_begin_qty_cost.get('current_period_remaining_qty', 0),
                         'period_begin_cost': period_begin_qty_cost.get('current_period_remaining_cost', 0)}
-                vals.update(self.current_period_type_current_period(dcit_goods))
-                month_product_cost_dict.update({dcit_goods.get('goods_id'): vals.copy()})
-                month_product_cost_dict.get(dcit_goods.get('goods_id')).update(self.month_remaining_qty_cost(
-                    month_product_cost_dict.get(dcit_goods.get('goods_id'))))
+                vals.update(self.current_period_type_current_period(dict_goods))
+                month_product_cost_dict.update({dict_goods.get('goods_id'): vals.copy()})
+                month_product_cost_dict.get(dict_goods.get('goods_id')).update(self.month_remaining_qty_cost(
+                    month_product_cost_dict.get(dict_goods.get('goods_id'))))
             else:
-                vals.update(self.current_period_type_current_period(dcit_goods))
-                month_product_cost_dict.get(dcit_goods.get('goods_id')).update(vals.copy())
-                month_product_cost_dict.get(dcit_goods.get('goods_id')).update(self.month_remaining_qty_cost(
-                    month_product_cost_dict.get(dcit_goods.get('goods_id'))))
+                vals.update(self.current_period_type_current_period(dict_goods))
+                month_product_cost_dict.get(dict_goods.get('goods_id')).update(vals.copy())
+                month_product_cost_dict.get(dict_goods.get('goods_id')).update(self.month_remaining_qty_cost(
+                    month_product_cost_dict.get(dict_goods.get('goods_id'))))
         return month_product_cost_dict
 
     @api.multi
@@ -181,6 +180,10 @@ class CheckOutWizard(models.TransientModel):
 
     @api.multi
     def button_checkout(self):
+        """
+
+        :return:
+        """
         if self.period_id:
             if self.env['ir.module.module'].search([('state', '=', 'installed'), ('name', '=', 'warehouse')]):
                 self.env['month.product.cost'].generate_issue_cost(self.period_id)

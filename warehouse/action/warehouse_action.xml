@@ -124,6 +124,19 @@
             <field name='target'>new</field>
             <field name='view_id' ref='report_lot_track_wizard_form' />
         </record>
-
+        <!-- 呆滞料报表向导 -->
+        <record id='non_active_report_wizard_action' model='ir.actions.act_window' >
+            <field name='name'>呆滞料报表</field>
+            <field name='res_model'>non.active.report.wizard</field>
+            <field name='target'>new</field>
+            <field name='view_id' ref='non_active_report_wizard_form' />
+        </record>
+        <!-- 呆滞料报表-->
+        <record id='non_active_report_action' model='ir.actions.act_window' >
+            <field name='name'>呆滞料报表</field>
+            <field name='res_model'>non.active.report</field>
+            <field name='view_mode'>tree</field>
+            <field name='view_id' ref='non_active_report_tree' />
+        </record>
     </data>
 </openerp>
