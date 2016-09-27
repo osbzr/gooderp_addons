@@ -46,10 +46,14 @@ class MonthProductCost(models.Model):
                    sum(line.goods_qty) as qty,
                    sum(line.cost) as cost
             FROM wh_move_line line
+            LEFT JOIN warehouse wh_dest ON line.warehouse_dest_id = wh_dest.id
+            LEFT JOIN warehouse wh ON line.warehouse_id = wh.id
             WHERE line.type in ('in','out')
               AND line.state = 'done'
-              AND line.date > '%s'
-              AND line.date < '%s'
+              AND line.date >= '%s'
+              AND line.date <= '%s'
+              AND ((wh_dest.type='stock' AND wh.type!='stock')
+              OR (wh_dest.type!='stock' AND wh.type='stock'))
             GROUP BY line.goods_id,line.type
         ''' % (date_range[0], date_range[1]))
         return self.env.cr.dictfetchall()
@@ -78,9 +82,11 @@ class MonthProductCost(models.Model):
         {'current_period_out_qty'：00,'current_period_out_cost' :00}
         """
         if dcit_goods.get('type') == 'in':
-            res = {'current_period_in_qty': dcit_goods.get('qty'), 'current_period_in_cost': dcit_goods.get('cost')}
+            res = {'current_period_in_qty': dcit_goods.get('qty', 0),
+                   'current_period_in_cost': dcit_goods.get('cost', 0)}
         else:
-            res = {'current_period_out_qty': dcit_goods.get('qty'), 'current_period_out_cost': dcit_goods.get('cost')}
+            res = {'current_period_out_qty': dcit_goods.get('qty'),
+                   'current_period_out_cost': dcit_goods.get('cost', 0)}
         return res
 
     @api.multi
@@ -110,29 +116,41 @@ class MonthProductCost(models.Model):
         :param data_dcit:
         :return:月发出成本
         """
-        balance_price = (data_dcit.get("period_begin_cost") + data_dcit.get("current_period_in_cost")) / \
-                        (data_dcit.get("period_begin_qty") + data_dcit.get("current_period_in_qty"))
-        return balance_price * data_dcit.get("current_period_out_qty")
+        balance_price = (data_dcit.get("period_begin_cost", 0) + data_dcit.get("current_period_in_cost", 0)) / \
+                        (data_dcit.get("period_begin_qty", 0) + data_dcit.get("current_period_in_qty", 0))
+        return balance_price * data_dcit.get("current_period_out_qty", 0)
 
     @api.multi
-    def generate_issue_cost(self, period_id):
-        """
+    def create_month_product_cost_voucher(self, period_id, month_product_cost_dict):
+        voucher_line_data_list = []
+        account_row = self.env.ref('finance.account_cost')
+        all_balance_price = 0
+        for create_vals in month_product_cost_dict.values():
+            goods_row = self.env['goods'].browse(create_vals.get('goods_id'))
+            if self.compute_balance_price(create_vals)!=0:
+                voucher_line_data = {'name': u'发出成本', 'credit':self.compute_balance_price(create_vals),
+                                     'account_id': goods_row.category_id.account_id.id,
+                                     'goods_id': create_vals.get('goods_id')}
+                voucher_line_data_list.append([0, 0, voucher_line_data.copy()])
+            all_balance_price += self.compute_balance_price(create_vals)
+            self.create(create_vals)
+        if all_balance_price != 0:
+            voucher_line_data_list.append(
+                [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
+        if voucher_line_data_list:
+            voucher_id = self.env['voucher'].create({'period_id': period_id.id, 'line_ids': voucher_line_data_list})
+            voucher_id.voucher_done()
 
-        :param period_id:
-        :return:
-        """
-        last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(period_id)
-        list_dict_data = self.get_stock_qty(period_id)
+    @api.multi
+    def data_structure(self, list_dict_data, period_id):
         month_product_cost_dict = {}
-        issue_cost_exists = self.search([('period_id', '=', period_id.id)])
-        issue_cost_exists.unlink()
         for dcit_goods in list_dict_data:
             vals = {}
             period_begin_qty_cost = self.get_goods_last_period_remaining_qty(period_id, dcit_goods.get('goods_id'))
             if dcit_goods.get('goods_id') not in month_product_cost_dict:
                 vals = {'goods_id': dcit_goods.get('goods_id'), 'period_id': period_id.id,
-                        'period_begin_qty': period_begin_qty_cost.get('current_period_remaining_qty'),
-                        'period_begin_cost': period_begin_qty_cost.get('current_period_remaining_cost')}
+                        'period_begin_qty': period_begin_qty_cost.get('current_period_remaining_qty', 0),
+                        'period_begin_cost': period_begin_qty_cost.get('current_period_remaining_cost', 0)}
                 vals.update(self.current_period_type_current_period(dcit_goods))
                 month_product_cost_dict.update({dcit_goods.get('goods_id'): vals.copy()})
                 month_product_cost_dict.get(dcit_goods.get('goods_id')).update(self.month_remaining_qty_cost(
@@ -142,21 +160,19 @@ class MonthProductCost(models.Model):
                 month_product_cost_dict.get(dcit_goods.get('goods_id')).update(vals.copy())
                 month_product_cost_dict.get(dcit_goods.get('goods_id')).update(self.month_remaining_qty_cost(
                     month_product_cost_dict.get(dcit_goods.get('goods_id'))))
-        voucher_line_data_list = []
-        account_row = self.env.ref('finance.account_cost')
-        all_balance_price = 0
-        for create_vals in month_product_cost_dict.values():
-            goods_row = self.env['goods'].browse(create_vals.get('goods_id'))
-            voucher_line_data = {'name': u'发出成本', 'credit': self.compute_balance_price(create_vals),
-                                 'account_id': goods_row.category_id.account_id.id,
-                                 'goods_id': create_vals.get('goods_id')}
-            voucher_line_data_list.append([0, 0, voucher_line_data.copy()])
-            all_balance_price += self.compute_balance_price(create_vals)
-            self.create(create_vals)
-        voucher_line_data_list.append(
-            [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
-        voucher_id = self.env['voucher'].create({'period_id': period_id.id,'line_ids':voucher_line_data_list})
-        voucher_id.voucher_done()
+        return month_product_cost_dict
+
+    @api.multi
+    def generate_issue_cost(self, period_id):
+        """
+
+        :param period_id:
+        :return:
+        """
+        list_dict_data = self.get_stock_qty(period_id)
+        issue_cost_exists = self.search([('period_id', '=', period_id.id)])
+        issue_cost_exists.unlink()
+        self.create_month_product_cost_voucher(period_id, self.data_structure(list_dict_data, period_id))
 
 
 class CheckOutWizard(models.TransientModel):
@@ -166,6 +182,7 @@ class CheckOutWizard(models.TransientModel):
     @api.multi
     def button_checkout(self):
         if self.period_id:
-            self.env['month.product.cost'].generate_issue_cost(self.period_id)
+            if self.env['ir.module.module'].search([('state', '=', 'installed'), ('name', '=', 'warehouse')]):
+                self.env['month.product.cost'].generate_issue_cost(self.period_id)
         res = super(CheckOutWizard, self).button_checkout()
         return res
