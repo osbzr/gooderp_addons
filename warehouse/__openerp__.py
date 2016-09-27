@@ -34,6 +34,7 @@
         'wizard/save_bom_view.xml',
         'wizard/stock_transceive_wizard_view.xml',
         'wizard/lot_track_wizard_view.xml',
+        'wizard/non_active_report_wizard.xml',
         'view/assets_backend.xml',
         'view/warehouse_view.xml',
         'view/inventory_view.xml',
