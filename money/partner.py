@@ -11,12 +11,21 @@ class partner(models.Model):
     @api.multi
     def _set_receivable_init(self):
         if self.receivable_init:
+            # 如果有前期初值，删掉已前的单据
+            money_invoice_id = self.env['money.invoice'].search([
+                '&',
+                ('partner_id', '=', self.id),
+                ('is_init', '=', True)])
+            if money_invoice_id:
+                money_invoice_id.money_invoice_draft()
+                money_invoice_id.unlink()
             # 创建源单
             categ = self.env.ref('money.core_category_sale')
             source_id = self.env['money.invoice'].create({
             'name': "期初应收余额",
             'partner_id': self.id,
             'category_id': categ.id,
+            'is_init': True,
             'date': self.env.user.company_id.start_date,
             'amount': self.receivable_init,
             'reconciled': 0,
@@ -28,12 +37,21 @@ class partner(models.Model):
     @api.multi
     def _set_payable_init(self):
         if self.payable_init:
+            # 如果有前期初值，删掉已前的单据
+            money_invoice_id = self.env['money.invoice'].search([
+                '&',
+                ('partner_id', '=', self.id),
+                ('is_init', '=', True)])
+            if money_invoice_id:
+                money_invoice_id.money_invoice_draft()
+                money_invoice_id.unlink()
             # 创建源单
             categ = self.env.ref('money.core_category_purchase')
             source_id = self.env['money.invoice'].create({
             'name': "期初应付余额",
             'partner_id': self.id,
             'category_id': categ.id,
+            'is_init': True,
             'date': self.env.user.company_id.start_date,
             'amount': self.payable_init,
             'reconciled': 0,
@@ -50,7 +68,6 @@ class partner(models.Model):
                            digits=dp.get_precision('Amount'),
                            inverse=_set_payable_init,
                         help=u'供应商的应付期初余额')
-
 
     @api.multi
     def partner_statements(self):
@@ -82,12 +99,21 @@ class bank_account(models.Model):
     @api.multi
     def _set_init_balance(self):
         if self.init_balance:
+            # 如果有前期初值，删掉已前的单据
+            other_money_id = self.env['other.money.order'].search([
+                '&',
+                ('bank_id', '=', self.id),
+                ('is_init', '=', True)])
+            if other_money_id:
+                other_money_id.other_money_draft()
+                other_money_id.unlink()
             # 资金期初 生成 其他收入
             other_money_init = self.env['other.money.order'].create({
                 'name': "期初",
                 'type': 'other_get',
                 'bank_id': self.id,
                 'date': self.env.user.company_id.start_date,
+                'is_init': True,
                 'line_ids': [(0, 0, {
                     'category_id': self.env.ref('money.core_category_init').id,
                     'amount': self.init_balance,

@@ -206,6 +206,7 @@
                     <button name="money_invoice_done" states="draft" string="审核" type="object"/>
                     <field name="bill_number"/>
                     <field name="date_due"/>
+                    <field name="is_init" invisible="1"/>
                 </tree>
             </field>
         </record>

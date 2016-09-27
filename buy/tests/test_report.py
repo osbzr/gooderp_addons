@@ -11,6 +11,11 @@ class test_detail_wizard(TransactionCase):
         super(test_detail_wizard, self).setUp()
         # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
+
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
+
         # 给buy_order_1中的产品“键盘”的分类设置科目
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -70,6 +75,9 @@ class test_track_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_track_wizard, self).setUp()
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
         # 给产品的分类设置科目
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -140,6 +148,9 @@ class test_payment_wizard(TransactionCase):
     def setUp(self):
         ''' 准备报表数据 '''
         super(test_payment_wizard, self).setUp()
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
         # 给buy_order_1中的产品“键盘”的分类设置科目
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
@@ -208,6 +219,9 @@ class test_goods_wizard(TransactionCase):
         ''' 准备报表数据 '''
         super(test_goods_wizard, self).setUp()
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
         # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -281,6 +295,9 @@ class test_partner_wizard(TransactionCase):
         ''' 准备报表数据 '''
         super(test_partner_wizard, self).setUp()
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
         # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')

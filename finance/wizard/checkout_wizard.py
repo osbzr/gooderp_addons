@@ -269,7 +269,14 @@ class checkout_wizard(models.TransientModel):
                 for voucher_id in voucher_ids:
                     # 产生凭证号
                     next_voucher_name = interpolated_prefix + '%%0%sd' % seq_id.padding % last_voucher_number + interpolated_suffix
-                    # 更新凭证号
+                    # 更新凭证号,将老号写到变化表中去！
+                    if voucher_id.name != next_voucher_name:
+                        self.env['chang.voucher.name'].create({
+                            'period_id': self.period_id.id,
+                            'before_voucher_name': voucher_id.name,
+                            'after_voucher_name': next_voucher_name,
+                        })
+                    print 'aaaaaaaaaaaaaaaaa'
                     voucher_id.with_context(context).write({'name': next_voucher_name})
                     last_voucher_number += 1
             # update ir.sequence  number_next
@@ -279,3 +286,5 @@ class checkout_wizard(models.TransientModel):
                 self.env['ir.sequence']._alter_sequence(seq_id.id, seq_id.number_increment,
                                                         seq_id.number_next)
                 self.env.cr.commit()
+
+

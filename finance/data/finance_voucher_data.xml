@@ -13,6 +13,7 @@
             <field name="code">voucher</field>
             <field name="prefix">V</field>
             <field name="padding">5</field>
+            <field name="implementation">no_gap</field>
         </record>
 
         <!--凭证字-->

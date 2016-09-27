@@ -40,7 +40,26 @@ class money_order(models.Model):
         else:
             values.update({'name': self.env['ir.sequence'].get('get.order')})
 
+        # 创建时查找该业务伙伴是否存在 未审核 状态下的收付款单
+        orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
+                                                 ('state', '=', 'draft')])
+        for order in orders:
+            if order:
+                raise except_orm(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
+
         return super(money_order, self).create(values)
+
+    @api.multi
+    def write(self, values):
+        # 保存时查找该业务伙伴是否存在 未审核 状态下的收付款单
+        if values.get('partner_id'):
+            orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
+                                                     ('state', '=', 'draft')])
+            for order in orders:
+                if order:
+                    raise except_orm(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
+
+        return super(money_order, self).write(values)
 
     @api.multi
     def unlink(self):
@@ -327,6 +346,7 @@ class money_invoice(models.Model):
                                   help=u'原始单据对应的外币币别')
     bill_number = fields.Char(u'发票号',
                               help=u'结算单对应的会计凭证号')
+    is_init = fields.Boolean(u'是否初始化单')
 
     @api.multi
     def money_invoice_done(self):

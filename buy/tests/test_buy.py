@@ -12,6 +12,10 @@ class test_buy_order(TransactionCase):
         self.order = self.env.ref('buy.buy_order_1')
         self.order.bank_account_id = False
 
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
+
     def test_onchange_discount_rate(self):
         ''' 优惠率改变时，改变优惠金额，优惠后金额也改变'''
         amount_before = self.order.amount
@@ -280,6 +284,10 @@ class test_buy_receipt(TransactionCase):
 
         self.bank_account = self.env.ref('core.alipay')
         self.bank_account.balance = 10000
+
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
 
     def test_compute_all_amount(self):
         '''测试当优惠金额改变时，改变优惠后金额和本次欠款'''
@@ -814,6 +822,10 @@ class test_payment(TransactionCase):
     def setUp(self):
         super(test_payment, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
      
     def test_request_payment(self):
         '''付款申请'''

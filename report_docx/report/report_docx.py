@@ -13,23 +13,21 @@ from docxtpl import DocxTemplate
 from openerp.tools.translate import _
 from openerp.tools import misc
 _logger = logging.getLogger(__name__)
+import pytz
 
 from openerp import models
+from openerp import fields
 
 class DataModelProxy(object):
     '''使用一个代理类，来转发 model 的属性，用来消除掉属性值为 False 的情况
        且支持 selection 字段取到实际的显示值
     '''
+    DEFAULT_TZ = 'Asia/Shanghai'
+
     def __init__(self, data):
         self.data = data
 
-    def __getattr__(self, key):
-        temp = getattr(self.data, key)
-        field = self.data._fields.get(key)
-
-        if isinstance(temp, models.Model):
-            return DataModelProxy(temp)
-
+    def _compute_by_selection(self, field, temp):
         if field and field.type == 'selection':
             selection = field.selection
             if isinstance(selection, basestring):
@@ -42,7 +40,34 @@ class DataModelProxy(object):
             except KeyError:
                 temp = ''
 
+        return temp
+
+    def _compute_by_datetime(self, field, temp):
+        if field and field.type == 'datetime' and temp:
+            tz = pytz.timezone(self.data.env.context.get('tz') or self.DEFAULT_TZ)
+            temp_date = fields.Datetime.from_string(temp) + tz._utcoffset
+            temp = fields.Datetime.to_string(temp_date)
+
+        return temp
+
+    def _compute_temp_false(self, field, temp):
+        if not temp:
+            if field and field.type in ('integer', 'float'):
+                return 0
+
         return temp or ''
+
+    def __getattr__(self, key):
+        temp = getattr(self.data, key)
+        field = self.data._fields.get(key)
+
+        if isinstance(temp, models.Model):
+            return DataModelProxy(temp)
+
+        temp = self._compute_by_selection(field, temp)
+        temp = self._compute_by_datetime(field, temp)
+
+        return self._compute_temp_false(field, temp)
 
     def __getitem__(self, index):
         '''支持列表取值'''
