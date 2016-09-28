@@ -37,14 +37,15 @@ import re
 import xlutils.copy
 from openerp.tools import misc
 
+
 class ReportTemplate(models.Model):
     _name = "report.template"
-    model_id = fields.Many2one('ir.model',u'模型')
+    model_id = fields.Many2one('ir.model', u'模型')
     file_address = fields.Char(u'模板文件路径')
-    model_name = fields.Char(u'模型名称', compute='_compute_model_name')
+    active = fields.Boolean(u'可用', default=True)
 
     @api.one
-    @api.depends('model_id')
+    @api.onchange('model_id')
     def _compute_model_name(self):
         if self.model_id:
             self.model_name = self.model_id.model
@@ -52,13 +53,12 @@ class ReportTemplate(models.Model):
     @api.model
     def get_time(self, model):
         ISOTIMEFORMAT = "%Y-%m-%d"
-        report_model = self.env['report.template'].search([('model_name', '=', model)], limit=1)
-        file_address = report_model.file_address or False
+        report_model = self.env['report.template'].search([('model_id.model', '=', model)], limit=1)
+        file_address = report_model and report_model[0].file_address or False
         return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address)
 
 
-class ExcelExportView(ExcelExport,):
-
+class ExcelExportView(ExcelExport, ):
     def __getattribute__(self, name):
         if name == 'fmt':
             raise AttributeError()
@@ -80,10 +80,12 @@ class ExcelExportView(ExcelExport,):
             ],
             cookies={'fileToken': token}
         )
-# 修改值
+
+    # 修改值
 
     def setOutCell(self, outSheet, col, row, value):
         """ Change cell value without changing formatting. """
+
         # 本方法来自 葡萄皮的数据空间[http://biotopiblog.sinaapp.com]
         # 链接http://biotopiblog.sinaapp.com/2014/06/python读写excel如何保留原有格式/
         def _getOutCell(outSheet, colIndex, rowIndex):
@@ -94,6 +96,7 @@ class ExcelExportView(ExcelExport,):
                 return None
             cell = row._Row__cells.get(colIndex)
             return cell
+
         previousCell = _getOutCell(outSheet, col, row)
         outSheet.write(row, col, value)
         # HACK, PART II
@@ -101,7 +104,24 @@ class ExcelExportView(ExcelExport,):
             newCell = _getOutCell(outSheet, col, row)
             if newCell:
                 newCell.xf_idx = previousCell.xf_idx
-        # END HACK
+                # END HACK
+
+    def style_data(self):
+        style = xlwt.easyxf(
+            'font: bold on,height 300;align: wrap on,vert centre, horiz center;border: left thin,right thin,top thin,bottom thin')
+        colour_style = xlwt.easyxf('align: wrap yes,vert centre, horiz center;pattern: pattern solid, \
+                                   fore-colour light_orange;border: left thin,right thin,top thin,bottom thin')
+
+        base_style = xlwt.easyxf('align: wrap yes,vert centre, horiz left; pattern: pattern solid, \
+                                     fore-colour light_yellow;border: left thin,right thin,top thin,bottom thin')
+        float_style = xlwt.easyxf('align: wrap yes,vert centre, horiz right ; pattern: pattern solid,\
+                                      fore-colour light_yellow;border: left thin,right thin,top thin,bottom thin')
+        date_style = xlwt.easyxf('align: wrap yes; pattern: pattern solid,fore-colour light_yellow;border: left thin,right thin,top thin,bottom thin\
+                                     ', num_format_str='YYYY-MM-DD')
+        datetime_style = xlwt.easyxf('align: wrap yes; pattern: pattern solid, fore-colour light_yellow;\
+                                         protection:formula_hidden yes;border: left thin,right thin,top thin,bottom thin',
+                                     num_format_str='YYYY-MM-DD HH:mm:SS')
+        return style, colour_style, base_style, float_style, date_style, datetime_style
 
     def from_data(self, fields, rows, file_address):
         if file_address:
@@ -118,19 +138,44 @@ class ExcelExportView(ExcelExport,):
         else:
             workbook = xlwt.Workbook()
             worksheet = workbook.add_sheet('Sheet 1')
-            base_style = xlwt.easyxf('align: wrap yes')
-            date_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD')
-            datetime_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD HH:mm:SS')
+            style, colour_style, base_style, float_style, date_style, datetime_style = self.style_data()
+            worksheet.write_merge(0, 0, 0, len(fields) - 1, fields[0], style=style)
+            worksheet.row(0).height = 400
+            worksheet.row(2).height = 400
+            [worksheet.write(1, i, '', style=xlwt.easyxf('border: left thin,right thin,top thin,bottom thin'))
+             for i in xrange(len(fields))]
+            columnwidth = {}
             for row_index, row in enumerate(rows):
                 for cell_index, cell_value in enumerate(row):
-                    cell_style = base_style
-                    if isinstance(cell_value, basestring):
-                        cell_value = re.sub("\r", " ", cell_value)
-                    elif isinstance(cell_value, datetime.datetime):
-                        cell_style = datetime_style
-                    elif isinstance(cell_value, datetime.date):
-                        cell_style = date_style
+                    if cell_index in columnwidth:
+                        if len(str(cell_value)) > columnwidth.get(cell_index):
+                            columnwidth.update({cell_index: len(str(cell_value))})
+                    else:
+                        columnwidth.update({cell_index: len(str(cell_value))})
+                    if row_index == 1:
+                        cell_style = colour_style
+                    elif row_index != len(rows) - 1:
+                        cell_style = base_style
+                        if isinstance(cell_value, basestring):
+                            cell_value = re.sub("\r", " ", cell_value)
+                        elif isinstance(cell_value, datetime.datetime):
+                            cell_style = datetime_style
+                        elif isinstance(cell_value, datetime.date):
+                            cell_style = date_style
+                        elif isinstance(cell_value, float) or isinstance(cell_value, int):
+                            cell_style = float_style
+                    else:
+                        cell_style = xlwt.easyxf('border: left thin,right thin,top thin,bottom thin')
                     worksheet.write(row_index + 1, cell_index, cell_value, cell_style)
+            for column, widthvalue in columnwidth.items():
+                """参考 下面链接关于自动列宽（探讨）的代码
+                 http://stackoverflow.com/questions/6929115/python-xlwt-accessing-existing-cell-content-auto-adjust-column-width"""
+                if (widthvalue + 2) * 367 >= 65536:
+                    widthvalue = 300
+                worksheet.col(column).width = (widthvalue+4) * 256
+        worksheet.set_panes_frozen(True)  # frozen headings instead of split panes
+        worksheet.set_horz_split_pos(3)  # in general, freeze after last heading row
+        worksheet.set_remove_splits(True)  # if user does unfreeze, don't leave a split there
         fp_currency = StringIO.StringIO()
         workbook.save(fp_currency)
         fp_currency.seek(0)

@@ -15,8 +15,8 @@
             <field name="arch" type="xml">
                 <tree string="报表模板" editable='bottom'>
                     <field name="model_id"/>
-                    <field name="model_name" readonly="1"/>
                     <field name="file_address"/>
+                    <field name="active" />
                 </tree>
             </field>
         </record>
