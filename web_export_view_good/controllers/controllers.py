@@ -157,8 +157,7 @@ class ExcelExportView(ExcelExport, ):
                     elif row_index != len(rows) - 1:
                         cell_style = base_style
                         if isinstance(cell_value, basestring):
-                            cell_value = re.sub(" ", "", cell_value)
-
+                            cell_value = re.sub("\r", " ", cell_value)
                         elif isinstance(cell_value, datetime.datetime):
                             cell_style = datetime_style
                         elif isinstance(cell_value, datetime.date):
