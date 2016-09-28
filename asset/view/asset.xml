@@ -67,6 +67,26 @@
             	</form>
             </field>
         </record>
+        
+        <!-- form view在此前定义，后面的form view引用了这两个action，所以不能把它们放在action文件里 -->
+        <!-- 固定资产清理 action -->
+        <record id="create_clean_action" model="ir.actions.act_window">
+            <field name="name">固定资产清理</field>
+            <field name="res_model">create.clean.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="create_clean_wizard_form"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+        <!-- 固定资产变更 action -->
+        <record id="create_chang_action" model="ir.actions.act_window">
+            <field name="name">固定资产变更</field>
+            <field name="res_model">create.chang.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="create_chang_wizard_form"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
 
 		<!--固定资产-->
         <record id='asset_form' model='ir.ui.view'>
