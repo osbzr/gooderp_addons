@@ -442,8 +442,49 @@ class CreateDepreciationWizard(models.TransientModel):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
+
+    @api.multi
+    def _get_voucher_line(self, asset, cost_depreciation, vouch_obj):
+        '''借方行'''
+        res = {}
+        if asset.account_depreciation.id not in res:
+            res[asset.account_depreciation.id] = {'debit': 0}
+        val = res[asset.account_depreciation.id]
+        val.update({'debit': val.get('debit') + cost_depreciation,
+                    'voucher_id': vouch_obj.id,
+                    'account_id': asset.account_depreciation.id,
+                    'name': u'固定资产折旧',
+                    })
+
+        '''贷方行'''
+        if asset.account_accumulated_depreciation.id not in res:
+            res[asset.account_accumulated_depreciation.id] = {'credit': 0}
+
+        val = res[asset.account_accumulated_depreciation.id]
+        val.update({'credit': val.get('credit') + cost_depreciation,
+                    'voucher_id': vouch_obj.id,
+                    'account_id': asset.account_accumulated_depreciation.id,
+                    'name': u'固定资产折旧',
+                    })
+        return res
+
+    @api.multi
+    def _generate_asset_line(self, asset, cost_depreciation, total):
+        '''生成折旧明细行'''
+        asset_line = self.env['asset.line'].create({
+             'date': asset.date,
+             'order_id': asset.id,
+             'period_id': self.period_id.id,
+             'cost_depreciation': cost_depreciation,
+             'name': asset.name,
+             'code': asset.code,
+             'no_depreciation': asset.surplus_value - total - cost_depreciation,
+            })
+        return asset_line
+
     @api.multi
     def create_depreciation(self):
+        ''' 资产折旧，生成凭证和折旧明细'''
         vouch_obj = self.env['voucher'].create({'date': self.date})
         res = {}
         for asset in self.env['asset'].search([('no_depreciation', '=', False), ('period_id','!=', self.period_id.id)]):
@@ -453,41 +494,15 @@ class CreateDepreciationWizard(models.TransientModel):
                 if asset.surplus_value <= (total + cost_depreciation):
                     cost_depreciation = asset.surplus_value - total
                     asset.no_depreciation = 1
-                '''借方行'''
-                if asset.account_depreciation.id not in res:
-                    res[asset.account_depreciation.id] = {'debit': 0}
-                val = res[asset.account_depreciation.id]
-                val.update({'debit':val.get('debit') + cost_depreciation,
-                            'voucher_id': vouch_obj.id,
-                            'account_id': asset.account_depreciation.id,
-                            'name': u'固定资产折旧',
-                            })
-
-                '''贷方行'''
-                if asset.account_accumulated_depreciation.id not in res:
-                    res[asset.account_accumulated_depreciation.id] = {'credit': 0}
-
-                val = res[asset.account_accumulated_depreciation.id]
-                val.update({'credit':val.get('credit') + cost_depreciation,
-                            'voucher_id': vouch_obj.id,
-                            'account_id': asset.account_accumulated_depreciation.id,
-                            'name': u'固定资产折旧',
-                            })
-                '''折旧明细行'''
-                self.env['asset.line'].create({
-                     'date': self.date,
-                     'order_id': asset.id,
-                     'period_id': self.period_id.id,
-                     'cost_depreciation': cost_depreciation,
-                     'name':asset.name,
-                     'code':asset.code,
-                     'no_depreciation':asset.surplus_value - total - cost_depreciation,
-                    })
+                # 获得凭证明细行
+                res = self._get_voucher_line(asset, cost_depreciation, vouch_obj)
+                # 生成折旧明细行
+                self._generate_asset_line(asset, cost_depreciation, total)
 
         for account_id,val in res.iteritems():
             self.env['voucher.line'].create(dict(val,account_id = account_id))
 
-        if not vouch_obj.line_ids :
+        if not vouch_obj.line_ids:
             vouch_obj.unlink()
             raise except_orm(u'错误', u'本期所有固定资产都已折旧！')
         vouch_obj.voucher_done()
@@ -528,7 +543,7 @@ class voucher(models.Model):
         res = {}
         for asset in self.env['asset'].search([('is_init', '=', True)]):
             cost = asset.cost
-            depreciation_value2 = asset.depreciation_value2
+            depreciation_previous = asset.depreciation_previous
             '''固定资产'''
             if asset.account_asset.id not in res:
                 res[asset.account_asset.id] = {'credit':0,'debit': 0,'cate':'asset'}
@@ -541,12 +556,12 @@ class voucher(models.Model):
                         'name': '固定资产 期初'
                         })
             '''累计折旧'''
-            if asset.account_depreciation2.id not in res:
-                res[asset.account_depreciation2.id] = {'credit':0,'debit': 0,'cate':'asset'}
+            if asset.account_accumulated_depreciation.id not in res:
+                res[asset.account_accumulated_depreciation.id] = {'credit':0,'debit': 0,'cate':'asset'}
 
-            val = res[asset.account_depreciation2.id]
-            val.update({'credit':val.get('credit') + depreciation_value2,
-                        'account_id': asset.account_depreciation2.id,
+            val = res[asset.account_accumulated_depreciation.id]
+            val.update({'credit':val.get('credit') + depreciation_previous,
+                        'account_id': asset.account_accumulated_depreciation.id,
                         'voucher_id': self.id,
                         'init_obj': 'asset',
                         'name': '固定资产 期初'
