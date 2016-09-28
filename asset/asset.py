@@ -204,7 +204,7 @@ class asset(models.Model):
         ''' 审核固定资产 '''
         self._wrong_asset_done()
         # 非初始化固定资产生成凭证
-        if not self.other_system:
+        if not self.is_init:
             if self.partner_id and self.partner_id.s_category_id.account_id.id == self.account_credit.id:
                 self._partner_generate_invoice()
             elif self.bank_account and self.account_credit.id == self.bank_account.account_id.id:
