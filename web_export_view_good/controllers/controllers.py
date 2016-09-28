@@ -119,19 +119,42 @@ class ExcelExportView(ExcelExport,):
         else:
             workbook = xlwt.Workbook()
             worksheet = workbook.add_sheet('Sheet 1')
-            base_style = xlwt.easyxf('align: wrap yes')
-            date_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD')
-            datetime_style = xlwt.easyxf('align: wrap yes', num_format_str='YYYY-MM-DD HH:mm:SS')
+            style = xlwt.easyxf('font: bold on,height 300;align: wrap on,vert centre, horiz center;border: left thin,right thin,top thin,bottom thin')
+            worksheet.write_merge(0, 0, 0, len(fields)-1, fields[0],style=style)
+            worksheet.row(0).height = 400
+            worksheet.row(2).height = 400
+            [worksheet.write(1, i,'',style=xlwt.easyxf('border: left thin,right thin,top thin,bottom thin'))
+             for i in xrange(len(fields))]
+            colour_style = xlwt.easyxf('align: wrap yes,vert centre, horiz center;pattern: pattern solid, \
+                                       fore-colour light_orange;border: left thin,right thin,top thin,bottom thin')
+            base_style = xlwt.easyxf('align: wrap yes,vert centre, horiz left; pattern: pattern solid, \
+                                     fore-colour light_yellow;border: left thin,right thin,top thin,bottom thin')
+            float_style = xlwt.easyxf('align: wrap yes,vert centre, horiz right ; pattern: pattern solid,\
+                                      fore-colour light_yellow;border: left thin,right thin,top thin,bottom thin')
+            date_style = xlwt.easyxf('align: wrap yes; pattern: pattern solid,fore-colour light_yellow;border: left thin,right thin,top thin,bottom thin\
+                                     ', num_format_str='YYYY-MM-DD')
+            datetime_style = xlwt.easyxf('align: wrap yes; pattern: pattern solid, fore-colour light_yellow;\
+                                         protection:formula_hidden yes;border: left thin,right thin,top thin,bottom thin', num_format_str='YYYY-MM-DD HH:mm:SS')
             for row_index, row in enumerate(rows):
                 for cell_index, cell_value in enumerate(row):
-                    cell_style = base_style
-                    if isinstance(cell_value, basestring):
-                        cell_value = re.sub("\r", " ", cell_value)
-                    elif isinstance(cell_value, datetime.datetime):
-                        cell_style = datetime_style
-                    elif isinstance(cell_value, datetime.date):
-                        cell_style = date_style
+                    if row_index ==1:
+                        cell_style = colour_style
+                    elif row_index !=len(rows)-1:
+                        cell_style = base_style
+                        if isinstance(cell_value, basestring):
+                            cell_value = re.sub("\r", " ", cell_value)
+                        elif isinstance(cell_value, datetime.datetime):
+                            cell_style = datetime_style
+                        elif isinstance(cell_value, datetime.date):
+                            cell_style = date_style
+                        elif isinstance(cell_value, float) or isinstance(cell_value, int):
+                            cell_style = float_style
+                    else:
+                        cell_style =  xlwt.easyxf('border: left thin,right thin,top thin,bottom thin')
                     worksheet.write(row_index + 1, cell_index, cell_value, cell_style)
+        worksheet.set_panes_frozen(True)  # frozen headings instead of split panes
+        worksheet.set_horz_split_pos(3)  # in general, freeze after last heading row
+        worksheet.set_remove_splits(True)  # if user does unfreeze, don't leave a split there
         fp_currency = StringIO.StringIO()
         workbook.save(fp_currency)
         fp_currency.seek(0)
