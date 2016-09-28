@@ -172,7 +172,7 @@ class ExcelExportView(ExcelExport, ):
                  http://stackoverflow.com/questions/6929115/python-xlwt-accessing-existing-cell-content-auto-adjust-column-width"""
                 if (widthvalue + 2) * 367 >= 65536:
                     widthvalue = 300
-                worksheet.col(column).width = (widthvalue+1) *  256
+                worksheet.col(column).width = (widthvalue+4) * 256
         worksheet.set_panes_frozen(True)  # frozen headings instead of split panes
         worksheet.set_horz_split_pos(3)  # in general, freeze after last heading row
         worksheet.set_remove_splits(True)  # if user does unfreeze, don't leave a split there
