@@ -38,4 +38,4 @@ class TestWebExportViewTwo(TransactionCase):
                              ["Demo User", "demo", u"Chinese (CN) / 简体中文", ""],
                              [u"操作人", "admin", u"操作时间", "2016-05-09"]],
                     "file_address": ''}
-        a.from_data(data_two.get('headers'), data_two.get("rows"), '')
+        #a.from_data(data_two.get('headers'), data_two.get("rows"), '')
