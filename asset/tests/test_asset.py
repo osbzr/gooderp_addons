@@ -20,4 +20,9 @@ class test_asset(TransactionCase):
     def test_onchange(self):
         '''资产相关科目由资产类别带出'''
         self.asset.category_id = self.env.ref('asset.house')
-        self.onchange_category_id()
+        self.asset.onchange_category_id()
+        self.asset.cost = 2000
+        self.asset.onchange_cost()
+        self.asset.partner_id = self.env.ref('core.jd')
+        self.asset.onchange_partner_id()
+        self.asset.bank_account = self.env.ref('core.alipay')
