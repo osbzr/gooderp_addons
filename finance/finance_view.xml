@@ -87,10 +87,10 @@
                     <field name="att_count"/>
                     <field name="period_id"/>
                     <field name="amount_text"/>
-                    <field name="line_ids" widget="relation_sublist" options="{'field': 'name'}"/>
-                    <field name="line_ids" widget="relation_sublist" options="{'field': 'account_id'}"/>
-                    <field name="line_ids" widget="relation_sublist" options="{'field': 'debit'}"/>
-                    <field name="line_ids" widget="relation_sublist" options="{'field': 'credit'}"/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'name'}" groups = 'finance.view_detail'/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'account_id'}" groups = 'finance.view_detail'/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'debit'}" groups = 'finance.view_detail'/>
+                    <field name="line_ids" widget="relation_sublist" options="{'field': 'credit'}" groups = 'finance.view_detail'/>
                     <field name="state" invisible="1" />
                     <field name="is_init" invisible="1" />
                 </tree>

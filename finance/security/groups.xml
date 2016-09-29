@@ -8,6 +8,12 @@
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 
+
+		<record id="view_detail" model="res.groups">
+			<field name='name'>列表上查看凭证明细行</field>
+			<field name='category_id' ref="core.good_finance"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+		</record>
 		<record id="group_account_goods" model="res.groups">
 			<field name='name'>凭证行上的商品</field>
 			<field name='category_id' ref="core.good_finance"/>
