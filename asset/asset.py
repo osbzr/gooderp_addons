@@ -487,6 +487,7 @@ class CreateDepreciationWizard(models.TransientModel):
         ''' 资产折旧，生成凭证和折旧明细'''
         vouch_obj = self.env['voucher'].create({'date': self.date})
         res = {}
+        asset_line_id_list = []
         for asset in self.env['asset'].search([('no_depreciation', '=', False), ('period_id','!=', self.period_id.id)]):
             if self.period_id not in asset.line_ids.period_id:
                 cost_depreciation = asset.cost_depreciation
@@ -497,8 +498,8 @@ class CreateDepreciationWizard(models.TransientModel):
                 # 获得凭证明细行
                 res = self._get_voucher_line(asset, cost_depreciation, vouch_obj)
                 # 生成折旧明细行
-                self._generate_asset_line(asset, cost_depreciation, total)
-
+                asset_line_row = self._generate_asset_line(asset, cost_depreciation, total)
+                asset_line_id_list.append(asset_line_row.id)
         for account_id,val in res.iteritems():
             self.env['voucher.line'].create(dict(val,account_id = account_id))
 
@@ -506,6 +507,15 @@ class CreateDepreciationWizard(models.TransientModel):
             vouch_obj.unlink()
             raise except_orm(u'错误', u'本期所有固定资产都已折旧！')
         vouch_obj.voucher_done()
+        view = self.env.ref('asset.asset_line_tree')
+        return {
+            'view_mode': 'tree',
+            'name': u'资产折旧明细行',
+            'views': [(view.id, 'tree')],
+            'res_model': 'asset.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', asset_line_id_list)]
+        }
 
 class chang_line(models.Model):
     _name = 'chang.line'
