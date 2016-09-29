@@ -148,10 +148,10 @@ class ExcelExportView(ExcelExport, ):
             for row_index, row in enumerate(rows):
                 for cell_index, cell_value in enumerate(row):
                     if cell_index in columnwidth:
-                        if len(str(cell_value)) > columnwidth.get(cell_index):
-                            columnwidth.update({cell_index: len(str(cell_value))})
+                        if len("%s"%(cell_value)) > columnwidth.get(cell_index):
+                            columnwidth.update({cell_index: len("%s"%(cell_value))})
                     else:
-                        columnwidth.update({cell_index: len(str(cell_value))})
+                        columnwidth.update({cell_index: len("%s"%(cell_value))})
                     if row_index == 1:
                         cell_style = colour_style
                     elif row_index != len(rows) - 1:
