@@ -1,35 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        <record id="issue_cost_wizard_form" model="ir.ui.view">
-            <field name="name">issue.cost.wizard.form</field>
-            <field name="model">issue.cost.wizard</field>
-            <field name="arch" type="xml">
-                <form string="期间发出成本">
-                	<group>
-	                	<group>
-                            <field name='period_id'/>
-	                	</group>
-                        <footer>
-                            <button name="check_month_product_cost" type="object" string="确定" class="oe_highlight"/>
-                            or
-                            <button name="cancel" special="cancel" type="object" string="取消" class="oe_highlight"/>
-                        </footer>
-                	</group>
-                </form>
-            </field>
-        </record>
-        <record id="issue_cost_wizard_action" model="ir.actions.act_window">
-            <field name="name">发出成本</field>
-            <field name="res_model">issue.cost.wizard</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-        </record>
-        <!--结账菜单-->
-
-        <menuitem id='issue_cost_wizard_menu' action='issue_cost_wizard_action' parent='checkout_menu' sequence='20'/>
-
         <record id="month_product_cost_tree" model="ir.ui.view">
             <field name="name">month.product.cost.tree</field>
             <field name="model">month.product.cost</field>
@@ -49,6 +20,21 @@
             </field>
         </record>
 
+        <record id="month_product_cost_search" model="ir.ui.view">
+            <field name="name">发出成本</field>
+            <field name="model">>month.product.cost</field>
+            <field name="arch" type="xml">
+                <search string="Search Voucher">
+                    <field name='goods_id' filter_domain="[('name','ilike',self)]"/>
+                    <field name='period_id'/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
+                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
         <record id="month_product_cost_action" model="ir.actions.act_window">
             <field name="name">发出成本(总)</field>
             <field name="res_model">month.product.cost</field>
