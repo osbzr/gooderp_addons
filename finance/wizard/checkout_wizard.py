@@ -276,7 +276,6 @@ class checkout_wizard(models.TransientModel):
                             'before_voucher_name': voucher_id.name,
                             'after_voucher_name': next_voucher_name,
                         })
-                    print 'aaaaaaaaaaaaaaaaa'
                     voucher_id.with_context(context).write({'name': next_voucher_name})
                     last_voucher_number += 1
             # update ir.sequence  number_next

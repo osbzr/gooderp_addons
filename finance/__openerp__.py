@@ -18,7 +18,7 @@
         'res_config_view.xml',
         'finance_conf.xml',
         'wizard/checkout_wizard.xml',
-        'wizard/issue_cost_wizard.xml',
+        'issue_cost_wizard.xml',
         'finance_view.xml',
         'company.xml',
         'trial_balance.xml',

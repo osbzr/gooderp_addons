@@ -6,3 +6,4 @@ import balance_sheet
 import report
 import res_config
 import voucher_template
+import issue_cost_wizard
