@@ -1,0 +1,31 @@
+<openerp>
+    <data>
+        <!-- 固定资产 action -->
+        <record id="asset_action" model="ir.actions.act_window">
+            <field name="name">固定资产</field>
+            <field name="res_model">asset</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <!-- 固定资产折旧明细 action -->
+        <record id="asset_line_action" model="ir.actions.act_window">
+            <field name="name">固定资产折旧明细</field>
+            <field name="res_model">asset.line</field>
+            <field name="view_mode">tree</field>
+        </record>
+		<!-- 固定资产折旧 action -->
+        <act_window id="create_depreciation_action"
+        	name='固定资产折旧'
+	        res_model="create.depreciation.wizard"
+	        multi="True"
+	        view_type="form"
+	        view_mode="form"
+	        target="new"
+	        />
+        <!-- 固定资产分类 action -->
+        <record id="asset_category_action" model="ir.actions.act_window">
+            <field name="name">固定资产分类</field>
+            <field name="res_model">asset.category</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</openerp>

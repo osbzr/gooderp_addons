@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-
+		<!--固定资产-->
 		<record id='asset_tree' model='ir.ui.view'>
 			<field name='name'>asset.tree</field>
 			<field name='model'>asset</field>
@@ -14,14 +14,13 @@
 					<field name='tax'/>
 					<field name='no_depreciation'/>
 					<field name='depreciation_number'/>
-					<field name='attribute'/>
+					<field name='category_id'/>
                     <field name='state'/>
 				</tree>
 			</field>
 		</record>
 
-                <!--固定资产清理-->
-
+        <!--固定资产清理-->
         <record id="create_clean_wizard_form" model="ir.ui.view">
             <field name="name">create.clean.wizard</field>
             <field name="model">create.clean.wizard</field>
@@ -45,20 +44,7 @@
             </field>
         </record>
 
-
-        <record id="create_clean_action" model="ir.actions.act_window">
-            <field name="name">固定资产清理</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">create.clean.wizard</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="create_clean_wizard_form"/>
-            <field name="target">new</field>
-            <field name="multi">True</field>
-        </record>
-
         <!--固定资产变更-->
-
         <record id="create_chang_wizard_form" model="ir.ui.view">
             <field name="name">create.chang.wizard</field>
             <field name="model">create.chang.wizard</field>
@@ -81,19 +67,28 @@
             	</form>
             </field>
         </record>
-
-
+        
+        <!-- form view在此前定义，后面的form view引用了这两个action，所以不能把它们放在action文件里 -->
+        <!-- 固定资产清理 action -->
+        <record id="create_clean_action" model="ir.actions.act_window">
+            <field name="name">固定资产清理</field>
+            <field name="res_model">create.clean.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="create_clean_wizard_form"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+        <!-- 固定资产变更 action -->
         <record id="create_chang_action" model="ir.actions.act_window">
             <field name="name">固定资产变更</field>
-            <field name="type">ir.actions.act_window</field>
             <field name="res_model">create.chang.wizard</field>
-            <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="create_chang_wizard_form"/>
             <field name="target">new</field>
             <field name="multi">True</field>
         </record>
 
+		<!--固定资产-->
         <record id='asset_form' model='ir.ui.view'>
 			<field name='name'>asset.form</field>
 			<field name='model'>asset</field>
@@ -121,13 +116,13 @@
                                 <field name="bank_account"/>
                                 <field name="no_depreciation"/>
                                 <field name="is_init" groups='core.master_groups'/>
-                                <field name="attribute"/>
+                                <field name="category_id"/>
                             </group>
                             <group>
                                 <field name="cost"/>
                                 <field name="tax"/>
                                 <field name="amount"/>
-                                <field name="depreciation_value2"/>
+                                <field name="depreciation_previous"/>
                                 <field name="surplus_value"/>
                                 <field name="depreciation_number"/>
                                 <field name="depreciation_value"/>
@@ -136,7 +131,7 @@
                                 <field name="account_asset"/>
                                 <field name="account_credit"/>
                                 <field name="account_depreciation"/>
-                                <field name="account_depreciation2"/>
+                                <field name="account_accumulated_depreciation"/>
                                 <field name="cost_depreciation"/>
                             </group>
                         </group>
@@ -169,14 +164,7 @@
 			</field>
 		</record>
 
-        <record id="asset_action" model="ir.actions.act_window">
-            <field name="name">固定资产</field>
-            <field name="res_model">asset</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
+		<!--固定资产折旧明细-->
         <record id='asset_line_tree' model='ir.ui.view'>
 			<field name='name'>asset.line.tree</field>
 			<field name='model'>asset.line</field>
@@ -207,16 +195,7 @@
             </field>
         </record>
 
-
-        <record id="asset_line_action" model="ir.actions.act_window">
-            <field name="name">固定资产折旧明细</field>
-            <field name="res_model">asset.line</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
         <!--固定资产折旧-->
-
         <record id="create_depreciation_wizard_form" model="ir.ui.view">
             <field name="name">create.depreciation.wizard.form</field>
             <field name="model">create.depreciation.wizard</field>
@@ -236,22 +215,14 @@
             </field>
         </record>
 
-      <act_window id="create_depreciation_action"
-        name='固定资产折旧'
-        res_model="create.depreciation.wizard"
-        multi="True"
-        view_type="form"
-        view_mode="form"
-        target="new"
-        />
-
+		<!--固定资产分类-->
         <record id='asset.category_tree' model='ir.ui.view'>
 			<field name='name'>asset.category.tree</field>
 			<field name='model'>asset.category</field>
 			<field name='arch' type='xml'>
 				<tree string='固定资产分类'>
 					<field name='name'/>
-					<field name='account_depreciation2'/>
+					<field name='account_accumulated_depreciation'/>
 					<field name='account_asset'/>
 					<field name='account_depreciation'/>
                     <field name='depreciation_number'/>
@@ -262,34 +233,16 @@
 			</field>
 		</record>
 
-        <record id="asset_category_action" model="ir.actions.act_window">
-            <field name="name">固定资产分类</field>
-            <field name="res_model">asset.category</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
         <record id="init_asset_form" model="ir.ui.view">
             <field name="name">init.asset.form</field>
             <field name="model">voucher</field>
             <field name="inherit_id" ref="finance.voucher_form"/>
             <field name="arch" type="xml">
                 <button  name="voucher_done" position="after">
+                	<field name='is_init' invisible='1'/>
                     <button name='init_asset' string="引入固定资产" type="object" class="oe_highlight" attrs="{'invisible': ['|',('is_init', '=', False), ('state', '=', 'done')]}"/>
                 </button>
             </field>
         </record>
-
-
-
-        <menuitem id='asset_home_menu_finance' name='固定资产' action="asset_action"
-                  parent='finance.voucher_home_menu' sequence='11'/>
-
-        <menuitem id='asset_line_menu_finance' name="固定资产折旧明细"
-                  action='asset_line_action' parent='finance.voucher_books_menu' sequence='11'/>
-        <menuitem id='create_depreciation_menu_finance' name="资产折旧"
-                  action='create_depreciation_action' parent='finance.checkout_menu' sequence='11'/>
-        <menuitem id='asset_category_finance' name="固定资产分类"
-                  action='asset_category_action' parent='finance.finance_setting_menu' sequence='31'/>
 	</data>
 </openerp>

@@ -47,7 +47,7 @@
         <!-- 固定资产分类 -->
         <record id="machinery_equipment" model='asset.category'>
             <field name='name'>机器设备</field>
-            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
             <field name='account_asset' ref='small_business_chart160101'/>
             <field name='account_depreciation' ref='small_business_chart410101'/>
             <field name='depreciation_number'>120</field>
@@ -57,7 +57,7 @@
         </record>
         <record id="transport_tool" model='asset.category'>
             <field name='name'>运输工具</field>
-            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
             <field name='account_asset' ref='small_business_chart160101'/>
             <field name='account_depreciation' ref='small_business_chart410101'/>
             <field name='depreciation_number'>48</field>
@@ -67,7 +67,7 @@
         </record>
         <record id="electronic_equipment" model='asset.category'>
             <field name='name'>电子设备</field>
-            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
             <field name='account_asset' ref='small_business_chart160101'/>
             <field name='account_depreciation' ref='small_business_chart410101'/>
             <field name='depreciation_number'>48</field>
@@ -77,7 +77,7 @@
         </record>
         <record id="production_tool" model='asset.category'>
             <field name='name'>生产工具</field>
-            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
             <field name='account_asset' ref='small_business_chart160101'/>
             <field name='account_depreciation' ref='small_business_chart410101'/>
             <field name='depreciation_number'>60</field>
@@ -87,7 +87,7 @@
         </record>
         <record id="office_furniture" model='asset.category'>
             <field name='name'>办公家具</field>
-            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
             <field name='account_asset' ref='small_business_chart160101'/>
             <field name='account_depreciation' ref='small_business_chart410101'/>
             <field name='depreciation_number'>60</field>
@@ -97,7 +97,7 @@
         </record>
         <record id="house" model='asset.category'>
             <field name='name'>房屋</field>
-            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
             <field name='account_asset' ref='small_business_chart160101'/>
             <field name='account_depreciation' ref='small_business_chart410101'/>
             <field name='depreciation_number'>240</field>
@@ -107,7 +107,7 @@
         </record>
         <record id="no_tax_house" model='asset.category'>
             <field name='name'>非房产税房产</field>
-            <field name='account_depreciation2' ref='finance.small_business_chart1602'/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
             <field name='account_asset' ref='small_business_chart160101'/>
             <field name='account_depreciation' ref='small_business_chart410101'/>
             <field name='depreciation_number'>240</field>
@@ -117,7 +117,7 @@
         </record>
         <record id="land" model='asset.category'>
             <field name='name'>土地</field>
-            <field name='account_depreciation2' ref='small_business_chart170201'/>
+            <field name='account_accumulated_depreciation' ref='small_business_chart170201'/>
             <field name='account_asset' ref='small_business_chart170101'/>
             <field name='account_depreciation' ref='small_business_chart5602022'/>
             <field name='depreciation_number'>600</field>
