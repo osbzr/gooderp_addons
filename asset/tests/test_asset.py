@@ -23,7 +23,7 @@ class test_asset(TransactionCase):
         self.asset.onchange_category_id()
         self.asset.cost = 2000
         self.asset.onchange_cost()
-        self.asset.partner_id = self.env.ref('core.jd')
+        self.asset.partner_id = self.env.ref('core.zt')
         self.asset.onchange_partner_id()
         self.asset.bank_account = self.env.ref('core.alipay')
         self.asset.onchange_bank_account()
