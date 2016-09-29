@@ -432,12 +432,10 @@ class other_money_order(models.Model):
                 self.env['money.invoice'].create_voucher_line(vals)
         # 删除初始非需要的凭证明细行
         if self.is_init:
-            print 'aaaaaaaaaaaaa'
             vouch_line_ids = self.env['voucher.line'].search([
                 '&',
                 ('account_id', '!=', self.bank_id.account_id.id),
                 ('init_obj', '=', 'other_money_order-%s' % (self.id))])
-            print 'bbbbbbbbb',vouch_line_ids
             for vouch_line_id in vouch_line_ids:
                 vouch_line_id.unlink()
         else:

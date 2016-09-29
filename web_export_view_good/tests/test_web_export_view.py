@@ -10,9 +10,7 @@ import openerp.tests
 # class TestWebExportView(openerp.tests.HttpCase):
 
 #     def test_web_export_view(self):
-#         print "++++"
 #         self.phantom_js("/", "openerp.Tour.run('test_export_view', 'test')", "openerp.Tour.tours.test_export_view", login="admin")
-#         print "----------"
 
 
 class TestWebExportViewTwo(TransactionCase):

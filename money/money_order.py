@@ -277,7 +277,6 @@ class money_order_line(models.Model):
     def _compute_currency_id(self):
         partner_currency_id = self.bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
         self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
-        print self.currency_id
         if self.bank_id and self.currency_id.id != self.money_id.currency_id.id :
             raise ValidationError(u'结算帐户与业务伙伴币别不一致')
 
