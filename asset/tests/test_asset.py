@@ -16,3 +16,8 @@ class test_asset(TransactionCase):
             self.asset.unlink()
         # 删除草稿状态的固定资产
         asset.unlink()
+
+    def test_onchange(self):
+        '''资产相关科目由资产类别带出'''
+        self.asset.category_id = self.env.ref('asset.house')
+        self.onchange_category_id()
