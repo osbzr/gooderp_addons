@@ -18,7 +18,6 @@
         'res_config_view.xml',
         'finance_conf.xml',
         'wizard/checkout_wizard.xml',
-        'wizard/issue_cost_wizard.xml',
         'finance_view.xml',
         'company.xml',
         'trial_balance.xml',
@@ -26,6 +25,7 @@
         'balance_sheet.xml',
         'home_page_data.xml',
         'voucher_template.xml',
+        'issue_cost_wizard.xml',
     ],
     'demo': [
         'tests/finance_demo.xml',

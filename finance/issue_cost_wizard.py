@@ -2,25 +2,9 @@
 
 from openerp import models, fields, api
 
-
-class IssueCostWizard(models.TransientModel):
-    _name = 'issue.cost.wizard'
-    period_id = fields.Many2one('finance.period', string='会计期间', help=u'根据选定期间过滤出已经生成的发出成本记录！')
-
-    @api.multi
-    def check_month_product_cost(self):
-        view = self.env.ref('finance.month_product_cost_tree')
-        return {
-            'view_mode': 'tree',
-            'views': [(view.id, 'tree')],
-            'res_model': 'month.product.cost',
-            'type': 'ir.actions.act_window',
-            'domain': [('period_id', '=', self.period_id.id)]
-        }
-
-
 class MonthProductCost(models.Model):
     _name = 'month.product.cost'
+    _order = 'period_id'
     period_id = fields.Many2one('finance.period', string='会计期间')
     goods_id = fields.Many2one('goods', string="产品")
     period_begin_qty = fields.Float(string='期初数量')
@@ -44,12 +28,11 @@ class MonthProductCost(models.Model):
             FROM wh_move_line line
             LEFT JOIN warehouse wh_dest ON line.warehouse_dest_id = wh_dest.id
             LEFT JOIN warehouse wh ON line.warehouse_id = wh.id
-            WHERE line.type in ('in','out')
-              AND line.state = 'done'
+            WHERE  line.state = 'done'
               AND line.date >= '%s'
               AND line.date <= '%s'
-              AND ((wh_dest.type='stock' AND wh.type!='stock')
-              OR (wh_dest.type!='stock' AND wh.type='stock'))
+              AND ((wh_dest.type='stock'AND wh.type!='stock') OR
+                (wh_dest.type!='stock' AND wh.type='stock'))
             GROUP BY line.goods_id,line.type
         ''' % (date_range[0], date_range[1]))
         return self.env.cr.dictfetchall()
@@ -147,6 +130,7 @@ class MonthProductCost(models.Model):
         month_product_cost_dict = {}
         for dict_goods in list_dict_data:
             period_begin_qty_cost = self.get_goods_last_period_remaining_qty(period_id, dict_goods.get('goods_id'))
+            vals = {}
             if dict_goods.get('goods_id') not in month_product_cost_dict:
                 vals = {'goods_id': dict_goods.get('goods_id'), 'period_id': period_id.id,
                         'period_begin_qty': period_begin_qty_cost.get('current_period_remaining_qty', 0),
