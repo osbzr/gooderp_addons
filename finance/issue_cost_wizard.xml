@@ -36,7 +36,7 @@
             </field>
         </record>
         <record id="month_product_cost_action" model="ir.actions.act_window">
-            <field name="name">发出成本(总)</field>
+            <field name="name">发出成本</field>
             <field name="res_model">month.product.cost</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
