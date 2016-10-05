@@ -1,4 +1,4 @@
-openerp.web_float_limit = function(instance) {
+odoo.web_float_limit = function(instance) {
     instance.web.form.widgets = instance.web.form.widgets.extend({
         'float_limit' : 'instance.web.form.FieldFloatLimit',
     });

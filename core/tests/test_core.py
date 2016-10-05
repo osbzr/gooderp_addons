@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
+from odoo.tests.common import TransactionCase
 from psycopg2 import IntegrityError
-from openerp.exceptions import except_orm
+from odoo.exceptions import UserError
 
 
 class test_core(TransactionCase):
@@ -26,9 +26,9 @@ class test_res_users(TransactionCase):
         user_demo.groups_id = [(4, self.env.ref('base.group_erp_manager').id)]
         user_admin = self.env.ref('base.user_root')
         env2 = self.env(self.env.cr, user_demo.id, self.env.context)
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             user_admin.with_env(env2).name = 'adsf'
-        # with self.assertRaises(except_orm):
+        # with self.assertRaises(UserError):
         user_admin.groups_id = [(3, self.env.ref('base.group_erp_manager').id)]
 
 

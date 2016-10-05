@@ -2,21 +2,20 @@
 # © 2016 Elico Corp (www.elico-corp.com).
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from openerp.report.report_sxw import report_sxw
-from openerp import pooler
+from odoo.report.report_sxw import report_sxw
 import logging
 from pyPdf import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
 import os
 import base64
 from docxtpl import DocxTemplate
-from openerp.tools.translate import _
-from openerp.tools import misc
+from odoo.tools.translate import _
+from odoo.tools import misc
 _logger = logging.getLogger(__name__)
 import pytz
 
-from openerp import models
-from openerp import fields
+from odoo import models
+from odoo import fields
 
 class DataModelProxy(object):
     '''使用一个代理类，来转发 model 的属性，用来消除掉属性值为 False 的情况
@@ -101,9 +100,7 @@ class IterDataModelProxy(object):
 
 class ReportDocx(report_sxw):
     def create(self, cr, uid, ids, data, context=None):
-        self.pool = pooler.get_pool(cr.dbname)
-
-        report_obj = self.pool.get('ir.actions.report.xml')
+        report_obj = self.env.get('ir.actions.report.xml')
         report_ids = report_obj.search(
             cr, uid, [('report_name', '=', self.name[7:])], context=context)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm, ValidationError
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError, ValidationError
 
 
 class test_voucher(TransactionCase):
@@ -12,29 +12,29 @@ class test_voucher(TransactionCase):
         voucher.voucher_done()
         self.assertTrue(voucher.state == 'done')
         #已审批的凭证不可以删除
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             voucher.unlink()
         for line in voucher.line_ids:
-            with self.assertRaises(except_orm):
+            with self.assertRaises(UserError):
                 line.unlink()
         #重复审批
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             voucher.voucher_done()
         #正常反审批
         voucher.voucher_draft()
         self.assertTrue(voucher.state == 'draft')
         #重复反审批
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             voucher.voucher_draft()
         #会计期间已关闭时的审批
         voucher.period_id.is_closed = True
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             voucher.voucher_done()
         #会计期间已关闭时的反审批
         voucher.period_id.is_closed = False
         voucher.voucher_done()
         voucher.period_id.is_closed = True
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             voucher.voucher_draft()
 
     def test_line_unlink(self):
@@ -92,7 +92,7 @@ class test_period(TransactionCase):
         period_obj = self.env['finance.period']
         if not period_obj.search([('year','=','2100'),
                                   ('month','=','6')]):
-            with self.assertRaises(except_orm):
+            with self.assertRaises(UserError):
                 period_obj.get_period('2100-06-20')
             
     def test_onchange_account_id(self):

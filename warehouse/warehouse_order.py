@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
+from odoo.osv import osv
 from utils import inherits, inherits_after, create_name, create_origin
-import openerp.addons.decimal_precision as dp
-from openerp import models, fields, api
+import odoo.addons.decimal_precision as dp
+from odoo import models, fields, api
 
 
 class wh_out(models.Model):

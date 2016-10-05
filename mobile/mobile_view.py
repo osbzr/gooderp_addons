@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields, api
-from openerp.osv import osv, fields as osv_fields
+from odoo import models, fields, api
 from xml.etree import ElementTree
-from openerp.tools.safe_eval import safe_eval as eval
+from odoo.tools.safe_eval import safe_eval as eval
 import itertools
 try:
     from cStringIO import StringIO

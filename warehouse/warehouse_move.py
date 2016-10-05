@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-from openerp import models, fields, api
+from odoo.osv import osv
+from odoo import models, fields, api
 
 
 class wh_move(models.Model):

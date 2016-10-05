@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 class test_report(TransactionCase):
     def test_bank_report(self):
@@ -22,7 +22,7 @@ class test_report(TransactionCase):
         # 测试现金银行对账单向导：'结束日期不能小于开始日期！'
         statement_date_error = self.env['bank.statements.report.wizard'].create({'bank_id':self.env.ref('core.comm').id,
                                                                                 'from_date': '2016-11-03', 'to_date': '2016-11-02'})
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             statement_date_error.confirm_bank_statements()
         # 测试现金银行对账单向导：from_date的默认值是否是公司启用日期
         statement_date = self.env['bank.statements.report.wizard'].create({'bank_id': self.env.ref('core.comm').id,
@@ -44,7 +44,7 @@ class test_report(TransactionCase):
         # 测试其他收支单明细表向导：'结束日期不能小于开始日期！'
         statement_error_date = self.env['other.money.statements.report.wizard'].create({'from_date': '2016-11-03',
                                                                                         'to_date': '2016-11-01'})
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             statement_error_date.confirm_other_money_statements()
         # 测试其他收支单明细表向导：from_date的默认值
         statement_date = self.env['other.money.statements.report.wizard'].create({'to_date': '2016-11-03'})

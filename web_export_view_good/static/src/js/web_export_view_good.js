@@ -20,7 +20,7 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //#############################################################################
-openerp.web_export_view_good = function (instance) {
+odoo.web_export_view_good = function (instance) {
 
     var _t = instance.web._t, QWeb = instance.web.qweb;
     instance.web.TreeView.include({

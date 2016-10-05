@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-import openerp.addons.decimal_precision as dp
+from odoo.osv import osv
+import odoo.addons.decimal_precision as dp
 from utils import safe_division
 from jinja2 import Environment, PackageLoader
-from openerp import models, fields, api
+from odoo import models, fields, api
 
-env = Environment(loader=PackageLoader('openerp.addons.warehouse', 'html'), autoescape=True)
+env = Environment(loader=PackageLoader('odoo.addons.warehouse', 'html'), autoescape=True)
 
 
 class wh_move_line(models.Model):

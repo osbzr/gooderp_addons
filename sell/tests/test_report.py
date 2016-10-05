@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_customer_statements(TransactionCase):
@@ -50,9 +50,9 @@ class test_customer_statements(TransactionCase):
         '''客户对账单向导'''
         # 测试客户对账单方法中的'结束日期不能小于开始日期！'
         self.statement.from_date = '2016-11-03'
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.statement.partner_statements_without_goods()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.statement.partner_statements_with_goods()
         # 测试客户对账单方法中的from_date的默认值是否是公司启用日期
         statement_date = self.env['partner.statements.report.wizard'].create({'partner_id': self.env.ref('sell.sell_order_1').partner_id.id,
@@ -67,7 +67,7 @@ class test_customer_statements(TransactionCase):
         customer_statement_init = self.env['customer.statements.report'].search([('move_id', '=', False),
                                                                                  ('amount', '!=', 0)])
         # 如果对账单中是期初余额行，点击查看按钮应报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             customer_statement_init.find_source_order()
 
         for report in list(set(customer_statement) - set(customer_statement_init)):
@@ -80,7 +80,7 @@ class test_customer_statements(TransactionCase):
                                                          ('amount', '!=', 0)])
 
         # 如果对账单中是期初余额行，点击查看按钮应报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             customer_statement_goods_init.find_source_order()
 
         for report in list(set(customer_statement_goods) - set(customer_statement_goods_init)):
@@ -129,7 +129,7 @@ class test_track_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             track.button_ok()
         # 按日期搜索
         self.track.button_ok()
@@ -193,7 +193,7 @@ class test_detail_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             detail.button_ok()
         # 按日期搜索
         self.detail.button_ok()
@@ -241,7 +241,7 @@ class test_goods_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             goods_wizard.button_ok()
         # 按日期搜索
         self.goods_wizard.button_ok()
@@ -301,7 +301,7 @@ class test_partner_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             partner_wizard.button_ok()
         # 按日期搜索
         self.partner_wizard.button_ok()
@@ -357,7 +357,7 @@ class test_staff_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             staff_wizard.button_ok()
         # 按日期搜索
         self.staff_wizard.button_ok()
@@ -443,7 +443,7 @@ class test_receipt_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             receipt_wizard.button_ok()
         # 按日期搜索
         self.receipt_wizard.button_ok()
@@ -499,7 +499,7 @@ class test_sell_top_ten_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_ok()
         # 日期默认值
         self.wizard_obj.create({})

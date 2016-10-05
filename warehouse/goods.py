@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
+from odoo.osv import osv
 from utils import safe_division
 
-from openerp import models, fields, api
+from odoo import models, fields, api
 
 
 class goods(models.Model):

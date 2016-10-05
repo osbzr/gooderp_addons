@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from openerp.addons.web import http
-from openerp.addons.web.http import request
-from openerp.tools.safe_eval import safe_eval as eval
-import openerp
+from odoo import http
+from odoo.http import request
+from odoo.tools.safe_eval import safe_eval as eval
 import simplejson
 import os
 import sys
 import jinja2
 import werkzeug
 from xml.etree import ElementTree
-from openerp.modules.registry import RegistryManager
+from odoo.modules.registry import RegistryManager
 from contextlib import closing
 try:
     from cStringIO import StringIO
@@ -21,7 +20,7 @@ if hasattr(sys, 'frozen'):
     path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'html'))
     loader = jinja2.FileSystemLoader(path)
 else:
-    loader = jinja2.PackageLoader('openerp.addons.mobile', 'html')
+    loader = jinja2.PackageLoader('odoo.addons.mobile', 'html')
 
 env = jinja2.Environment('<%', '%>', '${', '}', '%', loader=loader, autoescape=True)
 

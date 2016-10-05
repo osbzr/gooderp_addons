@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_reconcile_order(TransactionCase):
@@ -26,10 +26,10 @@ class test_reconcile_order(TransactionCase):
         # money.invoice 没有设置科目 银行账户没设置科目
         self.get_invoice.partner_id.c_category_id = False
         self.get_invoice.partner_id.s_category_id = False
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.get_invoice.money_invoice_done()
         self.get_invoice.category_id.account_id = False
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.get_invoice.money_invoice_done()
 
     def test_adv_pay_to_get(self):
@@ -94,10 +94,10 @@ class test_reconcile_order(TransactionCase):
         reconcile.onchange_partner_id()
         # 核销金额不能大于未核销金额
         reconcile.advance_payment_ids.to_reconcile = 200.0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             reconcile.reconcile_order_done()
         reconcile.receivable_source_ids.to_reconcile = 200.0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             reconcile.reconcile_order_done()
         reconcile.advance_payment_ids.to_reconcile = 300.0
         reconcile.receivable_source_ids.to_reconcile = 300.0
@@ -107,7 +107,7 @@ class test_reconcile_order(TransactionCase):
         # 确认核销单为已审核状态
         self.assertEqual(reconcile.state, 'done')
         # 已审核的核销单应该不可删除
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             reconcile.unlink()
         # 未审核的核销单可删除
         self.env.ref('money.pay_2000').money_order_done()
@@ -120,11 +120,11 @@ class test_reconcile_order(TransactionCase):
         reconcile_adv_get_to_pay = self.env.ref('money.reconcile_adv_get_to_pay')
         reconcile_adv_get_to_pay.partner_id = self.env.ref('core.lenovo').id
         reconcile_adv_get_to_pay.onchange_partner_id()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             reconcile_adv_get_to_pay.reconcile_order_done()
         # 预收预付时，本次核销金额不能大于未核销金额
         reconcile_adv_get_to_pay.advance_payment_ids.this_reconcile = 900.0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             reconcile_adv_get_to_pay.reconcile_order_done()
         # 状态为‘done’,再次执行reconcile_order_done(),执行continue
         reconcile_pay_to_pay_done = self.env['reconcile.order'].create({'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
@@ -150,12 +150,12 @@ class test_reconcile_order(TransactionCase):
                                                                                 'business_type': 'pay_to_pay',
                                                                                 'name': 'TO20160009', 'date': "2016-02-20",
                                                                                 'note': 'ywp pay to pay'})
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             reconcile_pay_to_pay_partner_same.reconcile_order_done()
 
         reconcile_pay_to_pay = self.env.ref('money.reconcile_pay_to_pay')
         # 执行_get_or_pay中的'核销金额不能大于未核销金额'
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             reconcile_pay_to_pay.payable_source_ids.this_reconcile = 800.0
             reconcile_pay_to_pay.reconcile_order_done()
         # 执行_get_or_pay里的business_type 'get_to_get'

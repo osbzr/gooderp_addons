@@ -1,7 +1,7 @@
 # -*- coding: utf-8-*- 
 
-from openerp import models
-from openerp.osv import osv, fields
+from odoo import models
+from odoo.osv import osv, fields
 from datetime import datetime
  
 class mail_message(osv.Model):

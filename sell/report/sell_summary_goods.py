@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from openerp import fields, models, api
-import openerp.addons.decimal_precision as dp
+from odoo import fields, models, api
+import odoo.addons.decimal_precision as dp
 import datetime
 
 class sell_summary_goods(models.Model):

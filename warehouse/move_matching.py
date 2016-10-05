@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-import openerp.addons.decimal_precision as dp
+from odoo.osv import osv
+import odoo.addons.decimal_precision as dp
 from utils import safe_division
-from openerp import models, fields, api
+from odoo import models, fields, api
 
 
 class wh_move_matching(models.Model):

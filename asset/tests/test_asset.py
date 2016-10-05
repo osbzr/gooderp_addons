@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 class test_asset(TransactionCase):
 
@@ -12,7 +12,7 @@ class test_asset(TransactionCase):
         '''测试删除已审核的固定资产'''
         asset = self.asset.copy()
         self.asset.asset_done()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.asset.unlink()
         # 删除草稿状态的固定资产
         asset.unlink()

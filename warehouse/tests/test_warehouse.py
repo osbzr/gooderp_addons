@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class TestWarehouse(TransactionCase):
@@ -52,14 +52,14 @@ class TestWarehouse(TransactionCase):
         result = self.env['warehouse'].name_search('000')
         self.assertEqual(result, real_result)
 
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.env['warehouse'].get_warehouse_by_type('error')
 
         # 临时在warehouse的类型中添加一个error类型的错误，让它跳过类型检测的异常
         # 此时在数据库中找不到该类型的仓库，应该报错
         x = self.env['warehouse'].search([('type', '=', 'inventory')])
         x.unlink()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.env['warehouse'].get_warehouse_by_type('inventory')
 
     def test_scan_barcode(self):
@@ -78,7 +78,7 @@ class TestWarehouse(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,order.id)
         #产品不存在报错
         barcode = '12342312312'
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             warehouse.scan_barcode(model_name,barcode,order.id)
 
         # 产品的条形码扫码出入库

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_supplier_statements(TransactionCase):
@@ -51,9 +51,9 @@ class test_supplier_statements(TransactionCase):
         '''供应商对账单向导'''
         # 测试'结束日期不能小于开始日期！'
         self.statement.from_date = '2016-11-03'
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.statement.partner_statements_without_goods()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.statement.partner_statements_with_goods()
         # 测试from_date的默认值是否是公司启用日期
         objStatements = self.env['partner.statements.report.wizard']
@@ -73,7 +73,7 @@ class test_supplier_statements(TransactionCase):
         supplier_statement_init = self.env['supplier.statements.report'].search([('move_id', '=', False),
                                                                                  ('amount', '!=', 0)])
         # 如果对账单中是期初余额行，点击查看按钮应报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             supplier_statement_init.find_source_order()
 
         for report in list(set(supplier_statement) - set(supplier_statement_init)):
@@ -87,7 +87,7 @@ class test_supplier_statements(TransactionCase):
                                                          ('amount', '!=', 0)])
 
         # 如果对账单中是期初余额行，点击查看按钮应报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             supplier_statement_goods_init.find_source_order()
 
         for report in list(set(supplier_statement_goods) - set(supplier_statement_goods_init)):

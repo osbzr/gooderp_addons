@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-# from openerp.osv import fields
+from odoo.osv import osv
+# from odoo.osv import fields
 from utils import create_name, safe_division
-import openerp.addons.decimal_precision as dp
+import odoo.addons.decimal_precision as dp
 
-from openerp import models
-from openerp import fields
-from openerp import api
+from odoo import models
+from odoo import fields
+from odoo import api
 
 
 class wh_inventory(models.Model):

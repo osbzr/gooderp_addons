@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class TestInventory(TransactionCase):
@@ -140,7 +140,7 @@ class TestInventory(TransactionCase):
         # 盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致的时候，此时没法生成盘盈盘亏单据
         mouse.difference_qty = -1
         mouse.difference_uos_qty = 1
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.inventory.generate_inventory()
 
         mouse.line_role_back()
@@ -164,7 +164,7 @@ class TestInventory(TransactionCase):
 
         # 重新盘点的时候相关的出入库单的单据必须未审核
         self.inventory.in_id.approve_order()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.inventory.requery_inventory()
 
         self.inventory.in_id.cancel_approved_order()
@@ -178,7 +178,7 @@ class TestInventory(TransactionCase):
         self.assertEqual(self.inventory.state, 'done')
 
         # 完成的单据不应该被删除
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.inventory.unlink()
 
         results = self.inventory.open_in()

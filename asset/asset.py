@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api
-import openerp.addons.decimal_precision as dp
-from openerp.exceptions import except_orm, ValidationError
+from odoo import models, fields, api
+import odoo.addons.decimal_precision as dp
+from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
 
 # 字段只读状态
@@ -129,15 +129,15 @@ class asset(models.Model):
     @api.one
     def _wrong_asset_done(self):
         if self.state == 'done':
-            raise except_orm(u'错误', u'请不要重复审核！')
+            raise UserError(u'错误', u'请不要重复审核！')
         if self.period_id.is_closed:
-            raise except_orm(u'错误', u'该会计期间已结账！不能审核')
+            raise UserError(u'错误', u'该会计期间已结账！不能审核')
         if self.cost <= 0:
-            raise except_orm(u'错误', u'金额必须大于0！')
+            raise UserError(u'错误', u'金额必须大于0！')
         if self.tax < 0:
-            raise except_orm(u'错误', u'税额必须大于0！')
+            raise UserError(u'错误', u'税额必须大于0！')
         if self.depreciation_previous < 0:
-            raise except_orm(u'错误', u'以前折旧必须大于0！')
+            raise UserError(u'错误', u'以前折旧必须大于0！')
         return
 
     @api.one
@@ -218,13 +218,13 @@ class asset(models.Model):
     def asset_draft(self):
         ''' 反审核固定资产 '''
         if self.state == 'draft':
-            raise except_orm(u'错误', u'请不要重复反审核！')
+            raise UserError(u'错误', u'请不要重复反审核！')
         if self.line_ids :
-            raise except_orm(u'错误', u'已折旧不能反审核！')
+            raise UserError(u'错误', u'已折旧不能反审核！')
         if self.chang_ids :
-            raise except_orm(u'错误', u'已变更不能反审核！')
+            raise UserError(u'错误', u'已变更不能反审核！')
         if self.period_id.is_closed:
-            raise except_orm(u'错误', u'该会计期间已结账！不能反审核')
+            raise UserError(u'错误', u'该会计期间已结账！不能反审核')
         self.state = 'draft'
         '''删掉凭证'''
         if self.voucher_id:
@@ -249,7 +249,7 @@ class asset(models.Model):
     def unlink(self):
         for record in self:
             if record.state != 'draft':
-                raise except_orm(u'错误', u'只能删除草稿状态的固定资产')
+                raise UserError(u'错误', u'只能删除草稿状态的固定资产')
 
         return super(asset, self).unlink()
 
@@ -505,7 +505,7 @@ class CreateDepreciationWizard(models.TransientModel):
 
         if not vouch_obj.line_ids:
             vouch_obj.unlink()
-            raise except_orm(u'错误', u'本期所有固定资产都已折旧！')
+            raise UserError(u'错误', u'本期所有固定资产都已折旧！')
         vouch_obj.voucher_done()
         view = self.env.ref('asset.asset_line_tree')
         return {

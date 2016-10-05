@@ -18,9 +18,9 @@
 #
 ##############################################################################
 
-from openerp.exceptions import except_orm
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api
+from odoo.exceptions import UserError
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api
 
 class other_money_order(models.Model):
     _name = 'other.money.order'
@@ -45,7 +45,7 @@ class other_money_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+                raise UserError(u'错误', u'不可以删除已经审核的单据')
 
         return super(other_money_order, self).unlink()
 
@@ -104,12 +104,12 @@ class other_money_order(models.Model):
         '''其他收支单的审核按钮'''
         for other in self:
             if other.total_amount <= 0:
-                raise except_orm(u'错误', u'金额应该大于0')
+                raise UserError(u'错误', u'金额应该大于0')
 
             # 根据单据类型更新账户余额
             if other.type == 'other_pay':
                 if other.bank_id.balance < other.total_amount:
-                    raise except_orm(u'错误', u'账户余额不足')
+                    raise UserError(u'错误', u'账户余额不足')
                 other.bank_id.balance -= other.total_amount
             else:
                 other.bank_id.balance += other.total_amount
@@ -125,7 +125,7 @@ class other_money_order(models.Model):
                 other.bank_id.balance += other.total_amount
             else:
                 if other.bank_id.balance < other.total_amount:
-                    raise except_orm(u'错误', u'账户余额不足')
+                    raise UserError(u'错误', u'账户余额不足')
                 other.bank_id.balance -= other.total_amount
             other.state = 'draft'
         return True

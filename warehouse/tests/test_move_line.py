@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class TestMoveLine(TransactionCase):
@@ -71,12 +71,12 @@ class TestMoveLine(TransactionCase):
        
     def test_get_matching_records_by_lot(self):
         # 批次号未审核的时候获取批次信息会报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.mouse_out_line.goods_id.get_matching_records_by_lot(
                 self.mouse_out_line.lot_id, self.mouse_out_line.goods_qty)
 
         # 批次号不存在的时候应该报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.mouse_out_line.goods_id.get_matching_records_by_lot(False, 0)
 
         self.mouse_out_line.lot_id.action_done()
@@ -93,7 +93,7 @@ class TestMoveLine(TransactionCase):
         self.assertEqual(results[0], real_results)
 
         # 当前明细行的产品数量大于批次的数量的时候，会报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.mouse_out_line.goods_id.get_matching_records_by_lot(
                 self.mouse_out_line.lot_id,
                 self.mouse_out_line.lot_id.qty_remaining + 10)
@@ -204,11 +204,11 @@ class TestMoveLine(TransactionCase):
         self.assertEqual(self.mouse_in_line.discount_amount,
                          self.mouse_in_line.goods_qty * self.mouse_in_line.price)
 
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.mouse_in_line.unlink()
 
         self.mouse_in_line.warehouse_id = self.mouse_in_line.warehouse_dest_id
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.mouse_in_line.check_availability()
 
     def test_name_search(self):

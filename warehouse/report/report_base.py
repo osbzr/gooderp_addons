@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-from openerp.http import request
+from odoo.osv import osv
+from odoo.http import request
 import itertools
 import operator
 import time
 import pickle
-from openerp import models, api
+from odoo import models, api
 
 
 class report_base(models.Model):

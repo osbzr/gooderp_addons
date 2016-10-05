@@ -19,9 +19,9 @@
 #
 ##############################################################################
 
-from openerp.exceptions import except_orm, ValidationError
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api
+from odoo.exceptions import UserError, ValidationError
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api
 
 class money_order(models.Model):
     _name = 'money.order'
@@ -45,7 +45,7 @@ class money_order(models.Model):
                                                  ('state', '=', 'draft')])
         for order in orders:
             if order:
-                raise except_orm(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
+                raise UserError(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
 
         return super(money_order, self).create(values)
 
@@ -57,7 +57,7 @@ class money_order(models.Model):
                                                      ('state', '=', 'draft')])
             for order in orders:
                 if order:
-                    raise except_orm(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
+                    raise UserError(u'错误', u'该业务伙伴存在未审核的收/付款单，请先审核')
 
         return super(money_order, self).write(values)
 
@@ -65,7 +65,7 @@ class money_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+                raise UserError(u'错误', u'不可以删除已经审核的单据')
 
         return super(money_order, self).unlink()
 
@@ -194,11 +194,11 @@ class money_order(models.Model):
         '''对收支单的审核按钮'''
         for order in self:
             if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
-                raise except_orm(u'错误', u'请输入供应商类别上的科目')
+                raise UserError(u'错误', u'请输入供应商类别上的科目')
             if order.type == 'get' and not order.partner_id.c_category_id.account_id:
-                raise except_orm(u'错误', u'请输入客户类别上的科目')
+                raise UserError(u'错误', u'请输入客户类别上的科目')
             if order.advance_payment < 0:
-                raise except_orm(u'错误', u'核销金额不能大于付款金额')
+                raise UserError(u'错误', u'核销金额不能大于付款金额')
 
             order.to_reconcile = order.advance_payment
             order.reconciled = order.amount - order.advance_payment
@@ -207,7 +207,7 @@ class money_order(models.Model):
             for line in order.line_ids:
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
                     if line.bank_id.balance < line.amount:
-                        raise except_orm(u'错误', u'账户余额不足')
+                        raise UserError(u'错误', u'账户余额不足')
                     line.bank_id.balance -= line.amount
                 else:  # 收款账号余额增加, 退款账号余额减少
                     line.bank_id.balance += line.amount
@@ -221,7 +221,7 @@ class money_order(models.Model):
             # 更新源单的未核销金额、已核销金额
             for source in order.source_ids:
                 if abs(source.to_reconcile) < source.this_reconcile:
-                    raise except_orm(u'错误', u'本次核销金额不能大于未核销金额')
+                    raise UserError(u'错误', u'本次核销金额不能大于未核销金额')
 
                 source.to_reconcile = (source.to_reconcile -
                                        source.this_reconcile)
@@ -244,7 +244,7 @@ class money_order(models.Model):
                     line.bank_id.balance += line.amount
                 else:  # 收款账号余额增加
                     if line.bank_id.balance < line.amount:
-                        raise except_orm(u'错误', u'账户余额不足')
+                        raise UserError(u'错误', u'账户余额不足')
                     line.bank_id.balance -= line.amount
                 total += line.amount
 
@@ -376,7 +376,7 @@ class money_invoice(models.Model):
     def unlink(self):
         for invoice in self:
             if invoice.state == 'done':
-                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+                raise UserError(u'错误', u'不可以删除已经审核的单据')
 
         return super(money_invoice, self).unlink()
 
@@ -443,7 +443,7 @@ class reconcile_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+                raise UserError(u'错误', u'不可以删除已经审核的单据')
 
         return super(reconcile_order, self).unlink()
 
@@ -565,7 +565,7 @@ class reconcile_order(models.Model):
     def _get_or_pay(self, line, business_type,
                     partner_id, to_partner_id, name):
         if line.this_reconcile > line.to_reconcile:
-            raise except_orm(u'错误', u'核销金额不能大于未核销金额')
+            raise UserError(u'错误', u'核销金额不能大于未核销金额')
         # 更新每一行的已核销余额、未核销余额
         line.name.to_reconcile -= line.this_reconcile
         line.name.reconciled += line.this_reconcile
@@ -602,13 +602,13 @@ class reconcile_order(models.Model):
             order_reconcile, invoice_reconcile = 0, 0
             if (self.business_type in ['get_to_get', 'pay_to_pay'] and
                 order.partner_id.id == order.to_partner_id.id):
-                raise except_orm(u'错误', u'转出客户和转入客户不能相同')
+                raise UserError(u'错误', u'转出客户和转入客户不能相同')
 
             # 核销预收预付
             for line in order.advance_payment_ids:
                 order_reconcile += line.this_reconcile
                 if line.this_reconcile > line.to_reconcile:
-                    raise except_orm(u'错误', u'核销金额不能大于未核销金额')
+                    raise UserError(u'错误', u'核销金额不能大于未核销金额')
 
                 # 更新每一行的已核销余额、未核销余额
                 line.name.to_reconcile -= line.this_reconcile
@@ -632,7 +632,7 @@ class reconcile_order(models.Model):
             if self.business_type in ['adv_pay_to_get',
                                       'adv_get_to_pay', 'get_to_pay']:
                 if order_reconcile != invoice_reconcile:
-                    raise except_orm(u'错误', u'核销金额必须相同, %s 不等于 %s'
+                    raise UserError(u'错误', u'核销金额必须相同, %s 不等于 %s'
                                      % (order_reconcile, invoice_reconcile))
 
             order.state = 'done'
