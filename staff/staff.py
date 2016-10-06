@@ -37,7 +37,7 @@ class staff(models.Model):
     _inherit = 'staff'
 
     @api.one
-    @api.depends('image_medium')
+    @api.depends('user_id')
     def _get_image(self):
         self.image_medium = self.user_id.image
 
