@@ -35,9 +35,9 @@ class other_money_order(models.Model):
     def create(self, values):
         # 创建单据时，更新订单类型的不同，生成不同的单据编号
         if self._context.get('type') == 'other_get':
-            values.update({'name': self.env['ir.sequence'].get('other.get.order') or '/'})
+            values.update({'name': self.env['ir.sequence'].next_by_code('other.get.order') or '/'})
         if self._context.get('type') == 'other_pay' or values.get('name', '/') == '/':
-            values.update({'name': self.env['ir.sequence'].get('other.pay.order') or '/'})
+            values.update({'name': self.env['ir.sequence'].next_by_code('other.pay.order') or '/'})
 
         return super(other_money_order, self).create(values)
 

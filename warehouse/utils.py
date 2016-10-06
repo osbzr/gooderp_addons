@@ -10,7 +10,7 @@ def create_name(method):
     @functools.wraps(method)
     def func(self, vals):
         if vals.get('name', '/') == '/':
-            vals.update({'name': self.env['ir.sequence'].get(self._name) or '/'})
+            vals.update({'name': self.env['ir.sequence'].next_by_code(self._name) or '/'})
 
         return method(self, vals)
 

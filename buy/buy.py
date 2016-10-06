@@ -653,7 +653,7 @@ class buy_receipt(models.Model):
         else:
             name = 'buy.return'
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(name) or '/'
+            vals['name'] = self.env['ir.sequence'].next_by_code(name) or '/'
 
         vals.update({
             'origin': self.get_move_origin(vals)

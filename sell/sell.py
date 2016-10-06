@@ -160,7 +160,7 @@ class sell_order(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+            vals['name'] = self.env['ir.sequence'].next_by_code(self._name) or '/'
 
         return super(sell_order, self).create(vals)
 
@@ -605,7 +605,7 @@ class sell_delivery(models.Model):
         else:
             name = 'sell.return'
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(name) or '/'
+            vals['name'] = self.env['ir.sequence'].next_by_code(name) or '/'
 
         vals.update({
             'origin': self.get_move_origin(vals),

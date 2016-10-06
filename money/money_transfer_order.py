@@ -30,7 +30,7 @@ class money_transfer_order(models.Model):
     @api.model
     def create(self, values):
         if values.get('name', '/') == '/':
-            values.update({'name': self.env['ir.sequence'].get(self._name) or '/'})
+            values.update({'name': self.env['ir.sequence'].next_by_code(self._name) or '/'})
 
         return super(money_transfer_order, self).create(values)
 

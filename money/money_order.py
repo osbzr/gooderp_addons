@@ -36,9 +36,9 @@ class money_order(models.Model):
     def create(self, values):
         # 创建单据时，根据订单类型的不同，生成不同的单据编号
         if self._context.get('type') == 'pay':
-            values.update({'name': self.env['ir.sequence'].get('pay.order')})
+            values.update({'name': self.env['ir.sequence'].next_by_code('pay.order')})
         else:
-            values.update({'name': self.env['ir.sequence'].get('get.order')})
+            values.update({'name': self.env['ir.sequence'].next_by_code('get.order')})
 
         # 创建时查找该业务伙伴是否存在 未审核 状态下的收付款单
         orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
@@ -435,7 +435,7 @@ class reconcile_order(models.Model):
     def create(self, values):
         # 生成订单编号
         if values.get('name', '/') == '/':
-            values.update({'name': self.env['ir.sequence'].get(self._name)})
+            values.update({'name': self.env['ir.sequence'].next_by_code(self._name)})
 
         return super(reconcile_order, self).create(values)
 
