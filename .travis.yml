@@ -20,6 +20,8 @@ install:
   - git clone http://github.com/GoodERPJeff/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly
+  - pip install xlrd
+  - pip install xlutils
   - pip install docxtpl
 
 script:
