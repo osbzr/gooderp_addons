@@ -168,7 +168,7 @@ class TestProduction(TransactionCase):
         save_bom_memory.save_bom()
 
         self._test_disassembly_bom(self.disassembly, self.disassembly.bom_id)
-''' results = self.assembly.onchange(assembly_values, 'bom_id', {'bom_id': 'true'}) 这句有问题
+
     def test_bom(self):
         # 创建一个新的临时bom
         self.assembly.bom_id = self.env['wh.bom'].create({'name': 'temp', 'type': 'assembly'})
@@ -246,4 +246,3 @@ class TestProduction(TransactionCase):
 
         for child in assembly_child_ids:
             self.assertTrue(child in bom_child_ids)
-'''
