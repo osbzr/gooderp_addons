@@ -824,13 +824,6 @@ class test_sell_adjust(TransactionCase):
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
                                  'quantity': 2,
                                 }),
-                         (0, 0, {'goods_id': self.mouse.id,
-                                 'quantity': 1,
-                                }),
-                         (0, 0, {'goods_id': self.keyboard.id,
-                                 'attribute_id': self.keyboard_white.id,
-                                 'quantity': 1,
-                                })
                          ]
         })
         adjust.sell_adjust_done()
