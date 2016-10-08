@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates id='template' xml:space='preserve'>
+    <t t-name='top_fist_1'>
+        <div  class='section m-t-lg m-b-lg top_div'>
+            <div class='container'>
+                    <div class='row'>
+                        <div class='col-sm-6 col-sm-offset-3 feature-bg text-center'>
+                        <p class='bg-primary'>
+                            <h1 class='feature-title' style='color:rgb(109,188,245)'>数据统计</h1> </p>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </t>
+    <t t-name='top_second_2'>
+        <div class='main_div'>
+            <div class='row'>
+                <div class='col-sm-6 col-sm-offset-3 feature-bg text-center'>
+                    <h1 class='feature-title' style='color:rgb(109,188,245)'>业务总览</h1>
+                 </div>
+            </div>
+
+        </div>
+    </t>
+    <t t-name='top_third_3'>
+        <div class='container' style='margin-bottom: 20px;'>
+            <div class='row'>
+                <div class='col-sm-6 col-sm-offset-3 feature-bg text-center '>
+                    <h1 class='feature-title' style='color:rgb(109,188,245)'>实时报表</h1>
+                </div>
+            </div>
+            <div class="right_div">
+            </div>
+         </div>
+    </t>
+     <t t-name='center_main_table'>
+        <div class='section section-feature'>
+            <div class='container'>
+                <div class='row feature-list'>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name='left_html_str'>
+        <div t-attf-class='col-xs-12 col-md-{{row_num}}"'>
+          <button  t-attf-class='btn btn-primary-outline btn-pill oe_top_link_{{i}}"' t-att-data-id="i" style='width: 160px;height: 160px;'>
+          <h4><t t-esc='top_data[0]' /></h4>
+          <h3><t t-esc='top_data[1]' /></h3>
+          </button><p class='m-t-sm'> </p>
+        </div>
+    </t>
+</templates>

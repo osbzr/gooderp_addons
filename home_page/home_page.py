@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
-
+from odoo.tools.safe_eval import safe_eval as eval
 
 class home_report_type(models.Model):
     _name = "home.report.type"
@@ -35,6 +35,29 @@ class home_page(models.Model):
             }
 
     @api.model
+    def construction_action_url_list(self,action,action_url_list):
+        if action.menu_type == 'all_business':
+            action_url_list['main'].append([action.note_one, action.action.view_mode, action.action.res_model,
+                                            action.action.domain, action.id, action.action.context,
+                                            action.view_id.id, action.action.name, action.action.target])
+        elif action.menu_type == 'amount_summary':
+            res_model_objs = self.env[action.action.res_model].search(eval(action.domain or '[]'))
+            field_compute = action.compute_field_one.name
+            note = action.note_one
+            note = "%s  %s" % (note, sum([res_model_obj[field_compute] for res_model_obj in res_model_objs]))
+            action_url_list['top'].append([note, action.action.view_mode, action.action.res_model, action.domain,
+                                           action.context, action.view_id.id, action.action.name, action.action.target])
+        else:
+            vals_list = ["%s   " % (action.note_one),
+                         action.action.view_mode, action.action.res_model,
+                         action.domain, action.context, action.view_id.id, action.action.name, action.action.target]
+            type_sequence_str = "%s;%s" % (action.report_type_id.sequence, action.report_type_id.name)
+            if action_url_list['right'].get(type_sequence_str):
+                action_url_list['right'][type_sequence_str].append(vals_list)
+            else:
+                action_url_list['right'].update({type_sequence_str: [vals_list]})
+
+    @api.model
     def get_action_url(self):
         """
         搜索设置表中的数据, 然后分组,
@@ -42,36 +65,12 @@ class home_page(models.Model):
         [显示的名称,  对应的跳转的视图类型, 跳转的视图的模型 , 跳转视图的context参数, 跳转视图的id, 跳转视图的名称]
         key 为 report 内容为一个字典 key 为('report顺序;report name':[显示的名称,  对应的跳转的视图类型, 跳转的视图的模型 , 跳转视图的context参数, 跳转视图的id, 跳转视图的名称])
         """
-        action_url_lsit = {'main': [], 'top': [], 'right': {}}
-
-        user_row = self.env['res.users'].browse(self._uid)
+        action_url_list = {'main': [], 'top': [], 'right': {}}
+        user_row = self.env.user
+        user_group_list = set([group.id for group in user_row.groups_id])
         action_list = self.env['home.page'].search([(1, '=', 1), ('sequence', '!=', 0),('is_active','=',True)], order='sequence')
         for action in action_list:
-            if list(set([group.id for group in action.group_ids]).intersection(set([group.id for group in user_row.groups_id]))) or not [group.id for group in action.group_ids]:
-                if action:
-                    if action.menu_type == 'all_business':
-                        action_url_lsit['main'].append([action.note_one, action.action.view_mode, action.action.res_model,
-                                                        action.action.domain, action.id, action.action.context,
-                                                        action.view_id.id, action.action.name,action.action.target])
-                    elif action.menu_type == 'amount_summary':
-                        res_model_objs = self.env[action.action.res_model].search(eval(action.domain or '[]'))
-                        note = "A  B"
-                        if action.compute_field_one:
-                            field_compute, note = "", ""
-                            if action.compute_field_one:
-                                field_compute = action.compute_field_one.name
-                                note = action.note_one
-                            note = "%s  %s" % (note, sum([res_model_obj[field_compute] for res_model_obj in res_model_objs]))
-                        action_url_lsit['top'].append([note, action.action.view_mode, action.action.res_model, action.domain,
-                                                       action.context, action.view_id.id, action.action.name,action.action.target])
-                    else:
-                        vals_list = ["%s   " % (action.note_one),
-                         action.action.view_mode, action.action.res_model,
-                         action.domain, action.context, action.view_id.id, action.action.name,action.action.target]
-                        type_sequence_str = "%s;%s" % (action.report_type_id.sequence, action.report_type_id.name)
-                        if action_url_lsit['right'].get(type_sequence_str):
-                            action_url_lsit['right'][type_sequence_str].append(vals_list)
-                        else:
-                            action_url_lsit['right'].update({type_sequence_str:[vals_list]})
-        action_url_lsit['right'] = sorted(action_url_lsit['right'].items(), key=lambda d: d[0])
-        return action_url_lsit
+            if not [group.id for group in action.group_ids] or list(set([group.id for group in action.group_ids]).intersection(user_group_list)):
+                self.construction_action_url_list(action,action_url_list)
+        action_url_list['right'] = sorted(action_url_list['right'].items(), key=lambda d: d[0])
+        return action_url_list
