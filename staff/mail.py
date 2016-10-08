@@ -24,7 +24,7 @@ class mail_message(models.Model):
                 values = {}
                 #创建一条祝福信息
                 values['subject'] = u"生日快乐！"
-                values['model'] = "mail.group"
+                values['model'] = "mail.channel"
                 values['body'] = staff.name + u"，祝你生日快乐!"
                 values['res_id'] = 1
                 newid.append(self.create(values))
