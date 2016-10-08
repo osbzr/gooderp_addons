@@ -40,7 +40,7 @@ odoo.define('home_page', function (require) {
             var self  =this;
             var $a = $(e.currentTarget);
             var a_id = $a[0].id;
-            var index_vals = result_quick[a_id][1];
+            var index_vals = self.result_quick[a_id][1];
             var view_mode = _.contains(index_vals[a_id][1].split(','), 'tree') ? 'list' : 'form';
             var views = _.contains(index_vals[a_id][1].split(','), 'tree') ? [[index_vals[a_id][5],
                 'list'], [false, 'form']] : [[index_vals[a_id][5], 'form']];
@@ -62,6 +62,7 @@ odoo.define('home_page', function (require) {
             var self  =this;
             var $a = $(e.currentTarget);
             var a_id = $a[0].id;
+            var result_main = self.result_main;
             var result_one = result_main[a_id];
             if (result_one[0] != result_one[1]) {
                 var view_mode = _.contains((result_main[a_id])[1].split(','), 'tree') ? 'list' : 'form';
