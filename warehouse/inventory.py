@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-# from openerp.osv import fields
+from odoo.osv import osv
+# from odoo.osv import fields
 from utils import create_name, safe_division
-import openerp.addons.decimal_precision as dp
-
-from openerp import models
-from openerp import fields
-from openerp import api
+import odoo.addons.decimal_precision as dp
+from odoo.exceptions import UserError
+from odoo import models
+from odoo import fields
+from odoo import api
 
 
 class wh_inventory(models.Model):
@@ -62,7 +62,7 @@ class wh_inventory(models.Model):
     def unlink(self):
         for inventory in self:
             if inventory.state == 'done':
-                raise osv.except_osv(u'错误', u'不可以删除一个完成的单据')
+                raise UserError(u'不可以删除一个完成的单据')
 
             inventory.delete_confirmed_wh()
 
@@ -73,7 +73,7 @@ class wh_inventory(models.Model):
             if inventory.state == 'confirmed':
                 if (inventory.out_id and inventory.out_id.state == 'done') \
                   or (inventory.in_id and inventory.in_id.state == 'done'):
-                    raise osv.except_osv(u'错误', u'请先反审核掉相关的盘盈盘亏单据')
+                    raise UserError(u'请先反审核掉相关的盘盈盘亏单据')
                 else:
                     inventory.out_id.unlink()
                     inventory.in_id.unlink()
@@ -156,10 +156,9 @@ class wh_inventory(models.Model):
             for line in inventory.line_ids:
                 if (line.difference_qty > 0 and line.difference_uos_qty < 0) or \
                 (line.difference_qty < 0 and line.difference_uos_qty > 0):
-                    raise osv.except_osv(
-                        u'错误',
-                        u'产品"%s"行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏\
-                        方向不一致' % line.goods_id.name)
+                    raise UserError(
+                        u'产品"%s"行上盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致' 
+                             % line.goods_id.name)
                 if line.difference_qty < 0 or line.difference_uos_qty < 0:
                     out_line.append(line)
                 elif line.difference_qty > 0 or line.difference_uos_qty > 0:

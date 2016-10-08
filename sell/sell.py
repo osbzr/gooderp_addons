@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import fields, models, api
-import openerp.addons.decimal_precision as dp
-from openerp.exceptions import except_orm
+from odoo import fields, models, api
+import odoo.addons.decimal_precision as dp
+from odoo.exceptions import UserError
 
 # 销货订单审核状态可选值
 SELL_ORDER_STATES = [
@@ -160,7 +160,7 @@ class sell_order(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(self._name) or '/'
+            vals['name'] = self.env['ir.sequence'].next_by_code(self._name) or '/'
 
         return super(sell_order, self).create(vals)
 
@@ -168,7 +168,7 @@ class sell_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise except_orm(u'错误', u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的单据')
 
         return super(sell_order, self).unlink()
 
@@ -208,18 +208,18 @@ class sell_order(models.Model):
     def sell_order_done(self):
         '''审核销货订单'''
         if self.state == 'done':
-            raise except_orm(u'错误', u'请不要重复审核！')
+            raise UserError(u'请不要重复审核！')
         if not self.line_ids:
-            raise except_orm(u'错误', u'请输入产品明细行！')
+            raise UserError(u'请输入产品明细行！')
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
-                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.tax_amount > 0 and self.currency_id.id != self.env.user.company_id.currency_id.id :
-                raise except_orm(u'错误', u'外贸免税！')
+                raise UserError(u'外贸免税！')
         if self.bank_account_id and not self.pre_receipt:
-            raise except_orm(u'警告！', u'结算账户不为空时，需要输入预付款！')
+            raise UserError(u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.pre_receipt:
-            raise except_orm(u'警告！', u'预付款不为空时，请选择结算账户！')
+            raise UserError(u'预付款不为空时，请选择结算账户！')
         # 销售预收款生成收款单
         self.generate_receipt_order()
         self.sell_generate_delivery()
@@ -230,9 +230,9 @@ class sell_order(models.Model):
     def sell_order_draft(self):
         '''反审核销货订单'''
         if self.state == 'draft':
-            raise except_orm(u'错误', u'请不要重复反审核！')
+            raise UserError(u'请不要重复反审核！')
         if self.goods_state != u'未出库':
-            raise except_orm(u'错误', u'该销货订单已经发货，不能反审核！')
+            raise UserError(u'该销货订单已经发货，不能反审核！')
         else:
             # 查找产生的发货单并删除
             delivery = self.env['sell.delivery'].search(
@@ -369,7 +369,7 @@ class sell_order_line(models.Model):
             self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
             self.subtotal = self.amount + self.tax_amount
         else :
-            rate_silent = self.order_id.currency_id.rate_silent or self.env.user.company_id.currency_id.rate_silent
+            rate_silent = self.order_id.currency_id.rate or self.env.user.company_id.currency_id.rate
             currency_amount = self.quantity * self.price_taxed - self.discount_amount
             self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
             self.amount = currency_amount * rate_silent
@@ -605,7 +605,7 @@ class sell_delivery(models.Model):
         else:
             name = 'sell.return'
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get(name) or '/'
+            vals['name'] = self.env['ir.sequence'].next_by_code(name) or '/'
 
         vals.update({
             'origin': self.get_move_origin(vals),
@@ -617,7 +617,7 @@ class sell_delivery(models.Model):
     def unlink(self):
         for delivery in self:
             if delivery.state == 'done':
-                raise except_orm(u'错误', u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的单据')
             move = self.env['wh.move'].search(
                 [('id', '=', delivery.sell_move_id.id)])
             if move:
@@ -657,11 +657,11 @@ class sell_delivery(models.Model):
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成源单和收款单'''
         if self.state == 'done':
-            raise except_orm(u'错误', u'请不要重复审核！')
+            raise UserError(u'请不要重复审核！')
         for line in self.line_in_ids:
             vals = {}
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise except_orm(u'错误', u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
         for line in self.line_out_ids:
             vals={}
             result = False
@@ -705,13 +705,13 @@ class sell_delivery(models.Model):
                     }
                 return dic
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise except_orm(u'错误', u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         if self.bank_account_id and not self.receipt:
-            raise except_orm(u'警告！', u'结算账户不为空时，需要输入收款额！')
+            raise UserError(u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
-            raise except_orm(u'警告！', u'收款额不为空时，请选择结算账户！')
+            raise UserError(u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount + self.partner_cost:
-            raise except_orm(u'警告！', u'本次收款金额不能大于优惠后金额！')
+            raise UserError(u'本次收款金额不能大于优惠后金额！')
         if self.order_id:
             if not self.is_return:
                 line_ids = self.line_out_ids
@@ -725,7 +725,7 @@ class sell_delivery(models.Model):
             amount = self.amount + self.partner_cost
             if self.partner_id.credit_limit != 0:
                 if amount - self.receipt + self.partner_id.receivable > self.partner_id.credit_limit:
-                    raise except_orm(u'警告！', u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！')
+                    raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！')
         else:
             amount = self.amount + self.partner_cost
 
@@ -958,7 +958,7 @@ class sell_adjust(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise except_orm(u'错误', u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的单据')
 
         return super(sell_adjust, self).unlink()
 
@@ -971,26 +971,26 @@ class sell_adjust(models.Model):
         当新增产品时，则更新原单据及发货单分单明细行。
         '''
         if self.state == 'done':
-            raise except_orm(u'错误', u'请不要重复审核！')
+            raise UserError(u'请不要重复审核！')
         if not self.line_ids:
-            raise except_orm(u'错误', u'请输入产品明细行！')
+            raise UserError(u'请输入产品明细行！')
         delivery = self.env['sell.delivery'].search(
                     [('order_id', '=', self.order_id.id),
                      ('state', '=', 'draft')])
         if not delivery:
-            raise except_orm(u'错误', u'销售发货单已全部出库，不能调整')
+            raise UserError(u'销售发货单已全部出库，不能调整')
         for line in self.line_ids:
             origin_line = self.env['sell.order.line'].search(
                         [('goods_id', '=', line.goods_id.id),
                          ('attribute_id', '=', line.attribute_id.id),
                          ('order_id', '=', self.order_id.id)])
             if len(origin_line) > 1:
-                raise except_orm(u'错误', u'要调整的商品 %s 在原始单据中不唯一' % line.goods_id.name)
+                raise UserError(u'要调整的商品 %s 在原始单据中不唯一' % line.goods_id.name)
             if origin_line:
                 origin_line.quantity += line.quantity # 调整后数量
                 origin_line.note = line.note
                 if origin_line.quantity < origin_line.quantity_out:
-                    raise except_orm(u'错误', u' %s 调整后数量不能小于原订单已出库数量' % line.goods_id.name)
+                    raise UserError(u' %s 调整后数量不能小于原订单已出库数量' % line.goods_id.name)
                 elif origin_line.quantity > origin_line.quantity_out:
                     # 查找出原销货订单产生的草稿状态的发货单明细行，并更新它
                     move_line = self.env['wh.move.line'].search(
@@ -1001,7 +1001,7 @@ class sell_adjust(models.Model):
                         move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
                         move_line.note = line.note
                     else:
-                        raise except_orm(u'错误', u'商品 %s 已全部入库，建议新建购货订单' % line.goods_id.name)
+                        raise UserError(u'商品 %s 已全部入库，建议新建购货订单' % line.goods_id.name)
                 # 调整后数量与已出库数量相等时，删除产生的发货单分单
                 else:
                     delivery.unlink()

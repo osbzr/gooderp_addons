@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
-from openerp.osv import osv
-from openerp.report import report_sxw
-from openerp import models, fields, api
+from odoo.osv import osv
+from odoo.report import report_sxw
+from odoo import models, fields, api
 
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.exceptions import except_orm
-from openerp import fields, models, api
+from odoo.exceptions import UserError
+from odoo import fields, models, api
 
 class other_money_statements_report_wizard(models.Model):
     _name = "other.money.statements.report.wizard"
@@ -20,7 +20,7 @@ class other_money_statements_report_wizard(models.Model):
     def confirm_other_money_statements(self):
         # 现金银行报表
         if self.from_date > self.to_date:
-            raise except_orm(u'错误！', u'结束日期不能小于开始日期！')
+            raise UserError(u'结束日期不能小于开始日期！')
 
         view = self.env.ref('money.other_money_statements_report_tree')
 

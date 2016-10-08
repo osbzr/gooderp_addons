@@ -7,21 +7,11 @@
             <field name='prefix'>MISJ/%(year)s/</field>
         </record>
 
-        <record id='wh_out_sequence_type' model='ir.sequence.type'>
-            <field name='name'>出库单</field>
-            <field name='code'>wh.out</field>
-        </record>
-
         <record id='wh_out_sequence' model='ir.sequence'>
             <field name='name'>出库单</field>
             <field name='code'>wh.out</field>
             <field eval='4' name='padding'/>
             <field name='prefix'>OTHERS/OUT/%(y)s%(month)s</field>
-        </record>
-
-        <record id='wh_in_sequence_type' model='ir.sequence.type'>
-            <field name='name'>出库单</field>
-            <field name='code'>wh.in</field>
         </record>
 
         <record id='wh_in_sequence' model='ir.sequence'>
@@ -31,21 +21,11 @@
             <field name='prefix'>OTHERS/IN/%(y)s%(month)s</field>
         </record>
 
-        <record id='wh_internal_sequence_type' model='ir.sequence.type'>
-            <field name='name'>出库单</field>
-            <field name='code'>wh.internal</field>
-        </record>
-
         <record id='wh_internal_sequence' model='ir.sequence'>
             <field name='name'>移库单</field>
             <field name='code'>wh.internal</field>
             <field eval='4' name='padding'/>
             <field name='prefix'>OTHERS/INT/%(y)s%(month)s</field>
-        </record>
-
-        <record id='wh_inventory_sequence_type' model='ir.sequence.type'>
-            <field name='name'>盘点单</field>
-            <field name='code'>wh.inventory</field>
         </record>
 
         <record id='wh_inventory_sequence' model='ir.sequence'>
@@ -55,21 +35,11 @@
             <field name='prefix'>INV/%(y)s%(month)s</field>
         </record>
 
-        <record id='wh_assembly_sequence_type' model='ir.sequence.type'>
-            <field name='name'>组装单</field>
-            <field name='code'>wh.assembly</field>
-        </record>
-
         <record id='wh_assembly_sequence' model='ir.sequence'>
             <field name='name'>组装单</field>
             <field name='code'>wh.assembly</field>
             <field eval='4' name='padding'/>
             <field name='prefix'>ASS/%(y)s%(month)s</field>
-        </record>
-
-        <record id='wh_disassembly_sequence_type' model='ir.sequence.type'>
-            <field name='name'>拆卸单</field>
-            <field name='code'>wh.disassembly</field>
         </record>
 
         <record id='wh_disassembly_sequence' model='ir.sequence'>

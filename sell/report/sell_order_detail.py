@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api, tools
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api, tools
 
 class sell_order_detail(models.Model):
     _name = 'sell.order.detail'
@@ -26,7 +26,8 @@ class sell_order_detail(models.Model):
     margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
-    def init(self, cr):
+    def init(self):
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'sell_order_detail')
         cr.execute("""
             CREATE or REPLACE VIEW sell_order_detail AS (

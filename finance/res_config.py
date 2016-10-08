@@ -4,13 +4,12 @@
 # #############################################################################
 import logging
 
-from openerp.osv import fields, osv
-from openerp import api, fields, models, _
+from odoo import api, fields, models, _
 
 _logger = logging.getLogger(__name__)
 
 
-class finance_config_wizard(osv.osv_memory):
+class finance_config_wizard(models.TransientModel):
     _name = 'finance.config.settings'
     _inherit = 'res.config.settings'
 

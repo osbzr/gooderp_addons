@@ -5,7 +5,7 @@
         <template id="assets_backend" name="web_export_view assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/web_export_view_good/static/src/js/web_export_view_good.js"></script>
-                <script type="text/javascript" src="/web_export_view_good/static/src/js/test.js"></script>
+<!--               <script type="text/javascript" src="/web_export_view_good/static/src/js/test.js"></script>   -->
             </xpath>
         </template>
        
@@ -27,6 +27,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>
-         <menuitem id='report_template_action_menu' action='report_template_action' parent='base.menu_config' sequence='10'/>
+         <menuitem id='report_template_action_menu' action='report_template_action' parent='base.menu_reporting_config' sequence='10'/>
     </data>
 </openerp>

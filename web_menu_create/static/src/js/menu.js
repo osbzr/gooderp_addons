@@ -1,4 +1,4 @@
-openerp.web_menu_create = function(instance) {
+odoo.web_menu_create = function(instance) {
     instance.web.Menu.include({
         init: function() {
             this._super.apply(this, arguments);

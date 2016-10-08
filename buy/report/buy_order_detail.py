@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api, tools
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api, tools
 
 
 class buy_order_detail(models.Model):
@@ -25,7 +25,8 @@ class buy_order_detail(models.Model):
     subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
 
-    def init(self, cr):
+    def init(self):
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'buy_order_detail')
         cr.execute("""
             CREATE or REPLACE VIEW buy_order_detail AS (

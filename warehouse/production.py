@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
+from odoo.osv import osv
 from utils import inherits, inherits_after, \
     create_name, safe_division, create_origin
-import openerp.addons.decimal_precision as dp
+import odoo.addons.decimal_precision as dp
 from itertools import islice
-from openerp import models, fields, api
-
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class wh_assembly(models.Model):
     _name = 'wh.assembly'
@@ -138,7 +138,7 @@ class wh_assembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise osv.except_osv(u'错误', u'组合件和子件的产品必须存在')
+            raise UserError(u'组合件和子件的产品必须存在')
 
     @api.multi
     @inherits_after(res_back=False)
@@ -214,9 +214,9 @@ class wh_assembly(models.Model):
         else:
             self.goods_qty=1
         self.line_out_ids = line_out_ids
-        # /openerp-china/openerp/fields.py[1664]行添加的参数
+        # /odoo-china/odoo/fields.py[1664]行添加的参数
         # 调用self.line_in_ids = line_in_ids的时候，此时会为其额外添加一个参数(6, 0, [])
-        # 在write函数的源代码中，会直接使用原表/openerp-china/openerp/osv/fields.py(839)来删除所有数据
+        # 在write函数的源代码中，会直接使用原表/odoo-china/odoo/osv/fields.py(839)来删除所有数据
         # 此时，上一步赋值的数据将会被直接删除，（不确定是bug，还是特性）
         self.line_in_ids = line_in_ids
 
@@ -345,7 +345,7 @@ class wh_disassembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise osv.except_osv(u'错误', u'组合件和子件的产品必须存在')
+            raise UserError(u'组合件和子件的产品必须存在')
 
     @api.multi
     @inherits_after(res_back=False)

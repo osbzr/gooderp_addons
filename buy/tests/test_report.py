@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_detail_wizard(TransactionCase):
@@ -48,7 +48,7 @@ class test_detail_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             detail.button_ok()
         # 按日期搜索
         self.detail.button_ok()
@@ -123,7 +123,7 @@ class test_track_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             track.button_ok()
         # 按日期搜索
         self.track.button_ok()
@@ -187,7 +187,7 @@ class test_payment_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             payment.button_ok()
         # 按日期搜索
         self.payment.button_ok()
@@ -252,7 +252,7 @@ class test_goods_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             goods_wizard.button_ok()
         # 按日期搜索
         self.goods_wizard.button_ok()
@@ -323,7 +323,7 @@ class test_partner_wizard(TransactionCase):
                              'date_start': '2016-11-01',
                              'date_end': '2016-1-01',
                              })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             partner.button_ok()
 
     def test_partner_report(self):

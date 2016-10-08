@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm, ValidationError
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError, ValidationError
 from datetime import datetime,timedelta
 
 class test_staff(TransactionCase):

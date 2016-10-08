@@ -17,8 +17,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import models, fields, api
-from openerp.exceptions import except_orm
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class money_order(models.Model):
@@ -55,7 +55,7 @@ class money_order(models.Model):
             # first_line_flag = True
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_debit_line = self.env['voucher.line'].create({
                     'name': u"收款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -68,17 +68,17 @@ class money_order(models.Model):
                 vouch_credit_line = self.env['voucher.line'].create({
                     'name': u"%s收款单%s " % (partner.name, name),
                     'account_id': partner_account_id,
-                    'credit': line.amount * (line.currency_id.rate_silent or 1),
+                    'credit': line.amount * (line.currency_id.rate or 1),
                     'voucher_id': vouch_obj.id,
                     'partner_id': partner.id,
                 })
                 if line.currency_id.id != self.env.user.company_id.currency_id.id:
                     vouch_credit_line.write({'currency_id': line.currency_id.id,
                                              'currency_amount': line.amount,
-                                             'rate_silent': line.currency_id.rate_silent})
+                                             'rate_silent': line.currency_id.rate})
                     vouch_debit_line.write({'currency_id': line.currency_id.id,
                                             'currency_amount': line.amount,
-                                            'rate_silent': line.currency_id.rate_silent
+                                            'rate_silent': line.currency_id.rate
                                             })
                 # # 折扣行生成凭证
                 # if self.discount_amount != 0 and first_line_flag:
@@ -96,7 +96,7 @@ class money_order(models.Model):
         if source_ids:
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_debit_line = self.env['voucher.line'].create({
                     'name': u"收款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -135,7 +135,7 @@ class money_order(models.Model):
             # first_line_flag = True
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_credit_line = self.env['voucher.line'].create({
                     'name': u"付款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -155,10 +155,10 @@ class money_order(models.Model):
                 if line.currency_id.id != self.env.user.company_id.currency_id.id:
                     vouch_credit_line.write({'currency_id': line.currency_id.id,
                                              'currency_amount': line.amount,
-                                             'rate_silent': line.currency_id.rate_silent})
+                                             'rate_silent': line.currency_id.rate})
                     vouch_debit_line.write({'currency_id': line.currency_id.id,
                                             'currency_amount': line.amount,
-                                            'rate_silent': line.currency_id.rate_silent})
+                                            'rate_silent': line.currency_id.rate})
 
                 # if self.discount_amount != 0 and first_line_flag:
                 #     first_line_flag = False
@@ -174,7 +174,7 @@ class money_order(models.Model):
         if source_ids:
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_credit_line = self.env['voucher.line'].create({
                     'name': u"付款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -247,23 +247,23 @@ class money_invoice(models.Model):
             vouch_obj = self.env['voucher'].create({'date': self.date})
             self.write({'voucher_id': vouch_obj.id})
         if not self.category_id.account_id:
-            raise except_orm(u'错误', u'请配置%s的会计科目' % (self.category_id.name))
+            raise UserError(u'请配置%s的会计科目' % (self.category_id.name))
         partner_cat = self.category_id.type == 'income' and self.partner_id.c_category_id or self.partner_id.s_category_id
         partner_account_id = partner_cat.account_id.id
         if not partner_account_id:
-            raise except_orm(u'错误', u'请配置%s的会计科目' % (partner_cat.name))
+            raise UserError(u'请配置%s的会计科目' % (partner_cat.name))
         if self.category_id.type == 'income':
             vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
                          'debit_account_id': partner_account_id, 'sell_tax_amount': self.tax_amount or 0,
-                         'credit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate_silent or 0,
+                         'credit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate or 0,
                          })
         else:
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': partner_account_id,
                          'debit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
                          'partner_credit':self.partner_id.id, 'buy_tax_amount': self.tax_amount or 0,
-                         'debit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate_silent or 0,
+                         'debit_auxiliary_id':self.auxiliary_id.id,'currency_id':self.currency_id.id or '','rate_silent':self.currency_id.rate or 0,
                          })
         if self.is_init:
             vals.update({'init_obj': 'money_invoice',})
@@ -321,7 +321,7 @@ class money_invoice(models.Model):
         # 进项税行
         if vals.get('buy_tax_amount'):
             if not self.env.user.company_id.import_tax_account:
-                raise except_orm(u'错误', u'请通过"配置-->高级配置-->系统参数"菜单来设置进项税科目')
+                raise UserError(u'请通过"配置-->高级配置-->系统参数"菜单来设置进项税科目')
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('string'), vals.get('name')),
                 'account_id': self.env.user.company_id.import_tax_account.id, 'debit': vals.get('buy_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
@@ -353,7 +353,7 @@ class money_invoice(models.Model):
         # 销项税行
         if vals.get('sell_tax_amount'):
             if not self.env.user.company_id.output_tax_account:            
-                raise except_orm(u'错误', u'请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目' )
+                raise UserError(u'请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目' )
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('string'), vals.get('name')),
                 'account_id': self.env.user.company_id.output_tax_account.id, 'credit': sell_tax_amount, 'voucher_id': vals.get('vouch_obj_id'),
@@ -403,11 +403,11 @@ class other_money_order(models.Model):
             vouch_obj = self.env['voucher'].create({'date': self.date})
             self.write({'voucher_id': vouch_obj.id})
         if not self.bank_id.account_id:
-            raise except_orm(u'错误', u'请配置%s的会计科目' % (self.bank_id.name))
+            raise UserError(u'请配置%s的会计科目' % (self.bank_id.name))
         if self.type == 'other_get':
             for line in self.line_ids:
                 if not line.category_id.account_id:
-                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他收入单',
                              'credit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount + line.tax_amount), 'credit_account_id': line.category_id.account_id.id,
@@ -420,7 +420,7 @@ class other_money_order(models.Model):
         else:
             for line in self.line_ids:
                 if not line.category_id.account_id:
-                    raise except_orm(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他支出单',
                              'debit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount + line.tax_amount), 'credit_account_id': self.bank_id.account_id.id,
@@ -432,12 +432,10 @@ class other_money_order(models.Model):
                 self.env['money.invoice'].create_voucher_line(vals)
         # 删除初始非需要的凭证明细行
         if self.is_init:
-            print 'aaaaaaaaaaaaa'
             vouch_line_ids = self.env['voucher.line'].search([
                 '&',
                 ('account_id', '!=', self.bank_id.account_id.id),
                 ('init_obj', '=', 'other_money_order-%s' % (self.id))])
-            print 'bbbbbbbbb',vouch_line_ids
             for vouch_line_id in vouch_line_ids:
                 vouch_line_id.unlink()
         else:
@@ -462,7 +460,7 @@ class money_transfer_order(models.Model):
             in_currency_id = line.in_bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
             company_currency_id = self.env.user.company_id.currency_id.id
             if (out_currency_id != company_currency_id or in_currency_id != company_currency_id) and not self.line_ids.currency_amount :
-                    raise except_orm(u'错误' u'请正确结汇')
+                    raise UserError(u'错误' u'请正确结汇')
             if line.currency_amount and out_currency_id != company_currency_id :
                 '''结汇'''
                 '''借方行'''

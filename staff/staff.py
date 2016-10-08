@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openerp import fields, models, api
+from odoo import fields, models, api
 
 class staff_department(models.Model):
     _name = "staff.department"
@@ -37,7 +37,7 @@ class staff(models.Model):
     _inherit = 'staff'
 
     @api.one
-    @api.depends('image_medium')
+    @api.depends('user_id')
     def _get_image(self):
         self.image_medium = self.user_id.image
 

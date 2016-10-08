@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_buy_order(TransactionCase):
@@ -102,7 +102,7 @@ class test_buy_order(TransactionCase):
     def test_unlink(self):
         '''测试删除已审核的采购订单'''
         self.order.buy_order_done()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.unlink()
         # 删除草稿状态的采购订单
         self.order.copy()
@@ -115,13 +115,13 @@ class test_buy_order(TransactionCase):
         self.order.buy_order_done()
         self.assertTrue(self.order.state == 'done')
         # 重复审核报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.buy_order_done()
         # 数量单价小于0应报错
         self.order.buy_order_draft()
         for line in self.order.line_ids:
             line.quantity = 0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.buy_order_done()
 
         # 输入预付款和结算账户
@@ -137,18 +137,18 @@ class test_buy_order(TransactionCase):
         self.order.buy_order_draft()
         self.order.bank_account_id = False
         self.order.prepayment = 50.0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.buy_order_done()
         # 结算账户不为空时，需要输入预付款！
         self.order.bank_account_id = bank_account
         self.order.prepayment = 0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.buy_order_done()
 
         # 没有订单行时审核报错
         for line in self.order.line_ids:
             line.unlink()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.buy_order_done()
 
     def test_buy_order_draft(self):
@@ -164,14 +164,14 @@ class test_buy_order(TransactionCase):
         # 重复反审核报错
         self.order.buy_order_done()
         self.order.buy_order_draft()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.buy_order_draft()
         # 订单已收货不能反审核
         self.order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
                   [('order_id', '=', self.order.id)])
         receipt.buy_receipt_done()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.order.buy_order_draft()
 
     def test_buy_generate_receipt(self):
@@ -236,7 +236,7 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.price_taxed == self.cable.cost)
             # 测试不设置商品的成本时是否弹出警告
             self.cable.cost = 0.0
-            with self.assertRaises(except_orm):
+            with self.assertRaises(UserError):
                 line.onchange_goods_id()
 
     def test_onchange_goods_id_vendor(self):
@@ -249,7 +249,7 @@ class test_buy_order_line(TransactionCase):
         # 不选择供应商时，应弹出警告
         self.order.partner_id = False
         for line in self.order.line_ids:
-            with self.assertRaises(except_orm):
+            with self.assertRaises(UserError):
                 line.onchange_goods_id()
         # 选择供应商联想，得到供应商价
         self.order.partner_id = self.env.ref('core.lenovo')
@@ -383,7 +383,7 @@ class test_buy_receipt(TransactionCase):
         '''测试删除采购入库/退货单'''
         # 测试是否可以删除已审核的单据
         self.receipt.buy_receipt_done()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.receipt.unlink()
 
         # 反审核购货订单，测试删除buy_receipt时是否可以删除关联的wh.move.line记录
@@ -407,27 +407,27 @@ class test_buy_receipt(TransactionCase):
         receipt = self.receipt.copy()
         # 付款额不为空时，请选择结算账户
         self.receipt.payment = 100
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.receipt.buy_receipt_done()
         # 结算账户不为空时，需要输入付款额！
         self.receipt.bank_account_id = bank_account
         self.receipt.payment = 0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.receipt.buy_receipt_done()
         # 付款金额不能大于折后金额！
         self.receipt.bank_account_id = bank_account
         self.receipt.payment = 20000
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.receipt.buy_receipt_done()
         # 入库单审核时未填数量应报错
         for line in self.receipt.line_in_ids:
             line.goods_qty = 0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.receipt.buy_receipt_done()
         # 采购退货单审核时未填数量应报错
         for line in self.return_receipt.line_out_ids:
             line.goods_qty = 0
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.return_receipt.buy_receipt_done()
         # 重复审核入库单报错
         self.receipt.bank_account_id = None
@@ -435,13 +435,13 @@ class test_buy_receipt(TransactionCase):
         for line in self.receipt.line_in_ids:
             line.goods_qty = 1
         self.receipt.buy_receipt_done()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.receipt.buy_receipt_done()
         # 重复审核退货单报错
         for line in self.return_receipt.line_out_ids:
             line.goods_qty = 1
         self.return_receipt.buy_receipt_done()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.return_receipt.buy_receipt_done()
         # 入库单上的采购费用分摊到入库单明细行上
         receipt.cost_line_ids.create({
@@ -450,7 +450,7 @@ class test_buy_receipt(TransactionCase):
                           'partner_id': 4,
                           'amount': 100, })
         # 测试分摊之前审核是否会弹出警告
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             receipt.buy_receipt_done()
         # 测试分摊之后金额是否相等，然后审核，测试采购费用是否产生源单
         receipt.buy_share_cost()
@@ -477,7 +477,7 @@ class test_buy_receipt(TransactionCase):
                     'goods_qty': 1.0})
             ]
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             receipt.buy_receipt_done()
 
     def test_wrong_receipt_done_lot_unique_wh(self):
@@ -493,7 +493,7 @@ class test_buy_receipt(TransactionCase):
                 'goods_qty': 1.0,
                 'state': 'done'})]
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             receipt.buy_receipt_done()
 
     def test_receipt_make_invoice(self):
@@ -568,13 +568,13 @@ class test_wh_move_line(TransactionCase):
         self.goods_mouse.cost = 0.0
         for line in self.receipt.line_in_ids:
             line.goods_id = self.goods_mouse.id
-            with self.assertRaises(except_orm):
+            with self.assertRaises(UserError):
                 line.onchange_goods_id()
 
         # 采购退货单行
         for line in self.return_receipt.line_out_ids:
             line.goods_id.cost = 0.0
-            with self.assertRaises(except_orm):
+            with self.assertRaises(UserError):
                 line.with_context({'default_is_return': True,
                     'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
             line.goods_id.cost = 1.0
@@ -605,7 +605,7 @@ class test_buy_adjust(TransactionCase):
                          ]
         })
         adjust.buy_adjust_done()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust.unlink()
         # 删除草稿状态的采购调整单
         new = adjust.copy()
@@ -630,7 +630,7 @@ class test_buy_adjust(TransactionCase):
         })
         adjust.buy_adjust_done()
         # 重复审核时报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_no_line(self):
@@ -638,7 +638,7 @@ class test_buy_adjust(TransactionCase):
         adjust_no_line = self.env['buy.adjust'].create({
             'order_id': self.order.id,
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust_no_line.buy_adjust_done()
 
     def test_buy_adjust_done_price_negative(self):
@@ -651,7 +651,7 @@ class test_buy_adjust(TransactionCase):
                                 'price_taxed': -1,
                                 })]
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_quantity_lt(self):
@@ -669,7 +669,7 @@ class test_buy_adjust(TransactionCase):
                                 'quantity': -5,
                                 })]
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_quantity_equal(self):
@@ -709,7 +709,7 @@ class test_buy_adjust(TransactionCase):
                                 }),
                          ]
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_more_same_line(self):
@@ -734,7 +734,7 @@ class test_buy_adjust(TransactionCase):
                                 }),
                          ]
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
 
@@ -759,7 +759,7 @@ class test_buy_adjust(TransactionCase):
                             }),
                      ]
         })
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
 
@@ -805,7 +805,7 @@ class test_buy_adjust_line(TransactionCase):
             self.assertTrue(line.price_taxed == self.cable.cost)
             # 测试不设置商品的成本时是否弹出警告
             self.cable.cost = 0.0
-            with self.assertRaises(except_orm):
+            with self.assertRaises(UserError):
                 line.onchange_goods_id()
 
     def test_onchange_discount_rate(self):

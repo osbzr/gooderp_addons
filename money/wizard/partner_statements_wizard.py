@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.exceptions import except_orm
-from openerp import fields, models, api
+from odoo.exceptions import UserError
+from odoo import fields, models, api
 import datetime
 
 class partner_statements_report_wizard(models.TransientModel):
@@ -23,7 +23,7 @@ class partner_statements_report_wizard(models.TransientModel):
     def partner_statements_without_goods(self):
         # 业务伙伴对账单: 不带商品明细
         if self.from_date > self.to_date:
-            raise except_orm(u'错误！', u'结束日期不能小于开始日期！')
+            raise UserError(u'结束日期不能小于开始日期！')
 
         if self._context.get('default_customer'):  # 客户
             view = self.env.ref('sell.customer_statements_report_tree')
@@ -50,7 +50,7 @@ class partner_statements_report_wizard(models.TransientModel):
         # 业务伙伴对账单: 带商品明细
         res_ids = []
         if self.from_date > self.to_date:
-            raise except_orm(u'错误！', u'结束日期不能小于开始日期！')
+            raise UserError(u'结束日期不能小于开始日期！')
 
         if self._context.get('default_customer'):  # 客户
             reports = self.env['customer.statements.report'].search([('partner_id', '=', self.partner_id.id),

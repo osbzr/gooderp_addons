@@ -1,6 +1,6 @@
 # -*- coding: utf-8-*-
-from openerp.exceptions import except_orm
-from openerp import models, fields, api
+from odoo.exceptions import UserError
+from odoo import models, fields, api
 
 class Country(models.Model):
     _name = 'country'

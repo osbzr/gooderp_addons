@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields, api
-from openerp.osv import osv, fields as osv_fields
+from odoo import models, fields, api
 from xml.etree import ElementTree
-from openerp.tools.safe_eval import safe_eval as eval
+from odoo.tools.safe_eval import safe_eval as eval
 import itertools
+from odoo.exceptions import UserError
 try:
     from cStringIO import StringIO
 except:
@@ -51,7 +51,7 @@ class MobileView(models.Model):
     def _check_selection(self, attrib):
         if attrib.get('type') == 'selection':
             if not attrib.get('selection'):
-                raise osv.except_osv(u'错误', u'selection类型的字段需要指定该字段的selection属性')
+                raise UserError(u'selection类型的字段需要指定该字段的selection属性')
 
             try:
                 selection = eval(attrib.get('selection'))
@@ -65,7 +65,7 @@ class MobileView(models.Model):
                     if len(item) != 2:
                         raise ValueError()
             except:
-                raise osv.except_osv(u'错误', u'无法解析的selection属性%s' % attrib.get('selection'))
+                raise UserError(u'无法解析的selection属性%s' % attrib.get('selection'))
 
     def _check_domain(self, model, domain):
         try:
@@ -87,18 +87,18 @@ class MobileView(models.Model):
                 if len(item) != 3:
                     raise ValueError()
         except:
-            raise osv.except_osv(u'错误', u'无法解析的domain条件%s' % domain)
+            raise UserError(u'无法解析的domain条件%s' % domain)
 
     def _check_model(self, model):
         try:
             self.env[model]
         except KeyError:
-            raise osv.except_osv(u'错误', u'Model %s不存在' % model)
+            raise UserError(u'Model %s不存在' % model)
 
     def _check_many2one(self, attrib):
         if attrib.get('type') == 'many2one':
             if not attrib.get('model'):
-                raise osv.except_osv(u'错误', u'many2one类型的字段需要指定该字段的model')
+                raise UserError(u'many2one类型的字段需要指定该字段的model')
 
             self._check_model(attrib.get('model'))
             self._check_domain(attrib.get('model'), attrib.get('domain'))
@@ -107,7 +107,7 @@ class MobileView(models.Model):
         for wizard_node in tree.findall('.//wizard/field'):
             attrib = wizard_node.attrib
             if not attrib.get('type') or attrib.get('type') not in self.WIZARD_TYPE:
-                raise osv.except_osv(u'错误', u'wizard里面的field标签type属性必须存在或type属性值错误')
+                raise UserError(u'wizard里面的field标签type属性必须存在或type属性值错误')
 
             self._check_many2one(attrib)
             self._check_selection(attrib)
@@ -118,14 +118,14 @@ class MobileView(models.Model):
                                     tree.findall('.//form/field'),
                                     tree.findall('.//search/field')):
             if 'name' not in node.attrib or 'string' not in node.attrib:
-                raise osv.except_osv(u'错误', u'每个field标签都必须要存在name和string属性')
+                raise UserError(u'每个field标签都必须要存在name和string属性')
 
             if node.attrib.get('name') not in columns:
-                raise osv.except_osv(u'错误', u'字段属性%s未定义' % node.attrib.get('name'))
+                raise UserError(u'字段属性%s未定义' % node.attrib.get('name'))
 
             if node.attrib.get('operator'):
                 if node.attrib.get('operator') not in self.MAP_OPERATOR:
-                    raise osv.except_osv(u'错误', u'不能识别的操作符%s' % node.attrib.get('operator'))
+                    raise UserError(u'不能识别的操作符%s' % node.attrib.get('operator'))
 
     @api.one
     @api.constrains('domain')
@@ -146,11 +146,11 @@ class MobileView(models.Model):
         try:
             tree = ElementTree.parse(StringIO(self.arch.encode('utf-8')))
         except:
-            raise osv.except_osv(u'错误', u'遇到了一个无法解析的XML视图')
+            raise UserError(u'遇到了一个无法解析的XML视图')
 
         tree_nodes = [node for node in tree.findall('.//tree/field')]
         if len(tree_nodes) != 3:
-            raise osv.except_osv(u'错误', u'XML视图中tree标签下面的field标签必须是3个字段')
+            raise UserError(u'XML视图中tree标签下面的field标签必须是3个字段')
 
         self._check_wizard(tree)
         self._check_field(tree)

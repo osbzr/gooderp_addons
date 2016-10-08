@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
+import odoo.addons.decimal_precision as dp
 
-from openerp import fields, models, api, tools
-from openerp.exceptions import except_orm
+from odoo import fields, models, api, tools
+from odoo.exceptions import UserError
 
 
 class supplier_statements_report(models.Model):
@@ -49,8 +49,9 @@ class supplier_statements_report(models.Model):
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
-    def init(self, cr):
+    def init(self):
         # union money_order(type = 'pay'), money_invoice(type = 'expense')
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'supplier_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW supplier_statements_report AS (
@@ -151,7 +152,7 @@ class supplier_statements_report(models.Model):
                     'res_id': buy.id,
                     'context': {'type': 'pay'}
                 }
-        raise except_orm(u'错误！', u'您不能查看期初余额的源单！')
+        raise UserError(u'您不能查看期初余额的源单！')
 
 
 class supplier_statements_report_with_goods(models.TransientModel):
@@ -242,6 +243,6 @@ class supplier_statements_report_with_goods(models.TransientModel):
                     'context': {'type': 'pay'}
                 }
 
-        raise except_orm(u'错误！', u'您不能查看期初余额的源单！')
+        raise UserError(u'您不能查看期初余额的源单！')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

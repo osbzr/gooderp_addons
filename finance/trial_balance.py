@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api
-from openerp.exceptions import except_orm
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 from math import fabs
 
 class TrialBalance(models.Model):
@@ -87,7 +87,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
             if last_period:
                 last_period_id = last_period.id
                 if not last_period.is_closed:
-                    raise except_orm(u'错误', u'前一期间未结账，无法取到期初余额')
+                    raise UserError(u'前一期间未结账，无法取到期初余额')
             else:
                 last_period_id = False
             period_id = self.period_id.id
@@ -390,7 +390,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_begin_id)
         if last_period:
             if not last_period.is_closed:
-                raise except_orm(u'错误', u'前一期间未结账，无法取到期初余额')
+                raise UserError(u'前一期间未结账，无法取到期初余额')
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code), ('code', '<=', self.subject_name_end_id.code)])
@@ -438,7 +438,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         """创建总账"""
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_begin_id)
         if last_period and not last_period.is_closed:
-            raise except_orm(u'错误', u'前一期间未结账，无法取到期初余额')
+            raise UserError(u'前一期间未结账，无法取到期初余额')
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code), ('code', '<=', self.subject_name_end_id.code)])

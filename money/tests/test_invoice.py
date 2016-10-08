@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_invoice(TransactionCase):
@@ -44,7 +44,7 @@ class test_invoice(TransactionCase):
         # 客户的应收余额
         self.assertEqual(self.partner.receivable, 10.0)
         # 已审核的发票应该不可删除
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             invoice.unlink()
         # 发票取消审核
         invoice.money_invoice_draft()

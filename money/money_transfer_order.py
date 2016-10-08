@@ -18,9 +18,9 @@
 #
 ##############################################################################
 
-from openerp.exceptions import except_orm
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api
+from odoo.exceptions import UserError
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api
 
 
 class money_transfer_order(models.Model):
@@ -30,7 +30,7 @@ class money_transfer_order(models.Model):
     @api.model
     def create(self, values):
         if values.get('name', '/') == '/':
-            values.update({'name': self.env['ir.sequence'].get(self._name) or '/'})
+            values.update({'name': self.env['ir.sequence'].next_by_code(self._name) or '/'})
 
         return super(money_transfer_order, self).create(values)
 
@@ -38,7 +38,7 @@ class money_transfer_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise except_orm(u'错误', u'不可以删除已经审核的单据')
+                raise UserError(u'不可以删除已经审核的单据')
 
         return super(money_transfer_order, self).unlink()
 
@@ -73,21 +73,21 @@ class money_transfer_order(models.Model):
         '''转账单的审核按钮'''
         for transfer in self:
             if not transfer.line_ids:
-                raise except_orm('错误', '请先输入转账金额')
+                raise UserError('请先输入转账金额')
             for line in transfer.line_ids:
                 company_currency_id = self.env.user.company_id.currency_id.id
                 out_currency_id = line.out_bank_id.account_id.currency_id.id or company_currency_id
                 in_currency_id = line.in_bank_id.account_id.currency_id.id or company_currency_id
 
                 if line.out_bank_id == line.in_bank_id :
-                    raise except_orm('错误', '转出账户与转入账户不能相同')
+                    raise UserError('转出账户与转入账户不能相同')
                 if line.amount < 0:
-                    raise except_orm('错误', '转账金额必须大于0')
+                    raise UserError('转账金额必须大于0')
                 if line.amount == 0:
-                    raise except_orm('错误', '转账金额不能为0')
+                    raise UserError('转账金额不能为0')
                 if out_currency_id == company_currency_id :
                     if line.out_bank_id.balance < line.amount:
-                        raise except_orm('错误', '转出账户余额不足')
+                        raise UserError('转出账户余额不足')
                     else:
                         line.out_bank_id.balance -= line.amount
                     if in_currency_id == company_currency_id :
@@ -96,12 +96,12 @@ class money_transfer_order(models.Model):
                         line.in_bank_id.balance += line.currency_amount
                 if out_currency_id != company_currency_id :
                     if line.out_bank_id.balance < line.currency_amount:
-                        raise except_orm('错误', '转出账户余额不足')
+                        raise UserError('转出账户余额不足')
                     if in_currency_id == company_currency_id:
                         line.in_bank_id.balance += line.amount
                         line.out_bank_id.balance -= line.currency_amount
                     else:
-                        raise except_orm('错误', '系统不支持外币转外币')
+                        raise UserError('系统不支持外币转外币')
 
             transfer.state = 'done'
         return True
@@ -112,7 +112,7 @@ class money_transfer_order(models.Model):
         for transfer in self:
             for line in transfer.line_ids:
                 if line.in_bank_id.balance < line.amount:
-                    raise except_orm('错误', '转入账户余额不足')
+                    raise UserError('转入账户余额不足')
                 else:
                     line.in_bank_id.balance -= line.amount
                     line.out_bank_id.balance += line.amount

@@ -1,4 +1,4 @@
-openerp.warehouse = function(instance) {
+odoo.warehouse = function(instance) {
     instance.web.list.Column.include({
         _format: function(row_data, options) {
             if (this.widget === 'selection_clickable' && !_.isUndefined(this.selection)) {

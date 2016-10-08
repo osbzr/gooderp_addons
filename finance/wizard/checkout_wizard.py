@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date
-from openerp import models, fields, api
-from openerp.exceptions import except_orm
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class checkout_wizard(models.TransientModel):
@@ -23,9 +23,9 @@ class checkout_wizard(models.TransientModel):
             last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_id)
             if last_period:
                 if not last_period.is_closed:
-                    raise except_orm(u'错误', u'上一个期间%s未结账' % last_period.name)
+                    raise UserError(u'上一个期间%s未结账' % last_period.name)
             if self.period_id.is_closed:
-                raise except_orm(u'错误', u'本期间已结账')
+                raise UserError(u'本期间已结账')
             else:
                 voucher_obj = self.env['voucher']
                 voucher_ids = voucher_obj.search([('period_id', '=', self.period_id.id)])
@@ -34,7 +34,7 @@ class checkout_wizard(models.TransientModel):
                     if voucher_id.state != 'done':
                         i += 1
                 if i != 0:
-                    raise except_orm(u'错误', u'该期间有%s张凭证未审核' % i)
+                    raise UserError(u'该期间有%s张凭证未审核' % i)
                 else:
                     voucher_line = []  # 生成的结账凭证行
                     account_obj = self.env['finance.account']
@@ -80,9 +80,9 @@ class checkout_wizard(models.TransientModel):
                     year_profit_account = company_obj.search([])[0].profit_account
                     remain_account = company_obj.search([])[0].remain_account
                     if not year_profit_account:
-                        raise except_orm(u'错误', u'公司本年利润科目未配置')
+                        raise UserError(u'公司本年利润科目未配置')
                     if not remain_account:
-                        raise except_orm(u'错误', u'公司未分配利润科目未配置')
+                        raise UserError(u'公司未分配利润科目未配置')
                     if (revenue_total - expense_total) > 0:
                         res = {
                             'name': u'利润结余',
@@ -179,12 +179,12 @@ class checkout_wizard(models.TransientModel):
     def button_counter_checkout(self):
         if self.period_id:
             if not self.period_id.is_closed:
-                raise except_orm(u'错误', u'本期间未结账')
+                raise UserError(u'本期间未结账')
             else:
                 next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_id)
                 if next_period:
                     if next_period.is_closed:
-                        raise except_orm(u'错误', u'下一个期间%s已结账！' % next_period.name)
+                        raise UserError(u'下一个期间%s已结账！' % next_period.name)
                 self.period_id.is_closed = False
                 voucher_ids = self.env['voucher'].search([('is_checkout', '=', True),
                                                           ('period_id', '=', self.period_id.id)])
@@ -223,7 +223,7 @@ class checkout_wizard(models.TransientModel):
                 if last_period:
                     while last_period and last_voucher_number < 1:
                         if not last_period.is_closed:
-                            raise except_orm(u'错误', u'上一个期间%s未结账' % last_period.name)
+                            raise UserError(u'上一个期间%s未结账' % last_period.name)
                         if period_id.year != last_period.year:
                             # 按年，而且是第一个会计期间
                             last_voucher_number = reset_init_number
@@ -235,7 +235,7 @@ class checkout_wizard(models.TransientModel):
                             if last_period_voucher_name:  # 上一期间是否有凭证？
                                 last_voucher_number = int(filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
                             #else:
-                            #    raise except_orm(u'错误', u'请核实上一个期间：%s是否有凭证！' % last_period.name)
+                            #    raise UserError(u'请核实上一个期间：%s是否有凭证！' % last_period.name)
                             last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(last_period)
                 else:
                     last_voucher_number = reset_init_number
@@ -245,7 +245,7 @@ class checkout_wizard(models.TransientModel):
                     interpolated_prefix = self.env['ir.sequence']._interpolate(seq_id.prefix, d)
                     interpolated_suffix = self.env['ir.sequence']._interpolate(seq_id.suffix, d)
                 except ValueError:
-                    raise except_orm(_(u'警告'),
+                    raise UserError(_(u'警告'),
                                      _(u'无效的前缀或后缀 \'%s\'') % (seq_id.name))
                 voucher_ids = voucher_obj.search([('period_id', '=', period_id.id)], order='create_date')
                 for voucher_id in voucher_ids:
@@ -263,7 +263,7 @@ class checkout_wizard(models.TransientModel):
                     interpolated_prefix = self.env['ir.sequence']._interpolate(seq_id.prefix, d)
                     interpolated_suffix = self.env['ir.sequence']._interpolate(seq_id.suffix, d)
                 except ValueError:
-                    raise except_orm(_(u'警告'),
+                    raise UserError(_(u'警告'),
                                      _(u'无效的前缀或后缀 \'%s\'') % (seq_id.name))
                 voucher_ids = voucher_obj.search([('period_id', '=', period_id.id)], order='create_date')
                 for voucher_id in voucher_ids:

@@ -2,7 +2,7 @@
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2013-Today OpenERP SA (<http://www.openerp.com>).
+#    Copyright (C) 2013-Today OpenERP SA (<http://www.odoo.com>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -25,7 +25,7 @@
     "author": 'ZhengXiang',
     "website": "http://www.osbzr.com",
     "category": "Generic Modules",
-    "depends": ['core', 'goods', 'mobile', 'decimal_precision', 'web_sublist', 'web_float_limit', 'web_readonly_bypass', 'report_docx','finance'],
+    "depends": ['core', 'goods', 'mobile', 'decimal_precision', 'web_sublist', 'web_float_limit', 'report_docx','finance'],
     "description": """
     """,
     "data": [

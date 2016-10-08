@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api, tools
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api, tools
 
 
 class bank_statements_report(models.Model):
@@ -37,8 +37,9 @@ class bank_statements_report(models.Model):
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
     note = fields.Char(string=u'备注', readonly=True)
 
-    def init(self, cr):
+    def init(self):
         # union money_order, other_money_order, money_transfer_order
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'bank_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW bank_statements_report AS (

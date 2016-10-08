@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-from openerp import models, fields, api
-
+from odoo.osv import osv
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class wh_move(models.Model):
     _name = 'wh.move'
@@ -83,7 +83,7 @@ class wh_move(models.Model):
         goods = self.env['goods'].search([('barcode', '=', barcode)])
 
         if not att and not goods:
-            raise osv.except_osv(u'错误', u'ean为  %s 的产品不存在' % (barcode))
+            raise UserError(u'ean为  %s 的产品不存在' % (barcode))
         else:
             conversion = att and att.goods_id.conversion or goods.conversion
             if model_name in ['wh.out','wh.in']:
@@ -223,14 +223,14 @@ class wh_move(models.Model):
     def unlink(self):
         for move in self:
             if move.state == 'done':
-                raise osv.except_osv(u'错误', u'不可以删除已经完成的单据')
+                raise UserError(u'不可以删除已经完成的单据')
 
         return super(wh_move, self).unlink()
 
     def prev_approve_order(self):
         for order in self:
             if not order.line_out_ids and not order.line_in_ids:
-                raise osv.except_osv(u'错误', u'单据的明细行不可以为空')
+                raise UserError(u'单据的明细行不可以为空')
 
     @api.multi
     def approve_order(self):

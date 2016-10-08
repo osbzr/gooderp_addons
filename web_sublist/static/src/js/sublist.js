@@ -1,4 +1,4 @@
-openerp.web_sublist = function(instance) {
+odoo.web_sublist = function(instance) {
     var QWeb = instance.web.qweb;
     var RELATION_TAG = 'RELATION_SUBLIST_MULTI';
 

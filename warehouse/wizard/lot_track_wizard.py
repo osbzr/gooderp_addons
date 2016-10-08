@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date, timedelta
-from openerp import models, fields, api
+from odoo import models, fields, api
 
 
 class report_lot_track_wizard(models.TransientModel):

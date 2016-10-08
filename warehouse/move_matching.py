@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-import openerp.addons.decimal_precision as dp
+from odoo.osv import osv
+import odoo.addons.decimal_precision as dp
 from utils import safe_division
-from openerp import models, fields, api
-
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class wh_move_matching(models.Model):
     _name = 'wh.move.matching'
@@ -103,7 +103,7 @@ class wh_move_line(models.Model):
     def prev_action_cancel(self):
         for line in self:
             if line.qty_remaining != line.goods_qty:
-                raise osv.except_osv(u'错误', u'当前的入库已经被其他出库匹配，请先取消相关的出库')
+                raise UserError(u'当前的入库已经被其他出库匹配，请先取消相关的出库')
 
             line.matching_in_ids.unlink()
             line.matching_out_ids.unlink()

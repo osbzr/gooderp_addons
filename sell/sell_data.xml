@@ -2,10 +2,6 @@
 <openerp>
     <data noupdate="1">
         <!-- 销货订单序列号 -->
-        <record id="seq_type_sell_order" model="ir.sequence.type">
-            <field name="name">Sell Order</field>
-            <field name="code">sell.order</field>
-        </record>
         <record id="seq_sell_order" model="ir.sequence">
             <field name="name">Sell Order</field>
             <field name="code">sell.order</field>
@@ -13,10 +9,6 @@
             <field name="padding">5</field>
         </record>
 		<!-- 销售发货单序列号 -->
-        <record id="seq_type_sell_delivery" model="ir.sequence.type">
-            <field name="name">Sell Delivery</field>
-            <field name="code">sell.delivery</field>
-        </record>
         <record id="seq_sell_delivery" model="ir.sequence">
             <field name="name">Sell Delivery</field>
             <field name="code">sell.delivery</field>
@@ -24,10 +16,6 @@
             <field name="padding">5</field>
         </record>
         <!-- 销售退货单序列号 -->
-        <record id="seq_type_sell_return" model="ir.sequence.type">
-            <field name="name">Sell Return</field>
-            <field name="code">sell.return</field>
-        </record>
         <record id="seq_sell_return" model="ir.sequence">
             <field name="name">Sell Return</field>
             <field name="code">sell.return</field>
@@ -35,10 +23,6 @@
             <field name="padding">5</field>
         </record>
         <!-- 销售调整单序列号 -->
-        <record id="seq_type_sell_adjust" model="ir.sequence.type">
-            <field name="name">Sell Adjust</field>
-            <field name="code">sell.adjust</field>
-        </record>
         <record id="seq_sell_adjust" model="ir.sequence">
             <field name="name">Sell Adjust</field>
             <field name="code">sell.adjust</field>

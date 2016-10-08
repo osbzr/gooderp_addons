@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_report(TransactionCase):
@@ -33,7 +33,7 @@ class test_report(TransactionCase):
                     )
         period_201411_wizard = self.env['create.trial.balance.wizard'].create(
             {'period_id': self.period_201411.id})
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             report.create_trial_balance()
         # 结转2015年12月的期间
         month_end = self.env['checkout.wizard'].create(
@@ -56,12 +56,12 @@ class test_report(TransactionCase):
         #会计期间相同时报错
         report.period_end_id = self.env.ref('finance.period_201512')
         report.onchange_period()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             report.create_general_ledger_account()
         #上一期间未结账报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             report.create_vouchers_summary()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             report.create_general_ledger_account()
         #正常流程
         report.period_end_id = self.period_id
@@ -152,9 +152,9 @@ class test_report(TransactionCase):
         report = self.env['create.balance.sheet.wizard'].create(
             {'period_id': self.period_id}
                     )
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             report.create_balance_sheet()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             report.create_profit_statement()
         # 结转2015年12月的期间
         month_end = self.env['checkout.wizard'].create(
@@ -187,17 +187,17 @@ class test_checkout_wizard(TransactionCase):
         wizard.onchange_period_id()
         self.assertTrue(wizard.period_id.name == u'2016年 第1期')
         #上期间未关闭报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_checkout()
         wizard.date = u'2015-12-31'
         wizard.onchange_period_id()
         #本期间已结账报错
         self.period_15_12.is_closed = True
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_checkout()
         self.period_15_12.is_closed = False
         #期间内凭证未审核报错
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_checkout()
         #正常流程
         self.voucher_15_12.voucher_done()
@@ -225,21 +225,21 @@ class test_checkout_wizard(TransactionCase):
         #反结账时下一期间已关闭
         next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(wizard.period_id)
         next_period.is_closed = True
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_counter_checkout()
         next_period.is_closed = False
         #重复反结账
         wizard.button_counter_checkout()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_counter_checkout()
         #公司科目未配置报错
         company_pro = self.env.ref('base.main_company')
         company_pro.profit_account = False
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_checkout()
         company_pro.profit_account = self.env.ref('finance.account_profit')
         company_pro.remain_account = False
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             wizard.button_checkout()
 
     def test_recreate_voucher_name(self):

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from openerp import tools
-import openerp.addons.decimal_precision as dp
-from openerp import models, fields
+from odoo import tools
+import odoo.addons.decimal_precision as dp
+from odoo import models, fields
 
 
 class report_lot_status(models.Model):
@@ -20,7 +20,8 @@ class report_lot_status(models.Model):
     qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'))
 
-    def init(self, cr):
+    def init(self):
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'report_lot_status')
         cr.execute(
             """

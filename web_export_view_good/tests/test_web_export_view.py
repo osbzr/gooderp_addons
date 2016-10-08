@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.addons.web_export_view_good.controllers.controllers import ExcelExportView
+from odoo.tests.common import TransactionCase
+from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView
 import os
-import openerp.tests
+import odoo.tests
 
 
-# @openerp.tests.common.at_install(False)
-# @openerp.tests.common.post_install(True)
-# class TestWebExportView(openerp.tests.HttpCase):
+# @odoo.tests.common.at_install(False)
+# @odoo.tests.common.post_install(True)
+# class TestWebExportView(odoo.tests.HttpCase):
 
 #     def test_web_export_view(self):
-#         print "++++"
-#         self.phantom_js("/", "openerp.Tour.run('test_export_view', 'test')", "openerp.Tour.tours.test_export_view", login="admin")
-#         print "----------"
+#         self.phantom_js("/", "odoo.Tour.run('test_export_view', 'test')", "odoo.Tour.tours.test_export_view", login="admin")
 
 
 class TestWebExportViewTwo(TransactionCase):

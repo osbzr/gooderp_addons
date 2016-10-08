@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 import time
 
 
@@ -75,19 +75,19 @@ class TestWarehouseOrder(TransactionCase):
     def test_unlink(self):
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.others_in.unlink()
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.overage_in.unlink()
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.internal.unlink()
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.others_out.unlink()
 
         self.others_out.cancel_approved_order()
@@ -114,7 +114,7 @@ class TestWarehouseOrder(TransactionCase):
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
 
         # 存在已经被匹配的出库时入库无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.others_in.cancel_approved_order()
 
         # 取消键盘套装的出库，此时others_in的键盘套装数量回复到48
@@ -143,7 +143,7 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(self.internal.state, 'draft')
 
         # 没有明细行的单据不可以被审核通过
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.overage_in.line_in_ids.unlink()
             self.overage_in.approve_order()
 

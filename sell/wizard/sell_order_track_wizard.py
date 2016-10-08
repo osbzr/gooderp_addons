@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date
-from openerp import models, fields, api
-from openerp.exceptions import except_orm
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class sell_order_track_wizard(models.TransientModel):
@@ -34,7 +34,7 @@ class sell_order_track_wizard(models.TransientModel):
     def button_ok(self):
         res = []
         if self.date_end < self.date_start:
-            raise except_orm(u'错误', u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！')
 
         domain = [('order_id.date', '>=', self.date_start), ('order_id.date', '<=', self.date_end)]
 

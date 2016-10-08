@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
-from openerp.http import request
+from odoo.osv import osv
+from odoo.http import request
 import itertools
 import operator
 import time
 import pickle
-from openerp import models, api
-
+from odoo import models, api
+from odoo.exceptions import UserError
 
 class report_base(models.Model):
     _name = 'report.base'
@@ -53,7 +53,7 @@ class report_base(models.Model):
 
     def check_valid_domain(self, domain):
         if not isinstance(domain, (list, tuple)):
-            raise osv.except_osv(u'错误', u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
+            raise UserError(u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
 
     def _get_next_domain(self, domains, index):
         domain = domains[index]
@@ -94,9 +94,9 @@ class report_base(models.Model):
                 if opto in compute_operator.iterkeys():
                     return compute_operator.get(opto)(result.get(field), value)
 
-                raise osv.except_osv(u'错误', u'暂时无法解析的domain条件%s，请联系管理员' % str(domain))
+                raise UserError(u'暂时无法解析的domain条件%s，请联系管理员' % str(domain))
 
-        raise osv.except_osv(u'错误', u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
+        raise UserError(u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
 
     def _compute_domain_util(self, result, domains):
         index = 0

@@ -1,9 +1,9 @@
 (function () {
     'use strict';
 
-    var _t = openerp._t;
+    var _t = odoo._t;
 
-    openerp.Tour.register({
+    odoo.Tour.register({
         id: 'test_export_view',
         name: _t("测试导出页面显示的内容!"),
         path: '/web',

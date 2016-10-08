@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
+from odoo.osv import osv
 from utils import safe_division
-
-from openerp import models, fields, api
+from odoo.exceptions import UserError
+from odoo import models, fields, api
 
 
 class goods(models.Model):
@@ -84,13 +84,13 @@ class goods(models.Model):
     def get_matching_records_by_lot(self, lot_id, qty, uos_qty=0, suggested=False):
         self.ensure_one()
         if not lot_id:
-            raise osv.except_osv(u'错误', u'批号没有被指定，无法获得成本')
+            raise UserError(u'批号没有被指定，无法获得成本')
 
         if not suggested and lot_id.state != 'done':
-            raise osv.except_osv(u'错误', u'批号%s还没有实际入库，请先审核该入库' % lot_id.move_id.name)
+            raise UserError(u'批号%s还没有实际入库，请先审核该入库' % lot_id.move_id.name)
 
         if qty > lot_id.qty_remaining:
-            raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (self.name,))
+            raise UserError(u'产品%s的库存数量不够本次出库行为' % (self.name,))
 
         return [{'line_in_id': lot_id.id, 'qty': qty, 'uos_qty': uos_qty}], \
             lot_id.get_real_cost_unit() * qty
@@ -136,6 +136,6 @@ class goods(models.Model):
                 uos_qty_to_go -= matching_uos_qty
             else:
                 if not ignore_stock and qty_to_go > 0:
-                    raise osv.except_osv(u'错误', u'产品%s的库存数量不够本次出库行为' % (goods.name,))
+                    raise UserError(u'产品%s的库存数量不够本次出库行为' % (goods.name,))
 
             return matching_records, cost
