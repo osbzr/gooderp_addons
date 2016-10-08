@@ -44,7 +44,6 @@ class ReportTemplate(models.Model):
     file_address = fields.Char(u'模板文件路径')
     active = fields.Boolean(u'可用', default=True)
 
-    @api.one
     @api.onchange('model_id')
     def _compute_model_name(self):
         if self.model_id:

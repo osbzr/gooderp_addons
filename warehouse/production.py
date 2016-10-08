@@ -83,7 +83,7 @@ class wh_assembly(models.Model):
                              'uom_id': self.goods_id.uom_id.id,'uos_id':self.goods_id.uos_id.id}]
         if self.line_out_ids:
             self.line_out_ids[0].onchange_goods_id()
-    @api.one
+
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
         """
@@ -172,7 +172,6 @@ class wh_assembly(models.Model):
 
         return res
 
-    @api.one
     @api.onchange('bom_id')
     def onchange_bom(self):
         line_out_ids, line_in_ids = [], []
@@ -385,7 +384,6 @@ class wh_disassembly(models.Model):
                               'uos_id':self.goods_id.uos_id.id,'uom_id': self.goods_id.uom_id.id}]
         self.line_out_ids[0].onchange_goods_id()
 
-    @api.one
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
         """
