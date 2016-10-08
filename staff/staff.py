@@ -41,7 +41,6 @@ class staff(models.Model):
     def _get_image(self):
         self.image_medium = self.user_id.image
 
-    @api.one
     @api.onchange('job_id')
     def onchange_job_id(self):
         '''选择职位时带出部门和部门经理'''

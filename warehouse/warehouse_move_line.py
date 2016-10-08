@@ -316,19 +316,16 @@ class wh_move_line(models.Model):
         self.compute_suggested_cost()
         return {'domain': {'lot_id': self.compute_lot_domain()}}
 
-    @api.one
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
         self.compute_suggested_cost()
 
-    @api.one
     @api.onchange('goods_uos_qty')
     def onchange_goods_uos_qty(self):
         if self.goods_id:
             self.goods_qty = self.goods_id.conversion_unit(self.goods_uos_qty)
         self.compute_suggested_cost()
 
-    @api.one
     @api.onchange('lot_id')
     def onchange_lot_id(self):
         if self.lot_id:
@@ -338,7 +335,6 @@ class wh_move_line(models.Model):
             if self.env.context.get('type') == 'internal':
                 self.lot = self.lot_id.lot
 
-    @api.one
     @api.onchange('goods_qty', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''

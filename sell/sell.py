@@ -141,7 +141,6 @@ class sell_order(models.Model):
                                   readonly=True,
                                   help=u'外币币别')
 
-    @api.one
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
@@ -150,7 +149,6 @@ class sell_order(models.Model):
             self.address = self.partner_id.address
             self.mobile = self.partner_id.mobile
 
-    @api.one
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
         '''当优惠率或销货订单行发生变化时，单据优惠金额发生变化'''
@@ -428,7 +426,6 @@ class sell_order_line(models.Model):
     note = fields.Char(u'备注',
                        help=u'本行备注')
 
-    @api.one
     @api.onchange('goods_id')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
@@ -443,7 +440,6 @@ class sell_order_line(models.Model):
             else:
                 self.discount_rate = 0
 
-    @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
@@ -451,7 +447,6 @@ class sell_order_line(models.Model):
             self.uom_id = self.goods_id.uom_id
             self.price_taxed = self.goods_id.price
 
-    @api.one
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
@@ -570,7 +565,6 @@ class sell_delivery(models.Model):
     modifying = fields.Boolean(u'差错修改中', default=False,
                                help=u'是否处于差错修改中')
 
-    @api.one
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
@@ -579,7 +573,6 @@ class sell_delivery(models.Model):
             self.address = self.partner_id.address
             self.mobile = self.partner_id.mobile
 
-    @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
     def onchange_discount_rate(self):
         '''当优惠率或订单行发生变化时，单据优惠金额发生变化'''
@@ -847,7 +840,6 @@ class wh_move_line(models.Model):
                                    ondelete='cascade',
                                    help=u'对应的销货订单行')
 
-    @api.one
     @api.onchange('warehouse_id','goods_id')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
@@ -1097,7 +1089,6 @@ class sell_adjust_line(models.Model):
     note = fields.Char(u'备注',
                        help=u'本行备注')
 
-    @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格'''
@@ -1105,7 +1096,6 @@ class sell_adjust_line(models.Model):
             self.uom_id = self.goods_id.uom_id
             self.price_taxed = self.goods_id.price
 
-    @api.one
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、含税单价或优惠率发生变化时，优惠金额发生变化'''

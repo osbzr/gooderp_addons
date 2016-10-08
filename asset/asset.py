@@ -94,7 +94,7 @@ class asset(models.Model):
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
     money_invoice = fields.Many2one('money.invoice', u'对应源单', readonly=True, ondelete='restrict')
     other_money_order = fields.Many2one('other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict')
-    @api.one
+
     @api.onchange('category_id')
     def onchange_category_id(self):
         '''当固定资产分类发生变化时，折旧期间数，固定资产科目，累计折旧科目，最终残值同时变化'''
@@ -105,21 +105,18 @@ class asset(models.Model):
             self.account_depreciation = self.category_id.account_depreciation
             self.depreciation_value = self.category_id.depreciation_value * self.cost / 100
 
-    @api.one
     @api.onchange('cost')
     def onchange_cost(self):
         '''当固定资产金额发生变化时，最终残值，价格合计,残值，每月折旧额变化'''
         if self.cost:
             self.depreciation_value = self.category_id.depreciation_value * self.cost / 100
 
-    @api.one
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         '''当合作伙伴发生变化时，固定资产贷方科目变化'''
         if self.partner_id:
             self.account_credit = self.partner_id.s_category_id.account_id
 
-    @api.one
     @api.onchange('bank_account')
     def onchange_bank_account(self):
         '''当结算帐户发生变化时，固定资产贷方科目变化'''

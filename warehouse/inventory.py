@@ -353,7 +353,6 @@ class wh_inventory_line(models.Model):
 
         return self.check_difference_identical()
 
-    @api.one
     @api.onchange('inventory_uos_qty')
     def onchange_uos_qty(self):
         self.inventory_qty = self.goods_id.conversion_unit(

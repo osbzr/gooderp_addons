@@ -201,7 +201,6 @@ class buy_order(models.Model):
                               store=True,
                               help=u'购货订单生成的采购入库单或退货单的付/退款状态')
 
-    @api.one
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
         '''当优惠率或购货订单行发生变化时，单据优惠金额发生变化'''
@@ -505,7 +504,6 @@ class buy_order_line(models.Model):
     origin = fields.Char(u'销售单号',
                          help=u'以销订购的销售订单号')
 
-    @api.one
     @api.onchange('goods_id', 'quantity')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、成本价。
@@ -523,7 +521,6 @@ class buy_order_line(models.Model):
                     self.price_taxed = line.price
                     break
 
-    @api.one
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
@@ -627,7 +624,6 @@ class buy_receipt(models.Model):
     voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True,
                                  help=u'审核时产生的入库凭证')
 
-    @api.one
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
     def onchange_discount_rate(self):
         '''当优惠率或订单行发生变化时，单据优惠金额发生变化'''
@@ -1178,7 +1174,6 @@ class buy_adjust_line(models.Model):
     note = fields.Char(u'备注',
                        help=u'本行备注')
 
-    @api.one
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本价'''
@@ -1188,7 +1183,6 @@ class buy_adjust_line(models.Model):
                 raise UserError(u'请先设置商品的成本！')
             self.price_taxed = self.goods_id.cost
 
-    @api.one
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
