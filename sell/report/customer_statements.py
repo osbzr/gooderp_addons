@@ -171,7 +171,7 @@ class customer_statements_report(models.Model):
                     'context': {'type': 'get'}
             }
 
-        raise UserError(u'错误！', u'您不能查看期初余额的源单！')
+        raise UserError(u'您不能查看期初余额的源单！')
 
 class customer_statements_report_with_goods(models.TransientModel):
     _name = "customer.statements.report.with.goods"
@@ -249,6 +249,6 @@ class customer_statements_report_with_goods(models.TransientModel):
                     'res_id': delivery.id,
                     'context': {'type': 'get'}
                 }
-        raise UserError(u'错误！', u'您不能查看期初余额的源单！')
+        raise UserError(u'您不能查看期初余额的源单！')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

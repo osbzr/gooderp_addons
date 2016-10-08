@@ -6,7 +6,7 @@ from utils import inherits, inherits_after, \
 import odoo.addons.decimal_precision as dp
 from itertools import islice
 from odoo import models, fields, api
-
+from odoo.exceptions import UserError
 
 class wh_assembly(models.Model):
     _name = 'wh.assembly'
@@ -138,7 +138,7 @@ class wh_assembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise osv.except_osv(u'错误', u'组合件和子件的产品必须存在')
+            raise UserError(u'组合件和子件的产品必须存在')
 
     @api.multi
     @inherits_after(res_back=False)
@@ -345,7 +345,7 @@ class wh_disassembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise osv.except_osv(u'错误', u'组合件和子件的产品必须存在')
+            raise UserError(u'组合件和子件的产品必须存在')
 
     @api.multi
     @inherits_after(res_back=False)

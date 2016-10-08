@@ -33,7 +33,7 @@ class sell_summary_goods_wizard(models.TransientModel):
     @api.multi
     def button_ok(self):
         if self.date_end < self.date_start:
-            raise UserError(u'错误', u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！')
 
         return {
             'name': u'销售汇总表（按商品）',

@@ -55,7 +55,7 @@ class money_order(models.Model):
             # first_line_flag = True
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise UserError(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_debit_line = self.env['voucher.line'].create({
                     'name': u"收款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -96,7 +96,7 @@ class money_order(models.Model):
         if source_ids:
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise UserError(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_debit_line = self.env['voucher.line'].create({
                     'name': u"收款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -135,7 +135,7 @@ class money_order(models.Model):
             # first_line_flag = True
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise UserError(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_credit_line = self.env['voucher.line'].create({
                     'name': u"付款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -174,7 +174,7 @@ class money_order(models.Model):
         if source_ids:
             for line in line_ids:
                 if not line.bank_id.account_id:
-                    raise UserError(u'错误', u'请配置%s的会计科目' % (line.bank_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
                 vouch_credit_line = self.env['voucher.line'].create({
                     'name': u"付款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
@@ -247,11 +247,11 @@ class money_invoice(models.Model):
             vouch_obj = self.env['voucher'].create({'date': self.date})
             self.write({'voucher_id': vouch_obj.id})
         if not self.category_id.account_id:
-            raise UserError(u'错误', u'请配置%s的会计科目' % (self.category_id.name))
+            raise UserError(u'请配置%s的会计科目' % (self.category_id.name))
         partner_cat = self.category_id.type == 'income' and self.partner_id.c_category_id or self.partner_id.s_category_id
         partner_account_id = partner_cat.account_id.id
         if not partner_account_id:
-            raise UserError(u'错误', u'请配置%s的会计科目' % (partner_cat.name))
+            raise UserError(u'请配置%s的会计科目' % (partner_cat.name))
         if self.category_id.type == 'income':
             vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': self.partner_id.id, 'name': self.name, 'string': u'源单',
                          'amount': self.amount, 'credit_account_id': self.category_id.account_id.id, 'partner_debit': self.partner_id.id,
@@ -321,7 +321,7 @@ class money_invoice(models.Model):
         # 进项税行
         if vals.get('buy_tax_amount'):
             if not self.env.user.company_id.import_tax_account:
-                raise UserError(u'错误', u'请通过"配置-->高级配置-->系统参数"菜单来设置进项税科目')
+                raise UserError(u'请通过"配置-->高级配置-->系统参数"菜单来设置进项税科目')
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('string'), vals.get('name')),
                 'account_id': self.env.user.company_id.import_tax_account.id, 'debit': vals.get('buy_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
@@ -353,7 +353,7 @@ class money_invoice(models.Model):
         # 销项税行
         if vals.get('sell_tax_amount'):
             if not self.env.user.company_id.output_tax_account:            
-                raise UserError(u'错误', u'请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目' )
+                raise UserError(u'请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目' )
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('string'), vals.get('name')),
                 'account_id': self.env.user.company_id.output_tax_account.id, 'credit': sell_tax_amount, 'voucher_id': vals.get('vouch_obj_id'),
@@ -403,11 +403,11 @@ class other_money_order(models.Model):
             vouch_obj = self.env['voucher'].create({'date': self.date})
             self.write({'voucher_id': vouch_obj.id})
         if not self.bank_id.account_id:
-            raise UserError(u'错误', u'请配置%s的会计科目' % (self.bank_id.name))
+            raise UserError(u'请配置%s的会计科目' % (self.bank_id.name))
         if self.type == 'other_get':
             for line in self.line_ids:
                 if not line.category_id.account_id:
-                    raise UserError(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他收入单',
                              'credit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount + line.tax_amount), 'credit_account_id': line.category_id.account_id.id,
@@ -420,7 +420,7 @@ class other_money_order(models.Model):
         else:
             for line in self.line_ids:
                 if not line.category_id.account_id:
-                    raise UserError(u'错误', u'请配置%s的会计科目' % (line.category_id.name))
+                    raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'其他支出单',
                              'debit_auxiliary_id':line.auxiliary_id,
                              'amount': abs(line.amount + line.tax_amount), 'credit_account_id': self.bank_id.account_id.id,

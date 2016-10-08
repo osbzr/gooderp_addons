@@ -78,17 +78,17 @@ class voucher(models.Model):
         :return: 主要是把 凭证的 state改变
         """
         if self.state == 'done':
-            raise UserError(u'错误', u'请不要重复审核！')
+            raise UserError(u'请不要重复审核！')
         if self.period_id.is_closed is True:
-            raise UserError(u'错误', u'该会计期间已结账！不能审核')
+            raise UserError(u'该会计期间已结账！不能审核')
         self.state = 'done'
 
     @api.one
     def voucher_draft(self):
         if self.state == 'draft':
-            raise UserError(u'错误', u'请不要重复反审核！')
+            raise UserError(u'请不要重复反审核！')
         if self.period_id.is_closed is True:
-            raise UserError(u'错误', u'该会计期间已结账！不能反审核')
+            raise UserError(u'该会计期间已结账！不能反审核')
         self.state = 'draft'
 
     @api.one
@@ -123,7 +123,7 @@ class voucher(models.Model):
     def unlink(self):
         for active_voucher in self:
             if active_voucher.state == 'done':
-                raise UserError(u'错误', u'不能删除已审核的凭证')
+                raise UserError(u'不能删除已审核的凭证')
         return super(voucher, self).unlink()
 
     # 重载write 方法
@@ -132,12 +132,12 @@ class voucher(models.Model):
         if self.env.context.get('call_module', False) == "checkout_wizard":
             return super(voucher, self).write(vals)
         if self.period_id.is_closed is True:
-            raise UserError(u'错误', u'该会计期间已结账，凭证不能再修改！')
+            raise UserError(u'该会计期间已结账，凭证不能再修改！')
         if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
             return super(voucher, self).write(vals)
         else:
             if self.state == 'done':
-                raise UserError(u'错误', u'凭证已审核！修改请先反审核！')
+                raise UserError(u'凭证已审核！修改请先反审核！')
         return super(voucher, self).write(vals)
 
 class voucher_line(models.Model):
@@ -234,7 +234,7 @@ class voucher_line(models.Model):
     def unlink(self):
         for active_voucher_line in self:
             if active_voucher_line.voucher_id.state == 'done':
-                raise UserError(u'错误', u'不能删除已审核的凭证行')
+                raise UserError(u'不能删除已审核的凭证行')
         return super(voucher_line, self).unlink()
 
 
@@ -295,7 +295,7 @@ class finance_period(models.Model):
             [('year', '=', datetime_str_list[0])])
         period_list = sorted(map(int, [period.month for period in period_row]))
         if not period_row[0]:
-            raise UserError(u'错误', u'会计期间不存在！')
+            raise UserError(u'会计期间不存在！')
         fist_period = self.search([('year', '=', datetime_str_list[0]), ('month', '=', period_list[0])], order='name')
         return fist_period
 
@@ -308,11 +308,11 @@ class finance_period(models.Model):
             ])
             if period_id:
                 if period_id.is_closed and self._context.get('module_name', False) != 'checkout_wizard':
-                    raise UserError(u'错误', u'此会计期间已关闭')
+                    raise UserError(u'此会计期间已关闭')
                 else:
                     return period_id
             else:
-                raise UserError(u'错误', u'此日期对应的会计期间不存在')
+                raise UserError(u'此日期对应的会计期间不存在')
 
     _sql_constraints = [
         ('period_uniq', 'unique (year,month)', u'会计区间不能重复'),

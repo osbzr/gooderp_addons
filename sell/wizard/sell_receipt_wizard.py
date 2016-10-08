@@ -36,7 +36,7 @@ class sell_receipt_wizard(models.TransientModel):
     def button_ok(self):
         res = []
         if self.date_end < self.date_start:
-            raise UserError(u'错误', u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！')
 
         cond = [('date', '>=', self.date_start),
                 ('date', '<=', self.date_end),

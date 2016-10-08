@@ -5,6 +5,7 @@ import odoo.addons.decimal_precision as dp
 from utils import safe_division
 from jinja2 import Environment, PackageLoader
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 env = Environment(loader=PackageLoader('odoo.addons.warehouse', 'html'), autoescape=True)
 
@@ -218,7 +219,7 @@ class wh_move_line(models.Model):
 
     def check_availability(self):
         if self.warehouse_dest_id == self.warehouse_id:
-            raise osv.except_osv(u'错误', u'调出仓库不可以和调入仓库一样')
+            raise UserError(u'调出仓库不可以和调入仓库一样')
 
     def prev_action_done(self):
         pass
@@ -348,6 +349,6 @@ class wh_move_line(models.Model):
     def unlink(self):
         for line in self:
             if line.state == 'done':
-                raise osv.except_osv(u'错误', u'不可以删除已经完成的明细')
+                raise UserError(u'不可以删除已经完成的明细')
 
         return super(wh_move_line, self).unlink()
