@@ -17,11 +17,11 @@ class IrActionReportDocx(models.Model):
     #     return super(IrActionReportDocx, self)._check_selection_field_value(
     #         field, value)
 
-    def _lookup_report(self, cr, name):
-        cr.execute("SELECT * FROM ir_act_report_xml WHERE report_name=%s", (name,))
-        r = cr.dictfetchone()
+    def _lookup_report(self, name):
+        self._cr.execute("SELECT * FROM ir_act_report_xml WHERE report_name=%s", (name,))
+        r = self._cr.dictfetchone()
         if r:
             if r['report_type'] == 'docx':
                 return report_docx.ReportDocx('report.' + r['report_name'], r['model'], register=False)
 
-        return super(IrActionReportDocx, self)._lookup_report(cr, name)
+        return super(IrActionReportDocx, self)._lookup_report(name)
