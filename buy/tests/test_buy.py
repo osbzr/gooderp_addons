@@ -620,6 +620,12 @@ class test_buy_adjust(TransactionCase):
                                 'attribute_id': self.keyboard_black.id,
                                 'quantity': 3.0,
                                 }),
+                        (0, 0, {'goods_id': self.mouse.id,
+                               'quantity': 1,
+                               }),
+                        (0, 0, {'goods_id': self.cable.id,
+                               'quantity': 1,
+                               })
                          ]
         })
         adjust.buy_adjust_done()
