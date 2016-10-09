@@ -9,5 +9,5 @@
     """,
     'version': '10.0.0.1',
     'application':True,
-    'depends': ['sell', 'buy', 'core', 'asset', 'staff', 'tree_zero_dispaly_blank', 'web_stock_query'],
+    'depends': ['sell', 'buy', 'asset', 'staff','web_stock_query'],
 }
