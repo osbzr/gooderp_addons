@@ -361,12 +361,12 @@ class sell_order_line(models.Model):
     @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
-        if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id :
+        if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
             self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
             self.amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
             self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
             self.subtotal = self.amount + self.tax_amount
-        else :
+        else:
             rate_silent = self.order_id.currency_id.rate or self.env.user.company_id.currency_id.rate
             currency_amount = self.quantity * self.price_taxed - self.discount_amount
             self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
@@ -1020,7 +1020,7 @@ class sell_adjust(models.Model):
                                     self.order_id.get_delivery_line(new_line, single=True))
                 else:
                     delivery_line.append(self.order_id.get_delivery_line(new_line, single=False))
-                delivery.line_out_ids = [(0, 0, li[0]) for li in delivery_line]
+                delivery.write({'line_out_ids': [(0, 0, li[0]) for li in delivery_line]})
         self.state = 'done'
         self.approve_uid = self._uid
 
