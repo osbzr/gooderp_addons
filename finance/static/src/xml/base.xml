@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates>
     <t t-extend="ListView">
-        <t t-jquery="tr.oe_list_header_columns" t-operation="replace">
-            <tr t-if="options.header" class="oe_list_header_columns">
+        <t t-jquery="thead > tr:first" t-operation="replace">
+            <tr t-if="options.header">
                 <t t-foreach="columns" t-as="column">
                     <th t-if="column.meta" rowspan="2" colspan="1">
                         <t t-esc="column.string"/>
                     </th>
                 </t>
-                <th t-if="options.selectable" width="1"   rowspan="2" colspan="1" >
-                    <input type="checkbox" class="oe_list_record_selector"/>
+                <th t-if="options.selectable" width="1" rowspan="2" colspan="1" >
+                    <input type="checkbox" class="o_list_record_selector"/>
                 </th>
                 <t t-foreach="columns" t-as="column">
                     <th t-if="!column.meta and column.invisible !== '1' and column.merge!=='False' and column.merge!=='True'" t-att-data-id="column.id"   rowspan="2" colspan="1" 
@@ -20,11 +20,11 @@
                         <t t-if="column.tag !== 'button'"  ><t t-esc="column.base_string"/></t>
                     </div></th>
                 </t>
-                <th t-if="options.deletable" class="oe_list_record_delete" width="13px"/>
+                <th t-if="options.deletable" class="o_list_record_delete" width="13px"/>
             </tr>
         </t>
-        <t t-jquery="tr.oe_list_header_columns" t-operation="after">
-            <tr t-if="options.header" class="oe_list_header_columns" >
+        <t t-jquery="thead > tr:first" t-operation="after">
+            <tr t-if="options.header" >
                  <t t-foreach="columns" t-as="column">
                      <th   t-if="!column.meta and column.invisible !== '1' and ( column.merge=='False' or column.merge=='True')"  t-att-data-id="column.id"   rowspan="1" colspan="1"
                         t-attf-class="oe_list_header_#{column.widget or column.type} #{((options.sortable and column.tag !== 'button') ? 'oe_sortable' : null)}" align='center' ><div>
