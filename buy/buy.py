@@ -1105,7 +1105,6 @@ class buy_adjust(models.Model):
                                     self.order_id.get_receipt_line(new_line, single=True))
                 else:
                     receipt_line.append(self.order_id.get_receipt_line(new_line, single=False))
-#                 buy_receipt.line_in_ids = [(0, 0, li[0]) for li in receipt_line]
                 buy_receipt.write({'line_in_ids': [(0, 0, li[0]) for li in receipt_line]})
         self.state = 'done'
         self.approve_uid = self._uid
