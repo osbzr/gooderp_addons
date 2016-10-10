@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<template>
+	<t t-extend="ListView">
+		<t t-jquery="thead > tr:first > t:first" t-operation="after">
+			<th t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
+		</t>
+		<t t-jquery="tfoot > tr:first > td:first" t-operation="before">
+			<td t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
+		</t>
+	</t>
+	<tr t-name="ListView.row"
+	t-att-data-id="record.get('id')"
+	t-attf-style="#{(view.fonts || view.colors) ? view.style_for(record) : ''}"
+	t-attf-class="#{view.compute_decoration_classnames(record)}">
+		<t t-set="asData" t-value="record.toForm().data"/>
+		<t t-foreach="columns" t-as="column">
+			<td t-if="column.meta"></td>
+		</t>
+		<td t-if="options.deletable" class='oe_list_record_copy' width="13px">
+			<span name="copy" class="fa fa-files-o"/>
+		</td>
+		<td t-if="edited and !options.deletable" class="oe_list_record_copy"/>
+		<td t-if="options.selectable" class="o_list_record_selector">
+			<t t-set="checked" t-value="options.select_view_id == record.get('id') ? 'checked' : null"/>
+			<input t-if="options.radio" type="radio" name="radiogroup" t-att-checked="checked"/>
+			<div t-if="!options.radio" class="o_checkbox">
+				<input type="checkbox" name="radiogroup" t-att-checked="checked"/>
+				<span/>
+			</div>
+		</td>
+		<t t-foreach="columns" t-as="column">
+			<t t-set="number" t-value="column.type === 'integer' or column.type == 'float' or column.type == 'monetary'"/>
+			<t t-set="text" t-value="column.type === 'text'"/>
+			<t t-set="modifiers" t-value="column.modifiers_for(asData)"/>
+			<td t-if="!column.meta and column.invisible !== '1'" t-att-title="column.help"
+			t-attf-class="#{modifiers.readonly ? 'o_readonly' : ''} #{number ? 'o_list_number' : ''} #{text ? 'o_list_text' : ''} #{column.id === 'sequence' ? 'o_handle_cell' : ''} #{column.tag === 'button' ? 'o_list_button' : ''}"
+			t-att-data-field="column.id"
+			>
+				<t t-raw="render_cell(record, column)"/>
+			</td>
+		</t>
+		<td t-if="options.deletable" class='o_list_record_delete'>
+			<span name="delete" class="fa fa-trash-o"/>
+		</td>
+	</tr>
+</template>

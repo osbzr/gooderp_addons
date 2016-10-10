@@ -291,11 +291,17 @@ class test_sell_order_line(TransactionCase):
             line.goods_id = self.env.ref('goods.keyboard')
             self.assertTrue(line.using_attribute)
 
+    def test_compute_all_amount(self):
+        '''外币测试：当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
+        self.order.currency_id = self.env.ref('base.EUR')
+        for line in self.order.line_ids:
+            line.price_taxed = 11.7
+
     def test_onchange_goods_id(self):
         '''当销货订单行的产品变化时，带出产品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
         c_category_id = self.order.partner_id.c_category_id
-    
+
         for line in self.order.line_ids:
             line.goods_id = goods
             line.onchange_goods_id()
