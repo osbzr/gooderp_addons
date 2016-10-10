@@ -32,15 +32,13 @@ class sell_order(models.Model):
     @api.one
     @api.depends('line_ids.quantity', 'line_ids.quantity_out')
     def _get_sell_goods_state(self):
-        '''返回收货状态'''
-        for line in self.line_ids:
-            if line.quantity_out == 0:
-                self.goods_state = u'未出库'
-            elif line.quantity > line.quantity_out:
-                self.goods_state = u'部分出库'
-                break
-            else:
-                self.goods_state = u'全部出库'
+        '''返回发货状态'''
+        if all(line.quantity_out == 0 for line in self.line_ids):
+            self.goods_state = u'未出库'
+        elif any(line.quantity > line.quantity_out for line in self.line_ids):
+            self.goods_state = u'部分出库'
+        else:
+            self.goods_state = u'全部出库'
 
     @api.one
     @api.depends('partner_id')
