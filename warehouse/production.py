@@ -79,10 +79,11 @@ class wh_assembly(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+        if self.goods_id:
+            self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                              'uom_id': self.goods_id.uom_id.id,'uos_id':self.goods_id.uos_id.id}]
-        if self.line_out_ids:
-            self.line_out_ids[0].onchange_goods_id()
+            if self.line_out_ids:
+                self.line_out_ids[0].onchange_goods_id()
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -132,7 +133,7 @@ class wh_assembly(models.Model):
             self.line_out_ids = False
             self.line_out_ids = line_out_ids
             self.line_in_ids = line_in_ids
-        else:
+        elif self.line_in_ids:
             self.line_in_ids[0].goods_qty = self.goods_qty
 
     @api.one
@@ -380,9 +381,10 @@ class wh_disassembly(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+        if self.goods_id:
+            self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                               'uos_id':self.goods_id.uos_id.id,'uom_id': self.goods_id.uom_id.id}]
-        self.line_out_ids[0].onchange_goods_id()
+            self.line_out_ids[0].onchange_goods_id()
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -432,7 +434,7 @@ class wh_disassembly(models.Model):
             self.line_out_ids = False
             self.line_out_ids = line_out_ids or False
             self.line_in_ids = line_in_ids or False
-        elif self.goods_id:
+        elif self.line_out_ids:
             self.line_out_ids[0].goods_qty = self.goods_qty
 
     @api.onchange('bom_id')
