@@ -110,14 +110,12 @@ class buy_order(models.Model):
     @api.depends('line_ids.quantity', 'line_ids.quantity_in')
     def _get_buy_goods_state(self):
         '''返回收货状态'''
-        for line in self.line_ids:
-            if line.quantity_in == 0:
-                self.goods_state = u'未入库'
-            elif line.quantity > line.quantity_in:
-                self.goods_state = u'部分入库'
-                break
-            else:
-                self.goods_state = u'全部入库'
+        if all(line.quantity_in == 0 for line in self.line_ids):
+            self.goods_state = u'未入库'
+        elif any(line.quantity > line.quantity_in for line in self.line_ids):
+            self.goods_state = u'部分入库'
+        else:
+            self.goods_state = u'全部入库'
 
     @api.model
     def _default_warehouse_dest(self):
