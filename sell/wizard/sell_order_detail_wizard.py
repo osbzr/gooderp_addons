@@ -54,7 +54,7 @@ class sell_order_detail_wizard(models.TransientModel):
         return {
             'name': u'销售明细表',
             'view_type': 'form',
-            'view_mode': 'tree,graph',
+            'view_mode': 'tree,pivot',
             'view_id': False,
             'views': [(view.id, 'tree'),(graph_view.id,'graph')],
             'res_model': 'sell.order.detail',

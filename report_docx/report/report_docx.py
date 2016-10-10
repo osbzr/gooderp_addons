@@ -58,6 +58,8 @@ class DataModelProxy(object):
         return temp or ''
 
     def __getattr__(self, key):
+        if not self.data:
+            return ""
         temp = getattr(self.data, key)
         field = self.data._fields.get(key)
 
@@ -128,7 +130,7 @@ class ReportDocx(report_sxw):
 
     def get_docx_data(self, cr, uid, ids, report, context):
         env = api.Environment(cr, uid, context)
-        return env.get(report.model).browse()
+        return env.get(report.model).browse(ids)
 
     def _save_file(self, folder_name, file):
         out_stream = open(folder_name, 'wb')
