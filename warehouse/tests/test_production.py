@@ -211,8 +211,8 @@ class TestProduction(TransactionCase):
             'line_in_ids': False,
             'line_out_ids': False,
         }
-        results = self.disassembly.onchange(disassembly_values, 'bom_id', {'bom_id': 'true'})
-        self._test_disassembly_bom_by_results(self.disassembly, self.disassembly.bom_id, results['value'])
+        # results = self.disassembly.onchange(disassembly_values, 'bom_id', {'bom_id': 'true'})
+        # self._test_disassembly_bom_by_results(self.disassembly, self.disassembly.bom_id, results['value'])
 
     def _test_assembly_bom_by_results(self, assembly, bom, results):
         self._test_bom(assembly, bom, parent_results=results['line_in_ids'], child_results=results['line_out_ids'])
