@@ -28,7 +28,6 @@ class report_stock_transceive_wizard(models.TransientModel):
     goods = fields.Char(u'产品',
                         help=u'本次报表查看的产品')
 
-    @api.one
     @api.onchange('date_start', 'date_end')
     def onchange_date(self):
         if self.date_start and self.date_end and self.date_end < self.date_start:

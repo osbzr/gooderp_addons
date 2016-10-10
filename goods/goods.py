@@ -19,7 +19,6 @@ class goods(models.Model):
         ('barcode_uniq', 'unique(barcode)', u'条形码不能重复'),
     ]
 
-    @api.one
     @api.onchange('uom_id')
     def onchange_uom(self):
         self.uos_id = self.uom_id

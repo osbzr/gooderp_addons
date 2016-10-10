@@ -109,7 +109,6 @@ class test_money_order(TransactionCase):
         with self.assertRaises(UserError):
             money.money_order_done()
         self.partner_id = self.env.ref('core.jd')
-        money.onchange_partner_id()
         # advance_payment < 0, 执行'核销金额不能大于付款金额'
         self.env.ref('money.pay_2000').line_ids.amount = -10.0
         with self.assertRaises(UserError):

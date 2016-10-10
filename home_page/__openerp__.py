@@ -16,5 +16,4 @@
     'depends': ['base','mail'],
     'demo': ['test_demo.xml'],
     'qweb': ['static/src/xml/*.xml'],
-    'application': True,
 }

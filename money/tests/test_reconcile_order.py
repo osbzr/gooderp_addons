@@ -153,10 +153,4 @@ class test_reconcile_order(TransactionCase):
         with self.assertRaises(UserError):
             reconcile_pay_to_pay_partner_same.reconcile_order_done()
 
-        reconcile_pay_to_pay = self.env.ref('money.reconcile_pay_to_pay')
-        # 执行_get_or_pay中的'核销金额不能大于未核销金额'
-        with self.assertRaises(UserError):
-            reconcile_pay_to_pay.payable_source_ids.this_reconcile = 800.0
-            reconcile_pay_to_pay.reconcile_order_done()
-        # 执行_get_or_pay里的business_type 'get_to_get'
         self.env.ref('money.reconcile_get_to_get').reconcile_order_done()

@@ -42,12 +42,12 @@
             <field name='name'>report.lot.track.graph</field>
             <field name='model'>report.lot.track</field>
             <field name='arch' type='xml'>
-                <graph type='pivot'>
+                <pivot>
                     <field name='lot' type='row' groups='goods.batch_groups' />
                     <field name='goods' type='row' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='qty' type='measure' />
-                </graph>
+                </pivot>
             </field>
         </record>
 

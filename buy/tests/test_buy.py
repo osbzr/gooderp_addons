@@ -160,7 +160,7 @@ class test_buy_order(TransactionCase):
                   [('order_id', '=', self.order.id)])
         self.assertTrue(not receipt)
         self.assertTrue(self.order.state == 'draft')
-        self.assertTrue(not self.order.approve_uid)
+        self.assertTrue(not self.order.approve_uid.id)
         # 重复反审核报错
         self.order.buy_order_done()
         self.order.buy_order_draft()
@@ -620,12 +620,12 @@ class test_buy_adjust(TransactionCase):
                                 'attribute_id': self.keyboard_black.id,
                                 'quantity': 3.0,
                                 }),
-                         (0, 0, {'goods_id': self.mouse.id,
-                                'quantity': 1,
-                                }),
-                         (0, 0, {'goods_id': self.cable.id,
-                                'quantity': 1,
-                                })
+                        (0, 0, {'goods_id': self.mouse.id,
+                               'quantity': 1,
+                               }),
+                        (0, 0, {'goods_id': self.cable.id,
+                               'quantity': 1,
+                               })
                          ]
         })
         adjust.buy_adjust_done()

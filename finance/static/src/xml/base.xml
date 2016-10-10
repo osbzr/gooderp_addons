@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates>
+
     <!-- <t t-extend="ListView">
        <t t-jquery="table.o_list_viewo_list_view" t-operation="replace"> &lt;!&ndash;因为一个属性-参数不识别所以不进行修改了，等找到号的解决办法，。&ndash;&gt;
             <table class="o_list_view table table-condensed table-striped">

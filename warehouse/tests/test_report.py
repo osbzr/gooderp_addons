@@ -49,10 +49,10 @@ class TestReport(TransactionCase):
 
     def test_open_report(self):
         # 测试批号跟踪表的wizard
-        self.assertEqual(self.track_wizard.onchange_date()[0], {})
+        self.assertEqual(self.track_wizard.onchange_date(), {})
 
         self.track_wizard.date_end = '1999-09-09'
-        results = self.track_wizard.onchange_date()[0]
+        results = self.track_wizard.onchange_date()
         real_results = {'warning': {
             'title': u'错误',
             'message': u'结束日期不可以小于开始日期'
@@ -64,10 +64,10 @@ class TestReport(TransactionCase):
         self.env['report.lot.track.wizard'].create({})
 
         # 测试商品收发明细表的wizard
-        self.assertEqual(self.transceive_wizard.onchange_date()[0], {})
+        self.assertEqual(self.transceive_wizard.onchange_date(), {})
 
         self.transceive_wizard.date_end = '1999-09-09'
-        results = self.transceive_wizard.onchange_date()[0]
+        results = self.transceive_wizard.onchange_date()
         real_results = {'warning': {
             'title': u'错误',
             'message': u'结束日期不可以小于开始日期'
