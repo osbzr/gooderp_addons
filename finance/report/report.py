@@ -17,7 +17,8 @@ class action_report_picking_wrapped(report_sxw.rml_parse):
         self.context = context
 
     def _rmb_upper(self, value):
-        return self.pool['res.currency'].rmb_upper(self.cr,self.uid,value)
+        env = api.Environment(self.cr, self.uid, self.context)
+        return env['res.currency'].rmb_upper(value)
     
     def _rmb_format(self, value):
         """
