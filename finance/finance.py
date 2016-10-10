@@ -153,10 +153,6 @@ class voucher_line(models.Model):
         if  context.get('line_ids'):
             for move_line_dict in move_obj.resolve_2many_commands('line_ids', context.get('line_ids')):
                 data['name'] = data.get('name') or move_line_dict.get('name')
-                data['partner_id'] = data.get('partner_id') or move_line_dict.get('partner_id')
-                data['account_id'] = data.get('account_id') or move_line_dict.get('account_id')
-                data['auxiliary_id'] = data.get('auxiliary_id') or move_line_dict.get('auxiliary_id')
-                data['goods_id'] = data.get('goods_id') or move_line_dict.get('goods_id')
                 total += move_line_dict.get('debit', 0.0) - move_line_dict.get('credit', 0.0)
             data['debit'] = total < 0 and -total or 0.0
             data['credit'] = total > 0 and total or 0.0
