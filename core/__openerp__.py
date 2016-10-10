@@ -21,4 +21,7 @@
         'core_view.xml',
         'security/ir.model.access.csv',
         ],
+    'qweb': [
+        'static/src/xml/*.xml',
+    ],
 }
