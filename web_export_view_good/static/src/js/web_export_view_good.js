@@ -29,28 +29,28 @@ function compute_main_data(rows,export_columns_keys){
         var $row = $(this);
         if ($row.attr('data-id')) {
             var export_row = [];
-            var checked = $row.find('td input[type=checkbox]');
-            if (checked.get(0).checked) {
-                $.each(export_columns_keys, function () {
-                    var cell = $row.find('td[data-field="' + this + '"]').get(0);
-                    var cell_object =$row.find('td[data-field="' + this + '"]');
-                    var text = cell.text || cell.textContent || cell.innerHTML || "";
-                    var is_boolean_cell = cell_object.find('.o_checkbox input[type=checkbox]');
-                    if (cell.classList.contains("o_list_number")) {
-                        export_row.push(text.trim());
-                    }else if (is_boolean_cell.length>0) {
-                        if (is_boolean_cell.get(0).checked) {
-                            export_row.push('√');
-                        }
-                        else {
-                            export_row.push('X');
-                        }
-                    } else {
-                        export_row.push(text.trim());
+            /*var checked = $row.find('td input[type=checkbox]');*/
+            /*if (checked.get(0).checked) {*/
+            $.each(export_columns_keys, function () {
+                var cell = $row.find('td[data-field="' + this + '"]').get(0);
+                var cell_object =$row.find('td[data-field="' + this + '"]');
+                var text = cell.text || cell.textContent || cell.innerHTML || "";
+                var is_boolean_cell = cell_object.find('.o_checkbox input[type=checkbox]');
+                if (cell.classList.contains("o_list_number")) {
+                    export_row.push(text.trim());
+                }else if (is_boolean_cell.length>0) {
+                    if (is_boolean_cell.get(0).checked) {
+                        export_row.push('√');
                     }
-                });
-                export_rows.push(export_row);
-            }
+                    else {
+                        export_row.push('X');
+                    }
+                } else {
+                    export_row.push(text.trim());
+                }
+            });
+            export_rows.push(export_row);
+            /*}*/
         }
     });
 
@@ -106,6 +106,7 @@ function button_export_action () {
             }).done(function (data) {
                 var now_day = data[0];
                 var operation_message = new Array(export_columns_names.length);
+                var header = new Array(export_columns_names.length);
                 for (var i = 0; i < operation_message.length; i++) { operation_message[i] = " "; }
                 operation_message[0] = "操作人";
                 operation_message[1] = view.getParent().session.username;
@@ -114,7 +115,7 @@ function button_export_action () {
                 export_rows.push(operation_message);
                 if (view.dataset.context.attachment_information !== undefined) {
                     var arr = view.dataset.context.attachment_information.split(",");
-                    var newArray = [];//new Array();
+                    var newArray = [];
                     for (var i = 0; i < arr.length; i++) {
                         var arrOne = arr[i];
                         newArray.push(arrOne);
@@ -122,13 +123,15 @@ function button_export_action () {
                     export_rows.splice(0, 0, newArray);
                 }
                 export_rows.splice(0, 0, []);
+                header[0] =  view.name
                 $.blockUI();
                 view.session.get_file({
 				                url: '/web/export/export_xls_view',
 				                data: {
                         data: JSON.stringify({
                             model: view.model,
-                            headers: export_columns_names,
+                            headers: header,
+                            files_name:view.ViewManager.title,
                             rows: export_rows,
                             file_address: data[1]
                         })

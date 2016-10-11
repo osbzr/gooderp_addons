@@ -37,7 +37,7 @@ import re
 import xlutils.copy
 from odoo.tools import misc
 from odoo import http
-
+import odoo,urllib2
 
 class ReportTemplate(models.Model):
     _name = "report.template"
@@ -57,6 +57,17 @@ class ReportTemplate(models.Model):
         file_address = report_model and report_model[0].file_address or False
         return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address)
 
+def content_disposition(filename):
+    filename = odoo.tools.ustr(filename)
+    escaped = urllib2.quote(filename.encode('utf8'))
+    browser = request.httprequest.user_agent.browser
+    version = int((request.httprequest.user_agent.version or '0').split('.')[0])
+    if browser == 'msie' and version < 9:
+        return "attachment; filename=%s" % escaped
+    elif browser == 'safari' and version < 537:
+        return u"attachment; filename=%s.xls" % filename.encode('ascii', 'replace')
+    else:
+        return "attachment; filename*=UTF-8''%s.xls" % escaped
 
 class ExcelExportView(ExcelExport, ):
     def __getattribute__(self, name):
@@ -67,17 +78,16 @@ class ExcelExportView(ExcelExport, ):
     @http.route('/web/export/export_xls_view', type='http', auth='user')
     def export_xls_view(self, data, token):
         data = json.loads(data)
-        model = data.get('model', [])
+        files_name = data.get('files_name', [])
         columns_headers = data.get('headers', [])
         rows = data.get('rows', [])
         file_address = data.get('file_address', [])
+
         return request.make_response(
-            self.from_data(columns_headers, rows, file_address),
+            self.from_data_excel(columns_headers, [rows, file_address]),
             headers=[
-                ('Content-Disposition', 'attachment; filename="%s"'
-                 % self.filename(model)),
-                ('Content-Type', self.content_type)
-            ],
+                ('Content-Disposition', content_disposition(files_name)),
+                ('Content-Type', self.content_type)],
             cookies={'fileToken': token}
         )
 
@@ -123,7 +133,8 @@ class ExcelExportView(ExcelExport, ):
                                      num_format_str='YYYY-MM-DD HH:mm:SS')
         return style, colour_style, base_style, float_style, date_style, datetime_style
 
-    def from_data(self, fields, rows, file_address):
+    def from_data_excel(self, fields, rows_file_address):
+        rows,file_address = rows_file_address
         if file_address:
             bk = xlrd.open_workbook(misc.file_open(file_address).name, formatting_info=True)
             workbook = xlutils.copy.copy(bk)
