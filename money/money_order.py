@@ -142,8 +142,8 @@ class money_order(models.Model):
     reconciled = fields.Float(string=u'已核销预收款',
                               digits=dp.get_precision('Amount'),
                             help=u'已核销的预收/预付款金额')
-    origin_name = fields.Char(u'来源单号',
-                            help=u'来源单号')
+    origin_name = fields.Char(u'原始单据编号',
+                            help=u'原始单据编号')
     bank_name = fields.Char(u'开户行',
                             help=u'开户行取自业务伙伴，可修改')
     bank_num = fields.Char(u'银行账号',
@@ -218,7 +218,7 @@ class money_order(models.Model):
             else:
                 order.partner_id.receivable -= total + self.discount_amount
 
-            # 更新源单的未核销金额、已核销金额
+            # 更新结算单的未核销金额、已核销金额
             for source in order.source_ids:
                 if abs(source.to_reconcile) < source.this_reconcile:
                     raise UserError(u'本次核销金额不能大于未核销金额')
@@ -387,13 +387,13 @@ class source_order_line(models.Model):
 
     money_id = fields.Many2one('money.order', string=u'收付款单',
                                ondelete='cascade',
-                                help=u'原始单据行对应的收付款单')  # 收付款单上的源单明细
+                                help=u'原始单据行对应的收付款单')  # 收付款单上的结算单明细
     receivable_reconcile_id = fields.Many2one('reconcile.order',
                             string=u'核销单', ondelete='cascade',
-                            help=u'核销单上的应收源单明细') # 核销单上的应收源单明细
+                            help=u'核销单上的应收结算单明细') # 核销单上的应收结算单明细
     payable_reconcile_id = fields.Many2one('reconcile.order',
                             string=u'核销单', ondelete='cascade',
-                            help=u'核销单上的应付源单明细') # 核销单上的应付源单明细
+                            help=u'核销单上的应付结算单明细') # 核销单上的应付结算单明细
     name = fields.Many2one('money.invoice', string=u'结算单编号',
                            copy=False, required=True,
                            ondelete='cascade',

@@ -92,7 +92,7 @@ class asset(models.Model):
     chang_ids = fields.One2many('chang.line', 'order_id', u'变更明细行',
                                states=READONLY_STATES, copy=True)
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
-    money_invoice = fields.Many2one('money.invoice', u'对应源单', readonly=True, ondelete='restrict')
+    money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
     other_money_order = fields.Many2one('other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict')
 
     @api.onchange('category_id')
@@ -235,7 +235,7 @@ class asset(models.Model):
             if other_money_order.state == 'done':
                 other_money_order.other_money_draft()
             other_money_order.unlink()
-        '''删掉源单'''
+        '''删掉结算单'''
         if self.money_invoice:
             money_invoice, self.money_invoice = self.money_invoice, False
             if money_invoice.state == 'done':
@@ -533,7 +533,7 @@ class chang_line(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     chang_before = fields.Float(u'变更前')
     chang_after = fields.Float(u'变更后')
-    chang_money_invoice = fields.Many2one('money.invoice', u'对应源单', readonly=True, ondelete='restrict')
+    chang_money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
     partner_id = fields.Many2one('partner', u'变更单位')
 
 class voucher(models.Model):

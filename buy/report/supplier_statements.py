@@ -109,7 +109,7 @@ class supplier_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三情况：收付款单、采购退货单、采购入库单
+        # 查看原始单据，三情况：收付款单、采购退货单、采购入库单
         money = self.env['money.order'].search([('name', '=', self.name)])
         # 付款单
         if money:
@@ -155,7 +155,7 @@ class supplier_statements_report(models.Model):
                     'res_id': buy.id,
                     'context': {'type': 'pay'}
                 }
-        raise UserError(u'您不能查看期初余额的源单！')
+        raise UserError(u'期初余额没有原始单据可供查看！')
 
 
 class supplier_statements_report_with_goods(models.TransientModel):
@@ -246,6 +246,6 @@ class supplier_statements_report_with_goods(models.TransientModel):
                     'context': {'type': 'pay'}
                 }
 
-        raise UserError(u'您不能查看期初余额的源单！')
+        raise UserError(u'期初余额没有原始单据可供查看！')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
