@@ -1,7 +1,9 @@
-openerp.web_stock_query = function(instance) {
-    var QWeb = instance.web.qweb;
-
-    instance.web.WebClient.include({
+odoo.define('web.stock_query', function(require) {
+    var Client = require('web.WebClient');
+    var Model = require('web.DataModel');
+    var Core = require('web.core');
+    
+    Client.include({
         show_application: function() {
             this._super.apply(this, arguments);
             this.show_stock_query();
@@ -63,10 +65,10 @@ openerp.web_stock_query = function(instance) {
 
         show_query_board: function($input) {
             var self = this;
-            new instance.web.Model('goods').call('name_search', {name: $input.val()} ).then(function(results) {
+            new Model('goods').call('name_search', {name: $input.val()} ).then(function(results) {
                 if (results.length <= 0) return self.hide_query_board();
 
-                self.$board = $(QWeb.render('web_stock_query.search_list', {'values': _.map(results, function(result) {
+                self.$board = $(Core.qweb.render('web_stock_query.search_list', {'values': _.map(results, function(result) {
                     return {id: result[0], name: result[1]};
                 })}));
 
@@ -104,7 +106,7 @@ openerp.web_stock_query = function(instance) {
             this.action_manager.do_action({
                 type: 'ir.actions.act_window',
                 res_model: 'report.stock.balance',
-                views: [[false, 'graph'], [false, 'list']],
+                views: [[false, 'pivot'], [false, 'list']],
                 target: 'current',
                 name: '库存余额表',
             });
@@ -121,7 +123,7 @@ openerp.web_stock_query = function(instance) {
                 self.action_manager.do_action({
                     type: 'ir.actions.act_window',
                     res_model: 'report.stock.balance',
-                    views: [[false, 'graph']],
+                    views: [[false, 'pivot'], [false, 'list']],
                     domain: [['goods_id', '=', $target.data('id')]],
                     target: 'new',
                     name: '搜索：' + $target.text().trim(),
@@ -129,5 +131,4 @@ openerp.web_stock_query = function(instance) {
             }
         }
     });
-
-};
+});
