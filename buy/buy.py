@@ -214,11 +214,15 @@ class buy_order(models.Model):
 
         return super(buy_order, self).unlink()
 
-    def _get_vals(self, money_lines):
+    def _get_vals(self):
         '''返回创建 money_order 时所需数据'''
         flag = (self.type == 'buy' and 1 or -1) # 用来标志入库或退货
         amount = flag * self.amount
         this_reconcile = flag * self.prepayment
+        money_lines = [{
+                'bank_id': self.bank_account_id.id,
+                'amount': this_reconcile,
+            }]
         return {
             'partner_id': self.partner_id.id,
             'date': fields.Date.context_today(self),
@@ -236,12 +240,8 @@ class buy_order(models.Model):
         '''由购货订单生成付款单'''
         # 入库单/退货单
         if self.prepayment:
-            money_lines = [{
-                'bank_id': self.bank_account_id.id,
-                'amount': self._get_amout()['this_reconcile'],
-            }]
             money_order = self.with_context(type='pay').env['money.order'].create(
-                self._get_vals(money_lines)
+                self._get_vals()
             )
             return money_order
 
@@ -331,16 +331,18 @@ class buy_order(models.Model):
             'date': self.planned_date,
             'date_due': fields.Date.context_today(self),
             'order_id': self.id,
-            'line_in_ids': [
-                (0, 0, line[0]) for line in receipt_line],
-            'line_out_ids': [
-                (0, 0, line[0]) for line in receipt_line],
             'origin': 'buy.receipt',
             'note': self.note,
             'discount_rate': self.discount_rate,
             'discount_amount': self.discount_amount,
             'invoice_by_receipt':self.invoice_by_receipt,
         })
+        if self.type == 'buy':
+            receipt_id.write({'line_in_ids': [
+                (0, 0, line[0]) for line in receipt_line]})
+        else:
+            receipt_id.write({'line_out_ids': [
+                (0, 0, line[0]) for line in receipt_line]})
         return receipt_id
 
     @api.one
@@ -703,7 +705,8 @@ class buy_receipt(models.Model):
     def _line_qty_write(self):
         if self.order_id:
             line_ids = not self.is_return and self.line_in_ids or self.line_out_ids
-            line.buy_line_id.quantity_in = sum(line.goods_qty for line in line_ids)
+            for line in line_ids:
+                line.buy_line_id.quantity_in += line.goods_qty
 
         return
 
