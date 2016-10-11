@@ -46,7 +46,7 @@ class buy_payment_wizard(models.TransientModel):
         if self.partner_id:
             cond.append(('partner_id', '=', self.partner_id.id))
         if self.order_id:
-            cond.append(('name', '=', self.order_id.id))
+            cond.append(('id', '=', self.order_id.id))
         if self.warehouse_dest_id:
             cond += ['|',('buy_move_id.warehouse_dest_id', '=', self.warehouse_dest_id.id),
                      ('buy_move_id.warehouse_id', '=', self.warehouse_dest_id.id)]

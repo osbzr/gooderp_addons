@@ -326,11 +326,11 @@ class test_buy_receipt(TransactionCase):
         receipt._get_buy_money_state()
         self.assertTrue(receipt.money_state == u'全部付款')
 
-    def test_get_buy_return_state(self):
+    def test_get_buy_money_state_return(self):
         '''测试返回退款状态'''
-        self.return_receipt._get_buy_return_state()
+        self.return_receipt._get_buy_money_state()
         self.return_receipt.buy_receipt_done()
-        self.return_receipt._get_buy_return_state()
+        self.return_receipt._get_buy_money_state()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
 
         return_receipt = self.return_receipt.copy()
@@ -343,7 +343,7 @@ class test_buy_receipt(TransactionCase):
         for line in source_line:
             line.money_id.money_order_done()
         # 判断状态
-        return_receipt._get_buy_return_state()
+        return_receipt._get_buy_money_state()
         self.assertTrue(return_receipt.return_state == u'部分退款')
 
         return_receipt = self.return_receipt.copy()
@@ -356,7 +356,7 @@ class test_buy_receipt(TransactionCase):
         for line in source_line:
             line.money_id.money_order_done()
         # 判断状态
-        return_receipt._get_buy_return_state()
+        return_receipt._get_buy_money_state()
         self.assertTrue(return_receipt.return_state == u'全部退款')
 
     def test_onchange_discount_rate(self):
