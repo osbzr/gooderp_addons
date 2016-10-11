@@ -26,7 +26,7 @@
     'author': "Agile Business Group,Odoo Community Association (OCA)",
     'website': 'http://www.agilebg.com',
     'license': 'AGPL-3',
-    'depends': [
+    'depends': ['base',
         'web'
     ],
     'data': [
@@ -34,7 +34,7 @@
         'security/ir.model.access.csv',
     ],
     'qweb': [
-        'static/src/xml/web_export_view_template.xml',
+        'static/src/xml/*.xml',
     ],
     'installable': True,
     'auto_install': False,

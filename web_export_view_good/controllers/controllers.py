@@ -36,6 +36,7 @@ import StringIO
 import re
 import xlutils.copy
 from odoo.tools import misc
+from odoo import http
 
 
 class ReportTemplate(models.Model):
@@ -63,7 +64,7 @@ class ExcelExportView(ExcelExport, ):
             raise AttributeError()
         return super(ExcelExportView, self).__getattribute__(name)
 
-    @http.route('/web/export/xls_view', type='http', auth='user')
+    @http.route('/web/export/export_xls_view', type='http', auth='user')
     def export_xls_view(self, data, token):
         data = json.loads(data)
         model = data.get('model', [])
@@ -107,7 +108,7 @@ class ExcelExportView(ExcelExport, ):
 
     def style_data(self):
         style = xlwt.easyxf(
-            'font: bold on,height 300;align: wrap on,vert centre, horiz center;border: left thin,right thin,top thin,bottom thin')
+            'font: bold on,height 300;align: wrap on,vert centre, horiz center;')
         colour_style = xlwt.easyxf('align: wrap yes,vert centre, horiz center;pattern: pattern solid, \
                                    fore-colour light_orange;border: left thin,right thin,top thin,bottom thin')
 
@@ -141,8 +142,6 @@ class ExcelExportView(ExcelExport, ):
             worksheet.write_merge(0, 0, 0, len(fields) - 1, fields[0], style=style)
             worksheet.row(0).height = 400
             worksheet.row(2).height = 400
-            [worksheet.write(1, i, '', style=xlwt.easyxf('border: left thin,right thin,top thin,bottom thin'))
-             for i in xrange(len(fields))]
             columnwidth = {}
             for row_index, row in enumerate(rows):
                 for cell_index, cell_value in enumerate(row):
@@ -153,7 +152,7 @@ class ExcelExportView(ExcelExport, ):
                         columnwidth.update({cell_index: len("%s"%(cell_value))})
                     if row_index == 1:
                         cell_style = colour_style
-                    elif row_index != len(rows) - 1:
+                    elif row_index != len(rows)-1:
                         cell_style = base_style
                         if isinstance(cell_value, basestring):
                             cell_value = re.sub("\r", " ", cell_value)
@@ -164,14 +163,14 @@ class ExcelExportView(ExcelExport, ):
                         elif isinstance(cell_value, float) or isinstance(cell_value, int):
                             cell_style = float_style
                     else:
-                        cell_style = xlwt.easyxf('border: left thin,right thin,top thin,bottom thin')
+                        cell_style = xlwt.easyxf()
                     worksheet.write(row_index + 1, cell_index, cell_value, cell_style)
             for column, widthvalue in columnwidth.items():
                 """参考 下面链接关于自动列宽（探讨）的代码
                  http://stackoverflow.com/questions/6929115/python-xlwt-accessing-existing-cell-content-auto-adjust-column-width"""
-                if (widthvalue + 2) * 367 >= 65536:
+                if (widthvalue + 3) * 367 >= 65536:
                     widthvalue = 300
-                worksheet.col(column).width = (widthvalue+4) * 256
+                worksheet.col(column).width = (widthvalue+4) * 367
         worksheet.set_panes_frozen(True)  # frozen headings instead of split panes
         worksheet.set_horz_split_pos(3)  # in general, freeze after last heading row
         worksheet.set_remove_splits(True)  # if user does unfreeze, don't leave a split there
