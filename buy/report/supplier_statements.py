@@ -21,10 +21,11 @@ class supplier_statements_report(models.Model):
         ])
         # 相邻的两条记录，partner不同，应收款余额重新计算
         if pre_record:
-            before_balance = pre_record.balance_amount
+            before_balance = pre_record.this_balance_amount
         else:
             before_balance = 0
         self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
+        self.this_balance_amount = self.balance_amount
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
@@ -44,8 +45,9 @@ class supplier_statements_report(models.Model):
         string=u'应付款余额',
         compute='_compute_balance_amount',
         readonly=True,
-        digits=dp.get_precision('Amount')
-    )
+        digits=dp.get_precision('Amount'))
+    this_balance_amount = fields.Float(string=u'应付款余额',
+                                       digits=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
@@ -66,6 +68,7 @@ class supplier_statements_report(models.Model):
                     pay_amount,
                     discount_money,
                     balance_amount,
+                    0 AS this_balance_amount,
                     note,
                     move_id
             FROM
