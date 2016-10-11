@@ -1,5 +1,5 @@
 odoo.define('web.float_limit', function(require) {
-    var form_widgets = require('web.form_widget');
+    var form_widgets = require('web.form_widgets');
     var form_view = require('web.FormView');
     var core = require('web.core');
     

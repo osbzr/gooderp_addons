@@ -34,7 +34,7 @@
     注意:此模块功能 有可能 和其他tree 上 float 字段 上的 widegt显示 冲突!
     """,
     'data': [
-        'tree_zero_dispaly_blank.xml',
+        'tree_zero_display_blank.xml',
     ],
     'installable': True,
 }
