@@ -171,7 +171,7 @@ class checkout_wizard(models.TransientModel):
                         'res_model': 'voucher',
                         'type': 'ir.actions.act_window',
                         'res_id': voucher.id,
-                        'limit': 300,
+                        'limit': 65535,
                     }
 
     # 反结账
