@@ -25,15 +25,22 @@ var formats = require('web.formats');
 var Model = require('web.DataModel');
 function compute_main_data(rows,export_columns_keys){
     var export_rows = []
+
     $.each(rows, function () {
         var $row = $(this);
         if ($row.attr('data-id')) {
             var export_row = [];
             /*var checked = $row.find('td input[type=checkbox]');*/
             /*if (checked.get(0).checked) {*/
+            var export_columns_dict={};
             $.each(export_columns_keys, function () {
-                var cell = $row.find('td[data-field="' + this + '"]').get(0);
-                var cell_object =$row.find('td[data-field="' + this + '"]');
+                var column =this;
+                if (export_columns_dict[column]!=undefined){
+                    export_columns_dict[column]=export_columns_dict[column]+1;
+                }else{
+                     export_columns_dict[column] = 0;}
+                var cell = $row.find('td[data-field="' + column + '"]').get(export_columns_dict[column]);
+                var cell_object =$row.find('td[data-field="' + column + '"]');
                 var text = cell.text || cell.textContent || cell.innerHTML || "";
                 var is_boolean_cell = cell_object.find('.o_checkbox input[type=checkbox]');
                 if (cell.classList.contains("o_list_number")) {
@@ -46,6 +53,13 @@ function compute_main_data(rows,export_columns_keys){
                         export_row.push('X');
                     }
                 } else {
+                    if (cell.innerHTML){
+                         var no_tag_and_bank_row = cell.innerHTML.replace(/<\/?[^>]*>/g,'').replace(/[\r\n]/g,"")
+                         if((no_tag_and_bank_row.split("                   ")).length>1){
+                             var list_result = no_tag_and_bank_row.split("                   ");
+                             text =list_result.splice(1,list_result.length).join("\r\n");
+                            };
+                    }
                     export_row.push(text.trim());
                 }
             });
