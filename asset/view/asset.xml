@@ -207,10 +207,11 @@
                             <field name="period_id"  style="width: 30%%"/>
                         </group>
                     </group>
-
-					<button name="create_depreciation"  string="查看折旧明细表" type="object" class="oe_highlight"/>
-                    或者
-                    <button string="取消" class="oe_link" special="cancel"/>
+                    <footer>
+                        <button name="create_depreciation"  string="查看折旧明细表" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
             	</form>
             </field>
         </record>
