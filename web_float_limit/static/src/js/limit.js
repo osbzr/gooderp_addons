@@ -18,7 +18,7 @@ odoo.define('web.float_limit', function(require) {
         }
     });
     
-    core.form_widget_regist.add('float_limit', float_limit);
+    core.form_widget_registry.add('float_limit', float_limit);
     
     form_view.include({
         on_invalid: function() {
