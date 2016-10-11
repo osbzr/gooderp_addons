@@ -33,6 +33,7 @@ class partner_statements_report_wizard(models.Model):
                 'res_model': 'bank.statements.report',
                 'view_id': False,
                 'views': [(view.id, 'tree')],
+                'limit': 65535,
                 'type': 'ir.actions.act_window',
                 'domain':[('bank_id', '=', self.bank_id.id), ('date', '>=', self.from_date), ('date', '<=', self.to_date)]
                 }
