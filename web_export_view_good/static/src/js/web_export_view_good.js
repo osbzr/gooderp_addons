@@ -101,7 +101,6 @@ function button_export_action () {
     export_rows = export_rows.concat(compute_main_data(rows,export_columns_keys));
     var amount = view.$el.find('.o_list_view > tfoot > tr');
     export_rows = export_rows.concat(compute_footer_data(amount,export_columns_keys));
-    console.log(this);
     new Model('report.template').call('get_time', [this.model], {
                 context: this.dataset.context
             }).done(function (data) {

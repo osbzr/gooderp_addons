@@ -137,7 +137,6 @@ class ExcelExportView(ExcelExport, ):
         rows,file_address = rows_file_address
         if file_address:
             bk = xlrd.open_workbook(misc.file_open(file_address).name, formatting_info=True)
-            print misc.file_open(file_address).name
             workbook = xlutils.copy.copy(bk)
             worksheet = workbook.get_sheet(0)
             for i, fieldname in enumerate(fields):
