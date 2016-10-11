@@ -59,7 +59,7 @@ class sell_summary_partner(models.Model):
                     ELSE - wml.subtotal END) AS subtotal,
                 (SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
                     ELSE - wml.amount END) - SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
-                    ELSE - wml.goods_qty END) * wml.cost) AS margin
+                    ELSE - wml.goods_qty END) * wml.cost_unit) AS margin
         '''
 
     def from_sql(self, sql_type='out'):
@@ -99,7 +99,7 @@ class sell_summary_partner(models.Model):
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY c_category,partner,goods_code,goods,attribute,warehouse,uos,uom,wml.cost
+        GROUP BY c_category,partner,goods_code,goods,attribute,warehouse,uos,uom,wml.cost_unit
         '''
 
     def order_sql(self, sql_type='out'):

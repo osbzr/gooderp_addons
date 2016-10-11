@@ -922,13 +922,14 @@ class wh_move_line(models.Model):
                               help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
 
     @api.multi
-    @api.onchange('goods_id')
+    @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税'''
         if self.goods_id:
-            is_return = self.env.context.get('default_is_return')
             if not self.goods_id.cost:
                 raise UserError(u'请先设置商品的成本！')
+
+            is_return = self.env.context.get('default_is_return')
             # 如果是采购入库单行 或 采购退货单行
             if (self.type == 'in' and not is_return) or (self.type == 'out' and is_return):
                 self.tax_rate = self.env.user.company_id.import_tax_rate
