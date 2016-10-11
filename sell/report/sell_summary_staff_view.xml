@@ -9,7 +9,7 @@
                 	<field name="staff"/>
                 	<field name="goods_code"/>
                     <field name="goods"/>
-                    <button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"/>
+                    <button name="view_detail" type="object" string="查看明细" icon="fa-search"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
                     <field name="warehouse" groups='warehouse.multi_warehouse_groups'/>
                     <field name="qty_uos" sum="辅助数量合计" groups='goods.auxiliary_unit_groups'/>

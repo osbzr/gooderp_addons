@@ -1,152 +1,189 @@
-openerp.home_page = function(instance, local) {
-    var _t = instance.web._t,
-        _lt = instance.web._lt;
-    var QWeb = instance.web.qweb;
+odoo.define('home_page', function (require) {
+    "use strict";
 
-    local.HomePage = instance.Widget.extend({
-        start: function() {
-            var num=this.get('value');
-            var self=this
-            self.$el.append("<div id='main' class='main'>\
-                             </div>\
-                    </div>")
+    var core = require('web.core');
+    var Widget = require('web.Widget');
+    var Model = require('web.Model');
+    var session = require('web.session');
+    var framework = require('web.framework');
+
+    var QWeb = core.qweb;
+    var _t = core._t;
+
+    var HomePage = Widget.extend({
+        events: {
+            'click button[oe_top_link]': 'on_click_top',
+            'click .oe_quick_link': 'on_click_quick',
+            'click .oe_main_link': 'on_click_main',
+        },
+        on_click_top: function (e) {
+            var self = this;
+            e.preventDefault();
+            var $button = $(e.currentTarget);
+            var button_id = $button[0].id;
+            var view_mode = _.contains((self.result_top[button_id])[1].split(','), 'tree') ? 'list' : 'form';
+            var views = _.contains((self.result_top[button_id])[1].split(','), 'tree') ? [[self.result_top[button_id][5],
+                'list'], [false, 'form']] : [[self.result_top[button_id][5], 'form']];
+            var action={
+                type: 'ir.actions.act_window',
+                res_model: (self.result_top[button_id])[2],
+                view_mode: view_mode,
+                views: views,
+                domain: self.result_top[button_id][3],
+                context: self.result_top[button_id][4],
+                name: self.result_top[button_id][6],
+                target: self.result_top[button_id][7],
+            }
+            this.do_action(action, {clear_breadcrumbs: true});
+        },
+        on_click_quick: function (e) {
+            //因为报表存在分区， 分区显示 所以 和第一第二模块的 数据处理不太一样，大同小异！
+
+            var self  =this;
+            var $li = $(e.currentTarget);
+            var a_id = $li.attr('oe_top_link_i');
+            var link_a_id = $li.attr('oe_top_link_j');
+            var index_vals = self.result_quick[a_id][1];
+            var view_mode = _.contains(index_vals[link_a_id][1].split(','), 'tree') ? 'list' : 'form';
+            var views = _.contains(index_vals[link_a_id][1].split(','), 'tree') ? [[index_vals[link_a_id][5],
+                'list'], [false, 'form']] : [[index_vals[link_a_id][5], 'form']];
+            self.do_action({
+                type: 'ir.actions.act_window',
+                res_model: index_vals[link_a_id][2],
+                view_mode: view_mode,
+                name: index_vals[link_a_id][6],
+                views: views,
+                domain: index_vals[link_a_id][3],
+                context: index_vals[link_a_id][4],
+                target: index_vals[link_a_id][7],
+            }, {
+                clear_breadcrumbs: true,
+            });
+        },
+
+        on_click_main: function (e) {
+            var self  =this;
+            var $a = $(e.currentTarget);
+            var a_id = $a[0].id;
+            var result_main = self.result_main;
+            var result_one = result_main[a_id];
+            if (result_one[0] != result_one[1]) {
+                var view_mode = _.contains((result_main[a_id])[1].split(','), 'tree') ? 'list' : 'form';
+                var views = _.contains((result_main[a_id])[1].split(','), 'tree') ? [[result_main[a_id][6],
+                    'list'], [false, 'form']] : [[result_main[a_id][6], 'form']];
+                self.do_action({
+                    type: 'ir.actions.act_window',
+                    res_model: (result_main[a_id])[2],
+                    view_mode: view_mode,
+                    name: result_main[a_id][7],
+                    view_type: result_main[a_id][1],
+                    views: views,
+                    domain: result_main[a_id][3],
+                    context: result_main[a_id][5],
+                    target: result_main[a_id][8],
+                }, {
+                    clear_breadcrumbs: true,
+                });
+            }
+        },
+
+
+        three_part_qweb_render: function () {
+            var top_fist = $(QWeb.render('top_fist_1'));
+            var top_second = $(QWeb.render('top_second_2'));
+            var top_third = $(QWeb.render('top_third_3'));
+            return {
+                'top_fist': top_fist,
+                'top_second': top_second,
+                'top_third': top_third
+            }
+        },
+        three_part_is_show: function (result, most_frame) {
+            var self = this;
+            if (result['top']) {
+                self.$el.find('.main').append(most_frame.top_fist);
+                this.result_top = result['top']
+            }
+            if (result['main']) {
+                self.$el.find('.main').append(most_frame.top_second);
+                var center_main_table = $(QWeb.render('center_main_table'));
+                self.$el.find('.main_div').append(center_main_table);
+                this.result_main = result['main']
+            }
+            if (result['right']) {
+                self.$el.find('.main').append(most_frame.top_third);
+                this.result_quick = result['right']
+            }
+        },
+        second_part: function () {
+            var self = this;
+            var row_num = 0;
+            var result_top = self.result_top;
+            result_top.length / 4 > 1 ? row_num = 3 : row_num = parseInt(12 / result_top.length);
+            for (var i = 0; i < result_top.length; i++) {
+                var top_data = this.result_top[i][0].split('  ');
+                if ((i + 1) / 4 > parseInt(result_top.length / 4)) {
+                    row_num = parseInt(12 / (result_top.length % 4)) == 0 ? 4 : parseInt(12 / (result_top.length % 4))
+                }
+                if (top_data.length == 2) {
+                    var left_html_str = $("<div class='col-xs-12 col-md-" + row_num + "'>\
+                          <button class='btn btn-primary-outline btn-pill oe_top_link_" + i + "' oe_top_link='" + i + "' id='" + i + "' style='width: 160px;height: 160px;'>\
+                          <h4>" + top_data[0] + "</h4>\
+                          <h3>" + top_data[1] + "</h3>\
+                          </button><p class='m-t-sm'></p></div>");
+                    self.$el.find('.top_div').append(left_html_str);
+                }
+            }
+        },
+        thrid_part: function () {
+            var index_last = 0;
+            var self = this;
+            var result_quick = self.result_quick;
+            for (var i = 0; i < result_quick.length; i++) {
+                var left_big_html_str = "<div class='col-xs-12 col-md-3 right_small_div_" + i + "'><a>\
+                        <h3>" + (result_quick[i][0].split(';'))[1] + "</h3></a></div>"
+                self.$el.find('.right_div').append(left_big_html_str);
+                for (var j = 0; j < result_quick[i][1].length; j++) {
+                    var left_html_str = $(" <a><li  class='text-muted oe_p oe_quick_link' oe_top_link_i='" + i + "'  oe_top_link_j='" + j+ "' id='" + index_last + "'>" +
+                        "<p>" + result_quick[i][1][j][6] + "</p></li></a>");
+                    self.$el.find('.right_small_div_' + i).append(left_html_str);
+                    index_last++;
+                }
+            }
+        },
+        first_part: function () {
+            var self = this;
+            var index = 0;
+            var row_num = 0;
+            var result_main = self.result_main;
+            result_main.length / 4 > 1 ? row_num = 3 : row_num = parseInt(12 / result_main.length);
+            for (var j = 0; j < result_main.length; j++) {
+                var result_one = result_main[index];
+                var center_html_str = "<div class='col-sm-" + row_num + " col-xs-6'><div class='feature-item text-center'>\
+                <p  class='btn btn-primary btn-lg oe_main_link'  oe_main_link='" + index + "' id='" + index + "'>" + result_one[0] + "</p>\
+                </div><div>";
+                self.$el.find('.feature-list').append(center_html_str);
+                index++;
+            }
+        },
+        start: function () {
+            var num = this.get('value');
+            var self = this;
+            self.$el.append("<div id='main' class='main'></div>")
             /*首页分为三块  样式进行显示 分别是 数据统计  业务总览 实时报表 */
-            var top_top_fist_1 ="<div class='class='section m-t-lg m-b-lg top_div'>\
-                                    <div class='container'>\
-                                            <div class='row'>\
-                                                <div class='col-sm-6 col-sm-offset-3 feature-bg text-center'>\
-                                                <p class='bg-primary'>\
-                                                    <h1 class='feature-title' style='color:rgb(109,188,245)'>数据统计</h1> </p>\
-                                                </div>\
-                                            </div>\
-                                            <div class='row text-center top_div'>\
-                                            </div>\
-                                    </div>\
-                               </div>"
-             var top_top_second_1 ="<div class='main_div'><div class='row'>\
-                                <div class='col-sm-6 col-sm-offset-3 feature-bg text-center'>\
-                                    <h1 class='feature-title' style='color:rgb(109,188,245)'>业务总览</h1> \
-                                 </div>\
-                             </div></div>"
-            var top_top_last_1 ="<div class='container' style='margin-bottom: 20px;'>\
-                                 <div class='row'>\
-                                     <div class='col-sm-6 col-sm-offset-3 feature-bg text-center '>\
-                                        <h1 class='feature-title' style='color:rgb(109,188,245)'>实时报表</h1> \
-                                    </div>\
-                                     <div class='col-xs-12 col-sm-12 news right_div'>\
-                                     </div>\
-                                  </div>"
-            new instance.web.Model("home.page").call("get_action_url").then(function(result){
-                var index=0;
+            var most_frame = this.three_part_qweb_render();
+            new Model("home.page").call("get_action_url").then(function (result) {
+                var index = 0;
                 /* 三块 可以选择性的不显示某个 模块 */
-                self.result_top=result['top']
-                if(self.result_top){
-                     self.$el.find('.main').append(top_top_fist_1);
-                }
-                self.result_main=result['main']
-                if(self.result_main) {
-                    self.$el.find('.main').append(top_top_second_1);
-                    var center_main_table = "<div class='section section-feature'><div class='container'><div class='row feature-list'></div></div></div>"
-                    self.$el.find('.main_div').append(center_main_table);
-                    self.result_main = result['main']
-                }
+                self.three_part_is_show(result, most_frame);
                 /* 第一块的视图的构建 及跳转的逻辑 */
-                self.result_main.length/4 > 1?row_num=3 :row_num=parseInt(12/self.result_main.length);
-                for(var j=0;j<self.result_main.length;j++){
-                    var result_one=self.result_main[index]
-                    var center_html_str="<div class='col-sm-"+row_num+" col-xs-6'><div class='feature-item text-center'>\
-                        <p  class='btn btn-primary btn-lg oe_main_link_"+index+"' id='"+index+"'>"+result_one[0]+"</p>\
-                        </div><div>"
-
-                    self.$el.find('.feature-list').append(center_html_str);
-                    if (result_one[0]!=result_one[1]){
-                        self.$(".oe_main_link_"+index+"").click(function() {
-                            var view_mode =  _.contains((self.result_main[this.id])[1].split(','),'tree')? 'list':'form'
-                            var views = _.contains((self.result_main[this.id])[1].split(','),'tree')?[[self.result_main[this.id][6],
-                                'list'],[false, 'form']]:[[self.result_main[this.id][6], 'form']]
-                             self.do_action({
-                                type: 'ir.actions.act_window',
-                                res_model: (self.result_main[this.id])[2],
-                                view_mode:view_mode,
-                                name:self.result_main[this.id][7],
-                                view_type: self.result_main[this.id][1],
-                                views:views,
-                                domain:self.result_main[this.id][3],
-                                context:self.result_main[this.id][5],
-                                target: self.result_main[this.id][8],
-                            });
-                        });
-                    }
-                    index++;
-                }
+                self.first_part();
                 /* 第er块的视图的构建 及跳转的逻辑 */
-                self.result_top.length/4 > 1?row_num=3 :row_num=parseInt(12/self.result_top.length);
-                for(var i=0;i< self.result_top.length;i++){
-                    var top_date = self.result_top[i][0].split('  ');
-                    if ((i+1)/4>parseInt(self.result_top.length/4)) {
-                        row_num = parseInt(12 / (self.result_top.length % 4)) == 0 ? 4 : parseInt(12 / (self.result_top.length % 4))
-                    }
-                    if (top_date.length==2){
-                        var left_html_str = $("<div class='col-xs-12 col-md-"+row_num+"'>\
-                              <button class='btn btn-primary-outline btn-pill oe_top_link_"+i+"' id='"+i+"' style='width: 160px;height: 160px;'>\
-                              <h4>"+top_date[0]+"</h4>\
-                              <h3   >"+top_date[1]+"</h3>\
-                              </button><p class='m-t-sm'></p></div>");
-                        self.$el.find('.top_div').append(left_html_str);
-                        self.$(".oe_top_link_"+i+"").click(function() {
-                            var view_mode =  _.contains((self.result_top[this.id])[1].split(','),'tree')? 'list':'form'
-                            var views = _.contains((self.result_top[this.id])[1].split(','),'tree')?[[self.result_top[this.id][5],
-                                'list'],[false, 'form']]:[[self.result_top[this.id][5], 'form']]
-                             self.do_action({
-                                type: 'ir.actions.act_window',
-                                res_model: (self.result_top[this.id])[2],
-                                view_mode: view_mode,
-                                views: views,
-                                domain:self.result_top[this.id][3],
-                                context:self.result_top[this.id][4],
-                                name:self.result_top[this.id][6],
-                                target: self.result_top[this.id][7],
-                            });
-                        });
-                    }
-                }
-                self.result_quick=result['right']
-                var index_last=0;
-                if(self.result_quick){
-                     self.$el.find('.main').append(top_top_last_1);
-                }
+                self.second_part();
                 /* 第san块的视图的构建 及跳转的逻辑 */
-                for(var i=0;i< self.result_quick.length;i++){
-                    var left_big_html_str = "<div class='col-xs-12 col-md-3 right_small_div_"+i+"'><a>\
-                                <h3>" + (self.result_quick[i][0].split(';'))[1] + "</h3></a></div>"
-                    self.$el.find('.right_div').append(left_big_html_str);
-                    for(var j=0;j<self.result_quick[i][1].length;j++) {
-                        var left_html_str = $(" <a><li  class='text-muted oe_p oe_quick_link_" + index_last+ "' data-id='"+i+"_"+j+"_" + index_last + "' id='"+index_last+"' >"+
-                            "<p>" + self.result_quick[i][1][j][6] + "</p></li></a>");
-                        self.$el.find('.right_small_div_'+i).append(left_html_str);
-                        self.$('.oe_quick_link_' +index_last + "").click(function () {
-                            index_list = ($(this).attr("data-id")).split('_')
-                            index_vals = self.result_quick[parseInt(index_list[0])][1]
-                            var view_mode =  _.contains(index_vals[parseInt(index_list[1])][1].split(','),'tree')? 'list':'form'
-                            var views = _.contains(index_vals[parseInt(index_list[1])][1].split(','),'tree')?[[index_vals[parseInt(index_list[1])][5],
-                                    'list'],[false, 'form']]:[[index_vals[parseInt(index_list[1])][5], 'form']]
-                            self.do_action({
-                                type: 'ir.actions.act_window',
-                                res_model: index_vals[parseInt(index_list[1])][2],
-                                view_mode: view_mode,
-                                name: index_vals[parseInt(index_list[1])][6],
-                                views: views,
-                                domain: index_vals[parseInt(index_list[1])][3],
-                                context: index_vals[parseInt(index_list[1])][4],
-                                target: index_vals[parseInt(index_list[1])][7],
-                            });
-                        });
-                        index_last ++;
-                    }
-                }
-             });
+                self.thrid_part()
+            });
         },
     });
-    instance.web.client_actions.add('home_page.homepage', 'instance.home_page.HomePage');
-    
-}
+    core.action_registry.add('home_page.homepage', HomePage);
+})

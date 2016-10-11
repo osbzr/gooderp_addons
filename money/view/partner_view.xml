@@ -11,7 +11,7 @@
                     <field name="init_balance"/>
 				</field>
                 <field name="balance" position="after">
-                    <button name="bank_statements" type="object" string="查看现金银行报表" icon="terp-stock_zoom" class="oe_highlight"/>
+                    <button name="bank_statements" type="object" string="查看现金银行报表" icon="fa-search" class="oe_highlight"/>
 				</field>
             </field>
         </record>

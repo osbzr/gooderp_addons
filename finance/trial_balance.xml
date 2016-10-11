@@ -110,7 +110,7 @@
                     <field name="date"/>
                     <field name="period_id"/>
                     <field name="voucher_id"/>
-                    <button name="view_detail_voucher" type="object" string="查看明细" icon="terp-stock_zoom"
+                    <button name="view_detail_voucher" type="object" string="查看明细" icon="fa-search"
                     	 attrs="{'invisible': [('voucher_id','=',False)]}"/>
                     <field name="summary"/>
                     <field name="debit"/>
