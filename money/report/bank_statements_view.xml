@@ -9,7 +9,7 @@
                 <tree string="Bank Statements Report">
                 	<field name="date"/>
                     <field name="name"/>
-                    <button name="find_source_order" type="object" string="查看源单" icon="fa-search" attrs="{'invisible':[('name','=','期初')]}" class="oe_highlight"/>
+                    <button name="find_source_order" type="object" string="查看原始单据" icon="fa-search" attrs="{'invisible':[('name','=','期初')]}" class="oe_highlight"/>
                     <field name="note"/>
                     <field name="get"/>
                     <field name="pay"/>

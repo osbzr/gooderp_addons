@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
-import odoo.addons.decimal_precision as dp
-from odoo.exceptions import UserError, ValidationError
-from datetime import datetime
 import calendar
+from datetime import datetime
+
+import odoo.addons.decimal_precision as dp
+from odoo import api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 FIANNCE_CATEGORY_TYPE = [
     ('finance_account', u'会计科目'),
@@ -81,6 +82,21 @@ class voucher(models.Model):
             raise UserError(u'请不要重复审核！')
         if self.period_id.is_closed is True:
             raise UserError(u'该会计期间已结账！不能审核')
+        if not self.line_ids:
+            raise ValidationError(u'请输入凭证行')
+        for line in self.line_ids:
+            if line.debit + line.credit == 0:
+                raise ValidationError(u'单行凭证行借和贷不能同时为0')
+            if line.debit * line.credit != 0:
+                raise ValidationError(u'单行凭证行不能同时输入借和贷')
+        debit_sum = sum([line.debit for line in self.line_ids])
+        credit_sum = sum([line.credit for line in self.line_ids])
+        precision = self.env['decimal.precision'].precision_get('Account')
+        debit_sum = round(debit_sum, precision)
+        credit_sum = round(credit_sum, precision)
+        if debit_sum != credit_sum:
+            raise ValidationError(u'借贷方不平')
+
         self.state = 'done'
 
     @api.one
@@ -96,28 +112,6 @@ class voucher(models.Model):
     def _compute_amount(self):
         # todo 实现明细行总金额
         self.amount_text = str(sum([line.debit for line in self.line_ids]))
-
-    @api.one
-    @api.constrains('line_ids')
-    def _check_balance(self):
-        debit_sum = sum([line.debit for line in self.line_ids])
-        credit_sum = sum([line.credit for line in self.line_ids])
-        precision = self.env['decimal.precision'].precision_get('Account')
-        debit_sum = round(debit_sum, precision)
-        credit_sum = round(credit_sum, precision)
-        if debit_sum != credit_sum:
-            raise ValidationError(u'借贷方不平')
-
-    @api.one
-    @api.constrains('line_ids')
-    def _check_line(self):
-        if not self.line_ids:
-            raise ValidationError(u'请输入凭证行')
-        for line in self.line_ids:
-            if line.debit + line.credit == 0:
-                raise ValidationError(u'单行凭证行借和贷不能同时为0')
-            if line.debit * line.credit != 0:
-                raise ValidationError(u'单行凭证行不能同时输入借和贷')
 
     @api.multi
     def unlink(self):

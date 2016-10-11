@@ -38,8 +38,8 @@ class wh_move(models.Model):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_dest_type', 'stock'))
 
-    origin = fields.Char(u'源单类型', required=True,
-                         help=u'源单类型')
+    origin = fields.Char(u'移库类型', required=True,
+                         help=u'移库类型')
     name = fields.Char(u'单据编号', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft',
