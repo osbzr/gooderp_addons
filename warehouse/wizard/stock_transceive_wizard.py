@@ -46,4 +46,5 @@ class report_stock_transceive_wizard(models.TransientModel):
             'view_mode': 'tree',
             'name': u'商品收发明细表 %s 至  %s ' % (self.date_start, self.date_end),
             'context': self.read(['date_start', 'date_end', 'warehouse', 'goods'])[0],
+            'limit': 65535,
         }

@@ -151,5 +151,5 @@ class sell_order_track_wizard(models.TransientModel):
             'res_model': 'sell.order.track',
             'type': 'ir.actions.act_window',
             'domain': [('id', 'in', res)],
-            'limit': 200,
+            'limit': 65535,
         }

@@ -46,4 +46,5 @@ class report_lot_track_wizard(models.TransientModel):
             'view_mode': 'tree',
             'name': u'批号跟踪表',
             'context': self.read(['date_start', 'date_end', 'warehouse', 'goods'])[0],
+            'limit': 65535,
         }
