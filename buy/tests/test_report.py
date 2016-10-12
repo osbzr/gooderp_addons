@@ -165,7 +165,7 @@ class test_payment_wizard(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.receipt.payment = 2.0
         new_receipt = self.receipt.copy()
-        new_receipt.discount_amount = 585   # 使入库单的优惠后金额为0
+#         new_receipt.discount_amount = 585   # 使入库单的优惠后金额为0
         new_receipt.payment = 0
         new_receipt.bank_account_id = False
         new_receipt.buy_receipt_done()
