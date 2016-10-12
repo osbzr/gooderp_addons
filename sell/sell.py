@@ -822,10 +822,10 @@ class sell_delivery(models.Model):
         if len(delivery_ids) > 1:
             self.modifying = True
         # 将原始订单中已执行数量清零
-        order = self.env['sell.order'].search(
-            [('id', '=', self.order_id.id)])
-        for line in order.line_ids:
-            line.quantity_out = 0
+        if self.order_id:
+            line_ids = not self.is_return and self.line_in_ids or self.line_out_ids
+            for line in line_ids:
+                line.sell_line_id.quantity_out -= line.goods_qty
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.sell_move_id.cancel_approved_order()
 
