@@ -11,7 +11,7 @@
                 'web_menu_create',
                 'decimal_precision',
 #                'web_readonly_bypass',
-                'web_export_view_good','home_page'],
+                'web_export_view_good','home_page', 'common_dialog'],
     'demo': [
         'core_demo.xml',
         ],

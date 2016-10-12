@@ -7,7 +7,6 @@ from openerp import fields
 class common_dialog_wizard(models.TransientModel):
     _name = 'common.dialog.wizard'
     
-    title = fields.Char(u'标题', default=lambda self: self.env.context.get('title'))
     message = fields.Text(u'消息', default=lambda self: self.env.context.get('message'))
 
     def do_confirm(self):
@@ -23,7 +22,7 @@ class common_dialog_wizard(models.TransientModel):
             
             args = self.env.context.get('args') or []
             kwargs = self.env.context.get('kwargs') or {}
-            
+       
             return func(*args, **kwargs)
         else:
             raise ValueError(u'错误, 向导中找不到源单的定义')

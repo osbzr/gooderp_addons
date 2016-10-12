@@ -533,31 +533,3 @@ class test_popup_wizard(TransactionCase):
                        [('order_id', '=', self.order.id)])
         self.hd_stock = self.env.ref('warehouse.hd_stock')
         self.warehouse_inventory = self.env.ref('warehouse.warehouse_inventory')
-
-    def test_button_ok(self):
-        '''缺货向导的确认按钮'''
-
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
-
-        self.delivery.sell_delivery_done()
-        inv_line = {}
-        for line in self.delivery.line_out_ids:
-            inv_line = {
-                'goods_id':line.goods_id.id,
-                'attribute_id':line.attribute_id.id,
-                'goods_uos_qty':line.goods_uos_qty,
-                'uos_id':line.uos_id.id,
-                'goods_qty':line.goods_qty,
-                'uom_id':line.uom_id.id,
-                'cost_unit':line.goods_id.cost
-            }
-        self.env['popup.wizard'].create({}).with_context({
-            'method': 'goods_inventery',
-            'vals': {'type': 'inventory',
-                     'warehouse_id': self.warehouse_inventory.id,
-                     'warehouse_dest_id': self.hd_stock.id,
-                     'line_in_ids':[(0, 0, inv_line)],
-                     },
-            'active_id': self.delivery.id,
-            'active_model': 'sell.delivery',
-        }).button_ok()

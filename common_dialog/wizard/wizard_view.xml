@@ -6,11 +6,8 @@
             <field name="model">common.dialog.wizard</field>
             <field name="arch" type="xml">
                 <form string="警告">
-                    <header>
-                        <h3><field name='title' readonly='1' nolabel='1' /></h3>
-                    </header>
                     <group>
-                        <h3><field name='message' readonly='1' nolabel='1' /></h3>
+                        <field name='message' readonly='1' nolabel='1' />
                     </group>
                     <footer>
                         <button name="do_confirm" type="object" string="确认" class="oe_highlight"/>
