@@ -59,7 +59,7 @@ class money_order(models.Model):
                 vouch_debit_line = self.env['voucher.line'].create({
                     'name': u"收款单%s" % (name),
                     'account_id': line.bank_id.account_id.id,
-                    'debit': line.amount,
+                    'debit': line.amount * (line.currency_id.rate or 1),
                     'voucher_id': vouch_obj.id,
                     'partner_id': '',
                 })
@@ -80,18 +80,6 @@ class money_order(models.Model):
                                             'currency_amount': line.amount,
                                             'rate_silent': line.currency_id.rate
                                             })
-                # # 折扣行生成凭证
-                # if self.discount_amount != 0 and first_line_flag:
-                #     first_line_flag = False
-                #     self.env['voucher.line'].create({
-                #         'name': u"%s收款单%s 折扣" % (partner.name, name),
-                #         'account_id': self.discount_account_id.id,
-                #         'debit': self.discount_amount,
-                #         'voucher_id': vouch_obj.id,
-                #         'partner_id': self.partner_id.id,
-                #     })
-                #
-                #     vouch_debit_line.debit += self.discount_amount
 
         if source_ids:
             for line in line_ids:
