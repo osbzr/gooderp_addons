@@ -38,3 +38,10 @@
 article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
     display: block
 }
+
+.button-circle {width:30px;height:30px;border-radius:100px;}
+.gooderp-colour { background-color:#9f5000;color: white}
+
+.gooderp-title {
+  color: #337ab7;
+}
