@@ -66,8 +66,7 @@ odoo.define('home_page', function (require) {
             var $a = $(e.currentTarget);
             var a_id = $a[0].id;
             var result_main = self.result_main;
-            var result_one = result_main[a_id];
-            if (result_one[0] != result_one[1]) {
+            if (result_main[a_id][0] != result_main[a_id][1]) {
                 var view_mode = _.contains((result_main[a_id])[1].split(','), 'tree') ? 'list' : 'form';
                 var views = _.contains((result_main[a_id])[1].split(','), 'tree') ? [[result_main[a_id][6],
                     'list'], [false, 'form']] : [[result_main[a_id][6], 'form']];
@@ -117,9 +116,8 @@ odoo.define('home_page', function (require) {
         },
         second_part: function () {
             var self = this;
-            var row_num = 0;
             var result_top = self.result_top;
-            result_top.length / 4 > 1 ? row_num = 3 : row_num = parseInt(12 / result_top.length);
+            var row_num = result_top.length / 4 > 1 ? 3 : parseInt(12 / result_top.length);
             for (var i = 0; i < result_top.length; i++) {
                 var top_data = this.result_top[i][0].split('  ');
                 if ((i + 1) / 4 > parseInt(result_top.length / 4)) {
@@ -154,13 +152,11 @@ odoo.define('home_page', function (require) {
         first_part: function () {
             var self = this;
             var index = 0;
-            var row_num = 0;
             var result_main = self.result_main;
-            result_main.length / 4 > 1 ? row_num = 3 : row_num = parseInt(12 / result_main.length);
+            var row_num = result_main.length / 4 > 1 ? 3 : parseInt(12 / result_main.length);
             for (var j = 0; j < result_main.length; j++) {
-                var result_one = result_main[index];
                 var center_html_str = "<div class='col-sm-" + row_num + " col-xs-6'><div class='feature-item text-center'>\
-                <p  class='btn btn-primary btn-lg oe_main_link'  oe_main_link='" + index + "' id='" + index + "'>" + result_one[0] + "</p>\
+                <p  class='btn btn-primary btn-lg oe_main_link'  oe_main_link='" + index + "' id='" + index + "'>" + result_main[index][0] + "</p>\
                 </div><div>";
                 self.$el.find('.feature-list').append(center_html_str);
                 index++;

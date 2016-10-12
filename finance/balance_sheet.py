@@ -36,14 +36,10 @@ class create_balance_sheet_wizard(models.TransientModel):
     def _default_period_domain(self):
         """
         用来设定期间的 可选的范围(这个是一个范围)
-        :return: domai条件
+        :return: domain条件
         """
         period_domain_setting = self.env['ir.values'].get_default('finance.config.settings', 'default_period_domain')
-        if period_domain_setting == 'cannot':
-            domain = [('is_closed', '!=', False)]
-        else:
-            domain = []
-        return domain
+        return [('is_closed', '!=', False)] if period_domain_setting == 'cannot' else []
 
     @api.model
     def _default_period_id(self):
@@ -97,9 +93,9 @@ class create_balance_sheet_wizard(models.TransientModel):
         force_company = self._context.get('force_company')
         if not force_company:
             force_company = self.env.user.company_id.id
-        company_id = self.env['res.company'].search([('id', '=', force_company)])
+        company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_id.name + u',,,,' + self.period_id.year\
+        attachment_information = u'编制单位：' + company_row.name + u',,,,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + str(days) + u'日' + u',,,' + u'单位：元'
         return {     # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
@@ -129,9 +125,9 @@ class create_balance_sheet_wizard(models.TransientModel):
         force_company = self._context.get('force_company')
         if not force_company:
             force_company = self.env.user.company_id.id
-        company_id = self.env['res.company'].search([('id', '=', force_company)])
+        company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_id.name + u',,' + self.period_id.year\
+        attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year\
                                  + u'年' + self.period_id.month + u'月' + str(days) + u'日' + u',' + u'单位：元'
         return {      # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
