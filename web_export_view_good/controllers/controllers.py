@@ -34,7 +34,7 @@ import xlrd
 import datetime
 import StringIO
 import re
-import xlutils.copy
+from xlutils.copy import copy
 from odoo.tools import misc
 from odoo import http
 import odoo,urllib2
@@ -137,7 +137,7 @@ class ExcelExportView(ExcelExport, ):
         rows,file_address = rows_file_address
         if file_address:
             bk = xlrd.open_workbook(misc.file_open(file_address).name, formatting_info=True)
-            workbook = xlutils.copy.copy(bk)
+            workbook = copy(bk)
             worksheet = workbook.get_sheet(0)
             for i, fieldname in enumerate(fields):
                 self.setOutCell(worksheet, 0, i, fieldname)
@@ -180,7 +180,7 @@ class ExcelExportView(ExcelExport, ):
                 """参考 下面链接关于自动列宽（探讨）的代码
                  http://stackoverflow.com/questions/6929115/python-xlwt-accessing-existing-cell-content-auto-adjust-column-width"""
                 if (widthvalue + 3) * 367 >= 65536:
-                    widthvalue = 300
+                    widthvalue = 50
                 worksheet.col(column).width = (widthvalue+4) * 367
         worksheet.set_panes_frozen(True)  # frozen headings instead of split panes
         worksheet.set_horz_split_pos(3)  # in general, freeze after last heading row

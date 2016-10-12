@@ -9,9 +9,6 @@ odoo.define('web.menu_create', function(require) {
             this.on('menu_bound', this, function() {
                 var $all_menus = self.$el.parents('.o_web_client').find('.o_sub_menu').find('[data-menu]');
                 var all_menu_ids = _.map($all_menus, function (menu) {return parseInt($(menu).attr('data-menu'), 10);});
-                
-                console.log(all_menu_ids)
-
                 this.do_load_create_tag(all_menu_ids);
             });
         },
