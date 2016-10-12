@@ -37,10 +37,11 @@ class customer_statements_report(models.Model):
         pre_record = self.search([('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
         # 相邻的两条记录，partner不同，应收款余额重新计算
         if pre_record:
-            before_balance = pre_record.balance_amount
+            before_balance = pre_record.this_balance_amount
         else:
             before_balance = 0
         self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
+        self.this_balance_amount = self.balance_amount
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
@@ -58,6 +59,8 @@ class customer_statements_report(models.Model):
                               digits=dp.get_precision('Amount'))
     balance_amount = fields.Float(string=u'应收款余额',
                                   compute='_compute_balance_amount',
+                                  digits=dp.get_precision('Amount'))
+    this_balance_amount = fields.Float(string=u'应收款余额',
                                   digits=dp.get_precision('Amount'))
     discount_money = fields.Float(string=u'收款折扣', readonly=True,
                               digits=dp.get_precision('Amount'))
@@ -82,6 +85,7 @@ class customer_statements_report(models.Model):
                     pay_amount,
                     discount_money,
                     balance_amount,
+                    0 AS this_balance_amount,
                     note,
                     move_id
             FROM
@@ -124,7 +128,7 @@ class customer_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三种情况：收款单、销售退货单、销售发货单
+        # 查看原始单据，三种情况：收款单、销售退货单、销售发货单
         money = self.env['money.order'].search([('name', '=', self.name)])
         # 收款单
         if money:
@@ -171,7 +175,7 @@ class customer_statements_report(models.Model):
                     'context': {'type': 'get'}
             }
 
-        raise UserError(u'您不能查看期初余额的源单！')
+        raise UserError(u'期初余额无原始单据可查看！')
 
 class customer_statements_report_with_goods(models.TransientModel):
     _name = "customer.statements.report.with.goods"
@@ -204,7 +208,7 @@ class customer_statements_report_with_goods(models.TransientModel):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三种情况：收款单、销售退货单、销售发货单
+        # 查看原始单据，三种情况：收款单、销售退货单、销售发货单
         money = self.env['money.order'].search([('name', '=', self.name)])
         if money:  # 收款单
             view = self.env.ref('money.money_order_form')
@@ -249,6 +253,6 @@ class customer_statements_report_with_goods(models.TransientModel):
                     'res_id': delivery.id,
                     'context': {'type': 'get'}
                 }
-        raise UserError(u'您不能查看期初余额的源单！')
+        raise UserError(u'期初余额无原始单据可查看！')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

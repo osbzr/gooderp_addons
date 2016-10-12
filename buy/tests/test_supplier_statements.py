@@ -15,7 +15,7 @@ class test_supplier_statements(TransactionCase):
             'from_date': '2016-01-01',
             'to_date': '2016-11-01'}).with_context({'default_supplier': True})
 
-        # 供应商期初余额，查看源单应报错
+        # 供应商期初余额，查看原始单据应报错
         self.env.ref('core.lenovo').payable_init = 1000
         partner = self.env['partner'].search([('id', '=', self.env.ref('core.lenovo').id)])
 

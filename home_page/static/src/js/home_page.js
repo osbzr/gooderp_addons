@@ -37,22 +37,25 @@ odoo.define('home_page', function (require) {
             this.do_action(action, {clear_breadcrumbs: true});
         },
         on_click_quick: function (e) {
+            //因为报表存在分区， 分区显示 所以 和第一第二模块的 数据处理不太一样，大同小异！
+
             var self  =this;
-            var $a = $(e.currentTarget);
-            var a_id = $a[0].id;
+            var $li = $(e.currentTarget);
+            var a_id = $li.attr('oe_top_link_i');
+            var link_a_id = $li.attr('oe_top_link_j');
             var index_vals = self.result_quick[a_id][1];
-            var view_mode = _.contains(index_vals[a_id][1].split(','), 'tree') ? 'list' : 'form';
-            var views = _.contains(index_vals[a_id][1].split(','), 'tree') ? [[index_vals[a_id][5],
-                'list'], [false, 'form']] : [[index_vals[a_id][5], 'form']];
+            var view_mode = _.contains(index_vals[link_a_id][1].split(','), 'tree') ? 'list' : 'form';
+            var views = _.contains(index_vals[link_a_id][1].split(','), 'tree') ? [[index_vals[link_a_id][5],
+                'list'], [false, 'form']] : [[index_vals[link_a_id][5], 'form']];
             self.do_action({
                 type: 'ir.actions.act_window',
-                res_model: index_vals[a_id][2],
+                res_model: index_vals[link_a_id][2],
                 view_mode: view_mode,
-                name: index_vals[a_id][6],
+                name: index_vals[link_a_id][6],
                 views: views,
-                domain: index_vals[a_id][3],
-                context: index_vals[a_id][4],
-                target: index_vals[a_id][7],
+                domain: index_vals[link_a_id][3],
+                context: index_vals[link_a_id][4],
+                target: index_vals[link_a_id][7],
             }, {
                 clear_breadcrumbs: true,
             });
@@ -122,7 +125,6 @@ odoo.define('home_page', function (require) {
                 if ((i + 1) / 4 > parseInt(result_top.length / 4)) {
                     row_num = parseInt(12 / (result_top.length % 4)) == 0 ? 4 : parseInt(12 / (result_top.length % 4))
                 }
-                 console.log(top_data);
                 if (top_data.length == 2) {
                     var left_html_str = $("<div class='col-xs-12 col-md-" + row_num + "'>\
                           <button class='btn btn-primary-outline btn-pill oe_top_link_" + i + "' oe_top_link='" + i + "' id='" + i + "' style='width: 160px;height: 160px;'>\
@@ -142,7 +144,7 @@ odoo.define('home_page', function (require) {
                         <h3>" + (result_quick[i][0].split(';'))[1] + "</h3></a></div>"
                 self.$el.find('.right_div').append(left_big_html_str);
                 for (var j = 0; j < result_quick[i][1].length; j++) {
-                    var left_html_str = $(" <a><li  class='text-muted oe_p oe_quick_link' oe_top_link='" + index_last + "' id='" + index_last + "'>" +
+                    var left_html_str = $(" <a><li  class='text-muted oe_p oe_quick_link' oe_top_link_i='" + i + "'  oe_top_link_j='" + j+ "' id='" + index_last + "'>" +
                         "<p>" + result_quick[i][1][j][6] + "</p></li></a>");
                     self.$el.find('.right_small_div_' + i).append(left_html_str);
                     index_last++;

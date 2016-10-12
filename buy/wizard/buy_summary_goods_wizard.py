@@ -43,4 +43,5 @@ class buy_summary_goods_wizard(models.TransientModel):
             'res_model': 'buy.summary.goods',
             'type': 'ir.actions.act_window',
             'context': self.read(read_field)[0],
+            'limit': 65535,
         }

@@ -18,7 +18,7 @@ class test_customer_statements(TransactionCase):
                     'from_date': '2016-01-01',
                     'to_date': '2016-11-01'}).with_context({'default_customer': True})
 
-        # 客户期初余额，查看源单应报错
+        # 客户期初余额，查看原始单据应报错
         self.env.ref('core.jd').receivable_init = 1000
         # 创建收款记录
         money_get = self.env.ref('money.get_40000')

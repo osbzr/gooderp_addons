@@ -44,4 +44,5 @@ class sell_summary_staff_wizard(models.TransientModel):
             'res_model': 'sell.summary.staff',
             'type': 'ir.actions.act_window',
             'context': self.read(read_fields)[0],
+            'limit': 65535,
         }

@@ -172,7 +172,8 @@ class CreateTrialBalanceWizard(models.TransientModel):
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],
-            'domain': [('id', 'in', trial_balance_ids)]
+            'domain': [('id', 'in', trial_balance_ids)],
+            'limit': 65535,
         }
 
 
@@ -430,7 +431,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],
-            'domain': [('id', 'in', vouchers_summary_ids)]
+            'domain': [('id', 'in', vouchers_summary_ids)],
+            'limit': 65535,
         }
 
     @api.multi
@@ -477,7 +479,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],
-            'domain': [('id', 'in', vouchers_summary_ids)]
+            'domain': [('id', 'in', vouchers_summary_ids)],
+            'limit':65535,
         }
 
 

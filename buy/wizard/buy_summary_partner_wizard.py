@@ -42,4 +42,5 @@ class buy_summary_partner_wizard(models.TransientModel):
             'res_model': 'buy.summary.partner',
             'type': 'ir.actions.act_window',
             'context': self.read(read_fields)[0],
+            'limit': 65535,
         }

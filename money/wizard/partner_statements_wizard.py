@@ -41,6 +41,7 @@ class partner_statements_report_wizard(models.TransientModel):
                 'res_model': res_model,
                 'view_id': False,
                 'views': [(view.id, 'tree')],
+                'limit': 65535,
                 'type': 'ir.actions.act_window',
                 'domain':[('partner_id', '=', self.partner_id.id), ('date', '>=', self.from_date), ('date', '<=', self.to_date)]
                 }
@@ -115,6 +116,7 @@ class partner_statements_report_wizard(models.TransientModel):
                     'res_model': 'customer.statements.report.with.goods',
                     'view_id': False,
                     'views': [(view.id, 'tree')],
+                    'limit': 65535,
                     'type': 'ir.actions.act_window',
                     'domain':[('id', 'in', res_ids)],
                     'context': {'is_customer': True, 'is_supplier': False},
@@ -181,6 +183,7 @@ class partner_statements_report_wizard(models.TransientModel):
                     'res_model': 'supplier.statements.report.with.goods',
                     'view_id': False,
                     'views': [(view.id, 'tree')],
+                    'limit': 65535,
                     'type': 'ir.actions.act_window',
                     'domain':[('id', 'in', res_ids)],
                     'context': {'is_customer': False, 'is_supplier': True},

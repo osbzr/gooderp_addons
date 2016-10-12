@@ -17,12 +17,13 @@ class bank_statements_report(models.Model):
         pre_record = self.search([('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
         if pre_record:
             if pre_record.name != u'期初余额':
-                before_balance = pre_record.balance
+                before_balance = pre_record.this_balance
             else:
                 before_balance = pre_record.get
         else:
             before_balance = 0
         self.balance += before_balance + self.get - self.pay
+        self.this_balance = self.balance
 
     bank_id = fields.Many2one('bank.account', string=u'账户名称', readonly=True)
     date = fields.Date(string=u'日期', readonly=True)
@@ -34,6 +35,8 @@ class bank_statements_report(models.Model):
     balance = fields.Float(string=u'账户余额',
                            compute='_compute_balance', readonly=True,
                            digits=dp.get_precision('Amount'))
+    this_balance = fields.Float(string=u'账户余额',
+                                digits=dp.get_precision('Amount'))
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
     note = fields.Char(string=u'备注', readonly=True)
 
@@ -50,6 +53,7 @@ class bank_statements_report(models.Model):
                     get,
                     pay,
                     balance,
+                    0 AS this_balance,
                     partner_id,
                     note
             FROM
@@ -105,7 +109,7 @@ class bank_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三种情况：收付款单、其他收支单、资金转换单
+        # 查看原始单据，三种情况：收付款单、其他收支单、资金转换单
         money = self.env['money.order'].search([('name', '=', self.name)])
         other_money = self.env['other.money.order'].search([('name', '=', self.name)])
 

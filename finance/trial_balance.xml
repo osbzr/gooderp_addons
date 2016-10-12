@@ -53,10 +53,11 @@
                             <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 30%%"/>
                         </group>
                     </group>
-
-					<button name="create_trial_balance"  string="查看科目余额表" type="object" class="oe_highlight"/>
-                    或者 
-                    <button string="取消" class="oe_link" special="cancel"/>
+                    <footer>
+                        <button name="create_trial_balance"  string="查看科目余额表" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
             	</form>
             </field>
         </record>
@@ -85,11 +86,12 @@
                             <field name="subject_name_end_id" options="{'no_open':True,'no_create':True}" required="True"/>
                          </group>
                     </group>
-
-                    <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="查看科目明细帐表" type="object" class="oe_highlight"/>
-                     <button name="create_general_ledger_account" invisible="context.get('create_vouchers_summary')" string="查看科目总账" type="object" class="oe_highlight"/>
-                    或者 
-                    <button string="取消" class="oe_link" special="cancel"/>
+                    <footer>
+                        <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="查看科目明细帐表" type="object" class="oe_highlight"/>
+                         <button name="create_general_ledger_account" invisible="context.get('create_vouchers_summary')" string="查看科目总账" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
                 </form>
             </field>
         </record>
@@ -110,7 +112,7 @@
                     <field name="date"/>
                     <field name="period_id"/>
                     <field name="voucher_id"/>
-                    <button name="view_detail_voucher" type="object" string="查看明细" icon="terp-stock_zoom"
+                    <button name="view_detail_voucher" type="object" string="查看明细" icon="fa-search"
                     	 attrs="{'invisible': [('voucher_id','=',False)]}"/>
                     <field name="summary"/>
                     <field name="debit"/>

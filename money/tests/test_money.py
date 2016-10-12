@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class test_money_order(TransactionCase):
@@ -137,6 +137,12 @@ class test_money_order(TransactionCase):
         with self.assertRaises(UserError):
             self.env.ref('money.pay_2000').partner_id = self.env.ref('core.jd').id
 
+    def test_money_order_done_get_voucher(self):
+        ''' 测试收付款审核时 单据行与当前用户公司的 currency 不一致的情况 '''
+        self.env.ref('money.get_line_1').currency_id = self.env.ref('base.USD').id
+        self.env.user.company_id.currency_id = self.env.ref('base.CNY').id
+        self.env.ref('money.get_40000').money_order_done()
+
     def test_money_order_voucher(self):
         invoice = self.env['money.invoice'].create({
             'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
@@ -149,7 +155,7 @@ class test_money_order(TransactionCase):
         # 把业务伙伴未审核的收付款单审核
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
-        # get  银行账户没设置科目
+
         money1 = self.env['money.order'].with_context({'type': 'get'}) \
             .create({
                 'partner_id': self.env.ref('core.jd').id,
@@ -162,6 +168,8 @@ class test_money_order(TransactionCase):
         money1.discount_account_id = self.env.ref('finance.small_business_chart5603001').id
         money1.discount_amount = 10
         money1.money_order_done()
+
+        # get  银行账户没设置科目 无结算单行
         money1.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money1.money_order_done()
@@ -177,6 +185,11 @@ class test_money_order(TransactionCase):
                     'this_reconcile': 210.0,
                     'date_due': '2016-09-07'})],
                     })
+        # get  银行账户没设置科目 有结算单行
+        money1.line_ids[0].bank_id.account_id = False
+        with self.assertRaises(UserError):
+            money1.money_order_done()
+
         money1.discount_amount = 10
         money1.line_ids[0].bank_id.account_id = self.env.ref('finance.account_bank').id
         money1.money_order_done()
@@ -194,7 +207,7 @@ class test_money_order(TransactionCase):
         money2.discount_account_id = self.env.ref('finance.small_business_chart5603002').id
         money2.discount_amount = 10
         money2.money_order_done()
-        # pay  银行账户没设置科目
+        # pay  银行账户没设置科目 无结算单行
         money2.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money2.money_order_done()
@@ -210,11 +223,20 @@ class test_money_order(TransactionCase):
             'this_reconcile': 210.0,
             'date_due': '2016-09-07'})],
                        })
+        # pay  银行账户没设置科目 有结算单行
+        money2.line_ids[0].bank_id.account_id = False
+        with self.assertRaises(UserError):
+            money2.money_order_done()
 
         money2.discount_amount = 10
         money2.line_ids[0].bank_id.account_id = self.env.ref('finance.account_bank').id
         money2.money_order_done()
 
+    def test_compute_currency_id(self):
+        '''测试 结算帐户与业务伙伴币别不一致 报错'''
+        self.env.ref('money.get_40000').currency_id = self.env.ref('base.USD').id
+        with self.assertRaises(ValidationError):
+            self.env.ref('money.get_line_1').bank_id = self.env.ref('core.alipay').id
 
 class test_other_money_order(TransactionCase):
     '''测试其他收支单'''
@@ -419,16 +441,20 @@ class test_partner(TransactionCase):
         self.env.ref('core.jd').partner_statements()
         self.env.ref('core.lenovo').partner_statements()
         self.env.ref('core.comm').bank_statements()
-    
+
     def test_partner_set_init(self):
         '''测试客户期初'''
         customer = self.env.ref('core.jd')
         customer.receivable_init = 1234567
         self.assertEqual(customer.receivable, customer.receivable_init)
+        # 测试  客户 如果有前期初值，删掉已前的单据   的 if 判断
+        customer._set_receivable_init()
 
         vendor = self.env.ref('core.lenovo')
         vendor.payable_init = 23456789
         self.assertEqual(vendor.payable, vendor.payable_init)
+        # 测试   供应商如果有前期初值，删掉已前的单据   的 if 判断
+        vendor._set_payable_init()
 
     def test_bank_set_init(self):
         '''测试资金期初'''
@@ -436,3 +462,5 @@ class test_partner(TransactionCase):
         balance = bank.balance
         bank.init_balance = 1111
         self.assertEqual(bank.balance, bank.init_balance + balance)
+        # 测试   资金如果有前期初值，删掉已前的单据   的 if 判断
+        bank._set_init_balance()

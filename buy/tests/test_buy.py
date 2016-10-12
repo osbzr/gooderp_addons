@@ -326,11 +326,11 @@ class test_buy_receipt(TransactionCase):
         receipt._get_buy_money_state()
         self.assertTrue(receipt.money_state == u'全部付款')
 
-    def test_get_buy_return_state(self):
+    def test_get_buy_money_state_return(self):
         '''测试返回退款状态'''
-        self.return_receipt._get_buy_return_state()
+        self.return_receipt._get_buy_money_state()
         self.return_receipt.buy_receipt_done()
-        self.return_receipt._get_buy_return_state()
+        self.return_receipt._get_buy_money_state()
         self.assertTrue(self.return_receipt.return_state == u'未退款')
 
         return_receipt = self.return_receipt.copy()
@@ -343,7 +343,7 @@ class test_buy_receipt(TransactionCase):
         for line in source_line:
             line.money_id.money_order_done()
         # 判断状态
-        return_receipt._get_buy_return_state()
+        return_receipt._get_buy_money_state()
         self.assertTrue(return_receipt.return_state == u'部分退款')
 
         return_receipt = self.return_receipt.copy()
@@ -356,7 +356,7 @@ class test_buy_receipt(TransactionCase):
         for line in source_line:
             line.money_id.money_order_done()
         # 判断状态
-        return_receipt._get_buy_return_state()
+        return_receipt._get_buy_money_state()
         self.assertTrue(return_receipt.return_state == u'全部退款')
 
     def test_onchange_discount_rate(self):
@@ -400,7 +400,7 @@ class test_buy_receipt(TransactionCase):
         self.assertTrue(not move.line_in_ids)
 
     def test_buy_receipt_done(self):
-        '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
+        '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成结算单和付款单'''
         # 结算账户余额
         bank_account = self.env.ref('core.alipay')
         bank_account.write({'balance': 1000000, })
@@ -452,7 +452,7 @@ class test_buy_receipt(TransactionCase):
         # 测试分摊之前审核是否会弹出警告
         with self.assertRaises(UserError):
             receipt.buy_receipt_done()
-        # 测试分摊之后金额是否相等，然后审核，测试采购费用是否产生源单
+        # 测试分摊之后金额是否相等，然后审核，测试采购费用是否产生结算单
         receipt.buy_share_cost()
         receipt.buy_receipt_done()
         for line in receipt.line_in_ids:

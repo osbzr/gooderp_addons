@@ -43,4 +43,5 @@ class sell_summary_goods_wizard(models.TransientModel):
             'context': self.read(['date_start', 'date_end',
                                   'partner_id', 'goods_id',
                                   'goods_categ_id', 'warehouse_id'])[0],
+            'limit': 65535,
         }
