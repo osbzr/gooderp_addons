@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="common_dialog_wizard_form" model="ir.ui.view">
+            <field name="name">common.dialog.wizard.form</field>
+            <field name="model">common.dialog.wizard</field>
+            <field name="arch" type="xml">
+                <form string="警告">
+                    <group>
+                        <field name='message' readonly='1' nolabel='1' />
+                    </group>
+                    <footer>
+                        <button name="do_confirm" type="object" string="确认" class="oe_highlight"/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

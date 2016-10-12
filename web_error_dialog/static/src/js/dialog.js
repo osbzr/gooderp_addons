@@ -3,7 +3,7 @@ odoo.define('web.gooderp_dialog', function(require) {
     var core = require('web.core');
     var Dialog = require('web.Dialog');
     
-    // 自定义填充按钮，一个对象列表。规则如下
+    // 自定义填充按钮，一个对象列表，规则如下
     // @text: 按钮的显示文本
     // @classes: 按钮的class
     // @click：参数为点击事件event的函数
@@ -21,7 +21,7 @@ odoo.define('web.gooderp_dialog', function(require) {
             }
             new Dialog(this, {
                 size: 'medium',
-                title: "Odoo " + (_.str.capitalize(error.type) || _t("Warning")),
+                title: "Odoo " + (_.str.capitalize(error.type) || core._t("Warning")),
                 subtitle: error.data.title,
                 $content: $('<div>').html(core.qweb.render('CrashManager.warning', {error: error})),
                 buttons: warning_buttons || default_buttons
@@ -39,7 +39,7 @@ odoo.define('web.gooderp_dialog', function(require) {
         },
         show_message: function(exception) {
             this.show_error({
-                type: _t("Client Error"),
+                type: core._t("Client Error"),
                 message: exception,
                 data: {debug: ""},
                 buttons: message_buttons || false,

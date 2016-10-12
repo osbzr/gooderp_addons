@@ -644,6 +644,12 @@ class sell_delivery(models.Model):
         else:
             return False
 
+    def goods_inventery(self, vals):
+        auto_in = self.env['wh.in'].create(vals)
+        auto_in.approve_order()
+
+        self.sell_delivery_done()
+
     @api.multi
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
@@ -681,20 +687,11 @@ class sell_delivery(models.Model):
                                                 }
                                         )]
                             })
-                msg = u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name
-                method = 'goods_inventery'
-                dic = {
-                    'name': u'警告',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'popup.wizard',
-                    'type': 'ir.actions.act_window',
-                    'context':{'method':method,
-                               'vals':vals,
-                               'msg':msg,},
-                    'target': 'new',
-                    }
-                return dic
+                return self.open_dialog('goods_inventery', {
+                    'message': u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name,
+                    'args': [vals],
+                })
+
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         if self.bank_account_id and not self.receipt:
