@@ -47,8 +47,11 @@
                                 <group>
                                     <group string="国籍和其他">
                                         <field name="identification_id"/>
-                                        <field name="passport_id"/>
+                                        <field name="type_of_certification"/>
                                         <field name="birthday"/>
+                                        <field name="is_arbeitnehmer"/>
+                                        <field name="is_investoren"/>
+                                        <field name="is_bsw"/>
                                     </group>
                                     <group string="状态">
                                         <field name="gender"/>
