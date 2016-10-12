@@ -875,7 +875,9 @@ class test_sell_adjust(TransactionCase):
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,
-                                   'quantity': 10,})
+                                   'quantity': 10,
+                                   'price_taxed': 10.0,
+                                   })
         new_order.sell_order_done()
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', new_order.id)])
@@ -934,7 +936,9 @@ class test_sell_adjust(TransactionCase):
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
                                    'attribute_id': self.keyboard_white.id,
-                                   'quantity': 10})
+                                   'quantity': 10,
+                                   'price_taxed': 10.0,
+                                   })
         new_order.sell_order_done()
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', new_order.id)])

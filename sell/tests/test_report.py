@@ -418,8 +418,8 @@ class test_receipt_wizard(TransactionCase):
 
         # 销货订单产生发货单，并审核发货单，优惠后金额和本次收款均为0
         new_delivery = self.delivery.copy()
-        new_delivery.discount_amount = (new_delivery.amount
-                                        + new_delivery.discount_amount)
+#         new_delivery.discount_amount = (new_delivery.amount
+#                                         + new_delivery.discount_amount)
         new_delivery.receipt = 0
         new_delivery.bank_account_id = False
         new_delivery.sell_delivery_done()
