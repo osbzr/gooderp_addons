@@ -113,5 +113,5 @@ class buy_payment_wizard(models.TransientModel):
             'res_model': 'buy.payment',
             'type': 'ir.actions.act_window',
             'domain': [('id', 'in', res)],
-            'limit': 300,
+            'limit': 65535,
         }

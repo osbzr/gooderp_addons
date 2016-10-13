@@ -108,6 +108,7 @@ class create_balance_sheet_wizard(models.TransientModel):
             'views': [(view_id, 'tree')],
             'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
             'domain': [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])],
+            'limit': 65535,
         }
 
     @api.multi
@@ -140,6 +141,7 @@ class create_balance_sheet_wizard(models.TransientModel):
             'views': [(view_id, 'tree')],
             'context': {'period_id': self.period_id.id, 'attachment_information': attachment_information},
             'domain': [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])],
+            'limit': 65535,
         }
 
     @api.multi

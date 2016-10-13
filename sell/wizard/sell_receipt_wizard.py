@@ -120,5 +120,5 @@ class sell_receipt_wizard(models.TransientModel):
             'res_model': 'sell.receipt',
             'type': 'ir.actions.act_window',
             'domain': [('id', 'in', res)],
-            'limit': 300,
+            'limit': 65535,
         }

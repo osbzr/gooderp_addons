@@ -19,7 +19,7 @@ class partner(models.Model):
             if money_invoice_id:
                 money_invoice_id.money_invoice_draft()
                 money_invoice_id.unlink()
-            # 创建源单
+            # 创建结算单
             categ = self.env.ref('money.core_category_sale')
             source_id = self.env['money.invoice'].create({
             'name': "期初应收余额",
@@ -45,7 +45,7 @@ class partner(models.Model):
             if money_invoice_id:
                 money_invoice_id.money_invoice_draft()
                 money_invoice_id.unlink()
-            # 创建源单
+            # 创建结算单
             categ = self.env.ref('money.core_category_purchase')
             source_id = self.env['money.invoice'].create({
             'name': "期初应付余额",

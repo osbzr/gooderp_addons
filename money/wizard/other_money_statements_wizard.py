@@ -31,6 +31,7 @@ class other_money_statements_report_wizard(models.Model):
                 'res_model': 'other.money.statements.report',
                 'view_id': False,
                 'views': [(view.id, 'tree')],
+                'limit': 65535,
                 'type': 'ir.actions.act_window',
                 'domain':[('date', '>=', self.from_date), ('date', '<=', self.to_date)]
                 }

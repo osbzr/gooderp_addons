@@ -109,7 +109,7 @@ class bank_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三种情况：收付款单、其他收支单、资金转换单
+        # 查看原始单据，三种情况：收付款单、其他收支单、资金转换单
         money = self.env['money.order'].search([('name', '=', self.name)])
         other_money = self.env['other.money.order'].search([('name', '=', self.name)])
 

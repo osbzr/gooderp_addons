@@ -169,7 +169,7 @@ class test_money_order(TransactionCase):
         money1.discount_amount = 10
         money1.money_order_done()
 
-        # get  银行账户没设置科目 无源单行
+        # get  银行账户没设置科目 无结算单行
         money1.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money1.money_order_done()
@@ -185,7 +185,7 @@ class test_money_order(TransactionCase):
                     'this_reconcile': 210.0,
                     'date_due': '2016-09-07'})],
                     })
-        # get  银行账户没设置科目 有源单行
+        # get  银行账户没设置科目 有结算单行
         money1.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money1.money_order_done()
@@ -207,7 +207,7 @@ class test_money_order(TransactionCase):
         money2.discount_account_id = self.env.ref('finance.small_business_chart5603002').id
         money2.discount_amount = 10
         money2.money_order_done()
-        # pay  银行账户没设置科目 无源单行
+        # pay  银行账户没设置科目 无结算单行
         money2.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money2.money_order_done()
@@ -223,7 +223,7 @@ class test_money_order(TransactionCase):
             'this_reconcile': 210.0,
             'date_due': '2016-09-07'})],
                        })
-        # pay  银行账户没设置科目 有源单行
+        # pay  银行账户没设置科目 有结算单行
         money2.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money2.money_order_done()

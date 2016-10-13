@@ -18,7 +18,7 @@ class test_customer_statements(TransactionCase):
                     'from_date': '2016-01-01',
                     'to_date': '2016-11-01'}).with_context({'default_customer': True})
 
-        # 客户期初余额，查看源单应报错
+        # 客户期初余额，查看原始单据应报错
         self.env.ref('core.jd').receivable_init = 1000
         # 创建收款记录
         money_get = self.env.ref('money.get_40000')
@@ -418,8 +418,8 @@ class test_receipt_wizard(TransactionCase):
 
         # 销货订单产生发货单，并审核发货单，优惠后金额和本次收款均为0
         new_delivery = self.delivery.copy()
-        new_delivery.discount_amount = (new_delivery.amount
-                                        + new_delivery.discount_amount)
+#         new_delivery.discount_amount = (new_delivery.amount
+#                                         + new_delivery.discount_amount)
         new_delivery.receipt = 0
         new_delivery.bank_account_id = False
         new_delivery.sell_delivery_done()
@@ -533,31 +533,3 @@ class test_popup_wizard(TransactionCase):
                        [('order_id', '=', self.order.id)])
         self.hd_stock = self.env.ref('warehouse.hd_stock')
         self.warehouse_inventory = self.env.ref('warehouse.warehouse_inventory')
-
-    def test_button_ok(self):
-        '''缺货向导的确认按钮'''
-
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
-
-        self.delivery.sell_delivery_done()
-        inv_line = {}
-        for line in self.delivery.line_out_ids:
-            inv_line = {
-                'goods_id':line.goods_id.id,
-                'attribute_id':line.attribute_id.id,
-                'goods_uos_qty':line.goods_uos_qty,
-                'uos_id':line.uos_id.id,
-                'goods_qty':line.goods_qty,
-                'uom_id':line.uom_id.id,
-                'cost_unit':line.goods_id.cost
-            }
-        self.env['popup.wizard'].create({}).with_context({
-            'method': 'goods_inventery',
-            'vals': {'type': 'inventory',
-                     'warehouse_id': self.warehouse_inventory.id,
-                     'warehouse_dest_id': self.hd_stock.id,
-                     'line_in_ids':[(0, 0, inv_line)],
-                     },
-            'active_id': self.delivery.id,
-            'active_model': 'sell.delivery',
-        }).button_ok()

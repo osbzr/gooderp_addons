@@ -45,7 +45,6 @@
             'wizard/sell_summary_staff_wizard_view.xml',
             'wizard/sell_receipt_wizard_view.xml',
             'wizard/sell_top_ten_wizard_view.xml',
-            'wizard/popup_wizard.xml',
             'security/ir.model.access.csv',
             'report/report_data.xml',
             'home_page_data.xml'

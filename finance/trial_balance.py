@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from math import fabs
-
 
 class TrialBalance(models.Model):
     """科目余额表"""
@@ -142,7 +140,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
         else:
             ending_balance_credit = initial_balance_credit
             ending_balance_debit = initial_balance_debit
-
         if self.period_id.year == last_period.year:
             cumulative_occurrence_credit = this_credit + trial_balance.cumulative_occurrence_credit
             cumulative_occurrence_debit = this_debit + trial_balance.cumulative_occurrence_debit
@@ -176,7 +173,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 'subject_name_id': subject_name_id
             }
         return trial_balance_dict
-
 
 class CreateVouchersSummaryWizard(models.TransientModel):
     """创建 明细账或者总账的向导 """
@@ -433,7 +429,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],
-            'domain': [('id', 'in', vouchers_summary_ids)]
+            'domain': [('id', 'in', vouchers_summary_ids)],
+            'limit': 65535,
         }
 
     @api.multi
@@ -480,7 +477,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'target': 'current',
             'view_id': False,
             'views': [(view_id, 'tree')],
-            'domain': [('id', 'in', vouchers_summary_ids)]
+            'domain': [('id', 'in', vouchers_summary_ids)],
+            'limit':65535,
         }
 
 

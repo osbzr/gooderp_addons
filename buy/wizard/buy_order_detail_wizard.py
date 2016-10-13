@@ -61,5 +61,5 @@ class buy_order_detail_wizard(models.TransientModel):
             'res_model': 'buy.order.detail',
             'type': 'ir.actions.act_window',
             'domain': domain,
-            'limit': 300,
+            'limit': 65535,
         }

@@ -510,7 +510,7 @@ class sell_delivery(models.Model):
                                help=u'是否为退货类型')
     staff_id = fields.Many2one('staff', u'销售员', ondelete='restrict',
                                help=u'单据负责人')
-    order_id = fields.Many2one('sell.order', u'源单号', copy=False,
+    order_id = fields.Many2one('sell.order', u'订单号', copy=False,
                                ondelete='cascade',
                                help=u'产生发货单/退货单的销货订单')
     invoice_id = fields.Many2one('money.invoice', u'发票号',
@@ -644,9 +644,15 @@ class sell_delivery(models.Model):
         else:
             return False
 
+    def goods_inventery(self, vals):
+        auto_in = self.env['wh.in'].create(vals)
+        auto_in.approve_order()
+
+        self.sell_delivery_done()
+
     @api.multi
     def sell_delivery_done(self):
-        '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成源单和收款单'''
+        '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         for line in self.line_in_ids:
@@ -681,20 +687,11 @@ class sell_delivery(models.Model):
                                                 }
                                         )]
                             })
-                msg = u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name
-                method = 'goods_inventery'
-                dic = {
-                    'name': u'警告',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'popup.wizard',
-                    'type': 'ir.actions.act_window',
-                    'context':{'method':method,
-                               'vals':vals,
-                               'msg':msg,},
-                    'target': 'new',
-                    }
-                return dic
+                return self.open_dialog('goods_inventery', {
+                    'message': u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name,
+                    'args': [vals],
+                })
+
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         if self.bank_account_id and not self.receipt:
@@ -720,7 +717,7 @@ class sell_delivery(models.Model):
         else:
             amount = self.amount + self.partner_cost
 
-        # 发库单/退货单 生成源单
+        # 发库单/退货单 生成结算单
         if not self.is_return:
             amount = self.amount + self.partner_cost
             this_reconcile = self.receipt
@@ -745,7 +742,7 @@ class sell_delivery(models.Model):
             'currency_id': self.currency_id.id
         })
         self.invoice_id = source_id.id
-        # 销售费用产生源单
+        # 销售费用产生结算单
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
                 cost_id = self.env['money.invoice'].create({
@@ -802,14 +799,14 @@ class sell_delivery(models.Model):
 
     @api.one
     def sell_delivery_draft(self):
-        '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的源单、收款单及凭证'''
+        '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的结算单、收款单及凭证'''
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(
                 [('name', '=', self.invoice_id.id)])
         for line in source_line:
             line.money_id.money_order_draft()
             line.money_id.unlink()
-        # 查找产生的源单
+        # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
                 [('name', '=', self.invoice_id.name)])
         for invoice in invoice_ids:
@@ -821,11 +818,11 @@ class sell_delivery(models.Model):
             [('order_id', '=', self.order_id.id)])
         if len(delivery_ids) > 1:
             self.modifying = True
-        # 将源单中已执行数量清零
-        order = self.env['sell.order'].search(
-            [('id', '=', self.order_id.id)])
-        for line in order.line_ids:
-            line.quantity_out = 0
+        # 将原始订单中已执行数量清零
+        if self.order_id:
+            line_ids = not self.is_return and self.line_in_ids or self.line_out_ids
+            for line in line_ids:
+                line.sell_line_id.quantity_out -= line.goods_qty
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.sell_move_id.cancel_approved_order()
 

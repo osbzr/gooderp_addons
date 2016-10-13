@@ -400,7 +400,7 @@ class test_buy_receipt(TransactionCase):
         self.assertTrue(not move.line_in_ids)
 
     def test_buy_receipt_done(self):
-        '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成源单和付款单'''
+        '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成结算单和付款单'''
         # 结算账户余额
         bank_account = self.env.ref('core.alipay')
         bank_account.write({'balance': 1000000, })
@@ -452,7 +452,7 @@ class test_buy_receipt(TransactionCase):
         # 测试分摊之前审核是否会弹出警告
         with self.assertRaises(UserError):
             receipt.buy_receipt_done()
-        # 测试分摊之后金额是否相等，然后审核，测试采购费用是否产生源单
+        # 测试分摊之后金额是否相等，然后审核，测试采购费用是否产生结算单
         receipt.buy_share_cost()
         receipt.buy_receipt_done()
         for line in receipt.line_in_ids:
@@ -719,7 +719,8 @@ class test_buy_adjust(TransactionCase):
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
                                    'attribute_id': self.keyboard_black.id,
-                                   'quantity': 10,})
+                                   'quantity': 10,
+                                   'price_taxed': 10.0,})
         new_order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', new_order.id)])
@@ -744,6 +745,7 @@ class test_buy_adjust(TransactionCase):
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,
+                                   'price_taxed': 10.0,
                                    'quantity': 10})
         new_order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
