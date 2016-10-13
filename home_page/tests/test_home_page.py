@@ -9,7 +9,7 @@ class test_home_page(TransactionCase):
     """
     def test_home_page(self):
         """测试首页的显示情况"""
-        partner_action = self.env.ref('base.view_users_simple_form')
+        partner_action = self.env.ref('base.action_res_users')
         self.env['home.page'].create({'sequence': 10, 'action': partner_action.id, 'menu_type': 'all_business',
                                       'domain': '[]', 'context': '{}'})
         self.env['home.page'].create({'sequence': 10, 'action': partner_action.id, 'menu_type': 'amount_summary',
@@ -21,7 +21,7 @@ class test_home_page(TransactionCase):
     def test_onchange_action(self):
         '''测试 onchange_action
         '''
-        partner_action = self.env.ref('base.view_users_simple_form')
+        partner_action = self.env.ref('base.action_res_users')
         partner_action = self.env['home.page'].create({'sequence': 10, 'action': partner_action.id, 'menu_type': 'all_business',
                                       'domain': '[]', 'context': '{}'})
         result = partner_action.onchange_action()
