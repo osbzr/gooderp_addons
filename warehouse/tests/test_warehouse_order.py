@@ -144,8 +144,8 @@ class TestWarehouseOrder(TransactionCase):
 
         # 没有明细行的单据不可以被审核通过
         with self.assertRaises(UserError):
-            self.overage_in.line_in_ids.unlink()
-            self.overage_in.approve_order()
+            self.internal.line_out_ids.unlink()
+            self.internal.approve_order()
 
         # 测试utils里面对于多重继承的时候报错
         # 在with里面，with接收之后里面的代码会生效，没有回溯
