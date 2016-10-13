@@ -52,14 +52,15 @@ class test_voucher(TransactionCase):
     
     def test_check_balance(self):
         '''检查凭证借贷方合计平衡'''
-        with self.assertRaises(ValidationError):
-            self.env['voucher'].create({
+        un_balance_voucher = self.env['voucher'].create({
             'line_ids':[(0,0,{
                              'account_id':self.env.ref('finance.account_cash').id,
                              'name':u'借贷方不平',
                              'debit':100,
                              })]
             })
+        with self.assertRaises(ValidationError):
+            un_balance_voucher.voucher_done()
     
     def test_check_line(self):
         '''检查凭证行'''
