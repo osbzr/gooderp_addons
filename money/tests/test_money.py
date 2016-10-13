@@ -166,15 +166,12 @@ class test_money_order(TransactionCase):
                     'amount': 200.0, 'note': 'money note'})],
                 'type': 'get'})
         money1.discount_account_id = self.env.ref('finance.small_business_chart5603001').id
-        money1.discount_amount = 10
-        money1.money_order_done()
 
         # get  银行账户没设置科目 无结算单行
         money1.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money1.money_order_done()
         # 测试 get 存在 source行 和 折扣生成凭证
-        money1.money_order_draft()
         money1.update({'source_ids': [(0, 0, {
                     'name': invoice.id,
                     'category_id': self.env.ref('money.core_category_sale').id,
@@ -205,14 +202,11 @@ class test_money_order(TransactionCase):
                     'amount': 200.0, 'note': 'money note'})],
                 'type': 'pay'})
         money2.discount_account_id = self.env.ref('finance.small_business_chart5603002').id
-        money2.discount_amount = 10
-        money2.money_order_done()
         # pay  银行账户没设置科目 无结算单行
         money2.line_ids[0].bank_id.account_id = False
         with self.assertRaises(UserError):
             money2.money_order_done()
         # 测试 pay 存在 source行 和 折扣生成凭证
-        money2.money_order_draft()
         money2.update({'source_ids': [(0, 0, {
             'name': invoice.id,
             'category_id': self.env.ref('money.core_category_purchase').id,
