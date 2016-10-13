@@ -842,6 +842,8 @@ class buy_receipt(models.Model):
         '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成结算单和付款单'''
         #报错
         self._wrong_receipt_done()
+        # 调用wh.move中审核方法，更新审核人和审核状态
+        self.buy_move_id.approve_order()
 
         #将收货/退货数量写入订单行
         self._line_qty_write()
@@ -855,8 +857,6 @@ class buy_receipt(models.Model):
         self._buy_amount_to_invoice()
         # 生成付款单
         self._make_payment(source_id)
-        # 调用wh.move中审核方法，更新审核人和审核状态
-        self.buy_move_id.approve_order()
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id and not self.modifying:
             return self.order_id.buy_generate_receipt()
