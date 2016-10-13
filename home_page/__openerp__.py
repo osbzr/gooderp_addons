@@ -13,7 +13,6 @@
         "home_page.xml",
         'security/ir.model.access.csv',
     ],
-    'depends': ['base','mail'],
-    'demo': ['test_demo.xml'],
+    'depends': ['base','web','mail'],
     'qweb': ['static/src/xml/*.xml'],
 }
