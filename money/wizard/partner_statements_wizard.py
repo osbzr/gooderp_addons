@@ -21,177 +21,216 @@ class partner_statements_report_wizard(models.TransientModel):
 
     @api.multi
     def partner_statements_without_goods(self):
-        # 业务伙伴对账单: 不带商品明细
-        if self.from_date > self.to_date:
-            raise UserError(u'结束日期不能小于开始日期！')
+        for s in self:
+            # 业务伙伴对账单: 不带商品明细
+            if s.from_date > s.to_date:
+                raise UserError(u'结束日期不能小于开始日期！')
 
-        if self._context.get('default_customer'):  # 客户
-            view = self.env.ref('sell.customer_statements_report_tree')
-            name = u'客户对账单:' + self.partner_id.name
-            res_model = 'customer.statements.report'
-        else:  # 供应商
-            view = self.env.ref('buy.supplier_statements_report_tree')
-            name = u'供应商对账单:' + self.partner_id.name
-            res_model = 'supplier.statements.report'
+            if self.env.context.get('default_customer'):  # 客户
+                view = self.env.ref('sell.customer_statements_report_tree')
+                name = u'客户对账单:' + s.partner_id.name
+                res_model = 'customer.statements.report'
+            else:  # 供应商
+                view = self.env.ref('buy.supplier_statements_report_tree')
+                name = u'供应商对账单:' + s.partner_id.name
+                res_model = 'supplier.statements.report'
 
-        return {
-                'name': name,
-                'view_type': 'form',
-                'view_mode': 'tree',
-                'res_model': res_model,
-                'view_id': False,
-                'views': [(view.id, 'tree')],
-                'limit': 65535,
-                'type': 'ir.actions.act_window',
-                'domain':[('partner_id', '=', self.partner_id.id), ('date', '>=', self.from_date), ('date', '<=', self.to_date)]
-                }
+            return {
+                    'name': name,
+                    'view_type': 'form',
+                    'view_mode': 'tree',
+                    'res_model': res_model,
+                    'view_id': False,
+                    'views': [(view.id, 'tree')],
+                    'limit': 65535,
+                    'type': 'ir.actions.act_window',
+                    'domain':[('partner_id', '=', s.partner_id.id), ('date', '>=', s.from_date), ('date', '<=', s.to_date)]
+                    }
+
+
+    def _create_statements_report_with_goods(self, partner_id, name, date, done_date, order_amount,
+                                             benefit_amount, fee, amount, pay_amount, discount_money,
+                                             balance_amount, note, move_id):
+        record_id = self.env['customer.statements.report.with.goods'].create({
+                        'partner_id': partner_id,
+                        'name': name,
+                        'date': date,
+                        'done_date': done_date,
+                        'order_amount': order_amount,
+                        'benefit_amount': benefit_amount,
+                        'fee': fee,
+                        'amount': amount,
+                        'pay_amount': pay_amount,
+                        'discount_money': discount_money,
+                        'balance_amount': balance_amount,
+                        'note': note,
+                        'move_id': move_id}).id
+
+        return record_id
+
+    def _create_statements_report_with_goods_line(self, goods_code, goods_name, attribute_id, uom_id,
+                                                  quantity, price, discount_amount, without_tax_amount,
+                                                  tax_amount, order_amount, balance_amount):
+        record_id = self.env['customer.statements.report.with.goods'].create({
+                        'goods_code': goods_code,
+                        'goods_name': goods_name,
+                        'attribute_id': attribute_id,
+                        'uom_id': uom_id,
+                        'quantity': quantity,
+                        'price': price,
+                        'discount_amount': discount_amount,
+                        'without_tax_amount': without_tax_amount,
+                        'tax_amount': tax_amount,
+                        'order_amount': order_amount,
+                        'balance_amount': balance_amount}).id
+
+        return record_id
 
     @api.multi
     def partner_statements_with_goods(self):
-        # 业务伙伴对账单: 带商品明细
-        res_ids = []
-        if self.from_date > self.to_date:
-            raise UserError(u'结束日期不能小于开始日期！')
+        for s in self:
+            # 业务伙伴对账单: 带商品明细
+            res_ids = []
+            if s.from_date > s.to_date:
+                raise UserError(u'结束日期不能小于开始日期！')
 
-        if self._context.get('default_customer'):  # 客户
-            reports = self.env['customer.statements.report'].search([('partner_id', '=', self.partner_id.id),
-                                                                    ('date', '>=', self.from_date),
-                                                                    ('date', '<=', self.to_date)])
-            for report in reports:
-                # 生成带商品明细的对账单记录
-                res_ids.append(self.env['customer.statements.report.with.goods'].create({
-                        'partner_id': report.partner_id.id,
-                        'name': report.name,
-                        'date': report.date,
-                        'done_date': report.done_date,
-                        'order_amount': report.sale_amount,
-                        'benefit_amount': report.benefit_amount,
-                        'fee': report.fee,
-                        'amount': report.amount,
-                        'pay_amount': report.pay_amount,
-                        'discount_money': report.discount_money,
-                        'balance_amount': report.balance_amount,
-                        'note': report.note,
-                        'move_id': report.move_id.id}).id)
+            if self.env.context.get('default_customer'):  # 客户
+                reports = self.env['customer.statements.report'].search([('partner_id', '=', s.partner_id.id),
+                                                                        ('date', '>=', s.from_date),
+                                                                        ('date', '<=', s.to_date)])
+                for report in reports:
+                    # 生成带商品明细的对账单记录
+                    record_id = self._create_statements_report_with_goods(report.partner_id.id,
+                                                                        report.name,
+                                                                        report.date,
+                                                                        report.done_date,
+                                                                        report.sale_amount,
+                                                                        report.benefit_amount,
+                                                                        report.fee,
+                                                                        report.amount,
+                                                                        report.pay_amount,
+                                                                        report.discount_money,
+                                                                        report.balance_amount,
+                                                                        report.note,
+                                                                        report.move_id.id)
+                    res_ids.append(record_id)
 
-                # 生成带商品明细的对账单记录
-                if report.move_id:
-                    if report.amount < 0: # 销售退货单
-                        for line in report.move_id.line_in_ids:
-                            res_ids.append(self.env['customer.statements.report.with.goods'].create({
-                                    'goods_code': line.goods_id.code,
-                                    'goods_name': line.goods_id.name,
-                                    'attribute_id': line.attribute_id.id,
-                                    'uom_id': line.uom_id.id,
-                                    'quantity': line.goods_qty,
-                                    'price': line.price,
-                                    'discount_amount': line.discount_amount,
-                                    'without_tax_amount': line.amount,
-                                    'tax_amount': line.tax_amount,
-                                    'order_amount': line.subtotal,
-                                    'balance_amount': report.balance_amount
-                                    }).id)
-                    else:
-                        for line in report.move_id.line_out_ids: # 销售发货单
-                            res_ids.append(self.env['customer.statements.report.with.goods'].create({
-                                    'goods_code': line.goods_id.code,
-                                    'goods_name': line.goods_id.name,
-                                    'attribute_id': line.attribute_id.id,
-                                    'uom_id': line.uom_id.id,
-                                    'quantity': line.goods_qty,
-                                    'price': line.price,
-                                    'discount_amount': line.discount_amount,
-                                    'without_tax_amount': line.amount,
-                                    'tax_amount': line.tax_amount,
-                                    'order_amount': line.subtotal,
-                                    'balance_amount': report.balance_amount
-                                    }).id)
+                    # 生成带商品明细的对账单记录
+                    if report.move_id:
+                        if report.amount < 0: # 销售退货单
+                            for line in report.move_id.line_in_ids:
+                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
+                                                                                        line.goods_id.name,
+                                                                                        line.attribute_id.id,
+                                                                                        line.uom_id.id,
+                                                                                        line.goods_qty,
+                                                                                        line.price,
+                                                                                        line.discount_amount,
+                                                                                        line.amount,
+                                                                                        line.tax_amount,
+                                                                                        line.subtotal,
+                                                                                        report.balance_amount)
+                                res_ids.append(record_id)
+                        else:
+                            for line in report.move_id.line_out_ids: # 销售发货单
+                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
+                                                                                        line.goods_id.name,
+                                                                                        line.attribute_id.id,
+                                                                                        line.uom_id.id,
+                                                                                        line.goods_qty,
+                                                                                        line.price,
+                                                                                        line.discount_amount,
+                                                                                        line.amount,
+                                                                                        line.tax_amount,
+                                                                                        line.subtotal,
+                                                                                        report.balance_amount)
+                                res_ids.append(record_id)
 
-            view = self.env.ref('sell.customer_statements_report_with_goods_tree')
+                view = self.env.ref('sell.customer_statements_report_with_goods_tree')
 
-            return {
-                    'name': u'客户对账单:' + self.partner_id.name,
-                    'view_type': 'form',
-                    'view_mode': 'tree',
-                    'res_model': 'customer.statements.report.with.goods',
-                    'view_id': False,
-                    'views': [(view.id, 'tree')],
-                    'limit': 65535,
-                    'type': 'ir.actions.act_window',
-                    'domain':[('id', 'in', res_ids)],
-                    'context': {'is_customer': True, 'is_supplier': False},
-                    }
-        else:  # 供应商
-            reports = self.env['supplier.statements.report'].search([('partner_id', '=', self.partner_id.id),
-                                                                    ('date', '>=', self.from_date),
-                                                                    ('date', '<=', self.to_date)])
-            for report in reports:
-                # 生成带商品明细的对账单记录
-                res_ids.append(self.env['supplier.statements.report.with.goods'].create({
-                        'partner_id': report.partner_id.id,
-                        'name': report.name,
-                        'date': report.date,
-                        'done_date': report.done_date,
-                        'order_amount': report.purchase_amount,
-                        'benefit_amount': report.benefit_amount,
-                        'amount': report.amount,
-                        'pay_amount': report.pay_amount,
-                        'discount_money': report.discount_money,
-                        'balance_amount': report.balance_amount,
-                        'note': report.note,
-                        'move_id': report.move_id.id}).id)
+                return {
+                        'name': u'客户对账单:' + s.partner_id.name,
+                        'view_type': 'form',
+                        'view_mode': 'tree',
+                        'res_model': 'customer.statements.report.with.goods',
+                        'view_id': False,
+                        'views': [(view.id, 'tree')],
+                        'limit': 65535,
+                        'type': 'ir.actions.act_window',
+                        'domain':[('id', 'in', res_ids)],
+                        'context': {'is_customer': True, 'is_supplier': False},
+                        }
+            else:  # 供应商
+                reports = self.env['supplier.statements.report'].search([('partner_id', '=', s.partner_id.id),
+                                                                        ('date', '>=', s.from_date),
+                                                                        ('date', '<=', s.to_date)])
+                for report in reports:
+                    # 生成带商品明细的对账单记录
+                    record_id = self._create_statements_report_with_goods(report.partner_id.id,
+                                                                        report.name,
+                                                                        report.date,
+                                                                        report.done_date,
+                                                                        report.purchase_amount,
+                                                                        report.benefit_amount,
+                                                                        0,
+                                                                        report.amount,
+                                                                        report.pay_amount,
+                                                                        report.discount_money,
+                                                                        report.balance_amount,
+                                                                        report.note,
+                                                                        report.move_id.id)
+                    res_ids.append(record_id)
 
-                # 生成带商品明细的对账单记录
-                if report.move_id:
-                    if report.amount < 0: # 采购退货单
-                        for line in report.move_id.line_out_ids:
-                            res_ids.append(self.env['supplier.statements.report.with.goods'].create({
-                                    'goods_code': line.goods_id.code,
-                                    'goods_name': line.goods_id.name,
-                                    'attribute_id': line.attribute_id.id,
-                                    'uom_id': line.uom_id.id,
-                                    'quantity': line.goods_qty,
-                                    'price': line.price,
-                                    'discount_amount': line.discount_amount,
-                                    'without_tax_amount': line.amount,
-                                    'tax_amount': line.tax_amount,
-                                    'order_amount': line.subtotal,
-                                    'balance_amount': report.balance_amount
-                                    }).id)
-                    else: # 采购入库单
-                        for line in report.move_id.line_in_ids:
-                            res_ids.append(self.env['supplier.statements.report.with.goods'].create({
-                                    'goods_code': line.goods_id.code,
-                                    'goods_name': line.goods_id.name,
-                                    'attribute_id': line.attribute_id.id,
-                                    'uom_id': line.uom_id.id,
-                                    'quantity': line.goods_qty,
-                                    'price': line.price,
-                                    'discount_amount': line.discount_amount,
-                                    'without_tax_amount': line.amount,
-                                    'tax_amount': line.tax_amount,
-                                    'order_amount': line.subtotal,
-                                    'balance_amount': report.balance_amount
-                                    }).id)
+                    # 生成带商品明细的对账单记录
+                    if report.move_id:
+                        if report.amount < 0: # 采购退货单
+                            for line in report.move_id.line_out_ids:
+                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
+                                                                                        line.goods_id.name,
+                                                                                        line.attribute_id.id,
+                                                                                        line.uom_id.id,
+                                                                                        line.goods_qty,
+                                                                                        line.price,
+                                                                                        line.discount_amount,
+                                                                                        line.amount,
+                                                                                        line.tax_amount,
+                                                                                        line.subtotal,
+                                                                                        report.balance_amount)
+                                res_ids.append(record_id)
 
-            view = self.env.ref('buy.supplier_statements_report_with_goods_tree')
+                        else: # 采购入库单
+                            for line in report.move_id.line_in_ids:
+                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
+                                                                                        line.goods_id.name,
+                                                                                        line.attribute_id.id,
+                                                                                        line.uom_id.id,
+                                                                                        line.goods_qty,
+                                                                                        line.price,
+                                                                                        line.discount_amount,
+                                                                                        line.amount,
+                                                                                        line.tax_amount,
+                                                                                        line.subtotal,
+                                                                                        report.balance_amount)
+                                res_ids.append(record_id)
 
-            return {
-                    'name': u'供应商对账单:' + self.partner_id.name,
-                    'view_type': 'form',
-                    'view_mode': 'tree',
-                    'res_model': 'supplier.statements.report.with.goods',
-                    'view_id': False,
-                    'views': [(view.id, 'tree')],
-                    'limit': 65535,
-                    'type': 'ir.actions.act_window',
-                    'domain':[('id', 'in', res_ids)],
-                    'context': {'is_customer': False, 'is_supplier': True},
-                    }
+                view = self.env.ref('buy.supplier_statements_report_with_goods_tree')
+
+                return {
+                        'name': u'供应商对账单:' + s.partner_id.name,
+                        'view_type': 'form',
+                        'view_mode': 'tree',
+                        'res_model': 'supplier.statements.report.with.goods',
+                        'view_id': False,
+                        'views': [(view.id, 'tree')],
+                        'limit': 65535,
+                        'type': 'ir.actions.act_window',
+                        'domain':[('id', 'in', res_ids)],
+                        'context': {'is_customer': False, 'is_supplier': True},
+                        }
 
     @api.onchange('from_date')
     def onchange_from_date(self):
-        if self._context.get('default_customer'):
+        if self.env.context.get('default_customer'):
             return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
