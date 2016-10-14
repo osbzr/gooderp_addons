@@ -50,8 +50,12 @@ class partner_statements_report_wizard(models.TransientModel):
 
     def _create_statements_report_with_goods(self, partner_id, name, date, done_date, order_amount,
                                              benefit_amount, fee, amount, pay_amount, discount_money,
-                                             balance_amount, note, move_id):
-        record_id = self.env['customer.statements.report.with.goods'].create({
+                                             balance_amount, note, move_id, ptype):
+        if ptype == 'customer':
+            model = self.env['customer.statements.report.with.goods']
+        else:
+            model = self.env['supplier.statements.report.with.goods']
+        record_id = model.create({
                         'partner_id': partner_id,
                         'name': name,
                         'date': date,
@@ -70,8 +74,13 @@ class partner_statements_report_wizard(models.TransientModel):
 
     def _create_statements_report_with_goods_line(self, goods_code, goods_name, attribute_id, uom_id,
                                                   quantity, price, discount_amount, without_tax_amount,
-                                                  tax_amount, order_amount, balance_amount):
-        record_id = self.env['customer.statements.report.with.goods'].create({
+                                                  tax_amount, order_amount, balance_amount, ptype):
+        if ptype == 'customer':
+            model = self.env['customer.statements.report.with.goods']
+        else:
+            model = self.env['supplier.statements.report.with.goods']
+
+        record_id = model.create({
                         'goods_code': goods_code,
                         'goods_name': goods_name,
                         'attribute_id': attribute_id,
@@ -112,7 +121,8 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                         report.discount_money,
                                                                         report.balance_amount,
                                                                         report.note,
-                                                                        report.move_id.id)
+                                                                        report.move_id.id,
+                                                                        'customer')
                     res_ids.append(record_id)
 
                     # 生成带商品明细的对账单记录
@@ -129,7 +139,8 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                                         line.amount,
                                                                                         line.tax_amount,
                                                                                         line.subtotal,
-                                                                                        report.balance_amount)
+                                                                                        report.balance_amount,
+                                                                                        'customer')
                                 res_ids.append(record_id)
                         else:
                             for line in report.move_id.line_out_ids: # 销售发货单
@@ -143,7 +154,8 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                                         line.amount,
                                                                                         line.tax_amount,
                                                                                         line.subtotal,
-                                                                                        report.balance_amount)
+                                                                                        report.balance_amount,
+                                                                                        'customer')
                                 res_ids.append(record_id)
 
                 view = self.env.ref('sell.customer_statements_report_with_goods_tree')
@@ -178,7 +190,8 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                         report.discount_money,
                                                                         report.balance_amount,
                                                                         report.note,
-                                                                        report.move_id.id)
+                                                                        report.move_id.id,
+                                                                        'supplier')
                     res_ids.append(record_id)
 
                     # 生成带商品明细的对账单记录
@@ -195,7 +208,8 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                                         line.amount,
                                                                                         line.tax_amount,
                                                                                         line.subtotal,
-                                                                                        report.balance_amount)
+                                                                                        report.balance_amount,
+                                                                                        'supplier')
                                 res_ids.append(record_id)
 
                         else: # 采购入库单
@@ -210,7 +224,8 @@ class partner_statements_report_wizard(models.TransientModel):
                                                                                         line.amount,
                                                                                         line.tax_amount,
                                                                                         line.subtotal,
-                                                                                        report.balance_amount)
+                                                                                        report.balance_amount,
+                                                                                        'supplier')
                                 res_ids.append(record_id)
 
                 view = self.env.ref('buy.supplier_statements_report_with_goods_tree')
