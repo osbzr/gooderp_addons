@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-
 import calendar
 from datetime import datetime
-
 import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
@@ -80,7 +78,7 @@ class voucher(models.Model):
         """
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
-        if self.period_id.is_closed is True:
+        if self.period_id.is_closed:
             raise UserError(u'该会计期间已结账！不能审核')
         if not self.line_ids:
             raise ValidationError(u'请输入凭证行')
@@ -103,7 +101,7 @@ class voucher(models.Model):
     def voucher_draft(self):
         if self.state == 'draft':
             raise UserError(u'请不要重复反审核！')
-        if self.period_id.is_closed is True:
+        if self.period_id.is_closed:
             raise UserError(u'该会计期间已结账！不能反审核')
         self.state = 'draft'
 
@@ -205,9 +203,7 @@ class voucher_line(models.Model):
                 'partner_id': [('name', '=', False)],
                 'goods_id': [('name', '=', False)],
                 'auxiliary_id': [('name', '=', False)]}}
-        if not self.account_id:
-            return res
-        if not self.account_id.auxiliary_financing:
+        if not self.account_id or self.account_id.auxiliary_financing:
             return res
         if self.account_id.auxiliary_financing == 'partner':
             res['domain']['partner_id'] = [('c_category_id', '!=', False)]
@@ -299,10 +295,9 @@ class finance_period(models.Model):
             if period_id:
                 if period_id.is_closed and self._context.get('module_name', False) != 'checkout_wizard':
                     raise UserError(u'此会计期间已关闭')
-                else:
-                    return period_id
             else:
                 raise UserError(u'此日期对应的会计期间不存在')
+            return period_id
 
     _sql_constraints = [
         ('period_uniq', 'unique (year,month)', u'会计区间不能重复'),

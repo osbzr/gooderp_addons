@@ -93,7 +93,7 @@ class test_report(TransactionCase):
              'subject_name_end_id': self.env.ref('finance.account_fund').id,
              }
         )
-        wizard.get_initial_balance(False, self.period_201411, wizard.subject_name_id.id)
+        wizard.get_initial_balance(self.period_201411, wizard.subject_name_id)
 
     def test_get_current_occurrence_amount(self):
         '''测试 本期的科目的 voucher_line的明细记录'''
