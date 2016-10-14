@@ -78,6 +78,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
         """
         trial_balance_objs = self.env['trial.balance'].search([('period_id', '=', self.period_id.id)])
+        trial_balance_ids = [trial_balance_row.id for trial_balance_row in trial_balance_objs]
         if not self.period_id.is_closed:
             trial_balance_objs.unlink()
             last_period = self.compute_last_period_id(self.period_id)
@@ -109,27 +110,26 @@ class CreateTrialBalanceWizard(models.TransientModel):
                                 'cumulative_occurrence_credit': this_credit,
                                 'subject_name_id': account.id}
                 trial_balance_dict[account.id] = account_dict
-                trial_balance_ids = [self.env['trial.balance'].create(vals).id for (key, vals) in
-                                     trial_balance_dict.items()]
-            self.construct_trial_balance_dict(trial_balance_dict, last_period)
-            view_id = self.env.ref('finance.trial_balance_tree').id
-            return {
-                'type': 'ir.actions.act_window',
-                'name': u'科目余额表:' + self.period_id.name,
-                'view_type': 'form',
-                'view_mode': 'tree',
-                'res_model': 'trial.balance',
-                'target': 'current',
-                'view_id': False,
-                'views': [(view_id, 'tree')],
-                'domain': [('id', 'in', trial_balance_ids)]
-            }
+            trial_balance_dict.update(self.construct_trial_balance_dict(trial_balance_dict, last_period))
+            trial_balance_ids = [self.env['trial.balance'].create(vals).id for (key, vals) in
+                             trial_balance_dict.items()]
+        view_id = self.env.ref('finance.trial_balance_tree').id
+        return {
+            'type': 'ir.actions.act_window',
+            'name': u'科目余额表:' + self.period_id.name,
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'trial.balance',
+            'target': 'current',
+            'view_id': False,
+            'views': [(view_id, 'tree')],
+            'domain': [('id', 'in', trial_balance_ids)]
+        }
 
     def compute_trial_balance_data(self, trial_balance, last_period, subject_name_id,trial_balance_dict):
         initial_balance_credit = trial_balance.ending_balance_credit or 0
         initial_balance_debit = trial_balance.ending_balance_debit or 0
         this_debit = this_credit = ending_balance_credit = 0
-
         if subject_name_id in trial_balance_dict:  # 本月有发生额
             this_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) or 0
             this_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) or 0
@@ -153,13 +153,14 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
     def construct_trial_balance_dict(self, trial_balance_dict, last_period):
         """ 结合上一期间的 数据 填写  trial_balance_dict(余额表 记录生成dict)   """
+        currency_dcit = trial_balance_dict.copy()
         for trial_balance in self.env['trial.balance'].search([('period_id', '=', last_period.id)]):
             subject_name_id = trial_balance.subject_name_id.id
             [initial_balance_credit, initial_balance_debit, ending_balance_credit, ending_balance_debit, this_debit,
              this_credit, cumulative_occurrence_credit, cumulative_occurrence_debit] = \
-                self.compute_trial_balance_data(trial_balance, last_period, subject_name_id,trial_balance_dict)
+                self.compute_trial_balance_data(trial_balance, last_period, subject_name_id,currency_dcit)
             subject_code = trial_balance.subject_code
-            trial_balance_dict[trial_balance.subject_name_id.id] = {
+            currency_dcit[trial_balance.subject_name_id.id] = {
                 'initial_balance_credit': initial_balance_credit,
                 'initial_balance_debit': initial_balance_debit,
                 'ending_balance_credit': ending_balance_credit,
@@ -172,7 +173,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 'period_id': last_period.id,
                 'subject_name_id': subject_name_id
             }
-        return trial_balance_dict
+        return currency_dcit
 
 class CreateVouchersSummaryWizard(models.TransientModel):
     """创建 明细账或者总账的向导 """

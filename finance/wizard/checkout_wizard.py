@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from datetime import date
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-
 
 class checkout_wizard(models.TransientModel):
     '''月末结账的向导'''
@@ -30,6 +28,12 @@ class checkout_wizard(models.TransientModel):
                 voucher_obj = self.env['voucher']
                 voucher_ids = voucher_obj.search([('period_id', '=', self.period_id.id)])
                 i = 0
+                # 生成科目余额表
+                trial_wizard = self.env['create.trial.balance.wizard'].create({
+                    'period_id': self.period_id.id,
+                })
+                trial_wizard.create_trial_balance()
+
                 for voucher_id in voucher_ids:
                     if voucher_id.state != 'done':
                         i += 1
@@ -138,11 +142,6 @@ class checkout_wizard(models.TransientModel):
                                  }
                         year_account = voucher_obj.create(value)  # 创建结转凭证
                         year_account.voucher_done()  # 凭证审核
-                # 生成科目余额表
-                trial_wizard = self.env['create.trial.balance.wizard'].create({
-                    'period_id': self.period_id.id,
-                })
-                trial_wizard.create_trial_balance()
                 # 按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）
                 self.recreate_voucher_name(self.period_id)
                 # 关闭会计期间
