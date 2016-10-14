@@ -32,6 +32,13 @@ class TestInventory(TransactionCase):
             'lot': 'MOUSE0001',
         })
 
+        # 产品     实际数量 实际辅助数量
+        # 键鼠套装  96     2
+        # 鼠标     1      1
+        # 网线     48     1
+        self.others_in.approve_order()
+        self.others_in_2.approve_order()
+        self.temp_mouse_in.action_done()
         # 创建一个临时的库存调拨，此时数量为0，但是辅助数量为1
         self.temp_mouse_in_zero_qty = self.env['wh.move.line'].with_context({
             'type': 'in',
@@ -47,13 +54,6 @@ class TestInventory(TransactionCase):
             'lot': 'MOUSE0002',
         })
 
-        # 产品     实际数量 实际辅助数量
-        # 键鼠套装  96     2
-        # 鼠标     1      1
-        # 网线     48     1
-        self.others_in.approve_order()
-        self.others_in_2.approve_order()
-        self.temp_mouse_in.action_done()
         self.temp_mouse_in_zero_qty.action_done()
 
         self.inventory = self.env['wh.inventory'].create({

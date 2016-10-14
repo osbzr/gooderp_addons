@@ -65,20 +65,22 @@ class test_voucher(TransactionCase):
     def test_check_line(self):
         '''检查凭证行'''
         # 没有凭证行
-        with self.assertRaises(ValidationError):
-            self.env['voucher'].create({
+        voucher_no_line = self.env['voucher'].create({
             'line_ids': False
             })
-        # 检查借贷方都为0
         with self.assertRaises(ValidationError):
-            self.env['voucher'].create({
+            voucher_no_line.voucher_done()
+        # 检查借贷方都为0
+        voucher_zero = self.env['voucher'].create({
             'line_ids':[(0,0,{
                              'account_id':self.env.ref('finance.account_cash').id,
                              'name':u'借贷方全为0',
                              })]
             })
         with self.assertRaises(ValidationError):
-            self.env['voucher'].create({
+            voucher_zero.voucher_done()
+        # 检查单行凭证行是否同时输入借和贷
+        voucher = self.env['voucher'].create({
             'line_ids':[(0,0,{
                              'account_id':self.env.ref('finance.account_cash').id,
                              'name':u'借贷方同时输入',
@@ -86,6 +88,8 @@ class test_voucher(TransactionCase):
                              'credit': 100,
                              })]
             })
+        with self.assertRaises(ValidationError):
+            voucher.voucher_done()
 
 class test_period(TransactionCase):
 
