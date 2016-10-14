@@ -30,12 +30,8 @@ class buy_payment_wizard(models.TransientModel):
     warehouse_dest_id = fields.Many2one('warehouse', u'仓库',
                              help=u'按指定仓库进行统计')
 
-    @api.multi
-    def button_ok(self):
-        res = []
-        if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！')
-
+    def _get_domain(self):
+        '''返回wizard界面上条件'''
         cond = [('date', '>=', self.date_start),
                 ('date', '<=', self.date_end),
                 ('state', '=', 'done')]
@@ -50,49 +46,70 @@ class buy_payment_wizard(models.TransientModel):
         if self.warehouse_dest_id:
             cond += ['|',('buy_move_id.warehouse_dest_id', '=', self.warehouse_dest_id.id),
                      ('buy_move_id.warehouse_id', '=', self.warehouse_dest_id.id)]
+        return cond
+
+    def _compute_payment(self, receipt):
+        '''计算该入库单的已付款和应付款余额'''
+        payment = 0
+        for order in self.env['money.order'].search(
+                    [('state', '=', 'done')], order='name'):
+            for source in order.source_ids:
+                if source.name.name == receipt.name:
+                    payment += source.this_reconcile
+        return payment
+
+    def _compute_payment_rate(self, payment, amount):
+        '''计算付款率'''
+        if amount == 0 and payment == 0:
+            payment_rate = 100
+        else:
+            payment_rate = (payment / amount) * 100
+        return payment_rate
+
+    @api.multi
+    def _create_buy_payment(self, receipt):
+        '''对于传入的入库单，创建采购付款一览表'''
+        purchase_amount = receipt.discount_amount + receipt.amount
+        discount_amount = receipt.discount_amount
+        amount = receipt.amount
+        # 计算该入库单的已付款和应付款余额
+        payment = self._compute_payment(receipt)
+        # 如果是退货则金额均取反
+        if not receipt.is_return:
+            order_type = u'普通采购'
+            warehouse = receipt.warehouse_dest_id
+        elif receipt.is_return:
+            order_type = u'采购退回'
+            purchase_amount = - purchase_amount
+            discount_amount = - discount_amount
+            amount = - amount
+            warehouse = receipt.warehouse_id
+        return self.env['buy.payment'].create({
+            'partner_id': receipt.partner_id.id,
+            'type': order_type,
+            'date': receipt.date,
+            'warehouse_dest_id': warehouse.id,
+            'order_name': receipt.name,
+            'purchase_amount': purchase_amount,
+            'discount_amount': discount_amount,
+            'amount': amount,
+            'payment': payment,
+            'balance': amount - payment,
+            'payment_rate': self._compute_payment_rate(payment, amount),
+            'note': receipt.note,
+        })
+
+    @api.multi
+    def button_ok(self):
+        res = []
+        if self.date_end < self.date_start:
+            raise UserError(u'开始日期不能大于结束日期！')
+
         receipt_obj = self.env['buy.receipt']
         count = sum_payment_rate = 0    # 行数及所有行的付款率之和
-        for receipt in receipt_obj.search(cond, order='partner_id,date'):
-            purchase_amount = receipt.discount_amount + receipt.amount
-            discount_amount = receipt.discount_amount
-            amount = receipt.amount
-            # 计算该入库单的已付款和应付款余额
-            payment = balance = 0
-            for order in self.env['money.order'].search(
-                        [('state', '=', 'done')], order='name'):
-                for source in order.source_ids:
-                    if source.name.name == receipt.name:
-                        payment += source.this_reconcile
-            # 如果是退货则金额均取反
-            if not receipt.is_return:
-                order_type = u'普通采购'
-                warehouse = receipt.warehouse_dest_id
-            elif receipt.is_return:
-                order_type = u'采购退回'
-                purchase_amount = - purchase_amount
-                discount_amount = - discount_amount
-                amount = - amount
-                warehouse = receipt.warehouse_id
-            # 计算付款率
-            if amount == 0 and payment == 0:
-                payment_rate = 100
-            else:
-                payment_rate = (payment / amount) * 100
+        for receipt in receipt_obj.search(self._get_domain(), order='partner_id,date'):
             # 用查找到的入库单信息来创建一览表
-            line = self.env['buy.payment'].create({
-                'partner_id': receipt.partner_id.id,
-                'type': order_type,
-                'date': receipt.date,
-                'warehouse_dest_id': warehouse.id,
-                'order_name': receipt.name,
-                'purchase_amount': purchase_amount,
-                'discount_amount': discount_amount,
-                'amount': amount,
-                'payment': payment,
-                'balance': amount - payment,
-                'payment_rate': payment_rate,
-                'note': receipt.note,
-            })
+            line = self._create_buy_payment(receipt)
             res.append(line.id)
             count += 1
             sum_payment_rate += line.payment_rate

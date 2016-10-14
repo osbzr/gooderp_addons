@@ -957,7 +957,6 @@ class money_order(models.Model):
     def money_order_done(self):
         ''' 将已核销金额写回到购货订单中的已执行金额 '''
         res = super(money_order, self).money_order_done()
-        move = False
         for source in self.source_ids:
             if self.type == 'pay':
                 move = self.env['buy.receipt'].search(
@@ -1016,6 +1015,21 @@ class buy_adjust(models.Model):
 
         return super(buy_adjust, self).unlink()
 
+    def _get_vals(self, line):
+        '''返回创建 buy order line 时所需数据'''
+        return {
+            'order_id': self.order_id.id,
+            'goods_id': line.goods_id.id,
+            'attribute_id': line.attribute_id.id,
+            'quantity': line.quantity,
+            'uom_id': line.uom_id.id,
+            'price_taxed': line.price_taxed,
+            'discount_rate': line.discount_rate,
+            'discount_amount': line.discount_amount,
+            'tax_rate': line.tax_rate,
+            'note': line.note or '',
+        }
+
     @api.one
     def buy_adjust_done(self):
         '''审核采购调整单：
@@ -1055,7 +1069,9 @@ class buy_adjust(models.Model):
                                      ('state', '=', 'draft')])
                     if move_line:
                         move_line.goods_qty += line.quantity
-                        move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
+                        move_line.goods_uos_qty = (move_line.goods_id.conversion
+                                                   and move_line.goods_qty / move_line.goods_id.conversion
+                                                   or move_line.goods_qty)
                         move_line.note = line.note
                     else:
                         raise UserError(u'商品%s已全部入库，建议新建购货订单' % line.goods_id.name)
@@ -1063,19 +1079,7 @@ class buy_adjust(models.Model):
                 else:
                     buy_receipt.unlink()
             else:
-                vals = {
-                    'order_id': self.order_id.id,
-                    'goods_id': line.goods_id.id,
-                    'attribute_id': line.attribute_id.id,
-                    'quantity': line.quantity,
-                    'uom_id': line.uom_id.id,
-                    'price_taxed': line.price_taxed,
-                    'discount_rate': line.discount_rate,
-                    'discount_amount': line.discount_amount,
-                    'tax_rate': line.tax_rate,
-                    'note': line.note or '',
-                }
-                new_line = self.env['buy.order.line'].create(vals)
+                new_line = self.env['buy.order.line'].create(self._get_vals(line))
                 receipt_line = []
                 if line.goods_id.force_batch_one:
                     i = 0
@@ -1104,7 +1108,8 @@ class buy_adjust_line(models.Model):
     @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
-        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.price = (self.tax_rate != -100
+                      and self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
         self.amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
         self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
         self.subtotal = self.amount + self.tax_amount
@@ -1166,6 +1171,7 @@ class buy_adjust_line(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        price = (self.tax_rate != -100
+                 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
         self.discount_amount = (self.quantity * price *
                                 self.discount_rate * 0.01)
