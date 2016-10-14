@@ -4,6 +4,7 @@
 
 from odoo.report.report_sxw import report_sxw
 import logging
+import random
 from pyPdf import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
 import os
@@ -11,6 +12,11 @@ import base64
 from docxtpl import DocxTemplate
 from odoo.tools.translate import _
 from odoo.tools import misc
+import ooxml
+from ooxml import parse, serialize, importer
+import codecs
+
+import pdfkit
 _logger = logging.getLogger(__name__)
 import pytz
 
@@ -112,21 +118,55 @@ class ReportDocx(report_sxw):
 
         return super(ReportDocx, self).create(cr, uid, ids, data, context)
 
+    def generate_temp_file(self, suffix='docx'):
+        return os.path.join(os.getcwd(), 'temp_%s_%s.%s' %
+                            (os.getpid(), random.randint(1, 10000), suffix))
+
     def create_source_docx(self, cr, uid, ids, report, context=None):
         data = DataModelProxy(self.get_docx_data(cr, uid, ids, report, context))
-        foldname = os.getcwd()
-        temp_out_file = os.path.join(foldname, 'temp_out_%s.docx' % os.getpid())
+        temp_out_file = self.generate_temp_file()
 
-        report_stream = ''
         doc = DocxTemplate(misc.file_open(report.template_file).name)
         doc.render({'obj': data})
         doc.save(temp_out_file)
 
-        with open(temp_out_file, 'rb') as input_stream:
+        if report.output_type == 'pdf':
+            temp_file = self.render_to_pdf(temp_out_file)
+        else:
+            temp_file = temp_out_file
+
+        report_stream = ''
+        with open(temp_file, 'rb') as input_stream:
             report_stream = input_stream.read()
 
-        os.remove(temp_out_file)
-        return (report_stream, report.report_type)
+        os.remove(temp_file)
+        return report_stream, report.output_type
+
+    def render_to_pdf(self, temp_file):
+        temp_out_file_html = self.generate_temp_file('html')
+        temp_out_file_pdf = self.generate_temp_file('pdf')
+
+        ofile = ooxml.read_from_file(temp_file)
+        html = """<html style="height: 100%">
+            <head>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8"/>'
+            </head>
+            <body>
+            """
+
+        html += unicode(serialize.serialize(ofile.document), 'utf-8')
+        html += "</body></html>"
+
+        with codecs.open(temp_out_file_html, 'w', 'utf-8') as f:
+            f.write(html)
+
+        pdfkit.from_file(temp_out_file_html, temp_out_file_pdf)
+
+        os.remove(temp_file)
+        os.remove(temp_out_file_html)
+
+        return temp_out_file_pdf
 
     def get_docx_data(self, cr, uid, ids, report, context):
         env = api.Environment(cr, uid, context)
