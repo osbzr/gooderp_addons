@@ -99,7 +99,7 @@ class other_money_order(models.Model):
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
-    @api.one
+    @api.multi
     def other_money_done(self):
         '''其他收支单的审核按钮'''
         for other in self:
@@ -116,7 +116,7 @@ class other_money_order(models.Model):
             other.state = 'done'
         return True
 
-    @api.one
+    @api.multi
     def other_money_draft(self):
         '''其他收支单的反审核按钮'''
         for other in self:

@@ -68,7 +68,7 @@ class money_transfer_order(models.Model):
     discount_account_id = fields.Many2one('finance.account', u'折扣科目',
                                       help=u'资金转换单审核生成凭证时，折扣额对应的科目')
 
-    @api.one
+    @api.multi
     def money_transfer_done(self):
         '''转账单的审核按钮'''
         for transfer in self:
@@ -106,7 +106,7 @@ class money_transfer_order(models.Model):
             transfer.state = 'done'
         return True
 
-    @api.one
+    @api.multi
     def money_transfer_draft(self):
         '''转账单的反审核按钮'''
         for transfer in self:
