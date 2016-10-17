@@ -23,7 +23,7 @@ install:
   - pip install xlrd
   - pip install xlutils
   - pip install docxtpl
-  - pip install ooxml
+  - pip install python-ooxml
   - pip install pdfkit
 
 script:
