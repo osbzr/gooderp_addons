@@ -162,7 +162,6 @@ class money_order(models.Model):
             return {}
 
         source_lines = []
-        self.source_ids = []
         money_invoice = self.env['money.invoice']
         if self.env.context.get('type') == 'get':
             money_invoice = self.env['money.invoice'].search([
@@ -187,7 +186,8 @@ class money_order(models.Model):
                    'this_reconcile': invoice.to_reconcile,
                    'date_due': invoice.date_due,
                    })
-        self.source_ids = source_lines
+        if source_lines:
+            self.source_ids = source_lines
 
     @api.multi
     def money_order_done(self):
