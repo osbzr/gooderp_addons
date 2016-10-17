@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
-
+from datetime import datetime
 
 class test_voucher(TransactionCase):
    
@@ -42,6 +42,17 @@ class test_voucher(TransactionCase):
         voucher = self.env.ref('finance.voucher_1')
         for line in voucher.line_ids:
             line.unlink()
+    def test_vourcher_write(self):
+        period_id = self.env.ref('finance.period_201601')
+        voucher = self.env.ref('finance.voucher_1')
+        voucher.state = 'done'
+        with self.assertRaises(UserError):
+            voucher.write({'period_id':period_id.id})
+        voucher.period_id.is_closed = True
+        with self.assertRaises(UserError):
+            voucher.write({'period_id':period_id.id})
+        self.env.context= dict(self.env.context,**{"call_module":'checkout_wizard'})
+        voucher.write({'period_id':period_id.id})
 
     def test_compute(self):
         '''新建凭证时计算字段加载'''
@@ -91,6 +102,21 @@ class test_voucher(TransactionCase):
         with self.assertRaises(ValidationError):
             voucher.voucher_done()
 
+    def test_default_voucher_date(self):
+        voucher_obj = self.env['voucher']
+        voucher_rows = self.env['voucher'].search([])
+        voucher_rows.unlink()
+        setting_row = self.env['finance.config.settings'].create({
+                "default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_reset_period": "month",
+                "default_voucher_date": "today",})
+        setting_row.execute()
+        setting_row.write({'default_voucher_date':'last'})
+        voucher_obj._default_voucher_date()
+        voucher_obj.create({})
+
 class test_period(TransactionCase):
 
     def test_get_period(self):
@@ -99,11 +125,21 @@ class test_period(TransactionCase):
                                   ('month','=','6')]):
             with self.assertRaises(UserError):
                 period_obj.get_period('2100-06-20')
+        period_obj.get_year_fist_period_id()
         period_row = period_obj.search([('year','=','2016'),('month','=','10')])
         if not period_row:
             period_row = period_obj.create({'year':u'2016','month':u'10'})
         self.assertTrue(("2016-10-01","2016-10-31") ==period_obj.get_period_month_date_range(period_row))
-        period_obj.get_year_fist_period_id()
+        period_row.is_closed = True
+        with self.assertRaises(UserError): #  得到对应时间的会计期间 ，期间已关闭
+            period_obj.get_period('2016-10-10')
+        # datetime_str = datetime.now().strftime("%Y-%m-%d")
+        # datetime_str_list = datetime_str.split('-')
+        # period_row = self.env['finance.period'].search(
+        #     [('year', '=', datetime_str_list[0])])
+        # if period_row: # 在相应的年份 会计期间不存在
+        #     period_row.unlink()
+        # period_obj.get_year_fist_period_id()
 
     def test_onchange_account_id(self):
         '''凭证行的科目变更影响到其他字段的可选值'''
@@ -122,7 +158,7 @@ class test_period(TransactionCase):
             line.account_id = self.env.ref('finance.account_goods').id
             line.account_id.auxiliary_financing = 'goods'
             line.onchange_account_id()
-            line.account_id.auxiliary_financing = 'member'
+            line.account_id.auxiliary_financing = 'partner'
             line.onchange_account_id()
 
         #这么写覆盖到了，但是这什么逻辑=。=
@@ -188,12 +224,13 @@ class test_voucher_template_wizard(TransactionCase):
         self.voucher.template_id= old_template_id
         self.voucher.onchange_template_id()
 
-class test_month_product_cost(TransactionCase):
 
+class test_checkout_wizard(TransactionCase):
     def setUp(self):
-        super(test_month_product_cost, self).setUp()
-        self.period_id = self.ref('period_201601')
-
-    def generate_issue_cost(self):
-        """本月成本结算 相关逻辑的测试"""
-        self.env['month.product.cost'].generate_issue_cost(self.period_id.id)
+        super(test_checkout_wizard, self).setUp()
+    def test_recreate_voucher_name(self):
+        checkout_wizard_obj = self.env['checkout.wizard']
+        period_id = self.env.ref('finance.period_201601')
+        setting_row = self.env['finance.config.settings'].create({'auto_reset':True,'reset_period':'year'})
+        checkout_wizard_obj.recreate_voucher_name(period_id)
+        print "+===="

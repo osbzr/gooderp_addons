@@ -159,7 +159,7 @@ odoo.define('home_page', function (require) {
                 <p></p><p></p></div><div>";
                 self.$el.find('.feature-list').append(center_html_str);
                 if (row_num*(j+1)%12==0){
-                    self.$el.find('.feature-list').append("<div class='col-sm-12 col-xs-12'><p></p><p></p></div>");
+                    self.$el.find('.feature-list').append("<div class='span12'><br/></div>");
                 }
                 index++;
             }
