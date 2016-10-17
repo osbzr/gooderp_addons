@@ -167,7 +167,7 @@ class asset(models.Model):
         category = self.env.ref('asset.asset')
         other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
-            'partner_id': self.partner_id,
+            'partner_id': self.partner_id.id,
             'date': self.date,
             'bank_id': self.bank_account.id,
         })
@@ -202,9 +202,9 @@ class asset(models.Model):
         self._wrong_asset_done()
         # 非初始化固定资产生成凭证
         if not self.is_init:
-            if self.partner_id and self.partner_id.s_category_id.account_id.id == self.account_credit.id:
+            if self.partner_id and self.partner_id.s_category_id.account_id == self.account_credit:
                 self._partner_generate_invoice()
-            elif self.bank_account and self.account_credit.id == self.bank_account.account_id.id:
+            elif self.bank_account and self.account_credit == self.bank_account.account_id:
                 self._bank_account_generate_other_pay()
             else:
                 self._construction_generate_voucher()
@@ -216,9 +216,9 @@ class asset(models.Model):
         ''' 反审核固定资产 '''
         if self.state == 'draft':
             raise UserError(u'请不要重复反审核！')
-        if self.line_ids :
+        if self.line_ids:
             raise UserError(u'已折旧不能反审核！')
-        if self.chang_ids :
+        if self.chang_ids:
             raise UserError(u'已变更不能反审核！')
         if self.period_id.is_closed:
             raise UserError(u'该会计期间已结账！不能反审核')
@@ -307,13 +307,13 @@ class CreateCleanWizard(models.TransientModel):
             })
 
     @api.one
-    def _generate_voucher(self):
+    def _generate_voucher(self, asset):
         ''' 生成凭证，并审核 '''
         vouch_obj = self.env['voucher'].create({'date': self.date})
         depreciation2 = sum(line.cost_depreciation for line in asset.line_ids)
         depreciation = asset.depreciation_previous + depreciation2
         income = asset.cost - depreciation
-        self.write({'voucher_id': vouch_obj.id})
+        asset.write({'voucher_id': vouch_obj.id})
         '''借方行'''
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
                      'debit': income, 'account_id': asset.category_id.clean_costs.id,
@@ -342,10 +342,10 @@ class CreateCleanWizard(models.TransientModel):
         # 按发票收入生成收入单
         self._generate_other_get()
         # 按费用生成支出单
-        if self.clean_cost :
+        if self.clean_cost:
             self._clean_cost_generate_other_pay(self.clean_cost)
         # 生成凭证
-        self._generate_voucher()
+        self._generate_voucher(asset)
 
 class CreateChangWizard(models.TransientModel):
     '''固定资产变更'''
