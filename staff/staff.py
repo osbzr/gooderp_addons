@@ -54,13 +54,24 @@ class staff(models.Model):
                                     'emp_id',
                                     'category_id', u'标签')
     work_email = fields.Char(u'办公邮箱')
-    work_phone = fields.Char(u'办公电话')
+    work_phone = fields.Char(u'办公电话', required=True)
     user_id = fields.Many2one('res.users', u'对应用户')
     image_medium = fields.Binary(string=u'头像', compute=_get_image)
     # 个人信息
     birthday = fields.Date(u'生日')
-    identification_id = fields.Char(u'身份证号')
-    passport_id = fields.Char(u'护照号')
+    identification_id = fields.Char(u'证照号码', required=True)
+    is_arbeitnehmer =  fields.Boolean(u'是否雇员', default='1')
+    is_investoren = fields.Boolean(u'是否投资者')
+    is_bsw = fields.Boolean(u'是否残疾烈属孤老')
+    type_of_certification = fields.Selection([
+                              ('male', u'居民身份证'),
+                              ('female', u'军官证'),
+                              ('female', u'士兵证'),
+                              ('female', u'武警警官证'),
+                              ('female', u'护照'),
+                              ],
+                              u'证照类型',
+                              required=True)
     gender = fields.Selection([
                               ('male', u'男'),
                               ('female', u'女')
