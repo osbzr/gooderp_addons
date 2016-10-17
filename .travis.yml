@@ -23,6 +23,8 @@ install:
   - pip install xlrd
   - pip install xlutils
   - pip install docxtpl
+  - pip install ooxml
+  - pip install pdfkit
 
 script:
   - travis_run_tests
