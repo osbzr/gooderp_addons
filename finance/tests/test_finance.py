@@ -99,8 +99,10 @@ class test_period(TransactionCase):
                                   ('month','=','6')]):
             with self.assertRaises(UserError):
                 period_obj.get_period('2100-06-20')
-        period_row = period_obj.create({'year':u'2016','month':u'10'})
-        self.assertTrue(("2016-10-01","2016-10-31") ==period_obj.get_period_month_date_range(period_row.id))
+        period_row = period_obj.search([('year','=','2016'),('month','=','10')])
+        if not period_row:
+            period_row = period_obj.create({'year':u'2016','month':u'10'})
+        self.assertTrue(("2016-10-01","2016-10-31") ==period_obj.get_period_month_date_range(period_row))
         period_obj.get_year_fist_period_id()
 
     def test_onchange_account_id(self):
@@ -168,21 +170,23 @@ class test_finance_account(TransactionCase):
 class test_voucher_template_wizard(TransactionCase):
     def setUp(self):
         super(test_voucher_template_wizard, self).setUp()
-        voucher = self.env.ref('finance.voucher_1')
+        self.voucher = self.env.ref('finance.voucher_1')
         self.voucher_template_wizard = self.env['voucher.template.wizard'].create({
-            'name':'测试模板','voucher_id':voucher.id,
+            'name':'测试模板','voucher_id':self.voucher.id,
         })
     def test_save_as_template(self):
         """凭证模板相关功能"""
         self.voucher_template_wizard.save_as_template()
         self.voucher_template_wizard.is_change_old_template = True
-        self.old_template_id =self.env['voucher.template'].search([])[0].id if self.env['voucher.template'].search() else False
-        self.voucher_template_wizard.old_template_id = self.old_template_id
+        old_template_id =self.env['voucher.template'].search([])[0].id if self.env['voucher.template'].search([]) else False
+        self.voucher_template_wizard.old_template_id = old_template_id
         self.voucher_template_wizard.save_as_template()
     def test_onchange_template_id(self):
         """凭证上模板字段的onchange"""
-        self.env['voucher'].template_id= self.old_template_id
-        self.env['voucher'].conchange_template_id()
+        old_template_id = self.env['voucher.template'].search([])[0].id if self.env[
+            'voucher.template'].search([]) else False
+        self.voucher.template_id= old_template_id
+        self.voucher.onchange_template_id()
 
 class test_month_product_cost(TransactionCase):
 
