@@ -52,7 +52,6 @@ class money_order(models.Model):
         self.write({'voucher_id': vouch_obj.id})
 
         if not source_ids:
-            # first_line_flag = True
             for line in line_ids:
                 if not line.bank_id.account_id:
                     raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
@@ -120,7 +119,6 @@ class money_order(models.Model):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         self.write({'voucher_id': vouch_obj.id})
         if not source_ids:
-            # first_line_flag = True
             for line in line_ids:
                 if not line.bank_id.account_id:
                     raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
@@ -147,17 +145,6 @@ class money_order(models.Model):
                     vouch_debit_line.write({'currency_id': line.currency_id.id,
                                             'currency_amount': line.amount,
                                             'rate_silent': line.currency_id.rate})
-
-                # if self.discount_amount != 0 and first_line_flag:
-                #     first_line_flag = False
-                #     self.env['voucher.line'].create({
-                #         'name': u"%s付款单%s 折扣" % (partner.name, name),
-                #         'account_id': self.discount_account_id.id,
-                #         'credit': self.discount_amount,
-                #         'voucher_id': vouch_obj.id,
-                #         'partner_id': self.partner_id.id,
-                #     })
-                #     vouch_credit_line.credit += self.discount_amount
 
         if source_ids:
             for line in line_ids:
