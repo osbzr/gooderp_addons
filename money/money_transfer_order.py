@@ -94,7 +94,7 @@ class money_transfer_order(models.Model):
                         line.in_bank_id.balance += line.amount
                     else:
                         line.in_bank_id.balance += line.currency_amount
-                if out_currency_id != company_currency_id :
+                else:
                     if line.out_bank_id.balance < line.currency_amount:
                         raise UserError('转出账户余额不足')
                     if in_currency_id == company_currency_id:

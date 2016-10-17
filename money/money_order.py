@@ -35,7 +35,7 @@ class money_order(models.Model):
     @api.model
     def create(self, values):
         # 创建单据时，根据订单类型的不同，生成不同的单据编号
-        if self._context.get('type') == 'pay':
+        if  self.env.context.get('type') == 'pay':
             values.update({'name': self.env['ir.sequence'].next_by_code('pay.order')})
         else:
             values.update({'name': self.env['ir.sequence'].next_by_code('get.order')})
@@ -151,7 +151,7 @@ class money_order(models.Model):
 
     @api.onchange('date')
     def onchange_date(self):
-        if self._context.get('type') == 'get':
+        if  self.env.context.get('type') == 'get':
             return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}

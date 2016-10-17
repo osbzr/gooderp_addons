@@ -8,12 +8,26 @@ class partner(models.Model):
     _inherit = 'partner'
     _description = u'查看业务伙伴对账单'
 
-    @api.multi
+    def _init_source_create(self, name, partner_id, category_id, is_init, date,
+                            amount, reconciled, to_reconcile, date_due, state):
+        return self.env['money.invoice'].create({
+                                            'name': name,
+                                            'partner_id': partner_id,
+                                            'category_id': category_id,
+                                            'is_init': is_init,
+                                            'date': date,
+                                            'amount': amount,
+                                            'reconciled': reconciled,
+                                            'to_reconcile': to_reconcile,
+                                            'date_due': date_due,
+                                            'state': state,
+                                          })
+
+    @api.one
     def _set_receivable_init(self):
         if self.receivable_init:
             # 如果有前期初值，删掉已前的单据
             money_invoice_id = self.env['money.invoice'].search([
-                '&',
                 ('partner_id', '=', self.id),
                 ('is_init', '=', True)])
             if money_invoice_id:
@@ -21,25 +35,15 @@ class partner(models.Model):
                 money_invoice_id.unlink()
             # 创建结算单
             categ = self.env.ref('money.core_category_sale')
-            source_id = self.env['money.invoice'].create({
-            'name': "期初应收余额",
-            'partner_id': self.id,
-            'category_id': categ.id,
-            'is_init': True,
-            'date': self.env.user.company_id.start_date,
-            'amount': self.receivable_init,
-            'reconciled': 0,
-            'to_reconcile': self.receivable_init,
-            'date_due': self.env.user.company_id.start_date,
-            'state': 'draft',
-             })
+            self._init_source_create("期初应收余额", self.id, categ.id, True,
+                                    self.env.user.company_id.start_date, self.receivable_init, 0,
+                                    self.receivable_init, self.env.user.company_id.start_date, 'draft')
 
-    @api.multi
+    @api.one
     def _set_payable_init(self):
         if self.payable_init:
             # 如果有前期初值，删掉已前的单据
             money_invoice_id = self.env['money.invoice'].search([
-                '&',
                 ('partner_id', '=', self.id),
                 ('is_init', '=', True)])
             if money_invoice_id:
@@ -47,18 +51,10 @@ class partner(models.Model):
                 money_invoice_id.unlink()
             # 创建结算单
             categ = self.env.ref('money.core_category_purchase')
-            source_id = self.env['money.invoice'].create({
-            'name': "期初应付余额",
-            'partner_id': self.id,
-            'category_id': categ.id,
-            'is_init': True,
-            'date': self.env.user.company_id.start_date,
-            'amount': self.payable_init,
-            'reconciled': 0,
-            'to_reconcile': self.payable_init,
-            'date_due': self.env.user.company_id.start_date,
-            'state': 'draft',
-             })
+            self._init_source_create("期初应付余额", self.id, categ.id, True,
+                                    self.env.user.company_id.start_date, self.payable_init, 0,
+                                    self.payable_init, self.env.user.company_id.start_date, 'draft')
+
 
     receivable_init = fields.Float(u'应收期初', 
                                    digits=dp.get_precision('Amount'),
@@ -96,12 +92,11 @@ class bank_account(models.Model):
     _inherit = 'bank.account'
     _description = u'查看账户对账单'
 
-    @api.multi
+    @api.one
     def _set_init_balance(self):
         if self.init_balance:
             # 如果有前期初值，删掉已前的单据
             other_money_id = self.env['other.money.order'].search([
-                '&',
                 ('bank_id', '=', self.id),
                 ('is_init', '=', True)])
             if other_money_id:
