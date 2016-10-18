@@ -7,7 +7,7 @@
         <record id="seq_voucher" model="ir.sequence">
             <field name="name">会计凭证</field>
             <field name="code">voucher</field>
-            <field name="prefix">V</field>
+            <field name="prefix"></field>
             <field name="padding">5</field>
             <field name="implementation">no_gap</field>
         </record>
