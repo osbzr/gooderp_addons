@@ -28,16 +28,10 @@ class IrActionsReportXml(models.Model):
     )
 
     template_file = fields.Char('Template File')
-
-    # watermark_string = fields.Char(string='Wartermark String')
-    #
-    # watermark_template = fields.Many2one(
-    #     comodel_name='ir.attachment', string='Watermark Template')
-    #
-    # output_type = fields.Selection(
-    #     [
-    #         ('pdf', 'PDF'),
-    #         ('docx', 'Docx'),
-    #     ],
-    #     'Output Type', required=True, default='pdf'
-    # )
+    output_type = fields.Selection(
+        [
+            ('pdf', 'PDF'),
+            ('docx', 'Docx'),
+        ],
+        'Output Type', required=True, default='docx'
+    )

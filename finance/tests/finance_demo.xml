@@ -36,6 +36,10 @@
             <field name='year'>2016</field>
             <field name='month'>4</field>
         </record>
+        <record id='period_201605' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>5</field>
+        </record>
         <record id='period_201611' model='finance.period'>
             <field name='year'>2016</field>
             <field name='month'>11</field>

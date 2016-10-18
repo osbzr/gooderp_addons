@@ -35,7 +35,7 @@ class money_order(models.Model):
     @api.model
     def create(self, values):
         # 创建单据时，根据订单类型的不同，生成不同的单据编号
-        if self._context.get('type') == 'pay':
+        if  self.env.context.get('type') == 'pay':
             values.update({'name': self.env['ir.sequence'].next_by_code('pay.order')})
         else:
             values.update({'name': self.env['ir.sequence'].next_by_code('get.order')})
@@ -151,7 +151,7 @@ class money_order(models.Model):
 
     @api.onchange('date')
     def onchange_date(self):
-        if self._context.get('type') == 'get':
+        if  self.env.context.get('type') == 'get':
             return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
@@ -162,7 +162,6 @@ class money_order(models.Model):
             return {}
 
         source_lines = []
-        self.source_ids = []
         money_invoice = self.env['money.invoice']
         if self.env.context.get('type') == 'get':
             money_invoice = self.env['money.invoice'].search([
@@ -187,7 +186,8 @@ class money_order(models.Model):
                    'this_reconcile': invoice.to_reconcile,
                    'date_due': invoice.date_due,
                    })
-        self.source_ids = source_lines
+        if source_lines:
+            self.source_ids = source_lines
 
     @api.multi
     def money_order_done(self):
