@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
-
+from odoo.addons.finance.report.report import action_report_picking_wrapped
 
 class test_report(TransactionCase):
 
@@ -254,4 +254,10 @@ class test_checkout_wizard(TransactionCase):
         self.checkout_voucher.voucher_done()
         wizard.button_checkout()
 
-    
+class test_action_report_picking_wrapped(TransactionCase):
+    def test_action_report(self):
+        arpw = action_report_picking_wrapped(self.env.cr,self.env.uid,'context',self.env.context)
+        arpw._rmb_upper(1000)
+        arpw._rmb_format(1000)
+        arpw._rmb_format(0.001)
+        arpw._paginate(100)

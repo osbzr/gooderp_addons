@@ -2,7 +2,7 @@
 from odoo.osv import osv
 from odoo.report import report_sxw
 from odoo import models, fields, api
-
+import math
 
 
 class action_report_picking_wrapped(report_sxw.rml_parse):
@@ -38,7 +38,7 @@ class action_report_picking_wrapped(report_sxw.rml_parse):
         返回：页数
         """
         count = len(items)
-        return int(ceil(float(count) / max_per_page))
+        return int(math.ceil(float(count) / max_per_page))
 
 
 class report_voucher(osv.AbstractModel):
