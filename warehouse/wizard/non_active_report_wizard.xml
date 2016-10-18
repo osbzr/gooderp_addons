@@ -5,7 +5,7 @@
             <field name='name'>non.active.report.wizard.form</field>
             <field name='model'>non.active.report.wizard</field>
             <field name='arch' type='xml'>
-                <form string='批号跟踪表'>
+                <form string='呆滞料报表'>
                     <group>
                         <group>
                             <field name='warehouse_id'/>

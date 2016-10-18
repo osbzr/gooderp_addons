@@ -246,3 +246,53 @@ class TestProduction(TransactionCase):
 
         for child in assembly_child_ids:
             self.assertTrue(child in bom_child_ids)
+
+    def test_onchange_goods_id(self):
+        ''' 测试 onchange_goods_id '''
+        # 组装单 onchange_goods_id
+        self.env.ref('warehouse.wh_assembly_ass0').goods_id =  self.env.ref('goods.keyboard_mouse').id
+        self.goods_id =  self.env.ref('goods.keyboard_mouse').id
+        self.env.ref('warehouse.wh_assembly_ass0').onchange_goods_id()
+
+        # 拆卸单 onchange_goods_id
+        self.env.ref('warehouse.wh_disassembly_dis1').goods_id =  self.env.ref('goods.keyboard_mouse').id
+        self.goods_id =  self.env.ref('goods.keyboard_mouse').id
+        self.env.ref('warehouse.wh_disassembly_dis1').onchange_goods_id()
+
+    def test_assembly_onchange_goods_qty(self):
+        ''' 测试 组装单 onchange_goods_qty '''
+        # no bom_id
+        self.goods_qty = 2
+        self.env.ref('warehouse.wh_assembly_ass0').onchange_goods_qty()
+
+        # has bom_id
+        self.env.ref('warehouse.wh_bom_0').type = 'assembly'
+        self.env.ref('warehouse.wh_bom_0').name = 'combination'
+        self.env.ref('warehouse.wh_assembly_ass0').bom_id = self.env.ref('warehouse.wh_bom_0').id
+        self.goods_qty = 1
+        self.env.ref('warehouse.wh_assembly_ass0').onchange_goods_qty()
+
+    def test_disassembly_onchange_goods_qty(self):
+        ''' 测试 拆卸单 onchange_goods_qty '''
+        # has bom_id
+        self.goods_qty = 2
+        self.env.ref('warehouse.wh_disassembly_dis1').onchange_goods_qty()
+
+        # no bom_id
+        self.env.ref('warehouse.wh_disassembly_dis1').bom_id = False
+        self.goods_qty = 1
+        self.env.ref('warehouse.wh_disassembly_dis1').onchange_goods_qty()
+
+    def test_assembly_onchange_bom(self):
+        ''' 测试  组装单 onchange_bom '''
+        self.env.ref('warehouse.wh_assembly_ass0').bom_id = self.env.ref('warehouse.wh_bom_0').id
+        self.bom_id = self.env.ref('warehouse.wh_bom_0').id
+        self.env.ref('warehouse.wh_assembly_ass0').onchange_bom()
+
+    def test_disassembly_onchange_bom(self):
+        ''' 测试 拆卸单 onchange_bom '''
+
+        bom_copy_1 = self.env.ref('warehouse.wh_bom_0').copy()
+        self.bom_id = bom_copy_1.id
+        self.env.ref('warehouse.wh_disassembly_dis1').bom_id = bom_copy_1.id
+        self.env.ref('warehouse.wh_disassembly_dis1').onchange_bom()

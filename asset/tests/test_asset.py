@@ -235,3 +235,20 @@ class test_DepreciationWizard(TransactionCase):
             {'date': '2016-04-01'})
         with self.assertRaises(UserError):
             wizard.create_depreciation()
+
+
+class test_voucher(TransactionCase):
+
+    def setUp(self):
+        '''折旧明细准备数据'''
+        super(test_voucher, self).setUp()
+        self.asset = self.env.ref('asset.asset_car')
+        self.asset.is_init = True
+        self.voucher = self.env.ref('finance.voucher_4')
+        self.voucher.is_init = True
+
+    def test_init_asset(self):
+        '''引入固定资产'''
+        self.voucher.init_asset()
+        # 删除以前引入的固定资产内容，然后再引入
+        self.voucher.init_asset()

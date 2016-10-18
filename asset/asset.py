@@ -91,9 +91,9 @@ class asset(models.Model):
                                states=READONLY_STATES, copy=True)
     chang_ids = fields.One2many('chang.line', 'order_id', u'变更明细行',
                                states=READONLY_STATES, copy=True)
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict')
-    money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
-    other_money_order = fields.Many2one('other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict')
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict', copy=False)
+    money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict', copy=False)
+    other_money_order = fields.Many2one('other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
 
     @api.onchange('category_id')
     def onchange_category_id(self):
@@ -542,7 +542,7 @@ class voucher(models.Model):
     @api.one
     def init_asset(self):
         '''删除以前引入的固定资产内容'''
-        for line in self.line_ids :
+        for line in self.line_ids:
             if line.init_obj == 'asset':
                 line.unlink()
 
