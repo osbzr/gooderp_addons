@@ -260,4 +260,4 @@ class test_action_report_picking_wrapped(TransactionCase):
         arpw._rmb_upper(1000)
         arpw._rmb_format(1000)
         arpw._rmb_format(0.001)
-        arpw._paginate(100)
+        arpw._paginate([190,2092,34934,5405])
