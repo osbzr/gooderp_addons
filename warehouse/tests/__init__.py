@@ -7,3 +7,4 @@ import test_inventory
 import test_warehouse
 import test_report
 import test_finace
+import test_non_active_report
