@@ -80,7 +80,7 @@ class TestWebExportViewTwo(TransactionCase):
                 ],
                 "file_address": false
             }"""
-        content_disposition("%s%s" % (os.path.split(os.path.realpath(__file__))[0], "/hello.xls"))
+        content_disposition("/hello.xls")
 
 class TestReportTemplate(TransactionCase):
 
