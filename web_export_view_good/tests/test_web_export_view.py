@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
-from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView
+from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView,content_disposition
 import os
 
 class TestWebExportViewTwo(TransactionCase):
 
     def test_web_export_view(self):
-        print "++++++++++++++++++=="
         self.env['report.template'].get_time('partner')
 
         # self.env['report.template'].create({'model': self.env.search([('name', '=', 'partner')]),
@@ -28,6 +27,60 @@ class TestWebExportViewTwo(TransactionCase):
                              [u"操作人", "admin", u"操作时间", "2016-05-09"]],
                     "file_address": ''}
         a.from_data_excel(data_two.get('headers'), [data_two.get("rows"), ''])
+
+    def test_content_disposition(self):
+        a = ExcelExportView()
+        data = u"""{
+                "model": "ir.module.module",
+                "headers": [
+                    "应用",
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "files_name": "应用",
+                "rows": [
+                    [        ],
+                    [
+                        "模块名",
+                        "技术名称",
+                        "作者",
+                        "最新版本",
+                        "状态"
+                    ],
+                    [
+                        "Discuss",
+                        "mail",
+                        "Odoo S.A.",
+                        "10.0.1.0",
+                        "未安装"
+                    ],
+                    [
+                        "Dashboards",
+                        "board",
+                        "Odoo S.A.",
+                        "10.0.1.0",
+                        "未安装"
+                    ],
+                    [
+                        "GOODERP SCM模块",
+                        "demo",
+                        "开阖软件",
+                        "10.0.0.1",
+                        "未安装"
+                    ],
+                    [
+                        "操作人",
+                        "admin",
+                        " ",
+                        "操作时间",
+                        "2016-10-18"
+                    ]
+                ],
+                "file_address": false
+            }"""
+        content_disposition("%s%s" % (os.path.split(os.path.realpath(__file__))[0], "/hello.xls"))
 
 class TestReportTemplate(TransactionCase):
 
