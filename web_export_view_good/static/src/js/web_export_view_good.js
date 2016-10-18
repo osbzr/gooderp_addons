@@ -75,7 +75,7 @@ function compute_footer_data(amount,export_columns_keys) {
     var footer = 0;
     $.each(amount, function () {
         var $row = $(this);
-        var export_row = [];
+        var export_row =  new Array(export_columns_keys.length);;
         var index = 0;
         $.each(export_columns_keys, function () {
             var cell = $row.find('td').get(index);
@@ -85,9 +85,9 @@ function compute_footer_data(amount,export_columns_keys) {
                 if (text.indexOf(" ") == -1) {
                      if (text!==''){
                         footer = 1;
-                        export_row.push(text);}
+                        export_row[index-2]=text.trim();}
                 }else {
-                    export_row.push('');}
+                    export_row[index-2]=text.trim();}
                 }
         });
         if (footer == 1) {
