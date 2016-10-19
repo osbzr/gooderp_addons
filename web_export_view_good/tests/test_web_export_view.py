@@ -37,7 +37,7 @@ class TestReportTemplate(TransactionCase):
         template.get_time('res.partner')
 
 
-class WebExportViewTestCase(HttpCase):
-    def test_content_dispostion(self):
-        content_disposition("/None.xls")
-      
+# class WebExportViewTestCase(HttpCase):
+#     def test_content_dispostion(self):
+#         content_disposition("/None.xls")
+#
