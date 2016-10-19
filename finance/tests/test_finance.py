@@ -210,6 +210,7 @@ class test_voucher_template_wizard(TransactionCase):
         self.voucher_template_wizard = self.env['voucher.template.wizard'].create({
             'name':'测试模板','voucher_id':self.voucher.id,
         })
+
     def test_save_as_template(self):
         """凭证模板相关功能"""
         self.voucher_template_wizard.save_as_template()
@@ -217,6 +218,7 @@ class test_voucher_template_wizard(TransactionCase):
         old_template_id =self.env['voucher.template'].search([])[0].id if self.env['voucher.template'].search([]) else False
         self.voucher_template_wizard.old_template_id = old_template_id
         self.voucher_template_wizard.save_as_template()
+
     def test_onchange_template_id(self):
         """凭证上模板字段的onchange"""
         old_template_id = self.env['voucher.template'].search([])[0].id if self.env[
@@ -231,6 +233,31 @@ class test_checkout_wizard(TransactionCase):
     def test_recreate_voucher_name(self):
         checkout_wizard_obj = self.env['checkout.wizard']
         period_id = self.env.ref('finance.period_201601')
-        setting_row = self.env['finance.config.settings'].create({'auto_reset':True,'reset_period':'year'})
+        last_period_id = self.env.ref('finance.period_201512')
+
+        setting_row = self.env['finance.config.settings'].create({"default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_voucher_date": "today"})
+        setting_row.execute()
+        checkout_wizard_obj.recreate_voucher_name(last_period_id)
+        setting_row = self.env['finance.config.settings'].create({"default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_reset_period": "year",
+                "default_voucher_date": "today"})
+        setting_row.execute()
         checkout_wizard_obj.recreate_voucher_name(period_id)
-        print "+===="
+        last_period_id.is_closed=True
+        checkout_wizard_obj.recreate_voucher_name(period_id)
+
+class test_month_product_cost(TransactionCase):
+
+    def setUp(self):
+        super(test_month_product_cost, self).setUp()
+        self.period_id = self.env.ref('finance.period_201601')
+    def test_generate_issue_cost(self):
+        """本月成本结算 相关逻辑的测试"""
+        checkout_wizard_row = self.env['checkout.wizard'].create({'date':'2016-01-31','period_id':self.period_id.id})
+        with self.assertRaises(UserError):
+            checkout_wizard_row.button_checkout()
