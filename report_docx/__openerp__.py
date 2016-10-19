@@ -12,7 +12,6 @@
     ],
     "data": [
         'views/ir_actions.xml',
-        'data/report_demo.xml',
     ],
     "license": "AGPL-3",
     "installable": True,
