@@ -163,7 +163,6 @@ class ReportDocx(report_sxw):
 
         pdfkit.from_file(temp_out_file_html, temp_out_file_pdf)
 
-        os.remove(temp_file)
         os.remove(temp_out_file_html)
 
         return temp_out_file_pdf
