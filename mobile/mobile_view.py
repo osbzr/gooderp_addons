@@ -64,7 +64,7 @@ class MobileView(models.Model):
 
                     if len(item) != 2:
                         raise ValueError()
-            except:
+            except UserError:
                 raise UserError(u'无法解析的selection属性%s' % attrib.get('selection'))
 
     def _check_domain(self, model, domain):
@@ -86,7 +86,7 @@ class MobileView(models.Model):
 
                 if len(item) != 3:
                     raise ValueError()
-        except:
+        except UserError:
             raise UserError(u'无法解析的domain条件%s' % domain)
 
     def _check_model(self, model):
