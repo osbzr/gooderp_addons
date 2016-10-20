@@ -71,11 +71,11 @@
 	                    	<field name="mobile" required="1"/>
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>
-	                    	<field name="province_id" required="1"/>
-        					<field name="city_id" required="1"/>
-        					<field name="county_id" required="1"/>
-        					<field name="town" required="1"/>
-        					<field name="detail_address" required='1'/>
+	                    	<field name="province_id" />
+        			<field name="city_id" />
+        			<field name="county_id"  />
+        			<field name="town" />
+        			<field name="detail_address" />
 	                    	<field name="is_default_add"/>
 	                    </tree>
 	                </field>
