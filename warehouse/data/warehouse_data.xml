@@ -30,44 +30,5 @@
             <field name='code'>others</field>
             <field name='type'>others</field>
         </record>
-
-        <record id='report_stock_transceive_mobile_view' model='mobile.view'>
-            <field name='name'>report_stock_transceive</field>
-            <field name='display_name'>商品收发明细表</field>
-            <field name='model'>report.stock.transceive</field>
-            <field name='sequence'>3</field>
-            <field name='arch' type='xml'>
-                <mobile>
-                    <wizard>
-                        <field name='goods' string='产品' type='char' placeholder="请输入产品" />
-                        <field name='warehouse' string='仓库' type='selection' selection="[('上海仓', '上海仓'), ('北京仓', '北京仓'), ('总仓', '总仓')]" />
-                        <field name='date_start' string='开始时间' type='date' required='1' />
-                        <field name='date_end' string='结束时间' type='date' required='1' />
-                    </wizard>
-                    <tree>
-                        <field name='goods' string='产品' />
-                        <field name='goods_qty_end' string='期末数量' />
-                        <field name='cost_end' string='期末成本' />
-                    </tree>
-                    <form>
-                        <field name='warehouse' string='仓库' />
-                        <field name='uom' string='单位' />
-                        <field name='goods_qty_begain' string='期初数量' />
-                        <field name='goods_qty_out' string='出库数量' />
-                        <field name='goods_qty_in' string='入库数量' />
-                        <field name='cost_begain' string='期初成本' />
-                        <field name='cost_out' string='出库成本' />
-                        <field name='cost_in' string='入库成本' />
-                    </form>
-                    <search>
-                        <field name='goods' string='产品' />
-                        <field name='warehouse' string='仓库' />
-                        <field name='uom' string='单位' />
-                        <field name='goods_qty_end' string='期末数量' />
-                        <field name='cost_end' string='期末成本' />
-                    </search>
-                </mobile>
-            </field>
-        </record>
     </data>
 </openerp>
