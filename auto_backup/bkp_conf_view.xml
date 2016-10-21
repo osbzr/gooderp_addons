@@ -30,11 +30,11 @@
                         <newline/>
                         <label  align="0.0"  string="Automatic backup of all the databases under this can be scheduled as follows: "/>
                         <newline/>
-                         <label  align="0.0" string="1) Go to Administration / Configuration / Scheduler / Scheduled Actions"/>
+                         <label  align="0.0" string="1) Go to Settings / Technical / Automation / Scheduled Actions"/>
                          <newline/>
                          <label align="0.0"  string="2) Schedule new action(create a new record)"/>
                          <newline/>
-                         <label align="0.0"  string="3) Set 'Object' to 'db.backup' and 'Function' to 'schedule_backup' under page 'Technical Data'"/>
+                         <label align="0.0"  string="3) Set 'Object' to 'db.backup' and 'Method' to 'schedule_backup_pgtool' under page 'Technical Data'"/>
                          <newline/>
                          <label align="0.0"  string="4) Set other values as per your preference"/>
                     </form>
