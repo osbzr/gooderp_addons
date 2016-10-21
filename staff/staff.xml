@@ -3,7 +3,7 @@
     <data>
     	<!--菜单-->
         <menuitem name="人力资源"
-            id="menu_staff_root" groups="staff.hr_groups"/>
+            id="menu_staff_root" groups="staff.hr_groups" web_icon="staff,static/description/staff.png"/>
         <menuitem id="menu_staff_main" name="员工" parent="staff.menu_staff_root"/>
         <menuitem id="menu_staff_configuration" name="设置" parent="staff.menu_staff_root"/>
         <!--员工界面-->
