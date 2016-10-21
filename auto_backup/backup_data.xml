@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<openerp>
+<odoo>
     <data noupdate="1">
         <record id="ir_cron_db_backup_scheduler" model="ir.cron">
             <field eval="&quot;&quot;&quot;schedule_backup_pgtool&quot;&quot;&quot;" name="function"/>
@@ -15,4 +15,4 @@
             <field eval="&quot;&quot;&quot;db.backup&quot;&quot;&quot;" name="model"/>
         </record>
     </data>
-</openerp>
+</odoo>
