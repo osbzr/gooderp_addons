@@ -2,6 +2,7 @@
 from odoo.tests.common import TransactionCase
 from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView,content_disposition
 import os
+from odoo.tests.common import HttpCase
 
 class TestWebExportViewTwo(TransactionCase):
 
@@ -34,3 +35,9 @@ class TestReportTemplate(TransactionCase):
     def test_compute_model_name(self):
         template = self.env['report.template'].create({'is_active':True,'file_address':u'dqjioie'})
         template.get_time('res.partner')
+
+
+# class WebExportViewTestCase(HttpCase):
+#     def test_content_dispostion(self):
+#         content_disposition("/None.xls")
+#

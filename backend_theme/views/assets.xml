@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Copyright 2016 LasLabs Inc.
+    @author Dave Lasley <dave@laslabs.com>
+    License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+-->
+
+
+<odoo>
+	<data>
+    <template id="assets_backend" name="Open Mobile Assets" inherit_id="web.assets_backend">
+        <xpath expr=".">
+				<link rel="stylesheet" href="/backend_theme/static/src/less/bootswatch/variables.less"/>
+				<link rel="stylesheet" href="/backend_theme/static/src/less/bootswatch/bootswatch.less"/>
+				<link rel="stylesheet" href="/backend_theme/static/src/less/bootswatch/style.less"/>
+            <link rel="stylesheet"
+                  type="text/css"
+                  href="/backend_theme/static/lib/css/drawer.3.2.0.css"
+                  />
+            <link rel="stylesheet"
+                  href="/backend_theme/static/src/less/main.less"
+                  />
+            <link rel="stylesheet"
+                  href="/backend_theme/static/src/less/navbar.less"
+                  />
+            <link rel="stylesheet"
+                  href="/backend_theme/static/src/less/app_drawer.less"
+                  />
+            <link rel="stylesheet"
+                  href="/backend_theme/static/src/less/variables.less"
+                  />
+            <script type="application/javascript"
+                    src="/backend_theme/static/lib/js/iscroll-probe.5.2.0.js"
+                    />
+            <script type="application/javascript"
+                    src="/backend_theme/static/lib/js/drawer.3.2.0.js"
+                    />
+            <script type="application/javascript"
+                    src="/backend_theme/static/src/js/web_responsive.js"
+                    />
+        </xpath>
+    </template>
+	</data>
+</odoo>

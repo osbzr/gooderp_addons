@@ -137,5 +137,13 @@
         	<field name="deactive_date">2016-12-30</field>
         	<field name="discount_rate">90</field>
         </record>
+        <record id='report_sell_order_1' model='ir.actions.report.xml'>
+            <field name='name'>销货订单</field>
+            <field name='model'>sell.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.order</field>
+            <field name='template_file'>sell/template/sell.order.docx</field>
+            <field name='output_type'>docx</field>
+        </record>
     </data>
 </openerp>

@@ -233,6 +233,14 @@ class test_checkout_wizard(TransactionCase):
     def test_recreate_voucher_name(self):
         checkout_wizard_obj = self.env['checkout.wizard']
         period_id = self.env.ref('finance.period_201601')
+        last_period_id = self.env.ref('finance.period_201512')
+
+        setting_row = self.env['finance.config.settings'].create({"default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_voucher_date": "today"})
+        setting_row.execute()
+        checkout_wizard_obj.recreate_voucher_name(last_period_id)
         setting_row = self.env['finance.config.settings'].create({"default_period_domain": "can",
                 "default_reset_init_number": 1,
                 "default_auto_reset": True,
@@ -240,9 +248,8 @@ class test_checkout_wizard(TransactionCase):
                 "default_voucher_date": "today"})
         setting_row.execute()
         checkout_wizard_obj.recreate_voucher_name(period_id)
-        setting_row.default_reset_period = 'month'
+        last_period_id.is_closed=True
         checkout_wizard_obj.recreate_voucher_name(period_id)
-
 
 class test_month_product_cost(TransactionCase):
 

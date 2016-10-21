@@ -658,7 +658,7 @@
         </record>
 
     	<!--根菜单-->
-        <menuitem id='sell_menu' name='销货' groups='group_sell'/>
+        <menuitem id='sell_menu' name='销货' groups='group_sell' web_icon="sell,static/description/sale.png"/>
     	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>
     	<menuitem id='sell_order_menu' name='销货订单' action='sell_order_action'
 			parent='sell_order_menu_root' sequence='1'

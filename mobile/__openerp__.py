@@ -37,7 +37,6 @@
     """,
     'data': [
         'view/mobile_view.xml',
-        'data/test_demo.xml',
         'security/ir.model.access.csv',
     ],
     'installable': True,

@@ -1,0 +1,113 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#    * auto_backup
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 5.0.6\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2009-11-24 13:49:51+0000\n"
+"PO-Revision-Date: 2009-11-24 13:49:51+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: auto_backup
+#: field:db.backup,bkp_dir:0
+#: model:ir.model.fields,field_description:auto_backup.field_db_backup_bkp_dir
+msgid "Backup Directory"
+msgstr "备份路径"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "3) Set 'Object' to 'db.backup' and 'Function' to 'schedule_backup' under page 'Technical Data'"
+msgstr "3) 【技术参数】页签，【对象】输入 db.backup, 【方法】输入schedule_backup"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "Help"
+msgstr "帮助"
+
+#. module: auto_backup
+#: field:db.backup,name:0
+#: model:ir.model.fields,field_description:auto_backup.field_db_backup_name
+msgid "Database"
+msgstr "账套"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "2) Schedule new action(create a new record)"
+msgstr "2) 创建一个计划动作(新建一条记录)"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "Database Configuration"
+msgstr "账套配置"
+
+#. module: auto_backup
+#: field:db.backup,host:0
+#: model:ir.model.fields,field_description:auto_backup.field_db_backup_host
+msgid "Host"
+msgstr "OpenERP主机"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "4) Set other values as per your preference"
+msgstr "4) 按需填写其他值。"
+
+#. module: auto_backup
+#: field:db.backup,port:0
+#: model:ir.model.fields,field_description:auto_backup.field_db_backup_port
+msgid "Port"
+msgstr "OpenERP端口"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "1) Go to Administration / Configuration / Scheduler / Scheduled Actions"
+msgstr "1) 菜单：设置 / 配置 / 计划 / 计划动作"
+
+#. module: auto_backup
+#: help:db.backup,name:0
+msgid "Database you want to schedule backups for"
+msgstr "需要备份的账套数据库名称"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "This configures the scheduler for automatic backup of the given database running on given host at given port on regular intervals."
+msgstr "为您的账套做好自动备份计划,您需要配置好相关的备份参数."
+
+#. module: auto_backup
+#: view:db.backup:0
+#: model:ir.actions.act_window,name:auto_backup.action_db_backup_tree
+#: model:ir.ui.menu,name:auto_backup.menu_db_backup_tree
+msgid "Configure Backup"
+msgstr "配置备份"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "IP Configuration"
+msgstr "服务器配置"
+
+#. module: auto_backup
+#: help:db.backup,bkp_dir:0
+msgid "Absolute path for storing the backups"
+msgstr "存放备份文件的绝对路径"
+
+#. module: auto_backup
+#: model:ir.model,name:auto_backup.model_db_backup
+msgid "db.backup"
+msgstr "db.backup"
+
+#. module: auto_backup
+#: constraint:db.backup:0
+msgid "Error ! No such database exist."
+msgstr "错误，没有这个 账套"
+
+#. module: auto_backup
+#: view:db.backup:0
+msgid "Automatic backup of all the databases under this can be scheduled as follows: "
+msgstr "需要按下面的操作步骤创建自动备份计划: "
+

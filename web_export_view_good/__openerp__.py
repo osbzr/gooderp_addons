@@ -27,7 +27,8 @@
     'website': 'http://www.agilebg.com',
     'license': 'AGPL-3',
     'depends': ['base',
-        'web'
+        'web',
+        'backend_theme',
     ],
     'data': [
         'view/web_export_view.xml',
