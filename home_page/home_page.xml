@@ -9,7 +9,7 @@
         </template>
 
 
-        <menuitem id="main_home_menu" name="首页" sequence="5"/>
+        <menuitem id="main_home_menu" name="首页" sequence="5" web_icon="home_page,static/description/home_page.png"/>
 
         <menuitem id="home_page_menu_two" name="首页"
             parent="main_home_menu" />

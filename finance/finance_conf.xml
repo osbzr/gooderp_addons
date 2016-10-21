@@ -3,7 +3,7 @@
     <data>
 
         <!--会计根菜单-->
-        <menuitem id='finance_menu' name='会计' groups='group_accountant'/>
+        <menuitem id='finance_menu' name='会计' groups='group_accountant'  web_icon="finance,static/description/finance.png"/>
 
         <menuitem id='finance_setting_menu' name='设置' parent='finance_menu' sequence='20'/>
 

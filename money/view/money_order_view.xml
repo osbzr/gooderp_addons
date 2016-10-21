@@ -2,7 +2,7 @@
 <openerp>
     <data>
     	<!-- 根菜单 -->
-        <menuitem id="menu_money_root" name="资金" groups='group_cashier'/>
+        <menuitem id="menu_money_root" name="资金" groups='group_cashier'  web_icon="money,static/description/money.png"/>
         <menuitem id="menu_money_manage" name="资金" parent="menu_money_root" sequence="1"/>
         
         <menuitem id="menu_money_setting" name="设置" parent="menu_money_root" sequence="3"/>
