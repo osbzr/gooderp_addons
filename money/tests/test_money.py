@@ -361,7 +361,7 @@ class test_other_money_order(TransactionCase):
         self.env['other.money.order.line'].create({
             'other_money_id': other.id,
             'category_id': self.env.ref('money.core_category_sale').id,
-            'amount': -10.0})
+            'amount':-10.0})
         with self.assertRaises(UserError):
             other.other_money_done()
 
@@ -406,14 +406,14 @@ class test_other_money_order_line(TransactionCase):
         ''' 测试选择了服务的onchange '''
         # 其他收入单
         for line in self.get_order.line_ids:
-            line.service = self.service_1   # 咨询服务
+            line.service = self.service_1  # 咨询服务
             line.onchange_service()
             self.assertTrue(line.category_id.id == self.service_1.get_categ_id.id)
             self.assertTrue(line.amount == 500)
 
         # 其他支出单
         for line in self.pay_order.line_ids:
-            line.service = self.service_1   # 咨询服务
+            line.service = self.service_1  # 咨询服务
             line.onchange_service()
             self.assertTrue(line.category_id.id == self.service_1.pay_categ_id.id)
             self.assertTrue(line.amount == 500)
@@ -422,11 +422,32 @@ class test_other_money_order_line(TransactionCase):
         '''当订单行的金额、税率改变时，改变税额'''
         # 其他收入单
         for line in self.get_order.line_ids:
-            line.service = self.service_1   # 咨询服务
+            line.service = self.service_1  # 咨询服务
             line.amount = 1000
             line.tax_rate = 17
             line.onchange_tax_amount()
             self.assertTrue(line.tax_amount == 170)
+
+    def test_other_money_line_no_category_account(self):
+        ''' 其他收支单审核，订单行分类 的 account 不存在 '''
+        other_pay = self.env['other.money.order'] \
+            .with_context({'type': 'other_pay'}) \
+            .create({
+                'partner_id': self.env.ref('core.lenovo').id, 'date': "2016-02-20",
+                    'bank_id': self.env.ref('core.comm').id,
+                    'line_ids': [(0, 0, {
+                        'category_id': self.env.ref('core.cat_consult').id,
+                        'amount': 10.0})]})
+        self.env.ref('core.comm').account_id = self.env.ref('finance.account_bank').id
+        other_pay.line_ids[0].category_id.account_id = False
+        with self.assertRaises(UserError):
+            other_pay.other_money_done()
+
+        # 其他收支单审核，订单的 is_init 为 True
+        other_pay.line_ids[0].category_id.account_id = self.env.ref('finance.bs_9').id
+        self.env.ref('money.get_40000').money_order_done()
+        other_pay.is_init = True
+        other_pay.other_money_done()
 
 
 class test_money_transfer_order(TransactionCase):
@@ -517,6 +538,17 @@ class test_money_transfer_order(TransactionCase):
         self.env.ref('money.transfer_300').money_transfer_draft()
         self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref('base.USD').id
         self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref('base.USD').id
+        with self.assertRaises(UserError):
+            self.env.ref('money.transfer_300').money_transfer_done()
+
+    def test_outCurrency_inCurrency_notEqual_company_curreny(self):
+        '''测试 资金转账单 转出账户或者转入账户与公司币别不一致并且外币金额为0 报错'''
+
+        self.env.ref('money.transfer_line_1').in_bank_id.account_id = self.env.ref('finance.account_cash').id
+        self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref('base.CNY').id
+        self.env.user.company_id.currency_id = self.env.ref('base.CNY').id
+
         with self.assertRaises(UserError):
             self.env.ref('money.transfer_300').money_transfer_done()
 
