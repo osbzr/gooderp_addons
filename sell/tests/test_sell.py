@@ -441,6 +441,12 @@ class test_sell_delivery(TransactionCase):
         with self.assertRaises(UserError):
             self.return_delivery.sell_delivery_done()
 
+    def test_sell_delivery_done_goods_inventory(self):
+        '''出库审核时产品不足直接盘盈'''
+        for line in self.delivery.line_out_ids:
+            line.goods_id = self.env.ref('goods.computer')
+        self.delivery.sell_delivery_done()
+
     def test_sell_delivery_done_raise_credit_limit(self):
         '''审核发货单/退货单 客户的 本次发货金额+客户应收余额 不能大于客户信用额度'''
         self.delivery.amount = 20000000
