@@ -216,3 +216,9 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.type = 'inventory'
         self.others_in_2.onchange_type()
         self.assertTrue(self.others_in_2.warehouse_id == warehouse_inventory)
+
+    def test_create_voucher_init(self):
+        '''初始化其他入库单时生成凭证的情况'''
+        self.others_in_2.is_init = True
+        self.others_in_2.approve_order()
+        self.others_in_2.cancel_approved_order()
