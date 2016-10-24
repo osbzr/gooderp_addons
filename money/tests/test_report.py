@@ -34,6 +34,18 @@ class test_report(TransactionCase):
             self.assertNotEqual(str(money.balance), 'zxy')
             money.find_source_order()
 
+    def test_bank_report_compute_init(self):
+        ''' 测试 银行对账单报表 _compute_balance name 为 期初'''
+        self.env.ref('money.other_get_60').other_money_done()
+        self.env.ref('core.comm').init_balance = 10000
+        statement = self.env['bank.statements.report.wizard'].create({'bank_id': self.env.ref('core.comm').id})
+        statement.confirm_bank_statements()
+        statement_money = self.env['bank.statements.report'].search([])
+        for money in statement_money:
+            self.assertNotEqual(str(money.balance), 'kaihe')
+            money.find_source_order()
+
+
     def test_other_money_report(self):
         ''' 测试其他收支单明细表'''
         # 执行向导
