@@ -440,12 +440,12 @@ class test_other_money_order_line(TransactionCase):
                         'amount': 10.0})]})
         self.env.ref('core.comm').account_id = self.env.ref('finance.account_bank').id
         other_pay.line_ids[0].category_id.account_id = False
+        self.env.ref('money.get_40000').money_order_done()
         with self.assertRaises(UserError):
             other_pay.other_money_done()
 
         # 其他收支单审核，订单的 is_init 为 True
         other_pay.line_ids[0].category_id.account_id = self.env.ref('finance.bs_9').id
-        self.env.ref('money.get_40000').money_order_done()
         other_pay.is_init = True
         other_pay.other_money_done()
 

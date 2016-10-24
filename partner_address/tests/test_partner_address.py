@@ -30,6 +30,7 @@ class test_partner_address(TransactionCase):
         # 存在省不存在市
         for child in self.partner.child_ids:
             child.province_id = province.id
+            child.city_id = False
             child.onchange_province()
         # 存在省存在市，但市不属于省
         city = self.env['all.city'].search([('city_name', '=', u'上海市')])
@@ -64,7 +65,9 @@ class test_partner_address(TransactionCase):
             child.onchange_city()
         # 存在市不存在省，不存在县
         for child in self.partner.child_ids:
+            child.province_id = False
             child.county_id = False
+            child.city = city.id
             child.onchange_city()
         # 存在市存在省存在县，但县不属于市
         county = self.env['all.county'].search(
