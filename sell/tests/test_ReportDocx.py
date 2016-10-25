@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
-from odoo.addons.report_docx.report.report_docx import ReportDocx
+from odoo.addons.report_docx.report.report_docx import DataModelProxy
 from odoo.tools import misc
 
 class test_ReportDocx(TransactionCase):
@@ -32,3 +32,9 @@ class test_ReportDocx(TransactionCase):
 
     def test_render_to_pdf(self):
         self.report_docx_sell.render_to_pdf(misc.file_open('sell/tests/sell.order.docx').name)
+
+    def test_datamodelproxy(self):
+        data=DataModelProxy([{"type":'selection'}])
+        data.__getitem__(0)
+        data = DataModelProxy([])
+        data.__getattr__(0)
