@@ -216,7 +216,7 @@ class checkout_wizard(models.TransientModel):
             seq_id = preferred_sequences[0] if preferred_sequences else seq_ids[0]
             voucher_obj = self.env['voucher']
             # 按年重置
-            last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_id)
+            last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(period_id)
             last_voucher_number = 0
             if reset_period == 'year':
                 if last_period:
@@ -261,5 +261,3 @@ class checkout_wizard(models.TransientModel):
                         })
                     voucher_id.with_context(context).write({'name': next_voucher_name})
                     last_voucher_number += 1
-
-

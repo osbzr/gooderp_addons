@@ -242,6 +242,15 @@ class test_checkout_wizard(TransactionCase):
         with self.assertRaises(UserError):
             wizard.button_checkout()
 
+    def test_button_checkout_period_month_notEuqal_12(self):
+        ''' 结账按钮, 下一个期间不存在  month 不等于 12 '''
+        wizard = self.env['checkout.wizard'].create({'date':'20160513'})
+        self.voucher_15_12.date = '2016-05-12'
+        self.voucher_15_12.voucher_done()
+        wizard.onchange_period_id()
+        self.env.ref('finance.period_201604').is_closed = True
+        wizard.button_checkout()
+
     def test_recreate_voucher_name(self):
         '''按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）'''
         # FIXME: 没有成功
