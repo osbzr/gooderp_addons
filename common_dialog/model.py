@@ -6,7 +6,7 @@ def open_dialog(self, func, options=None):
     context = dict(self.env.context or {})
     context.update(options or {})
     context.update({'func': func})
-    
+
     if not context.get('message'):
         context['message'] = u'确定吗？'
 
