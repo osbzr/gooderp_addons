@@ -79,10 +79,7 @@ class sell_receipt_wizard(models.TransientModel):
                 partner_cost = - partner_cost
                 warehouse = delivery.warehouse_dest_id
             # 计算回款率
-            if (amount + partner_cost) == 0 and receipt == 0:
-                receipt_rate = 100
-            else:
-                receipt_rate = (receipt / (amount + partner_cost)) * 100
+            receipt_rate = (amount + partner_cost) != 0 and (receipt / (amount + partner_cost)) * 100 or 0
             line = self.env['sell.receipt'].create({
                 'c_category_id': delivery.partner_id.c_category_id.id,
                 'partner_id': delivery.partner_id.id,
