@@ -2,8 +2,11 @@
 from odoo.tests.common import TransactionCase
 from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView,content_disposition
 import os
+from urllib import urlencode
 from odoo.tests.common import HttpCase
-
+from odoo.http import request
+import requests
+import json
 class TestWebExportViewTwo(TransactionCase):
 
     def test_web_export_view(self):
@@ -37,7 +40,19 @@ class TestReportTemplate(TransactionCase):
         template.get_time('res.partner')
 
 
-# class WebExportViewTestCase(HttpCase):
-#     def test_content_dispostion(self):
-#         content_disposition("/None.xls")
-#
+class WebExportViewTestCase(HttpCase):
+    def test_content_dispostion(self):
+        data_json={'data':{},'token':12142432}
+        url = '/web/export/export_xls_view'
+        self.url_open(url,data=bytes(urlencode(data_json)))
+        request.httprequest.user_agent.browser = 'msie'
+        request.httprequest.user_agent.version ='8'
+        content_disposition('filename')
+
+        request.httprequest.user_agent.browser = 'safari'
+        request.httprequest.user_agent.version ='8'
+        content_disposition('filename')
+
+        request.httprequest.user_agent.browser = 'OOO'
+        request.httprequest.user_agent.version ='8'
+        content_disposition('filename')
