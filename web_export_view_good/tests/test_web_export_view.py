@@ -46,7 +46,7 @@ class WebExportViewTestCase(HttpCase):
         self.url_open(url,data=bytes(urlencode(data_json)))
         ee = ExcelExportView()
         data={'header':'OKKK'}
-        ee.export_xls_view(json.dumps(data),2131413)
+        #ee.export_xls_view(json.dumps(data),2131413)
         # request.httprequest.user_agent.browser = 'msie'
         # request.httprequest.user_agent.version ='8'
         # content_disposition('filename')
