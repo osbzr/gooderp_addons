@@ -45,14 +45,14 @@ class WebExportViewTestCase(HttpCase):
         data_json={'data':{},'token':12142432}
         url = '/web/export/export_xls_view'
         self.url_open(url,data=bytes(urlencode(data_json)))
-        request.httprequest.user_agent.browser = 'msie'
-        request.httprequest.user_agent.version ='8'
-        content_disposition('filename')
-
-        request.httprequest.user_agent.browser = 'safari'
-        request.httprequest.user_agent.version ='8'
-        content_disposition('filename')
-
-        request.httprequest.user_agent.browser = 'OOO'
-        request.httprequest.user_agent.version ='8'
-        content_disposition('filename')
+        # request.httprequest.user_agent.browser = 'msie'
+        # request.httprequest.user_agent.version ='8'
+        # content_disposition('filename')
+        #
+        # request.httprequest.user_agent.browser = 'safari'
+        # request.httprequest.user_agent.version ='8'
+        # content_disposition('filename')
+        #
+        # request.httprequest.user_agent.browser = 'OOO'
+        # request.httprequest.user_agent.version ='8'
+        # content_disposition('filename')
