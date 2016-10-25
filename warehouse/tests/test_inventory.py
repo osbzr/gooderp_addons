@@ -200,3 +200,8 @@ class TestInventory(TransactionCase):
         }
 
         self.assertEqual(results, real_results)
+
+    def test_check_done(self):
+        '''盘盈盘亏产生的入库单和出库单审核时检查'''
+        self.inventory.query_inventory()
+        self.inventory.generate_inventory()
