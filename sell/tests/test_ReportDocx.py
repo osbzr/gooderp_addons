@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
+from odoo.addons.report_docx.report.report_docx import ReportDocx
+from odoo.tools import misc
 
 class test_ReportDocx(TransactionCase):
 
@@ -22,3 +24,11 @@ class test_ReportDocx(TransactionCase):
 
     def test_get_docx_data(self):
         model = self.report_docx_sell.get_docx_data(self.cr, self.uid, self.ir_actions.id, self.ir_actions, self.env.context)
+
+    def test_save_file(self):
+        doxc_file = self.report_docx_sell.create(self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
+        self.report_docx_sell._save_file(misc.file_open('sell/tests/sell.order.docx').name,doxc_file)
+
+
+    def test_render_to_pdf(self):
+        self.report_docx_sell.render_to_pdf(misc.file_open('sell/tests/sell.order.docx').name)
