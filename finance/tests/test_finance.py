@@ -231,25 +231,43 @@ class test_checkout_wizard(TransactionCase):
     def setUp(self):
         super(test_checkout_wizard, self).setUp()
     def test_recreate_voucher_name(self):
+        ''' 测试 按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续） '''
         checkout_wizard_obj = self.env['checkout.wizard']
         period_id = self.env.ref('finance.period_201601')
         last_period_id = self.env.ref('finance.period_201512')
 
-        setting_row = self.env['finance.config.settings'].create({"default_period_domain": "can",
+        # 按月 重排结账会计期间凭证号
+        setting_row_month = self.env['finance.config.settings'].create({"default_period_domain": "can",
                 "default_reset_init_number": 1,
                 "default_auto_reset": True,
                 "default_voucher_date": "today"})
-        setting_row.execute()
+        setting_row_month.execute()
         checkout_wizard_obj.recreate_voucher_name(last_period_id)
-        setting_row = self.env['finance.config.settings'].create({"default_period_domain": "can",
+
+        # 按年 重排结账会计期间凭证号
+        setting_row_year = self.env['finance.config.settings'].create({"default_period_domain": "can",
                 "default_reset_init_number": 1,
                 "default_auto_reset": True,
                 "default_reset_period": "year",
                 "default_voucher_date": "today"})
-        setting_row.execute()
-        checkout_wizard_obj.recreate_voucher_name(period_id)
+        setting_row_year.execute()
+        # 按年重置 上一个期间存在 但未结账
+        with self.assertRaises(UserError):
+            checkout_wizard_obj.recreate_voucher_name(period_id)
+
+        # 按年重置 上一个期间存在 已结账 两个期间的年相同
         last_period_id.is_closed=True
         checkout_wizard_obj.recreate_voucher_name(period_id)
+        # 按年重置 上一个期间存在 已结账 两个期间的年不相同
+        period_id = self.env.ref('finance.period_201603')
+        last_period_id = self.env.ref('finance.period_201602')
+        last_period_id.is_closed=True
+        checkout_wizard_obj.recreate_voucher_name(period_id)
+
+        # 按年重置 上一个期间不存在
+        period_id = self.env.ref('finance.period_201411')
+        checkout_wizard_obj.recreate_voucher_name(period_id)
+
 
 class test_month_product_cost(TransactionCase):
 
