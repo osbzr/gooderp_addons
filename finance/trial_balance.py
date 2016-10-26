@@ -215,14 +215,16 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     def onchange_period(self):
         '''结束期间大于起始期间报错'''
 
-        if self.period_end_id and self.period_begin_id and \
-                (
-                        self.period_begin_id.year > self.period_end_id.year and self.period_begin_id.month > self.period_end_id.month):
-            self.period_end_id = self.period_begin_id
-            return {'warning': {
-                'title': u'错误',
-                'message': u'结束期间必须大于等于开始期间!',
-            }}
+        if self.period_end_id and self.period_begin_id:
+            if (self.period_begin_id.year > self.period_end_id.year) or \
+                (self.period_begin_id.year == self.period_end_id.year and \
+                 self.period_begin_id.month > self.period_end_id.month):
+
+                self.period_end_id = self.period_begin_id
+                return {'warning': {
+                    'title': u'错误',
+                    'message': u'结束期间必须大于等于开始期间!',
+                }}
 
     @api.multi
     def get_initial_balance(self, period, account_row):
@@ -464,8 +466,6 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                     break_flag = False
                 for vals in create_vals:
                     del vals['date']
-                    if vals.get('voucher_id'):
-                        del vals['date']
                     vouchers_summary_ids.append((self.env['general.ledger.account'].create(vals)).id)
 
         view_id = self.env.ref('finance.general_ledger_account_tree').id

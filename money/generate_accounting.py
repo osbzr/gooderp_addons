@@ -435,7 +435,7 @@ class money_transfer_order(models.Model):
             in_currency_id = line.in_bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
             company_currency_id = self.env.user.company_id.currency_id.id
             if (out_currency_id != company_currency_id or in_currency_id != company_currency_id) and not self.line_ids.currency_amount :
-                    raise UserError(u'错误' u'请正确结汇')
+                raise UserError(u'错误' u'请正确结汇')
             if line.currency_amount and out_currency_id != company_currency_id :
                 '''结汇'''
                 '''借方行'''

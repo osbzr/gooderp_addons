@@ -60,10 +60,7 @@ class buy_payment_wizard(models.TransientModel):
 
     def _compute_payment_rate(self, payment, amount):
         '''计算付款率'''
-        if amount == 0 and payment == 0:
-            payment_rate = 100
-        else:
-            payment_rate = (payment / amount) * 100
+        payment_rate = amount != 0 and (payment / amount) * 100 or 0.0
         return payment_rate
 
     @api.multi
@@ -115,10 +112,7 @@ class buy_payment_wizard(models.TransientModel):
             sum_payment_rate += line.payment_rate
 
         # 创建一览表的平均付款率行
-        if sum_payment_rate == 0 and count == 0:
-            payment_rate = 100
-        else:
-            payment_rate = sum_payment_rate / count
+        payment_rate = count != 0 and sum_payment_rate / count or 0
         line_total = self.env['buy.payment'].create({
             'order_name': u'平均付款率',
             'payment_rate': payment_rate,

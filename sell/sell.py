@@ -210,7 +210,7 @@ class sell_order(models.Model):
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
-            if line.tax_amount > 0 and self.currency_id.id != self.env.user.company_id.currency_id.id :
+            if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
                 raise UserError(u'外贸免税！')
         if self.bank_account_id and not self.pre_receipt:
             raise UserError(u'结算账户不为空时，需要输入预付款！')
@@ -644,7 +644,7 @@ class sell_delivery(models.Model):
         else:
             return False
 
-    def goods_inventery(self, vals):
+    def goods_inventory(self, vals):
         auto_in = self.env['wh.in'].create(vals)
         auto_in.approve_order()
 
@@ -666,10 +666,7 @@ class sell_delivery(models.Model):
                 continue
             else:
                 result = self.check_goods_qty(line.goods_id, line.attribute_id, self.warehouse_id)
-                if result[0]:
-                    result = result[0][0] or 0
-                else:
-                    result = 0
+                result = result[0] and result[0][0] or 0
             if line.goods_qty - result > 0 and not line.lot_id:
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
                 vals.update({
@@ -687,7 +684,7 @@ class sell_delivery(models.Model):
                                                 }
                                         )]
                             })
-                return self.open_dialog('goods_inventery', {
+                return self.open_dialog('goods_inventory', {
                     'message': u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name,
                     'args': [vals],
                 })

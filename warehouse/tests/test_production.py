@@ -285,14 +285,43 @@ class TestProduction(TransactionCase):
 
     def test_assembly_onchange_bom(self):
         ''' 测试  组装单 onchange_bom '''
+        # no bom_id
+        self.assembly.onchange_bom()
+        self.assertEqual(self.assembly.goods_qty, 1.0)
+        # has bom_id
         self.env.ref('warehouse.wh_assembly_ass0').bom_id = self.env.ref('warehouse.wh_bom_0').id
         self.bom_id = self.env.ref('warehouse.wh_bom_0').id
         self.env.ref('warehouse.wh_assembly_ass0').onchange_bom()
+        # bom_id 的组合件 大于 1行时，len(line_in_ids)>1
+        self.disassembly_bom.line_parent_ids.create({
+            'bom_id': self.disassembly_bom.id,
+            'type': 'parent',
+            'goods_id': self.env.ref('goods.keyboard_mouse').id,
+            'goods_qty': 1,
+        })
+        self.assembly_mutli.bom_id = self.disassembly_bom.id
+        self.assembly_mutli.onchange_bom()
+        self.assertTrue(self.assembly_mutli.is_many_to_many_combinations)
 
     def test_disassembly_onchange_bom(self):
         ''' 测试 拆卸单 onchange_bom '''
-
+        # no bom_id
+        self.disassembly.bom_id = False
+        self.disassembly.onchange_bom()
+        self.assertEqual(self.disassembly.goods_qty, 1.0)
+        # has bom_id
         bom_copy_1 = self.env.ref('warehouse.wh_bom_0').copy()
         self.bom_id = bom_copy_1.id
         self.env.ref('warehouse.wh_disassembly_dis1').bom_id = bom_copy_1.id
         self.env.ref('warehouse.wh_disassembly_dis1').onchange_bom()
+
+        # bom_id 的组合件 大于 1行时，len(line_out_ids)>1
+        self.disassembly_bom.line_parent_ids.create({
+            'bom_id': self.disassembly_bom.id,
+            'type': 'parent',
+            'goods_id': self.env.ref('goods.keyboard_mouse').id,
+            'goods_qty': 1,
+        })
+        self.disassembly.bom_id = self.disassembly_bom.id
+        self.disassembly.onchange_bom()
+        self.assertTrue(self.disassembly.is_many_to_many_combinations)

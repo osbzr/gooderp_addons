@@ -108,7 +108,7 @@ class wh_assembly(models.Model):
                                'warehouse_dest_id': warehouse_id,
                                'uom_id': line.goods_id.uom_id,
                                'goods_qty': self.goods_qty,
-                               'product_uos_qty': self.goods_qty / line.goods_id.conversion,
+                               'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                                'uos_id': line.goods_id.uos_id.id,
                            } for line in self.bom_id.line_parent_ids]
             parent_line_goods_qty = self.bom_id.line_parent_ids[0].goods_qty
@@ -126,7 +126,7 @@ class wh_assembly(models.Model):
                     'goods_qty':  local_goods_qty,
                     'cost_unit': cost_unit,
                     'cost': cost,
-                    'product_uos_qty': local_goods_qty/ line.goods_id.conversion,
+                    'goods_uos_qty': local_goods_qty/ line.goods_id.conversion,
                     'uos_id': line.goods_id.uos_id.id,
                 })
             self.line_in_ids = False
@@ -182,13 +182,13 @@ class wh_assembly(models.Model):
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
             line_in_ids = [{
-                'goods_id': line.goods_id,
+                'goods_id': line.goods_id.id,
                 'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
-                    'production'),
-                'warehouse_dest_id': warehouse_id,
-                'uom_id': line.goods_id.uom_id,
+                    'production').id,
+                'warehouse_dest_id': warehouse_id.id,
+                'uom_id': line.goods_id.uom_id.id,
                 'goods_qty': line.goods_qty,
-                'product_uos_qty': line.goods_qty / line.goods_id.conversion,
+                'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                 'uos_id': line.goods_id.uos_id.id,
             } for line in self.bom_id.line_parent_ids]
 
@@ -197,15 +197,15 @@ class wh_assembly(models.Model):
                     get_suggested_cost_by_warehouse(
                         warehouse_id[0], line.goods_qty)
                 line_out_ids.append({
-                        'goods_id': line.goods_id,
-                        'warehouse_id': warehouse_id,
+                        'goods_id': line.goods_id.id,
+                        'warehouse_id': warehouse_id.id,
                         'warehouse_dest_id': self.env[
-                            'warehouse'].get_warehouse_by_type('production'),
-                        'uom_id': line.goods_id.uom_id,
+                            'warehouse'].get_warehouse_by_type('production').id,
+                        'uom_id': line.goods_id.uom_id.id,
                         'goods_qty': line.goods_qty,
                         'cost_unit': cost_unit,
                         'cost': cost,
-                        'product_uos_qty': self.goods_qty / line.goods_id.conversion,
+                        'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                         'uos_id': line.goods_id.uos_id.id,
                     })
             self.line_in_ids = False
@@ -416,7 +416,7 @@ class wh_disassembly(models.Model):
                  'warehouse_dest_id': warehouse_id,
                  'uom_id': parent_line.goods_id.uom_id,
                  'goods_qty': self.goods_qty,
-                 'product_uos_qty': self.goods_qty/parent_line.goods_id.conversion,
+                 'goods_uos_qty': self.goods_qty/parent_line.goods_id.conversion,
                  'uos_id':parent_line.goods_id.uos_id.id,
                  'cost_unit': cost_unit,
                  'cost': cost,
@@ -429,7 +429,7 @@ class wh_disassembly(models.Model):
                                 'warehouse'].get_warehouse_by_type('production'),
                             'uom_id': line.goods_id.uom_id,
                             'goods_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty,
-                            'product_uos_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty/line.goods_id.conversion,
+                            'goods_uos_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty/line.goods_id.conversion,
                             'uos_id':line.goods_id.uos_id.id,
                         } for line in self.bom_id.line_child_ids]
 
@@ -460,7 +460,7 @@ class wh_disassembly(models.Model):
                         'warehouse_dest_id': warehouse_id,
                         'uom_id': line.goods_id.uom_id,
                         'goods_qty': line.goods_qty,
-                        'product_uos_qty': line.goods_qty/line.goods_id.conversion,
+                        'goods_uos_qty': line.goods_qty/line.goods_id.conversion,
                         'uos_id':line.goods_id.uos_id.id,
                         'cost_unit': cost_unit,
                         'cost': cost,
@@ -473,7 +473,7 @@ class wh_disassembly(models.Model):
                     'warehouse'].get_warehouse_by_type('production'),
                 'uom_id': line.goods_id.uom_id,
                 'goods_qty': line.goods_qty,
-                'product_uos_qty': line.goods_qty/line.goods_id.conversion,
+                'goods_uos_qty': line.goods_qty/line.goods_id.conversion,
                 'uos_id':line.goods_id.uos_id.id,
             } for line in self.bom_id.line_child_ids]
 

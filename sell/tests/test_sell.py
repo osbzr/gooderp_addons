@@ -270,6 +270,15 @@ class test_sell_order(TransactionCase):
         with self.assertRaises(UserError):
             self.order.sell_order_done()
 
+    def test_sell_order_done_foreign_currency(self):
+        '''测试审核销货订单，外币免税'''
+        self.order.currency_id = self.env.ref('base.USD')
+        for line in self.order.line_ids:
+            line.price_taxed = 1170
+            line.tax_rate = 17
+        with self.assertRaises(UserError):
+            self.order.sell_order_done()
+
     def test_sell_order_draft(self):
         ''' 测试反审核销货订单  '''
         self.order.sell_order_done()
@@ -440,6 +449,38 @@ class test_sell_delivery(TransactionCase):
             line.goods_qty = 0
         with self.assertRaises(UserError):
             self.return_delivery.sell_delivery_done()
+
+    def test_sell_delivery_done_goods_inventory(self):
+        '''发库单审核时产品不足直接盘盈'''
+        for line in self.delivery.line_out_ids:
+            line.goods_id = self.env.ref('goods.computer')
+        self.delivery.sell_delivery_done()
+
+    def test_check_goods_qty(self):
+        '''查询指定产品，属性，仓库，的当前剩余数量'''
+        self.delivery.check_goods_qty(goods=None, attribute=None, warehouse=self.env.ref('warehouse.hd_stock'))
+
+    def test_goods_inventory(self):
+        '''发库单审核产品不足时调用创建盘盈入库方法'''
+        for line in self.delivery.line_out_ids:
+            vals = {
+                    'type':'inventory',
+                    'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
+                    'warehouse_dest_id':self.delivery.warehouse_id.id,
+                    'line_in_ids':[(0, 0, {
+                                'goods_id':line.goods_id.id,
+                                'attribute_id':line.attribute_id.id,
+                                'goods_uos_qty':line.goods_uos_qty,
+                                'uos_id':line.uos_id.id,
+                                'goods_qty':line.goods_qty,
+                                'uom_id':line.uom_id.id,
+                                'cost_unit':line.goods_id.cost
+                                            }
+                                    )]
+                        }
+            self.delivery.goods_inventory(vals)
+            # no message
+            self.delivery.open_dialog('goods_inventory', vals)
 
     def test_sell_delivery_done_raise_credit_limit(self):
         '''审核发货单/退货单 客户的 本次发货金额+客户应收余额 不能大于客户信用额度'''

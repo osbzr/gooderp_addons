@@ -3,10 +3,10 @@
 #
 #    Odoo, Open Source Management Solution
 #    Copyright (C) 2004-2009 Tiny SPRL (<http://tiny.be>). All Rights Reserved
-#    Copyright (C) 2012-2013 Mrshelly@gmail.com  upgrade to 7.0
+#    $Id$
+#    Copyright (C) 2013-09   Mr.Shelly (<mrshelly at hotmail.com>)
 #    Copyright (C) 2014      JianJian@osbzr.com  upgrade to 8.0
 #    Copyright (C) 2016      jeff@osbzr.com  upgrade to 10.0
-#    
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,24 @@
 #
 ##############################################################################
 
-import backup_scheduler
+{
+    "name" : "Database Auto-Backup",
+    "version" : "1.0",
+    "author" : "Tiny,MrShelly,JianJian",
+    "website" : "http://www.odoo.com",
+    "category" : "Generic Modules",
+    "description": """The generic Open ERP Database Auto-Backup system enables the user to make configurations for the automatic backup of the database.
+User simply requires to specify host & port under IP Configuration & database(on specified host running at specified port) and backup directory(in which all the backups of the specified database will be stored) under Database Configuration.
+
+Automatic backup for all such configured databases under this can then be scheduled as follows:
+
+1) Go to Settings / Technical / Automation / Scheduled Actions
+2) Schedule new action(create a new record)
+3) Set 'Object' to 'db.backup' and 'Method' to 'schedule_backup_pgtool' under page 'Technical Data'
+4) Set other values as per your preference""",
+    "depends" : [],
+    "data" : ["bkp_conf_view.xml","backup_data.xml"],
+    "installable": True
+}
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
