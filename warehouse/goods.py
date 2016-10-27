@@ -89,7 +89,7 @@ class goods(models.Model):
         if not suggested and lot_id.state != 'done':
             raise UserError(u'批号%s还没有实际入库，请先审核该入库' % lot_id.move_id.name)
 
-        if qty > lot_id.qty_remaining:
+        if qty > lot_id.qty_remaining and not self.env.context.get('wh_in_line_ids'):
             raise UserError(u'产品%s的库存数量不够本次出库行为' % (self.name,))
 
         return [{'line_in_id': lot_id.id, 'qty': qty, 'uos_qty': uos_qty}], \
@@ -135,7 +135,10 @@ class goods(models.Model):
                 qty_to_go -= matching_qty
                 uos_qty_to_go -= matching_uos_qty
             else:
-                if not ignore_stock and qty_to_go > 0:
+                if not ignore_stock and qty_to_go > 0 and not self.env.context.get('wh_in_line_ids'):
                     raise UserError(u'产品%s的库存数量不够本次出库行为' % (goods.name,))
+                if self.env.context.get('wh_in_line_ids'):
+                    matching_records.append({'line_in_id': self.env.context.get('wh_in_line_ids')[0],
+                                         'qty': qty_to_go, 'uos_qty': uos_qty_to_go})
 
             return matching_records, cost
