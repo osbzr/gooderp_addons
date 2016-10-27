@@ -383,8 +383,15 @@ class wh_disassembly(models.Model):
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         if self.goods_id:
+            warehouse_id = self.env['warehouse'].search(
+                [('type', '=', 'stock')], limit=1)
             self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
-                              'uos_id':self.goods_id.uos_id.id,'uom_id': self.goods_id.uom_id.id}]
+                                  'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production'),
+                                  'warehouse_dest_id': warehouse_id,
+                                  'uom_id': self.goods_id.uom_id,
+                                  'uos_id': self.goods_id.uos_id.id,
+                                  'cost_unit': self.goods_id.cost_unit,
+                                  }]
 
 
     @api.onchange('goods_qty')
