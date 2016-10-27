@@ -252,7 +252,7 @@ class TestProduction(TransactionCase):
         # 组装单 onchange_goods_id
         self.env.ref('warehouse.wh_assembly_ass0').goods_id =  self.env.ref('goods.keyboard_mouse').id
         self.goods_id =  self.env.ref('goods.keyboard_mouse').id
-        self.env.ref('warehouse.wh_assembly_ass0').onchange_goods_id()
+        self.assembly.onchange_goods_id()
 
         # 拆卸单 onchange_goods_id
         self.env.ref('warehouse.wh_disassembly_dis1').goods_id =  self.env.ref('goods.keyboard_mouse').id
@@ -291,7 +291,7 @@ class TestProduction(TransactionCase):
         # has bom_id
         self.env.ref('warehouse.wh_assembly_ass0').bom_id = self.env.ref('warehouse.wh_bom_0').id
         self.bom_id = self.env.ref('warehouse.wh_bom_0').id
-        self.env.ref('warehouse.wh_assembly_ass0').onchange_bom()
+        self.assembly.onchange_bom()
         # bom_id 的组合件 大于 1行时，len(line_in_ids)>1
         self.disassembly_bom.line_parent_ids.create({
             'bom_id': self.disassembly_bom.id,
