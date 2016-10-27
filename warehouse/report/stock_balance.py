@@ -45,8 +45,7 @@ class report_stock_balance(models.Model):
                     LEFT JOIN uom uom ON goods.uom_id = uom.id
                     LEFT JOIN uom uos ON goods.uos_id = uos.id
 
-                WHERE line.qty_remaining > 0
-                  AND wh.type = 'stock'
+                WHERE  wh.type = 'stock'
                   AND line.state = 'done'
                   AND ( goods.no_stock is null or goods.no_stock = FALSE)
 
