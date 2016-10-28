@@ -104,6 +104,12 @@
 			<field name="name">ASS/16040001</field>
 			<field name="date">2016-04-02</field>
 		</record>
+		<record id="wh_assembly_ass2" model="wh.assembly">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+		    <field name="warehouse_id" ref="warehouse.hd_stock"/>
+			<field name="name">ASS/16040001</field>
+			<field name="date">2016-04-02</field>
+		</record>
 		<record id="wh_move_line_0" model="wh.move.line">
 			<field eval="1.0" name="goods_uos_qty"/>
 			<field model="wh.move.line" name="lot_id" search="[('lot', '=', 'ms160301')]"/>
@@ -226,6 +232,13 @@
 	</data>
 	<data noupdate="1">
 		<record id="wh_disassembly_dis1" model="wh.disassembly">
+		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
+			<field name="name">DIS/16040001</field>
+			<field name="bom_id" ref="wh_bom_0"/>
+			<field name="date">2016-04-02</field>
+		</record>
+		<record id="wh_disassembly_dis3" model="wh.disassembly">
 		    <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field name="name">DIS/16040001</field>
