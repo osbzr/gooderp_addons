@@ -82,8 +82,6 @@ class wh_assembly(models.Model):
         if self.goods_id:
             self.line_in_ids=[{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                              'uom_id': self.goods_id.uom_id.id,'uos_id':self.goods_id.uos_id.id}]
-            if self.line_out_ids:
-                self.line_out_ids[0].onchange_goods_id()
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -102,11 +100,11 @@ class wh_assembly(models.Model):
         warehouse_id = self.env['warehouse'].search(
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
-            line_in_ids = [{'goods_id': line.goods_id,
+            line_in_ids = [{'goods_id': line.goods_id.id,
                                'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
-                                   'production'),
-                               'warehouse_dest_id': warehouse_id,
-                               'uom_id': line.goods_id.uom_id,
+                                   'production').id,
+                               'warehouse_dest_id': warehouse_id.id,
+                               'uom_id': line.goods_id.uom_id.id,
                                'goods_qty': self.goods_qty,
                                'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                                'uos_id': line.goods_id.uos_id.id,
@@ -118,11 +116,11 @@ class wh_assembly(models.Model):
                     warehouse_id[0], line.goods_qty / parent_line_goods_qty * self.goods_qty)
                 local_goods_qty = line.goods_qty / parent_line_goods_qty * self.goods_qty
                 line_out_ids.append({
-                    'goods_id': line.goods_id,
-                    'warehouse_id': warehouse_id,
+                    'goods_id': line.goods_id.id,
+                    'warehouse_id': warehouse_id.id,
                     'warehouse_dest_id': self.env[
                         'warehouse'].get_warehouse_by_type('production'),
-                    'uom_id': line.goods_id.uom_id,
+                    'uom_id': line.goods_id.uom_id.id,
                     'goods_qty':  local_goods_qty,
                     'cost_unit': cost_unit,
                     'cost': cost,
@@ -386,11 +384,10 @@ class wh_disassembly(models.Model):
             warehouse_id = self.env['warehouse'].search(
                 [('type', '=', 'stock')], limit=1)
             self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
-                                  'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production'),
-                                  'warehouse_dest_id': warehouse_id,
-                                  'uom_id': self.goods_id.uom_id,
+                                  'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
+                                  'warehouse_dest_id': warehouse_id.id,
+                                  'uom_id': self.goods_id.uom_id.id,
                                   'uos_id': self.goods_id.uos_id.id,
-                                  'cost_unit': self.goods_id.cost_unit,
                                   }]
 
 
@@ -417,11 +414,11 @@ class wh_disassembly(models.Model):
                  warehouse_id, self.goods_qty)
 
             line_out_ids.append({
-                 'goods_id': parent_line.goods_id,
+                 'goods_id': parent_line.goods_id.id,
                  'warehouse_id': self.env[
-                     'warehouse'].get_warehouse_by_type('production'),
-                 'warehouse_dest_id': warehouse_id,
-                 'uom_id': parent_line.goods_id.uom_id,
+                     'warehouse'].get_warehouse_by_type('production').id,
+                 'warehouse_dest_id': warehouse_id.id,
+                 'uom_id': parent_line.goods_id.uom_id.id,
                  'goods_qty': self.goods_qty,
                  'goods_uos_qty': self.goods_qty/parent_line.goods_id.conversion,
                  'uos_id':parent_line.goods_id.uos_id.id,
@@ -430,18 +427,18 @@ class wh_disassembly(models.Model):
              })
 
             line_in_ids = [{
-                            'goods_id': line.goods_id,
-                            'warehouse_id': warehouse_id,
+                            'goods_id': line.goods_id.id,
+                            'warehouse_id': warehouse_id.id,
                             'warehouse_dest_id': self.env[
-                                'warehouse'].get_warehouse_by_type('production'),
-                            'uom_id': line.goods_id.uom_id,
+                                'warehouse'].get_warehouse_by_type('production').id,
+                            'uom_id': line.goods_id.uom_id.id,
                             'goods_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty,
                             'goods_uos_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty/line.goods_id.conversion,
                             'uos_id':line.goods_id.uos_id.id,
                         } for line in self.bom_id.line_child_ids]
 
             if line_out_ids:
-                self.line_out_ids = line_out_ids[0]
+                self.line_out_ids = line_out_ids
             if line_in_ids:
                 self.line_in_ids = line_in_ids
 
@@ -463,9 +460,9 @@ class wh_disassembly(models.Model):
                 line_out_ids.append({
                         'goods_id': line.goods_id,
                         'warehouse_id': self.env[
-                            'warehouse'].get_warehouse_by_type('production'),
-                        'warehouse_dest_id': warehouse_id,
-                        'uom_id': line.goods_id.uom_id,
+                            'warehouse'].get_warehouse_by_type('production').id,
+                        'warehouse_dest_id': warehouse_id.id,
+                        'uom_id': line.goods_id.uom_id.id,
                         'goods_qty': line.goods_qty,
                         'goods_uos_qty': line.goods_qty/line.goods_id.conversion,
                         'uos_id':line.goods_id.uos_id.id,
@@ -474,11 +471,11 @@ class wh_disassembly(models.Model):
                     })
 
             line_in_ids = [{
-                'goods_id': line.goods_id,
+                'goods_id': line.goods_id.id,
                 'warehouse_id': warehouse_id,
                 'warehouse_dest_id': self.env[
-                    'warehouse'].get_warehouse_by_type('production'),
-                'uom_id': line.goods_id.uom_id,
+                    'warehouse'].get_warehouse_by_type('production').id,
+                'uom_id': line.goods_id.uom_id.id,
                 'goods_qty': line.goods_qty,
                 'goods_uos_qty': line.goods_qty/line.goods_id.conversion,
                 'uos_id':line.goods_id.uos_id.id,
@@ -489,7 +486,7 @@ class wh_disassembly(models.Model):
         else:
             self.goods_qty=1
         if line_out_ids:
-            self.line_out_ids = line_out_ids[0]
+            self.line_out_ids = line_out_ids
         if line_in_ids:
             self.line_in_ids = line_in_ids
 
