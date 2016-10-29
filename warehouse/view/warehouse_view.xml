@@ -52,6 +52,7 @@
             <field name='priority'>1</field>
             <field name='arch' type='xml'>
                 <tree string='库存调拨' create='0' edit='0' delete="0">
+                    <field name='date' />
                     <field name='move_id' string='单据编号' />
                     <field name='goods_id' />
                     <field name='attribute_id' groups='goods.multi_attrs_groups' />

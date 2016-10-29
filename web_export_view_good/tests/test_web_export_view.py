@@ -4,7 +4,7 @@ from odoo.addons.web_export_view_good.controllers.controllers import ExcelExport
 import os
 from urllib import urlencode
 from odoo.tests.common import HttpCase
-import json
+import odoo.tests
 
 class TestWebExportViewTwo(TransactionCase):
 
@@ -58,3 +58,4 @@ class WebExportViewTestCase(HttpCase):
         # request.httprequest.user_agent.browser = 'OOO'
         # request.httprequest.user_agent.version ='8'
         # content_disposition('filename')
+

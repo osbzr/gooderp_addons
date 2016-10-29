@@ -80,10 +80,8 @@ class wh_assembly(models.Model):
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         if self.goods_id:
-            self.write({'line_in_ids': {'goods_id': self.goods_id.id, 'goods_uos_qty': 1, 'goods_qty': 1,
-                             'uom_id': self.goods_id.uom_id.id,'uos_id':self.goods_id.uos_id.id}})
-            if self.line_out_ids:
-                self.line_out_ids[0].onchange_goods_id()
+            self.line_in_ids=[{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+                             'uom_id': self.goods_id.uom_id.id,'uos_id':self.goods_id.uos_id.id}]
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -102,11 +100,11 @@ class wh_assembly(models.Model):
         warehouse_id = self.env['warehouse'].search(
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
-            line_in_ids = [{'goods_id': line.goods_id,
+            line_in_ids = [{'goods_id': line.goods_id.id,
                                'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
-                                   'production'),
-                               'warehouse_dest_id': warehouse_id,
-                               'uom_id': line.goods_id.uom_id,
+                                   'production').id,
+                               'warehouse_dest_id': warehouse_id.id,
+                               'uom_id': line.goods_id.uom_id.id,
                                'goods_qty': self.goods_qty,
                                'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                                'uos_id': line.goods_id.uos_id.id,
@@ -118,11 +116,11 @@ class wh_assembly(models.Model):
                     warehouse_id[0], line.goods_qty / parent_line_goods_qty * self.goods_qty)
                 local_goods_qty = line.goods_qty / parent_line_goods_qty * self.goods_qty
                 line_out_ids.append({
-                    'goods_id': line.goods_id,
-                    'warehouse_id': warehouse_id,
+                    'goods_id': line.goods_id.id,
+                    'warehouse_id': warehouse_id.id,
                     'warehouse_dest_id': self.env[
                         'warehouse'].get_warehouse_by_type('production'),
-                    'uom_id': line.goods_id.uom_id,
+                    'uom_id': line.goods_id.uom_id.id,
                     'goods_qty':  local_goods_qty,
                     'cost_unit': cost_unit,
                     'cost': cost,
@@ -218,7 +216,8 @@ class wh_assembly(models.Model):
         # 调用self.line_in_ids = line_in_ids的时候，此时会为其额外添加一个参数(6, 0, [])
         # 在write函数的源代码中，会直接使用原表/odoo-china/odoo/osv/fields.py(839)来删除所有数据
         # 此时，上一步赋值的数据将会被直接删除，（不确定是bug，还是特性）
-        self.write({'line_in_ids': rec for rec in line_in_ids})
+        if line_in_ids:
+            self.line_in_ids = line_in_ids
 
         if len(line_in_ids) == 1:
             """当模板中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
@@ -382,9 +381,15 @@ class wh_disassembly(models.Model):
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         if self.goods_id:
-            self.write({'line_out_ids': {'goods_id': self.goods_id.id, 'goods_uos_qty': 1, 'goods_qty': 1,
-                              'uos_id':self.goods_id.uos_id.id,'uom_id': self.goods_id.uom_id.id}})
-            self.line_out_ids[0].onchange_goods_id()
+            warehouse_id = self.env['warehouse'].search(
+                [('type', '=', 'stock')], limit=1)
+            self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
+                                  'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
+                                  'warehouse_dest_id': warehouse_id.id,
+                                  'uom_id': self.goods_id.uom_id.id,
+                                  'uos_id': self.goods_id.uos_id.id,
+                                  }]
+
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -409,11 +414,11 @@ class wh_disassembly(models.Model):
                  warehouse_id, self.goods_qty)
 
             line_out_ids.append({
-                 'goods_id': parent_line.goods_id,
+                 'goods_id': parent_line.goods_id.id,
                  'warehouse_id': self.env[
-                     'warehouse'].get_warehouse_by_type('production'),
-                 'warehouse_dest_id': warehouse_id,
-                 'uom_id': parent_line.goods_id.uom_id,
+                     'warehouse'].get_warehouse_by_type('production').id,
+                 'warehouse_dest_id': warehouse_id.id,
+                 'uom_id': parent_line.goods_id.uom_id.id,
                  'goods_qty': self.goods_qty,
                  'goods_uos_qty': self.goods_qty/parent_line.goods_id.conversion,
                  'uos_id':parent_line.goods_id.uos_id.id,
@@ -422,20 +427,20 @@ class wh_disassembly(models.Model):
              })
 
             line_in_ids = [{
-                            'goods_id': line.goods_id,
-                            'warehouse_id': warehouse_id,
+                            'goods_id': line.goods_id.id,
+                            'warehouse_id': warehouse_id.id,
                             'warehouse_dest_id': self.env[
-                                'warehouse'].get_warehouse_by_type('production'),
-                            'uom_id': line.goods_id.uom_id,
+                                'warehouse'].get_warehouse_by_type('production').id,
+                            'uom_id': line.goods_id.uom_id.id,
                             'goods_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty,
                             'goods_uos_qty': line.goods_qty/parent_line.goods_qty*self.goods_qty/line.goods_id.conversion,
                             'uos_id':line.goods_id.uos_id.id,
                         } for line in self.bom_id.line_child_ids]
 
             if line_out_ids:
-                self.write({'line_out_ids': line_out_ids[0]})
+                self.line_out_ids = line_out_ids
             if line_in_ids:
-                self.write({'line_in_ids': rec for rec in line_in_ids})
+                self.line_in_ids = line_in_ids
 
         elif self.line_out_ids:
             self.line_out_ids[0].goods_qty = self.goods_qty
@@ -455,9 +460,9 @@ class wh_disassembly(models.Model):
                 line_out_ids.append({
                         'goods_id': line.goods_id,
                         'warehouse_id': self.env[
-                            'warehouse'].get_warehouse_by_type('production'),
-                        'warehouse_dest_id': warehouse_id,
-                        'uom_id': line.goods_id.uom_id,
+                            'warehouse'].get_warehouse_by_type('production').id,
+                        'warehouse_dest_id': warehouse_id.id,
+                        'uom_id': line.goods_id.uom_id.id,
                         'goods_qty': line.goods_qty,
                         'goods_uos_qty': line.goods_qty/line.goods_id.conversion,
                         'uos_id':line.goods_id.uos_id.id,
@@ -466,11 +471,11 @@ class wh_disassembly(models.Model):
                     })
 
             line_in_ids = [{
-                'goods_id': line.goods_id,
+                'goods_id': line.goods_id.id,
                 'warehouse_id': warehouse_id,
                 'warehouse_dest_id': self.env[
-                    'warehouse'].get_warehouse_by_type('production'),
-                'uom_id': line.goods_id.uom_id,
+                    'warehouse'].get_warehouse_by_type('production').id,
+                'uom_id': line.goods_id.uom_id.id,
                 'goods_qty': line.goods_qty,
                 'goods_uos_qty': line.goods_qty/line.goods_id.conversion,
                 'uos_id':line.goods_id.uos_id.id,
@@ -481,9 +486,9 @@ class wh_disassembly(models.Model):
         else:
             self.goods_qty=1
         if line_out_ids:
-            self.write({'line_out_ids': line_out_ids[0]})
+            self.line_out_ids = line_out_ids
         if line_in_ids:
-            self.write({'line_in_ids': rec for rec in line_in_ids})
+            self.line_in_ids = line_in_ids
 
         if len(line_out_ids) == 1 and line_out_ids:
             """当模板中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False

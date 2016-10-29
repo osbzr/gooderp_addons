@@ -260,3 +260,72 @@ class wh_move(models.Model):
                 'approve_date': False,
                 'state': 'draft',
             })
+
+
+    @api.multi
+    def check_goods_qty(self, goods, attribute, warehouse):
+        '''SQL来取指定产品，属性，仓库，的当前剩余数量'''
+        if attribute:
+            self.env.cr.execute('''
+                SELECT sum(line.qty_remaining) as qty
+                FROM wh_move_line line
+
+                WHERE line.warehouse_dest_id = %s
+                  AND line.state = 'done'
+                  AND line.attribute_id = %s
+            ''' % (warehouse.id, attribute.id,))
+
+            return self.env.cr.fetchone()
+        elif goods:
+            self.env.cr.execute('''
+                SELECT sum(line.qty_remaining) as qty
+                FROM wh_move_line line
+
+                WHERE line.warehouse_dest_id = %s
+                  AND line.state = 'done'
+                  AND line.goods_id = %s
+            ''' % (warehouse.id, goods.id,))
+
+            return self.env.cr.fetchone()
+        else:
+            return False
+
+    @api.multi
+    def create_zero_wh_in(self,wh_in,model_name):
+        for line in wh_in.line_out_ids:
+            vals={}
+            result = False
+            if line.goods_id.no_stock:
+                continue
+            else:
+                result = self.env['wh.move'].check_goods_qty(line.goods_id, line.attribute_id, wh_in.warehouse_id)
+                result = result[0] or 0
+            if line.goods_qty - result > 0 and not line.lot_id and not self.env.context.get('wh_in_line_ids'):
+                #在销售出库时如果临时缺货，自动生成一张盘盈入库单
+                today = fields.Datetime.now()
+                vals.update({
+                        'type':'inventory',
+                        'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
+                        'warehouse_dest_id':wh_in.warehouse_id.id,
+                        'state':'done',
+                        'date':today,
+                        'line_in_ids':[(0, 0, {
+                                    'goods_id':line.goods_id.id,
+                                    'attribute_id':line.attribute_id.id,
+                                    'goods_uos_qty':0,
+                                    'uos_id':line.uos_id.id,
+                                    'goods_qty':0,
+                                    'uom_id':line.uom_id.id,
+                                    'cost_unit':line.goods_id.cost,
+                                    'state': 'done',
+                                    'date': today,
+                                                }
+                                        )]
+                            })
+                return self.env[model_name].open_dialog('goods_inventory', {
+                    'message': u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name,
+                    'args': [vals],
+                })
+
+            if line.goods_qty <= 0 or line.price_taxed < 0:
+                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
