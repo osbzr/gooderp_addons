@@ -210,6 +210,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                                       help=u'默认是所有科目的最小code')
     subject_name_end_id = fields.Many2one('finance.account', string=u'到', default=_default_subject_name_end_id,
                                           help=u'默认是所有科目的最小code')
+    no_occurred = fields.Boolean(u'无发生额不显示', default=True, help=u'无发生额的科目不显示明细账，默认为不显示')
+    no_balance = fields.Boolean(u'无余额不显示', default=True, help=u'无余额的科目不显示明细账，默认为不显示')
 
     @api.onchange('period_begin_id', 'period_end_id')
     def onchange_period(self):
@@ -405,12 +407,12 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 create_vals = []
                 initial_balance = self.get_initial_balance(local_last_period, account_line)  # 取上期间期初余额
                 if init:
-                    create_vals.append(initial_balance)
+                    create_vals.append(initial_balance)  # 期初
                     init = 0
-                occurrence_amount = self.get_current_occurrence_amount(local_currcy_period, account_line)
+                occurrence_amount = self.get_current_occurrence_amount(local_currcy_period, account_line)  # 本期明细
                 create_vals += occurrence_amount
                 if local_currcy_period.is_closed:
-                    cumulative_year_occurrence = self.get_year_balance(local_currcy_period, account_line)
+                    cumulative_year_occurrence = self.get_year_balance(local_currcy_period, account_line)  # 本期合计 本年累计
                 else:
                     cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(), local_currcy_period, account_line)
                 create_vals += cumulative_year_occurrence
@@ -420,7 +422,14 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 local_currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(local_currcy_period)
                 if not local_currcy_period:  # 无下一期间，退出循环。
                     break_flag = False
-                for vals in create_vals:
+                # 无发生额不显示
+                if self.no_occurred and len(occurrence_amount) == 0:
+                    continue
+                # 无余额不显示
+                if self.no_balance and cumulative_year_occurrence[0].get('credit') == 0 \
+                        and cumulative_year_occurrence[0].get('debit') == 0:
+                    continue
+                for vals in create_vals:  # create_vals 值顺序为：期初余额  本期明细  本期本年累计
                     vouchers_summary_ids.append((self.env['vouchers.summary'].create(vals)).id)
         view_id = self.env.ref('finance.vouchers_summary_tree').id
         return {
@@ -464,6 +473,10 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 local_currcy_period = self.env['create.trial.balance.wizard'].compute_next_period_id(local_currcy_period)
                 if not local_currcy_period:  # 无下一期间，退出循环。
                     break_flag = False
+                # 无余额不显示
+                if self.no_balance and cumulative_year_occurrence[0].get('credit') == 0 \
+                        and cumulative_year_occurrence[0].get('debit') == 0:
+                    continue
                 for vals in create_vals:
                     del vals['date']
                     vouchers_summary_ids.append((self.env['general.ledger.account'].create(vals)).id)
