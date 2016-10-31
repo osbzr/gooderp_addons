@@ -39,13 +39,7 @@
                         <group>
 							<field name='type' invisible='1'/>
 							<field name="partner_id"
-								options="{'no_open': True, 'no_create': True}"
-								attrs="{'invisible': [('type','=','other_pay')]}"
-								domain="[('c_category_id', '!=', False)]"/>
-							<field name="partner_id"
-								options="{'no_open': True, 'no_create': True}"
-								attrs="{'invisible': [('type','=','other_get')]}"
-								domain="[('s_category_id', '!=', False)]"/>
+								options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <group>
                             <field name="date"/>
