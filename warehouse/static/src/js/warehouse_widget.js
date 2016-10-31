@@ -1,4 +1,4 @@
-odoo.define('core.core', function (require) {
+odoo.define('warehouse.warehouse', function (require) {
 "use strict";
 var ListView = require('web.ListView');
 var FormView = require('web.FormView');
