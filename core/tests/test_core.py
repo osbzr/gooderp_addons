@@ -42,4 +42,4 @@ class test_business_data(TransactionCase):
         business_data_table = self.env['business.data.table']
         clean_business_data = self.env['clean.business.data']
         business_data_table.create({'name': 'home.report.type'})
-        clean_business_data.create({'user_id':self.env.id}).remove_data()
+        clean_business_data.create({'create_uid':self.env.uid}).remove_data()
