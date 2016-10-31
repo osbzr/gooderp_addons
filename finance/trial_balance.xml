@@ -85,6 +85,10 @@
                             <field name="period_end_id" options="{'no_open':True,'no_create':True}" required="True"/>
                             <field name="subject_name_end_id" options="{'no_open':True,'no_create':True}" required="True"/>
                          </group>
+                        <group>
+                            <field name="no_occurred" invisible="context.get('create_general_ledger_account')" />
+                            <field name="no_balance"/>
+                        </group>
                     </group>
                     <footer>
                         <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="查看科目明细帐表" type="object" class="oe_highlight"/>
@@ -123,6 +127,25 @@
             </field>
         </record>
 
+		<!--明细帐 search 视图-->
+		<record id="vouchers_summary_search" model="ir.ui.view">
+            <field name="name">vouchers.summary.search</field>
+            <field name="model">vouchers.summary</field>
+            <field name="arch" type="xml">
+                <search string="科目明细帐">
+                    <field name="date"/>
+                    <field name="period_id"/>
+                    <field name="voucher_id"/>
+                    <field name="summary"/>
+                     <field name="direction" string="余额方向" domain="[('balance','=',u'平')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="摘要" domain="[]" context="{'group_by':'summary'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="vouchers_summary_action" model="ir.actions.act_window">
             <field name="name">明细帐</field>
             <field name="res_model">vouchers.summary</field>
@@ -151,6 +174,22 @@
                      <field name="direction"/>
                     <field name="balance"/>
                 </tree>
+            </field>
+        </record>
+
+		<!--总帐 search 视图-->
+		<record id="general_ledger_account_search" model="ir.ui.view">
+            <field name="name">vougeneral.ledger.account.search</field>
+            <field name="model">general.ledger.account</field>
+            <field name="arch" type="xml">
+                <search string="科目总帐">
+                    <field name="period_id"/>
+                    <field name="summary"/>
+                     <field name="direction" string="余额方向" domain="[('balance','=',u'平')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="摘要" domain="[]" context="{'group_by':'summary'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 
