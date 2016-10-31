@@ -25,6 +25,7 @@ install:
   - pip install docxtpl
   - pip install python-ooxml
   - pip install pdfkit
+  - pip install wkhtmltopdf
 
 script:
   - travis_run_tests

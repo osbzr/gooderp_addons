@@ -13,7 +13,7 @@ openerp.gooderp_statistics = function(instance) {
 
             if (action === false) {
                 action = { type: 'ir.actions.act_window_close' };
-            } else if (_.isString(action) && instance.web.client_actions.contains(action)) {
+            } else if (_.isString(action)) {
                 var action_client = { type: "ir.actions.client", tag: action, params: {} };
                 return this.do_action(action_client, options);
             } else if (_.isNumber(action) || _.isString(action)) {

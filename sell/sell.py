@@ -3,7 +3,7 @@
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
-
+import sys
 # 销货订单审核状态可选值
 SELL_ORDER_STATES = [
     ('draft', u'未审核'),
@@ -616,39 +616,11 @@ class sell_delivery(models.Model):
 
         return super(sell_delivery, self).unlink()
 
-    @api.one
-    def check_goods_qty(self, goods, attribute, warehouse):
-        '''SQL来取指定产品，属性，仓库，的当前剩余数量'''
-        if attribute:
-            self.env.cr.execute('''
-                SELECT sum(line.qty_remaining) as qty
-                FROM wh_move_line line
-    
-                WHERE line.warehouse_dest_id = %s
-                  AND line.state = 'done'
-                  AND line.attribute_id = %s
-            ''' % (warehouse.id,attribute.id,))
-    
-            return self.env.cr.fetchone()
-        elif goods:
-            self.env.cr.execute('''
-                SELECT sum(line.qty_remaining) as qty
-                FROM wh_move_line line
-    
-                WHERE line.warehouse_dest_id = %s
-                  AND line.state = 'done'
-                  AND line.goods_id = %s
-            ''' % (warehouse.id,goods.id,))
-            
-            return self.env.cr.fetchone()
-        else:
-            return False
 
     def goods_inventory(self, vals):
         auto_in = self.env['wh.in'].create(vals)
-        auto_in.approve_order()
-
-        self.sell_delivery_done()
+        line_ids = [line.id for line in auto_in.line_in_ids]
+        self.with_context({'wh_in_line_ids':line_ids}).sell_delivery_done()
 
     @api.multi
     def sell_delivery_done(self):
@@ -659,38 +631,10 @@ class sell_delivery(models.Model):
             vals = {}
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
-        for line in self.line_out_ids:
-            vals={}
-            result = False
-            if line.goods_id.no_stock:
-                continue
-            else:
-                result = self.check_goods_qty(line.goods_id, line.attribute_id, self.warehouse_id)
-                result = result[0] and result[0][0] or 0
-            if line.goods_qty - result > 0 and not line.lot_id:
-                #在销售出库时如果临时缺货，自动生成一张盘盈入库单
-                vals.update({
-                        'type':'inventory',
-                        'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
-                        'warehouse_dest_id':self.warehouse_id.id,
-                        'line_in_ids':[(0, 0, {
-                                    'goods_id':line.goods_id.id,
-                                    'attribute_id':line.attribute_id.id,
-                                    'goods_uos_qty':line.goods_uos_qty - result/line.goods_id.conversion,
-                                    'uos_id':line.uos_id.id,
-                                    'goods_qty':line.goods_qty - result,
-                                    'uom_id':line.uom_id.id,
-                                    'cost_unit':line.goods_id.cost
-                                                }
-                                        )]
-                            })
-                return self.open_dialog('goods_inventory', {
-                    'message': u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name,
-                    'args': [vals],
-                })
-
-            if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+        # 库存不足 生成零的
+        result_vals = self.env['wh.move'].create_zero_wh_in(self,self._name)
+        if result_vals:
+            return result_vals
         if self.bank_account_id and not self.receipt:
             raise UserError(u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:

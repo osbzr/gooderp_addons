@@ -4,9 +4,8 @@ from odoo.addons.web_export_view_good.controllers.controllers import ExcelExport
 import os
 from urllib import urlencode
 from odoo.tests.common import HttpCase
-from odoo.http import request
-import requests
-import json
+import odoo.tests
+
 class TestWebExportViewTwo(TransactionCase):
 
     def test_web_export_view(self):
@@ -45,6 +44,9 @@ class WebExportViewTestCase(HttpCase):
         data_json={'data':{},'token':12142432}
         url = '/web/export/export_xls_view'
         self.url_open(url,data=bytes(urlencode(data_json)))
+        ee = ExcelExportView()
+        data={'header':'OKKK'}
+        #ee.export_xls_view(json.dumps(data),2131413)
         # request.httprequest.user_agent.browser = 'msie'
         # request.httprequest.user_agent.version ='8'
         # content_disposition('filename')
@@ -56,3 +58,4 @@ class WebExportViewTestCase(HttpCase):
         # request.httprequest.user_agent.browser = 'OOO'
         # request.httprequest.user_agent.version ='8'
         # content_disposition('filename')
+

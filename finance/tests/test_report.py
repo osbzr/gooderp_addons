@@ -44,6 +44,10 @@ class test_report(TransactionCase):
         report.create_trial_balance()
         period_201411_wizard.create_trial_balance()
 
+        # 执行 _default_period_id
+        report_default_period = self.env['create.trial.balance.wizard'].create({})
+        report_default_period.create_trial_balance()
+
     def test_vouchers_summary(self):
         ''' 测试总账和明细账'''
         report = self.env['create.vouchers.summary.wizard'].create(
@@ -84,6 +88,40 @@ class test_report(TransactionCase):
         report.create_vouchers_summary()
         report.create_general_ledger_account()
 
+        # 执行 _default_end_period_id，_default_begin_period_id，
+        # _default_subject_name_id，_default_subject_name_end_id
+        report_default = self.env['create.vouchers.summary.wizard'].create({})
+        report_default.create_vouchers_summary()
+
+        # 执行 明细账 无下一期间，退出循环
+        report_default = self.env['create.vouchers.summary.wizard'].create({})
+        report_default.period_begin_id = self.env.ref('finance.period_201412')
+        report_default.create_vouchers_summary()
+
+    def test_vouchers_summary_onchange_period(self):
+        ''' 测试总账和明细账 onchange_period '''
+        report_default = self.env['create.vouchers.summary.wizard'].create({})
+        report_default.period_begin_id = self.env.ref('finance.period_201512').id
+        report_default.period_end_id = self.env.ref('finance.period_201411').id
+        report_default.onchange_period()
+        report_default.create_vouchers_summary()
+
+    def test_create_general_ledger_account(self):
+        ''' 测试总账 '''
+        report = self.env['create.vouchers.summary.wizard'].create(
+            {'period_begin_id': self.period_id,
+             'period_end_id': self.period_id,
+             'subject_name_id': self.env.ref('finance.account_fund').id,
+             'subject_name_end_id': self.env.ref('finance.account_fund').id,
+             })
+        # 当前期间已关闭
+        self.period_201512.is_closed = True
+        self.env.ref('finance.period_201601').is_closed = True
+        report.create_general_ledger_account()
+        # 执行 总账 无下一期间，退出循环
+        report.period_begin_id = self.env.ref('finance.period_201412')
+        report.create_general_ledger_account()
+
     def test_get_initial_balance(self):
         '''取得期初余额'''
         wizard = self.env['create.vouchers.summary.wizard'].create(
@@ -95,6 +133,9 @@ class test_report(TransactionCase):
         )
         wizard.get_initial_balance(self.period_201411, wizard.subject_name_id)
 
+        # get_initial_balance period 不存在
+        wizard.get_initial_balance(False, wizard.subject_name_id)
+
     def test_get_current_occurrence_amount(self):
         '''测试 本期的科目的 voucher_line的明细记录'''
         wizard = self.env['create.vouchers.summary.wizard'].create(
@@ -104,7 +145,6 @@ class test_report(TransactionCase):
              'subject_name_end_id': self.env.ref('finance.account_bank').id,
              })
         wizard.get_current_occurrence_amount(self.period_201512, self.env.ref('finance.account_bank'))
-
 
     def test_view_detail_voucher(self):
         '''在明细账上查看凭证明细按钮'''

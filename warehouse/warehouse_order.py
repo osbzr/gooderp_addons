@@ -205,9 +205,17 @@ class wh_internal(osv.osv):
                                 store=True, readonly=True, digits=dp.get_precision('Amount'),
                                 help=u'该调拨单的出库金额总和')
 
+    def goods_inventory(self, vals):
+        auto_in = self.env['wh.in'].create(vals)
+        self.with_context({'wh_in_line_ids': [line.id for line in
+                                              auto_in.line_in_ids]}).approve_order()
+
     @api.multi
     @inherits()
     def approve_order(self):
+        result_vals = self.env['wh.move'].create_zero_wh_in(self, self._name)
+        if result_vals:
+            return result_vals
         return True
 
     @api.multi
