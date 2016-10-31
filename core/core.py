@@ -565,7 +565,7 @@ class clean_business_data(models.Model):
                 obj_name = line.name
                 obj = self.pool.get(obj_name)
                 if obj and obj._table_exist:
-                    sql = "delete from %s" % obj._table
+                    sql = "TRUNCATE TABLE %s CASCADE " % obj._table
                     self.env.cr.execute(sql)
         except Exception, e:
             raise Warning(e)
