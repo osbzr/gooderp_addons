@@ -50,7 +50,7 @@
             	<form>
             		<group>
                         <group>
-                            <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 30%%"/>
+                            <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 60%%"/>
                         </group>
                     </group>
                     <footer>
