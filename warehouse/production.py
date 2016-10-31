@@ -174,7 +174,7 @@ class wh_assembly(models.Model):
     @api.onchange('bom_id')
     def onchange_bom(self):
         line_out_ids, line_in_ids = [], []
-
+        domain = {}
         # TODO
         warehouse_id = self.env['warehouse'].search(
             [('type', '=', 'stock')], limit=1)
@@ -210,14 +210,6 @@ class wh_assembly(models.Model):
             self.line_out_ids = False
         else:
             self.goods_qty=1
-        if line_out_ids:
-            self.line_out_ids = line_out_ids
-        # /odoo-china/odoo/fields.py[1664]行添加的参数
-        # 调用self.line_in_ids = line_in_ids的时候，此时会为其额外添加一个参数(6, 0, [])
-        # 在write函数的源代码中，会直接使用原表/odoo-china/odoo/osv/fields.py(839)来删除所有数据
-        # 此时，上一步赋值的数据将会被直接删除，（不确定是bug，还是特性）
-        if line_in_ids:
-            self.line_in_ids = line_in_ids
 
         if len(line_in_ids) == 1:
             """当模板中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
@@ -226,9 +218,20 @@ class wh_assembly(models.Model):
             self.goods_qty = line_in_ids[0].get("goods_qty")
             self.goods_id = line_in_ids[0].get("goods_id")
             domain = {'goods_id': [('id', '=', self.goods_id.id)]}
-            return {'domain': domain}
+
         elif len(line_in_ids) > 1:
             self.is_many_to_many_combinations = True
+        if line_out_ids:
+            self.line_out_ids = line_out_ids
+        # /odoo-china/odoo/fields.py[1664]行添加的参数
+        # 调用self.line_in_ids = line_in_ids的时候，此时会为其额外添加一个参数(6, 0, [])
+        # 在write函数的源代码中，会直接使用原表/odoo-china/odoo/osv/fields.py(839)来删除所有数据
+        # 此时，上一步赋值的数据将会被直接删除，（不确定是bug，还是特性）
+        if line_in_ids:
+            self.line_in_ids = line_in_ids
+        return {'domain': domain}
+
+
     @api.multi
     def update_bom(self):
         for assembly in self:
@@ -448,6 +451,7 @@ class wh_disassembly(models.Model):
     @api.onchange('bom_id')
     def onchange_bom(self):
         line_out_ids, line_in_ids = [], []
+        domain = {}
         # TODO
         warehouse_id = self.env['warehouse'].search(
             [('type', '=', 'stock')], limit=1)
@@ -485,21 +489,23 @@ class wh_disassembly(models.Model):
             self.line_out_ids = False
         else:
             self.goods_qty=1
+        if len(line_out_ids) == 1 and line_out_ids:
+            """当模板中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
+             使试图只能在 many2one中选择一个产品(并且只能选择在模板中的产品),并且回写数量"""
+            self.is_many_to_many_combinations = ''
+            self.goods_qty = line_out_ids[0].get("goods_qty")
+            self.goods_id = line_out_ids[0].get("goods_id")
+            domain = {'goods_id': [('id', '=', self.goods_id.id)]}
+
+        elif len(line_out_ids) > 1:
+            self.is_many_to_many_combinations = True
         if line_out_ids:
             self.line_out_ids = line_out_ids
         if line_in_ids:
             self.line_in_ids = line_in_ids
+        return {'domain': domain}
 
-        if len(line_out_ids) == 1 and line_out_ids:
-            """当模板中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
-             使试图只能在 many2one中选择一个产品(并且只能选择在模板中的产品),并且回写数量"""
-            self.is_many_to_many_combinations = False
-            self.goods_qty = line_out_ids[0].get("goods_qty")
-            self.goods_id = line_out_ids[0].get("goods_id")
-            domain = {'goods_id': [('id', '=', self.goods_id.id)]}
-            return {'domain': domain}
-        elif len(line_out_ids) > 1:
-            self.is_many_to_many_combinations = True
+
 
     @api.multi
     def update_bom(self):
