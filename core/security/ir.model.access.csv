@@ -11,3 +11,5 @@ access_bank_account,access_bank_account,model_bank_account,,1,1,1,1
 access_settle_mode,access_settle_mode,model_settle_mode,,1,1,1,1
 access_pricing,access_pricing,model_pricing,,1,1,1,1
 access_service,access_service,model_service,,1,1,1,1
+access_business_data_table,access_business_data_table,model_business_data_table,,1,1,1,1
+access_clean_business_data,access_clean_business_data,model_clean_business_data,,1,1,1,1
