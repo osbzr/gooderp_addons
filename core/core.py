@@ -545,7 +545,7 @@ class business_data_table(models.Model):
 
     @api.onchange('model')
     def onchange_model(self):
-        self.name = self.model.model
+        self.name = self.model and self.model.model
 
 
 class clean_business_data(models.Model):

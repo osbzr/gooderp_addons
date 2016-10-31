@@ -32,3 +32,14 @@ class test_res_users(TransactionCase):
         user_admin.groups_id = [(3, self.env.ref('base.group_erp_manager').id)]
 
 
+class test_business_data(TransactionCase):
+    def test_business_data_table(self):
+        business_data_table = self.env['business.data.table']
+        business_data_table_row = business_data_table.create({'name': 'home.report.type'})
+        business_data_table_row.onchange_model()
+
+    def test_clean_business_data(self):
+        business_data_table = self.env['business.data.table']
+        clean_business_data = self.env['clean.business.data']
+        business_data_table.create({'name': 'home.report.type'})
+        clean_business_data.create({'user_id':self.env.uid}).remove_data()
