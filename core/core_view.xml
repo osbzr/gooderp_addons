@@ -484,6 +484,51 @@
 			<field name="view_mode">tree</field>
 			<field name="search_view_id" ref="pricing_search"/>
 		</record>
+
+		<record id="business_data_table_tree" model="ir.ui.view">
+			<field name="name">business.data.table.tree</field>
+			<field name="model">business.data.table</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="业务数据表">
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+		<record id="action_business_data_table" model="ir.actions.act_window">
+			<field name="name">业务数据表</field>
+			<field name="res_model">business.data.table</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='menu_business_data_table' name='业务数据表' action='action_business_data_table' parent='base.menu_custom' sequence='60'/>
+
+		<record id="clean_business_data_form" model="ir.ui.view">
+			<field name="name">清理业务数据表</field>
+			<field name="model">clean.business.data</field>
+			<field name="arch" type="xml">
+				<form string="Service">
+					<group>
+						<field name="need_clean_table" widget="many2many_tags" options="{'color':'random','no_create':True}"/>
+					</group>
+					<footer>
+						<button name="remove_data"  string="清除业务数据" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="action_clean_business_data" model="ir.actions.act_window">
+			<field name="name">清理业务数据表</field>
+			<field name="res_model">clean.business.data</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+		<menuitem id='menu_clean_business_data' name='清理业务数据表' action='action_clean_business_data' parent='base.menu_custom' sequence='70'/>
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
 
 		<record model="ir.ui.menu" id="base.menu_administration">

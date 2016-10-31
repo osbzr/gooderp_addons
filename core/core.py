@@ -537,3 +537,36 @@ class res_users(models.Model):
             if not self.env.user.has_group('base.group_erp_manager'):
                 raise UserError(u'不能删除管理员的管理权限')
         return res
+class business_data_table(models.Model):
+    _name = 'business.data.table'
+    model = fields.Many2one('ir.model',u'需要清理的表')
+    name = fields.Char(u'业务数据表名',required=True)
+    clean_business_id = fields.Many2one('clean.business.data',string=u'清理数据对象')
+
+    @api.onchange('model')
+    def onchange_model(self):
+        self.name = self.model.model
+
+
+class clean_business_data(models.Model):
+    _name = 'clean.business.data'
+
+    @api.model
+    def _get_business_table_name(self):
+        return self.env['business.data.table'].search([])
+
+    need_clean_table = fields.One2many('business.data.table', 'clean_business_id', default=_get_business_table_name,
+                                       string='业务数据表列表')
+
+    @api.multi
+    def remove_data(self):
+        try:
+            for line in self.need_clean_table:
+                obj_name = line.name
+                obj = self.pool.get(obj_name)
+                if obj and obj._table_exist:
+                    sql = "delete from %s" % obj._table
+                    self.env.cr.execute(sql)
+        except Exception, e:
+            raise Warning(e)
+        return True
