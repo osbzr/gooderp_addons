@@ -15,9 +15,9 @@ class test_month_product_cost(TransactionCase):
             checkout_wizard_row.button_checkout()
         # sell_delivery_rows = self.env['sell.delivery'].search([('type','=','others')])
         wh_in_rows = self.env['wh.in'].search([])
-        wh_in_rows.write({'date':'2016-10-18 18:00:00'})
+        wh_in_rows.write({'date':'2016-01-18 18:00:00'})
         wh_out_rows = self.env['wh.out'].search([('name', '=', self.env.ref('warehouse.wh_out_whout1').name)])
-        wh_out_rows.write({'date':'2016-10-18 18:00:00'})
+        wh_out_rows.write({'date':'2016-01-18 18:00:00'})
         # wh_internal_rows = self.env['wh.internal'].search([])
         # [sell_delivery_row.sell_delivery_done() for sell_delivery_row in sell_delivery_rows]
         [wh_in_row.approve_order() for wh_in_row in wh_in_rows]
