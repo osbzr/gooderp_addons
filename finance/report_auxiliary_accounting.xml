@@ -30,15 +30,17 @@
                 </pivot>
             </field>
         </record>
-        <!--<record id='report_auxiliary_accounting_search' model='ir.ui.view'>-->
-            <!--<field name='name'>report.auxiliary.accounting.search</field>-->
-            <!--<field name='model'>report.auxiliary.accounting</field>-->
-            <!--<field name='arch' type='xml'>-->
-                <!--<search string='辅助核算余额表' >-->
-                <!--</search>-->
-            <!--</field>-->
-        <!--</record>-->
-     <!-- 库存余额表 -->
+        <record id='report_auxiliary_accounting_search' model='ir.ui.view'>
+            <field name='name'>report.auxiliary.accounting.search</field>
+            <field name='model'>report.auxiliary.accounting</field>
+            <field name='arch' type='xml'>
+                <search string='辅助核算余额表' >
+                    <field name='account_id'/>
+                    <field name='auxiliary_id'/>
+                </search>
+            </field>
+        </record>
+
         <record id='report_auxiliary_accounting_action' model='ir.actions.act_window' >
             <field name='name'>辅助核算余额表</field>
             <field name='res_model'>report.auxiliary.accounting</field>
