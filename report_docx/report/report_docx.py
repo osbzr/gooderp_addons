@@ -23,6 +23,7 @@ import pytz
 from odoo import models
 from odoo import fields
 from odoo import api
+import tempfile, os
 
 class DataModelProxy(object):
     '''使用一个代理类，来转发 model 的属性，用来消除掉属性值为 False 的情况
@@ -118,13 +119,14 @@ class ReportDocx(report_sxw):
 
         return super(ReportDocx, self).create(cr, uid, ids, data, context)
 
-    def generate_temp_file(self, suffix='docx'):
-        return os.path.join(os.getcwd(), 'temp_%s_%s.%s' %
+    def generate_temp_file(self,tempname, suffix='docx'):
+        return os.path.join(tempname, 'temp_%s_%s.%s' %
                             (os.getpid(), random.randint(1, 10000), suffix))
 
     def create_source_docx(self, cr, uid, ids, report, context=None):
         data = DataModelProxy(self.get_docx_data(cr, uid, ids, report, context))
-        temp_out_file = self.generate_temp_file()
+        tempname = tempfile.mkdtemp()
+        temp_out_file = self.generate_temp_file(tempname)
 
         doc = DocxTemplate(misc.file_open(report.template_file).name)
         doc.render({'obj': data})
@@ -138,13 +140,13 @@ class ReportDocx(report_sxw):
         report_stream = ''
         with open(temp_file, 'rb') as input_stream:
             report_stream = input_stream.read()
-
         os.remove(temp_file)
         return report_stream, report.output_type
 
     def render_to_pdf(self, temp_file):
-        temp_out_file_html = self.generate_temp_file('html')
-        temp_out_file_pdf = self.generate_temp_file('pdf')
+        tempname = tempfile.mkdtemp()
+        temp_out_file_html = self.generate_temp_file(tempname,suffix='html')
+        temp_out_file_pdf = self.generate_temp_file(tempname, suffix='pdf')
 
         ofile = ooxml.read_from_file(temp_file)
         html = """<html style="height: 100%">
