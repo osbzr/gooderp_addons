@@ -710,14 +710,14 @@ class buy_receipt(models.Model):
 
         return
 
-    def _get_invoice_vals(self, category_id, amount, tax_amount):
+    def _get_invoice_vals(self, category_id, date,amount, tax_amount):
         '''返回创建 money_invoice 时所需数据'''
         return {
             'move_id': self.buy_move_id.id, 
             'name': self.name,
             'partner_id': self.partner_id.id, 
             'category_id': category_id.id, 
-            'date': fields.Date.context_today(self), 
+            'date': date,
             'amount': amount, 
             'reconciled': 0, 
             'to_reconcile': amount,
@@ -738,7 +738,7 @@ class buy_receipt(models.Model):
             tax_amount = - sum(line.tax_amount for line in self.line_out_ids)
         categ = self.env.ref('money.core_category_purchase')
         source_id = self.env['money.invoice'].create(
-            self._get_invoice_vals(categ, amount, tax_amount)
+            self._get_invoice_vals(categ,self.date, amount, tax_amount)
         )
         self.invoice_id = source_id.id
         return source_id
@@ -749,7 +749,7 @@ class buy_receipt(models.Model):
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
                 cost_id = self.env['money.invoice'].create(
-                    self._get_invoice_vals(line.category_id, line.amount, 0)
+                    self._get_invoice_vals(line.category_id,self.date, line.amount, 0)
                 )
 
         return

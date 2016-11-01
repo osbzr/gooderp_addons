@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='report_auxiliary_accounting_tree' model='ir.ui.view'>
+            <field name='name'>report.auxiliary.accounting.tree</field>
+            <field name='model'>report.auxiliary.accounting</field>
+            <field name='arch' type='xml'>
+                <tree string='辅助核算余额表'>
+                    <field name='account_id'/>
+                    <field name='auxiliary_id'/>
+                    <field name='debit'  sum="合计"/>
+                    <field name='credit' sum="合计"/>
+                    <field name='balance' sum="合计"/>
+                    <button name="view_voucher_line_detail" string=""
+                            icon="fa-search" type="object" class="oe_highlight"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id='report_auxiliary_accounting_graph' model='ir.ui.view'>
+            <field name='name'>report.auxiliary.accounting.graph</field>
+            <field name='model'>report.auxiliary.accounting</field>
+            <field name='arch' type='xml'>
+                <pivot>
+                    <field name='account_id' type='row'/>
+                    <field name='auxiliary_id' type='col'/>
+                    <field name='debit' type='measure'/>
+                    <field name='credit' type='measure'/>
+                    <field name='balance' type='measure'/>
+                </pivot>
+            </field>
+        </record>
+        <record id='report_auxiliary_accounting_search' model='ir.ui.view'>
+            <field name='name'>report.auxiliary.accounting.search</field>
+            <field name='model'>report.auxiliary.accounting</field>
+            <field name='arch' type='xml'>
+                <search string='辅助核算余额表' >
+                    <field name='account_id'/>
+                    <field name='auxiliary_id'/>
+                </search>
+            </field>
+        </record>
+
+        <record id='report_auxiliary_accounting_action' model='ir.actions.act_window' >
+            <field name='name'>辅助核算余额表</field>
+            <field name='res_model'>report.auxiliary.accounting</field>
+            <field name='view_mode'>pivot,tree</field>
+            <field name='view_id' ref='report_auxiliary_accounting_graph' />
+        </record>
+         <menuitem id='report_auxiliary_accounting_menu' name='辅助核算余额表' action="report_auxiliary_accounting_action" parent='voucher_books_menu' sequence='100'/>
+    </data>
+</openerp>
