@@ -9,7 +9,7 @@ import docx
 import jinja2
 
 """
-使用一个独立的类来封装需要支持图片等功能，避免污染report_docx.py
+使用一个独立的文件来封装需要支持图片等功能，避免污染report_docx.py
 """
 
 
@@ -62,17 +62,31 @@ def calc_alignment(s):
 
 
 @jinja2.contextfilter
-def picture(ctx,path,width=None, height=None,align=None):
+def picture(ctx,data,width=None, height=None,align=None):
+    """
+    把图片的二进制数据（使用了base64编码）转化为一个docx.Document对象
+
+    data：图片的二进制数据（使用了base64编码）
+    width：图片的宽度，可以为：'12cm','12mm','12pt' 等，参考前面的 calc_length()
+    height：图片的长度，如果没有设置，根据长度自动缩放
+    align：图片的位置，'left'，'center'，'right'
+    """
+
+    if not data:
+        return None
+
     #转化为file-like对象
-    if isinstance(path, bytes):
-        import io
-        path = io.BytesIO(path)
-    else:
-        #路径可以直接使用，不需要在这里转化为file
-        pass
+    #在python2.7中，bytes==str，可以直接使用
+    #在python3.5中，bytes和str是不同的类型，需要使用base64这个库
 
+    
+    #data使用了base64编码，所以这里需要解码
+    data = data.decode('base64')
 
+    import io
+    data = io.BytesIO(data)
 
+        
     tpl = ctx['tpl']
     doc = tpl.new_subdoc()
 
@@ -81,28 +95,28 @@ def picture(ctx,path,width=None, height=None,align=None):
     if height:
         height=calc_length(height)
     
-    # 如果不需要对齐，简便的方法
-    # doc.add_picture(path,width=width,height=height)
-    # 如果需要对齐 
     p = doc.add_paragraph()
     p.alignment = calc_alignment(align)
-    p.add_run().add_picture(path,width=width,height=height)
+    p.add_run().add_picture(data,width=width,height=height)
     return doc
 
 
 def get_env():
     """
-    创建一个jinja的enviroment，然后添加了一个过滤器 
+    创建一个jinja的enviroment，然后添加一个过滤器 
     """
     jinja_env = jinja2.Environment()
     jinja_env.filters['picture'] = picture
     return jinja_env
 
 def test():
-    
+    """
+    演示了如何使用，可以直接执行该文件，但是需要使用自己写的docx模版，和图片
+    """
     tpl = DocxTemplate("tpls/test_tpl.docx")
- 
-    obj={'logo':'tpls/python_logo.png'}
+    #读取图片的数据且使用base64编码
+    data = open('tpls/python_logo.png','rb').read().encode('base64')
+    obj={'logo':data}
     # 需要添加模版对象
     ctx={'obj':obj,'tpl':tpl}
     jinja_env = get_env()
