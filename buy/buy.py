@@ -399,34 +399,35 @@ class payment(models.Model):
     @api.one
     def request_payment(self):
         categ = self.env.ref('money.core_category_purchase')
-        source_id = self.env['money.invoice'].create({
-                            'name': self.buy_id.name,
-                            'partner_id': self.buy_id.partner_id.id,
-                            'category_id': categ.id, 
-                            'date': fields.Date.context_today(self),
-                            'amount': self.amount_money,
-                            'reconciled': 0,
-                            'to_reconcile': self.amount_money,
-                            'date_due': fields.Date.context_today(self),
-                            'state': 'draft',
-                        })
-        payment_id = self.env["money.order"].create({
-                            'partner_id': self.buy_id.partner_id.id,
+        if self.amount_money != 0:
+            source_id = self.env['money.invoice'].create({
+                                'name': self.buy_id.name,
+                                'partner_id': self.buy_id.partner_id.id,
+                                'category_id': categ.id,
                                 'date': fields.Date.context_today(self),
-                                'source_ids':
-                                [(0, 0, {'name':source_id.id, 
-                                 'category_id':categ.id, 
-                                 'date':source_id.date, 
-                                 'amount':self.amount_money, 
-                                 'reconciled':0.0, 
-                                 'to_reconcile':self.amount_money, 
-                                 'this_reconcile':self.amount_money})],
-                                'type': 'pay',
                                 'amount': self.amount_money,
                                 'reconciled': 0,
                                 'to_reconcile': self.amount_money,
+                                'date_due': fields.Date.context_today(self),
                                 'state': 'draft',
-            })   
+                            })
+            self.env["money.order"].create({
+                                'partner_id': self.buy_id.partner_id.id,
+                                    'date': fields.Date.context_today(self),
+                                    'source_ids':
+                                    [(0, 0, {'name':source_id.id,
+                                     'category_id':categ.id,
+                                     'date':source_id.date,
+                                     'amount':self.amount_money,
+                                     'reconciled':0.0,
+                                     'to_reconcile':self.amount_money,
+                                     'this_reconcile':self.amount_money})],
+                                    'type': 'pay',
+                                    'amount': self.amount_money,
+                                    'reconciled': 0,
+                                    'to_reconcile': self.amount_money,
+                                    'state': 'draft',
+                })
         self.date_application = datetime.now()
 
 
@@ -737,10 +738,11 @@ class buy_receipt(models.Model):
             amount = -self.amount
             tax_amount = - sum(line.tax_amount for line in self.line_out_ids)
         categ = self.env.ref('money.core_category_purchase')
-        source_id = self.env['money.invoice'].create(
-            self._get_invoice_vals(categ,self.date, amount, tax_amount)
-        )
-        self.invoice_id = source_id.id
+        if amount != 0:
+            source_id = self.env['money.invoice'].create(
+                self._get_invoice_vals(categ,self.date, amount, tax_amount)
+            )
+            self.invoice_id = source_id.id
         return source_id
 
     @api.one
@@ -748,10 +750,10 @@ class buy_receipt(models.Model):
         '''采购费用产生结算单'''
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
-                cost_id = self.env['money.invoice'].create(
-                    self._get_invoice_vals(line.category_id,self.date, line.amount, 0)
-                )
-
+                if line.amount != 0:
+                    self.env['money.invoice'].create(
+                        self._get_invoice_vals(line.category_id,self.date, line.amount, 0)
+                    )
         return
 
     @api.one
