@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# © 2016 Elico Corp (www.elico-corp.com).
+# © 2016 cole
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from docxtpl import DocxTemplate
@@ -63,6 +63,16 @@ def calc_alignment(s):
 
 @jinja2.contextfilter
 def picture(ctx,path,width=None, height=None,align=None):
+    #转化为file-like对象
+    if isinstance(path, bytes):
+        import io
+        path = io.BytesIO(path)
+    else:
+        #路径可以直接使用，不需要在这里转化为file
+        pass
+
+
+
     tpl = ctx['tpl']
     doc = tpl.new_subdoc()
 
