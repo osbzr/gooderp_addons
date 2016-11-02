@@ -129,7 +129,11 @@ class ReportDocx(report_sxw):
         temp_out_file = self.generate_temp_file(tempname)
 
         doc = DocxTemplate(misc.file_open(report.template_file).name)
-        doc.render({'obj': data})
+        #2016-11-2 支持了图片
+        #1.导入依赖，python3语法
+        from . import report_helper
+        #2. 需要添加一个"tpl"属性获得模版对象
+        doc.render({'obj': data,'tpl':doc},report_helper.get_env())
         doc.save(temp_out_file)
 
         if report.output_type == 'pdf':
