@@ -3,6 +3,7 @@
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
+from odoo.tools import float_compare, float_is_zero
 import sys
 # 销货订单审核状态可选值
 SELL_ORDER_STATES = [
@@ -669,7 +670,7 @@ class sell_delivery(models.Model):
             tax_amount = - sum(line.tax_amount for line in self.line_in_ids)
         categ = self.env.ref('money.core_category_sale')
         source_id = False
-        if amount != 0:
+        if not float_is_zero(amount,2):
             source_id = self.env['money.invoice'].create({
                 'move_id': self.sell_move_id.id,
                 'name': self.name,
@@ -688,7 +689,7 @@ class sell_delivery(models.Model):
         # 销售费用产生结算单
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
-                if line.amount != 0:
+                if not float_is_zero(line.amount,2):
                     self.env['money.invoice'].create({
                         'move_id': self.sell_move_id.id,
                         'name': self.name,

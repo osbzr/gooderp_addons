@@ -22,6 +22,7 @@
 from odoo.exceptions import UserError, ValidationError
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
+from odoo.tools import float_compare, float_is_zero
 
 class money_order(models.Model):
     _name = 'money.order'
@@ -572,7 +573,7 @@ class reconcile_order(models.Model):
 
         # 应收转应收、应付转应付
         if business_type in ['get_to_get', 'pay_to_pay']:
-            if line.this_reconcile != 0:
+            if not float_is_zero(line.this_reconcile, 2):
                 self.env['money.invoice'].create({
                        'name': name,
                        'category_id': line.category_id.id,

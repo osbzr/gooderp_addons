@@ -23,6 +23,7 @@ from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
 from datetime import datetime
+from odoo.tools import float_compare, float_is_zero
 
 # 购货订单审核状态可选值
 BUY_ORDER_STATES = [
@@ -399,7 +400,7 @@ class payment(models.Model):
     @api.one
     def request_payment(self):
         categ = self.env.ref('money.core_category_purchase')
-        if self.amount_money != 0:
+        if not float_is_zero(self.amount_money, 2):
             source_id = self.env['money.invoice'].create({
                                 'name': self.buy_id.name,
                                 'partner_id': self.buy_id.partner_id.id,
@@ -738,7 +739,7 @@ class buy_receipt(models.Model):
             amount = -self.amount
             tax_amount = - sum(line.tax_amount for line in self.line_out_ids)
         categ = self.env.ref('money.core_category_purchase')
-        if amount != 0:
+        if not float_is_zero(amount,2):
             source_id = self.env['money.invoice'].create(
                 self._get_invoice_vals(categ,self.date, amount, tax_amount)
             )
@@ -750,7 +751,7 @@ class buy_receipt(models.Model):
         '''采购费用产生结算单'''
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
-                if line.amount != 0:
+                if not float_is_zero(line.amount,2):
                     self.env['money.invoice'].create(
                         self._get_invoice_vals(line.category_id,self.date, line.amount, 0)
                     )
