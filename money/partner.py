@@ -2,7 +2,7 @@
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
-
+from odoo.tools import float_is_zero
 
 class partner(models.Model):
     _inherit = 'partner'
@@ -10,7 +10,7 @@ class partner(models.Model):
 
     def _init_source_create(self, name, partner_id, category_id, is_init, date,
                             amount, reconciled, to_reconcile, date_due, state):
-        if amount != 0:
+        if not float_is_zero(amount, 2):
             return self.env['money.invoice'].create({
                                                 'name': name,
                                                 'partner_id': partner_id,
