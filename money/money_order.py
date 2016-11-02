@@ -572,16 +572,17 @@ class reconcile_order(models.Model):
 
         # 应收转应收、应付转应付
         if business_type in ['get_to_get', 'pay_to_pay']:
-            self.env['money.invoice'].create({
-                   'name': name,
-                   'category_id': line.category_id.id,
-                   'amount': line.this_reconcile,
-                   'date': line.date,
-                   'reconciled': 0,  # 已核销金额
-                   'to_reconcile': line.this_reconcile,  # 未核销金额
-                   'date_due': line.date_due,
-                   'partner_id': to_partner_id.id,
-                   })
+            if line.this_reconcile != 0:
+                self.env['money.invoice'].create({
+                       'name': name,
+                       'category_id': line.category_id.id,
+                       'amount': line.this_reconcile,
+                       'date': line.date,
+                       'reconciled': 0,  # 已核销金额
+                       'to_reconcile': line.this_reconcile,  # 未核销金额
+                       'date_due': line.date_due,
+                       'partner_id': to_partner_id.id,
+                       })
 
             if business_type == 'get_to_get':
                 to_partner_id.receivable += line.this_reconcile

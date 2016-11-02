@@ -10,18 +10,20 @@ class partner(models.Model):
 
     def _init_source_create(self, name, partner_id, category_id, is_init, date,
                             amount, reconciled, to_reconcile, date_due, state):
-        return self.env['money.invoice'].create({
-                                            'name': name,
-                                            'partner_id': partner_id,
-                                            'category_id': category_id,
-                                            'is_init': is_init,
-                                            'date': date,
-                                            'amount': amount,
-                                            'reconciled': reconciled,
-                                            'to_reconcile': to_reconcile,
-                                            'date_due': date_due,
-                                            'state': state,
-                                          })
+        if amount != 0:
+            return self.env['money.invoice'].create({
+                                                'name': name,
+                                                'partner_id': partner_id,
+                                                'category_id': category_id,
+                                                'is_init': is_init,
+                                                'date': date,
+                                                'amount': amount,
+                                                'reconciled': reconciled,
+                                                'to_reconcile': to_reconcile,
+                                                'date_due': date_due,
+                                                'state': state,
+                                              })
+
 
     @api.one
     def _set_receivable_init(self):

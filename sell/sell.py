@@ -668,37 +668,40 @@ class sell_delivery(models.Model):
             this_reconcile = - self.receipt
             tax_amount = - sum(line.tax_amount for line in self.line_in_ids)
         categ = self.env.ref('money.core_category_sale')
-        source_id = self.env['money.invoice'].create({
-            'move_id': self.sell_move_id.id,
-            'name': self.name,
-            'partner_id': self.partner_id.id,
-            'category_id': categ.id,
-            'date': self.date,
-            'amount': amount,
-            'reconciled': 0,
-            'to_reconcile': amount,
-            'tax_amount': tax_amount,
-            'date_due': self.date_due,
-            'state': 'draft',
-            'currency_id': self.currency_id.id
-        })
-        self.invoice_id = source_id.id
+        source_id = False
+        if amount != 0:
+            source_id = self.env['money.invoice'].create({
+                'move_id': self.sell_move_id.id,
+                'name': self.name,
+                'partner_id': self.partner_id.id,
+                'category_id': categ.id,
+                'date': self.date,
+                'amount': amount,
+                'reconciled': 0,
+                'to_reconcile': amount,
+                'tax_amount': tax_amount,
+                'date_due': self.date_due,
+                'state': 'draft',
+                'currency_id': self.currency_id.id
+            })
+            self.invoice_id = source_id.id
         # 销售费用产生结算单
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
-                cost_id = self.env['money.invoice'].create({
-                    'move_id': self.sell_move_id.id,
-                    'name': self.name,
-                    'partner_id': line.partner_id.id,
-                    'category_id': line.category_id.id,
-                    'date': self.date,
-                    'amount': line.amount,
-                    'reconciled': 0.0,
-                    'to_reconcile': line.amount,
-                    'date_due': self.date_due,
-                    'state': 'draft',
-                    'currency_id': self.currency_id.id
-                })
+                if line.amount != 0:
+                    self.env['money.invoice'].create({
+                        'move_id': self.sell_move_id.id,
+                        'name': self.name,
+                        'partner_id': line.partner_id.id,
+                        'category_id': line.category_id.id,
+                        'date': self.date,
+                        'amount': line.amount,
+                        'reconciled': 0.0,
+                        'to_reconcile': line.amount,
+                        'date_due': self.date_due,
+                        'state': 'draft',
+                        'currency_id': self.currency_id.id
+                    })
         # 生成收款单
         if self.receipt:
             money_lines = []
@@ -708,9 +711,9 @@ class sell_delivery(models.Model):
                 'amount': this_reconcile,
             })
             source_lines.append({
-                'name': source_id.id,
+                'name': source_id and source_id.id,
                 'category_id': categ.id,
-                'date': source_id.date,
+                'date': source_id and source_id.date,
                 'amount': amount,
                 'reconciled': 0.0,
                 'to_reconcile': amount,
