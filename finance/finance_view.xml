@@ -141,6 +141,7 @@
             <field name="arch" type="xml">
                 <tree string='分录查询'  create="false" edit='false'>
                     <field name='voucher_id'/>
+                    <field name='period_id'/>
                     <field name='date'/>
                     <field name='name'/>
                     <field name='account_id'/>
