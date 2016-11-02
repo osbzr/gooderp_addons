@@ -241,6 +241,17 @@ class finance_period(models.Model):
         if self.year and self.month:
             self.name = u'%s年 第%s期' % (self.year, self.month)
 
+    @api.multi
+    def period_compare(self,period_id_one,period_id_two):
+        period_one_str = "%s-%s"%(period_id_one.year,str(period_id_one.month).zfill(2))
+        period_two_str = "%s-%s"%(period_id_two.year,str(period_id_two.month).zfill(2))
+        if period_one_str > period_two_str:
+            return 1
+        elif period_one_str < period_two_str:
+            return -1
+        else:
+            return 0
+
     @api.model
     def init_period(self):
         ''' 根据系统启用日期（安装core模块的日期）创建 '''

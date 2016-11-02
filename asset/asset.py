@@ -88,9 +88,9 @@ class asset(models.Model):
         'finance.account', u'固定资产科目', required=True, states=READONLY_STATES)
     cost_depreciation = fields.Float(u'每月折旧额', digits=dp.get_precision(u'金额'), store=True, compute='_get_cost_depreciation')
     line_ids = fields.One2many('asset.line', 'order_id', u'折旧明细行',
-                               states=READONLY_STATES, copy=True)
+                               states=READONLY_STATES, copy=False)
     chang_ids = fields.One2many('chang.line', 'order_id', u'变更明细行',
-                               states=READONLY_STATES, copy=True)
+                               states=READONLY_STATES, copy=False)
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict', copy=False)
     money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict', copy=False)
     other_money_order = fields.Many2one('other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
@@ -469,7 +469,7 @@ class CreateDepreciationWizard(models.TransientModel):
     def _generate_asset_line(self, asset, cost_depreciation, total):
         '''生成折旧明细行'''
         asset_line = self.env['asset.line'].create({
-             'date': asset.date,
+             'date': self.date,
              'order_id': asset.id,
              'period_id': self.period_id.id,
              'cost_depreciation': cost_depreciation,
@@ -482,11 +482,14 @@ class CreateDepreciationWizard(models.TransientModel):
     @api.multi
     def create_depreciation(self):
         ''' 资产折旧，生成凭证和折旧明细'''
+
         vouch_obj = self.env['voucher'].create({'date': self.date})
         res = {}
         asset_line_id_list = []
-        for asset in self.env['asset'].search([('no_depreciation', '=', False), ('period_id','!=', self.period_id.id)]):
-            if self.period_id not in asset.line_ids.period_id:
+        for asset in self.env['asset'].search([('no_depreciation', '=', False),
+                                               ('state', '=', 'done'), ('period_id', '!=', self.period_id.id)]):
+            if self.period_id not in [line.period_id for line in asset.line_ids] and \
+                     self.env['finance.period'].period_compare(self.period_id,asset.period_id) > 0:
                 cost_depreciation = asset.cost_depreciation
                 total = sum(line.cost_depreciation for line in asset.line_ids) + asset.depreciation_value
                 if asset.surplus_value <= (total + cost_depreciation):
@@ -502,7 +505,7 @@ class CreateDepreciationWizard(models.TransientModel):
 
         if not vouch_obj.line_ids:
             vouch_obj.unlink()
-            raise UserError(u'本期所有固定资产都已折旧！')
+            raise UserError(u'本期没有需要折旧的固定资产啦！')
         vouch_obj.voucher_done()
         view = self.env.ref('asset.asset_line_tree')
         return {

@@ -227,7 +227,8 @@ class test_DepreciationWizard(TransactionCase):
     def test_create_depreciation(self):
         '''资产折旧，生成凭证和折旧明细'''
         self.asset.depreciation_number = 1
-        self.wizard.create_depreciation()
+        with self.assertRaises(UserError):
+            self.wizard.create_depreciation()
 
     def test_create_depreciation_no_voucher_line(self):
         '''报错：本期所有固定资产都已折旧'''
