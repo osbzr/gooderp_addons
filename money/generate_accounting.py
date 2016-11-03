@@ -432,6 +432,7 @@ class money_transfer_order(models.Model):
     '''外币转外币暂时不做，只处理外币转本位币'''
     @api.multi
     def money_transfer_done(self):
+        self.ensure_one()
         res = super(money_transfer_order, self).money_transfer_done()
         vouch_obj = self.env['voucher'].create({'date': self.date})
         vals = {}
