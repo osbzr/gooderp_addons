@@ -68,8 +68,14 @@ class wh_move_line(models.Model):
         self.uos_qty_remaining = self.goods_uos_qty - \
             sum(match.uos_qty for match in self.matching_in_ids)
 
-    def prev_action_done(self):
+    def create_matching_obj(self, line, matching):
         matching_obj = self.env['wh.move.matching']
+        matching_obj.create_matching(
+            matching.get('line_in_id'),
+            line.id, matching.get('qty'),
+            matching.get('uos_qty'))
+
+    def prev_action_done(self):
         for line in self:
             if line.warehouse_id.type == 'stock' and \
                     line.goods_id.is_using_matching():
@@ -78,23 +84,15 @@ class wh_move_line(models.Model):
                         line.goods_id.get_matching_records_by_lot(
                             self.lot_id, self.goods_qty, self.goods_uos_qty)
                     for matching in matching_records:
-                        matching_obj.create_matching(
-                            matching.get('line_in_id'),
-                            line.id, matching.get('qty'),
-                            matching.get('uos_qty'))
+                        self.create_matching_obj(line,matching)
                 else:
                     matching_records, cost = line.goods_id \
                         .get_matching_records(
                             line.warehouse_id, line.goods_qty,
                             uos_qty=line.goods_uos_qty,
                             attribute=line.attribute_id)
-
                     for matching in matching_records:
-                        matching_obj.create_matching(
-                            matching.get('line_in_id'),
-                            line.id, matching.get('qty'),
-                            matching.get('uos_qty'))
-
+                        self.create_matching_obj(line , matching)
                 line.cost_unit = safe_division(cost, line.goods_qty)
                 line.cost = cost
 
