@@ -23,16 +23,16 @@
         </record>
         <!-- 本模块的这些数据表可以清空 -->
         <record id="remove_core_value" model="business.data.table">
-            <field name="name">core_value</field>
+            <field name="name">core.value</field>
         </record>
         <record id="remove_core_category" model="business.data.table">
-            <field name="name">core_category</field>
+            <field name="name">core.category</field>
         </record>
         <record id="remove_uom" model="business.data.table">
             <field name="name">uom</field>
         </record>
         <record id="remove_settle_mode" model="business.data.table">
-            <field name="name">settle_mode</field>
+            <field name="name">settle.mode</field>
         </record>
         <record id="remove_partner" model="business.data.table">
             <field name="name">partner</field>
@@ -44,7 +44,7 @@
             <field name="name">staff</field>
         </record>
         <record id="remove_bank_account" model="business.data.table">
-            <field name="name">bank_account</field>
+            <field name="name">bank.account</field>
         </record>
         <record id="remove_service" model="business.data.table">
             <field name="name">service</field>
