@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import clean_data
 import core
+import clean_data
 import goods
 import partner
 import pricing
