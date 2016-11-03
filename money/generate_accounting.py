@@ -31,11 +31,10 @@ class money_order(models.Model):
         res = super(money_order, self).money_order_done()
         for money in self:
             if money.type == 'get':
-                vouch_obj = money.create_money_order_get_voucher(money.line_ids, money.source_ids, money.partner_id, money.name)
-                vouch_obj.voucher_done()
+                voucher = money.create_money_order_get_voucher(money.line_ids, money.source_ids, money.partner_id, money.name)
             else:
-                vouch_obj = money.create_money_order_pay_voucher(money.line_ids, money.source_ids, money.partner_id, money.name)
-                vouch_obj.voucher_done()
+                voucher = money.create_money_order_pay_voucher(money.line_ids, money.source_ids, money.partner_id, money.name)
+            voucher.voucher_done()
         return res
 
     @api.multi
@@ -233,8 +232,6 @@ class money_invoice(models.Model):
             if invoice.is_init:
                 vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
                 vouch_obj_lines = self.env['voucher.line'].search([
-                    '&',
-                    '&',
                     ('voucher_id', '=', vouch_obj.id),
                     ('partner_id', '=', invoice.partner_id.id),
                     ('init_obj', '=', 'money_invoice'), ])
@@ -284,7 +281,6 @@ class money_invoice(models.Model):
             # 删除初始非需要的凭证明细行
             if invoice.is_init:
                 vouch_line_ids = self.env['voucher.line'].search([
-                    '&',
                     ('account_id', '=', invoice.category_id.account_id.id),
                     ('init_obj', '=', 'money_invoice')])
                 for vouch_line_id in vouch_line_ids:
@@ -391,8 +387,6 @@ class other_money_order(models.Model):
             if money_order.is_init:
                 vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
                 vouch_obj_lines = self.env['voucher.line'].search([
-                    '&',
-                    '&',
                     ('voucher_id', '=', vouch_obj.id),
                     ('account_id', '=', money_order.bank_id.account_id.id),
                     ('init_obj', '=', 'other_money_order-%s' % (money_order.id))])
@@ -448,7 +442,6 @@ class other_money_order(models.Model):
             # 删除初始非需要的凭证明细行
             if money_order.is_init:
                 vouch_line_ids = self.env['voucher.line'].search([
-                    '&',
                     ('account_id', '!=', money_order.bank_id.account_id.id),
                     ('init_obj', '=', 'other_money_order-%s' % (money_order.id))])
                 for vouch_line_id in vouch_line_ids:
