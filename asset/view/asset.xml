@@ -36,10 +36,11 @@
                             <field name="sell_tax_amount"/>
                         </group>
                     </group>
-
-					<button name="create_clean_account"  string="生成清理凭证" type="object" class="oe_highlight"/>
-                    或者
-                    <button string="取消" class="oe_link" special="cancel"/>
+                    <footer>
+                        <button name="create_clean_account"  string="生成清理凭证" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
             	</form>
             </field>
         </record>
@@ -60,10 +61,11 @@
                             <field name="chang_partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
                         </group>
                     </group>
-
-					<button name="create_chang_account"  string="生成变更凭证" type="object" class="oe_highlight"/>
-                    或者
-                    <button string="取消" class="oe_link" special="cancel"/>
+                    <footer>
+                        <button name="create_chang_account"  string="生成变更凭证" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
             	</form>
             </field>
         </record>
