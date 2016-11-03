@@ -496,10 +496,10 @@ class money_transfer_order(models.Model):
 
     @api.multi
     def money_transfer_draft(self):
+        self.ensure_one()
         res = super(money_transfer_order, self).money_transfer_draft()
-        for money_transfer in self:
-            voucher, money_transfer.voucher_id = money_transfer.voucher_id, False
-            if voucher.state == 'done':
-                voucher.voucher_draft()
-            voucher.unlink()
+        voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
+        voucher.unlink()
         return res

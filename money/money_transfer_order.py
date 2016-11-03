@@ -109,14 +109,14 @@ class money_transfer_order(models.Model):
     @api.multi
     def money_transfer_draft(self):
         '''转账单的反审核按钮'''
-        for transfer in self:
-            for line in transfer.line_ids:
-                if line.in_bank_id.balance < line.amount:
-                    raise UserError('转入账户余额不足')
-                else:
-                    line.in_bank_id.balance -= line.amount
-                    line.out_bank_id.balance += line.amount
-            transfer.state = 'draft'
+        self.ensure_one()
+        for line in self.line_ids:
+            if line.in_bank_id.balance < line.amount:
+                raise UserError('转入账户余额不足')
+            else:
+                line.in_bank_id.balance -= line.amount
+                line.out_bank_id.balance += line.amount
+        self.state = 'draft'
         return True
 
 
