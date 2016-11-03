@@ -227,6 +227,7 @@ class test_DepreciationWizard(TransactionCase):
     def test_create_depreciation(self):
         '''资产折旧，生成凭证和折旧明细'''
         self.asset.depreciation_number = 1
+        self.asset.depreciation_previous = 950
         with self.assertRaises(UserError):
             self.wizard.create_depreciation()
 
