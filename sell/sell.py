@@ -329,7 +329,6 @@ class sell_order(models.Model):
             'view_id': False,
             'views': [(view_id, 'form')],
             'res_model': 'sell.delivery',
-            'res_id': delivery_id,
             'type': 'ir.actions.act_window',
             'domain': [('id', '=', delivery_id)],
             'target': 'current',
@@ -351,14 +350,16 @@ class sell_order_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
         if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
-            self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
+            self.price = (self.tax_rate != -100
+                          and self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
             self.amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
             self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
             self.subtotal = self.amount + self.tax_amount
         else:
             rate_silent = self.order_id.currency_id.rate or self.env.user.company_id.currency_id.rate
             currency_amount = self.quantity * self.price_taxed - self.discount_amount
-            self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
+            self.price = (self.tax_rate != -100
+                          and self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01) or 0)
             self.amount = currency_amount * rate_silent
             self.tax_amount = self.amount * self.tax_rate * 0.01
             self.subtotal = self.amount + self.tax_amount
@@ -439,7 +440,8 @@ class sell_order_line(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        price = (self.tax_rate != -100
+                 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
         self.discount_amount = self.quantity * price \
                 * self.discount_rate * 0.01
 
@@ -478,11 +480,7 @@ class sell_delivery(models.Model):
                 self.money_state = u'部分收款'
             elif self.invoice_id.reconciled == self.invoice_id.amount:
                 self.money_state = u'全部收款'
-
-    @api.one
-    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
-    def _get_sell_return_state(self):
-        '''返回退款状态'''
+        # 返回退款状态
         if self.is_return:
             if self.invoice_id.reconciled == 0:
                 self.return_state = u'未退款'
@@ -542,7 +540,7 @@ class sell_delivery(models.Model):
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
                               store=True, default=u'未收款',
                               help=u"销售发货单的收款状态", select=True, copy=False)
-    return_state = fields.Char(u'退款状态', compute=_get_sell_return_state,
+    return_state = fields.Char(u'退款状态', compute=_get_sell_money_state,
                                store=True, default=u'未退款',
                                help=u"销售退货单的退款状态", select=True, copy=False)
     contact = fields.Char(u'联系人', states=READONLY_STATES,
@@ -600,137 +598,151 @@ class sell_delivery(models.Model):
         for delivery in self:
             if delivery.state == 'done':
                 raise UserError(u'不能删除已审核的销售发货单')
-            move = self.env['wh.move'].search(
-                [('id', '=', delivery.sell_move_id.id)])
-            if move:
-                move.unlink()
+#             move = self.env['wh.move'].search(
+#                 [('id', '=', delivery.sell_move_id.id)])
+#             if move:
+            delivery.sell_move_id.unlink()
 
         return super(sell_delivery, self).unlink()
-
 
     def goods_inventory(self, vals):
         auto_in = self.env['wh.in'].create(vals)
         line_ids = [line.id for line in auto_in.line_in_ids]
         self.with_context({'wh_in_line_ids':line_ids}).sell_delivery_done()
 
-    @api.multi
-    def sell_delivery_done(self):
-        '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
+    @api.one
+    def _wrong_delivery_done(self):
+        '''审核时不合法的给出报错'''
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         for line in self.line_in_ids:
-            vals = {}
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
-        # 库存不足 生成零的
-        result_vals = self.env['wh.move'].create_zero_wh_in(self,self._name)
-        if result_vals:
-            return result_vals
         if self.bank_account_id and not self.receipt:
             raise UserError(u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
             raise UserError(u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount + self.partner_cost:
             raise UserError(u'本次收款金额不能大于优惠后金额！')
-        if self.order_id:
-            if not self.is_return:
-                line_ids = self.line_out_ids
-            else:
-                line_ids = self.line_in_ids
-            for line in line_ids:
-                line.sell_line_id.quantity_out += line.goods_qty
-
         # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
         if not self.is_return:
             amount = self.amount + self.partner_cost
             if self.partner_id.credit_limit != 0:
                 if amount - self.receipt + self.partner_id.receivable > self.partner_id.credit_limit:
                     raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！')
-        else:
-            amount = self.amount + self.partner_cost
 
-        # 发库单/退货单 生成结算单
+    def _line_qty_write(self):
+        line_ids = not self.is_return and self.line_out_ids or self.line_in_ids
+        for line in line_ids:
+            line.sell_line_id.quantity_out += line.goods_qty
+
+        return
+
+    def _get_invoice_vals(self, category_id, date, amount, tax_amount):
+        '''返回创建 money_invoice 时所需数据'''
+        return {
+            'move_id': self.sell_move_id.id,
+            'name': self.name,
+            'partner_id': self.partner_id.id,
+            'category_id': category_id.id,
+            'date': date,
+            'amount': amount,
+            'reconciled': 0,
+            'to_reconcile': amount,
+            'tax_amount': tax_amount,
+            'date_due': self.date_due,
+            'state': 'draft',
+            'currency_id': self.currency_id.id
+        }
+
+    def _delivery_make_invoice(self):
+        '''发货单/退货单 生成结算单'''
         if not self.is_return:
             amount = self.amount + self.partner_cost
-            this_reconcile = self.receipt
             tax_amount = sum(line.tax_amount for line in self.line_out_ids)
         else:
             amount = -(self.amount + self.partner_cost)
-            this_reconcile = - self.receipt
             tax_amount = - sum(line.tax_amount for line in self.line_in_ids)
-        categ = self.env.ref('money.core_category_sale')
-        source_id = False
+        category = self.env.ref('money.core_category_sale')
+        invoice_id = False
         if not float_is_zero(amount,2):
-            source_id = self.env['money.invoice'].create({
-                'move_id': self.sell_move_id.id,
-                'name': self.name,
-                'partner_id': self.partner_id.id,
-                'category_id': categ.id,
-                'date': self.date,
-                'amount': amount,
-                'reconciled': 0,
-                'to_reconcile': amount,
-                'tax_amount': tax_amount,
-                'date_due': self.date_due,
-                'state': 'draft',
-                'currency_id': self.currency_id.id
-            })
-            self.invoice_id = source_id.id
-        # 销售费用产生结算单
+            invoice_id = self.env['money.invoice'].create(
+                self._get_invoice_vals(category, self.date, amount, tax_amount)
+            )
+            self.invoice_id = invoice_id.id
+        return invoice_id
+
+    def _sell_amount_to_invoice(self):
+        '''销售费用产生结算单'''
+        invoice_id = False
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
                 if not float_is_zero(line.amount,2):
-                    self.env['money.invoice'].create({
-                        'move_id': self.sell_move_id.id,
-                        'name': self.name,
-                        'partner_id': line.partner_id.id,
-                        'category_id': line.category_id.id,
-                        'date': self.date,
-                        'amount': line.amount,
-                        'reconciled': 0.0,
-                        'to_reconcile': line.amount,
-                        'date_due': self.date_due,
-                        'state': 'draft',
-                        'currency_id': self.currency_id.id
-                    })
-        # 生成收款单
-        if self.receipt:
-            money_lines = []
-            source_lines = []
-            money_lines.append({
-                'bank_id': self.bank_account_id.id,
-                'amount': this_reconcile,
-            })
-            source_lines.append({
-                'name': source_id and source_id.id,
-                'category_id': categ.id,
-                'date': source_id and source_id.date,
-                'amount': amount,
-                'reconciled': 0.0,
-                'to_reconcile': amount,
-                'this_reconcile': this_reconcile,
-            })
-            rec = self.with_context(type='get')
-            money_order = rec.env['money.order'].create({
-                'partner_id': self.partner_id.id,
-                'date': self.date,
-                'line_ids': [(0, 0, line) for line in money_lines],
-                'source_ids': [(0, 0, line) for line in source_lines],
-                'type': 'get',
-                'amount': amount,
-                'reconciled': this_reconcile,
-                'to_reconcile': amount,
-                'state': 'draft',
-            })
-            money_order.money_order_done()
+                    invoice_id = self.env['money.invoice'].create(
+                        self._get_invoice_vals(line.category_id, self.date, line.amount, 0)
+                    )
+        return invoice_id
 
+    def _make_money_order(self, invoice_id, amount, this_reconcile):
+        '''生成收款单'''
+        if not invoice_id:
+            return False
+        categ = self.env.ref('money.core_category_sale')
+        money_lines = [{
+            'bank_id': self.bank_account_id.id,
+            'amount': this_reconcile,
+        }]
+        source_lines = [{
+            'name': invoice_id and invoice_id.id,
+            'category_id': categ.id,
+            'date': invoice_id and invoice_id.date,
+            'amount': amount,
+            'reconciled': 0.0,
+            'to_reconcile': amount,
+            'this_reconcile': this_reconcile,
+        }]
+        rec = self.with_context(type='get')
+        money_order = rec.env['money.order'].create({
+            'partner_id': self.partner_id.id,
+            'date': self.date,
+            'line_ids': [(0, 0, line) for line in money_lines],
+            'source_ids': [(0, 0, line) for line in source_lines],
+            'type': 'get',
+            'amount': amount,
+            'reconciled': this_reconcile,
+            'to_reconcile': amount,
+            'state': 'draft',
+        })
+        return money_order
+
+    @api.one
+    def sell_delivery_done(self):
+        '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
+        self._wrong_delivery_done()
+        # 库存不足 生成零的
+        result_vals = self.env['wh.move'].create_zero_wh_in(self,self._name)
+        if result_vals:
+            return result_vals
         # 调用wh.move中审核方法，更新审核人和审核状态
         self.sell_move_id.approve_order()
+        #将发货/退货数量写入销货订单行
+        if self.order_id:
+            self._line_qty_write()
+        # 发货单/退货单 生成结算单
+        invoice_id = self._delivery_make_invoice()
+        # 销售费用产生结算单
+        self._sell_amount_to_invoice()
+        # 生成收款单，并审核
+        if self.receipt:
+            flag = not self.is_return and 1 or -1
+            amount = flag * self.amount
+            this_reconcile = flag * self.receipt
+            money_order = self._make_money_order(invoice_id, amount, this_reconcile)
+            money_order.money_order_done()
+
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id and not self.modifying:
             return self.order_id.sell_generate_delivery()
-
-        return True
 
     @api.one
     def sell_delivery_draft(self):
@@ -782,12 +794,10 @@ class wh_move_line(models.Model):
             if self.env.context.get('warehouse_type') == 'customer' or \
                     self.env.context.get('warehouse_dest_type') == 'customer':
                 pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
-            else:
-                pricing = False
-            if pricing:
-                self.discount_rate = pricing.discount_rate
-            else:
-                self.discount_rate = 0
+                if pricing:
+                    self.discount_rate = pricing.discount_rate
+                else:
+                    self.discount_rate = 0
 
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
