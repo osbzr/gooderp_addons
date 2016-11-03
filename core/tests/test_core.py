@@ -13,13 +13,14 @@ class test_core(TransactionCase):
             self.env.ref('core.customer_category_1').unlink()
 
     def test_res_currency(self):
-        """测试阿拉伯数字转换称中文大写数字的方法"""
+        """测试阿拉伯数字转换成中文大写数字的方法"""
         self.env['res.currency'].rmb_upper(10000100.3)
         # 测试输入value为负时的货币大写问题
         self.assertTrue(self.env['res.currency'].rmb_upper(-10000100.3) == u'负壹仟万零壹佰元叁角整')
-        
+
+
 class test_res_users(TransactionCase):
-    
+
     def test_write(self):
         '''修改管理员权限'''
         user_demo = self.env.ref('base.user_demo')
@@ -34,15 +35,18 @@ class test_res_users(TransactionCase):
 
 class test_business_data(TransactionCase):
     def test_business_data_table(self):
+        ''' 选择model填充table名'''
         business_data_table = self.env['business.data.table']
         business_data_table_row = business_data_table.create({'name': 'home.report.type'})
         business_data_table_row.onchange_model()
 
     def test_clean_business_data(self):
+        ''' 测试清空业务数据 '''
         business_data_table = self.env['business.data.table']
         clean_business_data = self.env['clean.business.data']
         business_data_table.create({'name': 'home.report.type'})
         clean_business_data.create({'create_uid':self.env.uid}).remove_data()
+        # 表不存在会报错
         business_data_table.create({'name': 'ABCD'})
         with self.assertRaises(UserError):
             clean_business_data.create({'create_uid': self.env.uid}).remove_data()
