@@ -154,51 +154,43 @@ class sell_order(models.Model):
         total = sum(line.subtotal for line in self.line_ids)
         self.discount_amount = total * self.discount_rate * 0.01
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].next_by_code(self._name) or '/'
-
-        return super(sell_order, self).create(vals)
-
     @api.multi
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的销货订单')
 
         return super(sell_order, self).unlink()
+
+    def _get_vals(self):
+        '''返回创建 money_order 时所需数据'''
+        flag = (self.type == 'sell' and 1 or -1) # 用来标志发库或退货
+        amount = flag * self.amount
+        this_reconcile = flag * self.pre_receipt
+        money_lines = [{
+            'bank_id': self.bank_account_id.id,
+            'amount': this_reconcile,
+        }]
+        return {
+            'partner_id': self.partner_id.id,
+            'date': fields.Date.context_today(self),
+            'line_ids':
+            [(0, 0, line) for line in money_lines],
+            'amount': amount,
+            'reconciled': this_reconcile,
+            'to_reconcile': amount,
+            'state': 'draft',
+            'origin_name': self.name,
+        }
 
     @api.one
     def generate_receipt_order(self):
         '''由销货订单生成收款单'''
-        # 入库单/退货单
-        if self.type == 'sell':
-            amount = self.amount
-            this_reconcile = self.pre_receipt
-        else:
-            amount = - self.amount
-            this_reconcile = - self.pre_receipt
+        # 发库单/退货单
         if self.pre_receipt:
-            money_lines = []
-            money_lines.append({
-                'bank_id': self.bank_account_id.id,
-                'amount': this_reconcile,
-            })
-
-            rec = self.with_context(type='get')
-            money_order = rec.env['money.order'].create({
-                                'partner_id': self.partner_id.id,
-                                'date': fields.Date.context_today(self),
-                                'line_ids':
-                                [(0, 0, line) for line in money_lines],
-                                'type': 'get',
-                                'amount': amount,
-                                'reconciled': this_reconcile,
-                                'to_reconcile': amount,
-                                'state': 'draft',
-                                'origin_name':self.name,
-                            })
+            money_order = self.with_context(type='get').env['money.order'].create(
+                self._get_vals()
+            )
             money_order.money_order_done()
 
     @api.one
@@ -230,18 +222,16 @@ class sell_order(models.Model):
             raise UserError(u'请不要重复反审核！')
         if self.goods_state != u'未出库':
             raise UserError(u'该销货订单已经发货，不能反审核！')
-        else:
-            # 查找产生的发货单并删除
-            delivery = self.env['sell.delivery'].search(
-                [('order_id', '=', self.name)])
-            if delivery:
-                delivery.unlink()
-            # 查找产生的收款单并删除
-            money_order = self.env['money.order'].search(
-                              [('origin_name','=',self.name)])
-            if money_order:
-                money_order.money_order_draft()
-                money_order.unlink()
+        # 查找产生的发货单并删除
+        delivery = self.env['sell.delivery'].search(
+            [('order_id', '=', self.name)])
+        delivery.unlink()
+        # 查找产生的收款单并删除
+        money_order = self.env['money.order'].search(
+                          [('origin_name','=',self.name)])
+        if money_order:
+            money_order.money_order_draft()
+            money_order.unlink()
         self.state = 'draft'
         self.approve_uid = ''
 
@@ -253,7 +243,7 @@ class sell_order(models.Model):
         if single:
             qty = 1
             discount_amount = line.discount_amount \
-                    / (line.quantity - line.quantity_out)
+                    / ((line.quantity - line.quantity_out) or 1)
         else:
             qty = line.quantity - line.quantity_out
             discount_amount = line.discount_amount
@@ -273,10 +263,41 @@ class sell_order(models.Model):
             'note': line.note or '',
         }
 
+    def _generate_delivery(self, delivery_line):
+        '''根据明细行生成发货单或退货单'''
+        # 如果退货，warehouse_dest_id，warehouse_id要调换
+        warehouse = (self.type == 'sell'
+                     and self.warehouse_id
+                     or self.env.ref("warehouse.warehouse_customer"))
+        warehouse_dest = (self.type == 'sell'
+                          and self.env.ref("warehouse.warehouse_customer")
+                          or self.warehouse_id)
+        rec = (self.type == 'sell' and self.with_context(is_return=False)
+               or self.with_context(is_return=True))
+        delivery_id = rec.env['sell.delivery'].create({
+            'partner_id': self.partner_id.id,
+            'warehouse_id': warehouse.id,
+            'warehouse_dest_id': warehouse_dest.id,
+            'staff_id': self.staff_id.id,
+            'date': self.delivery_date,
+            'order_id': self.id,
+            'origin': 'sell.delivery',
+            'note': self.note,
+            'discount_rate': self.discount_rate,
+            'discount_amount': self.discount_amount,
+            'currency_id': self.currency_id.id
+        })
+        if self.type == 'sell':
+            delivery_id.write({'line_out_ids': [
+                (0, 0, line[0]) for line in delivery_line]})
+        else:
+            delivery_id.write({'line_in_ids': [
+                (0, 0, line[0]) for line in delivery_line]})
+        return delivery_id
+
     @api.one
     def sell_generate_delivery(self):
         '''由销货订单生成销售发货单'''
-        # 如果退货，warehouse_dest_id，warehouse_id要调换
         delivery_line = []  # 销售发货单行
 
         for line in self.line_ids:
@@ -296,43 +317,11 @@ class sell_order(models.Model):
 
         if not delivery_line:
             return {}
-        if self.type == 'sell':
-            delivery_id = self.env['sell.delivery'].create({
-                'partner_id': self.partner_id.id,
-                'warehouse_id': self.warehouse_id.id,
-                'warehouse_dest_id': self.env.ref("warehouse.warehouse_customer").id,
-                'staff_id': self.staff_id.id,
-                'date': self.delivery_date,
-                'order_id': self.id,
-                'origin': 'sell.delivery',
-                'line_out_ids': [(0, 0, line[0]) for line in delivery_line],
-                'note': self.note,
-                'discount_rate': self.discount_rate,
-                'discount_amount': self.discount_amount,
-                'currency_id': self.currency_id.id
-            })
-            view_id = self.env['ir.model.data']\
-                    .xmlid_to_res_id('sell.sell_delivery_form')
-            name = u'销售发货单'
-        elif self.type == 'return':
-            rec = self.with_context(is_return=True)
-            delivery_id = rec.env['sell.delivery'].create({
-                'partner_id': self.partner_id.id,
-                'warehouse_id': self.env.ref("warehouse.warehouse_customer").id,
-                'warehouse_dest_id': self.warehouse_id.id,
-                'staff_id': self.staff_id.id,
-                'date': self.delivery_date,
-                'order_id': self.id,
-                'origin': 'sell.delivery',
-                'line_in_ids': [(0, 0, line[0]) for line in delivery_line],
-                'note': self.note,
-                'discount_rate': self.discount_rate,
-                'discount_amount': self.discount_amount,
-                'currency_id': self.currency_id.id
-            })
-            view_id = self.env['ir.model.data']\
-                    .xmlid_to_res_id('sell.sell_return_form')
-            name = u'销售退货单'
+        delivery_id = self._generate_delivery(delivery_line)
+        view_id = (self.type == 'sell'
+                   and self.env.ref('sell.sell_delivery_form').id
+                   or self.env.ref('sell.sell_return_form').id)
+        name = (self.type == 'sell' and u'销售发货单' or u'销售退货单')
         return {
             'name': name,
             'view_type': 'form',
@@ -340,6 +329,7 @@ class sell_order(models.Model):
             'view_id': False,
             'views': [(view_id, 'form')],
             'res_model': 'sell.delivery',
+            'res_id': delivery_id,
             'type': 'ir.actions.act_window',
             'domain': [('id', '=', delivery_id)],
             'target': 'current',
@@ -609,7 +599,7 @@ class sell_delivery(models.Model):
     def unlink(self):
         for delivery in self:
             if delivery.state == 'done':
-                raise UserError(u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的销售发货单')
             move = self.env['wh.move'].search(
                 [('id', '=', delivery.sell_move_id.id)])
             if move:
@@ -890,7 +880,7 @@ class sell_adjust(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的销售调整单')
 
         return super(sell_adjust, self).unlink()
 
