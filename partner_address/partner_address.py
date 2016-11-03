@@ -65,17 +65,16 @@ class partner_address(models.Model):
                     if self.county_id:
                         if self.county_id.city_id.id == self.city_id.id:
                             return{}
-                    self.county_id = ''
-                    return {'domain': domain_dict}
+                    else:
+                        self.county_id = ''
                 else:
                     self.city_id = ''
-                    return {'domain': domain_dict}
-            else:
-                return {'domain': domain_dict}
         else:
             self.city_id = ''
             self.county_id = ''
-            return {'domain': {'city_id': [], 'county_id': []}}
+            domain_dict = {'city_id': [], 'county_id': []}
+
+        return {'domain': domain_dict}
 
     @api.onchange('city_id')
     def onchange_city(self):
@@ -85,37 +84,31 @@ class partner_address(models.Model):
             province = self.city_id.province_id
             if not self.province_id:
                 if self.county_id:
-                    if self.county_id.city_id.id == self.city_id.id:
-                        return {'domain': domain_dict}
-                    self.city_id = ''
+                    if self.county_id.city_id.id != self.city_id.id:
+                        self.city_id = ''
+                        self.province_id = province.id
+                else:
                     self.province_id = province.id
-                    return {'domain': domain_dict}
-                self.province_id = province.id
-                return {'domain': domain_dict}
             else:
                 domain_dict.update({'city_id': [('province_id', '=', province.id)]})
                 if self.county_id:
                     if self.county_id.city_id.id == self.city_id.id:
                         if province.id != self.province_id.id:
                             self.province_id = province.id
-                            return {'domain': domain_dict}
-                        return {'domain': domain_dict}
                     else:
                         if province.id != self.province_id.id:
                             self.province_id = province.id
                             self.county_id = ''
-                            return {'domain': domain_dict}
-                        self.county_id = ''
-                        return {'domain': domain_dict}
+                        else:
+                            self.county_id = ''
                 else:
                     if province.id != self.province_id.id:
                         self.province_id = province.id
-                        return {'domain': domain_dict}
-                    return {'domain': domain_dict}
         else:
             self.county_id = ''
-            return {'domain': {'county_id': []}}
+            domain_dict = {'county_id': []}
 
+        return {'domain': domain_dict}
 
     @api.onchange('county_id')
     def onchange_county(self):

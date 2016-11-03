@@ -132,7 +132,8 @@ class test_reconcile_order(TransactionCase):
                                                                         'business_type': 'pay_to_pay',
                                                                         'name': 'TO20160010',
                                                                         'state': 'done'})
-        reconcile_pay_to_pay_done.reconcile_order_done()
+        with self.assertRaises(UserError):
+            reconcile_pay_to_pay_done.reconcile_order_done()
 
     def test_onchange_partner_id(self):
         '''核销单onchange_partner_id()'''

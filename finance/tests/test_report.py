@@ -46,6 +46,9 @@ class test_report(TransactionCase):
 
         # 执行 _default_period_id
         report_default_period = self.env['create.trial.balance.wizard'].create({})
+        last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(report_default_period.period_id)
+        if last_period and last_period.is_closed == False: # 如果上一个期间没有闭合，则闭合
+            last_period.is_closed = True
         report_default_period.create_trial_balance()
 
     def test_vouchers_summary(self):

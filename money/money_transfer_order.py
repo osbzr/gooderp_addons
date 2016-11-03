@@ -71,52 +71,52 @@ class money_transfer_order(models.Model):
     @api.multi
     def money_transfer_done(self):
         '''转账单的审核按钮'''
-        for transfer in self:
-            if not transfer.line_ids:
-                raise UserError('请先输入转账金额')
-            for line in transfer.line_ids:
-                company_currency_id = self.env.user.company_id.currency_id.id
-                out_currency_id = line.out_bank_id.account_id.currency_id.id or company_currency_id
-                in_currency_id = line.in_bank_id.account_id.currency_id.id or company_currency_id
+        self.ensure_one()
+        if not self.line_ids:
+            raise UserError('请先输入转账金额')
+        for line in self.line_ids:
+            company_currency_id = self.env.user.company_id.currency_id.id
+            out_currency_id = line.out_bank_id.account_id.currency_id.id or company_currency_id
+            in_currency_id = line.in_bank_id.account_id.currency_id.id or company_currency_id
 
-                if line.out_bank_id == line.in_bank_id :
-                    raise UserError('转出账户与转入账户不能相同')
-                if line.amount < 0:
-                    raise UserError('转账金额必须大于0')
-                if line.amount == 0:
-                    raise UserError('转账金额不能为0')
-                if out_currency_id == company_currency_id :
-                    if line.out_bank_id.balance < line.amount:
-                        raise UserError('转出账户余额不足')
-                    else:
-                        line.out_bank_id.balance -= line.amount
-                    if in_currency_id == company_currency_id :
-                        line.in_bank_id.balance += line.amount
-                    else:
-                        line.in_bank_id.balance += line.currency_amount
+            if line.out_bank_id == line.in_bank_id :
+                raise UserError('转出账户与转入账户不能相同')
+            if line.amount < 0:
+                raise UserError('转账金额必须大于0')
+            if line.amount == 0:
+                raise UserError('转账金额不能为0')
+            if out_currency_id == company_currency_id :
+                if line.out_bank_id.balance < line.amount:
+                    raise UserError('转出账户余额不足')
                 else:
-                    if line.out_bank_id.balance < line.currency_amount:
-                        raise UserError('转出账户余额不足')
-                    if in_currency_id == company_currency_id:
-                        line.in_bank_id.balance += line.amount
-                        line.out_bank_id.balance -= line.currency_amount
-                    else:
-                        raise UserError('系统不支持外币转外币')
+                    line.out_bank_id.balance -= line.amount
+                if in_currency_id == company_currency_id :
+                    line.in_bank_id.balance += line.amount
+                else:
+                    line.in_bank_id.balance += line.currency_amount
+            else:
+                if line.out_bank_id.balance < line.currency_amount:
+                    raise UserError('转出账户余额不足')
+                if in_currency_id == company_currency_id:
+                    line.in_bank_id.balance += line.amount
+                    line.out_bank_id.balance -= line.currency_amount
+                else:
+                    raise UserError('系统不支持外币转外币')
 
-            transfer.state = 'done'
+            self.state = 'done'
         return True
 
     @api.multi
     def money_transfer_draft(self):
         '''转账单的反审核按钮'''
-        for transfer in self:
-            for line in transfer.line_ids:
-                if line.in_bank_id.balance < line.amount:
-                    raise UserError('转入账户余额不足')
-                else:
-                    line.in_bank_id.balance -= line.amount
-                    line.out_bank_id.balance += line.amount
-            transfer.state = 'draft'
+        self.ensure_one()
+        for line in self.line_ids:
+            if line.in_bank_id.balance < line.amount:
+                raise UserError('转入账户余额不足')
+            else:
+                line.in_bank_id.balance -= line.amount
+                line.out_bank_id.balance += line.amount
+        self.state = 'draft'
         return True
 
 
