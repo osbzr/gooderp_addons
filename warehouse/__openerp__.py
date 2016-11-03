@@ -48,7 +48,7 @@
         'menu/warehouse_menu.xml',
         'data/sequence.xml',
         'security/ir.model.access.csv',
-        'home_page_data.xml'
+        'data/home_page_data.xml'
     ],
     'demo': [
         'data/warehouse_demo.xml',
