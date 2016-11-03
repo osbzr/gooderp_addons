@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class goods(models.Model):
