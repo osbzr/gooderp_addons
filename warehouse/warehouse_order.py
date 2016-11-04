@@ -187,7 +187,7 @@ class wh_in(models.Model):
                 self.voucher_id.unlink()
 
 
-class wh_internal(osv.osv):
+class wh_internal(models.Model):
     _name = 'wh.internal'
     _order = 'date DESC, id DESC'
 
