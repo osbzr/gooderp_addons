@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models, api
+from datetime import datetime
 
 class staff_department(models.Model):
     _name = "staff.department"
@@ -90,6 +91,23 @@ class staff(models.Model):
     parent_id = fields.Many2one('staff', u'部门经理')
     job_id = fields.Many2one('staff.job', u'职位')
     notes = fields.Text(u'其他信息')
+
+    @api.model
+    def staff_contract_over_date(self):
+        # 员工合同到期，发送邮件给员工 和 部门经理（如果存在）
+        now = datetime.now().strftime("%Y-%m-%d")
+        for staff in self.search([]):
+            if not staff.contract_ids:
+                continue
+
+            for contract in staff.contract_ids:
+                print "now", contract.over_date, now, now == contract.over_date
+                if now == contract.over_date:
+                    self.env.ref('staff.contract_over_due_date_employee').send_mail(self.env.user.id)
+                    if staff.parent_id and staff.parent_id.work_email:
+                        self.env.ref('staff.contract_over_due_date_manager').send_mail(self.env.user.id)
+
+        return
 
 
 class res_users(models.Model):
