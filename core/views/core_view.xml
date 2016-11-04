@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
 	<data>
-		<template id="assets_backend" name="Core" inherit_id="web.assets_backend">
-            <xpath expr="." position="inside">
-                <script type="text/javascript" src="/core/static/src/js/core.js"></script>
-                <link rel="stylesheet" href="/core/static/src/css/style.css"/>
-            </xpath>
-        </template>
 
 		<!--根菜单-->
 		<menuitem id='setting_menu' name='配置' groups="core.master_groups" web_icon="core,static/description/core.png"/>
@@ -112,8 +106,8 @@
 					<group>
 						<field name="logo" widget="image"  class="oe_avatar oe_left"/>
                         <field name="name" class="oe_inline"/>
-						<field name="street"/>
-						<field name="phone"/>
+						<field name="street" required="1"/>
+						<field name="phone" required="1"/>
 						<field name="fax" string="手机"/>
 						<field name="zip"/>
 						<field name="start_date" readonly="1" />
@@ -140,7 +134,7 @@
 			<field name="act_window_id" ref="company_action"/>
 		</record>
 		<menuitem id='company_menu' name='系统参数' action='company_action' parent='system_menu' sequence='10'/>
-		<!--单位-->
+		<!--单位，菜单放在仓库模块下-->
 		<record id="uom_tree" model="ir.ui.view">
 			<field name="name">uom.tree</field>
 			<field name="model">uom</field>
@@ -166,7 +160,7 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<!--结算方式-->
+		<!--结算方式，菜单放在资金模块下-->
 		<record id="settle_mode_tree" model="ir.ui.view">
 			<field name="name">settle.mode.tree</field>
 			<field name="model">settle.mode</field>
@@ -192,7 +186,7 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<!--客户 form-->
+		<!--客户， 菜单放在资金和销售模块下-->
 		<record id="customer_address_form" model="ir.ui.view">
 			<field name="name">customer.address.form</field>
 			<field name="model">partner</field>
@@ -223,7 +217,6 @@
 				</form>
 			</field>
 		</record>
-		<!--客户-->
 		<record id="customer_tree" model="ir.ui.view">
 			<field name="name">客户列表</field>
 			<field name="model">partner</field>
@@ -274,7 +267,7 @@
 			<field name="view_id" ref="customer_address_form"/>
 			<field name="act_window_id" ref="customer_action"/>
 		</record>
-		<!--供应商 form-->
+		<!--供应商 菜单放在采购模块下-->
 		<record id="supplier_address_form" model="ir.ui.view">
 			<field name="name">supplier.address.form</field>
 			<field name="model">partner</field>
@@ -302,7 +295,6 @@
 				</form>
 			</field>
 		</record>
-		<!--供应商-->
 		<record id="vendor_tree" model="ir.ui.view">
 			<field name="name">供应商列表</field>
 			<field name="model">partner</field>
@@ -355,7 +347,7 @@
 		</record>
 		<!--用户-->
 		<menuitem id='users_menu' name="用户" action='base.action_res_users' parent='config_data_menu' sequence='1' groups="base.group_erp_manager"/>
-		<!--账户-->
+		<!--账户，菜单放在资金模块下-->
 		<record id="bank_account_tree" model="ir.ui.view">
 			<field name="name">bank.account.tree</field>
 			<field name="model">bank.account</field>
@@ -383,7 +375,7 @@
 			<field name="view_mode">tree</field>
 		</record>
 
-		<!--服务-->
+		<!--服务，菜单放在资金模块下-->
 		<record id="service_tree" model="ir.ui.view">
 			<field name="name">服务列表</field>
 			<field name="model">service</field>
@@ -484,27 +476,30 @@
 			<field name="view_mode">tree</field>
 			<field name="search_view_id" ref="pricing_search"/>
 		</record>
-
+		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
+        <!-- 用于清理业务数据 -->
 		<record id="business_data_table_tree" model="ir.ui.view">
 			<field name="name">business.data.table.tree</field>
 			<field name="model">business.data.table</field>
 			<field name="arch" type="xml">
 				<tree editable="TOP" string="业务数据表">
+				    <field name="model"/>
 					<field name="name"/>
 				</tree>
 			</field>
 		</record>
 		<record id="action_business_data_table" model="ir.actions.act_window">
-			<field name="name">业务数据表</field>
+			<field name="name">业务数据表名</field>
 			<field name="res_model">business.data.table</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree</field>
 		</record>
-		<menuitem id='menu_business_data_table' name='业务数据表' action='action_business_data_table' parent='base.menu_custom' sequence='60'/>
+		<menuitem id='menu_business_data' name='清空业务数据' parent='base.menu_custom' sequence='60'/>
+		<menuitem id='menu_business_data_table' name='业务数据表名' action='action_business_data_table' parent='menu_business_data' sequence='2'/>
 
 		<record id="clean_business_data_form" model="ir.ui.view">
-			<field name="name">清理业务数据表</field>
+			<field name="name">清空业务数据向导</field>
 			<field name="model">clean.business.data</field>
 			<field name="arch" type="xml">
 				<form string="Service">
@@ -521,7 +516,7 @@
 		</record>
 
 		<record id="action_clean_business_data" model="ir.actions.act_window">
-			<field name="name">清理业务数据表</field>
+			<field name="name">清空业务数据表</field>
 			<field name="res_model">clean.business.data</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
@@ -529,8 +524,9 @@
 			<field name="target">new</field>
 		</record>
 		<menuitem id='menu_clean_business_data' name='清理业务数据表' action='action_clean_business_data' parent='base.menu_custom' sequence='70'/>
-		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
+		
 
+        <!-- 用权限组来隐藏系统自带的根菜单 -->
 		<record model="ir.ui.menu" id="base.menu_administration">
             <field name="groups_id" eval="[(3, ref('base.group_erp_manager'))]"/>
         </record>

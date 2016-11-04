@@ -180,8 +180,6 @@ class wh_in(models.Model):
             if self.is_init:
                 vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
                 vouch_obj_lines = self.env['voucher.line'].search([
-                    '&',
-                    '&',
                     ('voucher_id', '=', vouch_obj.id),
                     ('goods_id', '=', self.line_in_ids.goods_id.id),
                     ('init_obj', '=', 'init_warehouse- %s' % (self.id)),])

@@ -390,11 +390,11 @@ class test_sell_delivery(TransactionCase):
         delivery._get_sell_money_state()
         self.assertEqual(delivery.money_state, u'全部收款')
 
-    def test_get_sell_return_state(self):
+    def test_get_sell_money_state_return(self):
         '''测试返回退款状态'''
         #  未退款
         self.return_delivery.sell_delivery_done()
-        self.return_delivery._get_sell_return_state()
+        self.return_delivery._get_sell_money_state()
         self.assertEqual(self.return_delivery.return_state, u'未退款')
 
         #  部分退款
@@ -404,7 +404,7 @@ class test_sell_delivery(TransactionCase):
         return_delivery.sell_delivery_done()
 
         # 判断状态
-        return_delivery._get_sell_return_state()
+        return_delivery._get_sell_money_state()
         self.assertEqual(return_delivery.return_state, u'部分退款')
 
         #  全部退款
@@ -413,7 +413,7 @@ class test_sell_delivery(TransactionCase):
         return_delivery.bank_account_id = self.bank_account
         return_delivery.sell_delivery_done()
         # 判断状态
-        return_delivery._get_sell_return_state()
+        return_delivery._get_sell_money_state()
         self.assertEqual(return_delivery.return_state, u'全部退款')
 
     def test_unlink(self):

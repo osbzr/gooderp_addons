@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<template id="assets_backend" name="Core" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!-- 
+                One2many字段增加复制按钮
+                使用 options="{'color':'random'}" 来实现多对多控件标签显示随机颜色
+                 -->
+                <script type="text/javascript" src="/core/static/src/js/core.js"></script>
+            </xpath>
+        </template>
+    </data>
+</openerp>

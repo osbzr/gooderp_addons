@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 系统里都是按 name 字符串搜索的，所以千万不要修改name -->
+        <record id='decimal_quantity' model="decimal.precision">
+            <field name="name">Quantity</field>
+            <field name="digits" eval="1"/>
+        </record>
+        <record id='decimal_amount' model="decimal.precision">
+            <field name="name">Amount</field>
+            <field name="digits" eval="2"/>
+        </record>
+        <record id="warehouse_general" model="warehouse">
+            <field name="name">主仓库</field>
+            <field name="code">General</field>
+            <field name='type'>stock</field>
+        </record>
+        <!-- 试用本系统的第一步就是修改公司名称 -->
+        <record id="base.main_company" model="res.company">
+            <field name="name">GoodERP测试公司</field>
+            <field name="currency_id" ref="base.CNY" />
+            <field name='cost_method'>average</field>
+        </record>
+        <!-- 本模块的这些数据表可以清空 -->
+        <record id="remove_core_value" model="business.data.table">
+            <field name="name">core.value</field>
+        </record>
+        <record id="remove_core_category" model="business.data.table">
+            <field name="name">core.category</field>
+        </record>
+        <record id="remove_uom" model="business.data.table">
+            <field name="name">uom</field>
+        </record>
+        <record id="remove_settle_mode" model="business.data.table">
+            <field name="name">settle.mode</field>
+        </record>
+        <record id="remove_partner" model="business.data.table">
+            <field name="name">partner</field>
+        </record>
+        <record id="remove_goods" model="business.data.table">
+            <field name="name">goods</field>
+        </record>
+        <record id="remove_staff" model="business.data.table">
+            <field name="name">staff</field>
+        </record>
+        <record id="remove_bank_account" model="business.data.table">
+            <field name="name">bank.account</field>
+        </record>
+        <record id="remove_service" model="business.data.table">
+            <field name="name">service</field>
+        </record>
+        <record id="remove_pricing" model="business.data.table">
+            <field name="name">pricing</field>
+        </record>
+    </data>
+</openerp>

@@ -228,23 +228,9 @@ class wh_inventory(models.Model):
             inventory.delete_line()
             line_ids = inventory.get_line_detail(inventory.uos_not_zero)
             for line in line_ids:
-                line_obj.create({
-                        'inventory_id': inventory.id,
-                        'warehouse_id': line.get('warehouse_id'),
-                        'goods_id': line.get('goods_id'),
-                        'attribute_id': line.get('attribute_id'),
-                        'lot': line.get('lot'),
-                        'uom_id': line.get('uom_id'),
-                        'uos_id': line.get('uos_id'),
-                        'real_qty': line.get('qty'),
-                        'real_uos_qty': line.get('uos_qty'),
-                        'inventory_qty': line.get('qty'),
-                        'inventory_uos_qty': line.get('uos_qty'),
-                    })
-
+                line_obj.create_wh_inventory_line_by_data(inventory.id,line)
             if line_ids:
                 inventory.state = 'query'
-
         return True
 
 
@@ -312,6 +298,22 @@ class wh_inventory_line(models.Model):
                 'title': u'错误',
                 'message': u'盘盈盘亏数量应该与辅助单位的盘盈盘亏数量盈亏方向一致',
             }}
+
+    def create_wh_inventory_line_by_data(self,inventory_id,line_data):
+        self.create({
+            'inventory_id': inventory_id,
+            'warehouse_id': line_data.get('warehouse_id'),
+            'goods_id': line_data.get('goods_id'),
+            'attribute_id': line_data.get('attribute_id'),
+            'lot': line_data.get('lot'),
+            'uom_id': line_data.get('uom_id'),
+            'uos_id': line_data.get('uos_id'),
+            'real_qty': line_data.get('qty'),
+            'real_uos_qty': line_data.get('uos_qty'),
+            'inventory_qty': line_data.get('qty'),
+            'inventory_uos_qty': line_data.get('uos_qty'),
+        })
+
 
     def line_role_back(self):
         self.inventory_qty = self.real_qty

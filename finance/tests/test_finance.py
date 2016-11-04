@@ -2,7 +2,8 @@
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
-
+from odoo import fields, models, api
+from odoo.tools import float_compare, float_is_zero
 class test_voucher(TransactionCase):
    
     def test_approve(self):
@@ -163,7 +164,12 @@ class test_period(TransactionCase):
 
         #这么写覆盖到了，但是这什么逻辑=。=
         self.env['voucher.line'].onchange_account_id()
-                                                    
+    def test_period_compare(self):
+        """测试会计期间比较的 代码 有三种情况 大于 小于 等于"""
+        period_id = self.env.ref('finance.period_201601')
+        last_period_id = self.env.ref('finance.period_201512')
+        self.env['finance.period'].period_compare(period_id,period_id)
+        self.env['finance.period'].period_compare(last_period_id,period_id)
 
 class test_finance_config_wizard (TransactionCase):
 

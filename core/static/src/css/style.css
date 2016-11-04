@@ -1,4 +1,0 @@
-.openerp a.button:focus, .openerp button:focus, .openerp .oe_button:focus, .openerp input[type='submit']:focus {
-    background-image: none !important;
-    background-color: #c02c2c !important;
-}
