@@ -727,6 +727,7 @@ class buy_receipt(models.Model):
 
     def _receipt_make_invoice(self):
         '''入库单/退货单 生成结算单'''
+        invoice_id = False
         if not self.is_return:
             if not self.invoice_by_receipt:
                 return False
@@ -737,11 +738,11 @@ class buy_receipt(models.Model):
             tax_amount = - sum(line.tax_amount for line in self.line_out_ids)
         categ = self.env.ref('money.core_category_purchase')
         if not float_is_zero(amount,2):
-            source_id = self.env['money.invoice'].create(
+            invoice_id = self.env['money.invoice'].create(
                 self._get_invoice_vals(categ,self.date, amount, tax_amount)
             )
-            self.invoice_id = source_id.id
-        return source_id
+            self.invoice_id = invoice_id.id
+        return invoice_id
 
     @api.one
     def _buy_amount_to_invoice(self):
