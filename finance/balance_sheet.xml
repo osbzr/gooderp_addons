@@ -6,20 +6,11 @@
             <field name="model">profit.statement</field>
             <field name="arch" type="xml">
                 <tree string='利润表' create='false' edit='false' >
-                    <field name="balance"/>
+                    <field name="balance" />
                     <field name="line_num"/>
                     <field name="cumulative_occurrence_balance"/>
                     <field name="current_occurrence_balance"/>
                 </tree>
-            </field>
-        </record>
-        <record id="profit_statement_search" model="ir.ui.view">
-            <field name="name">profit.statement.search</field>
-            <field name="model">profit.statement</field>
-            <field name="arch" type="xml">
-                <search string="利润表">
-                	<field name="balance"/>
-                </search>
             </field>
         </record>
         <record id="profit_statement_tree_template" model="ir.ui.view">
@@ -27,19 +18,11 @@
             <field name="model">profit.statement</field>
             <field name="arch" type="xml">
                 <tree string='利润表模板' editable="bottom" >
+                    <field name="sequence" widget="handle"/>
                     <field name="balance"/>
                     <field name="line_num"/>
                     <field name="occurrence_balance_formula" />
                 </tree>
-            </field>
-        </record>
-        <record id="profit_statement_template_search" model="ir.ui.view">
-            <field name="name">profit.statement.template.search</field>
-            <field name="model">profit.statement</field>
-            <field name="arch" type="xml">
-                <search string="利润表模板">
-                	<field name="balance"/>
-                </search>
             </field>
         </record>
         <record id="profit_statement_action_template" model="ir.actions.act_window">
@@ -59,6 +42,7 @@
             <field name="model">balance.sheet</field>
             <field name="arch" type="xml">
                 <tree string="资产负债表模板" editable="bottom" >
+                    <field name="sequence" widget="handle"/>
                     <field name="balance"/>
                     <field name="line_num"/>
                     <field name="balance_formula"/>
@@ -66,16 +50,6 @@
                      <field name="line_num_two"/>
                     <field name="balance_two_formula"  />
                 </tree>
-            </field>
-        </record>
-        <record id="balance_sheet_template_search" model="ir.ui.view">
-            <field name="name">balance.sheet.template.search</field>
-            <field name="model">balance.sheet</field>
-            <field name="arch" type="xml">
-                <search string="资产负债表模板">
-                	<field name="balance"/>
-                	<field name="balance_two"/>
-                </search>
             </field>
         </record>
         <record id="balance_sheet_tree_wizard" model="ir.ui.view">
@@ -92,16 +66,6 @@
                     <field name="beginning_balance_two"  />
                     <field name="ending_balance_two"  />
                 </tree>
-            </field>
-        </record>
-        <record id="balance_sheet_search" model="ir.ui.view">
-            <field name="name">balance.sheet.search</field>
-            <field name="model">balance.sheet</field>
-            <field name="arch" type="xml">
-                <search string="资产负债表">
-                	<field name="balance"/>
-                	<field name="balance_two"/>
-                </search>
             </field>
         </record>
         <record id="balance_sheet_action" model="ir.actions.act_window">
