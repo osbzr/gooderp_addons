@@ -36,5 +36,28 @@
         	<field name="deactive_date">3000-01-01</field>
         	<field name="discount_rate">0</field>
         </record>
+        <!-- 本模块的以下数据表可以清空 -->
+        <record id="remove_sell_order" model="business.data.table">
+            <field name="name">sell.order</field>
+        </record>
+        <record id="remove_sell_order_line" model="business.data.table">
+            <field name="name">sell.order.line</field>
+        </record>
+        <record id="remove_sell_delivery" model="business.data.table">
+            <field name="name">sell.delivery</field>
+        </record>
+        <record id="remove_sell_adjust" model="business.data.table">
+            <field name="name">sell.adjust</field>
+        </record>
+        <record id="remove_sell_adjust_line" model="business.data.table">
+            <field name="name">sell.adjust.line</field>
+        </record>
+        <!--清空报表数据-->
+        <record id="remove_sell_order_track" model="business.data.table">
+            <field name="name">sell.order.track</field>
+        </record>
+        <record id="remove_sell_receipt" model="business.data.table">
+            <field name="name">sell.receipt</field>
+        </record>
     </data>
 </openerp>
