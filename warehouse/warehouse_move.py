@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from odoo.osv import osv
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-
+from odoo.tools import float_compare
+from odoo.addons.core import compare_digits
 class wh_move(models.Model):
     _name = 'wh.move'
 
@@ -235,30 +235,22 @@ class wh_move(models.Model):
     @api.multi
     def check_goods_qty(self, goods, attribute, warehouse):
         '''SQL来取指定产品，属性，仓库，的当前剩余数量'''
+
         if attribute:
-            self.env.cr.execute('''
-                SELECT sum(line.qty_remaining) as qty
-                FROM wh_move_line line
-
-                WHERE line.warehouse_dest_id = %s
-                  AND line.state = 'done'
-                  AND line.attribute_id = %s
-            ''' % (warehouse.id, attribute.id,))
-
-            return self.env.cr.fetchone()
+            change_conditions = "AND line.attribute_id = %s" % attribute.id
         elif goods:
-            self.env.cr.execute('''
-                SELECT sum(line.qty_remaining) as qty
-                FROM wh_move_line line
-
-                WHERE line.warehouse_dest_id = %s
-                  AND line.state = 'done'
-                  AND line.goods_id = %s
-            ''' % (warehouse.id, goods.id,))
-
-            return self.env.cr.fetchone()
+            change_conditions = "AND line.goods_id = %s" % goods.id
         else:
-            return False
+            change_conditions = "AND 1 = 0"
+        self.env.cr.execute('''
+                       SELECT sum(line.qty_remaining) as qty
+                       FROM wh_move_line line
+
+                       WHERE line.warehouse_dest_id = %s
+                             AND line.state = 'done'
+                             %s
+                   ''' % (warehouse.id, change_conditions,))
+        return self.env.cr.fetchone()
 
     @api.multi
     def create_zero_wh_in(self,wh_in,model_name):
@@ -270,7 +262,7 @@ class wh_move(models.Model):
             else:
                 result = self.env['wh.move'].check_goods_qty(line.goods_id, line.attribute_id, wh_in.warehouse_id)
                 result = result[0] or 0
-            if line.goods_qty - result > 0 and not line.lot_id and not self.env.context.get('wh_in_line_ids'):
+            if float_compare(line.goods_qty, result, compare_digits) > 0 and not line.lot_id and not self.env.context.get('wh_in_line_ids'):
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
                 today = fields.Datetime.now()
                 vals.update({
@@ -297,5 +289,5 @@ class wh_move(models.Model):
                     'args': [vals],
                 })
 
-            if line.goods_qty <= 0 or line.price_taxed < 0:
+            if float_compare(line.goods_qty, 0,compare_digits) <= 0 or float_compare(line.price_taxed, 0,compare_digits) < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)

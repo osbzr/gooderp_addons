@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo.osv import osv
 from utils import inherits, inherits_after, create_name, create_origin
 import odoo.addons.decimal_precision as dp
 from odoo import models, fields, api
-
 
 class wh_out(models.Model):
     _name = 'wh.out'
