@@ -110,6 +110,7 @@ class supplier_statements_report(models.Model):
     @api.multi
     def find_source_order(self):
         # 查看原始单据，三情况：收付款单、采购退货单、采购入库单
+        self.ensure_one()
         money = self.env['money.order'].search([('name', '=', self.name)])
         # 付款单
         if money:
@@ -201,6 +202,7 @@ class supplier_statements_report_with_goods(models.TransientModel):
     @api.multi
     def find_source_order(self):
         # 三情况：收付款单、采购退货单、采购入库单
+        self.ensure_one()
         money = self.env['money.order'].search([('name', '=', self.name)])
         if money:  # 付款单
             view = self.env.ref('money.money_order_form')

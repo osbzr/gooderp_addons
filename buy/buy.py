@@ -656,10 +656,7 @@ class buy_receipt(models.Model):
         for receipt in self:
             if receipt.state == 'done':
                 raise UserError(u'不能删除已审核的单据')
-            move = self.env['wh.move'].search([
-                ('id', '=', receipt.buy_move_id.id)
-            ])
-            move.unlink()
+            receipt.buy_move_id.unlink()
 
         return super(buy_receipt, self).unlink()
 
@@ -757,36 +754,32 @@ class buy_receipt(models.Model):
                     )
         return
 
-    @api.one
-    def _make_payment(self, source_id):
+    def _make_payment(self, source_id, amount, this_reconcile):
         if not source_id:
             return False
-        if self.payment:
-            flag = not self.is_return and 1 or -1
-            amount = flag * self.amount
-            this_reconcile = flag * self.payment
-            categ = self.env.ref('money.core_category_purchase')
-            money_lines = [{'bank_id': self.bank_account_id.id, 'amount': this_reconcile}]
-            source_lines = [{'name': source_id.id,
-                             'category_id': categ.id,
-                             'date': source_id.date,
-                             'amount': amount,
-                             'reconciled': 0.0,
-                             'to_reconcile': amount,
-                             'this_reconcile': this_reconcile}]
-            rec = self.with_context(type='pay')
-            money_order = rec.env['money.order'].create({
-                    'partner_id': self.partner_id.id,
-                    'date': fields.Date.context_today(self),
-                    'line_ids':
-                    [(0, 0, line) for line in money_lines],
-                    'source_ids':
-                    [(0, 0, line) for line in source_lines],
-                    'type': 'pay',
-                    'amount': amount,
-                    'reconciled': this_reconcile,
-                    'to_reconcile': amount,
-                    'state': 'draft'})
+        categ = self.env.ref('money.core_category_purchase')
+        money_lines = [{'bank_id': self.bank_account_id.id, 'amount': this_reconcile}]
+        source_lines = [{'name': source_id.id,
+                         'category_id': categ.id,
+                         'date': source_id.date,
+                         'amount': amount,
+                         'reconciled': 0.0,
+                         'to_reconcile': amount,
+                         'this_reconcile': this_reconcile}]
+        rec = self.with_context(type='pay')
+        money_order = rec.env['money.order'].create({
+                'partner_id': self.partner_id.id,
+                'date': fields.Date.context_today(self),
+                'line_ids':
+                [(0, 0, line) for line in money_lines],
+                'source_ids':
+                [(0, 0, line) for line in source_lines],
+                'type': 'pay',
+                'amount': amount,
+                'reconciled': this_reconcile,
+                'to_reconcile': amount,
+                'state': 'draft'})
+        return money_order
 
     def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id):
         '''返回voucher line'''
@@ -855,11 +848,17 @@ class buy_receipt(models.Model):
         self.create_voucher()
 
         # 入库单/退货单 生成结算单
-        source_id = self._receipt_make_invoice()
+        invoice_id = self._receipt_make_invoice()
         # 采购费用产生结算单
         self._buy_amount_to_invoice()
         # 生成付款单
-        self._make_payment(source_id)
+        if self.payment:
+            flag = not self.is_return and 1 or -1
+            amount = flag * self.amount
+            this_reconcile = flag * self.payment
+            self._make_payment(invoice_id, amount, this_reconcile)
+            
+        self._make_payment(invoice_id)
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id and not self.modifying:
             return self.order_id.buy_generate_receipt()
@@ -925,6 +924,7 @@ class wh_move_line(models.Model):
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税'''
+        self.ensure_one()
         if self.goods_id:
             if not self.goods_id.cost:
                 raise UserError(u'请先设置商品的成本！')
@@ -959,6 +959,7 @@ class money_order(models.Model):
     @api.multi
     def money_order_done(self):
         ''' 将已核销金额写回到购货订单中的已执行金额 '''
+        self.ensure_one()
         res = super(money_order, self).money_order_done()
         for source in self.source_ids:
             if self.type == 'pay':
@@ -971,6 +972,7 @@ class money_order(models.Model):
     @api.multi
     def money_order_draft(self):
         ''' 将购货订单中的已执行金额清零'''
+        self.ensure_one()
         res = super(money_order, self).money_order_draft()
         move = False
         for source in self.source_ids:

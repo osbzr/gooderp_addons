@@ -136,6 +136,7 @@ class sell_summary_partner(models.Model):
     @api.multi
     def view_detail(self):
         '''销售汇总表（按客户）查看明细按钮'''
+        self.ensure_one()
         line_ids = []
         res = []
         move_lines = []

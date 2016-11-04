@@ -32,12 +32,8 @@ class sell_receipt_wizard(models.TransientModel):
     warehouse_id = fields.Many2one('warehouse', u'仓库',
                                    help=u'按指定仓库进行统计')
 
-    @api.multi
-    def button_ok(self):
-        res = []
-        if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！')
-
+    def _get_domain(self):
+        '''返回wizard界面上条件'''
         cond = [('date', '>=', self.date_start),
                 ('date', '<=', self.date_end),
                 ('state', '=', 'done')]
@@ -52,60 +48,69 @@ class sell_receipt_wizard(models.TransientModel):
         if self.warehouse_id:
             cond += ['|',('warehouse_id', '=', self.warehouse_id.id),
                      ('warehouse_dest_id', '=', self.warehouse_id.id)]
+        return cond
+
+    def _compute_receipt(self, delivery):
+        '''计算该发货单的已收款'''
+        receipt = 0
+        for order in self.env['money.order'].search(
+                    [('state', '=', 'done')], order='name'):
+            for source in order.source_ids:
+                if source.name.name == delivery.name:
+                    receipt += source.this_reconcile
+        return receipt
+
+    def _prepare_sell_receipt(self, delivery):
+        '''对于传入的发货单/退货单，为创建销售收款一览表准备数据'''
+        self.ensure_one()
+        factor = delivery.is_return and -1 or 1 # 如果是退货则金额均取反
+        sell_amount = factor * (delivery.discount_amount + delivery.amount)
+        discount_amount = factor * delivery.discount_amount
+        amount = factor * delivery.amount
+        partner_cost = factor * delivery.partner_cost
+        order_type = not delivery.is_return and u'普通销售' or u'销售退回'
+        warehouse = not delivery.is_return and delivery.warehouse_id or delivery.warehouse_dest_id
+        # 计算该发货单的已收款
+        receipt = self._compute_receipt(delivery)
+        # 计算回款率
+        receipt_rate = (amount + partner_cost) != 0 and (receipt / (amount + partner_cost)) * 100 or 0
+        return {
+            'c_category_id': delivery.partner_id.c_category_id.id,
+            'partner_id': delivery.partner_id.id,
+            'staff_id': delivery.staff_id.id,
+            'type': order_type,
+            'date': delivery.date,
+            'order_name': delivery.name,
+            'warehouse_id': warehouse.id,
+            'sell_amount': sell_amount,
+            'discount_amount': discount_amount,
+            'amount': amount,
+            'partner_cost': partner_cost,
+            'receipt': receipt,
+            'balance': amount + partner_cost - receipt,
+            'receipt_rate': receipt_rate,
+            'note': delivery.note,
+        }
+
+    @api.multi
+    def button_ok(self):
+        self.ensure_one()
+        res = []
+        if self.date_end < self.date_start:
+            raise UserError(u'开始日期不能大于结束日期！')
+
         delivery_obj = self.env['sell.delivery']
         count = sum_receipt_rate = 0
-        for delivery in delivery_obj.search(cond, order='partner_id'):
-            sell_amount = delivery.discount_amount + delivery.amount
-            discount_amount = delivery.discount_amount
-            amount = delivery.amount
-            partner_cost = delivery.partner_cost
+        for delivery in delivery_obj.search(self._get_domain(), order='partner_id'):
             # 用查找到的发货单信息来创建一览表
-            receipt = balance = 0
-            for order in self.env['money.order'].search(
-                        [('state', '=', 'done')], order='name'):
-                for source in order.source_ids:
-                    if source.name.name == delivery.name:
-                        receipt += source.this_reconcile
-
-            # 如果是退货则金额均取反
-            if not delivery.is_return:
-                order_type = u'普通销售'
-                warehouse = delivery.warehouse_id
-            elif delivery.is_return:
-                order_type = u'销售退回'
-                sell_amount = - sell_amount
-                discount_amount = - discount_amount
-                amount = - amount
-                partner_cost = - partner_cost
-                warehouse = delivery.warehouse_dest_id
-            # 计算回款率
-            receipt_rate = (amount + partner_cost) != 0 and (receipt / (amount + partner_cost)) * 100 or 0
-            line = self.env['sell.receipt'].create({
-                'c_category_id': delivery.partner_id.c_category_id.id,
-                'partner_id': delivery.partner_id.id,
-                'staff_id': delivery.staff_id.id,
-                'type': order_type,
-                'date': delivery.date,
-                'order_name': delivery.name,
-                'warehouse_id': warehouse.id,
-                'sell_amount': sell_amount,
-                'discount_amount': discount_amount,
-                'amount': amount,
-                'partner_cost': partner_cost,
-                'receipt': receipt,
-                'balance': amount + partner_cost - receipt,
-                'receipt_rate': receipt_rate,
-                'note': delivery.note,
-            })
+            line = self.env['sell.receipt'].create(
+                self._prepare_sell_receipt(delivery))
             res.append(line.id)
             count += 1
             sum_receipt_rate += line.receipt_rate
 
         # 创建一览表的合计行
-        if sum_receipt_rate == 0 and count == 0:
-            receipt_rate = 100
-        else:
-            receipt_rate = sum_receipt_rate / count
+        receipt_rate =  count != 0 and sum_receipt_rate / count or 0
         line_total = self.env['sell.receipt'].create({
             'order_name': u'平均回款率',
             'receipt_rate': receipt_rate,
