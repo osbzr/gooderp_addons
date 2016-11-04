@@ -754,14 +754,14 @@ class buy_receipt(models.Model):
                     )
         return
 
-    def _make_payment(self, source_id, amount, this_reconcile):
-        if not source_id:
+    def _make_payment(self, invoice_id, amount, this_reconcile):
+        if not invoice_id:
             return False
         categ = self.env.ref('money.core_category_purchase')
         money_lines = [{'bank_id': self.bank_account_id.id, 'amount': this_reconcile}]
-        source_lines = [{'name': source_id.id,
+        source_lines = [{'name': invoice_id.id,
                          'category_id': categ.id,
-                         'date': source_id.date,
+                         'date': invoice_id.date,
                          'amount': amount,
                          'reconciled': 0.0,
                          'to_reconcile': amount,
@@ -857,8 +857,6 @@ class buy_receipt(models.Model):
             amount = flag * self.amount
             this_reconcile = flag * self.payment
             self._make_payment(invoice_id, amount, this_reconcile)
-            
-        self._make_payment(invoice_id)
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id and not self.modifying:
             return self.order_id.buy_generate_receipt()
