@@ -38,6 +38,9 @@ class test_sell_order(TransactionCase):
              'warehouse_type': 'stock'
              }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
+        # 不传 warehouse_type 时
+        order2 = self.env['sell.order'].create({})
+        self.assertTrue(not order2.warehouse_id)
 
     def test_get_money_state(self):
         '''计算销货订单收款/退款状态'''

@@ -248,8 +248,6 @@ class sell_delivery(models.Model):
 
     def _make_money_order(self, invoice_id, amount, this_reconcile):
         '''生成收款单'''
-        if not invoice_id:
-            return False
         categ = self.env.ref('money.core_category_sale')
         money_lines = [{
             'bank_id': self.bank_account_id.id,
