@@ -200,7 +200,7 @@ class wh_internal(models.Model):
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
                                 store=True, readonly=True, digits=dp.get_precision('Amount'),
                                 help=u'该调拨单的出库金额总和')
-    trustees_id = fields.Many2one('staff', u'经办人')
+
 
     def goods_inventory(self, vals):
         auto_in = self.env['wh.in'].create(vals)

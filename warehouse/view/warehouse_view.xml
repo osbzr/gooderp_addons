@@ -432,7 +432,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name='trustees_id' attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                <field name='staff_id' attrs="{'readonly': [('state', '!=', 'draft')]}"
                                 	options="{'no_open': True, 'no_create': True}"/>
                                 <field name='warehouse_id'/>
                             </group>
