@@ -497,8 +497,6 @@ class sell_delivery(models.Model):
     is_return = fields.Boolean(u'是否退货', default=lambda self: \
                                self.env.context.get('is_return'),
                                help=u'是否为退货类型')
-    staff_id = fields.Many2one('staff', u'销售员', ondelete='restrict',
-                               help=u'单据负责人')
     order_id = fields.Many2one('sell.order', u'订单号', copy=False,
                                ondelete='cascade',
                                help=u'产生发货单/退货单的销货订单')

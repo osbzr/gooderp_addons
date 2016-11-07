@@ -36,7 +36,7 @@ class sell_order_detail(models.Model):
                     wm.name AS order_name,
                     (CASE WHEN wm.origin = 'sell.delivery.sell' THEN '销货'
                     ELSE '退货' END) AS type,
-                    sd.staff_id AS staff_id,
+                    wm.staff_id AS staff_id,
                     wm.partner_id AS partner_id,
                     goods.code AS goods_code,
                     goods.id AS goods_id,
@@ -70,7 +70,7 @@ class sell_order_detail(models.Model):
                   AND wm.origin like 'sell.delivery%%'
                   AND wh.type = 'stock'
 
-                GROUP BY wm.date, wm.name, origin, sd.staff_id, partner_id,
+                GROUP BY wm.date, wm.name, origin, wm.staff_id, partner_id,
                     goods_code, goods.id, attribute, wh.id, uom,
                     wml.price, wml.cost_unit, wml.note
                 )
