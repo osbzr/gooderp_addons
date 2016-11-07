@@ -1,0 +1,340 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 采购入库单视图 -->
+
+        <record id="buy_receipt_tree" model="ir.ui.view">
+            <field name="name">buy.receipt.tree</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <tree string="采购入库单">
+                    <field name='date'/>
+            		<field name='name'/>
+            		<field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="amount"/>
+            		<field name='payment'/>
+            		<field name='date_due'/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <field name='state'/>
+            		<field name='money_state'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="buy_receipt_form" model="ir.ui.view">
+            <field name="name">buy.receipt.form</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <form string="采购入库单">
+                <header>
+                	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label string="扫描条码 "/>
+                        <input type='text' class="ge_scan_barcode" autofocus="true"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" required='1'
+                            	attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                            <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="is_return" readonly="1" invisible="1"/>
+                            <field name="warehouse_dest_id"/>
+                            <field name="invoice_by_receipt" invisible="1"></field>
+                        </group>
+                        <group>
+                        	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="order_id" readonly="1"/>
+                            <field name='invoice_id' readonly='1'/>
+                            <field name='voucher_id'/>
+                            <field name="money_state" readonly='1'/>
+                            <field name="modifying" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                    	<page string="入库单行">
+		                    <field name="line_in_ids" attrs="{'readonly': [('state','!=','draft')]}"
+		                    	context="{
+		                    	'type':'in',
+		                    	}">
+		                    	<tree string="Buy Receipt Lines" editable="bottom">
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
+		                            <field name="attribute_id"
+		                            	domain="[('goods_id', '=', goods_id)]"
+		                            	groups='goods.multi_attrs_groups'
+		                            	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)],}"/>
+		                            <field name='lot' groups='goods.batch_groups'
+											attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
+		                            <field name="goods_uos_qty" sum="合计辅助数量"
+		                            	groups="goods.auxiliary_unit_groups"/>
+		                            <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+		                            <field name="goods_qty" sum="合计数量"/>
+		                            <field name="uom_id"/>
+		                            <field name="price"/>
+		                            <field name="price_taxed" groups='buy.in_tax_groups'/>
+				 					<field name='cost_unit'/>
+		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+		                            <field name="discount_amount" groups='buy.buy_line_discount_groups' readonly="0" sum="合计折扣额"/>
+		                            <field name="amount" string="购货金额" sum="合计金额"/>
+		                            <field name="tax_rate" groups='buy.in_tax_groups'/>
+		                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
+		                            <field name="note"/>
+		                            <field name="share_cost"/>
+		                            <field name="type" invisible="1"/>
+		                            <field name='using_attribute' invisible='1'/>
+		                            <field name='using_batch' invisible='1'/>
+				                    <field name='force_batch_one' invisible='1'/>
+		                        </tree>
+		                    </field>
+		                </page>
+		                <page string="采购费用行">
+		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
+		                		<tree string="Cost Lines" editable="bottom">
+		                			<field name="partner_id"
+		                				domain="[('s_category_id', '!=', False)]"
+		                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
+			                		<field name="category_id"/>
+			                		<field name="amount"/>
+			                		<field name="note"/>
+			                	</tree>
+		                	</field>
+		                	<button name="buy_share_cost" string="分摊" type="object"/>
+		                </page>
+		            </notebook>
+                    <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+                    <group>
+                        <group>
+                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
+                            <field name="amount"/>
+                        </group>
+                        <group>
+                        	<field name="payment" attrs="{'readonly': [('state','!=','draft')],
+                                                'invisible': [('invoice_by_receipt','=',False)]}"/>
+                            <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')],
+                                                        'invisible': [('invoice_by_receipt','=',False)]}"/>
+                            <field name="debt"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="create_uid" readonly="1" string="制单人"/>
+                            <field name="approve_uid" readonly="1"/>
+                        </group>
+                    	<group>
+                            <field name="create_date" readonly="1" string="录单时间"/>
+                            <field name="write_date" readonly="1" string="最后修改时间"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+        </record>
+
+		<record id="buy_receipt_search" model="ir.ui.view">
+            <field name="name">buy.receipt.search</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <search string="采购入库单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="money_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not paid" string="未付款" domain="[('money_state','=',u'未付款')]"/>
+                    <filter name="part paid" string="部分付款" domain="[('money_state','=',u'部分付款')]"/>
+                    <filter name="all paid" string="全部付款" domain="[('money_state','=',u'全部付款')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+		<!-- 采购退货单视图 -->
+
+        <record id="buy_return_tree" model="ir.ui.view">
+            <field name="name">buy.return.tree</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <tree string="采购退货单">
+                    <field name='date'/>
+            		<field name='name'/>
+            		<field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="amount"/>
+            		<field name='payment'/>
+            		<field name='date_due'/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <field name='state'/>
+            		<field name='return_state'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="buy_return_form" model="ir.ui.view">
+            <field name="name">buy.return.form</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <form string="采购退货单">
+                <header>
+                	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                    	<label string="扫描条码 "/>
+                        <input type='text' class="ge_scan_barcode" autofocus="true"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" required='1'
+                            	attrs="{'readonly': [('state','!=','draft')]}"
+                            	domain="[('s_category_id', '!=', False)]"
+                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                            <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="is_return" readonly="1" invisible="1"/>
+                            <field name="warehouse_id"/>
+                        </group>
+                        <group>
+                        	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="order_id" readonly="1"/>
+                            <field name='invoice_id' readonly='1'/>
+                            <field name='voucher_id'/>
+                            <field name="return_state" readonly="1"/>
+                            <field name="modifying" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                    	<page string="退货单行">
+		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
+		                    	context="{
+		                    	'type':'out',
+		                    	}">
+		                    	<tree string="Buy Receipt Lines" editable="bottom">
+		                            <field name="goods_id" required='1'
+		                            	context="{'default_partner':parent.partner_id,
+		         								  'default_is_return':parent.is_return}"/>
+		                            <field name="attribute_id"
+		                            	domain="[('goods_id', '=', goods_id)]"
+		                            	groups='goods.multi_attrs_groups'
+		                            	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
+                    				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
+                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
+                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
+                    					groups='goods.batch_groups'/>
+                    				<field name="goods_uos_qty" sum="合计辅助数量"
+		                            	groups="goods.auxiliary_unit_groups"/>
+		                            <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+		                            <field name="goods_qty" sum="合计数量"/>
+		                            <field name="uom_id"/>
+		                            <field name="price"/>
+		                            <field name="price_taxed" groups='buy.in_tax_groups'/>
+		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+		                            <field name="discount_amount" readonly="0" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
+		                            <field name="amount" string="购货金额" sum="合计金额"/>
+		                            <field name="tax_rate" groups='buy.in_tax_groups'/>
+		                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
+		                            <field name="note"/>
+		                            <field name="type" invisible="1"/>
+		                            <field name='using_attribute' invisible='1'/>
+		                            <field name='using_batch' invisible='1'/>
+		                            <field name='lot_qty' invisible='1'/>
+		                        </tree>
+		                    </field>
+		                </page>
+		                <page string="采购费用行">
+		                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
+		                		<tree string="Cost Lines" editable="bottom">
+		                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
+			                		<field name="category_id"/>
+			                		<field name="amount"/>
+			                		<field name="note"/>
+			                	</tree>
+		                	</field>
+		                </page>
+		            </notebook>
+                    <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+                    <group>
+                        <group>
+                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
+                            <field name="amount"/>
+                        </group>
+                        <group>
+                        	<field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name="debt"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="create_uid" readonly="1" string="制单人"/>
+                            <field name="approve_uid" readonly="1"/>
+                        </group>
+                    	<group>
+                            <field name="create_date" readonly="1" string="录单时间"/>
+                            <field name="write_date" readonly="1" string="最后修改时间"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+        </record>
+
+		<record id="buy_return_search" model="ir.ui.view">
+            <field name="name">buy.return.search</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <search string="采购退货单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="return_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
+                    <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
+                    <filter name="all refund" string="全部退款" domain="[('return_state','=',u'全部退款')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+	</data>
+</openerp>
