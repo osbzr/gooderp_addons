@@ -11,7 +11,12 @@
     'data': [
         'data/buy_data.xml',
         'security/groups.xml',
-        'views/buy_view.xml',
+        'views/buy_order_view.xml',
+        'views/buy_receipt_view.xml',
+        'views/buy_adjust_view.xml',
+        'views/buy_action.xml',
+        'views/buy_menu.xml',
+        'views/vendor_goods_view.xml',
         'wizard/buy_order_track_wizard_view.xml',
         'wizard/buy_order_detail_wizard_view.xml',
         'wizard/buy_summary_goods_wizard_view.xml',

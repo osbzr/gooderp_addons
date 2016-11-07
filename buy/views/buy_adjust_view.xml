@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+		<!-- 采购调整单视图 -->
+
+    	<record id="buy_adjust_tree" model="ir.ui.view">
+            <field name="name">buy.adjust.tree</field>
+            <field name="model">buy.adjust</field>
+            <field name="arch" type="xml">
+                <tree string="采购调整单">
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="buy_adjust_form" model="ir.ui.view">
+            <field name="name">buy.adjust.form</field>
+            <field name="model">buy.adjust</field>
+            <field name="arch" type="xml">
+                <form string="采购调整单">
+                <header>
+                	<button name="buy_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id" required="1"
+                            	domain="[('state', '=', 'done'), ('type', '=', 'buy')]"
+                            	options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                        	<field name="date" required="1"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                    	<tree string="采购调整单行" editable="bottom">
+                            <field name="goods_id" required='1'/>
+                            <field name="attribute_id"
+                            	groups='goods.multi_attrs_groups'
+                            	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
+                            <field name="quantity" sum="合计数量"/>
+                            <field name="uom_id"/>
+                            <field name="price"/>
+                            <field name="price_taxed" groups='buy.in_tax_groups'/>
+                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+                            <field name="discount_amount" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
+                            <field name="amount" sum="合计金额"/>
+                            <field name="tax_rate" groups='buy.in_tax_groups'/>
+                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
+                            <field name="note"/>
+                            <field name='using_attribute' invisible='1'/>
+                        </tree>
+                    </field>
+
+                    <field name="note" placeholder="暂无备注信息"/>
+                    <group>
+                        <group>
+                            <field name="create_uid" readonly="1" string="制单人"/>
+                            <field name="approve_uid" readonly="1"/>
+                        </group>
+                    	<group>
+                            <field name="create_date" readonly="1" string="录单时间"/>
+                            <field name="write_date" readonly="1" string="最后修改时间"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+        </record>
+
+		<record id="buy_adjust_search" model="ir.ui.view">
+            <field name="name">buy.adjust.search</field>
+            <field name="model">buy.adjust</field>
+            <field name="arch" type="xml">
+                <search string="采购调整单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+	</data>
+</openerp>
