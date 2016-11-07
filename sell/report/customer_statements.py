@@ -129,6 +129,7 @@ class customer_statements_report(models.Model):
     @api.multi
     def find_source_order(self):
         # 查看原始单据，三种情况：收款单、销售退货单、销售发货单
+        self.ensure_one()
         money = self.env['money.order'].search([('name', '=', self.name)])
         # 收款单
         if money:
@@ -209,6 +210,7 @@ class customer_statements_report_with_goods(models.TransientModel):
     @api.multi
     def find_source_order(self):
         # 查看原始单据，三种情况：收款单、销售退货单、销售发货单
+        self.ensure_one()
         money = self.env['money.order'].search([('name', '=', self.name)])
         if money:  # 收款单
             view = self.env.ref('money.money_order_form')

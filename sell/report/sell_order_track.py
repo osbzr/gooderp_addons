@@ -27,6 +27,7 @@ class sell_order_track(models.TransientModel):
     @api.multi
     def view_detail(self):
         '''查看明细按钮'''
+        self.ensure_one()
         order = self.env['sell.order'].search([('name', '=', self.order_name)])
         if order:
             view = self.env.ref('sell.sell_order_form')

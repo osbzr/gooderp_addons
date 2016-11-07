@@ -79,6 +79,7 @@ class sell_order_detail(models.Model):
     @api.multi
     def view_detail(self):
         '''查看明细按钮'''
+        self.ensure_one()
         order = self.env['sell.delivery'].search([('name', '=', self.order_name)])
         if order:
             if not order.is_return:

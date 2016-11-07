@@ -598,9 +598,6 @@ class sell_delivery(models.Model):
         for delivery in self:
             if delivery.state == 'done':
                 raise UserError(u'不能删除已审核的销售发货单')
-#             move = self.env['wh.move'].search(
-#                 [('id', '=', delivery.sell_move_id.id)])
-#             if move:
             delivery.sell_move_id.unlink()
 
         return super(sell_delivery, self).unlink()
@@ -803,6 +800,7 @@ class wh_move_line(models.Model):
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的零售价，以及公司的销项税'''
+        self.ensure_one()
         if self.goods_id:
             is_return = self.env.context.get('default_is_return')
             # 如果是销售发货单行 或 销售退货单行
@@ -834,6 +832,7 @@ class money_order(models.Model):
     @api.multi
     def money_order_done(self):
         ''' 将已核销金额写回到销货订单中的已执行金额 '''
+        self.ensure_one()
         res = super(money_order, self).money_order_done()
         move = False
         for source in self.source_ids:
@@ -847,6 +846,7 @@ class money_order(models.Model):
     @api.multi
     def money_order_draft(self):
         ''' 将销货订单中的已执行金额清零'''
+        self.ensure_one()
         res = super(money_order, self).money_order_draft()
         move = False
         for source in self.source_ids:
@@ -979,7 +979,8 @@ class sell_adjust_line(models.Model):
     @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
-        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.price = (self.tax_rate != -100 and
+                      self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
         self.amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
         self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
         self.subtotal = self.amount + self.tax_amount
@@ -1039,6 +1040,7 @@ class sell_adjust_line(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、含税单价或优惠率发生变化时，优惠金额发生变化'''
-        price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        price = (self.tax_rate != -100 and
+                 self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
         self.discount_amount = (self.quantity * price *
                                 self.discount_rate * 0.01)

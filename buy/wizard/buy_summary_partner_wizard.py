@@ -32,6 +32,7 @@ class buy_summary_partner_wizard(models.TransientModel):
 
     @api.multi
     def button_ok(self):
+        self.ensure_one()
         if self.date_end < self.date_start:
             raise UserError(u'开始日期不能大于结束日期！')
         read_fields = ['date_start', 'date_end', 'partner_id',

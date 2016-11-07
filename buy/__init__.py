@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
-import buy
+import models
 import wizard
 import report
