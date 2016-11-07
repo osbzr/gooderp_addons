@@ -63,25 +63,18 @@ class buy_payment_wizard(models.TransientModel):
         payment_rate = amount != 0 and (payment / amount) * 100 or 0.0
         return payment_rate
 
-    @api.multi
-    def _create_buy_payment(self, receipt):
-        '''对于传入的入库单，创建采购付款一览表'''
-        purchase_amount = receipt.discount_amount + receipt.amount
-        discount_amount = receipt.discount_amount
-        amount = receipt.amount
-        # 计算该入库单的已付款和应付款余额
+    def _prepare_buy_payment(self, receipt):
+        '''对于传入的入库单，为创建采购付款一览表准备数据'''
+        self.ensure_one()
+        factor = not receipt.is_return and 1 or -1 # 如果是退货则金额均取反
+        purchase_amount = factor * (receipt.discount_amount + receipt.amount)
+        discount_amount = factor * receipt.discount_amount
+        amount = factor * receipt.amount
+        order_type = receipt.is_return and u'采购退回' or u'普通采购'
+        warehouse = receipt.is_return and receipt.warehouse_id or receipt.warehouse_dest_id
+        # 计算该入库单的已付款
         payment = self._compute_payment(receipt)
-        # 如果是退货则金额均取反
-        if not receipt.is_return:
-            order_type = u'普通采购'
-            warehouse = receipt.warehouse_dest_id
-        elif receipt.is_return:
-            order_type = u'采购退回'
-            purchase_amount = - purchase_amount
-            discount_amount = - discount_amount
-            amount = - amount
-            warehouse = receipt.warehouse_id
-        return self.env['buy.payment'].create({
+        return {
             'partner_id': receipt.partner_id.id,
             'type': order_type,
             'date': receipt.date,
@@ -94,7 +87,7 @@ class buy_payment_wizard(models.TransientModel):
             'balance': amount - payment,
             'payment_rate': self._compute_payment_rate(payment, amount),
             'note': receipt.note,
-        })
+        }
 
     @api.multi
     def button_ok(self):
@@ -106,7 +99,7 @@ class buy_payment_wizard(models.TransientModel):
         count = sum_payment_rate = 0    # 行数及所有行的付款率之和
         for receipt in receipt_obj.search(self._get_domain(), order='partner_id,date'):
             # 用查找到的入库单信息来创建一览表
-            line = self._create_buy_payment(receipt)
+            line = self.env['buy.payment'].create(self._prepare_buy_payment(receipt))
             res.append(line.id)
             count += 1
             sum_payment_rate += line.payment_rate

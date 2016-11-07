@@ -33,6 +33,7 @@ class buy_order_detail_wizard(models.TransientModel):
     @api.multi
     def button_ok(self):
         '''向导上的确定按钮'''
+        self.ensure_one()
         if self.date_end < self.date_start:
             raise UserError(u'开始日期不能大于结束日期！')
 

@@ -131,6 +131,7 @@ class buy_summary_partner(models.Model):
     @api.multi
     def view_detail(self):
         '''采购汇总表（按供应商）查看明细按钮'''
+        self.ensure_one()
         line_ids = []
         res = []
         move_lines = []
