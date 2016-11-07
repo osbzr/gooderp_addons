@@ -2,8 +2,6 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-from odoo.tools import float_compare
-from odoo.addons.core import compare_digits
 class wh_move(models.Model):
     _name = 'wh.move'
 
@@ -262,7 +260,7 @@ class wh_move(models.Model):
             else:
                 result = self.env['wh.move'].check_goods_qty(line.goods_id, line.attribute_id, wh_in.warehouse_id)
                 result = result[0] or 0
-            if float_compare(line.goods_qty, result, compare_digits) > 0 and not line.lot_id and not self.env.context.get('wh_in_line_ids'):
+            if line.goods_qty > result and not line.lot_id and not self.env.context.get('wh_in_line_ids'):
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
                 today = fields.Datetime.now()
                 vals.update({
@@ -289,5 +287,5 @@ class wh_move(models.Model):
                     'args': [vals],
                 })
 
-            if float_compare(line.goods_qty, 0,compare_digits) <= 0 or float_compare(line.price_taxed, 0,compare_digits) < 0:
+            if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
