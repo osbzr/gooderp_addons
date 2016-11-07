@@ -238,11 +238,21 @@ class finance_period(models.Model):
     @api.one
     @api.depends('year', 'month')
     def _compute_name(self):
+        """
+        根据填写的月份年份 设定期间的name值
+        :return: None
+        """
         if self.year and self.month:
             self.name = u'%s年 第%s期' % (self.year, self.month)
 
     @api.multi
     def period_compare(self,period_id_one,period_id_two):
+        """
+        比较期间的大小
+        :param period_id_one: 要比较的期间 1
+        :param period_id_two:要比较的期间 2
+        :return: 1 0 -1 分别代表 期间1 大于 等于 小于 期间2
+        """
         period_one_str = "%s-%s"%(period_id_one.year,str(period_id_one.month).zfill(2))
         period_two_str = "%s-%s"%(period_id_two.year,str(period_id_two.month).zfill(2))
         if period_one_str > period_two_str:
@@ -277,6 +287,11 @@ class finance_period(models.Model):
 
     @api.multi
     def get_period_month_date_range(self, period_id):
+        """
+        取得 period_id 期间的第一天 和最后一天
+        :param period_id: 要取得一个月 最后一天和第一天的期间
+        :return: 返回一个月的第一天和最后一天 （'2016-01-01','2016-01-31'）
+        """
         month_day_range = calendar.monthrange(int(period_id.year), int(period_id.month))
         return ("%s-%s-01" % (period_id.year, period_id.month), "%s-%s-%s" % (period_id.year, period_id.month, str(month_day_range[1])))
 
@@ -298,6 +313,11 @@ class finance_period(models.Model):
 
     @api.multi
     def get_period(self, date):
+        """
+        根据参数date 得出对应的期间
+        :param date: 需要取得期间的时间
+        :return: 对应的期间
+        """
         if date:
             period_id = self.search([
                 ('year', '=', date[0:4]),
@@ -357,6 +377,10 @@ class finance_account(models.Model):
     @api.multi
     @api.depends('name', 'code')
     def name_get(self):
+        """
+        在其他model中用到account时在页面显示 code name 如：2202 应付账款 （更有利于会计记账）
+        :return:
+        """
         result = []
         for line in self:
             account_name = line.code + ' ' + line.name
@@ -375,12 +399,20 @@ class finance_account(models.Model):
 
     @api.multi
     def get_smallest_code_account(self):
+        """
+        取得最小的code对应的account对象
+        :return: 最小的code 对应的对象
+        """
         finance_account_row = self.search([],order='code')
         return finance_account_row and finance_account_row[0]
 
 
     @api.multi
     def get_max_code_account(self):
+        """
+        取得最大的code对应的account对象
+        :return: 最大的code 对应的对象
+        """
         finance_account_row = self.search([],order='code desc')
         return finance_account_row and finance_account_row[0]
 

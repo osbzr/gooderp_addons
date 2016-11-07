@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-from odoo.osv import osv
 import odoo.addons.decimal_precision as dp
 from utils import safe_division
 from jinja2 import Environment, PackageLoader
@@ -47,7 +45,7 @@ class wh_move_line(models.Model):
     @api.depends('goods_qty', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变金额、税额、价税合计'''
-        self.price = self.tax_rate != -100 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0
+        self.price = self.tax_rate+100 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0
         self.amount = self.goods_qty * self.price - self.discount_amount  # 折扣后金额
         self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
         self.subtotal = self.amount + self.tax_amount
@@ -287,7 +285,7 @@ class wh_move_line(models.Model):
             self.uom_id = self.goods_id.uom_id
             self.uos_id = self.goods_id.uos_id
             self.attribute_id = False
-            self.cost_unit = self.tax_rate != -100 and self.goods_id.cost / (1 + self.tax_rate * 0.01) or 0
+            self.cost_unit = self.tax_rate+100 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0
             if self.goods_id.using_batch and self.goods_id.force_batch_one:
                 self.goods_qty = 1
                 self.goods_uos_qty = self.goods_id.anti_conversion_unit(

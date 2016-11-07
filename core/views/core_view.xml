@@ -503,6 +503,9 @@
 			<field name="model">clean.business.data</field>
 			<field name="arch" type="xml">
 				<form string="Service">
+					<header>
+						<h2 style="color:red">数据清理后不能恢复，请先备份再进行操作！</h2>
+					</header>
 					<group>
 						<field name="need_clean_table" widget="many2many_tags" options="{'color':'random','no_create':True}"/>
 					</group>

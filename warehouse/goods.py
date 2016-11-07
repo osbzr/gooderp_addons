@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo.osv import osv
 from utils import safe_division
 from odoo.exceptions import UserError
 from odoo import models, fields, api
-
 
 class goods(models.Model):
     _inherit = 'goods'
