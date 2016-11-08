@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
-import sell
+import models
 import wizard
 import report
