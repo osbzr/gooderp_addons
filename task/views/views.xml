@@ -121,9 +121,9 @@
 							</group>
 						</group>
 						<field name="timeline_ids">
-							<tree string="进展" edit='0'>
-								<field name="create_uid"/>
-								<field name="create_date"/>
+							<tree string="进展" create='0' edit='0'>
+								<field name="create_uid" string='创建人'/>
+								<field name="create_date" string='创建时间'/>
 								<field name='hours' sum="全天合计"/>
 								<field name='just_done'/>
 							</tree>
@@ -170,16 +170,31 @@
 			<field name="name">项目</field>
 			<field name="res_model">project</field>
 			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建一个项目
+              </p>
+            </field>
 		</record>
 		<record model="ir.actions.act_window" id="action_task">
 			<field name="name">任务</field>
 			<field name="res_model">task</field>
-			<field name="view_mode">tree,form,kanban</field>
+			<field name="view_mode">kanban,tree,form</field>
+			<field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建一个任务
+              </p>
+            </field>
 		</record>
 		<record model="ir.actions.act_window" id="action_timesheet">
 			<field name="name">时间记录</field>
 			<field name="res_model">timesheet</field>
 			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建一个时间记录
+              </p>
+            </field>
 		</record>
 		<menuitem name="任务" id="menu_task_root" web_icon="task,static/description/task.png"/>
 		<menuitem name="任务" id="menu_task_data" parent="menu_task_root"/>
