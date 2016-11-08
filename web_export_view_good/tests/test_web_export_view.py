@@ -35,7 +35,7 @@ class TestWebExportViewTwo(TransactionCase):
 class TestReportTemplate(TransactionCase):
 
     def test_compute_model_name(self):
-        template = self.env['report.template'].create({'is_active':True,'file_address':u'dqjioie'})
+        template = self.env['report.template'].create({'active':True,'file_address':u'dqjioie'})
         template.get_time('res.partner')
 
 

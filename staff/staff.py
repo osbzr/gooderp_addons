@@ -65,13 +65,14 @@ class staff(models.Model):
     is_investoren = fields.Boolean(u'是否投资者')
     is_bsw = fields.Boolean(u'是否残疾烈属孤老')
     type_of_certification = fields.Selection([
-                              ('male', u'居民身份证'),
-                              ('female', u'军官证'),
-                              ('female', u'士兵证'),
-                              ('female', u'武警警官证'),
-                              ('female', u'护照'),
+                              ('ID', u'居民身份证'),
+                              ('Military_ID', u'军官证'),
+                              ('Soldiers_Card', u'士兵证'),
+                              ('Police_badge', u'武警警官证'),
+                              ('Passport_card', u'护照'),
                               ],
                               u'证照类型',
+                              default='ID',
                               required=True)
     gender = fields.Selection([
                               ('male', u'男'),
