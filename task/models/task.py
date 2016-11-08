@@ -7,7 +7,7 @@ TASK_STATES = [
     ('todo', u'新建'),
     ('doing', u'正在进行'),
     ('done', u'已完成'),
-    ('canceled', u'已取消'),
+    ('cancel', u'已取消'),
 ]
 
 
@@ -35,15 +35,15 @@ class project(models.Model):
 class task(models.Model):
     _name = 'task'
     _inherit = ['mail.thread']
-
-    # TODO 继承mail形成跟踪记录
+    _order = 'sequence, id'
 
     @api.multi
     def _compute_hours(self):
-        self.ensure_one()
-        for line in self.env['timeline'].search(
-                            [('task_id', '=', self.id)]):
-            self.hours += line.hours
+        '''计算任务的实际时间'''
+        for task in self:
+            for line in self.env['timeline'].search(
+                                [('task_id', '=', task.id)]):
+                task.hours += line.hours
 
     name = fields.Char(
         string=u'名称',
@@ -86,9 +86,21 @@ class task(models.Model):
     plan_hours = fields.Float(u'计划时间')
     hours = fields.Float(u'实际时间',
                          compute=_compute_hours)
+    sequence = fields.Integer(u'顺序')
+    is_schedule = fields.Boolean(u'列入计划')
+
+    @api.multi
+    def assign_to_me(self):
+        '''将任务指派给自己，并修改状态'''
+        self.ensure_one()
+        next_status = self.env['task.status'].search([('state', '=', 'doing')])
+        self.user_id = self.env.user
+        if next_status:
+            self.status = next_status[0]
 
 class task_status(models.Model):
     _name = 'task.status'
+    _order = 'sequence, id'
     
     name = fields.Char(u'名称')
     state = fields.Selection(TASK_STATES,
@@ -103,6 +115,7 @@ class timesheet(models.Model):
     date = fields.Date(
         string=u'日期',
         required=True,
+        readonly=True,
         default=fields.Date.context_today)
 
     user_id = fields.Many2one(
@@ -132,6 +145,9 @@ class timesheet(models.Model):
         context={},
         limit=None
     )
+    _sql_constraints = [
+        ('user_uniq', 'unique(user_id,date)', '同一个人一天只能创建一个工作日志')
+    ]
 
     @api.multi
     def name_get(self):
@@ -155,6 +171,12 @@ class timeline(models.Model):
         required=True,
         readonly=False,
         comodel_name='task',
+    )
+
+    project_id = fields.Many2one(
+        string=u'项目',
+        related='task_id.project_id',
+        ondelete='cascade',
     )
 
     user_id = fields.Many2one(
