@@ -15,7 +15,7 @@ class res_company(models.Model):
     cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法',
                                    help=u'''GoodERP仓库模块使用先进先出规则匹配
                                    每次出库对应的入库成本和数量，但不实时记账。
-                                   财务月结时使用此方法相应调整发出成本''',required=True)
+                                   财务月结时使用此方法相应调整发出成本''', default='average',required=True)
     draft_invoice = fields.Boolean(u'根据发票确认应收应付',
                                    help=u'勾选这里，所有新建的结算单不会自动记账')
     import_tax_rate = fields.Float(string=u"默认进项税税率")

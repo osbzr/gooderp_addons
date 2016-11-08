@@ -8,6 +8,8 @@ class test_staff(TransactionCase):
     def test_get_image(self):
         '''拿到用户头像,职位的onchange'''
         staff_pro = self.env['staff'].create({
+                                              'identification_id':111111,
+                                              'work_phone':12345678901,
                                               'name': 'DemoUser',
                                               'user_id': 1,
                                               'job_id': self.env.ref('staff.staff_job_1').id})
