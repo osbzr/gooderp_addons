@@ -48,7 +48,7 @@ class checkout_wizard(models.TransientModel):
                             ('voucher_id.period_id', '=', self.period_id.id)])
                         credit_total = 0
                         for voucher_line_id in voucher_line_ids:
-                            credit_total += voucher_line_id.credit
+                            credit_total += voucher_line_id.credit - voucher_line_id.debit
                         revenue_total += credit_total
                         if credit_total != 0:
                             res = {
@@ -64,7 +64,7 @@ class checkout_wizard(models.TransientModel):
                             ('voucher_id.period_id', '=', self.period_id.id)])
                         debit_total = 0
                         for voucher_line_id in voucher_line_ids:
-                            debit_total += voucher_line_id.debit
+                            debit_total += voucher_line_id.debit - voucher_line_id.credit
                         expense_total += debit_total
                         if debit_total != 0:
                             res = {
