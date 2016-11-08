@@ -5,12 +5,7 @@
 from odoo.report.report_sxw import report_sxw
 import logging
 import random
-from pyPdf import PdfFileWriter, PdfFileReader
-from reportlab.pdfgen import canvas
-import os
-import base64
 from docxtpl import DocxTemplate
-from odoo.tools.translate import _
 from odoo.tools import misc
 import ooxml
 from ooxml import parse, serialize, importer
