@@ -241,12 +241,6 @@ class test_buy_receipt(TransactionCase):
                        [('order_id', '=', self.order.id)])
         receipt.buy_receipt_done()
 
-    def test_make_payment_no_invoice(self):
-        '''入库单优惠后金额为0，不生成发票和收款单'''
-        self.receipt.discount_amount = 585
-        self.receipt._make_payment(False, 0, 0)
-        self.assertTrue(not self.receipt.invoice_id)
-
     def test_buy_receipt_draft(self):
         '''反审核采购入库单/退货单'''
         # 先审核入库单，再反审核
