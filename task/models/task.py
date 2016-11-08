@@ -7,7 +7,7 @@ TASK_STATES = [
     ('todo', u'新建'),
     ('doing', u'正在进行'),
     ('done', u'已完成'),
-    ('canceled', u'已取消'),
+    ('cancel', u'已取消'),
 ]
 
 
@@ -39,6 +39,7 @@ class task(models.Model):
 
     @api.multi
     def _compute_hours(self):
+        '''计算任务的实际时间'''
         for task in self:
             for line in self.env['timeline'].search(
                                 [('task_id', '=', task.id)]):
