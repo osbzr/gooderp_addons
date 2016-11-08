@@ -1,0 +1,61 @@
+<openerp>
+  <data>
+
+    <record model="ir.ui.view" id="timesheet_treet">
+      <field name="name">时间记录列表</field>
+      <field name="model">timesheet</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="date"/>
+          <field name="user_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="timesheet_form">
+      <field name="name">时间记录</field>
+      <field name="model">timesheet</field>
+      <field name="arch" type="xml">
+        <form string="时间记录">
+        <sheet>
+          <group>
+          <group>
+          <field name="user_id"/>
+          <field name="date"/>
+          </group>
+          <group>
+          <field name="task_ids">
+             <tree string="计划">
+                <field name="name"/>
+             </tree>
+          </field>
+          </group>
+          </group>
+          <field name="timeline_ids">
+            <tree string="进展"  editable='BOTTOM'>
+             <field name='task_id'/>
+             <field name='hours' sum="全天合计"/>
+             <field name='just_done'/>
+             <field name='next_action'/>
+             <field name='next_datetime'/>
+             </tree>
+          </field>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="action_timesheet">
+      <field name="name">时间记录</field>
+      <field name="res_model">timesheet</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="任务" id="menu_task_root" web_icon="task,static/description/task.png"/>
+
+    <menuitem name="任务" id="menu_task_data" parent="menu_task_root"/>
+
+    <menuitem name="时间记录" id="menu_timesheet" parent="menu_task_data"
+              action="action_timesheet"/>
+  </data>
+</openerp>
