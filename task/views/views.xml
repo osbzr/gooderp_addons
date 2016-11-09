@@ -2,14 +2,14 @@
 	<data>
 
 		<!-- <record model="ir.ui.view" id="timesheet_tree">
-			<field name="name">今日</field>
-			<field name="model">timesheet</field>
-			<field name="arch" type="xml">
-				<tree>
-					<field name="date"/>
-					<field name="user_id"/>
-				</tree>
-			</field>
+		<field name="name">今日</field>
+		<field name="model">timesheet</field>
+		<field name="arch" type="xml">
+		<tree>
+		<field name="date"/>
+		<field name="user_id"/>
+		</tree>
+		</field>
 		</record> -->
 		<record model="ir.ui.view" id="timesheet_form">
 			<field name="name">今日</field>
@@ -251,6 +251,9 @@
 			<field name="res_model">timesheet</field>
 			<field name="view_mode">kanban,form</field>
 			<field name="domain">[('date', '=', context_today().strftime('%Y-%m-%d')),('user_id', '=', uid)]</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个今日工作日志</p>
+			</field>
 		</record>
 		<record model="ir.actions.act_window" id="action_task_status">
 			<field name="name">任务阶段</field>
