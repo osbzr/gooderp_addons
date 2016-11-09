@@ -556,7 +556,7 @@ class voucher(models.Model):
             depreciation_previous = asset.depreciation_previous
             '''固定资产'''
             if asset.account_asset.id not in res:
-                res[asset.account_asset.id] = {'credit':0,'debit': 0,'cate':'asset'}
+                res[asset.account_asset.id] = {'credit':0,'debit': 0} # vorcher_line 没有这个字段 ,'cate':'asset'
 
             val = res[asset.account_asset.id]
             val.update({'debit':val.get('debit') + cost,
@@ -567,7 +567,7 @@ class voucher(models.Model):
                         })
             '''累计折旧'''
             if asset.account_accumulated_depreciation.id not in res:
-                res[asset.account_accumulated_depreciation.id] = {'credit':0,'debit': 0,'cate':'asset'}
+                res[asset.account_accumulated_depreciation.id] = {'credit':0,'debit': 0} # vorcher_line 没有这个字段 ,'cate':'asset'
 
             val = res[asset.account_accumulated_depreciation.id]
             val.update({'credit':val.get('credit') + depreciation_previous,

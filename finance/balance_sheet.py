@@ -12,7 +12,7 @@ class BalanceSheet(models.Model):
     """
 
     _name = "balance.sheet"
-    _order = "sequence"
+    _order = "sequence,id"
     sequence = fields.Integer(u'序号')
     line = fields.Integer(u'序号', required=True, help=u'资产负债表的行次')
     balance = fields.Char(u'资产')
@@ -187,7 +187,7 @@ class ProfitStatement(models.Model):
 
     """
     _name = "profit.statement"
-    _order = "sequence"
+    _order = "sequence,id"
     sequence = fields.Integer(u'序号')
 
     balance = fields.Char(u'项目', help=u'报表的行次的总一个名称')
