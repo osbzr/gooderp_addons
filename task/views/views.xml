@@ -1,16 +1,6 @@
 <openerp>
 	<data>
 
-		<!-- <record model="ir.ui.view" id="timesheet_tree">
-		<field name="name">今日</field>
-		<field name="model">timesheet</field>
-		<field name="arch" type="xml">
-		<tree>
-		<field name="date"/>
-		<field name="user_id"/>
-		</tree>
-		</field>
-		</record> -->
 		<record model="ir.ui.view" id="timesheet_form">
 			<field name="name">今日</field>
 			<field name="model">timesheet</field>
