@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<!-- 根菜单 -->
+        <menuitem id="menu_buy_root" name="采购" groups='group_buy' web_icon="buy,static/description/buy.png"/>
+
+        <menuitem id="menu_buy_manage" name="采购" parent="menu_buy_root" sequence="1"/>
+
+
+        <menuitem id="menu_buy_order" name='购货订单' action="buy_order_action"
+            parent="menu_buy_manage" sequence="1"
+            groups='buy.buy_groups'/>
+        <menuitem id="menu_buy_receipt" name='采购入库单' action="buy_receipt_action"
+            parent="menu_buy_manage" sequence="2"/>
+        <menuitem id="menu_buy_return" name='采购退货单' action="buy_return_action"
+            parent="menu_buy_manage" sequence="3"/>
+        <menuitem id="menu_buy_adjust" name='采购调整单' action="buy_adjust_action"
+            parent="menu_buy_manage" sequence="4"
+            groups='buy.buy_groups'/>
+
+        <!-- 菜单加入仓库模块 -->
+        <menuitem id="menu_wh_buy_receipt" name='采购入库单' action="buy_receipt_action"
+            parent="warehouse.warehouse_order" sequence="3"/>
+        <menuitem id="menu_wh_buy_return" name='采购退货单' action="buy_return_action"
+            parent="warehouse.warehouse_order" sequence="4"/>
+
+		<!-- 采购主数据 -->
+		<menuitem id="menu_buy_master" name="主数据" parent="menu_buy_root" sequence="2"/>
+        <menuitem id='buy_vendor_menu' action='core.vendor_action' name="供应商" parent='menu_buy_master' sequence='10'/>
+		<menuitem id='buy_goods_menu' name='商品' parent='menu_buy_master' action='goods.goods_action' sequence='20' />
+        <record id="buy_goods_menu" model="ir.ui.menu">
+			<field name="create_tag">1</field>
+		</record>
+		<!-- 采购报表 -->
+		<menuitem id="menu_buy_report" name="报表" parent="menu_buy_root" sequence="3"/>
+	</data>
+</openerp>

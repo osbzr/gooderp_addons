@@ -4,7 +4,9 @@ odoo.define('core.core', function (require) {
     var common = require('web.list_common');
     var form_relational = require('web.form_relational');
     var data = require('web.data');
-
+    var UserMenu = require('web.UserMenu');
+    var session = require('web.session');
+    var Model = require('web.Model');
     /*
     One2many字段增加复制按钮
     */
@@ -103,5 +105,22 @@ odoo.define('core.core', function (require) {
             }
             this._super.apply(this, arguments);
         },
+    });
+    UserMenu.include({
+          do_update: function () {
+            var self =this;
+            this._super.apply(this, arguments);
+            var $company_avatar = this.$('.oe_top_company_bar_avatar');
+            if (!session.uid) {
+                $company_avatar.attr('src', $company_avatar.data('default-src'));
+                return $.when();
+            }
+            new Model("res.company").call("read", [session.company_id]).then(function(data) {
+                self.$('.oe_topbar_company_name').text(data[0]['display_name']);
+            })
+            var company_avatar_src = session.url('/web/image', {model:'res.company', field: 'logo', id: session.uid});
+            $company_avatar.attr('src', company_avatar_src);
+        },
+
     });
 })

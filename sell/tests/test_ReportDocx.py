@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import UserError
 from odoo.addons.report_docx.report.report_docx import DataModelProxy
 from odoo.tools import misc
-import random,os
+import tempfile
+import shutil
 
 class test_ReportDocx(TransactionCase):
 
@@ -33,7 +33,9 @@ class test_ReportDocx(TransactionCase):
 
     def test_save_file(self):
         doxc_file = self.report_docx_sell.create(self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
-        self.report_docx_sell._save_file(misc.file_open('sell/tests/sell.order.docx').name,doxc_file)
+        tempname = tempfile.mkdtemp()
+        shutil.copy(misc.file_open('sell/template/sell.order.docx').name, tempname)
+        self.report_docx_sell._save_file(tempname+"/sell.order.docx",doxc_file)
 
     def test_render_to_pdf(self):
         doxc_file = self.report_pdf_sell.create(self.cr, self.uid, self.sell_order.id, self.ir_actions_pdf,

@@ -239,8 +239,7 @@ class buy_receipt(models.Model):
         return
 
     def _make_payment(self, invoice_id, amount, this_reconcile):
-        if not invoice_id:
-            return False
+        '''根据传入的invoice_id生成付款单'''
         categ = self.env.ref('money.core_category_purchase')
         money_lines = [{'bank_id': self.bank_account_id.id, 'amount': this_reconcile}]
         source_lines = [{'name': invoice_id.id,

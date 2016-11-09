@@ -43,4 +43,14 @@
 			<span name="delete" class="fa fa-trash-o"/>
 		</td>
 	</tr>
+	<t t-extend="UserMenu">
+		<t t-jquery=".o_user_menu" t-operation="before">
+			<li class="o_user_menu">
+				<p class='o_company' href="#"  style="height:35px ;margin:0 0 0 0 " ><img class=" oe_top_company_bar_avatar"
+					 t-att-src="_s + '/web/static/src/img/user_menu_avatar.png'" style="height:35px;"/>
+				<span class="oe_topbar_company_name"/></p>
+				<ul></ul>
+			</li>
+		</t>
+	</t>
 </template>
