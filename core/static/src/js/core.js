@@ -8,6 +8,7 @@ odoo.define('core.core', function (require) {
     var session = require('web.session');
     var Model = require('web.Model');
     var FormView = require('web.FormView');
+    var WebClient = require('web.AbstractWebClient');
     /*
     One2many字段增加复制按钮
     */
@@ -141,4 +142,15 @@ odoo.define('core.core', function (require) {
             this.open_defaults_dialog();
         },
     });
+    //頁面title 換成自己定義的字符！
+    WebClient.include({
+        set_title_part: function(part, title) {
+            var tmp = _.clone(this.get("title_part"));
+            tmp[part] = title;
+            if ('zopenerp' in tmp){
+                tmp['zopenerp'] = 'Gooderp';
+            }
+            this.set("title_part", tmp);
+        },
+      });
 })

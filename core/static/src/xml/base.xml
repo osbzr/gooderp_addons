@@ -52,5 +52,12 @@
 				<ul></ul>
 			</li>
 		</t>
+		<t t-jquery="li > a[data-menu='documentation']" t-operation="replace"></t>
+		<t t-jquery="li.divider" t-operation="replace">
+		</t>
+		<t t-jquery="li > a[data-menu='support']" t-operation="replace">
+		</t>
+		<t t-jquery="li > a[data-menu='account']" t-operation="replace">
+		</t>
 	</t>
-</template>
+ </template>
