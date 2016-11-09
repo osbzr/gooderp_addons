@@ -27,6 +27,7 @@
         'voucher_template.xml',
         'issue_cost_wizard.xml',
         'report_auxiliary_accounting.xml',
+        'exchange.xml',
     ],
     'demo': [
         'tests/finance_demo.xml',
