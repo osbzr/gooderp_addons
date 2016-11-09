@@ -349,21 +349,23 @@ class sell_order_line(models.Model):
     @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
+        if self.tax_rate > 100:
+            raise UserError('税率不能输入超过100的数')
+        if self.tax_rate < 0:
+            raise UserError('税率不能输入负数')
         if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
-            self.price = (self.tax_rate != -100
-                          and self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
-            self.amount = self.quantity * self.price - self.discount_amount  # 折扣后金额
-            self.tax_amount = self.amount * self.tax_rate * 0.01  # 税额
-            self.subtotal = self.amount + self.tax_amount
+            self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
+            self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
+            self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
+            self.amount = self.subtotal - self.tax_amount # 金额
         else:
             rate_silent = self.order_id.currency_id.rate or self.env.user.company_id.currency_id.rate
             currency_amount = self.quantity * self.price_taxed - self.discount_amount
-            self.price = (self.tax_rate != -100
-                          and self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01) or 0)
-            self.amount = currency_amount * rate_silent
-            self.tax_amount = self.amount * self.tax_rate * 0.01
-            self.subtotal = self.amount + self.tax_amount
-            self.currency_amount = currency_amount
+            self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
+            self.subtotal = (self.price_taxed * self.quantity - self.discount_amount) * rate_silent  # 价税合计
+            self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
+            self.amount = self.subtotal - self.tax_amount # 本位币金额
+            self.currency_amount = currency_amount  # 外币金额
 
     order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
                                required=True, ondelete='cascade',
