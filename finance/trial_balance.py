@@ -170,7 +170,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 'cumulative_occurrence_credit': cumulative_occurrence_credit,
                 'cumulative_occurrence_debit': cumulative_occurrence_debit,
                 'subject_code': subject_code,
-                'period_id': last_period.id,
+                'period_id': self.period_id.id,
                 'subject_name_id': subject_name_id
             }
         return currency_dcit
