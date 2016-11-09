@@ -15,7 +15,7 @@
 						</group>
 						<notebook>
 							<page name='task' string='待办事项'>
-								<field name="task_ids">
+								<field name="task_ids" domain="[('user_id', '=', uid)]">
 									<tree string="计划">
 										<field name="name"/>
 										<field name="status"/>
@@ -28,7 +28,7 @@
 										<field name='task_id'/>
 										<field name='just_done'/>
 										<field name='next_action'/>
-										<field name='hours' sum="全天合计"/>
+										<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
 										<field name="user_id"/>
 										<field name='next_datetime'/>
 										<field name='set_status'/>
@@ -125,20 +125,20 @@
 							<group>
 								<field name="project_id"/>
 								<field name="name"/>
-								<field name="plan_hours"/>
+								<field name="plan_hours" groups='task.group_task_hours'/>
 								<field name="user_id"/>
 							</group>
 							<group>
 								<field name="next_action"/>
 								<field name="next_datetime"/>
-								<field name="hours"/>
+								<field name="hours" groups='task.group_task_hours'/>
 							</group>
 						</group>
 						<field name="timeline_ids">
 							<tree string="进展" create='0' edit='0'>
 								<field name="create_uid" string='创建人'/>
 								<field name="create_date" string='创建时间'/>
-								<field name='hours' sum="全天合计"/>
+								<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
 								<field name='just_done'/>
 							</tree>
 						</field>
@@ -168,9 +168,11 @@
 								<p>
 									<t t-esc="record.project_id.value"/>
 									<t t-esc="record.name.value"/>
-									<t t-esc="record.hours.value"/>
-									/
-									<t t-esc="record.plan_hours.value"/>
+									<div groups='task.group_task_hours'>
+										<t t-esc="record.hours.value"/>
+										/
+										<t t-esc="record.plan_hours.value"/>
+									</div>
 								</p>
 								<p>
 									<t t-esc="record.user_id.value"/>
@@ -191,7 +193,7 @@
 					<field name='task_id'/>
 					<field name='project_id'/>
 					<field name='just_done'/>
-					<field name='hours' sum="全天合计"/>
+					<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
 					<field name="user_id"/>
 					<field name='set_status'/>
 					<field name="create_uid" string='创建人'/>
@@ -253,7 +255,8 @@
 				<p class="oe_view_nocontent_create">点击创建一个任务阶段</p>
 			</field>
 		</record>
-		<menuitem name="任务" id="menu_task_root" web_icon="task,static/description/task.png"/>
+		<menuitem name="任务" id="menu_task_root" web_icon="task,static/description/task.png"
+		groups='task.group_task'/>
 		<menuitem name="今日" id="menu_timesheet" parent="menu_task_root"
 		action="action_timesheet_today" sequence='1'/>
 		<menuitem name="主数据" id="menu_task_data" parent="menu_task_root" sequence='5'/>
@@ -261,10 +264,12 @@
 		action="action_task" sequence='1'/>
 		<menuitem name="项目" id="menu_project" parent="menu_task_data"
 		action="action_project" sequence='5'/>
-		<menuitem name="报表" id="menu_task_report" parent="menu_task_root" sequence='10'/>
+		<menuitem name="报表" id="menu_task_report" parent="menu_task_root"
+		groups='task.group_task_manager' sequence='10'/>
 		<menuitem name="工作日志" id="menu_task_timesheet" parent="menu_task_report"
 		action="action_timeline" sequence='1'/>
-		<menuitem name="设置" id="menu_task_configuration" parent="menu_task_root" sequence='15'/>
+		<menuitem name="设置" id="menu_task_configuration" parent="menu_task_root"
+		groups='task.group_task_manager' sequence='15'/>
 		<menuitem name="任务阶段" id="menu_task_status" parent="menu_task_configuration"
 		action="action_task_status" sequence='1'/>
 	</data>
