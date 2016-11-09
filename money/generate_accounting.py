@@ -154,7 +154,7 @@ class money_order(models.Model):
                                                               u"付款单%s" % (name),
                                                               line.bank_id.account_id.id,
                                                               0,
-                                                              line.amount,
+                                                              line.amount * (line.currency_id.rate or 1),
                                                               vouch_obj.id,
                                                               '')
                 # 生成借方明细行
@@ -164,7 +164,7 @@ class money_order(models.Model):
                 vouch_debit_line = self._create_voucher_line(line,
                                                              u"付款单%s" % (name),
                                                              partner_account_id,
-                                                             line.amount + self.discount_amount or 0,
+                                                             line.amount  * (line.currency_id.rate or 1) + self.discount_amount or 0,
                                                              0,
                                                              vouch_obj.id,
                                                              partner.id)
