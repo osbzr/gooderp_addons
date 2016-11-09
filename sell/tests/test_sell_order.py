@@ -17,7 +17,7 @@ class test_sell_order(TransactionCase):
 
     def test_compute_amount(self):
         ''' 计算字段的测试'''
-        self.assertEqual(self.order.amount, 151600.00)
+        self.assertEqual(self.order.amount, 154048.00)
 
     def test_get_sell_goods_state(self):
         '''返回发货状态'''
@@ -70,7 +70,7 @@ class test_sell_order(TransactionCase):
         delivery.sell_delivery_draft()
         bank_account = self.env.ref('core.alipay')
         bank_account.balance = 1000000
-        delivery.receipt = 73.3
+        delivery.receipt = 75
         delivery.bank_account_id = bank_account.id
         delivery.sell_delivery_done()
         order2._get_money_state()
@@ -84,7 +84,7 @@ class test_sell_order(TransactionCase):
         ''' sell.order onchange test '''
         self.order.discount_rate = 10
         self.order.onchange_discount_rate()
-        self.assertEqual(self.order.discount_amount, 15163.2)
+        self.assertEqual(self.order.discount_amount, 15408.0)
 
     def test_unlink(self):
         '''测试删除已审核的销货订单'''
@@ -171,10 +171,10 @@ class test_sell_order_line(TransactionCase):
 
     def test_compute_all_amount(self):
         ''' 销售订单行计算字段的测试 '''
-        self.assertEqual(self.sell_order_line.amount, 90.0)  # tax_amount subtotal
+        self.assertEqual(self.sell_order_line.amount, 91.45)  # tax_amount subtotal
         self.assertEqual(self.sell_order_line.tax_rate, 17.0)
-        self.assertEqual(self.sell_order_line.tax_amount, 15.3)
-        self.assertEqual(self.sell_order_line.subtotal, 105.3)
+        self.assertEqual(self.sell_order_line.tax_amount, 15.55)
+        self.assertEqual(self.sell_order_line.subtotal, 107)
 
     def test_compute_all_amount_foreign_currency(self):
         '''外币测试：当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
