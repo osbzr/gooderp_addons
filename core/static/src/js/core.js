@@ -7,6 +7,7 @@ odoo.define('core.core', function (require) {
     var UserMenu = require('web.UserMenu');
     var session = require('web.session');
     var Model = require('web.Model');
+    var FormView = require('web.FormView');
     /*
     One2many字段增加复制按钮
     */
@@ -106,6 +107,7 @@ odoo.define('core.core', function (require) {
             this._super.apply(this, arguments);
         },
     });
+    //在页面的 表头部分 添加公司图标 及公司名称
     UserMenu.include({
           do_update: function () {
             var self =this;
@@ -121,6 +123,20 @@ odoo.define('core.core', function (require) {
             var company_avatar_src = session.url('/web/image', {model:'res.company', field: 'logo', id: session.uid});
             $company_avatar.attr('src', company_avatar_src);
         },
-
+    });
+    /*把设置默认值的的按钮菜单 放到form菜单的更多里面。
+    */
+    FormView.include({
+       render_sidebar: function($node) {
+           this._super.apply(this, arguments);
+            this.sidebar.add_items('other', _.compact([
+               { label: '设默认值', callback: this.on_click_set_defaults}
+            ]));
+            this.sidebar.appendTo($node);
+            this.toggle_sidebar();
+        },
+        on_click_set_defaults:function() {
+            this.open_defaults_dialog();
+        },
     });
 })
