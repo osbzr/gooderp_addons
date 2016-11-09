@@ -210,8 +210,9 @@ class timeline(models.Model):
     set_status = fields.Many2one('task.status',
                              string=u'状态更新到')
 
+    @api.model
     def create(self, vals):
-        '''更新task的以下字段'''
+        '''创建工作记录时，更新对应task的status等字段'''
         res = super(timeline, self).create(vals)
         set_status = vals.get('set_status')
         task_id = vals.get('task_id')
