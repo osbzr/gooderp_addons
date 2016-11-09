@@ -129,11 +129,13 @@ odoo.define('core.core', function (require) {
     FormView.include({
        render_sidebar: function($node) {
            this._super.apply(this, arguments);
-            this.sidebar.add_items('other', _.compact([
-               { label: '设默认值', callback: this.on_click_set_defaults}
-            ]));
-            this.sidebar.appendTo($node);
-            this.toggle_sidebar();
+           if(this.sidebar){
+                this.sidebar.add_items('other', _.compact([
+                   { label: '设默认值', callback: this.on_click_set_defaults}
+                ]));
+                this.sidebar.appendTo($node);
+                this.toggle_sidebar();
+           }
         },
         on_click_set_defaults:function() {
             this.open_defaults_dialog();
