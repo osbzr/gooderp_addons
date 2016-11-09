@@ -15,7 +15,7 @@
 						</group>
 						<notebook>
 							<page name='task' string='待办事项'>
-								<field name="task_ids">
+								<field name="task_ids" domain="[('user_id', '=', uid)]">
 									<tree string="计划">
 										<field name="name"/>
 										<field name="status"/>
