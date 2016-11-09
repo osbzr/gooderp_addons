@@ -138,7 +138,6 @@ class sell_adjust_line(models.Model):
     @api.depends('quantity', 'price_taxed', 'discount_amount', 'tax_rate')
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
-        '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         if self.tax_rate > 100:
             raise UserError('税率不能输入超过100的数')
         if self.tax_rate < 0:

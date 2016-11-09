@@ -182,6 +182,14 @@ class test_sell_order_line(TransactionCase):
         for line in self.order.line_ids:
             line.price_taxed = 11.7
 
+    def test_compute_all_amount_wrong_tax_rate(self):
+        '''明细行上输入错误税率，应报错'''
+        for line in self.order.line_ids:
+            with self.assertRaises(UserError):
+                line.tax_rate = -1
+            with self.assertRaises(UserError):
+                line.tax_rate = 102
+
     def test_onchange_goods_id(self):
         '''当销货订单行的产品变化时，带出产品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
@@ -210,4 +218,4 @@ class test_sell_order_line(TransactionCase):
         ''' 销售订单行 折扣率 on_change'''
         self.sell_order_line.discount_rate = 20
         self.sell_order_line.onchange_discount_rate()
-        self.assertEqual(self.sell_order_line.amount, 80.0)
+        self.assertEqual(self.sell_order_line.amount, 82.91)

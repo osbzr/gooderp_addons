@@ -46,13 +46,13 @@ class test_sell_delivery(TransactionCase):
         self.delivery.discount_rate = 10
         self.delivery.write({"date_due": (datetime.now()).strftime(ISODATEFORMAT)})
         self.delivery.onchange_discount_rate()
-        self.assertAlmostEqual(self.delivery.discount_amount, 10.53)
+        self.assertAlmostEqual(self.delivery.discount_amount, 10.70)
 
     def test_onchange_discount_rate_in(self):
         """ 销售 退货单 的折扣率 on_change 测试"""
         self.return_delivery.discount_rate = 10
         self.return_delivery.onchange_discount_rate()
-        self.assertEqual(self.return_delivery.discount_amount, 10.53)
+        self.assertAlmostEqual(self.return_delivery.discount_amount, 10.70)
 
     def test_get_sell_money_state(self):
         '''测试返回收款状态'''
