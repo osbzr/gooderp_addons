@@ -217,3 +217,10 @@ class TestMoveLine(TransactionCase):
         result = self.env['wh.move.line'].name_search('ms160301')
         real_result = [(move_line.id, move_line.lot + ' ' + move_line.warehouse_dest_id.name + u' 余 ' + str(move_line.goods_qty))]
         self.assertEqual(result, real_result)
+
+    def test_compute_all_amount_wrong_tax_rate(self):
+        '''明细行上输入错误税率，应报错'''
+        with self.assertRaises(UserError):
+            self.mouse_in_line.tax_rate = -1
+        with self.assertRaises(UserError):
+            self.mouse_in_line.tax_rate = 102
