@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.tools import float_is_zero
+from odoo.exceptions import UserError
 
 # 状态可选值
 TASK_STATES = [
@@ -13,9 +15,12 @@ TASK_STATES = [
 
 class project(models.Model):
     _name = 'project'
+    _inherits = {'auxiliary.financing': 'auxiliary_id'}
 
-    name = fields.Char(
-        string=u'名称',
+    auxiliary_id = fields.Many2one(
+        string=u'辅助核算',
+        comodel_name='auxiliary.financing',
+        ondelete='cascade',
         required=True,
     )
 
@@ -29,7 +34,101 @@ class project(models.Model):
         string=u'客户',
         comodel_name='partner',
         ondelete='restrict',
+        required=True,
     )
+
+    invoice_ids = fields.One2many(
+        string=u'发票行',
+        comodel_name='project.invoice',
+        inverse_name='project_id',
+    )
+
+
+class project_invoice(models.Model):
+    _name = 'project.invoice'
+
+    @api.one
+    @api.depends('tax_rate', 'amount')
+    def _compute_tax_amount(self):
+        '''计算税额'''
+        if self.tax_rate > 100:
+            raise UserError('税率不能输入超过100的数')
+        if self.tax_rate < 0:
+            raise UserError('税率不能输入负数')
+        self.tax_amount = self.amount / (100 + self.tax_rate) * self.tax_rate
+
+    project_id = fields.Many2one(
+        string=u'项目',
+        comodel_name='project',
+        ondelete='cascade',
+   )
+
+    tax_rate = fields.Float(
+        string=u'税率',
+        default=lambda self: self.env.user.company_id.output_tax_rate,
+        help=u'默认值取公司销项税率',
+    )
+
+    tax_amount = fields.Float(
+        string=u'税额',
+        compute=_compute_tax_amount,
+    )
+
+    amount = fields.Float(
+        string=u'金额',
+        help=u'含税金额',
+    )
+
+    date = fields.Date(
+        string='收款日期',
+        default=lambda self: fields.Date.context_today(self),
+        help=u'收款日期',
+    )
+
+    date_due = fields.Date(
+        string='到期日',
+        default=lambda self: fields.Date.context_today(self),
+        required=True,
+        help=u'收款截止日期',
+    )
+
+    invoice_id = fields.Many2one(
+        string=u'发票号',
+        comodel_name='money.invoice',
+        readonly=True,
+        copy=False,
+        ondelete='set null',
+        help=u'产生的发票号',
+    )
+
+    def _get_invoice_vals(self, category_id, project_id, amount, tax_amount):
+        '''返回创建 money_invoice 时所需数据'''
+        return {
+            'name': project_id.name,
+            'partner_id': project_id.customer_id.id,
+            'category_id': category_id.id,
+            'auxiliary_id': project_id.auxiliary_id.id,
+            'date': fields.Date.context_today(self),
+            'amount': amount,
+            'reconciled': 0,
+            'to_reconcile': amount,
+            'tax_amount': tax_amount,
+            'date_due': self.date_due,
+            'state': 'draft',
+        }
+
+    @api.multi
+    def make_invoice(self):
+        '''生成结算单'''
+        for line in self:
+            invoice_id = False
+            category = self.env.ref('money.core_category_sale')
+            if not float_is_zero(self.amount, 2):
+                invoice_id = self.env['money.invoice'].create(
+                    self._get_invoice_vals(category, line.project_id, line.amount, line.tax_amount)
+                )
+                line.invoice_id = invoice_id.id
+            return invoice_id
 
 
 class task(models.Model):
