@@ -7,7 +7,7 @@
     "description": """
         实现平均年限法的固定资产初始化，采购，变更，处理。
     """,
-    'version': '8.0.0.1',
+    'version': '11.11',
     'depends': ['base', 'finance', 'money'],
     'data': [
         'view/asset.xml',

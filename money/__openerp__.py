@@ -6,7 +6,7 @@
     'category': 'gooderp',
     "description": """
     """,
-    'version': '8.0.0.1',
+    'version': '11.11',
     'depends': ['core', 'base', 'finance', 'report_docx'],
     'data': [
         'data/money_data.xml',

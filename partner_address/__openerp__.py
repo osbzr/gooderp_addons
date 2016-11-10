@@ -3,6 +3,7 @@
     'name': "GOODERP 联系人地址模块",
     'author': "judy（开阖软件）",
     'category': 'gooderp',
+    'version': '11.11',
     'depends': ['core'],
     "description": """
     """,

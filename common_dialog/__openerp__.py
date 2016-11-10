@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Common Dialog",
-    "version": "0.1",
+    "version": '11.11',
     "author": 'ZhengXiang',
     "website": "http://www.osbzr.com",
     "category": "Generic Modules",
