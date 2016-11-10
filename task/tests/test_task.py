@@ -53,3 +53,31 @@ class test_timeline(TransactionCase):
         self.assertEqual(self.task.status, self.status_doing)
         self.assertEqual(self.task.next_action, timeline.next_action)
         self.assertEqual(self.task.next_datetime, timeline.next_datetime)
+
+
+class test_project_invoice(TransactionCase):
+
+    def setUp(self):
+        super(test_project_invoice, self).setUp()
+        self.project = self.env.ref('task.project_gooderp')
+        self.invoice1 = self.env.ref('task.project_invoice_1')
+
+    def test_compute_tax_amount(self):
+        '''计算税额'''
+        self.assertTrue(self.invoice1.tax_amount == 17.0)
+
+#     def test_compute_tax_amount_wrong_tax_rate(self):
+#         '''输入错误税率，应报错'''
+#         for line in self.project.invoice_ids:
+#             with self.assertRaises(UserError):
+#                 line.tax_rate = -1
+#             with self.assertRaises(UserError):
+#                 line.tax_rate = 102
+
+    def test_make_invoice(self):
+        '''生成结算单'''
+        invoice = self.invoice1.make_invoice()
+        self.assertTrue(self.invoice1.invoice_id == invoice)
+        self.assertTrue(self.invoice1.project_id.auxiliary_id == invoice.auxiliary_id)
+        self.assertTrue(self.invoice1.tax_amount == invoice.tax_amount)
+        self.assertTrue(self.invoice1.amount == invoice.amount)
