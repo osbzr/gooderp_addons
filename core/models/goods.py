@@ -45,7 +45,7 @@ class goods(models.Model):
                              string=u'计量单位', required=True)
     uos_id = fields.Many2one('uom', ondelete='restrict', string=u'辅助单位')
     conversion = fields.Float(
-        string=u'转化率', default=1, digits(16, 3), 
+        string=u'转化率', default=1, digits=(16, 3), 
         help=u'1个辅助单位等于多少计量计量单位的数量，如1箱30个苹果，这里输入30')
     cost = fields.Float(u'成本',
                         required=True,
