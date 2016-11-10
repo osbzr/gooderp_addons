@@ -276,34 +276,35 @@ class sell_delivery(models.Model):
         })
         return money_order
 
-    @api.one
+    @api.multi
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
-        self._wrong_delivery_done()
-        # 库存不足 生成零的
-        result_vals = self.env['wh.move'].create_zero_wh_in(self,self._name)
-        if result_vals:
-            return result_vals
-        # 调用wh.move中审核方法，更新审核人和审核状态
-        self.sell_move_id.approve_order()
-        #将发货/退货数量写入销货订单行
-        if self.order_id:
-            self._line_qty_write()
-        # 发货单/退货单 生成结算单
-        invoice_id = self._delivery_make_invoice()
-        # 销售费用产生结算单
-        self._sell_amount_to_invoice()
-        # 生成收款单，并审核
-        if self.receipt:
-            flag = not self.is_return and 1 or -1
-            amount = flag * self.amount
-            this_reconcile = flag * self.receipt
-            money_order = self._make_money_order(invoice_id, amount, this_reconcile)
-            money_order.money_order_done()
+        for record in self:
+            record._wrong_delivery_done()
+            # 库存不足 生成零的
+            result_vals = self.env['wh.move'].create_zero_wh_in(record,record._name)
+            if result_vals:
+                return result_vals
+            # 调用wh.move中审核方法，更新审核人和审核状态
+            record.sell_move_id.approve_order()
+            #将发货/退货数量写入销货订单行
+            if record.order_id:
+                record._line_qty_write()
+            # 发货单/退货单 生成结算单
+            invoice_id = record._delivery_make_invoice()
+            # 销售费用产生结算单
+            record._sell_amount_to_invoice()
+            # 生成收款单，并审核
+            if record.receipt:
+                flag = not record.is_return and 1 or -1
+                amount = flag * record.amount
+                this_reconcile = flag * record.receipt
+                money_order = record._make_money_order(invoice_id, amount, this_reconcile)
+                money_order.money_order_done()
 
-        # 生成分拆单 FIXME:无法跳转到新生成的分单
-        if self.order_id and not self.modifying:
-            return self.order_id.sell_generate_delivery()
+            # 生成分拆单 FIXME:无法跳转到新生成的分单
+            if record.order_id and not record.modifying:
+                return record.order_id.sell_generate_delivery()
 
     @api.one
     def sell_delivery_draft(self):
