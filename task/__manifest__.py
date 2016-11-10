@@ -15,7 +15,7 @@
     'category': 'gooderp',
     'version': '0.1',
 
-    'depends': ['core'],
+    'depends': ['core', 'money'],
 
     'data': [
         'security/ir.model.access.csv',

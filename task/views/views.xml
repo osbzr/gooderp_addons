@@ -82,15 +82,32 @@
 								<field name="customer_id"/>
 							</group>
 						</group>
-						<field name="task_ids">
-							<tree string="任务"  editable='BOTTOM'>
-								<field name="sequence" widget="handle"/>
-								<field name="name"/>
-								<field name="user_id"/>
-								<field name="next_action"/>
-								<field name="next_datetime"/>
-							</tree>
-						</field>
+						<notebook>
+							<page name='task' string='任务'>
+								<field name="task_ids">
+									<tree string="任务"  editable='BOTTOM'>
+										<field name="sequence" widget="handle"/>
+										<field name="name"/>
+										<field name="user_id"/>
+										<field name="next_action"/>
+										<field name="next_datetime"/>
+									</tree>
+								</field>
+							</page>
+							<page name='project_invoice' string='发票行'>
+								<field name="invoice_ids">
+									<tree string="发票"  editable='BOTTOM'>
+										<field name="date"/>
+										<field name="date_due"/>
+										<field name="tax_rate"/>
+										<field name="amount"/>
+										<field name="tax_amount"/>
+										<field name="invoice_id"/>
+										<button name='make_invoice' type='object' string='生成发票' class='oe_highlight'/>
+									</tree>
+								</field>
+							</page>
+						</notebook>
 					</sheet>
 				</form>
 			</field>
@@ -108,7 +125,7 @@
 					<field name="next_datetime"/>
 					<field name="status"/>
 					<field name="is_schedule"/>
-					<button name='assign_to_me' type='object' string='我来'/>
+					<button name='assign_to_me' type='object' string='我来' class='oe_highlight'/>
 				</tree>
 			</field>
 		</record>
