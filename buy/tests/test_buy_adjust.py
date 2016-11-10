@@ -217,6 +217,14 @@ class test_buy_adjust_line(TransactionCase):
             self.assertTrue(line.tax_amount == 17)
             self.assertTrue(line.subtotal == 117)
 
+    def test_compute_all_amount_wrong_tax_rate(self):
+        '''明细行上输入错误税率，应报错'''
+        for line in self.adjust.line_ids:
+            with self.assertRaises(UserError):
+                line.tax_rate = -1
+            with self.assertRaises(UserError):
+                line.tax_rate = 102
+
     def test_onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、成本'''
         for line in self.adjust.line_ids:
