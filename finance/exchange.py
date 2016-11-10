@@ -25,8 +25,7 @@ class CreateExchangeWizard(models.TransientModel):
         '''
         account_id = vals.get('account_id')
         voucher_lines = self.env['voucher.line'].search([('account_id','=', account_id)])
-        account = self.env['finance.account'].search([('id','=', account_id)])
-        print 'PARTNER',voucher_lines
+        account = vals.get('account')
         res = {}
         for line in voucher_lines:
             if line.partner_id.id not in res :
@@ -35,21 +34,19 @@ class CreateExchangeWizard(models.TransientModel):
                                            'total_credit':0}
             val = res[line.partner_id.id]
             if line.debit == 0:
-                print '1',val
                 val.update({'currency': val.get('currency') +line.currency_amount,
                              'total_debit':val.get('total_debit') + line.debit,
                              'total_credit':val.get('total_credit') + line.credit})
             else:
-                print '2',val
                 val.update({'currency': val.get('currency') - line.currency_amount,
                              'total_debit':val.get('total_debit') + line.debit,
                              'total_credit':val.get('total_credit') + line.credit})
             exp = val.get('currency') * vals.get('rate_silent') + val.get('total_debit') - val.get('total_credit')
 
-        if account.balance_directions == 'in':
-            '''科目为借，则生成借方凭证行,差额为0的凭证行不生成'''
-            if exp !=0 :
-                val.update({'name': u"汇兑损益",
+            if account.balance_directions == 'in':
+                '''科目为借，则生成借方凭证行,差额为0的凭证行不生成'''
+                if exp !=0 :
+                    val.update({'name': u"汇兑损益",
                         'account_id': vals.get('account_id'),
                         'debit': -exp,
                         'credit': 0,
@@ -60,10 +57,10 @@ class CreateExchangeWizard(models.TransientModel):
                         'partner_id': line.partner_id.id,
                     })
 
-        if account.balance_directions == 'out' :
-            '''科目为贷，则生成贷方凭证行,差额为0的凭证行不生成'''
-            if exp !=0:
-                val.update({'name': u"汇兑损益",
+            if account.balance_directions == 'out' :
+                '''科目为贷，则生成贷方凭证行,差额为0的凭证行不生成'''
+                if exp !=0:
+                    val.update({'name': u"汇兑损益",
                         'account_id': vals.get('account_id'),
                         'credit': exp ,
                         'voucher_id': vals.get('vouch_obj_id'),
@@ -72,9 +69,11 @@ class CreateExchangeWizard(models.TransientModel):
                         'rate_silent':False,
                         'partner_id': line.partner_id.id,
                     })
+
         '''如果所有差额都为0，则无会计科目，则不生成明细行'''
-        if val.get('account_id'):
-            for partner_id,val in res.iteritems():
+        for partner_id,val in res.iteritems():
+            del val['currency'],val['total_debit'],val['total_credit']
+            if val:
                 self.env['voucher.line'].create(dict(val,partner_id = partner_id))
 
 
@@ -85,8 +84,7 @@ class CreateExchangeWizard(models.TransientModel):
         '''
         account_id = vals.get('account_id')
         voucher_lines = self.env['voucher.line'].search([('account_id','=', account_id)])
-        account = self.env['finance.account'].search([('id','=', account_id)])
-        print voucher_lines
+        account = vals.get('account')
         currency_amount = 0
         debit = 0
         credit = 0
@@ -97,7 +95,6 @@ class CreateExchangeWizard(models.TransientModel):
                 currency_amount = currency_amount - line.currency_amount
             debit =  line.debit + debit
             credit = line.credit + credit
-        print currency_amount,debit,credit
         if account.balance_directions == 'in':
             '''科目为借，则生成借方凭证行,差额为0的凭证行不生成'''
             if currency_amount * vals.get('rate_silent') - debit + credit != 0 :
@@ -154,10 +151,10 @@ class CreateExchangeWizard(models.TransientModel):
             ('currency_id','!=',self.env.user.company_id.currency_id.id),
             ('currency_id','!=', False),
             ('exchange','=', True)]):
-            print account_id.name
             vals = {}
             rate_silent = account_id.currency_id.rate or 0
             vals.update({'account_id': account_id.id,
+                         'account':account_id,
                          'vouch_obj_id': vouch_obj.id,
                          'rate_silent':rate_silent,
                          })
