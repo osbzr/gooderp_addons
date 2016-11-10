@@ -51,10 +51,10 @@ class project_invoice(models.Model):
     @api.depends('tax_rate', 'amount')
     def _compute_tax_amount(self):
         '''计算税额'''
-        if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数')
-        if self.tax_rate < 0:
-            raise UserError('税率不能输入负数')
+#         if self.tax_rate > 100:
+#             raise UserError('税率不能输入超过100的数')
+#         if self.tax_rate < 0:
+#             raise UserError('税率不能输入负数')
         self.tax_amount = self.amount / (100 + self.tax_rate) * self.tax_rate
 
     project_id = fields.Many2one(
