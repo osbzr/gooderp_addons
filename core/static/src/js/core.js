@@ -148,7 +148,7 @@ odoo.define('core.core', function (require) {
             var tmp = _.clone(this.get("title_part"));
             tmp[part] = title;
             if ('zopenerp' in tmp){
-                tmp['zopenerp'] = 'Gooderp';
+                tmp['zopenerp'] = 'GoodERP';
             }
             this.set("title_part", tmp);
         },
