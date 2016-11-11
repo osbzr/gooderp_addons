@@ -3,7 +3,6 @@
 		<!-- 项目数据 -->
 		<record id="project_gooderp" model="project">
 			<field name="name">GoodERP</field>
-			<field name="customer_id" ref="core.lenovo"/>
 		</record>
 		<record id="task_sell" model="task">
 			<field name="name">维护销售模块</field>
