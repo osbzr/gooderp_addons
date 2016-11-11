@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 {
     "name": "Report Docx",
-    "version": "8.0.1.0.1",
+    "version": '11.11',
     "category": "Report",
     "website": "www.elico-corp.com",
     "author": "Elico Corp, Odoo Community Association (OCA)",

@@ -21,7 +21,7 @@
 
 {
     'name': "零显示为空(tree页面)",
-    'version': '1.0',
+    'version': '11.11',
     'summary': """
             
     """,
