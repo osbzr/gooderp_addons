@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import api, fields, models,tools
 from odoo.exceptions import UserError
-
+import os
+from odoo.tools import misc
 # 成本计算方法，已实现 先入先出
 
 CORE_COST_METHOD = [('average', u'全月一次加权平均法'),
@@ -20,3 +21,9 @@ class res_company(models.Model):
                                    help=u'勾选这里，所有新建的结算单不会自动记账')
     import_tax_rate = fields.Float(string=u"默认进项税税率")
     output_tax_rate = fields.Float(string=u"默认销项税税率")
+
+    def _get_logo(self):
+        return open(misc.file_open('core/static/description/logo.png').name, 'rb') .read().encode('base64')
+
+
+    logo = fields.Binary(related='partner_id.image', default=_get_logo)
