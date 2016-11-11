@@ -350,18 +350,18 @@ class money_invoice(models.Model):
     def money_invoice_done(self):
         for inv in self:
             inv.state = 'done'
-            if self.category_id.type == 'income':
+            if inv.category_id.type == 'income':
                 inv.partner_id.receivable += inv.amount
-            if self.category_id.type == 'expense':
+            if inv.category_id.type == 'expense':
                 inv.partner_id.payable += inv.amount
 
     @api.multi
     def money_invoice_draft(self):
         for inv in self:
             inv.state = 'draft'
-            if self.category_id.type == 'income':
+            if inv.category_id.type == 'income':
                 inv.partner_id.receivable -= inv.amount
-            if self.category_id.type == 'expense':
+            if inv.category_id.type == 'expense':
                 inv.partner_id.payable -= inv.amount
 
     @api.model

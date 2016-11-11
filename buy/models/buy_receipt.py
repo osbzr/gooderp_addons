@@ -192,19 +192,19 @@ class buy_receipt(models.Model):
 
         return
 
-    def _get_invoice_vals(self, category_id, date,amount, tax_amount):
+    def _get_invoice_vals(self, partner_id, category_id, date,amount, tax_amount):
         '''返回创建 money_invoice 时所需数据'''
         return {
-            'move_id': self.buy_move_id.id, 
+            'move_id': self.buy_move_id.id,
             'name': self.name,
-            'partner_id': self.partner_id.id, 
-            'category_id': category_id.id, 
+            'partner_id': partner_id.id,
+            'category_id': category_id.id,
             'date': date,
-            'amount': amount, 
-            'reconciled': 0, 
+            'amount': amount,
+            'reconciled': 0,
             'to_reconcile': amount,
             'tax_amount': tax_amount,
-            'date_due': self.date_due, 
+            'date_due': self.date_due,
             'state': 'draft'
         }
 
@@ -222,7 +222,7 @@ class buy_receipt(models.Model):
         categ = self.env.ref('money.core_category_purchase')
         if not float_is_zero(amount,2):
             invoice_id = self.env['money.invoice'].create(
-                self._get_invoice_vals(categ,self.date, amount, tax_amount)
+                self._get_invoice_vals(self.partner_id, categ, self.date, amount, tax_amount)
             )
             self.invoice_id = invoice_id.id
         return invoice_id
@@ -234,7 +234,7 @@ class buy_receipt(models.Model):
             for line in self.cost_line_ids:
                 if not float_is_zero(line.amount,2):
                     self.env['money.invoice'].create(
-                        self._get_invoice_vals(line.category_id,self.date, line.amount, 0)
+                        self._get_invoice_vals(line.partner_id, line.category_id,self.date, line.amount, 0)
                     )
         return
 
