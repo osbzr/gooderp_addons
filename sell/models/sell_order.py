@@ -285,7 +285,10 @@ class sell_order(models.Model):
             'note': self.note,
             'discount_rate': self.discount_rate,
             'discount_amount': self.discount_amount,
-            'currency_id': self.currency_id.id
+            'currency_id': self.currency_id.id,
+            'contact': self.contact,
+            'address': self.address,
+            'mobile': self.mobile
         })
         if self.type == 'sell':
             delivery_id.write({'line_out_ids': [
