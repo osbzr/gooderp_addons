@@ -401,6 +401,10 @@ class wh_move_line(models.Model):
                               digits=dp.get_precision('Amount'),
                               help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
 
+    def _buy_get_price_and_tax(self):
+        self.tax_rate = self.env.user.company_id.import_tax_rate
+        self.price_taxed = self.goods_id.cost
+
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
@@ -413,7 +417,6 @@ class wh_move_line(models.Model):
             is_return = self.env.context.get('default_is_return')
             # 如果是采购入库单行 或 采购退货单行
             if (self.type == 'in' and not is_return) or (self.type == 'out' and is_return):
-                self.tax_rate = self.env.user.company_id.import_tax_rate
-                self.price_taxed = self.goods_id.cost
+                self._buy_get_price_and_tax()
 
         return super(wh_move_line,self).onchange_goods_id()
