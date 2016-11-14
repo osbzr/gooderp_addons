@@ -101,7 +101,10 @@ odoo.define('home_page', function (require) {
         },
         three_part_is_show: function (result, most_frame) {
             var self = this;
-            var have_content = true
+            var have_content = true;
+            this.result_top=[];
+            this.result_main =[];
+            this.result_quick=[];
             if (result['top'].length) {
                 self.$el.find('.main').append(most_frame.top_fist);
                 this.result_top = result['top']
