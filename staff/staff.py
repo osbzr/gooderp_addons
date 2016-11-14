@@ -55,12 +55,12 @@ class staff(models.Model):
                                     'emp_id',
                                     'category_id', u'标签')
     work_email = fields.Char(u'办公邮箱')
-    work_phone = fields.Char(u'办公电话', required=True)
+    work_phone = fields.Char(u'办公电话')
     user_id = fields.Many2one('res.users', u'对应用户')
     image_medium = fields.Binary(string=u'头像', compute=_get_image)
     # 个人信息
     birthday = fields.Date(u'生日')
-    identification_id = fields.Char(u'证照号码', required=True)
+    identification_id = fields.Char(u'证照号码')
     is_arbeitnehmer =  fields.Boolean(u'是否雇员', default='1')
     is_investoren = fields.Boolean(u'是否投资者')
     is_bsw = fields.Boolean(u'是否残疾烈属孤老')

@@ -24,7 +24,7 @@
                             <label for="work_email" class="oe_edit_only"/>
                             <field name="work_email" widget="email"/>
                             <label for="work_phone" class="oe_edit_only"/>
-                            <field name="work_phone"/>
+                            <field name="work_phone" required="1"/>
                         </div>
                         <notebook>
                             <page string="公开信息">
@@ -46,7 +46,7 @@
                             <page string="个人信息">
                                 <group>
                                     <group string="国籍和其他">
-                                        <field name="identification_id"/>
+                                        <field name="identification_id" required="1"/>
                                         <field name="type_of_certification"/>
                                         <field name="birthday"/>
                                         <field name="is_arbeitnehmer"/>
