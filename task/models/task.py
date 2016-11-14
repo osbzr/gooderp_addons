@@ -34,7 +34,6 @@ class project(models.Model):
         string=u'客户',
         comodel_name='partner',
         ondelete='restrict',
-        required=True,
     )
 
     invoice_ids = fields.One2many(
@@ -51,10 +50,10 @@ class project_invoice(models.Model):
     @api.depends('tax_rate', 'amount')
     def _compute_tax_amount(self):
         '''计算税额'''
-#         if self.tax_rate > 100:
-#             raise UserError('税率不能输入超过100的数')
-#         if self.tax_rate < 0:
-#             raise UserError('税率不能输入负数')
+        if self.tax_rate > 100:
+            raise UserError('税率不能输入超过100的数')
+        if self.tax_rate < 0:
+            raise UserError('税率不能输入负数')
         self.tax_amount = self.amount / (100 + self.tax_rate) * self.tax_rate
 
     project_id = fields.Many2one(
@@ -105,7 +104,7 @@ class project_invoice(models.Model):
         '''返回创建 money_invoice 时所需数据'''
         return {
             'name': project_id.name,
-            'partner_id': project_id.customer_id.id,
+            'partner_id': project_id.customer_id and project_id.customer_id.id,
             'category_id': category_id.id,
             'auxiliary_id': project_id.auxiliary_id.id,
             'date': fields.Date.context_today(self),
@@ -122,6 +121,8 @@ class project_invoice(models.Model):
         '''生成结算单'''
         for line in self:
             invoice_id = False
+            if not line.project_id.customer_id:
+                return
             category = self.env.ref('money.core_category_sale')
             if not float_is_zero(self.amount, 2):
                 invoice_id = self.env['money.invoice'].create(

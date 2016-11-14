@@ -66,16 +66,22 @@ class test_project_invoice(TransactionCase):
         '''计算税额'''
         self.assertTrue(self.invoice1.tax_amount == 17.0)
 
-#     def test_compute_tax_amount_wrong_tax_rate(self):
-#         '''输入错误税率，应报错'''
-#         for line in self.project.invoice_ids:
-#             with self.assertRaises(UserError):
-#                 line.tax_rate = -1
-#             with self.assertRaises(UserError):
-#                 line.tax_rate = 102
+    def test_compute_tax_amount_wrong_tax_rate(self):
+        '''输入错误税率，应报错'''
+        with self.assertRaises(UserError):
+            self.invoice1.tax_rate = -1
+            self.invoice1._compute_tax_amount() # 不调用此方法，测试中UserError报不出来
+        with self.assertRaises(UserError):
+            self.invoice1.tax_rate = 102
+            self.invoice1._compute_tax_amount()
 
     def test_make_invoice(self):
         '''生成结算单'''
+        # 不输入客户时不产生结算单
+        self.invoice1.make_invoice()
+        self.assertTrue(not self.invoice1.invoice_id)
+        # 输入客户产生结算单，验证如下
+        self.invoice1.project_id.customer_id = self.env.ref('core.jd')
         invoice = self.invoice1.make_invoice()
         self.assertTrue(self.invoice1.invoice_id == invoice)
         self.assertTrue(self.invoice1.project_id.auxiliary_id == invoice.auxiliary_id)

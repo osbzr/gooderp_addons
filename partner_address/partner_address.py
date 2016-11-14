@@ -135,10 +135,10 @@ class partner(models.Model):
                 self.mobile = child.mobile
                 self.phone = child.phone
                 self.qq = child.qq
-                address = '%s%s%s%s%s' % (child.province_id.name,
-                           child.city_id.city_name,
-                           child.county_id.county_name,
-                           child.town,
+                address = '%s%s%s%s%s' % (child.province_id and child.province_id.name or '',
+                           child.city_id and child.city_id.city_name or '',
+                           child.county_id and child.county_id.county_name or '',
+                           child.town or '',
                            child.detail_address)
                 self.address = address
 
