@@ -26,7 +26,6 @@
 		<record id="project_invoice_1" model="project.invoice">
 			<field name="date">2016-11-10</field>
 			<field name="date_due">2016-11-11</field>
-			<!-- <field name="tax_rate">17.0</field> -->
 			<field name="amount">117.0</field>
 			<field name="project_id" ref='task.project_gooderp'/>
 		</record>
