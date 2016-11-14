@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "task",
+    'name': "GOODERP Task",
 
     'summary': """
         使用 GTD 理念支持员工记录日常工作进度 """,
@@ -13,14 +13,16 @@
     'website': "http://www.osbzr.com",
 
     'category': 'gooderp',
-    'version': '0.1',
+    'version': '11.11',
 
-    'depends': ['core'],
+    'depends': ['core', 'money'],
 
     'data': [
         'security/ir.model.access.csv',
+        'security/groups.xml',
         'views/views.xml',
         'views/templates.xml',
+        'data/data.xml',
     ],
     'demo': [
         'demo/demo.xml',

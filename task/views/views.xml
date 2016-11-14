@@ -1,61 +1,293 @@
 <openerp>
-  <data>
+	<data>
 
-    <record model="ir.ui.view" id="timesheet_treet">
-      <field name="name">时间记录列表</field>
-      <field name="model">timesheet</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="date"/>
-          <field name="user_id"/>
-        </tree>
-      </field>
-    </record>
+		<record model="ir.ui.view" id="timesheet_form">
+			<field name="name">今日</field>
+			<field name="model">timesheet</field>
+			<field name="arch" type="xml">
+				<form string="今日">
+					<sheet>
+						<group>
+							<group>
+								<field name="user_id"/>
+								<field name="date"/>
+							</group>
+						</group>
+						<notebook>
+							<page name='task' string='待办事项'>
+								<field name="task_ids" domain="[('user_id', '=', uid)]">
+									<tree string="计划">
+										<field name="name"/>
+										<field name="status"/>
+									</tree>
+								</field>
+							</page>
+							<page name='timeline' string='工作记录'>
+								<field name="timeline_ids">
+									<tree string="进展"  editable='BOTTOM'>
+										<field name='task_id'/>
+										<field name='just_done'/>
+										<field name='next_action'/>
+										<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
+										<field name="user_id"/>
+										<field name='next_datetime'/>
+										<field name='set_status'/>
+									</tree>
+								</field>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record id="timesheet_kanban" model="ir.ui.view">
+			<field name="name">timesheet kanban</field>
+			<field name="model">timesheet</field>
+			<field name="arch" type="xml">
+				<kanban class="o_kanban_mobile">
+					<field name="date"/>
+					<field name="user_id"/>
+					<templates>
+						<t t-name="kanban-box">
+							<div t-attf-class="oe_kanban_card oe_kanban_global_click">
+								<p>
+									<t t-esc="record.date.value"/>
+									<t t-esc="record.user_id.value"/>
+								</p>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="project_tree">
+			<field name="name">项目列表</field>
+			<field name="model">project</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+					<field name="customer_id"/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="project_form">
+			<field name="name">项目</field>
+			<field name="model">project</field>
+			<field name="arch" type="xml">
+				<form string="项目">
+					<sheet>
+						<group>
+							<group>
+								<field name="name"/>
+								<field name="customer_id"/>
+							</group>
+						</group>
+						<notebook>
+							<page name='task' string='任务'>
+								<field name="task_ids">
+									<tree string="任务"  editable='BOTTOM'>
+										<field name="sequence" widget="handle"/>
+										<field name="name"/>
+										<field name="user_id"/>
+										<field name="next_action"/>
+										<field name="next_datetime"/>
+									</tree>
+								</field>
+							</page>
+							<page name='project_invoice' string='发票行'>
+								<field name="invoice_ids">
+									<tree string="发票"  editable='BOTTOM'>
+										<field name="date"/>
+										<field name="date_due"/>
+										<field name="tax_rate"/>
+										<field name="amount"/>
+										<field name="tax_amount"/>
+										<field name="invoice_id"/>
+										<button name='make_invoice' type='object' string='生成发票' class='oe_highlight'/>
+									</tree>
+								</field>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="task_tree">
+			<field name="name">任务列表</field>
+			<field name="model">task</field>
+			<field name="arch" type="xml">
+				<tree editable='top'>
+					<field name="sequence" widget="handle"/>
+					<field name="name"/>
+					<field name="user_id"/>
+					<field name="project_id"/>
+					<field name="next_action"/>
+					<field name="next_datetime"/>
+					<field name="status"/>
+					<field name="is_schedule"/>
+					<button name='assign_to_me' type='object' string='我来' class='oe_highlight'/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="task_form">
+			<field name="name">任务</field>
+			<field name="model">task</field>
+			<field name="arch" type="xml">
+				<form string="任务">
+					<header>
+						<field name="status" widget="statusbar"/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="project_id"/>
+								<field name="name"/>
+								<field name="plan_hours" groups='task.group_task_hours'/>
+								<field name="user_id"/>
+							</group>
+							<group>
+								<field name="next_action"/>
+								<field name="next_datetime"/>
+								<field name="hours" groups='task.group_task_hours'/>
+							</group>
+						</group>
+						<field name="timeline_ids">
+							<tree string="进展" create='0' edit='0'>
+								<field name="create_uid" string='创建人'/>
+								<field name="create_date" string='创建时间'/>
+								<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
+								<field name='just_done'/>
+							</tree>
+						</field>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+		<record id="task_kanban" model="ir.ui.view">
+			<field name="name">task kanban</field>
+			<field name="model">task</field>
+			<field name="arch" type="xml">
+				<kanban class="o_kanban_mobile">
+					<field name="name"/>
+					<field name="user_id"/>
+					<field name="project_id"/>
+					<field name="next_action"/>
+					<field name="next_datetime"/>
+					<field name="hours"/>
+					<field name="plan_hours"/>
+					<templates>
+						<t t-name="kanban-box">
+							<div t-attf-class="oe_kanban_card oe_kanban_global_click">
+								<p>
+									<t t-esc="record.project_id.value"/>
+									<t t-esc="record.name.value"/>
+									<div groups='task.group_task_hours'>
+										<t t-esc="record.hours.value"/>
+										/
+										<t t-esc="record.plan_hours.value"/>
+									</div>
+								</p>
+								<p>
+									<t t-esc="record.user_id.value"/>
+									<t t-esc="record.next_datetime.value"/>
+									<t t-esc="record.next_action.value"/>
+								</p>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="timeline_tree">
+			<field name="name">工作日志</field>
+			<field name="model">timeline</field>
+			<field name="arch" type="xml">
+				<tree create='0' edit='0' default_order='create_date desc'>
+					<field name='task_id'/>
+					<field name='project_id'/>
+					<field name='just_done'/>
+					<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
+					<field name="user_id"/>
+					<field name='set_status'/>
+					<field name="create_uid" string='创建人'/>
+					<field name="create_date" string='创建时间'/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="task_status_tree">
+			<field name="name">任务阶段</field>
+			<field name="model">task.status</field>
+			<field name="arch" type="xml">
+				<tree editable='bottom'>
+					<field name="sequence" widget="handle"/>
+					<field name="name"/>
+					<field name="state"/>
+				</tree>
+			</field>
+		</record>
 
-    <record model="ir.ui.view" id="timesheet_form">
-      <field name="name">时间记录</field>
-      <field name="model">timesheet</field>
-      <field name="arch" type="xml">
-        <form string="时间记录">
-        <sheet>
-          <group>
-          <group>
-          <field name="user_id"/>
-          <field name="date"/>
-          </group>
-          <group>
-          <field name="task_ids">
-             <tree string="计划">
-                <field name="name"/>
-             </tree>
-          </field>
-          </group>
-          </group>
-          <field name="timeline_ids">
-            <tree string="进展"  editable='BOTTOM'>
-             <field name='task_id'/>
-             <field name='hours' sum="全天合计"/>
-             <field name='just_done'/>
-             <field name='next_action'/>
-             <field name='next_datetime'/>
-             </tree>
-          </field>
-          </sheet>
-        </form>
-      </field>
-    </record>
-    
-    <record model="ir.actions.act_window" id="action_timesheet">
-      <field name="name">时间记录</field>
-      <field name="res_model">timesheet</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-
-    <menuitem name="任务" id="menu_task_root" web_icon="task,static/description/task.png"/>
-
-    <menuitem name="任务" id="menu_task_data" parent="menu_task_root"/>
-
-    <menuitem name="时间记录" id="menu_timesheet" parent="menu_task_data"
-              action="action_timesheet"/>
-  </data>
+		<!--action-->
+		<record model="ir.actions.act_window" id="action_project">
+			<field name="name">项目</field>
+			<field name="res_model">project</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个项目</p>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="action_task">
+			<field name="name">任务</field>
+			<field name="res_model">task</field>
+			<field name="view_mode">kanban,tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个任务</p>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="action_timeline">
+			<field name="name">工作日志</field>
+			<field name="res_model">timeline</field>
+			<field name="view_mode">tree</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个工作日志</p>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="action_timesheet_today">
+			<field name="name">今日工作日志</field>
+			<field name="res_model">timesheet</field>
+			<field name="view_mode">kanban,form</field>
+			<field name="domain">[('date', '=', context_today().strftime('%Y-%m-%d')),('user_id', '=', uid)]</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建今日的工作日志</p>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="action_task_status">
+			<field name="name">任务阶段</field>
+			<field name="res_model">task.status</field>
+			<field name="view_mode">tree</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个任务阶段</p>
+			</field>
+		</record>
+		<menuitem name="任务" id="menu_task_root" web_icon="task,static/description/task.png"
+		groups='task.group_task'/>
+		<menuitem name="今日" id="menu_timesheet" parent="menu_task_root"
+		action="action_timesheet_today" sequence='1'/>
+		<menuitem name="主数据" id="menu_task_data" parent="menu_task_root" sequence='5'/>
+		<menuitem name="任务" id="menu_task" parent="menu_task_data"
+		action="action_task" sequence='1'/>
+		<menuitem name="项目" id="menu_project" parent="menu_task_data"
+		action="action_project" sequence='5'/>
+		<menuitem name="报表" id="menu_task_report" parent="menu_task_root"
+		groups='task.group_task_manager' sequence='10'/>
+		<menuitem name="工作日志" id="menu_task_timesheet" parent="menu_task_report"
+		action="action_timeline" sequence='1'/>
+		<menuitem name="设置" id="menu_task_configuration" parent="menu_task_root"
+		groups='task.group_task_manager' sequence='15'/>
+		<menuitem name="任务阶段" id="menu_task_status" parent="menu_task_configuration"
+		action="action_task_status" sequence='1'/>
+	</data>
 </openerp>

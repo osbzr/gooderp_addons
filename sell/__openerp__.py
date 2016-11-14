@@ -24,6 +24,8 @@
     'author': 'jeff@osbzr.com,flora@osbzr.com',
     'website': 'https://www.osbzr.com',
     'description': '''gooderp销售实例，通过安装gooderp模块展示odoo的销售流程''',
+    'category': 'gooderp',
+    'version': '11.11',
     'depends': ['core', 'warehouse', 'money', 'partner_address'],
     'data': [
             'data/sell_data.xml',

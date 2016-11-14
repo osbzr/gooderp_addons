@@ -192,19 +192,19 @@ class buy_receipt(models.Model):
 
         return
 
-    def _get_invoice_vals(self, category_id, date,amount, tax_amount):
+    def _get_invoice_vals(self, partner_id, category_id, date,amount, tax_amount):
         '''返回创建 money_invoice 时所需数据'''
         return {
-            'move_id': self.buy_move_id.id, 
+            'move_id': self.buy_move_id.id,
             'name': self.name,
-            'partner_id': self.partner_id.id, 
-            'category_id': category_id.id, 
+            'partner_id': partner_id.id,
+            'category_id': category_id.id,
             'date': date,
-            'amount': amount, 
-            'reconciled': 0, 
+            'amount': amount,
+            'reconciled': 0,
             'to_reconcile': amount,
             'tax_amount': tax_amount,
-            'date_due': self.date_due, 
+            'date_due': self.date_due,
             'state': 'draft'
         }
 
@@ -222,7 +222,7 @@ class buy_receipt(models.Model):
         categ = self.env.ref('money.core_category_purchase')
         if not float_is_zero(amount,2):
             invoice_id = self.env['money.invoice'].create(
-                self._get_invoice_vals(categ,self.date, amount, tax_amount)
+                self._get_invoice_vals(self.partner_id, categ, self.date, amount, tax_amount)
             )
             self.invoice_id = invoice_id.id
         return invoice_id
@@ -234,7 +234,7 @@ class buy_receipt(models.Model):
             for line in self.cost_line_ids:
                 if not float_is_zero(line.amount,2):
                     self.env['money.invoice'].create(
-                        self._get_invoice_vals(line.category_id,self.date, line.amount, 0)
+                        self._get_invoice_vals(line.partner_id, line.category_id,self.date, line.amount, 0)
                     )
         return
 
@@ -401,6 +401,10 @@ class wh_move_line(models.Model):
                               digits=dp.get_precision('Amount'),
                               help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
 
+    def _buy_get_price_and_tax(self):
+        self.tax_rate = self.env.user.company_id.import_tax_rate
+        self.price_taxed = self.goods_id.cost
+
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
@@ -413,7 +417,6 @@ class wh_move_line(models.Model):
             is_return = self.env.context.get('default_is_return')
             # 如果是采购入库单行 或 采购退货单行
             if (self.type == 'in' and not is_return) or (self.type == 'out' and is_return):
-                self.tax_rate = self.env.user.company_id.import_tax_rate
-                self.price_taxed = self.goods_id.cost
+                self._buy_get_price_and_tax()
 
         return super(wh_move_line,self).onchange_goods_id()

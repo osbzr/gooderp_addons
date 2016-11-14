@@ -25,7 +25,7 @@
 
 {
     "name" : "Database Auto-Backup",
-    "version" : "1.0",
+    "version" : "11.11",
     "author" : "Tiny,MrShelly,JianJian",
     "website" : "http://www.openerp.com",
     "category" : "Generic Modules",

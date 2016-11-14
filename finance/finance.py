@@ -427,7 +427,7 @@ class auxiliary_financing(models.Model):
         ('member', u'个人'),
         ('project', u'项目'),
         ('department', u'部门'),
-    ], u'分类')
+    ], u'分类', default='project')
 
 
 class res_company(models.Model):

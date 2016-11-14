@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="0">
+		<!--添加管理任务-->
+		<record id="group_task" model="res.groups">
+			<field name='name'>任务</field>
+			<field name='category_id' ref="core.good_task"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+		</record>
+		<!--添加管理时间组-->
+		<record id='group_task_hours' model='res.groups'>
+			<field name='name'>管理时间</field>
+			<field name='category_id' ref="core.good_task"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+		</record>
+		<!--添加任务经理组-->
+		<record id='group_task_manager' model='res.groups'>
+			<field name='name'>任务经理组</field>
+			<field name='category_id' ref="core.good_task"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+		</record>
+	</data>
+</openerp>

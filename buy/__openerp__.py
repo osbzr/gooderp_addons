@@ -6,7 +6,7 @@
     'category': 'gooderp',
     "description": """
     """,
-    'version': '8.0.0.1',
+    'version': '11.11',
     'depends': ['core', 'warehouse', 'money', 'finance'],
     'data': [
         'data/buy_data.xml',

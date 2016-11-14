@@ -34,6 +34,10 @@
 			<field name="name">人事</field>
 			<field name="sequence">7</field>
 		</record>
+		<record model="ir.module.category" id="good_task">
+			<field name="name">任务</field>
+			<field name="sequence">8</field>
+		</record>
 		<!--用户组-->
 		<record id='master_groups' model='res.groups'>
 			<field name='name'>配置</field>

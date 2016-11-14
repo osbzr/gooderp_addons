@@ -8,7 +8,7 @@
     "description": """
     用于测试GoodERP进销存加财务的核心功能.
     """,
-    'version': '10.0.0.1',
+    'version': '11.11',
     'application':True,
     'depends': ['sell', 'buy', 'asset', 'staff','web_stock_query'],
 }

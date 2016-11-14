@@ -1,30 +1,35 @@
 <openerp>
-    <data>
-        <!--  -->
-        <!--   <record id="object0" model="task.task"> -->
-        <!--     <field name="name">Object 0</field> -->
-        <!--     <field name="value">0</field> -->
-        <!--   </record> -->
-        <!--  -->
-        <!--   <record id="object1" model="task.task"> -->
-        <!--     <field name="name">Object 1</field> -->
-        <!--     <field name="value">10</field> -->
-        <!--   </record> -->
-        <!--  -->
-        <!--   <record id="object2" model="task.task"> -->
-        <!--     <field name="name">Object 2</field> -->
-        <!--     <field name="value">20</field> -->
-        <!--   </record> -->
-        <!--  -->
-        <!--   <record id="object3" model="task.task"> -->
-        <!--     <field name="name">Object 3</field> -->
-        <!--     <field name="value">30</field> -->
-        <!--   </record> -->
-        <!--  -->
-        <!--   <record id="object4" model="task.task"> -->
-        <!--     <field name="name">Object 4</field> -->
-        <!--     <field name="value">40</field> -->
-        <!--   </record> -->
-        <!--  -->
-    </data>
+	<data>
+		<!-- 项目数据 -->
+		<record id="project_gooderp" model="project">
+			<field name="name">GoodERP</field>
+			<field name="customer_id" ref="core.lenovo"/>
+		</record>
+		<record id="task_sell" model="task">
+			<field name="name">维护销售模块</field>
+			<field name="project_id" ref='task.project_gooderp'/>
+		</record>
+		<record id="timeline_sell" model="timeline">
+			<field name="task_id" ref='task.task_sell'/>
+			<field name="project_id" ref='task.project_gooderp'/>
+			<field name="hours">1</field>
+			<field name="just_done">修改销售订单的打印报表</field>
+		</record>
+		<record id="task_status_doing" model="task.status">
+			<field name="name">进行中</field>
+			<field name="state">doing</field>
+		</record>
+		<!--2016-11-10，Admin的工作日志-->
+		<record id="timesheet_20161110" model="timesheet">
+			<field name="user_id" ref='base.user_root'/>
+			<field name="date">2016-11-10</field>
+		</record>
+		<record id="project_invoice_1" model="project.invoice">
+			<field name="date">2016-11-10</field>
+			<field name="date_due">2016-11-11</field>
+			<!-- <field name="tax_rate">17.0</field> -->
+			<field name="amount">117.0</field>
+			<field name="project_id" ref='task.project_gooderp'/>
+		</record>
+	</data>
 </openerp>
