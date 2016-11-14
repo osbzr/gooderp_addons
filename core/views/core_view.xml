@@ -114,8 +114,9 @@
 						<field name="currency_id"/>
 						<field name="cost_method"/>
 						<field name="draft_invoice"/>
-                        <field name="import_tax_rate"></field>
-	                    <field name="output_tax_rate"></field>
+						<field name="import_tax_rate"/>
+						<field name="output_tax_rate"/>
+						<field name="bank_account_id"/>
 					</group>
 				</form>
 			</field>

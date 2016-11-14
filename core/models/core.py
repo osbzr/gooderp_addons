@@ -96,7 +96,6 @@ class bank_account(models.Model):
     ]
 
 
-
 class service(models.Model):
     ''' 是对其他收支业务的更细分类 '''
     _name = 'service'
