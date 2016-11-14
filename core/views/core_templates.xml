@@ -12,7 +12,7 @@
         </template>
         <template id="login_layout"  inherit_id="web.login_layout" name="login" >
             <xpath expr="//a[@target='_blank']" position="replace">
-                <a href="https://www.gooderp.org" target="_blank">由<span>开阖软件有限公司</span>技术提供</a>
+                <a href="http://www.gooderp.org" target="_blank">由<span>www.GoodERP.org</span>技术提供</a>
             </xpath>
         </template>
 
@@ -23,7 +23,7 @@
         </template>
          <template id="web_layout"  inherit_id="web.layout" name="web_layout" >
              <xpath expr="//html/head/title" position="replace">
-                 <title t-esc="title or 'gooderp'"/>
+                 <title t-esc="title or 'GoodERP'"/>
              </xpath>
          </template>
 

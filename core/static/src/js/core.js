@@ -144,11 +144,15 @@ odoo.define('core.core', function (require) {
     });
     //頁面title 換成自己定義的字符！
     WebClient.include({
+         init: function(parent) {
+                this._super(parent);
+                this.set('title_part', {"zopenerp": "GoodERP"});
+         },
         set_title_part: function(part, title) {
             var tmp = _.clone(this.get("title_part"));
             tmp[part] = title;
             if ('zopenerp' in tmp){
-                tmp['zopenerp'] = 'Gooderp';
+                tmp['zopenerp'] = 'GoodERP';
             }
             this.set("title_part", tmp);
         },

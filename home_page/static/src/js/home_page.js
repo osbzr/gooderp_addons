@@ -91,28 +91,36 @@ odoo.define('home_page', function (require) {
             var top_fist = $(QWeb.render('top_fist_1'));
             var top_second = $(QWeb.render('top_second_2'));
             var top_third = $(QWeb.render('top_third_3'));
+            var help_content = $(QWeb.render('help_content'));
             return {
                 'top_fist': top_fist,
                 'top_second': top_second,
-                'top_third': top_third
+                'top_third': top_third,
+                'help_content':help_content
             }
         },
         three_part_is_show: function (result, most_frame) {
             var self = this;
-            if (result['top']) {
+            var have_content = true
+            if (result['top'].length) {
                 self.$el.find('.main').append(most_frame.top_fist);
                 this.result_top = result['top']
             }
-            if (result['main']) {
+            if (result['main'].length) {
                 self.$el.find('.main').append(most_frame.top_second);
                 var center_main_table = $(QWeb.render('center_main_table'));
                 self.$el.find('.main_div').append(center_main_table);
                 this.result_main = result['main']
             }
-            if (result['right']) {
+            if (result['right'].length) {
                 self.$el.find('.main').append(most_frame.top_third);
                 this.result_quick = result['right']
             }
+            if (!(result['right'].length || result['main'].length || result['right'].length)) {
+                self.$el.find('.main').append(most_frame.help_content);
+                have_content = false
+            }
+            return have_content
         },
         second_part: function () {
             var self = this;
@@ -173,13 +181,14 @@ odoo.define('home_page', function (require) {
             new Model("home.page").call("get_action_url").then(function (result) {
                 var index = 0;
                 /* 三块 可以选择性的不显示某个 模块 */
-                self.three_part_is_show(result, most_frame);
-                /* 第一块的视图的构建 及跳转的逻辑 */
-                self.first_part();
-                /* 第er块的视图的构建 及跳转的逻辑 */
-                self.second_part();
-                /* 第san块的视图的构建 及跳转的逻辑 */
-                self.thrid_part()
+                if (self.three_part_is_show(result, most_frame)) {
+                    /* 第一块的视图的构建 及跳转的逻辑 */
+                    self.first_part();
+                    /* 第er块的视图的构建 及跳转的逻辑 */
+                    self.second_part();
+                    /* 第san块的视图的构建 及跳转的逻辑 */
+                    self.thrid_part()
+                }
             });
         },
     });
