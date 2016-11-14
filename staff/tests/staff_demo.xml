@@ -12,6 +12,10 @@
             <field name='identification_id'>12345678</field>
             <field name='work_phone'>12345678901</field>
         </record>
+        <record id='core.lili' model='staff'>
+            <field name='identification_id'>87654321</field>
+            <field name='work_phone'>18823456789</field>
+        </record>
         <!--部门-->
         <record id='department_1' model='staff.department'>
             <field name='name'>人事部</field>
