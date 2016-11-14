@@ -102,7 +102,6 @@ class staff(models.Model):
                 continue
 
             for contract in staff.contract_ids:
-                print "now", contract.over_date, now, now == contract.over_date
                 if now == contract.over_date:
                     self.env.ref('staff.contract_over_due_date_employee').send_mail(self.env.user.id)
                     if staff.parent_id and staff.parent_id.work_email:
