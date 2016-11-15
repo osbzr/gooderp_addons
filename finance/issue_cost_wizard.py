@@ -100,7 +100,7 @@ class MonthProductCost(models.Model):
             month_cost = balance_price * data_dcit.get("current_period_out_qty", 0)
         else:
             month_cost = data_dcit.get("current_period_out_cost", 0)
-        return month_cost
+        return round(month_cost, 2)
 
     @api.multi
     def create_month_product_cost_voucher(self, period_id, month_product_cost_dict):
