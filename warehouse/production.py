@@ -26,7 +26,7 @@ class wh_assembly(models.Model):
     fee = fields.Float(
         u'组装费用', digits=dp.get_precision('Amount'),
         help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
-    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False, help="通用情况是一对多的组合,当为False时\
+    is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个产品作为组合件,(选择模板后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
                             不会自动影响子件的数量")
     goods_id = fields.Many2one('goods', string=u'组合件产品')
@@ -294,7 +294,7 @@ class wh_disassembly(models.Model):
     fee = fields.Float(
         u'拆卸费用', digits=dp.get_precision('Amount'),
         help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
-    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False,help="通用情况是一对多的组合,当为False时\
+    is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False,help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个产品作为组合件,(选择模板后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
                             不会自动影响子件的数量")
     goods_id = fields.Many2one('goods', string=u'组合件产品')
@@ -392,7 +392,6 @@ class wh_disassembly(models.Model):
                                   'uom_id': self.goods_id.uom_id.id,
                                   'uos_id': self.goods_id.uos_id.id,
                                   }]
-
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
