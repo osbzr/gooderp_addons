@@ -429,7 +429,7 @@
 			                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 			                		<tree string="Cost Lines" editable="bottom">
 			                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
-				                		<field name="category_id"/>
+				                		<field name="category_id" domain="[('type', '=', 'income')]"/>
 				                		<field name="amount"/>
 				                		<field name="note"/>
 				                	</tree>

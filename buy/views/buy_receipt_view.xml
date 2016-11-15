@@ -103,7 +103,7 @@
 		                			<field name="partner_id"
 		                				domain="[('s_category_id', '!=', False)]"
 		                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
-			                		<field name="category_id"/>
+			                		<field name="category_id" domain="[('type', '=', 'expense')]"/>
 			                		<field name="amount"/>
 			                		<field name="note"/>
 			                	</tree>

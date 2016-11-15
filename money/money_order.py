@@ -674,7 +674,6 @@ class cost_line(models.Model):
     category_id = fields.Many2one('core.category', u'类别',
                                   required=True,
                                   ondelete='restrict',
-                                  domain="[('type', '=', 'other_pay')]",
                                   help=u'分类：其他支出')
     amount = fields.Float(u'金额',
                           required=True,
