@@ -103,7 +103,8 @@
 										<field name="amount"/>
 										<field name="tax_amount"/>
 										<field name="invoice_id"/>
-										<button name='make_invoice' type='object' string='生成发票' class='oe_highlight'/>
+										<button name='make_invoice' type='object' string='生成发票' class='oe_highlight'
+											attrs="{'invisible': [('invoice_id', '!=', False)]}"/>
 									</tree>
 								</field>
 							</page>
