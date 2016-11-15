@@ -67,7 +67,7 @@ class sell_summary_staff(models.Model):
             LEFT JOIN sell_delivery AS sd
                  ON wm.id = sd.sell_move_id
             LEFT JOIN staff
-                 ON sd.staff_id = staff.id
+                 ON wm.staff_id = staff.id
             LEFT JOIN goods ON wml.goods_id = goods.id
             LEFT JOIN core_category AS categ ON goods.category_id = categ.id
             LEFT JOIN attribute AS attr ON wml.attribute_id = attr.id
