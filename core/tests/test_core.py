@@ -43,7 +43,10 @@ class test_business_data(TransactionCase):
     def test_clean_business_data(self):
         ''' 测试清空业务数据 '''
         business_data_table = self.env['business.data.table']
+        business_data_table.create({'name': 'ABCD'})
         clean_business_data = self.env['clean.business.data']
+        with self.assertRaises(UserError):
+            clean_business_data.create({'create_uid': self.env.uid}).remove_data()
         business_data_table.create({'name': 'home.report.type'})
         clean_business_data.create({'create_uid':self.env.uid}).remove_data()
         # 表不存在会报错
