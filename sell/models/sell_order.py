@@ -205,8 +205,6 @@ class sell_order(models.Model):
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
                 raise UserError(u'外贸免税！')
-        if self.bank_account_id and not self.pre_receipt:
-            raise UserError(u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.pre_receipt:
             raise UserError(u'预付款不为空时，请选择结算账户！')
         # 销售预收款生成收款单

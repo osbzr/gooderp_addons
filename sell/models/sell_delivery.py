@@ -181,8 +181,6 @@ class sell_delivery(models.Model):
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
-        if self.bank_account_id and not self.receipt:
-            raise UserError(u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
             raise UserError(u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount + self.partner_cost:

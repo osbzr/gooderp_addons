@@ -123,14 +123,6 @@ class test_sell_delivery(TransactionCase):
         self.assertTrue(not move)
         self.assertTrue(not move.line_out_ids)
 
-    def test_sell_delievery_done_no_receipt(self):
-        """ 销售 退货单 审核时收款为空测试"""
-        #  结算账户 需要输入付款额 测试
-        self.return_delivery.bank_account_id = self.bank_account.id
-        self.return_delivery.receipt = False
-        with self.assertRaises(UserError):
-            self.return_delivery.sell_delivery_done()
-
     def test_sell_delievery_done_no_account_id(self):
         """销售 发货单 审核时付款账户为空 测试"""
         self.delivery.bank_account_id = False
