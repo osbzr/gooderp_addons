@@ -69,5 +69,10 @@
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 			<field name="comment">用于显示服务类产品功能，服务类产品不管理库存数量</field>
 		</record>
+		<record id="nobody_can_see" model="res.groups" >
+			<field name="name">彻底隐藏</field>
+			<field name='category_id' ref="core.Gooderp"/>
+			<field name="comment">用来隐藏管理员也没必要看到的菜单等...(使用时请慎重)!</field>
+		</record>
     </data>
 </openerp>

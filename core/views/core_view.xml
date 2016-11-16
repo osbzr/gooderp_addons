@@ -535,7 +535,15 @@
             <field name="groups_id" eval="[(3, ref('base.group_erp_manager'))]"/>
         </record>
 		<menuitem id="home_page.main_home_menu" name="首页" groups="home_page.group_all_manager"/>
-		<menuitem id="mail.mail_channel_menu_root_chat"
-			groups="-base.group_user,home_page.group_mail" />
-    </data>
+		<menuitem id="mail.mail_channel_menu_root_chat" groups="-base.group_user,home_page.group_mail" />
+		<menuitem id="base.module_mi"  groups="-base.group_no_one,core.nobody_can_see" />
+		<menuitem id="base.menu_module_updates" parent="base.menu_management" sequence="20"
+				   groups="-base.group_no_one,core.nobody_can_see" action="base.modules_updates_act_cl"/>
+		<menuitem action="base.action_view_base_module_update" id="base.menu_view_base_module_update"
+				groups="base.group_no_one" parent="base.menu_management" sequence="40" />
+		<menuitem action="base.action_view_base_module_upgrade" groups="-base.group_no_one"
+           id="base.menu_view_base_module_upgrade"
+           parent="base.menu_management"
+           sequence="50"/>
+	</data>
 </openerp>
