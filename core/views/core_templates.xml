@@ -3,16 +3,16 @@
 	<data>
 		<template id="assets_backend" name="Core" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
-                <!-- 
+                <!--
                 One2many字段增加复制按钮
                 使用 options="{'color':'random'}" 来实现多对多控件标签显示随机颜色
                  -->
                 <script type="text/javascript" src="/core/static/src/js/core.js"></script>
             </xpath>
         </template>
-        <template id="login_layout"  inherit_id="web.login_layout" name="login" >
+        <template  id="login_layout"  inherit_id="web.login_layout" name="login" priority="1">
             <xpath expr="//a[@target='_blank']" position="replace">
-                <a href="https://www.gooderp.org" target="_blank">融入开源社区</a>
+                <a href="http://www.gooderp.org" target="_blank">融入开源社区</a>
             </xpath>
         </template>
 
@@ -26,6 +26,5 @@
                  <title t-esc="title or 'GoodERP'"/>
              </xpath>
          </template>
-
     </data>
 </openerp>
