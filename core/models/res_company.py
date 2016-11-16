@@ -21,6 +21,7 @@ class res_company(models.Model):
                                    help=u'勾选这里，所有新建的结算单不会自动记账')
     import_tax_rate = fields.Float(string=u"默认进项税税率")
     output_tax_rate = fields.Float(string=u"默认销项税税率")
+    bank_account_id = fields.Many2one('bank.account', string=u'开户行')
 
     def _get_logo(self):
         return open(misc.file_open('core/static/description/logo.png').name, 'rb') .read().encode('base64')

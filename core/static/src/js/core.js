@@ -121,7 +121,7 @@ odoo.define('core.core', function (require) {
             new Model("res.company").call("read", [session.company_id]).then(function(data) {
                 self.$('.oe_topbar_company_name').text(data[0]['display_name']);
             })
-            var company_avatar_src = session.url('/web/image', {model:'res.company', field: 'logo', id: session.uid});
+            var company_avatar_src = session.url('/web/image', {model:'res.company', field: 'logo', id:session.company_id});
             $company_avatar.attr('src', company_avatar_src);
         },
     });

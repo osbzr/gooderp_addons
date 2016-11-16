@@ -177,7 +177,7 @@ class CheckOutWizard(models.TransientModel):
         :return:
         """
         if self.period_id:
-            if self.env['ir.module.module'].search([('state', '=', 'installed'), ('name', '=', 'warehouse')]):
+            if self.env['ir.module.module'].sudo().search([('state', '=', 'installed'), ('name', '=', 'warehouse')]):
                 self.env['month.product.cost'].generate_issue_cost(self.period_id)
         res = super(CheckOutWizard, self).button_checkout()
         return res
