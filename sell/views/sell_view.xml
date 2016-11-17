@@ -89,7 +89,6 @@
 										<field name="discount_rate" groups='sell.sell_discount_groups'/>
 										<field name="discount_amount" groups='sell.sell_discount_groups'/>
                             			<field name="amount"/>
-                            			<field name="amount_executed" readonly="1"/>
                         			</group>
                         			<group>
 										<field name="pre_receipt"/>

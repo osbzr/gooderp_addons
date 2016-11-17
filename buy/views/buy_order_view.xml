@@ -86,7 +86,6 @@
 								<field name="discount_rate" groups='buy.buy_discount_groups'/>
 								<field name="discount_amount" groups='buy.buy_discount_groups'/>
 								<field name="amount"/>
-								<field name="amount_executed" readonly="1"/>
 							</group>
 							<group>
 								<field name="prepayment" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
