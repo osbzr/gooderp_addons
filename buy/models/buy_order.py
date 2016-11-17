@@ -71,15 +71,18 @@ class buy_order(models.Model):
         return self.env['warehouse'].browse()
 
     @api.one
-    @api.depends('amount', 'amount_executed')
+    @api.depends('type')
     def _get_money_state(self):
         '''计算购货订单付款/退款状态'''
-        if self.amount_executed == 0:
+        receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
+        if all(receipt.invoice_id.reconciled == 0
+               for receipt in receipts):
             self.money_state = (self.type == 'buy') and u'未付款' or u'未退款'
-        elif self.amount_executed < self.amount:
-            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
-        elif self.amount_executed == self.amount:
+        elif all(receipt.invoice_id.reconciled ==
+                 receipt.invoice_id.amount for receipt in receipts):
             self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
+        else:
+            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
 
     partner_id = fields.Many2one('partner', u'供应商', states=READONLY_STATES,
                                  ondelete='restrict',
@@ -136,11 +139,8 @@ class buy_order(models.Model):
                                help=u'该单据是否已终止')
     pay_ids=fields.One2many("payment.plan","buy_id",string=u"付款计划",
                             help=u'分批付款时使用付款计划')
-    amount_executed = fields.Float(u'已执行金额',
-                                   help=u'入库单已付款金额或退货单已退款金额')
     money_state = fields.Char(u'付/退款状态',
                               compute=_get_money_state,
-                              store=True,
                               copy=False,
                               help=u'购货订单生成的采购入库单或退货单的付/退款状态')
 

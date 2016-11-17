@@ -311,6 +311,7 @@ class sell_delivery(models.Model):
         for line in source_line:
             line.money_id.money_order_draft()
             line.money_id.unlink()
+            # FIXME:查找产生的核销单，反审核后删掉
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
                 [('name', '=', self.invoice_id.name)])
