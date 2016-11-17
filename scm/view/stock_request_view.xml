@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="stock_request_goods_form" model="ir.ui.view">
+            <field name="name">stock.request.goods.form</field>
+            <field name="model">goods</field>
+            <field name="inherit_id" ref="goods.goods_form"/>
+            <field name="arch" type="xml">
+                <field name="cost" position="after">
+                    <field name="min_stock_qty"/>
+                </field>
+            </field>
+        </record>
+        <record id='stock_request_tree' model='ir.ui.view'>
+            <field name='name'>stock.request.tree</field>
+            <field name='model'>stock.request</field>
+            <field name='arch' type='xml'>
+                <tree string='补货申请'>
+                    <field name="staff_id"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id='stock_request_form' model='ir.ui.view'>
+            <field name='name'>stock.request.form</field>
+            <field name='model'>stock.request</field>
+            <field name='arch' type='xml'>
+                <form string='补货申请'>
+                    <header>
+                        <button name="stock_query" states="unsubmit" string="查询库存" type="object" class="oe_highlight"/>
+                        <button name="stock_request_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="staff_id"/>
+                            </group>
+                            <group>
+                                <field name="date"/>
+                            </group>
+                        </group>
+                        <field name="line_ids">
+                            <tree string='补货申请明细行' editable='bottom' create='false'>
+                                <field name='goods_id' readonly='1'/>
+                                <field name='supplier_id'
+                                domain="[('s_category_id', '!=', False)]"
+                                context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                                <field name='attribute_id' readonly='1' groups='goods.multi_attrs_groups' />
+                                <field name='qty' readonly='1'/>
+                                <field name='to_sell_qty' readonly='1'/>
+                                <field name='to_delivery_qty' readonly='1'/>
+                                <field name='to_buy_qty' readonly='1'/>
+                                <field name='to_receipt_qty' readonly='1'/>
+                                <field name='min_stock_qty' readonly='1'/>
+                                <field name='request_qty' />
+                                <field name='uom_id' readonly='1'/>
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- 按需补货-->
+        <record id='stock_request_action' model='ir.actions.act_window'>
+            <field name='name'>补货申请</field>
+            <field name='res_model'>stock.request</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+        <menuitem id='stock_request_menu' action='stock_request_action' name='补货申请'
+            parent='warehouse.warehouse_order' sequence='11'/>
+    </data>
+</openerp>
