@@ -130,6 +130,7 @@ class sell_order(models.Model):
     money_state = fields.Char(u'收/退款状态',
                               compute=_get_money_state,
                               store=True,
+                              copy=False,
                               help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止',
                                help=u'该单据是否已终止')

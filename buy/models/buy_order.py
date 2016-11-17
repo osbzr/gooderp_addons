@@ -141,6 +141,7 @@ class buy_order(models.Model):
     money_state = fields.Char(u'付/退款状态',
                               compute=_get_money_state,
                               store=True,
+                              copy=False,
                               help=u'购货订单生成的采购入库单或退货单的付/退款状态')
 
     @api.onchange('discount_rate', 'line_ids')
