@@ -144,6 +144,9 @@ class CreateExchangeWizard(models.TransientModel):
                         })
 
     @api.multi
+    def create_rate_period(self):
+
+    @api.multi
     def create_exchange(self):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         '''只有外币＋期末需要调汇的科目才会能生成调汇凭证的明细行'''
@@ -169,3 +172,18 @@ class CreateExchangeWizard(models.TransientModel):
 
         if not vouch_obj.line_ids :
             vouch_obj.unlink()
+
+class rate_period(models.Model):
+    """记录本月结算汇兑损益时的汇率，用于反结算后，汇兑损益正确时汇率正确"""
+    _name = "rate.period"
+
+    name = fields.Many2one('res.currency', u'币别', required=True)
+    account_accumulated_depreciation = fields.Many2one(
+        'finance.account', u'累计折旧科目', required=True)
+    account_asset = fields.Many2one(
+        'finance.account', u'固定资产科目', required=True)
+    account_depreciation = fields.Many2one(
+        'finance.account', u'折旧费用科目', required=True)
+
+
+
