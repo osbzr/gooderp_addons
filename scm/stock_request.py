@@ -62,7 +62,7 @@ class stock_request(models.Model):
                 else:
                     if wh_move_line.type == 'out':
                         if wh_move_line.attribute_id:  # 产品存在属性
-                            if wh_move_line.attribute_id not in attribute_dict:
+                            if not to_delivery_dict.has_key(wh_move_line.attribute_id):
                                 to_delivery_dict.update({wh_move_line.attribute_id: wh_move_line.goods_qty})
                             else:
                                 to_delivery_dict[wh_move_line.attribute_id] += wh_move_line.goods_qty
@@ -70,7 +70,7 @@ class stock_request(models.Model):
                             to_delivery_qty += wh_move_line.goods_qty
                     else:
                         if wh_move_line.attribute_id:  # 产品存在属性
-                            if wh_move_line.attribute_id not in attribute_dict:
+                            if not to_receipt_dict.has_key(wh_move_line.attribute_id):
                                 to_receipt_dict.update({wh_move_line.attribute_id: wh_move_line.goods_qty})
                             else:
                                 to_receipt_dict[wh_move_line.attribute_id] += wh_move_line.goods_qty
@@ -81,7 +81,7 @@ class stock_request(models.Model):
                                                                    ('order_id.state', '=', 'draft')])
             for line in sell_order_lines:
                 if line.attribute_id:  # 产品存在属性
-                    if line.attribute_id not in attribute_dict:
+                    if not to_sell_dict.has_key(line.attribute_id):
                         to_sell_dict.update({line.attribute_id: line.quantity})
                     else:
                         to_sell_dict[line.attribute_id] += line.quantity
@@ -92,7 +92,7 @@ class stock_request(models.Model):
                                                                    ('order_id.state', '=', 'draft')])
             for line in buy_order_lines:
                 if line.attribute_id:  # 产品存在属性
-                    if line.attribute_id not in attribute_dict:
+                    if not to_buy_dict.has_key(line.attribute_id):
                         to_buy_dict.update({line.attribute_id: line.quantity})
                     else:
                         to_buy_dict[line.attribute_id] += line.quantity
@@ -103,10 +103,7 @@ class stock_request(models.Model):
             bom_line = self.env['wh.bom.line'].search([('goods_id', '=', good.id),
                                                        ('bom_id.type', '=', 'assembly'),
                                                        ('type', '=', 'parent')])
-            if bom_line:
-                is_buy = False
-            else:
-                is_buy = True
+            is_buy = bom_line and False or True
 
             # 生成补货申请行
             qty_available = 0  # 可用库存
@@ -211,10 +208,7 @@ class stock_request(models.Model):
                         bom_line = self.env['wh.bom.line'].search([('goods_id', '=', line_out.goods_id.id),
                                                                    ('bom_id.type', '=', 'assembly'),
                                                                    ('type', '=', 'parent')])
-                        if bom_line:
-                            is_buy = False
-                        else:
-                            is_buy = True
+                        is_buy = bom_line and False or True
 
                         request_line_ids = self.env['stock.request.line'].create({
                            'request_id': self.id,
