@@ -39,6 +39,7 @@
         'view/warehouse_view.xml',
         'view/inventory_view.xml',
         'view/production_view.xml',
+        'view/res_company.xml',
         'report/report_data.xml',
         'report/stock_balance_view.xml',
         'report/stock_transceive_view.xml',
@@ -48,7 +49,7 @@
         'menu/warehouse_menu.xml',
         'data/sequence.xml',
         'security/ir.model.access.csv',
-        'data/home_page_data.xml'
+        'data/home_page_data.xml',
     ],
     'demo': [
         'data/warehouse_demo.xml',
