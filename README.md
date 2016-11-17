@@ -1,4 +1,4 @@
-[【在线试用】](http://demo.gooderp.org:8888/login?db=demo&login=admin&key=gooderp)
+[【在线试用】](http://demo.gooderp.org:8888)
 或
 [【下载Windows绿色版】](http://com.osbzr.net/osbzr_downloads/static/gooderp.zip)
 ----
