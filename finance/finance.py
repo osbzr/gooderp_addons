@@ -94,7 +94,7 @@ class voucher(models.Model):
         debit_sum = round(debit_sum, precision)
         credit_sum = round(credit_sum, precision)
         if debit_sum != credit_sum:
-            raise ValidationError(u'借贷方不平')
+            raise ValidationError(u'借贷方不平!\n 借方合计:%s 贷方合计:%s' % (debit_sum, credit_sum))
 
         self.state = 'done'
 
@@ -442,11 +442,13 @@ class res_company(models.Model):
                                          help=u'进项税额，是指纳税人购进货物、加工修理修配劳务、服务、无形资产或者不动产，支付或者负担的增值税额。')
     output_tax_account = fields.Many2one('finance.account', u"销项税科目", ondelete='restrict')
 
+    @api.model
     def _get_operating_cost_account_id(self):
-        return self.env.ref('finance.small_business_chart2211001').id
+        return self.env.ref('finance.small_business_chart2211001')
 
-    operating_cost_account_id = fields.Many2one('finance.account', default=_get_operating_cost_account_id,ondelete='restrict',
-                                                string='生产费用科目',help='用在组装拆卸的费用上!')
+    operating_cost_account_id = fields.Many2one('finance.account', default=_get_operating_cost_account_id,
+                                                ondelete='restrict',
+                                                string='生产费用科目', help='用在组装拆卸的费用上!')
 
 class bank_account(models.Model):
     _inherit = 'bank.account'
