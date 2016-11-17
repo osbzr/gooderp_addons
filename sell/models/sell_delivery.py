@@ -182,13 +182,16 @@ class sell_delivery(models.Model):
         if not self.bank_account_id and self.receipt:
             raise UserError(u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount + self.partner_cost:
-            raise UserError(u'本次收款金额不能大于优惠后金额！')
+            raise UserError(u'本次收款金额不能大于优惠后金额！\n本次收款金额:%s 优惠后金额:%s' %
+                            (self.receipt, self.amount + self.partner_cost))
         # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
         if not self.is_return:
             amount = self.amount + self.partner_cost
             if self.partner_id.credit_limit != 0:
                 if amount - self.receipt + self.partner_id.receivable > self.partner_id.credit_limit:
-                    raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！')
+                    raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！\n\
+                     本次发货金额:%s\n 客户应收余额:%s\n 本次收款金额:%s\n客户信用额度:%s' % (
+                    amount, self.receipt, self.partner_id.receivable, self.partner_id.credit_limit))
 
     def _line_qty_write(self):
         line_ids = not self.is_return and self.line_out_ids or self.line_in_ids

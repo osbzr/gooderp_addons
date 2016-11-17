@@ -128,13 +128,13 @@ class asset(models.Model):
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间已结账！不能审核')
+            raise UserError(u'该会计期间(%s)已结账！不能审核'%self.period_id.name)
         if self.cost <= 0:
-            raise UserError(u'金额必须大于0！')
+            raise UserError(u'金额必须大于0！\n金额:%s'%self.cost)
         if self.tax < 0:
-            raise UserError(u'税额必须大于0！')
+            raise UserError(u'税额必须大于0！\n税额:%s'%self.tax)
         if self.depreciation_previous < 0:
-            raise UserError(u'以前折旧必须大于0！')
+            raise UserError(u'以前折旧必须大于0！\n折旧金额:%s' % self.depreciation_previous)
         return
 
     @api.one
@@ -221,7 +221,7 @@ class asset(models.Model):
         if self.chang_ids:
             raise UserError(u'已变更不能反审核！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间已结账！不能反审核')
+            raise UserError(u'该会计期间(%s)已结账！不能反审核'%self.period_id.name)
         self.state = 'draft'
         '''删掉凭证'''
         if self.voucher_id:

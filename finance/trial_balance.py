@@ -84,7 +84,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
             last_period = self.compute_last_period_id(self.period_id)
             if last_period:
                 if not last_period.is_closed:
-                    raise UserError(u'前一期间未结账，无法取到期初余额')
+                    raise UserError(u'期间%s未结账，无法取到%s期期初余额'%(last_period,self.period_id.name))
             period_id = self.period_id.id
             current_occurrence_dic_list = self.get_period_balance(period_id)
             trial_balance_dict = {}
@@ -225,7 +225,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 self.period_end_id = self.period_begin_id
                 return {'warning': {
                     'title': u'错误',
-                    'message': u'结束期间必须大于等于开始期间!',
+                    'message': u'结束期间必须大于等于开始期间!\n开始期间为:%s 结束期间为:%s' %
+                               (self.period_begin_id.name, self.period_end_id.name),
                 }}
 
     @api.multi
@@ -394,7 +395,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_begin_id)
         if last_period:
             if not last_period.is_closed:
-                raise UserError(u'前一期间未结账，无法取到期初余额')
+                raise UserError(u'%s未结账，无法取到%s期初余额' % (last_period.name, self.period_begin_id.name))
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code), ('code', '<=', self.subject_name_end_id.code)])
@@ -450,7 +451,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         """创建总账"""
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_begin_id)
         if last_period and not last_period.is_closed:
-            raise UserError(u'前一期间未结账，无法取到期初余额')
+            raise UserError(u'%s未结账，无法取到%s期初余额'%(last_period.name,self.period_begin_id.name))
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code), ('code', '<=', self.subject_name_end_id.code)])

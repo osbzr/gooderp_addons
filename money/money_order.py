@@ -56,7 +56,7 @@ class money_order(models.Model):
             orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
                                                      ('state', '=', 'draft')])
             if orders:
-                raise UserError(u'该业务伙伴存在未审核的收/付款单，请先审核')
+                raise UserError(u'业务伙伴(%s)存在未审核的收/付款单，请先审核'%orders.partner_id.name)
 
         return super(money_order, self).write(values)
 
@@ -193,11 +193,11 @@ class money_order(models.Model):
         '''对收支单的审核按钮'''
         for order in self:
             if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
-                raise UserError(u'请输入供应商类别上的科目')
+                raise UserError(u'请输入供应商类(%s)别上的科目'%order.partner_id.s_category_id.name)
             if order.type == 'get' and not order.partner_id.c_category_id.account_id:
-                raise UserError(u'请输入客户类别上的科目')
+                raise UserError(u'请输入客户类别(%s)上的科目'%order.partner_id.c_category_id.name)
             if order.advance_payment < 0:
-                raise UserError(u'核销金额不能大于付款金额')
+                raise UserError(u'核销金额不能大于付款金额!\n核销金额:%s'%(order.advance_payment))
 
             order.to_reconcile = order.advance_payment
             order.reconciled = order.amount - order.advance_payment
@@ -206,7 +206,7 @@ class money_order(models.Model):
             for line in order.line_ids:
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
                     if line.bank_id.balance < line.amount:
-                        raise UserError(u'账户余额不足')
+                        raise UserError(u'账户余额不足!\n账户余额:%s 订单金额:%s'%(line.bank_id.balance,line.amount))
                     line.bank_id.balance -= line.amount
                 else:  # 收款账号余额增加, 退款账号余额减少
                     line.bank_id.balance += line.amount
@@ -220,7 +220,8 @@ class money_order(models.Model):
             # 更新结算单的未核销金额、已核销金额
             for source in order.source_ids:
                 if abs(source.to_reconcile) < source.this_reconcile:
-                    raise UserError(u'本次核销金额不能大于未核销金额')
+                    raise UserError(u'本次核销金额不能大于未核销金额!那你\n 核销金额:%s 未审核金额:%s'
+                                    %( abs(source.to_reconcile),source.this_reconcile))
 
                 source.to_reconcile = (source.to_reconcile - 
                                        source.this_reconcile)
@@ -243,7 +244,7 @@ class money_order(models.Model):
                     line.bank_id.balance += line.amount
                 else:  # 收款账号余额增加
                     if line.bank_id.balance < line.amount:
-                        raise UserError(u'账户余额不足')
+                        raise UserError(u'账户余额不足!\n 账户余额:%s 订单金额:%s' % (line.bank_id.balance, line.amount))
                     line.bank_id.balance -= line.amount
                 total += line.amount
 
@@ -277,7 +278,8 @@ class money_order_line(models.Model):
         partner_currency_id = self.bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
         self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
         if self.bank_id and self.currency_id.id != self.money_id.currency_id.id :
-            raise ValidationError(u'结算帐户与业务伙伴币别不一致')
+            raise ValidationError(u'结算帐户与业务伙伴币别不一致\n 结算账户币别:%s 业务伙伴币别:%s'
+                                  %(self.currency_id.name,self.money_id.currency_id.name))
 
     money_id = fields.Many2one('money.order', string=u'收付款单',
                                ondelete='cascade',
@@ -564,7 +566,7 @@ class reconcile_order(models.Model):
     def _get_or_pay(self, line, business_type,
                     partner_id, to_partner_id, name):
         if line.this_reconcile > line.to_reconcile:
-            raise UserError(u'核销金额不能大于未核销金额')
+            raise UserError(u'核销金额不能大于未核销金额!\n核销金额:%s 未核销金额:%s'%(line.this_reconcile, line.to_reconcile))
         # 更新每一行的已核销余额、未核销余额
         line.name.to_reconcile -= line.this_reconcile
         line.name.reconciled += line.this_reconcile
@@ -601,13 +603,14 @@ class reconcile_order(models.Model):
                 raise UserError(u'核销单%s已审核，不能再次审核' % order.name)
             order_reconcile, invoice_reconcile = 0, 0
             if self.business_type in ['get_to_get', 'pay_to_pay'] and order.partner_id == order.to_partner_id:
-                raise UserError(u'转出客户和转入客户不能相同')
+                raise UserError(u'转出客户和转入客户不能相同!\n转出客户:%s 转入客户:%s'
+                                %(order.partner_id.name, order.to_partner_id.name))
 
             # 核销预收预付
             for line in order.advance_payment_ids:
                 order_reconcile += line.this_reconcile
                 if line.this_reconcile > line.to_reconcile:
-                    raise UserError(u'核销金额不能大于未核销金额')
+                    raise UserError(u'核销金额不能大于未核销金额\n核销金额:%s 未核销金额:%s'%(line.this_reconcile, line.to_reconcile))
 
                 # 更新每一行的已核销余额、未核销余额
                 line.name.to_reconcile -= line.this_reconcile

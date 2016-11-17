@@ -48,7 +48,7 @@ class buy_adjust(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的单据\n采购调整单%s已经审核'%order.name)
 
         return super(buy_adjust, self).unlink()
 
@@ -76,12 +76,12 @@ class buy_adjust(models.Model):
         当新增产品时，则更新原单据及入库单分单明细行。
         '''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复审核！\n采购调整单%s已审核'%self.name)
         if not self.line_ids:
             raise UserError(u'请输入产品明细行！')
         for line in self.line_ids:
             if  line.price_taxed < 0:
-                raise UserError(u'产品含税单价不能小于0！')
+                raise UserError(u'产品含税单价不能小于0！\n单价:%s'%line.price_taxed)
         buy_receipt = self.env['buy.receipt'].search(
                     [('order_id', '=', self.order_id.id),
                      ('state', '=', 'draft')])
@@ -146,9 +146,9 @@ class buy_adjust_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数')
+            raise UserError('税率不能输入超过100的数\n税率:%s!'%self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数')
+            raise UserError('税率不能输入负数\n税率:%s!'%self.tax_rate)
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
         self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
@@ -205,7 +205,7 @@ class buy_adjust_line(models.Model):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             if not self.goods_id.cost:
-                raise UserError(u'请先设置商品的成本！')
+                raise UserError(u'请先设置商品(%s)的成本！'%self.goods_id.name)
             self.price_taxed = self.goods_id.cost
 
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
