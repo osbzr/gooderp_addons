@@ -11,6 +11,7 @@
             		<field name='remain_account'/>
             		<field name='import_tax_account'/>
             		<field name='output_tax_account'/>
+            		<field name='operating_cost_account_id'/>
             	</field>
             </field>
         </record>
