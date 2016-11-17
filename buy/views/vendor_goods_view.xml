@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-		<!--继承视图-->
+        <!--继承视图-->
         <record id="buy_supplier_address_form" model="ir.ui.view">
             <field name="name">buy.supplier.address.form</field>
             <field name="model">partner</field>
@@ -20,17 +20,16 @@
                 </field>
             </field>
         </record>
-
         <record id="buy_goods_form" model="ir.ui.view">
             <field name="name">buy.goods.form</field>
             <field name="model">goods</field>
             <field name="inherit_id" ref="goods.goods_form"/>
             <field name="arch" type="xml">
-            <field name="supplier_id" position="after">
-                <field name="vendor_ids" colspan="2" nolabel="1" groups='goods.view_cost_groups'>
+                <field name="supplier_id" position="after">
+                    <field name="vendor_ids" colspan="2" nolabel="1" groups='goods.view_cost_groups'>
                         <tree string="goods" editable="bottom">
                             <field name="vendor_id"
-                            	context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                            context="{'form_view_ref': 'core.supplier_address_form'}"/>
                             <field name="price"/>
                             <field name="code"/>
                             <field name="name"/>
@@ -40,5 +39,5 @@
                 </field>
             </field>
         </record>
-	</data>
+    </data>
 </openerp>
