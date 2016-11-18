@@ -145,6 +145,7 @@ class CreateExchangeWizard(models.TransientModel):
 
     @api.multi
     def create_rate_period(self):
+        #todo 当反过帐后，怎么样取汇率，特别是汇率已经改变。
         pass
 
     @api.multi
