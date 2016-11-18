@@ -166,7 +166,7 @@ class buy_receipt(models.Model):
                 batch_one_list.append((line.goods_id.id, line.lot))
 
         if len(batch_one_list) > len(set(batch_one_list)):
-            raise UserError(u'不能创建相同序列号的产品！\n 序列号list为%'%str(batch_one_list))
+            raise UserError(u'不能创建相同序列号的产品！\n 序列号list为%s'%str(batch_one_list))
 
         for line in self.line_out_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
