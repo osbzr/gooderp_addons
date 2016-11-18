@@ -177,7 +177,7 @@ class checkout_wizard(models.TransientModel):
     def button_counter_checkout(self):
         if self.period_id:
             if not self.period_id.is_closed:
-                raise UserError(u'期间%s未结账'%self.period_id)
+                raise UserError(u'期间%s未结账'%self.period_id.name)
             else:
                 next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_id)
                 if next_period:

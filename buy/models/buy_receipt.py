@@ -157,7 +157,7 @@ class buy_receipt(models.Model):
                         batch_one_list_wh.append((move_line.goods_id.id, move_line.lot))
 
             if (line.goods_id.id, line.lot) in batch_one_list_wh:
-                raise UserError(u'仓库已存在相同序列号的产品！\n产品:%s 序列号:%'%(line.goods_id.name,line.lot.name))
+                raise UserError(u'仓库已存在相同序列号的产品！\n产品:%s 序列号:%'%(line.goods_id.name,line.lot))
 
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
