@@ -145,6 +145,7 @@ class CreateExchangeWizard(models.TransientModel):
 
     @api.multi
     def create_rate_period(self):
+        pass
 
     @api.multi
     def create_exchange(self):
