@@ -97,7 +97,7 @@ class sell_receipt_wizard(models.TransientModel):
         self.ensure_one()
         res = []
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s'%(self.date_start, self.date_end))
 
         delivery_obj = self.env['sell.delivery']
         count = sum_receipt_rate = 0

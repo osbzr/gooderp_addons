@@ -7,10 +7,7 @@
             <field name='inherit_id' ref='core.company_form' />
             <field name="arch" type="xml">
             	<field name='draft_invoice' position='after'>
-            		<field name='profit_account'/>
-            		<field name='remain_account'/>
-            		<field name='import_tax_account'/>
-            		<field name='output_tax_account'/>
+            		<field name='operating_cost_account_id'/>
             	</field>
             </field>
         </record>

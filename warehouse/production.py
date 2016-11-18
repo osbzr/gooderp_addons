@@ -148,26 +148,26 @@ class wh_assembly(models.Model):
         line_out_data, line_in_data = [], []
         for line_out in assembly.line_out_ids:
             account_id = self.env.ref('finance.account_cost').id
-            line_out_data.append({'debit': line_out.cost,
+            line_out_data.append({'credit': line_out.cost,
                                          'goods_id': line_out.goods_id.id,
                                          'voucher_id': voucher_row.id,
                                          'account_id': account_id,
                                          'name': u'组合单 原料'})
         for line_in in assembly.line_in_ids:
             account_id = line_in.goods_id.category_id.account_id.id
-            line_in_data.append({'credit': line_in.cost,
+            line_in_data.append({'debit': line_in.cost,
                                         'goods_id':line_in.goods_id.id,
                                         'voucher_id': voucher_row.id,
                                         'account_id': account_id,
-                                        'name': u'组合单 组合件'})
+                                        'name': u'组合单 成品'})
         return line_out_data + line_in_data
 
     def wh_assembly_create_voucher_line(self, assembly, voucher_row):
         voucher_line_data = []
         if assembly.fee:
             account_row = assembly.create_uid.company_id.operating_cost_account_id
-            voucher_line_data.append({'name': '组合费用', 'account_id': account_row.id,
-                                      'debit': assembly.fee, 'voucher_id': voucher_row.id})
+            voucher_line_data.append({'name': '组装费用', 'account_id': account_row.id,
+                                      'credit': assembly.fee, 'voucher_id': voucher_row.id})
         voucher_line_data += self.create_vourcher_line_data(assembly, voucher_row)
         self.create_voucher_line(voucher_line_data)
 
@@ -403,14 +403,14 @@ class wh_disassembly(models.Model):
         line_out_data, line_in_data = [], []
         for line_out in assembly.line_out_ids:
             account_id = self.env.ref('finance.account_cost').id
-            line_out_data.append({'debit': line_out.cost,
+            line_out_data.append({'credit': line_out.cost,
                                          'goods_id': line_out.goods_id.id,
                                          'voucher_id': voucher_row.id,
                                          'account_id': account_id,
                                          'name': u'拆卸单 原料'})
         for line_in in assembly.line_in_ids:
             account_id = line_in.goods_id.category_id.account_id.id
-            line_in_data.append({'credit': line_in.cost,
+            line_in_data.append({'debit': line_in.cost,
                                         'goods_id':line_in.goods_id.id,
                                         'voucher_id': voucher_row.id,
                                         'account_id': account_id,
@@ -420,9 +420,9 @@ class wh_disassembly(models.Model):
     def wh_disassembly_create_voucher_line(self, disassembly, voucher_row):
         voucher_line_data = []
         if disassembly.fee:
-            account_row =  disassembly.create_uid.company_id.operating_cost_account_id
-            voucher_line_data.append({'name': '组合费用', 'account_id': account_row.id,
-                                      'debit': disassembly.fee, 'voucher_id': voucher_row.id})
+            account_row = disassembly.create_uid.company_id.operating_cost_account_id
+            voucher_line_data.append({'name': '拆卸费用', 'account_id': account_row.id,
+                                      'credit': disassembly.fee, 'voucher_id': voucher_row.id})
         voucher_line_data += self.create_vourcher_line_data(disassembly, voucher_row)
         self.create_voucher_line(voucher_line_data)
 

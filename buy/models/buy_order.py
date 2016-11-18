@@ -159,7 +159,7 @@ class buy_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的单据(%s)'%order.name)
 
         return super(buy_order, self).unlink()
 

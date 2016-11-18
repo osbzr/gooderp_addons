@@ -157,7 +157,7 @@ class buy_receipt(models.Model):
                         batch_one_list_wh.append((move_line.goods_id.id, move_line.lot))
 
             if (line.goods_id.id, line.lot) in batch_one_list_wh:
-                raise UserError(u'仓库已存在相同序列号的产品！')
+                raise UserError(u'仓库已存在相同序列号的产品！\n产品:%s 序列号:%s'%(line.goods_id.name,line.lot))
 
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
@@ -166,7 +166,7 @@ class buy_receipt(models.Model):
                 batch_one_list.append((line.goods_id.id, line.lot))
 
         if len(batch_one_list) > len(set(batch_one_list)):
-            raise UserError(u'不能创建相同序列号的产品！')
+            raise UserError(u'不能创建相同序列号的产品！\n 序列号list为%s'%str(batch_one_list))
 
         for line in self.line_out_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
@@ -175,10 +175,12 @@ class buy_receipt(models.Model):
         if not self.bank_account_id and self.payment:
             raise UserError(u'付款额不为空时，请选择结算账户！')
         if self.payment > self.amount:
-            raise UserError(u'本次付款金额不能大于折后金额！')
+            raise UserError(u'本次付款金额不能大于折后金额！\n付款金额:%s 折后金额:%s'%(self.payment,self.amount))
         if (sum(cost_line.amount for cost_line in self.cost_line_ids) != 
             sum(line.share_cost for line in self.line_in_ids)):
-            raise UserError(u'采购费用还未分摊或分摊不正确！')
+            raise UserError(u'采购费用还未分摊或分摊不正确！\n采购费用:%s 分摊总费用:%s'%
+                            (sum(cost_line.amount for cost_line in self.cost_line_ids),
+                             sum(line.share_cost for line in self.line_in_ids)))
         return
 
     @api.one

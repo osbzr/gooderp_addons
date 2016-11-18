@@ -45,7 +45,7 @@ class other_money_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不可以删除已经审核的单据')
+                raise UserError(u'不可以删除已经审核的单据(%s)'%order.name)
 
         return super(other_money_order, self).unlink()
 
@@ -104,12 +104,12 @@ class other_money_order(models.Model):
         '''其他收支单的审核按钮'''
         self.ensure_one()
         if self.total_amount <= 0:
-            raise UserError(u'金额应该大于0')
+            raise UserError(u'金额应该大于0!\n金额:%s'%self.total_amount)
 
         # 根据单据类型更新账户余额
         if self.type == 'other_pay':
             if self.bank_id.balance < self.total_amount:
-                raise UserError(u'账户余额不足')
+                raise UserError(u'账户余额不足!\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
         else:
             self.bank_id.balance += self.total_amount
@@ -125,7 +125,7 @@ class other_money_order(models.Model):
             self.bank_id.balance += self.total_amount
         else:
             if self.bank_id.balance < self.total_amount:
-                raise UserError(u'账户余额不足')
+                raise UserError(u'账户余额不足!\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
         self.state = 'draft'
         return True

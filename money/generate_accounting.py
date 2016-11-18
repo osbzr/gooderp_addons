@@ -362,7 +362,7 @@ class money_invoice(models.Model):
         # 销项税行
         if vals.get('sell_tax_amount'):
             if not self.env.user.company_id.output_tax_account:            
-                raise UserError(u'请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目')
+                raise UserError(u'您还没有配置公司的销项税科目!\n请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目!')
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('string'), vals.get('name')),
                 'account_id': self.env.user.company_id.output_tax_account.id, 'credit': sell_tax_amount, 'voucher_id': vals.get('vouch_obj_id'),

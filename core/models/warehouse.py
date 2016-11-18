@@ -82,7 +82,7 @@ class warehouse(models.Model):
         warehouses = self.search(
             [('type', '=', _type)], limit=1, order='id asc')
         if not warehouses:
-            raise UserError(u'不存在该类型" % s"的仓库，请检查基础数据是否全部导入')
+            raise UserError(u'不存在类型为%s的仓库，请检查基础数据是否全部导入'%_type)
 
         return warehouses[0]
 

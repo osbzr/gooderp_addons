@@ -23,7 +23,7 @@ class checkout_wizard(models.TransientModel):
                 if not last_period.is_closed:
                     raise UserError(u'上一个期间%s未结账' % last_period.name)
             if self.period_id.is_closed:
-                raise UserError(u'本期间已结账')
+                raise UserError(u'本期间%s已结账' % self.period_id.name)
             else:
                 voucher_obj = self.env['voucher']
                 voucher_ids = voucher_obj.search([('period_id', '=', self.period_id.id)])
@@ -177,7 +177,7 @@ class checkout_wizard(models.TransientModel):
     def button_counter_checkout(self):
         if self.period_id:
             if not self.period_id.is_closed:
-                raise UserError(u'本期间未结账')
+                raise UserError(u'期间%s未结账'%self.period_id.name)
             else:
                 next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_id)
                 if next_period:

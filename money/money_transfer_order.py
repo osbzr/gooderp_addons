@@ -38,7 +38,7 @@ class money_transfer_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不可以删除已经审核的单据')
+                raise UserError(u'不可以删除已经审核的单据\n 资金转账单%s已审核'%order.name)
 
         return super(money_transfer_order, self).unlink()
 
@@ -82,12 +82,12 @@ class money_transfer_order(models.Model):
             if line.out_bank_id == line.in_bank_id :
                 raise UserError('转出账户与转入账户不能相同')
             if line.amount < 0:
-                raise UserError('转账金额必须大于0')
+                raise UserError('转账金额必须大于0!\n 转账金额:%s'%line.amount)
             if line.amount == 0:
                 raise UserError('转账金额不能为0')
             if out_currency_id == company_currency_id :
                 if line.out_bank_id.balance < line.amount:
-                    raise UserError('转出账户余额不足')
+                    raise UserError('转出账户余额不足!\n转出账户余额:%s 本次转出余额:%s'%(line.out_bank_id.balance, line.amount))
                 else:
                     line.out_bank_id.balance -= line.amount
                 if in_currency_id == company_currency_id :
@@ -96,7 +96,8 @@ class money_transfer_order(models.Model):
                     line.in_bank_id.balance += line.currency_amount
             else:
                 if line.out_bank_id.balance < line.currency_amount:
-                    raise UserError('转出账户余额不足')
+                    raise UserError('转出账户余额不足!\n转出账户余额:%s 本次转出余额:%s'
+                                    % (line.out_bank_id.balance, line.currency_amount))
                 if in_currency_id == company_currency_id:
                     line.in_bank_id.balance += line.amount
                     line.out_bank_id.balance -= line.currency_amount
@@ -112,7 +113,8 @@ class money_transfer_order(models.Model):
         self.ensure_one()
         for line in self.line_ids:
             if line.in_bank_id.balance < line.amount:
-                raise UserError('转入账户余额不足')
+                raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
+                                % (line.in_bank_id.balance, line.amount))
             else:
                 line.in_bank_id.balance -= line.amount
                 line.out_bank_id.balance += line.amount
