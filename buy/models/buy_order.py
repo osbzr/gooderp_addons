@@ -62,13 +62,17 @@ class buy_order(models.Model):
             self.goods_state = u'全部入库'
 
     @api.model
-    def _default_warehouse_dest(self):
-        '''获取默认调入仓库'''
+    def _default_warehouse_dest_impl(self):
         if self.env.context.get('warehouse_dest_type'):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_dest_type'))
 
         return self.env['warehouse'].browse()
+
+    @api.model
+    def _default_warehouse_dest(self):
+        '''获取默认调入仓库'''
+        return self._default_warehouse_dest_impl()
 
     @api.one
     @api.depends('type')
