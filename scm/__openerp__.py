@@ -10,9 +10,10 @@
     """,
     'version': '11.11',
     'application':True,
-    'depends': ['sell', 'buy', 'warehouse'],
+    'depends': ['core', 'sell', 'buy', 'warehouse'],
     'data': [
              'security/ir.model.access.csv',
+             'data/stock_request_data.xml',
              'view/stock_request_view.xml',
              ]
 }
