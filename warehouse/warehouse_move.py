@@ -23,18 +23,26 @@ class wh_move(models.Model):
         self.total_qty = goods_total
 
     @api.model
-    def _get_default_warehouse(self):
-        '''获取调出仓库'''
+    def _get_default_warehouse_impl(self):
         if self.env.context.get('warehouse_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_type', 'stock'))
 
     @api.model
-    def _get_default_warehouse_dest(self):
-        '''获取调入仓库'''
+    def _get_default_warehouse_dest_impl(self):
         if self.env.context.get('warehouse_dest_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_dest_type', 'stock'))
+
+    @api.model
+    def _get_default_warehouse(self):
+        '''获取调出仓库'''
+        return self._get_default_warehouse_impl()
+
+    @api.model
+    def _get_default_warehouse_dest(self):
+        '''获取调入仓库'''
+        return self._get_default_warehouse_dest_impl()
 
     origin = fields.Char(u'移库类型', required=True,
                          help=u'移库类型')
