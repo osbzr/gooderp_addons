@@ -19,7 +19,7 @@ class stock_request(models.Model):
     _description = u'补货申请'
 
     name = fields.Char(u'编号')
-    date = fields.Date(u'日期')
+    date = fields.Date(u'日期', default=lambda self: fields.Date.context_today(self))
     staff_id = fields.Many2one('staff', u'经办人')
     line_ids = fields.One2many('stock.request.line', 'request_id', u'补货申请行')
     state = fields.Selection(STOCK_REQUEST_STATES, u'审核状态', readonly=True,
@@ -31,7 +31,7 @@ class stock_request(models.Model):
         ''' 点击 查询库存 按钮 生成补货申请行
                                     每行一个产品一个属性的 数量，补货数量
          '''
-        goods = self.env['goods'].search([])
+        goods = self.env['goods'].search([('no_stock', '=', False)])
 
         for good in goods:
             qty = 0  # 当前数量
@@ -103,7 +103,10 @@ class stock_request(models.Model):
             bom_line = self.env['wh.bom.line'].search([('goods_id', '=', good.id),
                                                        ('bom_id.type', '=', 'assembly'),
                                                        ('type', '=', 'parent')])
-            is_buy = bom_line and False or True
+            if bom_line:
+                is_buy = False
+            else:
+                is_buy = True
 
             # 生成补货申请行
             qty_available = 0  # 可用库存
@@ -208,7 +211,10 @@ class stock_request(models.Model):
                         bom_line = self.env['wh.bom.line'].search([('goods_id', '=', line_out.goods_id.id),
                                                                    ('bom_id.type', '=', 'assembly'),
                                                                    ('type', '=', 'parent')])
-                        is_buy = bom_line and False or True
+                        if bom_line:
+                            is_buy = False
+                        else:
+                            is_buy = True
 
                         request_line_ids = self.env['stock.request.line'].create({
                            'request_id': self.id,
