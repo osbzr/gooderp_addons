@@ -57,15 +57,18 @@ class sell_order(models.Model):
         return self.env['warehouse'].browse()
 
     @api.one
-    @api.depends('amount', 'amount_executed')
+    @api.depends('type')
     def _get_money_state(self):
         '''计算销货订单收款/退款状态'''
-        if self.amount_executed == 0:
-            self.money_state = (self.type == 'sell') and u'未收款' or u'未退款'
-        elif self.amount_executed < self.amount:
-            self.money_state = (self.type == 'sell') and u'部分收款' or u'部分退款'
-        elif self.amount_executed == self.amount:
-            self.money_state = (self.type == 'sell') and u'全部收款' or u'全部退款'
+        deliverys = self.env['sell.delivery'].search([('order_id', '=', self.id)])
+        if all(delivery.invoice_id.reconciled == 0
+               for delivery in deliverys):
+            self.money_state = (self.type == 'sell' and u'未收款' or u'未退款')
+        elif all(delivery.invoice_id.reconciled ==
+                 delivery.invoice_id.amount for delivery in deliverys):
+            self.money_state = (self.type == 'sell' and u'全部收款' or u'全部退款')
+        else:
+            self.money_state = (self.type == 'sell' and u'部分收款' or u'部分退款')
 
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES,
@@ -125,11 +128,9 @@ class sell_order(models.Model):
                               default=u'未出库',
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
-    amount_executed = fields.Float(u'已执行金额',
-                                   help=u'发货单已收款金额或退货单已退款金额')
     money_state = fields.Char(u'收/退款状态',
                               compute=_get_money_state,
-                              store=True,
+                              copy=False,
                               help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止',
                                help=u'该单据是否已终止')

@@ -1281,6 +1281,7 @@
             <field name="remain_account" ref='account_remain'/>
             <field name="import_tax_account" ref='small_business_chart2221001001'/>
             <field name="output_tax_account" ref='small_business_chart2221001005'/>
+            <field name="operating_cost_account_id" ref='small_business_chart2211001'/>
         </record>
         <!--设置cny为1-->
         <record forcecreate="0" id="base.rateCNY" model="res.currency.rate">

@@ -442,6 +442,8 @@ class res_company(models.Model):
                                          help=u'进项税额，是指纳税人购进货物、加工修理修配劳务、服务、无形资产或者不动产，支付或者负担的增值税额。')
     output_tax_account = fields.Many2one('finance.account', u"销项税科目", ondelete='restrict')
 
+    operating_cost_account_id = fields.Many2one('finance.account', ondelete='restrict',
+                                                string=u'生产费用科目', help='用在组装拆卸的费用上')
 
 class bank_account(models.Model):
     _inherit = 'bank.account'
