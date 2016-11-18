@@ -157,8 +157,7 @@
                                     <field name='lot'
                                         attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
                                     <field name='goods_uos_qty'
-                                        groups='goods.auxiliary_unit_groups'
-                                        attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1'/>
+                                        groups='goods.auxiliary_unit_groups' sum='1'/>
                                     <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                                     <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1' />
                                     <field name='uom_id' required='1' />
@@ -191,8 +190,7 @@
                                         <field name='goods_uos_qty' sum='1'
                                             widget='float_limit'
                                             options="{'field': 'lot_uos_qty'}"
-                                            groups='goods.auxiliary_unit_groups'
-                                            attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
+                                            groups='goods.auxiliary_unit_groups'/>
                                         <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                                         <field name='goods_qty' sum='1'
                                             widget='float_limit'
@@ -321,8 +319,7 @@
                                     <field name='goods_uos_qty' sum='1'
                                         widget='float_limit'
                                         options="{'field': 'lot_uos_qty'}"
-                                        groups='goods.auxiliary_unit_groups'
-                                        attrs="{'readonly': [('force_batch_one', '=', True)]}"/>
+                                        groups='goods.auxiliary_unit_groups'/>
                                     <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                                     <field name='goods_qty' sum='1'
                                         widget='float_limit'
@@ -352,8 +349,7 @@
                                         <field name='lot'
                                             attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}" />
                                         <field name='goods_uos_qty'
-                                            groups='goods.auxiliary_unit_groups'
-                                            attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1'/>
+                                            groups='goods.auxiliary_unit_groups' sum='1'/>
                                         <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                                         <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1' />
                                         <field name='uom_id' required='1' />
