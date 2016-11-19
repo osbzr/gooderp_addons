@@ -202,6 +202,10 @@ class wh_move(models.Model):
         return val
 
     @api.model
+    def check_barcode(self, model_name, order_id, att, goods):
+        pass
+
+    @api.model
     def scan_barcode(self,model_name,barcode,order_id):
         att = self.env['attribute'].search([('ean','=',barcode)])
         goods = self.env['goods'].search([('barcode', '=', barcode)])
@@ -209,6 +213,7 @@ class wh_move(models.Model):
         if not att and not goods:
             raise UserError(u'ean为  %s 的产品不存在' % (barcode))
         else:
+            self.check_barcode(model_name, order_id, att, goods)
             conversion = att and att.goods_id.conversion or goods.conversion
             move, create_line, val = self.scan_barcode_each_model_operation(model_name, order_id, att, goods,conversion)
             if not create_line:
