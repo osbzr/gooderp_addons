@@ -11,7 +11,7 @@ class sell_summary_staff(models.Model):
     _description = u'销售汇总表（按销售人员）'
 
     id_lists = fields.Text(u'移动明细行id列表')
-    staff = fields.Char(u'销售人员')
+    staff_id = fields.Many2one('staff', u'销售人员')
     goods_code = fields.Char(u'商品编号')
     goods = fields.Char(u'商品名称')
     attribute = fields.Char(u'属性')
@@ -30,7 +30,7 @@ class sell_summary_staff(models.Model):
         return '''
         SELECT MIN(wml.id) as id,
                array_agg(wml.id) AS id_lists,
-               staff.name AS staff,
+               staff.id AS staff_id,
                goods.code AS goods_code,
                goods.name AS goods,
                attr.name AS attribute,
@@ -99,7 +99,7 @@ class sell_summary_staff(models.Model):
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY staff,goods_code,goods,attribute,warehouse,uos,uom,wml.cost_unit
+        GROUP BY staff.id,goods_code,goods,attribute,warehouse,uos,uom,wml.cost_unit
         '''
 
     def order_sql(self, sql_type='out'):

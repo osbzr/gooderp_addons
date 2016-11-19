@@ -20,7 +20,9 @@ class stock_request(models.Model):
 
     name = fields.Char(u'编号')
     date = fields.Date(u'日期', default=lambda self: fields.Date.context_today(self))
-    staff_id = fields.Many2one('staff', u'经办人')
+    staff_id = fields.Many2one('staff',
+                               u'经办人',
+                               default=lambda self: self.env.user.staff_id)
     line_ids = fields.One2many('stock.request.line', 'request_id', u'补货申请行')
     state = fields.Selection(STOCK_REQUEST_STATES, u'审核状态', readonly=True,
                              help=u"补货申请的审核状态", copy=False,
