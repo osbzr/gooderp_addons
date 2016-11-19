@@ -23,18 +23,26 @@ class wh_move(models.Model):
         self.total_qty = goods_total
 
     @api.model
-    def _get_default_warehouse(self):
-        '''获取调出仓库'''
+    def _get_default_warehouse_impl(self):
         if self.env.context.get('warehouse_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_type', 'stock'))
 
     @api.model
-    def _get_default_warehouse_dest(self):
-        '''获取调入仓库'''
+    def _get_default_warehouse_dest_impl(self):
         if self.env.context.get('warehouse_dest_type', 'stock'):
             return self.env['warehouse'].get_warehouse_by_type(
                     self.env.context.get('warehouse_dest_type', 'stock'))
+
+    @api.model
+    def _get_default_warehouse(self):
+        '''获取调出仓库'''
+        return self._get_default_warehouse_impl()
+
+    @api.model
+    def _get_default_warehouse_dest(self):
+        '''获取调入仓库'''
+        return self._get_default_warehouse_dest_impl()
 
     origin = fields.Char(u'移库类型', required=True,
                          help=u'移库类型')
@@ -134,6 +142,13 @@ class wh_move(models.Model):
             else:
                 val['type'] = 'in'
                 create_line = self.scan_barcode_sell_or_buy_operation(move, att, conversion, goods,val)
+
+            # 调拔单的扫描条码
+        if model_name == 'wh.internal':
+            move = self.env[model_name].browse(order_id).move_id
+            val['type'] = 'internal'
+            create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
+
         return move, create_line, val
 
     def prepare_move_line_data(self, att, val, goods, move):
@@ -143,24 +158,34 @@ class wh_move(models.Model):
             uom_id = att.goods_id.uom_id.id
             attribute_id = att.id
             conversion = att.goods_id.conversion
-            if val['type'] == 'in':
+            if val['type'] in ('in','internal'):
                 # 入库操作取产品的成本
                 price = cost_unit = att.goods_id.cost
             elif val['type'] == 'out':
                 # 出库操作取产品的零售价
                 price = cost_unit = att.goods_id.price
+
+            # 伪装成出库明细，代码结构问题
+            if val['type'] == 'internal':
+                val['type'] = 'out'
+
         elif goods:
             goods_id = goods.id
             uos_id = goods.uos_id.id
             uom_id = goods.uom_id.id
             attribute_id = False
             conversion = goods.conversion
-            if val['type'] == 'in':
+            if val['type'] in ('in','internal'):
                 # 入库操作取产品的成本
                 price = cost_unit = goods.cost
             elif val['type'] == 'out':
                 # 出库操作取产品的零售价
                 price = cost_unit = goods.price
+
+            # 伪装成出库明细，代码结构问题
+            if val['type'] == 'internal':
+                val['type'] = 'out'
+
         val.update({
             'goods_id': goods_id,
             'attribute_id': attribute_id,

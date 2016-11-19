@@ -430,6 +430,10 @@
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
                         <field name='state' widget='statusbar' readonly='1' />                    </header>
                     <sheet>
+                        <div class="oe_title">
+                            <label string="扫描条码"/>
+                            <input type='text' class="ge_scan_barcode" autofocus="true"/>
+                        </div>
                         <group>
                             <group>
                                 <field name='staff_id' attrs="{'readonly': [('state', '!=', 'draft')]}"
