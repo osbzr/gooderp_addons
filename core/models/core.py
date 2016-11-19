@@ -81,10 +81,6 @@ class staff(models.Model):
 
     user_id = fields.Many2one('res.users', u'对应用户')
 
-    _sql_constraints = [
-        ('name_uniq', 'unique(name)', '员工不能重名')
-    ]
-
     @api.one
     @api.constrains('user_id')
     def _check_user_id(self):

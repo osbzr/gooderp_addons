@@ -431,6 +431,10 @@ class auxiliary_financing(models.Model):
         ('department', u'部门'),
     ], u'分类', default='project')
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '辅助核算不能重名')
+    ]
+
 
 class res_company(models.Model):
     '''继承公司对象,添加字段'''
