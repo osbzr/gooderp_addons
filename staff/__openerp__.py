@@ -7,7 +7,7 @@
     "description": """
     """,
     'version': '11.11',
-    'depends': ['base','core'],
+    'depends': ['base','core','finance'],
     'demo': [
              'tests/staff_demo.xml'
         ],

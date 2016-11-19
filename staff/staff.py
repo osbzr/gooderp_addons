@@ -4,8 +4,14 @@ from datetime import datetime
 
 class staff_department(models.Model):
     _name = "staff.department"
+    _inherits = {'auxiliary.financing': 'auxiliary_id'}
 
-    name = fields.Char(u'部门名称', required=True)
+    auxiliary_id = fields.Many2one(
+        string=u'辅助核算',
+        comodel_name='auxiliary.financing',
+        ondelete='cascade',
+        required=True,
+    )
     manager_id = fields.Many2one('staff', u'部门经理')
     member_ids = fields.One2many('staff', 'department_id', u'部门成员')
     parent_id = fields.Many2one('staff.department', u'上级部门')
@@ -36,6 +42,7 @@ class staff_employee_category(models.Model):
 
 class staff(models.Model):
     _inherit = 'staff'
+    _inherits = {'auxiliary.financing': 'auxiliary_id'}
 
     @api.one
     @api.depends('user_id')
@@ -49,14 +56,18 @@ class staff(models.Model):
             self.department_id = self.job_id.department_id
             self.parent_id = self.job_id.department_id.manager_id
 
-    name = fields.Char(u'名称', required=True)
+    auxiliary_id = fields.Many2one(
+        string=u'辅助核算',
+        comodel_name='auxiliary.financing',
+        ondelete='cascade',
+        required=True,
+    )
     category_ids = fields.Many2many('staff.employee.category',
                                     'employee_category_rel',
                                     'emp_id',
                                     'category_id', u'标签')
     work_email = fields.Char(u'办公邮箱')
     work_phone = fields.Char(u'办公电话')
-    user_id = fields.Many2one('res.users', u'对应用户')
     image_medium = fields.Binary(string=u'头像', compute=_get_image)
     # 个人信息
     birthday = fields.Date(u'生日')
