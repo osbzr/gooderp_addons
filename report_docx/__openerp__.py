@@ -7,6 +7,10 @@
     "category": "Report",
     "website": "www.elico-corp.com",
     "author": "Elico Corp, Odoo Community Association (OCA)",
+    'description':
+     '''
+                            该模块是报表打印个的基础模块。
+    ''',
     "depends": [
         "base",
     ],

@@ -5,9 +5,9 @@
     'summary': '首页配置',
     'category': 'Tools',
     'description':
-        """
-        用于实现可配置的首页系统.
-        """,
+    '''
+                            该模块实现了 GoodERP 可配置的首页系统。
+    ''',
     'data': [
         'security/groups.xml',
         "home_page.xml",
