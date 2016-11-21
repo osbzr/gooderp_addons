@@ -90,11 +90,6 @@
             <field name="name">交通银行(622262 8888888888888)</field>
         </record>
 
-        <!-- 员工 -->
-        <record id="lili" model="staff">
-        	<field name="name">丽丽</field>
-        </record>
-
         <!-- 服务产品 -->
         <record id="service_1" model="service">
         	<field name="name">咨询服务</field>

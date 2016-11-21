@@ -483,7 +483,6 @@
             <field name="name">res.users.staff.form</field>
             <field name="model">res.users</field>
             <field name='inherit_id' ref='base.view_users_form' />
-            <!-- <field name='priority'>30</field> -->
             <field name="arch" type="xml">
             	<field name='partner_id' position='after'>
             		<field name='staff_id'/>
