@@ -305,6 +305,7 @@ class money_order_line(models.Model):
 class money_invoice(models.Model):
     _name = 'money.invoice'
     _description = u'结算单'
+    _rec_name = 'bill_number'
 
     state = fields.Selection([
                           ('draft', u'草稿'),

@@ -25,7 +25,7 @@
 							<page name='timeline' string='工作记录'>
 								<field name="timeline_ids">
 									<tree string="进展"  editable='BOTTOM'>
-										<field name='task_id'/>
+										<field name='task_id' domain="[('user_id', 'in', [uid, False])]"/>
 										<field name='just_done'/>
 										<field name='next_action'/>
 										<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
@@ -97,7 +97,6 @@
 							<page name='project_invoice' string='发票行'>
 								<field name="invoice_ids">
 									<tree string="发票"  editable='BOTTOM'>
-										<field name="date"/>
 										<field name="date_due"/>
 										<field name="tax_rate"/>
 										<field name="amount"/>
