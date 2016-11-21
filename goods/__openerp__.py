@@ -26,8 +26,10 @@
     "website": "http://www.osbzr.com",
     "category": "Generic Modules",
     "depends": ['core', 'decimal_precision'],
-    "description": """
-    """,
+    "description":
+    '''
+                     该模块继承自 core 模块，进一步扩展定义了商品及其相关的类。
+    ''',
     "data": [
         'security/groups.xml',
         'view/goods_view.xml',

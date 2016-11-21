@@ -29,10 +29,10 @@
     'author': "开阖静静<gilbert@osbzr.com>(开阖出品)",
     "depends": ['web'],
     'description':
-    """
-    在tree上面为零的显示为空(次模块为全局设置,安装后就自动启用功能,无需加参数控制!)
-    注意:此模块功能 有可能 和其他tree 上 float 字段 上的 widegt显示 冲突!
-    """,
+    '''
+                    该模块实现了在tree上面显示为零的转换为显示为空(该模块为全局设置,安装后就自动启用功能,无需加参数控制!)
+                    注意:此模块功能 有可能 和其他tree 上 float 字段 上的 widegt显示 冲突!
+    ''',
     'data': [
         'tree_zero_display_blank.xml',
     ],
