@@ -12,7 +12,8 @@
             <field name='identification_id'>12345678</field>
             <field name='work_phone'>12345678901</field>
         </record>
-        <record id='core.lili' model='staff'>
+        <record id="lili" model="staff">
+        	<field name="name">丽丽</field>
             <field name='identification_id'>87654321</field>
             <field name='work_phone'>18823456789</field>
         </record>

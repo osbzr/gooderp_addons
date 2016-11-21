@@ -60,7 +60,7 @@ class staff(models.Model):
         string=u'辅助核算',
         comodel_name='auxiliary.financing',
         ondelete='cascade',
-#         required=True,
+        required=True,
     )
     category_ids = fields.Many2many('staff.employee.category',
                                     'employee_category_rel',
