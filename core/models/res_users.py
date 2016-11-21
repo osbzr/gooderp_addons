@@ -6,6 +6,18 @@ from odoo.exceptions import UserError
 class res_users(models.Model):
     _inherit = 'res.users'
 
+    staff_id = fields.Many2one('staff',
+                               u'对应员工')
+
+    @api.one
+    @api.constrains('staff_id')
+    def _check_user_id(self):
+        '''一个用户只能对应一个员工'''
+        if self.staff_id:
+            users = self.search([('staff_id', '=', self.staff_id.id)])
+            if len(users) > 1:
+                raise UserError('员工 %s 已有对应用户' % self.staff_id.name)
+
     @api.multi
     def write(self, vals):
         res = super(res_users, self).write(vals)

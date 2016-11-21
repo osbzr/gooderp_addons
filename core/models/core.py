@@ -78,11 +78,17 @@ class settle_mode(models.Model):
 
 class staff(models.Model):
     _name = 'staff'
-    name = fields.Char(u'姓名', required=True)
 
-    _sql_constraints = [
-        ('name_uniq', 'unique(name)', '员工不能重名')
-    ]
+    user_id = fields.Many2one('res.users', u'对应用户')
+
+    @api.one
+    @api.constrains('user_id')
+    def _check_user_id(self):
+        '''一个员工只能对应一个用户'''
+        if self.user_id:
+            staffs = self.env['staff'].search([('user_id', '=', self.user_id.id)])
+            if len(staffs) > 1:
+                raise UserError('用户 %s 已有对应员工' % self.user_id.name)
 
 
 class bank_account(models.Model):
