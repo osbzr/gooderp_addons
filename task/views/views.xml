@@ -141,7 +141,7 @@
 					<sheet>
 						<group>
 							<group>
-								<field name="project_id"/>
+								<field name="project_id" options="{'no_create': True}"/>
 								<field name="name"/>
 								<field name="plan_hours" groups='task.group_task_hours'/>
 								<field name="user_id"/>
