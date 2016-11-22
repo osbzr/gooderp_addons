@@ -8,6 +8,10 @@ class other_money_statements_report_wizard(models.Model):
 
     @api.model
     def _get_company_start_date(self):
+        return self._get_company_start_date_impl()
+    @api.model
+    def _get_company_start_date_impl(self):
+        ''' 获取当前登录用户公司的启用日期 '''
         return self.env.user.company_id.start_date
 
     from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date,
