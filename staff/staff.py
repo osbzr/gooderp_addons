@@ -59,7 +59,7 @@ class staff(models.Model):
     auxiliary_id = fields.Many2one(
         string=u'辅助核算',
         comodel_name='auxiliary.financing',
-        ondelete='cascade',
+        ondelete='restrict',
         required=True,
     )
     category_ids = fields.Many2many('staff.employee.category',
