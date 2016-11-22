@@ -160,7 +160,7 @@ class stock_request(models.Model):
         price_taxed = line.goods_id.cost
         for vendor_price in line.goods_id.vendor_ids:
             if vendor_price.vendor_id == buy_order.partner_id \
-                and line.quantity >= vendor_price.min_qty:
+                and line.request_qty >= vendor_price.min_qty:
                 price_taxed = vendor_price.price
                 break
 
