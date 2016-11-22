@@ -8,7 +8,7 @@ class res_company(models.Model):
 
     @api.model
     def _get_operating_cost_account_id(self):
-        return self._get_operating_cost_account_id()
+        return self._get_operating_cost_account_id_impl()
     @api.model
     def _get_operating_cost_account_id_impl(self):
         return self.env.ref('finance.small_business_chart2211001')
