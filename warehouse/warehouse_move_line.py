@@ -83,6 +83,14 @@ class wh_move_line(models.Model):
             self.uom_id = ''
             self.uos_id = ''
 
+    @api.one
+    @api.depends('goods_qty','goods_id')
+    def _get_goods_uos_qty(self):
+        if self.goods_id and self.goods_qty:
+            self.goods_uos_qty = self.goods_qty/self.goods_id.conversion
+        else:
+            self.goods_uos_qty = 1
+
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade',
                               help=u'出库/入库/移库单行对应的移库单')
     date = fields.Date(u'完成日期', copy=False,
@@ -136,8 +144,9 @@ class wh_move_line(models.Model):
                                         help=u'单据的目的仓库')
     goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'), default=1,
                              help=u'产品的数量')
-    goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),default=1
-                                 , readonly='1', help=u'产品的辅助数量')
+    goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),
+                                 compute=_get_goods_uos_qty, store=True,
+                                 help=u'产品的辅助数量')
     price = fields.Float(u'单价', compute=_compute_all_amount,
                          store=True, readonly=True,
                          digits=dp.get_precision('Amount'),

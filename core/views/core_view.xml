@@ -548,9 +548,9 @@
 		<menuitem id="home_page.main_home_menu" name="首页" groups="home_page.group_all_manager"/>
 		<menuitem id="mail.mail_channel_menu_root_chat" groups="-base.group_user,home_page.group_mail" />
 		<menuitem id="base.module_mi"  groups="-base.group_no_one,core.nobody_can_see" />
-		<menuitem id="base.menu_module_updates"  sequence="20"  groups="-base.group_no_one,core.nobody_can_see"  />
-		<menuitem  id="base.menu_view_base_module_update" groups="-base.group_no_one"  />
-		<menuitem  groups="base.group_no_one" id="base.menu_view_base_module_upgrade" />
-		<menuitem  groups="-base.group_no_one,core.nobody_can_see" id="web_settings_dashboard.web_dashboard_menu"  />
+		<menuitem id="base.menu_module_updates"  sequence="20"  groups="-base.group_no_one,core.nobody_can_see" parent="base.menu_management"  />
+		<menuitem  id="base.menu_view_base_module_update" groups="-base.group_no_one"  parent="base.menu_management" />
+		<menuitem  groups="base.group_no_one" id="base.menu_view_base_module_upgrade"  parent="base.menu_management" />
+		<menuitem  groups="-base.group_no_one,core.nobody_can_see" id="web_settings_dashboard.web_dashboard_menu" parent="base.menu_administration"  />
 	</data>
 </openerp>
