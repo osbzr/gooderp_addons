@@ -47,10 +47,19 @@ class test_business_data(TransactionCase):
         business_data_table.create({'name': 'home.report.type'})
         clean_business_data.create({'create_uid':self.env.uid}).remove_data()
 
-    def test_clean_business_data(self):
+    def test_clean_business_data_no_table(self):
         ''' 测试清空业务数据 表不存在会报错'''
         business_data_table = self.env['business.data.table']
         clean_business_data = self.env['clean.business.data']
         business_data_table.create({'name': 'ABCD'})
         with self.assertRaises(UserError):
             clean_business_data.create({'create_uid': self.env.uid}).remove_data()
+
+class test_res_company(TransactionCase):
+
+    def test_get_logo(self):
+        ''' 取默认logo '''
+        self.env['res.company'].create({
+                                        'name': 'demo company',
+                                        'partner_id': self.env.ref('core.zt').id
+                                        })

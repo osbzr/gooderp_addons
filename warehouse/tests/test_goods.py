@@ -97,3 +97,12 @@ class TestGoods(TransactionCase):
         suggested_cost, _ = suggested_cost_func(
             self.hd_warehouse, 24, ignore_move=self.others_in_keyboard_mouse.id)
         self.assertEqual(suggested_cost, 24 * 80)
+
+class test_res_company(TransactionCase):
+
+    def test_get_operating_cost_account_id(self):
+        ''' 测试默认生产费用科目 '''
+        self.env['res.company'].create({
+                                        'name': 'demo company',
+                                        'partner_id': self.env.ref('core.zt').id
+                                        })

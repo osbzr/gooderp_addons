@@ -24,7 +24,9 @@ class res_company(models.Model):
     bank_account_id = fields.Many2one('bank.account', string=u'开户行')
 
     def _get_logo(self):
+        return self._get_logo_impl()
+    def _get_logo_impl(self):
+        ''' 默认取 core/static/description 下的 logo.png 作为 logo'''
         return open(misc.file_open('core/static/description/logo.png').name, 'rb') .read().encode('base64')
-
 
     logo = fields.Binary(related='partner_id.image', default=_get_logo)

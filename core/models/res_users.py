@@ -16,7 +16,7 @@ class res_users(models.Model):
         if self.staff_id:
             users = self.search([('staff_id', '=', self.staff_id.id)])
             if len(users) > 1:
-                raise UserError('员工 %s 已有对应用户' % self.staff_id.name)
+                raise UserError(u'员工 %s 已有对应用户' % self.staff_id.name)
 
     @api.multi
     def write(self, vals):

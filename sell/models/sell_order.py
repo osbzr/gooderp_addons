@@ -50,6 +50,9 @@ class sell_order(models.Model):
 
     @api.model
     def _default_warehouse(self):
+        return self._default_warehouse_impl()
+    @api.model
+    def _default_warehouse_impl(self):
         if self.env.context.get('warehouse_type'):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_type'))

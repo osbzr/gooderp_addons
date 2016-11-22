@@ -8,6 +8,10 @@ class partner_statements_report_wizard(models.Model):
 
     @api.model
     def _get_company_start_date(self):
+        return self._get_company_start_date_impl()
+    @api.model
+    def _get_company_start_date_impl(self):
+        ''' 获取当前登录用户公司的启用日期 '''
         return self.env.user.company_id.start_date
 
     bank_id = fields.Many2one('bank.account', string=u'账户名称', required=True,
