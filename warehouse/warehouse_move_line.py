@@ -81,6 +81,7 @@ class wh_move_line(models.Model):
         else:
             self.goods_uos_qty = 0
 
+    @api.one
     @api.depends('goods_id')
     def _compute_uom_uos(self):
         if self.goods_id:
@@ -128,7 +129,7 @@ class wh_move_line(models.Model):
     valid_date = fields.Date(u'有效期至',
                              help=u'产品的有效期')
     uom_id = fields.Many2one('uom', string=u'单位', ondelete='restrict', compute=_compute_uom_uos,
-                             readonly=True, help=u'产品的计量单位', store=True)
+                              help=u'产品的计量单位', store=True)
     uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict', compute=_compute_uom_uos,
                              readonly=True,  help=u'产品的辅助单位', store=True)
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
