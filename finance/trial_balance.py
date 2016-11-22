@@ -27,8 +27,11 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
     @api.model
     def _default_period_id(self):
+        return self._default_period_id_impl()
+    @api.model
+    def _default_period_id_impl(self):
         """
-        默认是当前会计期间
+                        默认是当前会计期间
         :return: 当前会计期间的对象
         """
         return self.env['finance.period'].get_date_now_period_id()

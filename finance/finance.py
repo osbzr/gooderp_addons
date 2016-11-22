@@ -36,6 +36,10 @@ class voucher(models.Model):
 
     @api.model
     def _default_voucher_date(self):
+        return self._default_voucher_date_impl()
+    @api.model
+    def _default_voucher_date_impl(self):
+        ''' 获得默认的凭证创建日期 '''
         voucher_setting = self.env['ir.values'].get_default('finance.config.settings', 'default_voucher_date')
         now_date = fields.Date.context_today(self)
         if voucher_setting == 'last' and self.search([], limit=1):
