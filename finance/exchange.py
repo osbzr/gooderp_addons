@@ -144,11 +144,14 @@ class CreateExchangeWizard(models.TransientModel):
                         })
 
     @api.multi
+<<<<<<< Updated upstream
     def create_rate_period(self):
         #todo 当反过帐后，怎么样取汇率，特别是汇率已经改变。
         pass
 
     @api.multi
+=======
+>>>>>>> Stashed changes
     def create_exchange(self):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         '''只有外币＋期末需要调汇的科目才会能生成调汇凭证的明细行'''
