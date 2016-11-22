@@ -23,10 +23,24 @@
     'name': 'GOODERP 销售模块',
     'author': 'jeff@osbzr.com,flora@osbzr.com',
     'website': 'https://www.osbzr.com',
-    'description': '''gooderp销售实例，通过安装gooderp模块展示odoo的销售流程''',
     'category': 'gooderp',
+    'description':
+     '''
+                            该模块可以方便的管理销货。
+
+                            通过创建销货订单，审核后将销货订单行中的商品销售给客户，来完成销货功能。
+                            通过创建销货退货订单，审核后将退货订单行中的商品退回，来完成销货退货功能。
+                            通过创建销售调整单，选择原始销货订单，审核后将销售调整单行中的商品调整到原始销货订单行，来完成销售调整功能。
+
+                            销货管理的报表有：
+                                  销售订单跟踪表；
+                                  销售明细表；
+                                  销售汇总表（按商品、按客户、按销售人员）；
+                                  销售收款一览表；
+                                  销售前十商品。
+    ''',
     'version': '11.11',
-    'depends': ['core', 'warehouse', 'money', 'partner_address'],
+    'depends': ['core', 'warehouse', 'money', 'partner_address', 'staff'],
     'data': [
             'data/sell_data.xml',
             'security/groups.xml',

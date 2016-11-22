@@ -78,12 +78,6 @@ class project_invoice(models.Model):
         help=u'含税金额',
     )
 
-    date = fields.Date(
-        string='收款日期',
-        default=lambda self: fields.Date.context_today(self),
-        help=u'收款日期',
-    )
-
     date_due = fields.Date(
         string='到期日',
         default=lambda self: fields.Date.context_today(self),

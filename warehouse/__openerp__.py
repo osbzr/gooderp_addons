@@ -26,8 +26,24 @@
     "website": "http://www.osbzr.com",
     "category": "Generic Modules",
     "depends": ['core', 'goods', 'decimal_precision', 'web_sublist', 'web_float_limit', 'report_docx','finance'],
-    "description": """
-    """,
+    "description":
+    '''
+                        该模块实现了 GoodERP 中 仓库管理的功能。
+
+                        通过创建或者处理销售发货单/销售退货单，来完成出/入库。
+                        通过创建或者处理采购入库单/采购退货单，来完成入/出库。
+                        通过创建其他出入库单，来完成其他出入库的流程。
+                        通过创建组装/拆卸单，来完成商品的生产。
+                        通过创建盘点单，完成仓库中商品的实际库存数量与账面库存数量的比较和调整。
+
+                         仓库管理的报表有：
+                                  库存余额表；
+                                  商品收发明细表；
+                                  批号状态表；
+                                  批号跟踪表；
+                                  库存调拨；
+                                  呆滞料报表。
+    ''',
     "data": [
         'data/warehouse_data.xml',
         'security/groups.xml',

@@ -478,6 +478,17 @@
 			<field name="search_view_id" ref="pricing_search"/>
 		</record>
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
+		<!--继承user视图，增加对应员工字段-->
+		<record id="view_users_staff_form" model="ir.ui.view">
+            <field name="name">res.users.staff.form</field>
+            <field name="model">res.users</field>
+            <field name='inherit_id' ref='base.view_users_form' />
+            <field name="arch" type="xml">
+            	<field name='partner_id' position='after'>
+            		<field name='staff_id'/>
+            	</field>
+            </field>
+        </record>
         <!-- 用于清理业务数据 -->
 		<record id="business_data_table_tree" model="ir.ui.view">
 			<field name="name">business.data.table.tree</field>

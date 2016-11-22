@@ -110,7 +110,7 @@
 
 		<!-- 虚拟商品 -->
         <record id="diy" model="goods">
-            <field name="code">005</field>
+            <field name="code">006</field>
             <field name="name">装机</field>
             <field name="category_id" ref="core.goods_category_1"/>
             <field name="uom_id" ref="core.uom_set"/>
@@ -123,7 +123,7 @@
 
         <!-- 带条形码商品 -->
         <record id="computer" model="goods">
-			<field name="code">006</field>
+			<field name="code">007</field>
 			<field name="name">电脑</field>
 			<field name="category_id" ref="core.goods_category_1"/>
 			<field name="uom_id" ref="core.uom_pc"/>

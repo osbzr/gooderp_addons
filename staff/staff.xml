@@ -100,6 +100,7 @@
             <field name="res_model">staff</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+            <field name="context">{'type':'member'}</field>
         </record>
         
         <menuitem action="staff_action" id="menu_staff" sequence="3" parent="menu_staff_main"/>
@@ -144,6 +145,7 @@
             <field name="res_model">staff.department</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+            <field name="context">{'type':'department'}</field>
         </record>
         <menuitem action="staff_department_action" id="menu_staff_department" sequence="4" parent="menu_staff_configuration"/>
         

@@ -19,8 +19,10 @@ class stock_request(models.Model):
     _description = u'补货申请'
 
     name = fields.Char(u'编号')
-    date = fields.Date(u'日期')
-    staff_id = fields.Many2one('staff', u'经办人')
+    date = fields.Date(u'日期', default=lambda self: fields.Date.context_today(self))
+    staff_id = fields.Many2one('staff',
+                               u'经办人',
+                               default=lambda self: self.env.user.staff_id)
     line_ids = fields.One2many('stock.request.line', 'request_id', u'补货申请行')
     state = fields.Selection(STOCK_REQUEST_STATES, u'审核状态', readonly=True,
                              help=u"补货申请的审核状态", copy=False,
@@ -31,7 +33,7 @@ class stock_request(models.Model):
         ''' 点击 查询库存 按钮 生成补货申请行
                                     每行一个产品一个属性的 数量，补货数量
          '''
-        goods = self.env['goods'].search([])
+        goods = self.env['goods'].search([('no_stock', '=', False)])
 
         for good in goods:
             qty = 0  # 当前数量
@@ -103,7 +105,10 @@ class stock_request(models.Model):
             bom_line = self.env['wh.bom.line'].search([('goods_id', '=', good.id),
                                                        ('bom_id.type', '=', 'assembly'),
                                                        ('type', '=', 'parent')])
-            is_buy = bom_line and False or True
+            if bom_line:
+                is_buy = False
+            else:
+                is_buy = True
 
             # 生成补货申请行
             qty_available = 0  # 可用库存
@@ -128,6 +133,7 @@ class stock_request(models.Model):
                            'min_stock_qty': good.min_stock_qty,
                            'request_qty': good.min_stock_qty - qty_available,
                            'uom_id': good.uom_id.id,
+                           'supplier_id': good.supplier_id and good.supplier_id.id or False,
                            'is_buy': is_buy,
                         })
             else:  # 产品不存在属性
@@ -184,21 +190,23 @@ class stock_request(models.Model):
                 break
 
             for line in todo_produce_lines:
-                if line.is_requested:
-                    continue
-    
+                # 处理过的组装单行 移除
+                todo_produce_lines.remove(line)
+
                 if not line.request_qty:
                     continue
 
                 # 如果组装单模板存在，创建组装单
                 bom_line = self.env['wh.bom.line'].search([('goods_id', '=', line.goods_id.id),
-                                                      ('bom_id.type', '=', 'assembly')])
+                                                      ('bom_id.type', '=', 'assembly'),
+                                                      ('type', '=', 'parent')])
                 if bom_line:
                     assembly = self.env['wh.assembly'].create({
                                                                'bom_id': bom_line.bom_id.id,
                                                                'goods_qty': line.request_qty
                                                                })
                     assembly.onchange_goods_qty()
+
                     if line.attribute_id:
                         for line_in in assembly.line_in_ids:
                             line_in.attribute_id = line.attribute_id
@@ -208,7 +216,10 @@ class stock_request(models.Model):
                         bom_line = self.env['wh.bom.line'].search([('goods_id', '=', line_out.goods_id.id),
                                                                    ('bom_id.type', '=', 'assembly'),
                                                                    ('type', '=', 'parent')])
-                        is_buy = bom_line and False or True
+                        if bom_line:
+                            is_buy = False
+                        else:
+                            is_buy = True
 
                         request_line_ids = self.env['stock.request.line'].create({
                            'request_id': self.id,
@@ -223,12 +234,10 @@ class stock_request(models.Model):
                             todo_buy_lines.append(request_line_ids)
                         else:
                             todo_produce_lines.append(request_line_ids)
-                line.is_requested = True
-                todo_produce_lines.remove(line)
 
         # 处理待生成购货订单行
         for line in todo_buy_lines:
-            if line.is_requested:  # 订单行已处理
+            if not line.request_qty:
                 continue
 
             if not line.supplier_id:
@@ -261,8 +270,6 @@ class stock_request(models.Model):
                 vals = self._get_buy_order_line_data(line, buy_order)
                 self.env['buy.order.line'].create(vals)
 
-            line.is_requested = True
-
         self.state = 'done'
 
 
@@ -284,5 +291,4 @@ class stock_request_line(models.Model):
     to_consume_qty = fields.Float(u'未投料数量', digits=dp.get_precision('Quantity'))
     uom_id = fields.Many2one('uom', u'单位')
     supplier_id = fields.Many2one('partner', u'供应商')
-    is_requested = fields.Boolean(u'已申请')
     is_buy = fields.Boolean(u'采购', default=True)

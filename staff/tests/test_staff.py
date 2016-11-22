@@ -27,7 +27,7 @@ class test_staff(TransactionCase):
         self.env['staff'].staff_contract_over_date()
 
         # has staff.contract_ids but no apartment manager
-        staff_lily = self.env.ref('core.lili')
+        staff_lily = self.env.ref('staff.lili')
         staff_lily.work_email = 'lili@sina.com.cn'
         staff_lily.contract_ids.create({'staff_id': staff_lily.id,
                                         'basic_wage': 123456,

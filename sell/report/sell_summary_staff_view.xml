@@ -6,7 +6,7 @@
             <field name="model">sell.summary.staff</field>
             <field name="arch" type="xml">
                 <tree string="销售汇总表（按销售人员）" create="false">
-                	<field name="staff"/>
+                	<field name="staff_id"/>
                 	<field name="goods_code"/>
                     <field name="goods"/>
                     <button name="view_detail" type="object" string="查看明细" icon="fa-search"/>

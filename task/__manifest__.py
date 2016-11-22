@@ -5,9 +5,12 @@
     'summary': """
         使用 GTD 理念支持员工记录日常工作进度 """,
 
-    'description': """
-        将project拆分成task，并将task分配到人。每个人每天一张timesheet记录每个task的执行过程
-    """,
+    'description':
+    '''
+                        该模块实现了 GoodERP 中 任务管理 的功能。
+
+                        将project拆分成task，并将task分配到人。每个人每天一张 timesheet 记录每个 task 的执行过程。
+    ''',
 
     'author': "开阖软件",
     'website': "http://www.osbzr.com",

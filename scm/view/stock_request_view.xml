@@ -44,9 +44,6 @@
                         <field name="line_ids">
                             <tree string='补货申请明细行' editable='bottom' create='false'>
                                 <field name='goods_id' readonly='1'/>
-                                <field name='supplier_id'
-                                domain="[('s_category_id', '!=', False)]"
-                                context="{'form_view_ref': 'core.supplier_address_form'}"/>
                                 <field name='attribute_id' readonly='1' groups='goods.multi_attrs_groups' />
                                 <field name='qty' readonly='1'/>
                                 <field name='to_sell_qty' readonly='1'/>
@@ -54,6 +51,9 @@
                                 <field name='to_buy_qty' readonly='1'/>
                                 <field name='to_receipt_qty' readonly='1'/>
                                 <field name='min_stock_qty' readonly='1'/>
+                                <field name='supplier_id'
+                                    domain="[('s_category_id', '!=', False)]"
+                                    context="{'form_view_ref': 'core.supplier_address_form'}"/>
                                 <field name='request_qty' />
                                 <field name='uom_id' readonly='1'/>
                             </tree>
