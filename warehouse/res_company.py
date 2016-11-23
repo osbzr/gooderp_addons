@@ -5,8 +5,12 @@ from odoo import api, fields, models
 class res_company(models.Model):
     '''继承公司对象,添加字段'''
     _inherit = 'res.company'
+
     @api.model
     def _get_operating_cost_account_id(self):
+        return self._get_operating_cost_account_id_impl()
+    @api.model
+    def _get_operating_cost_account_id_impl(self):
         return self.env.ref('finance.small_business_chart2211001')
 
 

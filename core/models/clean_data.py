@@ -20,6 +20,12 @@ class clean_business_data(models.Model):
 
     @api.model
     def _get_business_table_name(self):
+        return self._get_business_table_name_impl()
+    @api.model
+    def _get_business_table_name_impl(self):
+        '''
+                         默认取business.data.table 里的所有业务数据表清理
+        '''
         return self.env['business.data.table'].search([])
 
     need_clean_table = fields.One2many('business.data.table', 'clean_business_id',

@@ -88,7 +88,7 @@ class staff(models.Model):
         if self.user_id:
             staffs = self.env['staff'].search([('user_id', '=', self.user_id.id)])
             if len(staffs) > 1:
-                raise UserError('用户 %s 已有对应员工' % self.user_id.name)
+                raise UserError(u'用户 %s 已有对应员工' % self.user_id.name)
 
 
 class bank_account(models.Model):

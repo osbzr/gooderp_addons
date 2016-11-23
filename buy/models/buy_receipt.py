@@ -67,6 +67,7 @@ class buy_receipt(models.Model):
                                  ondelete='set null',
                                  help=u'产生的发票号')
     date_due = fields.Date(u'到期日期', copy=False,
+                           default=lambda self: fields.Date.context_today(self),
                            help=u'付款截止日期')
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
                                  help=u'整单优惠率')
