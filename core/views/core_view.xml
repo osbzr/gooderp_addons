@@ -109,6 +109,7 @@
 						<field name="street" required="1"/>
 						<field name="phone" required="1"/>
 						<field name="fax" string="手机"/>
+						<field name='email' string='公司邮箱'/>
 						<field name="zip"/>
 						<field name="start_date" readonly="1" />
 						<field name="currency_id"/>

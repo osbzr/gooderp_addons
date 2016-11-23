@@ -72,7 +72,7 @@ class test_ReportHelper(TransactionCase):
     ''' 测试 ReportHelper '''
     def test_picture(self):
         ''' 测试 把图片的二进制数据（使用了base64编码）转化为一个docx.Document对象 '''
-        doc = DocxTemplate(misc.file_open('sell/tests/sell.templ.docx').name)
+        doc = DocxTemplate(misc.file_open('sell/template/sell.order.docx').name)
         #读取图片的数据且使用base64编码
         data_1 = open(misc.file_open('core/static/description/logo.png').name,'rb').read().encode('base64')
 
@@ -97,7 +97,7 @@ class test_ReportHelper(TransactionCase):
 
     def test_get_env(self):
         ''' 测试 get_env 方法 '''
-        doc = DocxTemplate(misc.file_open('sell/tests/sell.templ.docx').name)
+        doc = DocxTemplate(misc.file_open('sell/template/sell.order.docx').name)
         data = self.env['sell.order'].search([('name', '=', 'SO00001')])
 
         ctx={'obj':data,'tpl':doc}
