@@ -49,7 +49,7 @@
             <field name='name'>report.stock.transceive.graph</field>
             <field name='model'>report.stock.transceive</field>
             <field name='arch' type='xml'>
-                <pivot>
+                <pivot string="商品收发明细表">
                     <field name='goods' type='row' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='goods_qty_begain' type='measure' />
