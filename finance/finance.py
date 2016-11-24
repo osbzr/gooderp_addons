@@ -147,7 +147,7 @@ class voucher_line(models.Model):
         move_obj = self.env['voucher']
         total = 0.0
         context= self._context
-        if  context.get('line_ids'):
+        if context.get('line_ids'):
             for move_line_dict in move_obj.resolve_2many_commands('line_ids', context.get('line_ids')):
                 data['name'] = data.get('name') or move_line_dict.get('name')
                 total += move_line_dict.get('debit', 0.0) - move_line_dict.get('credit', 0.0)
@@ -208,7 +208,7 @@ class voucher_line(models.Model):
                 'partner_id': [('name', '=', False)],
                 'goods_id': [('name', '=', False)],
                 'auxiliary_id': [('name', '=', False)]}}
-        if not self.account_id or self.account_id.auxiliary_financing:
+        if not self.account_id or not self.account_id.auxiliary_financing:
             return res
         if self.account_id.auxiliary_financing == 'partner':
             res['domain']['partner_id'] = [('c_category_id', '!=', False)]
