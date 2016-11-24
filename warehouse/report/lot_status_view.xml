@@ -43,7 +43,7 @@
             <field name='name'>report.lot.status.graph</field>
             <field name='model'>report.lot.status</field>
             <field name='arch' type='xml'>
-                <pivot>
+                <pivot string='批号状态表'>
                     <field name='lot' type='row' groups='goods.batch_groups' />
                     <field name='goods' type='row' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
