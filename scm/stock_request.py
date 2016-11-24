@@ -250,7 +250,7 @@ class stock_request(models.Model):
                 buy_order = buy_order[0]
             else:
                 # 创建新的购货订单
-                buy_order = self.env['buy.order'].create({
+                buy_order = self.env['buy.order'].with_context(warehouse_dest_type='stock').create({
                                                           'partner_id': line.supplier_id.id
                                                           })
             # 找相同的采购单行
