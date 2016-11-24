@@ -94,6 +94,8 @@ class test_ReportHelper(TransactionCase):
         report_helper.picture(ctx, data_1, width='12twips',height='12twips', align='middle')
         # width, height 单位不写，为像素
         report_helper.picture(ctx, data_1, width='12',height='12', align='middle')
+        # width, height 不是 string 类型 :  not isinstance(s, str)
+        report_helper.picture(ctx, data_1, width=12,height=12, align='middle')
 
     def test_get_env(self):
         ''' 测试 get_env 方法 '''
