@@ -540,14 +540,14 @@
 			<field name="target">new</field>
 		</record>
 		<menuitem id='menu_clean_business_data' name='清理业务数据表' action='action_clean_business_data' parent='base.menu_custom' sequence='70'/>
-		
+
 
         <!-- 用权限组来隐藏系统自带的根菜单 -->
 		<record model="ir.ui.menu" id="base.menu_administration">
             <field name="groups_id" eval="[(3, ref('base.group_erp_manager'))]"/>
         </record>
 		<menuitem id="home_page.main_home_menu" name="首页" groups="home_page.group_all_manager"/>
-		<menuitem id="mail.mail_channel_menu_root_chat" groups="-base.group_user,home_page.group_mail" />
+		<menuitem id="mail.mail_channel_menu_root_chat" name="消息" groups="-base.group_user,home_page.group_mail" />
 		<menuitem id="base.module_mi"  groups="-base.group_no_one,core.nobody_can_see" />
 		<menuitem id="base.menu_module_updates"  sequence="20"  groups="-base.group_no_one,core.nobody_can_see" parent="base.menu_management"  />
 		<menuitem  id="base.menu_view_base_module_update" groups="-base.group_no_one"  parent="base.menu_management" />
