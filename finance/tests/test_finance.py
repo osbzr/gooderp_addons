@@ -114,7 +114,22 @@ class test_voucher(TransactionCase):
                 "default_reset_period": "month",
                 "default_voucher_date": "today",})
         setting_row.execute()
-        setting_row.write({'default_voucher_date':'last'})
+        setting_row.default_voucher_date = 'last'
+        voucher_obj._default_voucher_date()
+        voucher_obj.create({})
+
+    def test_default_voucher_date_last(self):
+        ''' 测试 default_voucher_date 等于 last '''
+        voucher_obj = self.env['voucher']
+
+        setting_row = self.env['finance.config.settings'].create({
+                "default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_reset_period": "month",
+                "default_voucher_date": "last",})
+
+        setting_row.execute()
         voucher_obj._default_voucher_date()
         voucher_obj.create({})
 
@@ -160,6 +175,10 @@ class test_period(TransactionCase):
             line.account_id.auxiliary_financing = 'goods'
             line.onchange_account_id()
             line.account_id.auxiliary_financing = 'partner'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'supplier'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'project'
             line.onchange_account_id()
 
         #这么写覆盖到了，但是这什么逻辑=。=
