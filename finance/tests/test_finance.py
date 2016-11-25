@@ -309,6 +309,18 @@ class test_checkout_wizard(TransactionCase):
         period_id = self.env.ref('finance.period_201411')
         checkout_wizard_obj.recreate_voucher_name(period_id)
 
+    def test_recreate_voucher_name_unEqual_nextVoucherName(self):
+        ''' 测试 按月重排结账会计期间凭证号  凭证号不连续,更新凭证号 '''
+        checkout_wizard_obj = self.env['checkout.wizard']
+        period_id = self.env.ref('finance.period_201601')
+
+        # 按月 重排结账会计期间凭证号
+        setting_row_month = self.env['finance.config.settings'].create({"default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_voucher_date": "today"})
+        setting_row_month.execute()
+        checkout_wizard_obj.recreate_voucher_name(period_id)
 
 class test_month_product_cost(TransactionCase):
 
