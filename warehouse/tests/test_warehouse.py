@@ -76,6 +76,15 @@ class TestWarehouse(TransactionCase):
         order = self.env.ref('warehouse.wh_out_wh_out_attribute')
         warehouse.scan_barcode(model_name,barcode,order.id)
         warehouse.scan_barcode(model_name,barcode,order.id)
+
+        #调拔单的扫描条码
+        model_name = 'wh.internal'
+        order = self.env.ref('warehouse.wh_internal_whint0')
+        warehouse.scan_barcode(model_name,barcode,order.id)
+        # 能找到 barcode 对应的产品
+        self.env.ref('warehouse.wh_move_line_17').goods_id = self.env.ref('goods.iphone').id
+        warehouse.scan_barcode(model_name,barcode,order.id)
+
         #产品不存在报错
         barcode = '12342312312'
         with self.assertRaises(UserError):
