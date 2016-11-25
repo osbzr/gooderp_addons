@@ -103,6 +103,22 @@ class test_voucher(TransactionCase):
         with self.assertRaises(ValidationError):
             voucher.voucher_done()
 
+    def test_voucher_line_default_get(self):
+        line = self.env['voucher.line'].create({
+                             'account_id':self.env.ref('finance.account_cash').id,
+                             'name':u'借贷方同时输入',
+                             'debit': 100,
+                             'credit': 100,
+                             })
+        self.env['voucher'].with_context({'line_ids': {line.id}}).create({
+                            'line_ids':[(0,0,{
+                                              'account_id':self.env.ref('finance.account_cash').id,
+                                              'name':u'借贷方同时输入',
+                                              'debit': 100,
+                                              'credit': 100,
+                                              })]
+                            })
+
     def test_default_voucher_date(self):
         voucher_obj = self.env['voucher']
         voucher_rows = self.env['voucher'].search([])
