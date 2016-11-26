@@ -72,6 +72,11 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(self.others_out_2.state, 'done')
         self.assertEqual(self.internal.state, 'done')
 
+    def test_approve_create_zero_wh_in(self):
+        ''' 测试 create_zero_wh_in '''
+        self.env.ref('warehouse.wh_move_line_17').goods_qty = 20000
+        self.internal.approve_order()
+
     def test_unlink(self):
 
         # 审核后的单据无法被取消
@@ -222,3 +227,9 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.is_init = True
         self.others_in_2.approve_order()
         self.others_in_2.cancel_approved_order()
+
+    def test_goods_inventory(self):
+        ''' 发库单审核产品不足时调用创建盘盈入库方法 '''
+        
+        
+        
