@@ -13,7 +13,7 @@ access_voucher_template_line,access_voucher_template_line,model_voucher_template
 access_model_month_product_cost,access_model_month_product_cost,model_month_product_cost,,1,1,1,1
 chang_voucher_name,chang_voucher_name,model_chang_voucher_name,,1,1,1,0
 access_model_month_product_cost,access_model_month_product_cost,model_month_product_cost,,1,1,1,1
-
+access_rate_period,access_rate_period,model_rate_period,,1,0,0,0
 access_report_auxiliary_accounting,access_report_auxiliary_accounting,model_report_auxiliary_accounting,,1,1,1,1
 
 
