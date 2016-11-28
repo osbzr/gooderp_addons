@@ -192,9 +192,8 @@ class test_report(TransactionCase):
 
     def test_balance_sheet(self):
         ''' 测试资产负债表 '''
-        report = self.env['create.balance.sheet.wizard'].create(
-            {'period_id': self.period_id}
-                    )
+        report = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_id})
+
         with self.assertRaises(UserError):
             report.create_balance_sheet()
         with self.assertRaises(UserError):
@@ -212,6 +211,21 @@ class test_report(TransactionCase):
         for balance_sheet_obj in balance_sheet_objs:
             balance_sheet_obj.cumulative_occurrence_balance_formula = ''
         report.create_profit_statement()
+
+    def test_balance_sheet_default_period(self):
+        ''' 测试资产负债表  wizard no period'''
+        self.env['create.balance.sheet.wizard'].create({})
+
+    def test_balance_sheet_compute_balance(self):
+        ''' 测试资产负债表  compute balance'''
+        report = self.env['create.balance.sheet.wizard'].create({'period_id': self.period_id})
+        self.env.ref('finance.bs_1').balance_formula = '1001'
+        # 结转2015年12月的期间
+        month_end = self.env['checkout.wizard'].create({'date':'2015-12-31'})
+
+        month_end.onchange_period_id()
+        month_end.button_checkout()
+        report.create_balance_sheet()
 
 
 class test_checkout_wizard(TransactionCase):
