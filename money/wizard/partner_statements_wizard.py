@@ -9,6 +9,10 @@ class partner_statements_report_wizard(models.TransientModel):
 
     @api.model
     def _get_company_start_date(self):
+        return self._get_company_start_date_impl()
+    @api.model
+    def _get_company_start_date_impl(self):
+        ''' 获取当前登录用户公司的启用日期 '''
         return self.env.user.company_id.start_date
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True,
@@ -24,7 +28,7 @@ class partner_statements_report_wizard(models.TransientModel):
         for s in self:
             # 业务伙伴对账单: 不带商品明细
             if s.from_date > s.to_date:
-                raise UserError(u'结束日期不能小于开始日期！')
+                raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' % (s.from_date, s.to_date))
 
             if self.env.context.get('default_customer'):  # 客户
                 view = self.env.ref('sell.customer_statements_report_tree')
@@ -101,7 +105,7 @@ class partner_statements_report_wizard(models.TransientModel):
             # 业务伙伴对账单: 带商品明细
             res_ids = []
             if s.from_date > s.to_date:
-                raise UserError(u'结束日期不能小于开始日期！')
+                raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' % (s.from_date, s.to_date))
 
             if self.env.context.get('default_customer'):  # 客户
                 reports = self.env['customer.statements.report'].search([('partner_id', '=', s.partner_id.id),

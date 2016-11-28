@@ -94,7 +94,7 @@ class sell_order_track_wizard(models.TransientModel):
         self.ensure_one()
         res = []
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！\n所选开始日期:%s 所选结束日期:%s'%(self.date_start, self.date_end))
 
         index = 0
         sum_qty = sum_amount = sum_not_out = 0  # 数量、金额、未出库数量合计

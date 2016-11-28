@@ -103,6 +103,22 @@ class test_voucher(TransactionCase):
         with self.assertRaises(ValidationError):
             voucher.voucher_done()
 
+    def test_voucher_line_default_get(self):
+        line = self.env['voucher.line'].create({
+                             'account_id':self.env.ref('finance.account_cash').id,
+                             'name':u'借贷方同时输入',
+                             'debit': 100,
+                             'credit': 100,
+                             })
+        self.env['voucher'].with_context({'line_ids': {line.id}}).create({
+                            'line_ids':[(0,0,{
+                                              'account_id':self.env.ref('finance.account_cash').id,
+                                              'name':u'借贷方同时输入',
+                                              'debit': 100,
+                                              'credit': 100,
+                                              })]
+                            })
+
     def test_default_voucher_date(self):
         voucher_obj = self.env['voucher']
         voucher_rows = self.env['voucher'].search([])
@@ -114,7 +130,22 @@ class test_voucher(TransactionCase):
                 "default_reset_period": "month",
                 "default_voucher_date": "today",})
         setting_row.execute()
-        setting_row.write({'default_voucher_date':'last'})
+        setting_row.default_voucher_date = 'last'
+        voucher_obj._default_voucher_date()
+        voucher_obj.create({})
+
+    def test_default_voucher_date_last(self):
+        ''' 测试 default_voucher_date 等于 last '''
+        voucher_obj = self.env['voucher']
+
+        setting_row = self.env['finance.config.settings'].create({
+                "default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_reset_period": "month",
+                "default_voucher_date": "last",})
+
+        setting_row.execute()
         voucher_obj._default_voucher_date()
         voucher_obj.create({})
 
@@ -160,6 +191,10 @@ class test_period(TransactionCase):
             line.account_id.auxiliary_financing = 'goods'
             line.onchange_account_id()
             line.account_id.auxiliary_financing = 'partner'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'supplier'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'project'
             line.onchange_account_id()
 
         #这么写覆盖到了，但是这什么逻辑=。=
@@ -274,6 +309,18 @@ class test_checkout_wizard(TransactionCase):
         period_id = self.env.ref('finance.period_201411')
         checkout_wizard_obj.recreate_voucher_name(period_id)
 
+    def test_recreate_voucher_name_unEqual_nextVoucherName(self):
+        ''' 测试 按月重排结账会计期间凭证号  凭证号不连续,更新凭证号 '''
+        checkout_wizard_obj = self.env['checkout.wizard']
+        period_id = self.env.ref('finance.period_201601')
+
+        # 按月 重排结账会计期间凭证号
+        setting_row_month = self.env['finance.config.settings'].create({"default_period_domain": "can",
+                "default_reset_init_number": 1,
+                "default_auto_reset": True,
+                "default_voucher_date": "today"})
+        setting_row_month.execute()
+        checkout_wizard_obj.recreate_voucher_name(period_id)
 
 class test_month_product_cost(TransactionCase):
 

@@ -21,7 +21,7 @@
 
 {
     'name': "会计中数字用中文表示",
-    'version': '1.0',
+    'version': '11.11',
     'summary': """
             
     """,
@@ -29,9 +29,9 @@
     'author': "开阖静静<gilbert@osbzr.com>(开阖出品)",
     "depends": ['web', 'core'],
     'description':
-    """
-    主要实现一个widget 使得阿拉伯数字在页面上显示为中文.
-    """,
+    '''
+                    该模块主要实现了一个widget 使得阿拉伯数字在页面上显示为中文。
+    ''',
     'data': [
         'num_to_china.xml',
     ],

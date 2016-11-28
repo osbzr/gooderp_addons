@@ -73,6 +73,24 @@ class wh_move_line(models.Model):
         if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly') and self.type == 'out':
             self.warehouse_dest_id = self.env.ref('warehouse.warehouse_production').id
 
+    @api.one
+    @api.depends('goods_id')
+    def _compute_uom_uos(self):
+        if self.goods_id:
+            self.uom_id = self.goods_id.uom_id
+            self.uos_id = self.goods_id.uos_id
+        else:
+            self.uom_id = ''
+            self.uos_id = ''
+
+    @api.one
+    @api.depends('goods_qty','goods_id')
+    def _get_goods_uos_qty(self):
+        if self.goods_id and self.goods_qty:
+            self.goods_uos_qty = self.goods_qty/self.goods_id.conversion
+        else:
+            self.goods_uos_qty = 1
+
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade',
                               help=u'出库/入库/移库单行对应的移库单')
     date = fields.Date(u'完成日期', copy=False,
@@ -110,10 +128,10 @@ class wh_move_line(models.Model):
                                 help=u'产品的保质期(天)')
     valid_date = fields.Date(u'有效期至',
                              help=u'产品的有效期')
-    uom_id = fields.Many2one('uom', string=u'单位', ondelete='restrict',
-                             help=u'产品的计量单位')
-    uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict',
-                             help=u'产品的辅助单位')
+    uom_id = fields.Many2one('uom', string=u'单位', ondelete='restrict', compute=_compute_uom_uos,
+                              help=u'产品的计量单位', store=True)
+    uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict', compute=_compute_uom_uos,
+                             readonly=True,  help=u'产品的辅助单位', store=True)
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict',
                                    store=True,
@@ -127,7 +145,8 @@ class wh_move_line(models.Model):
     goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'), default=1,
                              help=u'产品的数量')
     goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),
-                                 default=1, help=u'产品的辅助数量')
+                                 compute=_get_goods_uos_qty, store=True,
+                                 help=u'产品的辅助数量')
     price = fields.Float(u'单价', compute=_compute_all_amount,
                          store=True, readonly=True,
                          digits=dp.get_precision('Amount'),
@@ -322,11 +341,11 @@ class wh_move_line(models.Model):
     def onchange_goods_qty(self):
         self.compute_suggested_cost()
 
-    @api.onchange('goods_uos_qty')
-    def onchange_goods_uos_qty(self):
-        if self.goods_id:
-            self.goods_qty = self.goods_id.conversion_unit(self.goods_uos_qty)
-        self.compute_suggested_cost()
+    # @api.onchange('goods_uos_qty')
+    # def onchange_goods_uos_qty(self):
+    #     if self.goods_id:
+    #         self.goods_qty = self.goods_id.conversion_unit(self.goods_uos_qty)
+    #     self.compute_suggested_cost()
 
     @api.onchange('lot_id')
     def onchange_lot_id(self):

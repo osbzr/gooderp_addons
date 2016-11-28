@@ -36,7 +36,7 @@ class sell_summary_staff_wizard(models.TransientModel):
     def button_ok(self):
         self.ensure_one()
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' % (self.date_start, self.date_end))
         read_fields = ['date_start', 'date_end', 'staff_id',
                        'goods_id', 'goods_categ_id', 'warehouse_id']
         return {

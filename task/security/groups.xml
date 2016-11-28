@@ -6,7 +6,6 @@
 			<field name='name'>任务</field>
 			<field name='category_id' ref="core.good_task"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
-			<field name="implied_ids" eval="[(4, ref('goods.view_cost_groups'))]"/>
 		</record>
 		<!--添加管理时间组-->
 		<record id='group_task_hours' model='res.groups'>

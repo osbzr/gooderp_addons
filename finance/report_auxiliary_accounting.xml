@@ -21,7 +21,7 @@
             <field name='name'>report.auxiliary.accounting.graph</field>
             <field name='model'>report.auxiliary.accounting</field>
             <field name='arch' type='xml'>
-                <pivot>
+                <pivot string='辅助核算余额表'>
                     <field name='account_id' type='row'/>
                     <field name='auxiliary_id' type='col'/>
                     <field name='debit' type='measure'/>

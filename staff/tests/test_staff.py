@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 
 class test_staff(TransactionCase):
 
@@ -15,6 +15,29 @@ class test_staff(TransactionCase):
                                               'job_id': self.env.ref('staff.staff_job_1').id})
         staff_pro._get_image()
         staff_pro.onchange_job_id()
+
+    def test_staff_contract_over_date(self):
+        '''测试：员工合同到期，发送邮件给员工 和 部门经理（如果存在）'''
+
+        job = self.browse_ref('staff.ir_cron_module_remind_contract_over_date')
+        job.interval_type = 'minutes'
+        job.nextcall = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+        job.doall = True
+        # not staff.contract_ids
+        self.env['staff'].staff_contract_over_date()
+
+        # has staff.contract_ids but no apartment manager
+        staff_lily = self.env.ref('staff.lili')
+        staff_lily.work_email = 'lili@sina.com.cn'
+        staff_lily.contract_ids.create({'staff_id': staff_lily.id,
+                                        'basic_wage': 123456,
+                                        'over_date': datetime.now().strftime("%Y-%m-%d"),
+                                        'job_id': self.env.ref('staff.staff_job_1').id})
+
+        # has staff.contract_ids and apartment manager
+        self.env.ref('staff.staff_1').work_email = 'admin@sina.com.cn'
+        staff_lily.parent_id = self.env.ref('staff.staff_1').id
+        self.env['staff'].staff_contract_over_date()
 
 
 class test_mail_message(TransactionCase):
@@ -34,3 +57,22 @@ class test_mail_message(TransactionCase):
         job.nextcall = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
         job.doall = True
         self.env['mail.message'].staff_birthday_message()
+
+class test_res_users(TransactionCase):
+
+    def test_check_user_id(self):
+        ''' 测试 一个用户只能对应一个员工 '''
+        # core 模块里
+        user = self.env.ref('base.user_demo')
+        self.env.ref('staff.lili').user_id = user.id
+
+        with self.assertRaises(ValidationError):
+            self.env.ref('staff.staff_1').user_id = user.id
+
+        # staff 模块里
+        user = self.env.ref('base.user_demo')
+        admin_user = self.env.ref('base.user_root')
+        user.staff_id = self.env.ref('staff.lili').id
+
+        with self.assertRaises(ValidationError):
+            admin_user.staff_id = self.env.ref('staff.lili').id

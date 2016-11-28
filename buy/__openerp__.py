@@ -4,9 +4,21 @@
     'author': "flora@osbzr.com",
     'website': "http://www.osbzr.com",
     'category': 'gooderp',
-    "description": """
-    """,
-    'version': '8.0.0.1',
+    "description":
+    '''
+                            该模块可以方便的管理购货。
+
+                            通过创建购货订单，审核后从供应商那里采购购货订单行中的商品，来完成购货功能。
+                            通过创建购货退货订单，审核后将购货订单行中的商品退回给供应商，来完成购货退货功能。
+                            通过创建采购调整单，选择原始购货订单，审核后将采购调整单行中的商品调整到原始购货订单行，来完成采购调整功能。
+
+                            购货管理的报表有：
+                                 采购订单跟踪表；
+                                 采购明细表；
+                                 采购汇总表（按商品、按供应商）；
+                                 采购收款一览表。
+    ''',
+    'version': '11.11',
     'depends': ['core', 'warehouse', 'money', 'finance'],
     'data': [
         'data/buy_data.xml',

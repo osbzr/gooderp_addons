@@ -136,7 +136,7 @@ class test_track_wizard(TransactionCase):
         # 按产品、客户、销售员、仓库搜索
         self.track.goods_id = self.env.ref('goods.mouse').id
         self.track.partner_id = self.env.ref('core.yixun').id
-        self.track.staff_id = self.env.ref('core.lili').id
+        self.track.staff_id = self.env.ref('staff.lili').id
         self.track.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.track.button_ok()
 
@@ -200,7 +200,7 @@ class test_detail_wizard(TransactionCase):
         # 按产品、客户、销售员、仓库搜索
         self.detail.goods_id = self.env.ref('goods.mouse').id
         self.detail.partner_id = self.env.ref('core.yixun').id
-        self.detail.staff_id = self.env.ref('core.lili').id
+        self.detail.staff_id = self.env.ref('staff.lili').id
         self.detail.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.detail.button_ok()
 
@@ -369,7 +369,7 @@ class test_staff_wizard(TransactionCase):
         results = summary_staff.with_context(context).search_read(domain=[])
 
         new_staff_wizard = self.staff_wizard.copy()
-        new_staff_wizard.staff_id = self.env.ref('core.lili').id
+        new_staff_wizard.staff_id = self.env.ref('staff.lili').id
         new_staff_wizard.goods_id = self.env.ref('goods.cable').id
         new_staff_wizard.goods_categ_id = \
             self.env.ref('core.goods_category_1').id
@@ -451,7 +451,7 @@ class test_receipt_wizard(TransactionCase):
         self.receipt_wizard.c_category_id = \
             self.env.ref('core.customer_category_1').id
         self.receipt_wizard.partner_id = self.env.ref('core.jd').id
-        self.receipt_wizard.staff_id = self.env.ref('core.lili').id
+        self.receipt_wizard.staff_id = self.env.ref('staff.lili').id
         self.receipt_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.receipt_wizard.button_ok()
 

@@ -50,6 +50,9 @@ class sell_order(models.Model):
 
     @api.model
     def _default_warehouse(self):
+        return self._default_warehouse_impl()
+    @api.model
+    def _default_warehouse_impl(self):
         if self.env.context.get('warehouse_type'):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_type'))
@@ -57,15 +60,18 @@ class sell_order(models.Model):
         return self.env['warehouse'].browse()
 
     @api.one
-    @api.depends('amount', 'amount_executed')
+    @api.depends('type')
     def _get_money_state(self):
         '''计算销货订单收款/退款状态'''
-        if self.amount_executed == 0:
-            self.money_state = (self.type == 'sell') and u'未收款' or u'未退款'
-        elif self.amount_executed < self.amount:
-            self.money_state = (self.type == 'sell') and u'部分收款' or u'部分退款'
-        elif self.amount_executed == self.amount:
-            self.money_state = (self.type == 'sell') and u'全部收款' or u'全部退款'
+        deliverys = self.env['sell.delivery'].search([('order_id', '=', self.id)])
+        if all(delivery.invoice_id.reconciled == 0
+               for delivery in deliverys):
+            self.money_state = (self.type == 'sell' and u'未收款' or u'未退款')
+        elif all(delivery.invoice_id.reconciled ==
+                 delivery.invoice_id.amount for delivery in deliverys):
+            self.money_state = (self.type == 'sell' and u'全部收款' or u'全部退款')
+        else:
+            self.money_state = (self.type == 'sell' and u'部分收款' or u'部分退款')
 
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES,
@@ -78,6 +84,7 @@ class sell_order(models.Model):
                                  help=u'联系手机')
     staff_id = fields.Many2one('staff', u'销售员',
                             ondelete='restrict', states=READONLY_STATES,
+                            default=lambda self: self.env.user.staff_id,
                                  help=u'单据负责人')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
@@ -125,11 +132,9 @@ class sell_order(models.Model):
                               default=u'未出库',
                               store=True,
                               help=u"销货订单的发货状态", select=True, copy=False)
-    amount_executed = fields.Float(u'已执行金额',
-                                   help=u'发货单已收款金额或退货单已退款金额')
     money_state = fields.Char(u'收/退款状态',
                               compute=_get_money_state,
-                              store=True,
+                              copy=False,
                               help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止',
                                help=u'该单据是否已终止')
@@ -205,8 +210,6 @@ class sell_order(models.Model):
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
                 raise UserError(u'外贸免税！')
-        if self.bank_account_id and not self.pre_receipt:
-            raise UserError(u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.pre_receipt:
             raise UserError(u'预付款不为空时，请选择结算账户！')
         # 销售预收款生成收款单
@@ -285,7 +288,10 @@ class sell_order(models.Model):
             'note': self.note,
             'discount_rate': self.discount_rate,
             'discount_amount': self.discount_amount,
-            'currency_id': self.currency_id.id
+            'currency_id': self.currency_id.id,
+            'contact': self.contact,
+            'address': self.address,
+            'mobile': self.mobile
         })
         if self.type == 'sell':
             delivery_id.write({'line_out_ids': [
@@ -350,9 +356,9 @@ class sell_order_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数')
+            raise UserError('税率不能输入超过100的数!\n输入税率:%s'%self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数')
+            raise UserError('税率不能输入负数\n 输入税率:%s'%self.tax_rate)
         if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
             self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
             self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计

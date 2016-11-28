@@ -18,9 +18,16 @@
 			<field name="name">进行中</field>
 			<field name="state">doing</field>
 		</record>
+		<!--2016-11-10，Admin的工作日志-->
 		<record id="timesheet_20161110" model="timesheet">
 			<field name="user_id" ref='base.user_root'/>
 			<field name="date">2016-11-10</field>
+		</record>
+		<record id="project_invoice_1" model="project.invoice">
+			<field name="date">2016-11-10</field>
+			<field name="date_due">2016-11-11</field>
+			<field name="amount">117.0</field>
+			<field name="project_id" ref='task.project_gooderp'/>
 		</record>
 	</data>
 </openerp>

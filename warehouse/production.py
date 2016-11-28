@@ -26,12 +26,14 @@ class wh_assembly(models.Model):
     fee = fields.Float(
         u'组装费用', digits=dp.get_precision('Amount'),
         help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
-    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False, help="通用情况是一对多的组合,当为False时\
+    is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个产品作为组合件,(选择模板后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
                             不会自动影响子件的数量")
     goods_id = fields.Many2one('goods', string=u'组合件产品')
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'), help="(选择使用模板后)当更改这个数量的时候后\
                                                                                               自动的改变相应的子件的数量")
+    voucher_id = fields.Many2one('voucher',string='凭证号')
+
     def apportion_cost(self, cost):
         for assembly in self:
             if not assembly.line_in_ids:
@@ -139,15 +141,59 @@ class wh_assembly(models.Model):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
             raise UserError(u'组合件和子件的产品必须存在')
 
+    def create_voucher_line(self, data):
+        return [self.env['voucher.line'].create(data_line) for data_line in data]
+
+    def create_vourcher_line_data(self, assembly, voucher_row):
+        line_out_data, line_in_data = [], []
+        for line_out in assembly.line_out_ids:
+            account_id = self.env.ref('finance.account_cost').id
+            line_out_data.append({'credit': line_out.cost,
+                                         'goods_id': line_out.goods_id.id,
+                                         'voucher_id': voucher_row.id,
+                                         'account_id': account_id,
+                                         'name': u'组合单 原料'})
+        for line_in in assembly.line_in_ids:
+            account_id = line_in.goods_id.category_id.account_id.id
+            line_in_data.append({'debit': line_in.cost,
+                                        'goods_id':line_in.goods_id.id,
+                                        'voucher_id': voucher_row.id,
+                                        'account_id': account_id,
+                                        'name': u'组合单 成品'})
+        return line_out_data + line_in_data
+
+    def wh_assembly_create_voucher_line(self, assembly, voucher_row):
+        voucher_line_data = []
+        if assembly.fee:
+            account_row = assembly.create_uid.company_id.operating_cost_account_id
+            voucher_line_data.append({'name': '组装费用', 'account_id': account_row.id,
+                                      'credit': assembly.fee, 'voucher_id': voucher_row.id})
+        voucher_line_data += self.create_vourcher_line_data(assembly, voucher_row)
+        self.create_voucher_line(voucher_line_data)
+
+    def wh_assembly_create_voucher(self):
+        for assembly in self:
+            if not assembly.fee:
+                return True
+            voucher_row = self.env['voucher'].create({'date': fields.Datetime.now()})
+            self.wh_assembly_create_voucher_line(assembly, voucher_row)
+            assembly.voucher_id = voucher_row.id
+            voucher_row.voucher_done()
+
     @api.multi
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
+        self.wh_assembly_create_voucher()
         return self.update_parent_cost()
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
+        for assembly in self:
+            if assembly.voucher_id:
+                assembly.voucher_id.voucher_draft()
+                assembly.voucher_id.unlink()
         return True
 
     @api.multi
@@ -294,12 +340,13 @@ class wh_disassembly(models.Model):
     fee = fields.Float(
         u'拆卸费用', digits=dp.get_precision('Amount'),
         help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
-    is_many_to_many_combinations = fields.Boolean(u'多对多组合', default=False,help="通用情况是一对多的组合,当为False时\
+    is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False,help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个产品作为组合件,(选择模板后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
                             不会自动影响子件的数量")
     goods_id = fields.Many2one('goods', string=u'组合件产品')
     goods_qty = fields.Float(u'组合件数量',default=1, digits=dp.get_precision('Quantity'),help="(选择使用模板后)当更改这个数量的时候后\
                                                                                           自动的改变相应的子件的数量")
+    voucher_id = fields.Many2one('voucher', string='凭证号')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -349,15 +396,59 @@ class wh_disassembly(models.Model):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
             raise UserError(u'组合件和子件的产品必须存在')
 
+    def create_voucher_line(self, data):
+        return [self.env['voucher.line'].create(data_line) for data_line in data]
+
+    def create_vourcher_line_data(self, assembly, voucher_row):
+        line_out_data, line_in_data = [], []
+        for line_out in assembly.line_out_ids:
+            account_id = self.env.ref('finance.account_cost').id
+            line_out_data.append({'credit': line_out.cost,
+                                         'goods_id': line_out.goods_id.id,
+                                         'voucher_id': voucher_row.id,
+                                         'account_id': account_id,
+                                         'name': u'拆卸单 原料'})
+        for line_in in assembly.line_in_ids:
+            account_id = line_in.goods_id.category_id.account_id.id
+            line_in_data.append({'debit': line_in.cost,
+                                        'goods_id':line_in.goods_id.id,
+                                        'voucher_id': voucher_row.id,
+                                        'account_id': account_id,
+                                        'name': u'拆卸单 成品'})
+        return line_out_data + line_in_data
+
+    def wh_disassembly_create_voucher_line(self, disassembly, voucher_row):
+        voucher_line_data = []
+        if disassembly.fee:
+            account_row = disassembly.create_uid.company_id.operating_cost_account_id
+            voucher_line_data.append({'name': '拆卸费用', 'account_id': account_row.id,
+                                      'credit': disassembly.fee, 'voucher_id': voucher_row.id})
+        voucher_line_data += self.create_vourcher_line_data(disassembly, voucher_row)
+        self.create_voucher_line(voucher_line_data)
+
+    def wh_disassembly_create_voucher(self):
+        for disassembly in self:
+            if not disassembly.fee:
+                return True
+            voucher_row = self.env['voucher'].create({'date': fields.Datetime.now()})
+            self.wh_disassembly_create_voucher_line(disassembly, voucher_row)
+            disassembly.voucher_id = voucher_row.id
+            voucher_row.voucher_done()
+
     @api.multi
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
+        self.wh_disassembly_create_voucher()
         return self.update_child_cost()
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
+        for disassembly in self:
+            if disassembly.voucher_id:
+                disassembly.voucher_id.voucher_draft()
+                disassembly.voucher_id.unlink()
         return True
 
     @api.multi
@@ -392,7 +483,6 @@ class wh_disassembly(models.Model):
                                   'uom_id': self.goods_id.uom_id.id,
                                   'uos_id': self.goods_id.uos_id.id,
                                   }]
-
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):

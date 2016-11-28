@@ -63,8 +63,6 @@ class sell_delivery(models.Model):
     is_return = fields.Boolean(u'是否退货', default=lambda self: \
                                self.env.context.get('is_return'),
                                help=u'是否为退货类型')
-    staff_id = fields.Many2one('staff', u'销售员', ondelete='restrict',
-                               help=u'单据负责人')
     order_id = fields.Many2one('sell.order', u'订单号', copy=False,
                                ondelete='cascade',
                                help=u'产生发货单/退货单的销货订单')
@@ -181,18 +179,19 @@ class sell_delivery(models.Model):
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
-        if self.bank_account_id and not self.receipt:
-            raise UserError(u'结算账户不为空时，需要输入收款额！')
         if not self.bank_account_id and self.receipt:
             raise UserError(u'收款额不为空时，请选择结算账户！')
         if self.receipt > self.amount + self.partner_cost:
-            raise UserError(u'本次收款金额不能大于优惠后金额！')
+            raise UserError(u'本次收款金额不能大于优惠后金额！\n本次收款金额:%s 优惠后金额:%s' %
+                            (self.receipt, self.amount + self.partner_cost))
         # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
         if not self.is_return:
             amount = self.amount + self.partner_cost
             if self.partner_id.credit_limit != 0:
                 if amount - self.receipt + self.partner_id.receivable > self.partner_id.credit_limit:
-                    raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！')
+                    raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！\n\
+                     本次发货金额:%s\n 客户应收余额:%s\n 本次收款金额:%s\n客户信用额度:%s' % (
+                    amount, self.receipt, self.partner_id.receivable, self.partner_id.credit_limit))
 
     def _line_qty_write(self):
         line_ids = not self.is_return and self.line_out_ids or self.line_in_ids
@@ -201,12 +200,12 @@ class sell_delivery(models.Model):
 
         return
 
-    def _get_invoice_vals(self, category_id, date, amount, tax_amount):
+    def _get_invoice_vals(self, partner_id, category_id, date, amount, tax_amount):
         '''返回创建 money_invoice 时所需数据'''
         return {
             'move_id': self.sell_move_id.id,
             'name': self.name,
-            'partner_id': self.partner_id.id,
+            'partner_id': partner_id.id,
             'category_id': category_id.id,
             'date': date,
             'amount': amount,
@@ -230,7 +229,7 @@ class sell_delivery(models.Model):
         invoice_id = False
         if not float_is_zero(amount,2):
             invoice_id = self.env['money.invoice'].create(
-                self._get_invoice_vals(category, self.date, amount, tax_amount)
+                self._get_invoice_vals(self.partner_id, category, self.date, amount, tax_amount)
             )
             self.invoice_id = invoice_id.id
         return invoice_id
@@ -242,7 +241,7 @@ class sell_delivery(models.Model):
             for line in self.cost_line_ids:
                 if not float_is_zero(line.amount,2):
                     invoice_id = self.env['money.invoice'].create(
-                        self._get_invoice_vals(line.category_id, self.date, line.amount, 0)
+                        self._get_invoice_vals(line.partner_id, line.category_id, self.date, line.amount, 0)
                     )
         return invoice_id
 
@@ -276,34 +275,35 @@ class sell_delivery(models.Model):
         })
         return money_order
 
-    @api.one
+    @api.multi
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
-        self._wrong_delivery_done()
-        # 库存不足 生成零的
-        result_vals = self.env['wh.move'].create_zero_wh_in(self,self._name)
-        if result_vals:
-            return result_vals
-        # 调用wh.move中审核方法，更新审核人和审核状态
-        self.sell_move_id.approve_order()
-        #将发货/退货数量写入销货订单行
-        if self.order_id:
-            self._line_qty_write()
-        # 发货单/退货单 生成结算单
-        invoice_id = self._delivery_make_invoice()
-        # 销售费用产生结算单
-        self._sell_amount_to_invoice()
-        # 生成收款单，并审核
-        if self.receipt:
-            flag = not self.is_return and 1 or -1
-            amount = flag * self.amount
-            this_reconcile = flag * self.receipt
-            money_order = self._make_money_order(invoice_id, amount, this_reconcile)
-            money_order.money_order_done()
+        for record in self:
+            record._wrong_delivery_done()
+            # 库存不足 生成零的
+            result_vals = self.env['wh.move'].create_zero_wh_in(record,record._name)
+            if result_vals:
+                return result_vals
+            # 调用wh.move中审核方法，更新审核人和审核状态
+            record.sell_move_id.approve_order()
+            #将发货/退货数量写入销货订单行
+            if record.order_id:
+                record._line_qty_write()
+            # 发货单/退货单 生成结算单
+            invoice_id = record._delivery_make_invoice()
+            # 销售费用产生结算单
+            record._sell_amount_to_invoice()
+            # 生成收款单，并审核
+            if record.receipt:
+                flag = not record.is_return and 1 or -1
+                amount = flag * record.amount
+                this_reconcile = flag * record.receipt
+                money_order = record._make_money_order(invoice_id, amount, this_reconcile)
+                money_order.money_order_done()
 
-        # 生成分拆单 FIXME:无法跳转到新生成的分单
-        if self.order_id and not self.modifying:
-            return self.order_id.sell_generate_delivery()
+            # 生成分拆单 FIXME:无法跳转到新生成的分单
+            if record.order_id and not record.modifying:
+                return record.order_id.sell_generate_delivery()
 
     @api.one
     def sell_delivery_draft(self):
@@ -314,6 +314,7 @@ class sell_delivery(models.Model):
         for line in source_line:
             line.money_id.money_order_draft()
             line.money_id.unlink()
+            # FIXME:查找产生的核销单，反审核后删掉
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
                 [('name', '=', self.invoice_id.name)])
@@ -360,6 +361,10 @@ class wh_move_line(models.Model):
                 else:
                     self.discount_rate = 0
 
+    def _delivery_get_price_and_tax(self):
+        self.tax_rate = self.env.user.company_id.output_tax_rate
+        self.price_taxed = self.goods_id.price
+
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
@@ -369,7 +374,6 @@ class wh_move_line(models.Model):
             is_return = self.env.context.get('default_is_return')
             # 如果是销售发货单行 或 销售退货单行
             if (self.type == 'out' and not is_return) or (self.type == 'in' and is_return):
-                self.tax_rate = self.env.user.company_id.output_tax_rate
-                self.price_taxed = self.goods_id.price
+                self._delivery_get_price_and_tax()
 
         return super(wh_move_line,self).onchange_goods_id()

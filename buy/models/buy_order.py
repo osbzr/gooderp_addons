@@ -62,24 +62,31 @@ class buy_order(models.Model):
             self.goods_state = u'全部入库'
 
     @api.model
-    def _default_warehouse_dest(self):
-        '''获取默认调入仓库'''
+    def _default_warehouse_dest_impl(self):
         if self.env.context.get('warehouse_dest_type'):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_dest_type'))
 
         return self.env['warehouse'].browse()
 
+    @api.model
+    def _default_warehouse_dest(self):
+        '''获取默认调入仓库'''
+        return self._default_warehouse_dest_impl()
+
     @api.one
-    @api.depends('amount', 'amount_executed')
+    @api.depends('type')
     def _get_money_state(self):
         '''计算购货订单付款/退款状态'''
-        if self.amount_executed == 0:
+        receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
+        if all(receipt.invoice_id.reconciled == 0
+               for receipt in receipts):
             self.money_state = (self.type == 'buy') and u'未付款' or u'未退款'
-        elif self.amount_executed < self.amount:
-            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
-        elif self.amount_executed == self.amount:
+        elif all(receipt.invoice_id.reconciled ==
+                 receipt.invoice_id.amount for receipt in receipts):
             self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
+        else:
+            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
 
     partner_id = fields.Many2one('partner', u'供应商', states=READONLY_STATES,
                                  ondelete='restrict',
@@ -136,11 +143,9 @@ class buy_order(models.Model):
                                help=u'该单据是否已终止')
     pay_ids=fields.One2many("payment.plan","buy_id",string=u"付款计划",
                             help=u'分批付款时使用付款计划')
-    amount_executed = fields.Float(u'已执行金额',
-                                   help=u'入库单已付款金额或退货单已退款金额')
     money_state = fields.Char(u'付/退款状态',
                               compute=_get_money_state,
-                              store=True,
+                              copy=False,
                               help=u'购货订单生成的采购入库单或退货单的付/退款状态')
 
     @api.onchange('discount_rate', 'line_ids')
@@ -154,7 +159,7 @@ class buy_order(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据')
+                raise UserError(u'不能删除已审核的单据(%s)'%order.name)
 
         return super(buy_order, self).unlink()
 
@@ -199,8 +204,6 @@ class buy_order(models.Model):
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
-        if self.bank_account_id and not self.prepayment:
-            raise UserError(u'结算账户不为空时，需要输入预付款！')
         if not self.bank_account_id and self.prepayment:
             raise UserError(u'预付款不为空时，请选择结算账户！')
         # 采购预付款生成付款单

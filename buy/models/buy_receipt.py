@@ -67,6 +67,7 @@ class buy_receipt(models.Model):
                                  ondelete='set null',
                                  help=u'产生的发票号')
     date_due = fields.Date(u'到期日期', copy=False,
+                           default=lambda self: fields.Date.context_today(self),
                            help=u'付款截止日期')
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
                                  help=u'整单优惠率')
@@ -157,7 +158,7 @@ class buy_receipt(models.Model):
                         batch_one_list_wh.append((move_line.goods_id.id, move_line.lot))
 
             if (line.goods_id.id, line.lot) in batch_one_list_wh:
-                raise UserError(u'仓库已存在相同序列号的产品！')
+                raise UserError(u'仓库已存在相同序列号的产品！\n产品:%s 序列号:%s'%(line.goods_id.name,line.lot))
 
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
@@ -166,21 +167,21 @@ class buy_receipt(models.Model):
                 batch_one_list.append((line.goods_id.id, line.lot))
 
         if len(batch_one_list) > len(set(batch_one_list)):
-            raise UserError(u'不能创建相同序列号的产品！')
+            raise UserError(u'不能创建相同序列号的产品！\n 序列号list为%s'%str(batch_one_list))
 
         for line in self.line_out_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
         
-        if self.bank_account_id and not self.payment:
-            raise UserError(u'结算账户不为空时，需要输入付款额！')
         if not self.bank_account_id and self.payment:
             raise UserError(u'付款额不为空时，请选择结算账户！')
         if self.payment > self.amount:
-            raise UserError(u'本次付款金额不能大于折后金额！')
+            raise UserError(u'本次付款金额不能大于折后金额！\n付款金额:%s 折后金额:%s'%(self.payment,self.amount))
         if (sum(cost_line.amount for cost_line in self.cost_line_ids) != 
             sum(line.share_cost for line in self.line_in_ids)):
-            raise UserError(u'采购费用还未分摊或分摊不正确！')
+            raise UserError(u'采购费用还未分摊或分摊不正确！\n采购费用:%s 分摊总费用:%s'%
+                            (sum(cost_line.amount for cost_line in self.cost_line_ids),
+                             sum(line.share_cost for line in self.line_in_ids)))
         return
 
     @api.one
@@ -192,19 +193,19 @@ class buy_receipt(models.Model):
 
         return
 
-    def _get_invoice_vals(self, category_id, date,amount, tax_amount):
+    def _get_invoice_vals(self, partner_id, category_id, date,amount, tax_amount):
         '''返回创建 money_invoice 时所需数据'''
         return {
-            'move_id': self.buy_move_id.id, 
+            'move_id': self.buy_move_id.id,
             'name': self.name,
-            'partner_id': self.partner_id.id, 
-            'category_id': category_id.id, 
+            'partner_id': partner_id.id,
+            'category_id': category_id.id,
             'date': date,
-            'amount': amount, 
-            'reconciled': 0, 
+            'amount': amount,
+            'reconciled': 0,
             'to_reconcile': amount,
             'tax_amount': tax_amount,
-            'date_due': self.date_due, 
+            'date_due': self.date_due,
             'state': 'draft'
         }
 
@@ -222,7 +223,7 @@ class buy_receipt(models.Model):
         categ = self.env.ref('money.core_category_purchase')
         if not float_is_zero(amount,2):
             invoice_id = self.env['money.invoice'].create(
-                self._get_invoice_vals(categ,self.date, amount, tax_amount)
+                self._get_invoice_vals(self.partner_id, categ, self.date, amount, tax_amount)
             )
             self.invoice_id = invoice_id.id
         return invoice_id
@@ -234,7 +235,7 @@ class buy_receipt(models.Model):
             for line in self.cost_line_ids:
                 if not float_is_zero(line.amount,2):
                     self.env['money.invoice'].create(
-                        self._get_invoice_vals(line.category_id,self.date, line.amount, 0)
+                        self._get_invoice_vals(line.partner_id, line.category_id,self.date, line.amount, 0)
                     )
         return
 
@@ -401,6 +402,10 @@ class wh_move_line(models.Model):
                               digits=dp.get_precision('Amount'),
                               help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
 
+    def _buy_get_price_and_tax(self):
+        self.tax_rate = self.env.user.company_id.import_tax_rate
+        self.price_taxed = self.goods_id.cost
+
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
@@ -413,7 +418,6 @@ class wh_move_line(models.Model):
             is_return = self.env.context.get('default_is_return')
             # 如果是采购入库单行 或 采购退货单行
             if (self.type == 'in' and not is_return) or (self.type == 'out' and is_return):
-                self.tax_rate = self.env.user.company_id.import_tax_rate
-                self.price_taxed = self.goods_id.cost
+                self._buy_get_price_and_tax()
 
         return super(wh_move_line,self).onchange_goods_id()

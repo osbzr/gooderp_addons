@@ -18,7 +18,7 @@ class common_dialog_wizard(models.TransientModel):
             func = getattr(model, self.env.context.get('func'), None)
 
             if not func:
-                raise ValueError(u'错误, model中找不到定义的函数%s' % self.env.context.get('func'))
+                raise ValueError(u'错误, model(%s)中找不到定义的函数%s' % (active_model,self.env.context.get('func')))
 
             args = self.env.context.get('args') or []
             kwargs = self.env.context.get('kwargs') or {}

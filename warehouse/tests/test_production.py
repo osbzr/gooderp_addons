@@ -281,27 +281,27 @@ class TestProduction(TransactionCase):
         wh_disassembly_dis3.goods_qty = 2
         wh_disassembly_dis3.onchange_goods_qty()
 
-
     def test_assembly_onchange_bom(self):
         ''' 测试  组装单 onchange_bom '''
         # no bom_id
-        wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
-        wh_disassembly_dis3.onchange_bom()
-        self.assertEqual(wh_disassembly_dis3.goods_qty, 1.0)
+        wh_assembly_ass0 = self.browse_ref('warehouse.wh_assembly_ass0')
+        wh_assembly_ass0.onchange_bom()
+        self.assertEqual(wh_assembly_ass0.goods_qty, 1.0)
         # has bom_id
     def test_has_bom_id(self):
-        wh_disassembly_dis4 = self.env.ref('warehouse.wh_disassembly_dis3')
-        wh_disassembly_dis4.bom_id = self.env.ref('warehouse.wh_bom_0').id
-        wh_disassembly_dis4.onchange_bom()
+        wh_assembly_ass0 = self.env.ref('warehouse.wh_assembly_ass0')
+        wh_assembly_ass0.bom_id = self.env.ref('warehouse.wh_bom_0').id
+        wh_assembly_ass0.onchange_bom()
         # bom_id 的组合件 大于 1行时，len(line_in_ids)>1
-        wh_disassembly_dis4.bom_id.line_parent_ids.create({
+        wh_assembly_ass0.bom_id.line_parent_ids.create({
             'type': 'parent',
             'goods_id': self.env.ref('goods.keyboard_mouse').id,
             'goods_qty': 1,
         })
-        # wh_disassembly_dis4.bom_id = self.disassembly_bom.id
-        wh_disassembly_dis4.onchange_bom()
-        #self.assertTrue(wh_disassembly_dis4.is_many_to_many_combinations)
+#         self.disassembly_bom.type = 'assembly'
+#         wh_assembly_ass0.bom_id = self.disassembly_bom.id
+        wh_assembly_ass0.onchange_bom()
+#         self.assertTrue(wh_assembly_ass0.is_many_to_many_combinations)
 
     def test_disassembly_onchange_bom(self):
         ''' 测试 拆卸单 onchange_bom '''
@@ -311,8 +311,9 @@ class TestProduction(TransactionCase):
         wh_disassembly_dis3.bom_id = False
         wh_disassembly_dis3.onchange_bom()
         self.assertEqual(wh_disassembly_dis3.goods_qty, 1.0)
+
+    def test_disassembly_has_bom(self):
         # has bom_id
-    def test_disassembly_has_bome(self):
         wh_disassembly_dis3 = self.env.ref('warehouse.wh_disassembly_dis3')
         bom_copy_1 = self.env.ref('warehouse.wh_bom_0').copy()
         self.bom_id = bom_copy_1.id
@@ -325,6 +326,7 @@ class TestProduction(TransactionCase):
             'goods_id': self.env.ref('goods.keyboard_mouse').id,
             'goods_qty': 1,
         })
-        # wh_disassembly_dis3.bom_id = self.disassembly_bom.id
+        self.bom_id = self.disassembly_bom.id
+#         wh_disassembly_dis3.bom_id = self.disassembly_bom.id
         wh_disassembly_dis3.onchange_bom()
-        #self.assertTrue(wh_disassembly_dis3.is_many_to_many_combinations)
+#         self.assertTrue(wh_disassembly_dis3.is_many_to_many_combinations)

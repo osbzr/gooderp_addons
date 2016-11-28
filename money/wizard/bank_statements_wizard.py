@@ -8,6 +8,10 @@ class partner_statements_report_wizard(models.Model):
 
     @api.model
     def _get_company_start_date(self):
+        return self._get_company_start_date_impl()
+    @api.model
+    def _get_company_start_date_impl(self):
+        ''' 获取当前登录用户公司的启用日期 '''
         return self.env.user.company_id.start_date
 
     bank_id = fields.Many2one('bank.account', string=u'账户名称', required=True,
@@ -22,7 +26,7 @@ class partner_statements_report_wizard(models.Model):
     def confirm_bank_statements(self):
         # 现金银行报表
         if self.from_date > self.to_date:
-            raise UserError(u'结束日期不能小于开始日期！')
+            raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s '%(self.from_date,self.to_date))
 
         view = self.env.ref('money.bank_statements_report_tree')
 

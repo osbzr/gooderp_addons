@@ -89,7 +89,6 @@
 										<field name="discount_rate" groups='sell.sell_discount_groups'/>
 										<field name="discount_amount" groups='sell.sell_discount_groups'/>
                             			<field name="amount"/>
-                            			<field name="amount_executed" readonly="1"/>
                         			</group>
                         			<group>
 										<field name="pre_receipt"/>
@@ -429,7 +428,7 @@
 			                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
 			                		<tree string="Cost Lines" editable="bottom">
 			                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
-				                		<field name="category_id"/>
+				                		<field name="category_id" domain="[('type', '=', 'income')]"/>
 				                		<field name="amount"/>
 				                		<field name="note"/>
 				                	</tree>

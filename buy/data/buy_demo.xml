@@ -82,5 +82,9 @@
             <field eval="58.5" name="price_taxed"/>
             <field eval="10.0" name="quantity"/>
         </record>
+        <record id="goods_vendor" model="vendor.goods">
+            <field name="vendor_id" ref="core.zt"/>
+            <field name="goods_id" ref="goods.keyboard"/>
+        </record>
     </data>
 </openerp>

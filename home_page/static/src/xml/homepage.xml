@@ -48,4 +48,9 @@
           </button><p class='m-t-sm'> </p>
         </div>
     </t>
+    <t t-name="help_content">
+        <div>
+            <p class="text-muted text-center ">首页还没有配置！请在首页-> 设置主页元素 和 首页->报表分类 菜单进行配置首页</p>
+        </div>
+    </t>
 </templates>

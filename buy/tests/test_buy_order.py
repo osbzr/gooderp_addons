@@ -139,11 +139,6 @@ class test_buy_order(TransactionCase):
         self.order.prepayment = 50.0
         with self.assertRaises(UserError):
             self.order.buy_order_done()
-        # 结算账户不为空时，需要输入预付款！
-        self.order.bank_account_id = bank_account
-        self.order.prepayment = 0
-        with self.assertRaises(UserError):
-            self.order.buy_order_done()
 
         # 没有订单行时审核报错
         for line in self.order.line_ids:

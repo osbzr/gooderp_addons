@@ -109,13 +109,15 @@
 						<field name="street" required="1"/>
 						<field name="phone" required="1"/>
 						<field name="fax" string="手机"/>
+						<field name='email' string='公司邮箱'/>
 						<field name="zip"/>
 						<field name="start_date" readonly="1" />
 						<field name="currency_id"/>
 						<field name="cost_method"/>
 						<field name="draft_invoice"/>
-                        <field name="import_tax_rate"></field>
-	                    <field name="output_tax_rate"></field>
+						<field name="import_tax_rate"/>
+						<field name="output_tax_rate"/>
+						<field name="bank_account_id"/>
 					</group>
 				</form>
 			</field>
@@ -477,6 +479,17 @@
 			<field name="search_view_id" ref="pricing_search"/>
 		</record>
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
+		<!--继承user视图，增加对应员工字段-->
+		<record id="view_users_staff_form" model="ir.ui.view">
+            <field name="name">res.users.staff.form</field>
+            <field name="model">res.users</field>
+            <field name='inherit_id' ref='base.view_users_form' />
+            <field name="arch" type="xml">
+            	<field name='partner_id' position='after'>
+            		<field name='staff_id'/>
+            	</field>
+            </field>
+        </record>
         <!-- 用于清理业务数据 -->
 		<record id="business_data_table_tree" model="ir.ui.view">
 			<field name="name">business.data.table.tree</field>
@@ -527,14 +540,18 @@
 			<field name="target">new</field>
 		</record>
 		<menuitem id='menu_clean_business_data' name='清理业务数据表' action='action_clean_business_data' parent='base.menu_custom' sequence='70'/>
-		
+
 
         <!-- 用权限组来隐藏系统自带的根菜单 -->
 		<record model="ir.ui.menu" id="base.menu_administration">
             <field name="groups_id" eval="[(3, ref('base.group_erp_manager'))]"/>
         </record>
 		<menuitem id="home_page.main_home_menu" name="首页" groups="home_page.group_all_manager"/>
-		<menuitem id="mail.mail_channel_menu_root_chat"
-			groups="-base.group_user,home_page.group_mail" />
-    </data>
+		<menuitem id="mail.mail_channel_menu_root_chat" name="消息" groups="-base.group_user,home_page.group_mail" />
+		<menuitem id="base.module_mi"  groups="-base.group_no_one,core.nobody_can_see" />
+		<menuitem id="base.menu_module_updates"  sequence="20"  groups="-base.group_no_one,core.nobody_can_see" parent="base.menu_management"  />
+		<menuitem  id="base.menu_view_base_module_update" groups="-base.group_no_one"  parent="base.menu_management" />
+		<menuitem  groups="base.group_no_one" id="base.menu_view_base_module_upgrade"  parent="base.menu_management" />
+		<menuitem  groups="-base.group_no_one,core.nobody_can_see" id="web_settings_dashboard.web_dashboard_menu" parent="base.menu_administration"  />
+	</data>
 </openerp>

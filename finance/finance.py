@@ -36,6 +36,10 @@ class voucher(models.Model):
 
     @api.model
     def _default_voucher_date(self):
+        return self._default_voucher_date_impl()
+    @api.model
+    def _default_voucher_date_impl(self):
+        ''' 获得默认的凭证创建日期 '''
         voucher_setting = self.env['ir.values'].get_default('finance.config.settings', 'default_voucher_date')
         now_date = fields.Date.context_today(self)
         if voucher_setting == 'last' and self.search([], limit=1):
@@ -84,25 +88,26 @@ class voucher(models.Model):
             raise ValidationError(u'请输入凭证行')
         for line in self.line_ids:
             if line.debit + line.credit == 0:
-                raise ValidationError(u'单行凭证行借和贷不能同时为0')
+                raise ValidationError(u'单行凭证行借和贷不能同时为0\n 借方金额为: %s .贷方金额为:%s' % (line.debit, line.credit))
             if line.debit * line.credit != 0:
-                raise ValidationError(u'单行凭证行不能同时输入借和贷')
+                raise ValidationError(u'单行凭证行不能同时输入借和贷\n 摘要为%s的凭证行 借方为:%s 贷方为:%s' %
+                                      (line.name, line.debit, line.credit))
         debit_sum = sum([line.debit for line in self.line_ids])
         credit_sum = sum([line.credit for line in self.line_ids])
         precision = self.env['decimal.precision'].precision_get('Account')
         debit_sum = round(debit_sum, precision)
         credit_sum = round(credit_sum, precision)
         if debit_sum != credit_sum:
-            raise ValidationError(u'借贷方不平')
+            raise ValidationError(u'借贷方不平!\n 借方合计:%s 贷方合计:%s' % (debit_sum, credit_sum))
 
         self.state = 'done'
 
     @api.one
     def voucher_draft(self):
         if self.state == 'draft':
-            raise UserError(u'请不要重复反审核！')
+            raise UserError(u'凭证%s已经审核,请不要重复反审核！' % self.name)
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间已结账！不能反审核')
+            raise UserError(u'%s期 会计期间已结账！不能反审核' % self.period_id.name)
         self.state = 'draft'
 
     @api.one
@@ -115,7 +120,7 @@ class voucher(models.Model):
     def unlink(self):
         for active_voucher in self:
             if active_voucher.state == 'done':
-                raise UserError(u'不能删除已审核的凭证')
+                raise UserError(u'凭证%s已审核,不能删除已审核的凭证'%active_voucher.name)
         return super(voucher, self).unlink()
 
     # 重载write 方法
@@ -124,12 +129,12 @@ class voucher(models.Model):
         if self.env.context.get('call_module', False) == "checkout_wizard":
             return super(voucher, self).write(vals)
         if self.period_id.is_closed is True:
-            raise UserError(u'该会计期间已结账，凭证不能再修改！')
+            raise UserError(u'%s期 会计期间已结账，凭证不能再修改！'%self.period_id.name)
         if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
             return super(voucher, self).write(vals)
         else:
             if self.state == 'done':
-                raise UserError(u'凭证已审核！修改请先反审核！')
+                raise UserError(u'凭证%s已审核！修改请先反审核！'%self.name)
         return super(voucher, self).write(vals)
 
 class voucher_line(models.Model):
@@ -142,7 +147,7 @@ class voucher_line(models.Model):
         move_obj = self.env['voucher']
         total = 0.0
         context= self._context
-        if  context.get('line_ids'):
+        if context.get('line_ids'):
             for move_line_dict in move_obj.resolve_2many_commands('line_ids', context.get('line_ids')):
                 data['name'] = data.get('name') or move_line_dict.get('name')
                 total += move_line_dict.get('debit', 0.0) - move_line_dict.get('credit', 0.0)
@@ -203,7 +208,7 @@ class voucher_line(models.Model):
                 'partner_id': [('name', '=', False)],
                 'goods_id': [('name', '=', False)],
                 'auxiliary_id': [('name', '=', False)]}}
-        if not self.account_id or self.account_id.auxiliary_financing:
+        if not self.account_id or not self.account_id.auxiliary_financing:
             return res
         if self.account_id.auxiliary_financing == 'partner':
             res['domain']['partner_id'] = [('c_category_id', '!=', False)]
@@ -220,7 +225,8 @@ class voucher_line(models.Model):
     def unlink(self):
         for active_voucher_line in self:
             if active_voucher_line.voucher_id.state == 'done':
-                raise UserError(u'不能删除已审核的凭证行')
+                raise UserError(u'不能删除已审核的凭证行\n 所属凭证%s\n凭证行摘要%s'
+                                %(active_voucher_line.voucher_id.name,active_voucher_line.name))
         return super(voucher_line, self).unlink()
 
 
@@ -307,7 +313,7 @@ class finance_period(models.Model):
             [('year', '=', datetime_str_list[0])])
         period_list = sorted(map(int, [period.month for period in period_row]))
         if not period_row[0]:
-            raise UserError(u'会计期间不存在！')
+            raise UserError(u'日期%s所在会计期间不存在！'%datetime_str)
         fist_period = self.search([('year', '=', datetime_str_list[0]), ('month', '=', period_list[0])], order='name')
         return fist_period
 
@@ -325,9 +331,9 @@ class finance_period(models.Model):
             ])
             if period_id:
                 if period_id.is_closed and self._context.get('module_name', False) != 'checkout_wizard':
-                    raise UserError(u'此会计期间已关闭')
+                    raise UserError(u'会计期间%s已关闭' % period_id.name)
             else:
-                raise UserError(u'此日期对应的会计期间不存在')
+                raise UserError(u'%s 对应的会计期间不存在'%date)
             return period_id
 
     _sql_constraints = [
@@ -427,7 +433,11 @@ class auxiliary_financing(models.Model):
         ('member', u'个人'),
         ('project', u'项目'),
         ('department', u'部门'),
-    ], u'分类')
+    ], u'分类', default=lambda self: self.env.context.get('type'))
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', '辅助核算不能重名')
+    ]
 
 
 class res_company(models.Model):
@@ -440,6 +450,8 @@ class res_company(models.Model):
                                          help=u'进项税额，是指纳税人购进货物、加工修理修配劳务、服务、无形资产或者不动产，支付或者负担的增值税额。')
     output_tax_account = fields.Many2one('finance.account', u"销项税科目", ondelete='restrict')
 
+    operating_cost_account_id = fields.Many2one('finance.account', ondelete='restrict',
+                                                string=u'生产费用科目', help='用在组装拆卸的费用上')
 
 class bank_account(models.Model):
     _inherit = 'bank.account'

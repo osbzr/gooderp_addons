@@ -35,7 +35,7 @@ class sell_order_detail_wizard(models.TransientModel):
         '''向导上的确定按钮'''
         self.ensure_one()
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！\n所选开始日期:%s所选结束日期:%s'%(self.date_start, self.date_end))
 
         domain = [('date', '>=', self.date_start),
                   ('date', '<=', self.date_end),

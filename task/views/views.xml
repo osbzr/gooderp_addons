@@ -25,7 +25,7 @@
 							<page name='timeline' string='工作记录'>
 								<field name="timeline_ids">
 									<tree string="进展"  editable='BOTTOM'>
-										<field name='task_id'/>
+										<field name='task_id' domain="[('user_id', 'in', [uid, False])]"/>
 										<field name='just_done'/>
 										<field name='next_action'/>
 										<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
@@ -82,15 +82,32 @@
 								<field name="customer_id"/>
 							</group>
 						</group>
-						<field name="task_ids">
-							<tree string="任务"  editable='BOTTOM'>
-								<field name="sequence" widget="handle"/>
-								<field name="name"/>
-								<field name="user_id"/>
-								<field name="next_action"/>
-								<field name="next_datetime"/>
-							</tree>
-						</field>
+						<notebook>
+							<page name='task' string='任务'>
+								<field name="task_ids">
+									<tree string="任务"  editable='BOTTOM'>
+										<field name="sequence" widget="handle"/>
+										<field name="name"/>
+										<field name="user_id"/>
+										<field name="next_action"/>
+										<field name="next_datetime"/>
+									</tree>
+								</field>
+							</page>
+							<page name='project_invoice' string='发票行'>
+								<field name="invoice_ids">
+									<tree string="发票"  editable='BOTTOM'>
+										<field name="date_due"/>
+										<field name="tax_rate"/>
+										<field name="amount"/>
+										<field name="tax_amount"/>
+										<field name="invoice_id"/>
+										<button name='make_invoice' type='object' string='生成发票' class='oe_highlight'
+											attrs="{'invisible': [('invoice_id', '!=', False)]}"/>
+									</tree>
+								</field>
+							</page>
+						</notebook>
 					</sheet>
 				</form>
 			</field>
@@ -108,7 +125,7 @@
 					<field name="next_datetime"/>
 					<field name="status"/>
 					<field name="is_schedule"/>
-					<button name='assign_to_me' type='object' string='我来'/>
+					<button name='assign_to_me' type='object' string='我来' class='oe_highlight'/>
 				</tree>
 			</field>
 		</record>
@@ -123,7 +140,7 @@
 					<sheet>
 						<group>
 							<group>
-								<field name="project_id"/>
+								<field name="project_id" options="{'no_create': True}"/>
 								<field name="name"/>
 								<field name="plan_hours" groups='task.group_task_hours'/>
 								<field name="user_id"/>
@@ -185,6 +202,19 @@
 				</kanban>
 			</field>
 		</record>
+		<record model="ir.ui.view" id="task_calendar">
+            <field name="name">task.calendar</field>
+            <field name="model">task</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar color="user_id" date_start="next_datetime" string="Task Organization">
+                    <field name="project_id"/>
+                    <field name="name"/>
+                    <field name="next_action"/>
+                    <field name="next_datetime"/>
+                </calendar>
+            </field>
+        </record>
 		<record model="ir.ui.view" id="timeline_tree">
 			<field name="name">工作日志</field>
 			<field name="model">timeline</field>
@@ -218,6 +248,7 @@
 			<field name="name">项目</field>
 			<field name="res_model">project</field>
 			<field name="view_mode">tree,form</field>
+			<field name="context">{'type':'project'}</field>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">点击创建一个项目</p>
 			</field>
@@ -225,7 +256,7 @@
 		<record model="ir.actions.act_window" id="action_task">
 			<field name="name">任务</field>
 			<field name="res_model">task</field>
-			<field name="view_mode">kanban,tree,form</field>
+			<field name="view_mode">kanban,calendar,tree,form</field>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">点击创建一个任务</p>
 			</field>

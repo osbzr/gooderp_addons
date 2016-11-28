@@ -124,7 +124,7 @@ class partner(models.Model):
     _description = u'业务伙伴'
 
     @api.one
-    @api.depends('child_ids.is_default_add')
+    @api.depends('child_ids.is_default_add', 'child_ids.province_id', 'child_ids.city_id', 'child_ids.county_id', 'child_ids.town', 'child_ids.detail_address')
     def _compute_partner_address(self):
         '''如果业务伙伴地址中有默认地址，则显示在业务伙伴列表上'''
         if not self.child_ids:
@@ -135,11 +135,11 @@ class partner(models.Model):
                 self.mobile = child.mobile
                 self.phone = child.phone
                 self.qq = child.qq
-                address = '%s%s%s%s%s' % (child.province_id.name,
-                           child.city_id.city_name,
-                           child.county_id.county_name,
-                           child.town,
-                           child.detail_address)
+                address = '%s%s%s%s%s' % (child.province_id and child.province_id.name or '',
+                           child.city_id and child.city_id.city_name or '',
+                           child.county_id and child.county_id.county_name or '',
+                           child.town or '',
+                           child.detail_address or '')
                 self.address = address
 
     child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')

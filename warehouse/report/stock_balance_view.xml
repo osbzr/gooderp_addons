@@ -23,7 +23,7 @@
             <field name='name'>report.stock.balance.graph</field>
             <field name='model'>report.stock.balance</field>
             <field name='arch' type='xml'>
-                <pivot>
+                <pivot string="商品库存余额表">
                     <field name='goods' type='row' />
                     <field name='attribute_id' type='col' groups='goods.multi_attrs_groups' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />

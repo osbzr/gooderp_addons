@@ -145,11 +145,6 @@ class test_buy_receipt(TransactionCase):
         self.receipt.payment = 100
         with self.assertRaises(UserError):
             self.receipt.buy_receipt_done()
-        # 结算账户不为空时，需要输入付款额！
-        self.receipt.bank_account_id = bank_account
-        self.receipt.payment = 0
-        with self.assertRaises(UserError):
-            self.receipt.buy_receipt_done()
         # 付款金额不能大于折后金额！
         self.receipt.bank_account_id = bank_account
         self.receipt.payment = 20000
