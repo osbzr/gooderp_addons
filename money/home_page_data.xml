@@ -5,32 +5,6 @@
 			<field name="sequence">4</field>
 		    <field name="name" >资金</field>
 		</record>
-        <record id="money_receipt_action_action" model="home.page">
-        	<field name="sequence">3</field>
-            <field name="action" ref="money_receipt_action"/>
-            <field name="menu_type">all_business</field>
-            <field name="domain" >[('type','=','get')]</field>
-            <field name="context" >{'type':'get', 'default_get': 1, 'default_pay': 0}</field>
-            <field name="note_one" > 收款单</field>
-       </record>
-
-		<record id="money_payment_action_action" model="home.page">
-        	<field name="sequence">3</field>
-            <field name="action" ref="money_payment_action"/>
-            <field name="menu_type">all_business</field>
-            <field name="domain" >[('type','=','get')]</field>
-            <field name="context" >{'type':'get', 'default_get': 1, 'default_pay': 0}</field>
-            <field name="note_one" > 付款单</field>
-       </record>
-
-		<record id="money_invoice_action_action" model="home.page">
-        	<field name="sequence">3</field>
-            <field name="action" ref="money.money_invoice_action"/>
-            <field name="menu_type">all_business</field>
-            <field name="domain" >[]</field>
-            <field name="context" >{}</field>
-            <field name="note_one" > 结算单</field>
-       </record>
 
         <record id="report_other_money_statements_action_report2" model="home.page">
 			<field name="sequence">14</field>
@@ -47,5 +21,33 @@
 			<field name="report_type_id" ref="home_report_type_3"/>
 		    <field name="note_one" >现金银行报表</field>
 		</record>
-       </data>
+
+        <record id="amount_summary_bank_account_action" model="home.page">
+        	<field name="sequence">1</field>
+            <field name="action" ref="core.bank_account_action"/>
+            <field name="menu_type">amount_summary</field>
+            <field name="note_one">账户余额</field>
+            <field name="compute_field_one" ref="core.field_bank_account_balance"/>
+            <field name="domain" >[]</field>
+            <field name="context" >{}</field>
+       </record>
+		<record id="all_business_money_receipt_action" model="home.page">
+        	<field name="sequence">13</field>
+		    <field name="action" ref="money.money_receipt_action"/>
+		    <field name="view_id" ref="money.money_order_tree"/>
+		    <field name="menu_type">all_business</field>
+		    <field name="domain" >[('type','=','get')]</field>
+		    <field name="context" >{'type':'get', 'default_get': 1, 'default_pay': 0}</field>
+		    <field name="note_one" >收款单</field>
+		</record>
+		<record id="all_business_money_payment_action" model="home.page">
+        	<field name="sequence">13</field>
+		    <field name="action" ref="money.money_payment_action"/>
+		    <field name="view_id" ref="money.money_order_tree"/>
+		    <field name="menu_type">all_business</field>
+		    <field name="domain" >[('type','=','pay'),('state','=','done')]</field>
+		    <field name="context" >{'type':'pay', 'default_get': 0, 'default_pay': 1}</field>
+		    <field name="note_one" >付款单</field>
+		</record>
+    </data>
 </openerp>

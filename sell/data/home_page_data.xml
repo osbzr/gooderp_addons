@@ -5,60 +5,14 @@
 			<field name="sequence">2</field>
 		    <field name="name" >销货</field>
 		</record>
-        <record id="amount_summary_5" model="home.page">
+        <record id="amount_summary_sell_delivery_action" model="home.page">
         	<field name="sequence">13</field>
-		    <field name="action" ref="sell.sell_order_action"/>
-		    <field name="menu_type">amount_summary</field>
-		    <field name="domain" >[]</field>
-		    <field name="context" >{}</field>
-		    <field name="note_one" >销售收入</field>
-		    <field name="compute_field_one" ref="sell.field_sell_order_amount"/>
-		</record>
-		<record id="all_business_2" model="home.page">
-			<field name="sequence">15</field>
-		    <field name="action" ref="core.customer_action"/>
-		    <field name="menu_type">all_business</field>
-		    <field name="domain" >[('c_category_id','!=',False)]</field>
-		    <field name="context" >{}</field>
-		    <field name="view_id" ref="core.customer_tree"/>
-		    <field name="note_one" >客户管理</field>
-		</record>
-
-		<record id="sell_delivery_action_all_business_2" model="home.page">
-			<field name="sequence">15</field>
 		    <field name="action" ref="sell.sell_delivery_action"/>
-		    <field name="menu_type">all_business</field>
-		    <field name="domain" >[('is_return','=',False)]</field>
+		    <field name="menu_type">amount_summary</field>
+		    <field name="domain" >[('is_return','=',False),('state','=','done')]</field>
 		    <field name="context" >{'is_return':False, 'warehouse_dest_type': 'customer'}</field>
-
-		    <field name="note_one" >销售发货单</field>
-		</record>
-
-		<record id="sell_return_action_all_business_2" model="home.page">
-			<field name="sequence">15</field>
-		    <field name="action" ref="sell.sell_return_action"/>
-		    <field name="menu_type">all_business</field>
-		    <field name="domain" >[('is_return','=',True)]</field>
-		    <field name="context" >{'is_return':True, 'warehouse_type': 'customer'}</field>
-
-		    <field name="note_one" >销售退货单</field>
-		</record>
-		<record id="sell_return_action_all_business_2" model="home.page">
-			<field name="sequence">15</field>
-		    <field name="action" ref="sell.sell_adjust_action"/>
-		    <field name="menu_type">all_business</field>
-		    <field name="domain" >[]</field>
-		    <field name="context" >{}</field>
-		    <field name="note_one" >销售调整单</field>
-		</record>
-        <record id="all_business_1" model="home.page">
-			<field name="sequence">14</field>
-		    <field name="action" ref="goods.goods_action"/>
-		    <field name="menu_type">all_business</field>
-			<field name="report_type_id" ref="home_report_type_1"/>
-		    <field name="domain" >[]</field>
-		    <field name="context" >{}</field>
-		    <field name="note_one" >产品管理</field>
+		    <field name="note_one" >销售收入</field>
+		    <field name="compute_field_one" ref="sell.field_sell_delivery_amount"/>
 		</record>
 
         <record id="sell_order_track_wizard_action_report" model="home.page">
@@ -91,5 +45,24 @@
 			<field name="report_type_id" ref="home_report_type_1"/>
 		    <field name="note_one" >销量前十商品</field>
 		</record>
-        </data>
-    </openerp>
+		<record id="amount_summary_customer_action" model="home.page">
+        	<field name="sequence">1</field>
+            <field name="action" ref="core.customer_action"/>
+            <field name="view_id" ref="core.customer_tree"/>
+            <field name="menu_type">amount_summary</field>
+            <field name="note_one">应收余额</field>
+            <field name="compute_field_one" ref="core.field_partner_payable"/>
+            <field name="domain" >[('c_category_id','!=',False)]</field>
+            <field name="context" >{}</field>
+        </record>
+		<record id="all_business_sell_delivery_action" model="home.page">
+        	<field name="sequence">13</field>
+		    <field name="action" ref="sell.sell_delivery_action"/>
+		    <field name="view_id" ref="sell.sell_delivery_tree"/>
+		    <field name="menu_type">all_business</field>
+		    <field name="domain" >[('is_return','=',False)]</field>
+		    <field name="context" >{'is_return':False, 'warehouse_dest_type': 'customer'}</field>
+		    <field name="note_one" >销售发货单</field>
+		</record>
+	</data>
+</openerp>

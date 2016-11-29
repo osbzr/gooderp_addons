@@ -40,8 +40,14 @@ class test_ReportDocx(TransactionCase):
 #         self.ir_actions_pdf.write({'report_type':'pdf'})
 #         self.report_pdf_sell.create(self.cr, self.uid,self.sell_order.id, self.ir_actions, self.env.context)
 
+    def test_lookup_report_no_r(self):
+        ''' 测试 执行 ir_report '''
+        # 测试 执行 ir_report 的 _lookup_report no r
+        with self.assertRaises(Exception):
+            self.report_pdf_sell_1 = self.ir_actions_pdf._lookup_report('sell.order1')
+
     def test_get_docx_data(self):
-        model = self.report_docx_sell.get_docx_data(self.cr, self.uid, self.ir_actions.id, self.ir_actions, self.env.context)
+        self.report_docx_sell.get_docx_data(self.cr, self.uid, self.ir_actions.id, self.ir_actions, self.env.context)
 
     def test_save_file(self):
         doxc_file = self.report_docx_sell.create(self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
