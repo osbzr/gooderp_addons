@@ -26,6 +26,7 @@
         'views/views.xml',
         'views/templates.xml',
         'data/data.xml',
+        'data/home_page.xml'
     ],
     'demo': [
         'demo/demo.xml',

@@ -5,6 +5,7 @@ odoo.define('core.core', function (require) {
     var form_relational = require('web.form_relational');
     var data = require('web.data');
     var UserMenu = require('web.UserMenu');
+    var Menu = require('web.Menu');
     var session = require('web.session');
     var Model = require('web.Model');
     var FormView = require('web.FormView');
@@ -252,5 +253,31 @@ odoo.define('core.core', function (require) {
                 $tbody.append($row);
             }
         },
-    })
-})
+
+    });
+    Menu.include({
+        events: {
+            mouseenter: "on_open_second_menu",
+            mouseleave: "on_close_second_menu",
+        },
+        on_open_second_menu: function (e) {
+            var $target = $(e.target);
+            $target.parent().addClass('open')
+            var menu_list = $target.parent().find('.oe_secondary_submenu');
+            menu_list.show();
+        },
+        on_close_second_menu: function (e) {
+            var $target = $(e.target);
+            $target.parent().removeClass('open');
+            var menu_list = $target.parent().find('.oe_secondary_submenu');
+            menu_list.hide();
+        },
+        bind_menu: function () {
+            this._super.apply(this, arguments);
+            this.$second_menu = this.$el.parents().find('.dropdown-toggle');
+            this.$second_menu.parent().on('mouseenter.anchor', this.on_open_second_menu.bind(this));
+            this.$second_menu.parent().on('mouseleave.anchor', this.on_close_second_menu.bind(this));
+        }
+
+    });
+});
