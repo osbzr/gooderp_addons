@@ -109,15 +109,31 @@ class money_transfer_order(models.Model):
 
     @api.multi
     def money_transfer_draft(self):
-        '''转账单的反审核按钮'''
+        '''转账单的反审核按钮,外币要考虑是转入还是转出'''
         self.ensure_one()
         for line in self.line_ids:
-            if line.in_bank_id.balance < line.amount:
-                raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
+            if line.currency_amount >0 :
+                if line.in_bank_id.currency_id:
+                    if line.in_bank_id.balance < line.currency_amount:
+                        raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
+                                % (line.in_bank_id.balance, line.currency_amount))
+                    else:
+                        line.in_bank_id.balance -= line.currency_amount
+                        line.out_bank_id.balance += line.amount
+                else:
+                    if line.in_bank_id.balance < line.amount:
+                        raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
                                 % (line.in_bank_id.balance, line.amount))
+                    else:
+                        line.in_bank_id.balance -= line.amount
+                        line.out_bank_id.balance += line.currency_amount
             else:
-                line.in_bank_id.balance -= line.amount
-                line.out_bank_id.balance += line.amount
+                if line.in_bank_id.balance < line.amount:
+                    raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
+                                % (line.in_bank_id.balance, line.amount))
+                else:
+                    line.in_bank_id.balance -= line.amount
+                    line.out_bank_id.balance += line.amount
         self.state = 'draft'
         return True
 
