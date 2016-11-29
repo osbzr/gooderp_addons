@@ -202,6 +202,19 @@
 				</kanban>
 			</field>
 		</record>
+		<record model="ir.ui.view" id="task_calendar">
+            <field name="name">task.calendar</field>
+            <field name="model">task</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar color="user_id" date_start="next_datetime" string="Task Organization">
+                    <field name="project_id"/>
+                    <field name="name"/>
+                    <field name="next_action"/>
+                    <field name="next_datetime"/>
+                </calendar>
+            </field>
+        </record>
 		<record model="ir.ui.view" id="timeline_tree">
 			<field name="name">工作日志</field>
 			<field name="model">timeline</field>
@@ -243,7 +256,7 @@
 		<record model="ir.actions.act_window" id="action_task">
 			<field name="name">任务</field>
 			<field name="res_model">task</field>
-			<field name="view_mode">kanban,tree,form</field>
+			<field name="view_mode">kanban,calendar,tree,form</field>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">点击创建一个任务</p>
 			</field>

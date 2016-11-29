@@ -231,6 +231,14 @@ class test_DepreciationWizard(TransactionCase):
         with self.assertRaises(UserError):
             self.wizard.create_depreciation()
 
+    def test_create_depreciation_surplusValue(self):
+        ''' 测试 surplus_value <= (total + cost_depreciation) '''
+        self.asset.depreciation_number = 1
+        self.asset.depreciation_previous = 950
+        self.asset.depreciation_value = 1000
+        with self.assertRaises(UserError):
+            self.wizard.create_depreciation()
+
     def test_create_depreciation_no_voucher_line(self):
         '''报错：本期所有固定资产都已折旧'''
         wizard = self.env['create.depreciation.wizard'].create(

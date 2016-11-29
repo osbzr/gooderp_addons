@@ -864,6 +864,12 @@
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
+        <record id='small_business_chart5603003' model='finance.account'>
+            <field name='code'>5603003</field>
+            <field name='name'>财务费用-汇兑损益</field>
+            <field name='costs_types'>out</field>
+            <field name='balance_directions'>in</field>
+        </record>
 
         <record id='small_business_chart5711' model='finance.account'>
             <field name='code'>5711</field>
@@ -1289,6 +1295,14 @@
             <field name="currency_id" ref="base.CNY"/>
             <field name="name">2016-01-01</field>
         </record>
+
+		<!-- 汇兑损益： -->
+		<record id="account_exchange" model="core.category">
+			<field name="name">汇兑损益</field>
+			<field name="type">other_pay</field>
+			<field name="account_id" ref="small_business_chart5603003"/>
+            <field name='note'>由系统创建</field>
+		</record>
 
     </data>
 </openerp>
