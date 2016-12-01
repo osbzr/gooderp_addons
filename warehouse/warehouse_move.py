@@ -81,7 +81,7 @@ class wh_move(models.Model):
     total_qty = fields.Integer(u'产品总数', compute=_compute_total_qty, store=True,
                                help=u'该移库单的入/出库明细行包含的产品总数')
     staff_id = fields.Many2one('staff', u'经办人',
-                               default=lambda self: self.env.user.staff_id)
+                               default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0])
 
     def scan_barcode_move_line_operation(self, line, conversion):
         line.goods_qty += 1

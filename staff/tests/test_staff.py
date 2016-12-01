@@ -68,11 +68,3 @@ class test_res_users(TransactionCase):
 
         with self.assertRaises(ValidationError):
             self.env.ref('staff.staff_1').user_id = user.id
-
-        # staff 模块里
-        user = self.env.ref('base.user_demo')
-        admin_user = self.env.ref('base.user_root')
-        user.staff_id = self.env.ref('staff.lili').id
-
-        with self.assertRaises(ValidationError):
-            admin_user.staff_id = self.env.ref('staff.lili').id

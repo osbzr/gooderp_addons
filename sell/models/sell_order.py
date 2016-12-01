@@ -84,7 +84,7 @@ class sell_order(models.Model):
                                  help=u'联系手机')
     staff_id = fields.Many2one('staff', u'销售员',
                             ondelete='restrict', states=READONLY_STATES,
-                            default=lambda self: self.env.user.staff_id,
+                            default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0],
                                  help=u'单据负责人')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
