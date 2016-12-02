@@ -7,5 +7,11 @@
             <field name='view_mode'>tree,form</field>
             <field name='view_id' ref='goods_tree' />
         </record>
+        <record id='attribute_value_value_action' model='ir.actions.act_window'>
+            <field name='name'>属性值</field>
+            <field name='res_model'>attribute.value.value</field>
+            <field name='view_mode'>tree</field>
+            <field name='view_id' ref='attribute_value_value_tree' />
+        </record>
     </data>
 </openerp>

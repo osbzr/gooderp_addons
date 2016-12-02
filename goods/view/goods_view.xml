@@ -94,5 +94,15 @@
 				</form>
 			</field>
 		</record>
+		<record id='attribute_value_value_tree' model='ir.ui.view'>
+			<field name='name'>attribute value value tree</field>
+			<field name='model'>attribute.value.value</field>
+			<field name='arch' type='xml'>
+				<tree string='属性值'>
+					<field name='name'/>
+					<field name='category_id'/>
+				</tree>
+			</field>
+		</record>
 	</data>
 </openerp>
