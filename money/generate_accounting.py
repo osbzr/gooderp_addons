@@ -85,7 +85,7 @@ class money_order(models.Model):
                 if partner.c_category_id:
                     partner_account_id = partner.c_category_id.account_id.id
                 vouch_credit_line = self._create_voucher_line(line,
-                                                              u"%s收款单%s " % (partner.name, name),
+                                                              u"%s%s收款单%s " % (self.date, partner.name, name),
                                                               partner_account_id,
                                                               0,
                                                               line.amount * (line.currency_id.rate or 1),
@@ -132,7 +132,7 @@ class money_order(models.Model):
                 # 生成借方明细行
                 # param: False, name, account_id, debit, credit, voucher_id, partner_id
                 self._create_voucher_line(False,
-                                         u"%s收款单%s 折扣" % (partner.name, name),
+                                         u"%s%s收款单%s 折扣" % (self.date, partner.name, name),
                                          self.discount_account_id.id,
                                          self.discount_amount,
                                          0,
@@ -196,7 +196,7 @@ class money_order(models.Model):
                 # 生成借方明细行 debit
                 # param: source, name, account_id, debit, credit, voucher_id, partner_id
                 self._create_voucher_line(source,
-                                          u"%s付款单%s" % (partner.name, name),
+                                          u"%s%s付款单%s" % (self.date,partner.name, name),
                                           partner_account_id,
                                           source.this_reconcile,
                                           0,
@@ -207,7 +207,7 @@ class money_order(models.Model):
                 # 生成贷方明细行 credit
                 # param: False, name, account_id, debit, credit, voucher_id, partner_id
                 self._create_voucher_line(line,
-                                          u"%s付款单%s 折扣" % (partner.name, name),
+                                          u"%s%s付款单%s 折扣" % (self.date, partner.name, name),
                                           self.discount_account_id.id,
                                           0,
                                           self.discount_amount,
@@ -263,13 +263,13 @@ class money_invoice(models.Model):
             if not partner_account_id:
                 raise UserError(u'请配置%s的会计科目' % (partner_cat.name))
             if invoice.category_id.type == 'income':
-                vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': invoice.partner_id.id, 'name': invoice.name, 'string': u'结算单',
+                vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': invoice.partner_id.id, 'name': invoice.name, 'string': u'%s发票%s结算单' % (invoice.date_due,invoice.bill_number or ''),
                              'amount': invoice.amount, 'credit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
                              'debit_account_id': partner_account_id, 'sell_tax_amount': invoice.tax_amount or 0,
                              'credit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '', 'rate_silent':invoice.currency_id.rate or 0,
                              })
             else:
-                vals.update({'vouch_obj_id': vouch_obj.id, 'name': invoice.name, 'string': u'结算单',
+                vals.update({'vouch_obj_id': vouch_obj.id, 'name': invoice.name, 'string': u'%s发票%s结算单' % (invoice.date_due,invoice.bill_number or ''),
                              'amount': invoice.amount, 'credit_account_id': partner_account_id,
                              'debit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
                              'partner_credit':invoice.partner_id.id, 'buy_tax_amount': invoice.tax_amount or 0,

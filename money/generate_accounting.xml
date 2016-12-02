@@ -18,6 +18,8 @@
             <field name="arch" type="xml">
                 <field name="type" position="after">
 					<field name="account_id" attrs="{'required': [('type', '!=', 'attribute')]}"/>
+                    <field name="account_in_id" attrs="{'required': [('type', '=', 'goods')], 'invisible': [('type', '!=', 'goods')]}"/>
+                    <field name="account_out_id" attrs="{'required': [('type', '=', 'goods')], 'invisible': [('type', '!=', 'goods')]}"/>
 				</field>
             </field>
         </record>
@@ -30,8 +32,6 @@
                 <field name="name" position="after">
 					<field name="account_id"/>
                     <field name="currency_id"
-                    	 groups='finance.group_multi_currency'/>
-                    <field name="currency_amount"
                     	 groups='finance.group_multi_currency'/>
 				</field>
             </field>

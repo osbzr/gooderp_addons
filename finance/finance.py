@@ -467,6 +467,8 @@ class bank_account(models.Model):
 class core_category(models.Model):
     _inherit = 'core.category'
     account_id = fields.Many2one('finance.account', u'科目', help=u'科目')
+    account_in_id = fields.Many2one('finance.account', u'收入科目', help=u'科目')
+    account_out_id = fields.Many2one('finance.account', u'成本科目', help=u'科目')
 
 class chang_voucher_name(models.Model) :
     _name = 'chang.voucher.name'
