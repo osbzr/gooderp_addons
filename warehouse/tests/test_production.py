@@ -266,6 +266,11 @@ class TestProduction(TransactionCase):
         wh_assembly_ass2 = self.browse_ref('warehouse.wh_assembly_ass2')
         wh_assembly_ass2.goods_qty = 2
         wh_assembly_ass2.onchange_goods_qty()
+        
+        # self.line_in_ids
+        wh_assembly_ass0 = self.browse_ref('warehouse.wh_assembly_ass0')
+        wh_assembly_ass0.goods_qty = 2
+        wh_assembly_ass0.onchange_goods_qty()
 
         # has bom_id
         wh_assembly_ass2.type = 'assembly'
@@ -280,6 +285,12 @@ class TestProduction(TransactionCase):
         wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
         wh_disassembly_dis3.goods_qty = 2
         wh_disassembly_dis3.onchange_goods_qty()
+        
+        # self.line_out_ids
+#         wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
+#         wh_disassembly_dis3.bom_id = False
+#         wh_disassembly_dis3.goods_qty = 2
+#         wh_disassembly_dis3.onchange_goods_qty()
 
     def test_assembly_onchange_bom(self):
         ''' 测试  组装单 onchange_bom '''
@@ -330,3 +341,13 @@ class TestProduction(TransactionCase):
 #         wh_disassembly_dis3.bom_id = self.disassembly_bom.id
         wh_disassembly_dis3.onchange_bom()
 #         self.assertTrue(wh_disassembly_dis3.is_many_to_many_combinations)
+
+    def test_cancel_approve_order_has_voucher(self):
+        ''' 测试 拆卸单 反审核 删除发票 '''
+        self.assembly.approve_order()
+        self.disassembly.fee = 10
+#         print "cost", self.disassembly.line_out_ids[0].cost
+#         print "cost in", self.disassembly.line_in_ids[0].cost, self.disassembly.line_in_ids[1].cost
+#         self.disassembly.approve_order()
+# 
+#         self.disassembly.cancel_approved_order()
