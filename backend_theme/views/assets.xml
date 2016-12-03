@@ -14,6 +14,7 @@
 				<link rel="stylesheet" href="/backend_theme/static/src/less/bootswatch/variables.less"/>
 				<link rel="stylesheet" href="/backend_theme/static/src/less/bootswatch/bootswatch.less"/>
 				<link rel="stylesheet" href="/backend_theme/static/src/less/bootswatch/style.less"/>
+				<link rel="stylesheet" href="/backend_theme/static/src/less/form_adaption.less"/>
             <link rel="stylesheet"
                   type="text/css"
                   href="/backend_theme/static/lib/css/drawer.3.2.0.css"
