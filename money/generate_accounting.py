@@ -287,7 +287,9 @@ class money_invoice(models.Model):
                     ('init_obj', '=', 'money_invoice')])
                 for vouch_line_id in vouch_line_ids:
                     vouch_line_id.unlink()
-            else:
+            print 'aaaaaaaaaaaaaaa',invoice.category_id.type
+            if invoice.category_id.type in ('expense','income'):
+                print 'bbbbbbbbbbbbbbb'
                 vouch_line_ids = self.env['voucher.line'].search([
                     ('account_id', '=', invoice.category_id.account_id.id),
                     ('voucher_id', '=', vouch_obj.id)])
