@@ -85,12 +85,14 @@ class bank_statements_report(models.Model):
                         mto.date,
                         mto.name,
                         0 AS get,
-                        mtol.amount AS pay,
+                        (CASE WHEN ba.currency_id IS NULL OR rc.name='CNY' THEN mtol.amount ELSE mtol.currency_amount END) AS pay,
                         0 AS balance,
                         NULL AS partner_id,
                         mto.note
                 FROM money_transfer_order_line AS mtol
                 LEFT JOIN money_transfer_order AS mto ON mtol.transfer_id = mto.id
+                LEFT JOIN bank_account AS ba ON ba.id = mtol.out_bank_id
+                LEFT JOIN res_currency AS rc ON rc.id = ba.currency_id
                 WHERE mto.state = 'done'
                 UNION ALL
                 SELECT  mtol.in_bank_id AS bank_id,

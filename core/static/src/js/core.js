@@ -260,9 +260,13 @@ odoo.define('core.core', function (require) {
             mouseenter: "on_open_second_menu",
             mouseleave: "on_close_second_menu",
         },
+
         on_open_second_menu: function (e) {
             var $target = $(e.target);
-            $target.parent().addClass('open')
+            $target.parent().addClass('open');
+            if($target.attr('aria-expanded')!=undefined && !$target.attr('aria-expanded')){
+                $target.attr('aria-expanded', true);
+            };
             var menu_list = $target.parent().find('.oe_secondary_submenu');
             menu_list.show();
         },
@@ -270,13 +274,17 @@ odoo.define('core.core', function (require) {
             var $target = $(e.target);
             $target.parent().removeClass('open');
             var menu_list = $target.parent().find('.oe_secondary_submenu');
+            var dropdown_a = $target.parent().find('.dropdown-toggle')
+            if(dropdown_a.attr('aria-expanded')!=undefined && $target.attr('aria-expanded')){
+                $target.attr('aria-expanded', false);
+            };
             menu_list.hide();
         },
         bind_menu: function () {
             this._super.apply(this, arguments);
             this.$second_menu = this.$el.parents().find('.dropdown-toggle');
-            this.$second_menu.parent().on('mouseenter.anchor', this.on_open_second_menu.bind(this));
-            this.$second_menu.parent().on('mouseleave.anchor', this.on_close_second_menu.bind(this));
+            this.$second_menu.on('mouseenter', this.on_open_second_menu.bind(this));
+            this.$second_menu.parent().on('mouseleave', this.on_close_second_menu.bind(this));
         }
 
     });
