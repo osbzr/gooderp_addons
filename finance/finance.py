@@ -88,7 +88,7 @@ class voucher(models.Model):
             raise ValidationError(u'请输入凭证行')
         for line in self.line_ids:
             if line.debit + line.credit == 0:
-                raise ValidationError(u'单行凭证行借和贷不能同时为0\n 借方金额为: %s .贷方金额为:%s' % (line.debit, line.credit))
+                raise ValidationError(u'单行凭证行借和贷不能同时为0\n 借方金额为: %s 贷方金额为:%s' % (line.debit, line.credit))
             if line.debit * line.credit != 0:
                 raise ValidationError(u'单行凭证行不能同时输入借和贷\n 摘要为%s的凭证行 借方为:%s 贷方为:%s' %
                                       (line.name, line.debit, line.credit))
@@ -225,7 +225,7 @@ class voucher_line(models.Model):
     def unlink(self):
         for active_voucher_line in self:
             if active_voucher_line.voucher_id.state == 'done':
-                raise UserError(u'不能删除已审核的凭证行\n 所属凭证%s\n凭证行摘要%s'
+                raise UserError(u'不能删除已审核的凭证行\n 所属凭证%s  凭证行摘要%s'
                                 %(active_voucher_line.voucher_id.name,active_voucher_line.name))
         return super(voucher_line, self).unlink()
 

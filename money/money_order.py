@@ -220,7 +220,7 @@ class money_order(models.Model):
             # 更新结算单的未核销金额、已核销金额
             for source in order.source_ids:
                 if abs(source.to_reconcile) < source.this_reconcile:
-                    raise UserError(u'本次核销金额不能大于未核销金额!那你\n 核销金额:%s 未审核金额:%s'
+                    raise UserError(u'本次核销金额不能大于未核销金额!\n 核销金额:%s 未审核金额:%s'
                                     %( abs(source.to_reconcile),source.this_reconcile))
 
                 source.to_reconcile = (source.to_reconcile - 
