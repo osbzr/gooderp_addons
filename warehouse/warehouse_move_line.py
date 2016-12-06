@@ -316,10 +316,14 @@ class wh_move_line(models.Model):
             else:
                 self.goods_qty = self.goods_id.conversion_unit(
                     self.goods_uos_qty or 1)
-
+        else:
+            self.uom_id = False
+            self.uos_id = False
+            self.attribute_id = False
+            self.cost_unit = False
         self.compute_suggested_cost()
         self.compute_lot_compatible()
-
+        
         return {'domain': {'lot_id': self.compute_lot_domain()}}
 
     @api.multi
