@@ -466,9 +466,26 @@ class bank_account(models.Model):
 
 class core_category(models.Model):
     _inherit = 'core.category'
+
+    @api.model
+    def _defaut_account_in_id(self):
+        """
+        返回默认主营业务收入
+        :return:
+        """
+        return self.env.ref('finance.account_income').id
+
+    @api.model
+    def _defaut_account_out_id(self):
+        """
+          返回默认主营业务成本
+          :return:
+        """
+        return self.env.ref('finance.account_cost').id
+
     account_id = fields.Many2one('finance.account', u'科目', help=u'科目')
-    account_in_id = fields.Many2one('finance.account', u'收入科目', help=u'科目')
-    account_out_id = fields.Many2one('finance.account', u'成本科目', help=u'科目')
+    account_in_id = fields.Many2one('finance.account', u'收入科目', help=u'科目', default=_defaut_account_in_id)
+    account_out_id = fields.Many2one('finance.account', u'成本科目', help=u'科目', default=_defaut_account_out_id)
 
 class chang_voucher_name(models.Model) :
     _name = 'chang.voucher.name'
