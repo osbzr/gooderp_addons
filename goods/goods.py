@@ -14,6 +14,7 @@ class goods(models.Model):
     supplier_id = fields.Many2one('partner',u'供应商',domain=[('s_category_id','!=',False)])
     price = fields.Float(u'零售价')
     barcode = fields.Char(u'条形码')
+    note = fields.Text(u'备注')
 
     _sql_constraints = [
         ('barcode_uniq', 'unique(barcode)', u'条形码不能重复'),
