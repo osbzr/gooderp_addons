@@ -306,7 +306,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'date': False,
             'direction': direction_tuple_period[0],
             'balance': fabs(direction_tuple_period[1]),
-            'period_id': period.id,
+            'period_id': False,
             'debit': cumulative_occurrence_debit,
             'credit': cumulative_occurrence_credit,
             'summary': subject_name.code + ' ' + subject_name.name + u":" + u'本年累计'})
@@ -315,10 +315,11 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     @api.multi
     def get_current_occurrence_amount(self, period, subject_name):
         """计算出 本期的科目的 voucher_line的明细记录 """
-        sql = ''' select vo.date as date, vo.id as voucher_id,COALESCE(vol.debit,0) as debit,vol.name as summary,COALESCE(vol.credit,0) as credit
-         from voucher as vo left join voucher_line as vol
-            on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id=%s
-            order by vo.name
+        sql = ''' select vo.date as date, vo.id as voucher_id,COALESCE(vol.debit,0) as debit,vol.name
+                  as summary,COALESCE(vol.credit,0) as credit
+                  from voucher as vo left join voucher_line as vol
+                  on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id=%s
+                  order by vo.name
                  '''
         self.env.cr.execute(sql, (period.id, subject_name.id))
         sql_results = self.env.cr.dictfetchall()
@@ -358,7 +359,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         # 本年累计
         # 查找累计区间,作本年累计
         year_balance_debit = year_balance_credit = 0
-        compute_periods = self.env['finance.period'].search([('year', '=', str(period.year)), ('month', '<=', str(period.month))])
+        compute_periods = self.env['finance.period'].search([('year', '=', str(period.year)),
+                                                             ('month', '<=', str(period.month))])
         for line_period in compute_periods:
             sql = ''' select  sum(COALESCE(vol.debit,0)) as debit,sum(COALESCE(vol.credit,0)) as credit
              from voucher as vo left join voucher_line as vol
@@ -387,7 +389,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             'balance': abs(direction_tuple_current[1]),
             'debit': year_balance_debit,
             'credit': year_balance_credit,
-            'period_id': period.id,
+            'period_id':False,
             'summary': subject_name.code + ' ' + subject_name.name + u":" + u'本年累计'
         })
         return [current_occurrence, initial_balance_new]
@@ -401,7 +403,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 raise UserError(u'%s未结账，无法取到%s期初余额' % (last_period.name, self.period_begin_id.name))
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         vouchers_summary_ids = []
-        subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code), ('code', '<=', self.subject_name_end_id.code)])
+        subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code),
+                                                          ('code', '<=', self.subject_name_end_id.code)])
         for account_line in subject_ids:
             local_last_period = last_period
             local_currcy_period = self.period_begin_id
@@ -418,7 +421,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 if local_currcy_period.is_closed:
                     cumulative_year_occurrence = self.get_year_balance(local_currcy_period, account_line)  # 本期合计 本年累计
                 else:
-                    cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(), local_currcy_period, account_line)
+                    cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(),
+                                                                               local_currcy_period, account_line)
                 create_vals += cumulative_year_occurrence
                 if local_currcy_period.id == self.period_end_id.id:
                     break_flag = False
@@ -457,7 +461,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
             raise UserError(u'%s未结账，无法取到%s期初余额'%(last_period.name,self.period_begin_id.name))
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         vouchers_summary_ids = []
-        subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code), ('code', '<=', self.subject_name_end_id.code)])
+        subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code),
+                                                          ('code', '<=', self.subject_name_end_id.code)])
         for account_line in subject_ids:
             local_last_period = last_period
             local_currcy_period = self.period_begin_id
@@ -469,7 +474,8 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 if local_currcy_period.is_closed:
                     cumulative_year_occurrence = self.get_year_balance(local_currcy_period, account_line)
                 else:
-                    cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(), local_currcy_period, account_line)
+                    cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(),
+                                                                               local_currcy_period, account_line)
                 create_vals += cumulative_year_occurrence
                 if local_currcy_period.id == self.period_end_id.id:
                     break_flag = False
@@ -520,7 +526,8 @@ class VouchersSummary(models.TransientModel):
      ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
     debit = fields.Float(u'借方金额', help=u'借方金额')
     credit = fields.Float(u'贷方金额', help=u'贷方金额')
-    balance = fields.Float(u'余额', help=u'一般显示为正数，计算方式：当方向为借时 余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')
+    balance = fields.Float(u'余额', help=u'一般显示为正数，计算方式：当方向为借时 \
+                                   余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')
 
     @api.multi
     def view_detail_voucher(self):
@@ -558,4 +565,5 @@ class GeneralLedgerAccount(models.TransientModel):
      ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
     debit = fields.Float(u'借方金额', help=u'借方金额')
     credit = fields.Float(u'贷方金额', help=u'贷方金额')
-    balance = fields.Float(u'余额', help=u'一般显示为正数，计算方式：当方向为借时 余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')
+    balance = fields.Float(u'余额', help=u'一般显示为正数，计算方式：当方向为借时\
+                                   余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')
