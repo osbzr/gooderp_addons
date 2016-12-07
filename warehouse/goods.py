@@ -7,25 +7,6 @@ from odoo import models, fields, api
 class goods(models.Model):
     _inherit = 'goods'
 
-    @api.model
-    def _defaut_account_in_id(self):
-        """
-        返回默认主营业务收入
-        :return:
-        """
-        return self.env.ref('finance.account_income').id
-
-    @api.model
-    def _defaut_account_out_id(self):
-        """
-          返回默认主营业务成本
-          :return:
-        """
-        return self.env.ref('finance.account_cost').id
-
-    account_in_id = fields.Many2one('finance.account', u'收入科目', help=u'科目', default=_defaut_account_in_id)
-    account_out_id = fields.Many2one('finance.account', u'成本科目', help=u'科目', default=_defaut_account_out_id)
-
     # 使用SQL来取得指定产品情况下的库存数量
     def get_stock_qty(self):
         for goods in self:
