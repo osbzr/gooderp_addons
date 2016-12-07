@@ -17,6 +17,7 @@
              'security/ir.model.access.csv',
              'security/groups.xml',
              'staff.xml',
+             'leave.xml',
              'mail_data.xml',
         ],
 }

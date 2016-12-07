@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+         <record id="staff_leave_calendar" model="ir.ui.view">
+            <field name="name">staff.leave.graph</field>
+            <field name="model">staff.leave</field>
+            <field name="arch" type="xml">
+                <calendar color="user_id" string="请假日历单" date_start="date_start"   date_stop="date_stop"  >
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="leave_date"/>
+                </calendar>
+            </field>
+        </record>
+
+        <record id="staff_leave_tree" model="ir.ui.view">
+            <field name="name">staff.leave.tree</field>
+            <field name="model">staff.leave</field>
+            <field name="arch" type="xml">
+                <tree string="请假单">
+                    <field name="user_id"/>
+                    <field name="date_start"/>
+                    <field name="date_stop"/>
+                    <field name="name"/>
+                    <field name="leave_type"/>
+                    <field name="leave_date"/>
+                </tree>
+            </field>
+        </record>
+        <record id="staff_leave_form" model="ir.ui.view">
+            <field name="name">staff.leave.form</field>
+            <field name="model">staff.leave</field>
+            <field name="arch" type="xml">
+                <form string="职位">
+                	<group>
+                		<field name='user_id'/>
+                		<field name='name'/>
+                        <field name="leave_type"/>
+                	</group>
+                	<group>
+                		<field name='leave_date'  />
+                		<field name='date_start'  />
+                		<field name='date_stop' />
+                	</group>
+                </form>
+            </field>
+        </record>
+        <record id="staff_leave_action" model="ir.actions.act_window">
+            <field name="name">请假单</field>
+            <field name="res_model">staff.leave</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">calendar,tree,form</field>
+             <field name="view_id" ref="staff_leave_calendar"/>
+        </record>
+        <menuitem action="staff_leave_action" id="staff_leave_menu" sequence="10" parent="staff.menu_staff_main"/>
+
+    </data>
+</openerp>
