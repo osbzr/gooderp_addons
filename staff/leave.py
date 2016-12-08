@@ -25,7 +25,6 @@ class staff_leave(models.Model):
         if self.date_start and self.date_stop:
             date_start_struct = time.strptime(self.date_start, "%Y-%m-%d %H:%M:%S")  # 字符串转换成time类型
             date_stop_struct = time.strptime(self.date_stop, "%Y-%m-%d %H:%M:%S")  # 字符串转换成time类型
-            print date_start_struct[0], date_start_struct[1],  date_start_struct[2]
             date_start = datetime.datetime(date_start_struct[0], date_start_struct[1], date_start_struct[2])
             date_stop = datetime.datetime(date_stop_struct[0], date_stop_struct[1], date_stop_struct[2])
             self.leave_dates = (date_stop - date_start).days or 1
