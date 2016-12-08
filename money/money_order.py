@@ -205,7 +205,8 @@ class money_order(models.Model):
             total = 0
             for line in order.line_ids:
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
-                    if line.bank_id.balance < line.amount:
+                    decimal_amount = self.env.ref('core.decimal_amount')
+                    if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError(u'账户余额不足!\n账户余额:%s 订单金额:%s'%(line.bank_id.balance,line.amount))
                     line.bank_id.balance -= line.amount
                 else:  # 收款账号余额增加, 退款账号余额减少
@@ -219,7 +220,10 @@ class money_order(models.Model):
 
             # 更新结算单的未核销金额、已核销金额
             for source in order.source_ids:
-                if abs(source.to_reconcile) < source.this_reconcile:
+                '''float_compare(value1,value2): return -1, 0 or 1,
+                if 'value1' is lower than, equal to, or greater than 'value2' at the given precision'''
+                decimal_amount = self.env.ref('core.decimal_amount')
+                if float_compare(source.this_reconcile, abs(source.to_reconcile), precision_digits=decimal_amount.digits) == 1:
                     raise UserError(u'本次核销金额不能大于未核销金额!\n 核销金额:%s 未审核金额:%s'
                                     %( abs(source.to_reconcile),source.this_reconcile))
 
@@ -243,7 +247,8 @@ class money_order(models.Model):
                 if order.type == 'pay':  # 付款账号余额减少
                     line.bank_id.balance += line.amount
                 else:  # 收款账号余额增加
-                    if line.bank_id.balance < line.amount:
+                    decimal_amount = self.env.ref('core.decimal_amount')
+                    if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError(u'账户余额不足!\n 账户余额:%s 订单金额:%s' % (line.bank_id.balance, line.amount))
                     line.bank_id.balance -= line.amount
                 total += line.amount
@@ -566,7 +571,8 @@ class reconcile_order(models.Model):
     @api.multi
     def _get_or_pay(self, line, business_type,
                     partner_id, to_partner_id, name):
-        if line.this_reconcile > line.to_reconcile:
+        decimal_amount = self.env.ref('core.decimal_amount')
+        if float_compare(line.this_reconcile, line.to_reconcile, precision_digits=decimal_amount.digits) == 1:
             raise UserError(u'核销金额不能大于未核销金额!\n核销金额:%s 未核销金额:%s'%(line.this_reconcile, line.to_reconcile))
         # 更新每一行的已核销余额、未核销余额
         line.name.to_reconcile -= line.this_reconcile
@@ -610,7 +616,8 @@ class reconcile_order(models.Model):
             # 核销预收预付
             for line in order.advance_payment_ids:
                 order_reconcile += line.this_reconcile
-                if line.this_reconcile > line.to_reconcile:
+                decimal_amount = self.env.ref('core.decimal_amount')
+                if float_compare(line.this_reconcile, line.to_reconcile, precision_digits=decimal_amount.digits) == 1:
                     raise UserError(u'核销金额不能大于未核销金额\n核销金额:%s 未核销金额:%s'%(line.this_reconcile, line.to_reconcile))
 
                 # 更新每一行的已核销余额、未核销余额
@@ -634,7 +641,8 @@ class reconcile_order(models.Model):
             # 核销金额必须相同
             if self.business_type in ['adv_pay_to_get',
                                       'adv_get_to_pay', 'get_to_pay']:
-                if order_reconcile != invoice_reconcile:
+                decimal_amount = self.env.ref('core.decimal_amount')
+                if float_compare(order_reconcile, invoice_reconcile, precision_digits=decimal_amount.digits) == 0:
                     raise UserError(u'核销金额必须相同, %s 不等于 %s'
                                      % (order_reconcile, invoice_reconcile))
 
