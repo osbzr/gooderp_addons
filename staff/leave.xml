@@ -8,7 +8,6 @@
                 <calendar color="user_id" string="请假日历单" date_start="date_start"   date_stop="date_stop"  >
                     <field name="name"/>
                     <field name="user_id"/>
-                    <field name="leave_date"/>
                 </calendar>
             </field>
         </record>
@@ -23,7 +22,7 @@
                     <field name="date_stop"/>
                     <field name="name"/>
                     <field name="leave_type"/>
-                    <field name="leave_date"/>
+                    <field name="leave_dates"/>
                 </tree>
             </field>
         </record>
@@ -38,7 +37,7 @@
                         <field name="leave_type"/>
                 	</group>
                 	<group>
-                		<field name='leave_date'  />
+                		<field name='leave_dates'  />
                 		<field name='date_start'  />
                 		<field name='date_stop' />
                 	</group>
