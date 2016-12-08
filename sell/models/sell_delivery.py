@@ -241,7 +241,7 @@ class sell_delivery(models.Model):
             for line in self.cost_line_ids:
                 if not float_is_zero(line.amount,2):
                     invoice_id = self.env['money.invoice'].create(
-                        self._get_invoice_vals(line.partner_id, line.category_id, self.date, line.amount, 0)
+                        self._get_invoice_vals(line.partner_id, line.category_id, self.date, line.amount + line.tax, line.tax)
                     )
         return invoice_id
 

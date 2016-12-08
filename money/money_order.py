@@ -672,6 +672,11 @@ class cost_line(models.Model):
     _name = 'cost.line'
     _description = u"采购销售费用"
 
+    @api.one
+    @api.depends('amount', 'tax_rate')
+    def _compute_tax(self):
+        self.tax = self.amount * self.tax_rate * 0.01
+
     partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict',
                                  required=True,
                                  help=u'采购/销售费用对应的业务伙伴')
@@ -683,5 +688,12 @@ class cost_line(models.Model):
                           required=True,
                           digits=dp.get_precision('Amount'),
                           help=u'采购/销售费用金额')
+    tax_rate = fields.Float(u'税率(%)',
+                            default=lambda self:self.env.user.company_id.import_tax_rate,
+                            help=u'默认值取公司进项税率')
+    tax = fields.Float(u'税额',
+                       digits=dp.get_precision('Amount'),
+                       compute=_compute_tax,
+                       help=u'采购/销售费用税额')
     note = fields.Char(u'备注',
                        help=u'该采购/销售费用添加的一些标识信息')
