@@ -373,7 +373,7 @@ class money_invoice(models.Model):
 
 class other_money_order(models.Model):
     _inherit = 'other.money.order'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='set null',
                                  help=u'其他收支单审核时生成的对应凭证')
 
     @api.multi
