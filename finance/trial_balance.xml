@@ -16,8 +16,6 @@
                     <field name="current_occurrence_credit" sum="合计" merge="True" child_name='贷方'/>
                     <field name="ending_balance_debit" sum="合计"    base_string='期末余额' merge="False" child_name='借方' colspan='2'/>
                     <field name="ending_balance_credit" sum="合计" merge="True" child_name='贷方'/>
-                    <field name="cumulative_occurrence_debit" sum="合计"    base_string='本年累计' merge="False" child_name='借方' colspan='2'/>
-                    <field name="cumulative_occurrence_credit" sum="合计" merge="True" child_name='贷方'/>
           		</tree>
             </field>
         </record>
