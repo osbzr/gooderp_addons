@@ -296,7 +296,7 @@ class sell_delivery(models.Model):
             # 生成收款单，并审核
             if record.receipt:
                 flag = not record.is_return and 1 or -1
-                amount = flag * record.amount
+                amount = flag * (record.amount + record.partner_cost)
                 this_reconcile = flag * record.receipt
                 money_order = record._make_money_order(invoice_id, amount, this_reconcile)
                 money_order.money_order_done()
