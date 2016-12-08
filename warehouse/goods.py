@@ -123,8 +123,7 @@ class goods(models.Model):
                     break
 
                 matching_qty = min(line.qty_remaining, qty_to_go)
-                matching_uos_qty = line.qty_remaining == qty_to_go and \
-                    uos_qty_to_go or line.uos_qty_remaining
+                matching_uos_qty = matching_qty/goods.conversion
 
                 matching_records.append({'line_in_id': line.id,
                                          'qty': matching_qty, 'uos_qty': matching_uos_qty})
