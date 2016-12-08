@@ -60,6 +60,7 @@
 								</group>
 							</page>
 						</notebook>
+						<field name='note' placeholder="备注……"/>
 					</sheet>
 				</form>
 			</field>
