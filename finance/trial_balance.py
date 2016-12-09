@@ -220,7 +220,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     def onchange_period(self):
         '''结束期间大于起始期间报错'''
 
-        if self.env['finance.period'].period_compare(self.period_end_id, self.period_begin_id) > 0:
+        if self.env['finance.period'].period_compare(self.period_end_id, self.period_begin_id) < 0:
                 self.period_end_id = self.period_begin_id
                 return {'warning': {
                     'title': u'错误',
