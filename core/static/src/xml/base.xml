@@ -53,7 +53,7 @@
 		</t>
 	</t>
 	 <t t-extend="ListView">
-       <t t-jquery="thead " t-operation="replace">
+       <t t-jquery="thead" t-operation="replace">
            <!--&lt;!&ndash;因为一个属性-参数不识别所以不进行修改了，等找到号的解决办法，。&ndash;&gt;-->
            <thead>
                 <tr t-if="options.header">
