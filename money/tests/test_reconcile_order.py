@@ -41,7 +41,7 @@ class test_reconcile_order(TransactionCase):
         reconcile.partner_id = self.env.ref('core.jd').id
         reconcile.onchange_partner_id()
         reconcile.advance_payment_ids.this_reconcile = 300.0
-        reconcile.receivable_source_ids.this_reconcile = 300.0
+        reconcile.receivable_source_ids[0].this_reconcile = 300.0
         reconcile.reconcile_order_done()
 
     def test_adv_get_to_pay(self):
@@ -52,7 +52,7 @@ class test_reconcile_order(TransactionCase):
         reconcile.partner_id = self.env.ref('core.lenovo').id
         reconcile.onchange_partner_id()
         reconcile.advance_payment_ids.this_reconcile = 600.0
-        reconcile.payable_source_ids.this_reconcile = 600.0
+        reconcile.payable_source_ids[0].this_reconcile = 600.0
         reconcile.reconcile_order_done()
 
     def test_get_to_pay(self):
@@ -64,7 +64,7 @@ class test_reconcile_order(TransactionCase):
         reconcile = self.env.ref('money.reconcile_get_to_pay')
         reconcile.partner_id = self.env.ref('core.lenovo').id
         reconcile.onchange_partner_id()
-        reconcile.payable_source_ids.this_reconcile = 300.0
+        reconcile.payable_source_ids[0].this_reconcile = 300.0
         reconcile.reconcile_order_done()
 
     def test_get_to_get(self):
@@ -83,7 +83,7 @@ class test_reconcile_order(TransactionCase):
         reconcile = self.env.ref('money.reconcile_pay_to_pay')
         reconcile.partner_id = self.env.ref('core.lenovo').id
         reconcile.onchange_partner_id()
-        reconcile.payable_source_ids.this_reconcile = 600.0
+        reconcile.payable_source_ids[0].this_reconcile = 600.0
         reconcile.reconcile_order_done()
 
     def test_reconcile_order(self):
