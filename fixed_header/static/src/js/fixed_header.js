@@ -5,7 +5,7 @@ odoo.define('gooderp.fixed_header', function(require) {
         load_list: function () {
             var self = this;
             this._super.apply(this, arguments);
-            var one2many_length = self.$el.parents('.o_form_field_one2many').length;
+            var one2many_length = self.$el.parents('.o_form_field').length;
             if (one2many_length == 0) {
                 self.$el.find('table.o_list_view').each(function () {
                     $(this).floatThead({
