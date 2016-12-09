@@ -58,14 +58,14 @@ class voucher(models.Model):
         default=lambda self: self.env.ref('finance.document_word_1'), help=u'“收款凭证”，凭证字就是“收”\n“付款凭证”，凭证字就是“付”\
         “转帐凭证”，凭证字就是“转”\n“记款凭证”，凭证字就是“记” (可以不用以上三种凭证字，就用记字也可以)')
     date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date,
-                       track_visibility='always', help=u'本张凭证创建的时间！')
+                       track_visibility='always', help=u'本张凭证创建的时间！', copy=False)
     name = fields.Char(u'凭证号', track_visibility='always', copy=False)
     att_count = fields.Integer(u'附单据', default=1, help='原始凭证的张数！')
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True, help=u'本张凭证发生日期对应的，会计期间！')
-    line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细')
+    line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细', copy=True)
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
                                track_visibility='always',help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
