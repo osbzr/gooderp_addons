@@ -28,6 +28,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
     @api.model
     def _default_period_id(self):
         return self._default_period_id_impl()
+
     @api.model
     def _default_period_id_impl(self):
         """
@@ -220,7 +221,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     def onchange_period(self):
         '''结束期间大于起始期间报错'''
 
-        if self.env['finance.period'].period_compare(self.period_end_id, self.period_begin_id) > 0:
+        if self.env['finance.period'].period_compare(self.period_end_id, self.period_begin_id) < 0:
                 self.period_end_id = self.period_begin_id
                 return {'warning': {
                     'title': u'错误',
@@ -506,16 +507,8 @@ class VouchersSummary(models.TransientModel):
     """明细帐"""
     _name = 'vouchers.summary'
 
-    @api.model
-    def _default_period_id(self):
-        """
-        默认是当前会计期间
-        :return: 当前会计期间的对象
-        """
-        return self.env['finance.period'].get_date_now_period_id()
-
     date = fields.Date(u'日期', help=u'日期')
-    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id, help=u'会计期间')
+    period_id = fields.Many2one('finance.period', string=u'会计期间', help=u'会计期间')
     voucher_id = fields.Many2one('voucher', u'凭证字号', help=u'凭证字号')
     summary = fields.Char(u'摘要', help=u'从凭证中获取到对应的摘要')
     direction = fields.Char(u'方向', help=u'会计术语,主要方向借、贷、平, 当借方金额大于贷方金额 方向为借\n\
@@ -547,15 +540,7 @@ class GeneralLedgerAccount(models.TransientModel):
     """总账"""
     _name = 'general.ledger.account'
 
-    @api.model
-    def _default_period_id(self):
-        """
-        默认是当前会计期间
-        :return: 当前会计期间的对象
-        """
-        return self.env['finance.period'].get_date_now_period_id()
-
-    period_id = fields.Many2one('finance.period', string=u'会计期间', default=_default_period_id, help=u'记录本条记录的期间!')
+    period_id = fields.Many2one('finance.period', string=u'会计期间',  help=u'记录本条记录的期间!')
     summary = fields.Char(u'摘要', help=u'')
     direction = fields.Char(u'方向', help=u'会计术语,主要方向借、贷、平, 当借方金额大于贷方金额 方向为借\n\
      ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
