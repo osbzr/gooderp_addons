@@ -43,6 +43,7 @@ class create_balance_sheet_wizard(models.TransientModel):
 
     @api.model
     def _default_period_id(self):
+
         return self._default_period_id_impl()
 
     def _default_period_id_impl(self):
