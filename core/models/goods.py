@@ -52,5 +52,8 @@ class goods(models.Model):
                         digits=dp.get_precision('Amount'))
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', '产品不能重名')
+        ('name_uniq', 'unique(name)', '产品不能重名'),
+        ('conversion_no_zero', 'check(conversion != 0)', '产品的转化率不能为0')
     ]
+
+
