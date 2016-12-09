@@ -642,7 +642,7 @@ class reconcile_order(models.Model):
             if self.business_type in ['adv_pay_to_get',
                                       'adv_get_to_pay', 'get_to_pay']:
                 decimal_amount = self.env.ref('core.decimal_amount')
-                if float_compare(order_reconcile, invoice_reconcile, precision_digits=decimal_amount.digits) == 0:
+                if float_compare(order_reconcile, invoice_reconcile, precision_digits=decimal_amount.digits) != 0:
                     raise UserError(u'核销金额必须相同, %s 不等于 %s'
                                      % (order_reconcile, invoice_reconcile))
 
