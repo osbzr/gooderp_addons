@@ -26,12 +26,10 @@
             
     """,
     'category': 'osbzr',
-    'author': "开阖静静<gilbert@osbzr.com>(开阖出品)",
+    'author': "开阖静静<gilbert@osbzr.com>(开阖出品), MAXodoo<9842766@qq.com>",
     "depends": ['web'],
     'description':
-    '''
-        此模块仅限在电脑上使用,(但是仍有局限性,仅限与常规操作,如果页面变化太快会导致表头定位不准)
-        另外在手机端或者页面很小的情况下 会导致 表头挡道其他的 dom
+    '''对于分组Grouping显示模式，展开关闭分组行时，重新锁定表头的代码还需要完善。
     ''',
     'data': [
         'fixed_header.xml',
