@@ -111,7 +111,7 @@ class checkout_wizard(models.TransientModel):
                 if self.period_id.month == '12':
                     year_profit_ids = voucher_line_obj.search([
                         ('account_id', '=', year_profit_account.id),
-                        ('voucher_id.period_id', '=', self.period_id.id)])
+                        ('voucher_id.period_id.year', '=', self.period_id.year)])
                     year_total = 0
                     for year_profit_id in year_profit_ids:
                         year_total += (year_profit_id.credit - year_profit_id.debit)
