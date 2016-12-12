@@ -36,9 +36,7 @@
 							</group>
 							<group>
 	            				<div>
-	            					<field name='image' widget='image'
-	            						class="oe_right oe_avatar"
-	            						options='{"preview_image": "image", "size": [500, 500]}'/>
+	            					<field name='image' widget='image' />
 	            				</div>
 							</group>
                 		</group>
