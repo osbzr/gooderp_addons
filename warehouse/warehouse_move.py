@@ -166,6 +166,7 @@ class wh_move(models.Model):
         # 盘点单的扫码
         if model_name == 'wh.inventory':
             move = self.env[model_name].browse(order_id)
+            val['type'] = 'in'
             create_line = self.scan_barcode_inventory_operation(move, att, conversion, goods, val)
 
         return move, create_line, val
