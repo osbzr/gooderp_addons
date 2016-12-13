@@ -21,11 +21,21 @@ class wh_inventory(models.Model):
         ('done', u'完成'),
     ]
 
+    @api.model
+    def _get_default_warehouse_impl(self):
+        if self.env.context.get('warehouse_type', 'stock'):
+            return self.env['warehouse'].get_warehouse_by_type(
+                    self.env.context.get('warehouse_type', 'stock'))
+    @api.model
+    def _get_default_warehouse(self):
+        '''获取盘点仓库'''
+        return self._get_default_warehouse_impl()
+
     date = fields.Date(u'日期', default=fields.Date.context_today,
                        help=u'盘点单创建日期，默认为当前天')
     name = fields.Char(u'名称', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')
-    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True,
+    warehouse_id = fields.Many2one('warehouse', u'仓库', required=True, default=_get_default_warehouse,
                                    help=u'盘点单盘点的仓库')
     goods = fields.Char(u'产品',
                         help=u'盘点单盘点的产品')

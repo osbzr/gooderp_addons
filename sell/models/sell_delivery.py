@@ -241,7 +241,7 @@ class sell_delivery(models.Model):
             for line in self.cost_line_ids:
                 if not float_is_zero(line.amount,2):
                     invoice_id = self.env['money.invoice'].create(
-                        self._get_invoice_vals(line.partner_id, line.category_id, self.date, line.amount, 0)
+                        self._get_invoice_vals(line.partner_id, line.category_id, self.date, line.amount + line.tax, line.tax)
                     )
         return invoice_id
 
@@ -296,7 +296,7 @@ class sell_delivery(models.Model):
             # 生成收款单，并审核
             if record.receipt:
                 flag = not record.is_return and 1 or -1
-                amount = flag * record.amount
+                amount = flag * (record.amount + record.partner_cost)
                 this_reconcile = flag * record.receipt
                 money_order = record._make_money_order(invoice_id, amount, this_reconcile)
                 money_order.money_order_done()

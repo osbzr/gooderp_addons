@@ -1,13 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <template>
-	<t t-extend="ListView">
-		<t t-jquery="thead > tr:first > t:first" t-operation="after">
-			<th t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
-		</t>
-		<t t-jquery="tfoot > tr:first > td:first" t-operation="before">
-			<td t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
-		</t>
-	</t>
 	<tr t-name="ListView.row"
 	t-att-data-id="record.get('id')"
 	t-attf-style="#{(view.fonts || view.colors) ? view.style_for(record) : ''}"
@@ -60,4 +52,46 @@
 		<t t-jquery="li > a[data-menu='account']" t-operation="replace">
 		</t>
 	</t>
+	 <t t-extend="ListView">
+       <t t-jquery="thead" t-operation="replace">
+           <!--&lt;!&ndash;因为一个属性-参数不识别所以不进行修改了，等找到号的解决办法，。&ndash;&gt;-->
+           <thead>
+                <tr t-if="options.header">
+                    <t t-foreach="columns" t-as="column" >
+                        <th t-if="column.meta" rowspan="2" colspan="1">
+                            <t t-esc="column.string"/>
+                        </th>
+                    </t>
+					<th t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
+                    <th t-if="options.selectable" class="o_list_record_selector" rowspan="2" colspan="1">
+                        <div class="o_checkbox" >
+                            <input type="checkbox"/><span/>
+                        </div>
+                    </th>
+                    <t t-foreach="columns" t-as="column">
+                        <th t-if="!column.meta and column.invisible !== '1' and column.merge!=='False' and column.merge!=='True'" t-att-data-id="column.id"  rowspan="2" colspan="1"
+                            t-attf-class="#{((options.sortable and column.sortable and column.tag !== 'button') ? 'o_column_sortable' : '')}"
+                            ><div>
+                            <t t-if="column.tag !== 'button'"  ><t t-raw="column.heading()"/></t>
+                        </div></th>
+                         <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' " t-att-data-id="column.id"   rowspan="1" colspan="2" style='text-align:center;'><div>
+                            <t t-if="column.tag !== 'button'"  ><t t-esc="column.base_string"/></t>
+                        </div></th>
+                    </t>
+					<th t-if="options.deletable" class="o_list_record_delete" rowspan="2" colspan="1"/>
+                </tr>
+                <tr>
+                    <t t-foreach="columns" t-as="column">
+                         <th   t-if="!column.meta and column.invisible !== '1' and ( column.merge=='False' or column.merge=='True')" rowspan="1" colspan="1"
+                            t-attf-class="oe_list_header_#{column.widget or column.type} #{((options.sortable and column.tag !== 'button') ? 'oe_sortable' : null)}" align='center' ><div>
+                           <t t-esc="column.child_name"/>
+                        </div></th>
+                     </t>
+                </tr>
+           </thead>
+        </t>
+		<t t-jquery="tfoot > tr:first > td:first" t-operation="before">
+			<td t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
+		</t>
+    </t>
  </template>

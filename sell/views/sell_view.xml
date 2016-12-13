@@ -258,6 +258,8 @@
 			                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
 				                		<field name="category_id"/>
 				                		<field name="amount"/>
+				                		<field name='tax_rate' groups="sell.out_tax_groups"/>
+				                		<field name="tax" groups="sell.out_tax_groups"/>
 				                		<field name="note"/>
 				                	</tree>
 			                	</field>
@@ -430,6 +432,8 @@
 			                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
 				                		<field name="category_id" domain="[('type', '=', 'income')]"/>
 				                		<field name="amount"/>
+                                        <field name="tax_rate" groups="sell.out_tax_groups"/>
+                                        <field name="tax" groups="sell.out_tax_groups"/>
 				                		<field name="note"/>
 				                	</tree>
 			                	</field>

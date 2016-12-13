@@ -45,7 +45,7 @@ def execute(connector, method, *args):
             raise e
     return res
 
-addons_path = (os.environ.get('HOME') or os.environ.get('HOMEPATH')) + '/DBbackups'
+addons_path = '%s/DBbackups' % (os.environ.get('HOME','') or os.environ.get('HOMEPATH',''))
 
 class db_backup(models.Model):
     _name = 'db.backup'

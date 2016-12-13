@@ -21,6 +21,7 @@
 from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
+from odoo.tools import float_compare
 
 
 class money_transfer_order(models.Model):
@@ -95,7 +96,8 @@ class money_transfer_order(models.Model):
                 else:
                     line.in_bank_id.balance += line.currency_amount
             else:
-                if line.out_bank_id.balance < line.currency_amount:
+                decimal_amount = self.env.ref('core.decimal_amount')
+                if float_compare(line.out_bank_id.balance, line.currency_amount, precision_digits=decimal_amount.digits) == -1:
                     raise UserError('转出账户余额不足!\n转出账户余额:%s 本次转出余额:%s'
                                     % (line.out_bank_id.balance, line.currency_amount))
                 if in_currency_id == company_currency_id:
@@ -111,24 +113,25 @@ class money_transfer_order(models.Model):
     def money_transfer_draft(self):
         '''转账单的反审核按钮,外币要考虑是转入还是转出'''
         self.ensure_one()
+        decimal_amount = self.env.ref('core.decimal_amount')
         for line in self.line_ids:
             if line.currency_amount >0 :
                 if line.in_bank_id.currency_id:
-                    if line.in_bank_id.balance < line.currency_amount:
+                    if float_compare(line.in_bank_id.balance, line.currency_amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
                                 % (line.in_bank_id.balance, line.currency_amount))
                     else:
                         line.in_bank_id.balance -= line.currency_amount
                         line.out_bank_id.balance += line.amount
                 else:
-                    if line.in_bank_id.balance < line.amount:
+                    if float_compare(line.in_bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
                                 % (line.in_bank_id.balance, line.amount))
                     else:
                         line.in_bank_id.balance -= line.amount
                         line.out_bank_id.balance += line.currency_amount
             else:
-                if line.in_bank_id.balance < line.amount:
+                if float_compare(line.in_bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                     raise UserError('转入账户余额不足!\n转入账户余额:%s 本次转出余额:%s'
                                 % (line.in_bank_id.balance, line.amount))
                 else:
