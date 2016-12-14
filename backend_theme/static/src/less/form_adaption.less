@@ -4,18 +4,6 @@
 @sheet-padding: 16px;
 
 .o_form_view {
-    /*form 中 在编辑状态隐藏 某个部分*/
-    &.o_form_editable {
-        .oe_form_edit_invisivle {
-            display: none;
-        }
-    }
-    /*form 中 在编辑状态显示 某个部分*/
-    &.o_form_readonly {
-        .oe_form_edit_invisivle {
-            display: block;
-        }
-    }
     /*form 中的sheet 的最小的宽度进行调整 降低为手机的屏幕大小就可以了*/
     &.o_form_nosheet {
         min-width:250px;
@@ -30,17 +18,6 @@
         padding: @sheet-padding 0;
         .o_form_sheet {
             min-width: @sheet-min-width;
-            max-width: @sheet-max-width;
-            min-height: 330px;
-            background: white;
-            padding: 16px;
-            margin: 0 auto;
-            .ui-tabs {
-                margin: 0 -16px;
-            }
-            .oe_notebook_page {
-                padding: 0 16px;
-            }
         }
     }
     /*form  中设置field的最小的宽度 保证屏幕在缩小的时候不会导致看不清楚想要的结果*/
@@ -66,7 +43,6 @@
   min-width:300px;
   margin: 10px;
 }
-
 
 
 

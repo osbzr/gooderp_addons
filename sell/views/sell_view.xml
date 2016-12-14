@@ -494,13 +494,13 @@
             </field>
         </record>
 
-		<!-- 销售调整单视图 -->
+		<!-- 销售变更单视图 -->
 
     	<record id="sell_adjust_tree" model="ir.ui.view">
             <field name="name">sell.adjust.tree</field>
             <field name="model">sell.adjust</field>
             <field name="arch" type="xml">
-                <tree string="销售调整单">
+                <tree string="销售变更单">
                     <field name="date"/>
                     <field name="name"/>
                     <field name="order_id"/>
@@ -515,7 +515,7 @@
             <field name="name">sell.adjust.form</field>
             <field name="model">sell.adjust</field>
             <field name="arch" type="xml">
-                <form string="销售调整单">
+                <form string="销售变更单">
                 <header>
                 	<button name="sell_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
@@ -532,7 +532,7 @@
                         </group>
                     </group>
                     <field name="line_ids">
-                    	<tree string="销售调整单行" editable="bottom">
+                    	<tree string="销售变更单行" editable="bottom">
                             <field name='goods_id' required='1'/>
                             <field name='attribute_id'
                             	groups='goods.multi_attrs_groups'
@@ -575,7 +575,7 @@
             <field name="name">sell.adjust.search</field>
             <field name="model">sell.adjust</field>
             <field name="arch" type="xml">
-                <search string="销售调整单">
+                <search string="销售变更单">
                     <field name="name"/>
                     <field name="order_id"/>
                     <field name="state"/>
@@ -649,13 +649,13 @@
         </record>
 
 		<record id="sell_adjust_action" model="ir.actions.act_window">
-            <field name="name">销售调整单</field>
+            <field name="name">销售变更单</field>
             <field name="res_model">sell.adjust</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="sell_adjust_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                点击创建销售调整单
+                点击创建销售变更单
               </p>
             </field>
         </record>
@@ -670,7 +670,7 @@
 			parent='sell_order_menu_root' sequence='2'/>
 		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"
             parent="sell_order_menu_root" sequence="3"/>
-        <menuitem id="sell_adjust_menu" name='销售调整单' action="sell_adjust_action"
+        <menuitem id="sell_adjust_menu" name='销售变更单' action="sell_adjust_action"
             parent="sell_order_menu_root" sequence="4"
             groups='sell.sell_groups'/>
 

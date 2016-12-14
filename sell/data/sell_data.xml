@@ -22,7 +22,7 @@
             <field name="prefix">OUT/RETURN/</field>
             <field name="padding">5</field>
         </record>
-        <!-- 销售调整单序列号 -->
+        <!-- 销售变更单序列号 -->
         <record id="seq_sell_adjust" model="ir.sequence">
             <field name="name">Sell Adjust</field>
             <field name="code">sell.adjust</field>

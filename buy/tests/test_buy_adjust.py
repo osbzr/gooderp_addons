@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 class test_buy_adjust(TransactionCase):
 
     def setUp(self):
-        '''采购调整单准备基本数据'''
+        '''采购变更单准备基本数据'''
         super(test_buy_adjust, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
         self.order.buy_order_done()
@@ -16,7 +16,7 @@ class test_buy_adjust(TransactionCase):
         self.cable = self.env.ref('goods.cable')
 
     def test_unlink(self):
-        '''测试删除已审核的采购调整单'''
+        '''测试删除已审核的采购变更单'''
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
@@ -28,12 +28,12 @@ class test_buy_adjust(TransactionCase):
         adjust.buy_adjust_done()
         with self.assertRaises(UserError):
             adjust.unlink()
-        # 删除草稿状态的采购调整单
+        # 删除草稿状态的采购变更单
         new = adjust.copy()
         new.unlink()
 
     def test_buy_adjust_done(self):
-        '''审核采购调整单:正常情况'''
+        '''审核采购变更单:正常情况'''
         # 正常情况下审核，新增产品鼠标（每批次为1的）、网线（无批次的）
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
@@ -55,7 +55,7 @@ class test_buy_adjust(TransactionCase):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_no_line(self):
-        '''审核采购调整单:没输入明细行，审核时报错'''
+        '''审核采购变更单:没输入明细行，审核时报错'''
         adjust_no_line = self.env['buy.adjust'].create({
             'order_id': self.order.id,
         })
@@ -63,7 +63,7 @@ class test_buy_adjust(TransactionCase):
             adjust_no_line.buy_adjust_done()
 
     def test_buy_adjust_done_price_negative(self):
-        '''审核采购调整单:产品价格为负，审核时报错'''
+        '''审核采购变更单:产品价格为负，审核时报错'''
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
@@ -76,7 +76,7 @@ class test_buy_adjust(TransactionCase):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_quantity_lt(self):
-        '''审核采购调整单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
+        '''审核采购变更单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
@@ -94,7 +94,7 @@ class test_buy_adjust(TransactionCase):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_quantity_equal(self):
-        '''审核采购调整单:调整后数量6 == 原订单已入库数量 6，审核后将产生的入库单分单删除'''
+        '''审核采购变更单:调整后数量6 == 原订单已入库数量 6，审核后将产生的入库单分单删除'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
@@ -115,7 +115,7 @@ class test_buy_adjust(TransactionCase):
         self.assertTrue(not new_receipt)
 
     def test_buy_adjust_done_all_in(self):
-        '''审核采购调整单：购货订单生成的采购入库单已全部入库，审核时报错'''
+        '''审核采购变更单：购货订单生成的采购入库单已全部入库，审核时报错'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.buy_order_done()
@@ -134,7 +134,7 @@ class test_buy_adjust(TransactionCase):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_more_same_line(self):
-        '''审核采购调整单：查找到购货订单中多行同一产品，不能调整'''
+        '''审核采购变更单：查找到购货订单中多行同一产品，不能调整'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
@@ -161,7 +161,7 @@ class test_buy_adjust(TransactionCase):
 
 
     def test_buy_adjust_done_goods_done(self):
-        '''审核采购调整单:原始单据中一行产品已全部入库，另一行没有'''
+        '''审核采购变更单:原始单据中一行产品已全部入库，另一行没有'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,

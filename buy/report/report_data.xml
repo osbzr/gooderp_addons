@@ -55,9 +55,9 @@
                 </button>
             </field>
         </record>
-        <!-- 采购调整单打印 -->
+        <!-- 采购变更单打印 -->
         <record id='report_buy_adjust' model='ir.actions.report.xml'>
-            <field name='name'>采购调整单</field>
+            <field name='name'>采购变更单</field>
             <field name='model'>buy.adjust</field>
             <field name='report_type'>docx</field>
             <field name='report_name'>buy.adjust</field>
