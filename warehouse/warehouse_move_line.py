@@ -309,6 +309,24 @@ class wh_move_line(models.Model):
             self.uos_id = self.goods_id.uos_id
             self.attribute_id = False
             self.cost_unit = self.tax_rate+100 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0
+
+            partner_id = self.env.context.get('default_partner')
+            partner = self.env['partner'].browse(partner_id)
+            if self.goods_id.tax_rate and partner.tax_rate:
+                if self.goods_id.tax_rate >= partner.tax_rate:
+                    self.tax_rate = partner.tax_rate
+                else:
+                    self.tax_rate = self.goods_id.tax_rate
+            elif self.goods_id.tax_rate and not partner.tax_rate:
+                self.tax_rate = self.goods_id.tax_rate
+            elif not self.goods_id.tax_rate and partner.tax_rate:
+                self.tax_rate = partner.tax_rate
+            else:
+                if self.type == 'in':
+                    self.tax_rate = self.env.user.company_id.import_tax_rate
+                if self.type == 'out':
+                    self.tax_rate = self.env.user.company_id.output_tax_rate
+
             if self.goods_id.using_batch and self.goods_id.force_batch_one:
                 self.goods_qty = 1
                 self.goods_uos_qty = self.goods_id.anti_conversion_unit(
