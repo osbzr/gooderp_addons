@@ -196,6 +196,28 @@ class test_buy_order(TransactionCase):
         receipt.buy_receipt_done()
         return_receipt.buy_generate_receipt()
 
+    def test_onchange_partner_id(self):
+        # partner 无 税率，购货单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 0
+        self.env.ref('goods.keyboard').tax_rate = 0
+        self.order.onchange_partner_id()
+        # partner 有 税率，购货单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 10
+        self.env.ref('goods.keyboard').tax_rate = 0
+        self.order.onchange_partner_id()
+        # partner 无税率，购货单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 0
+        self.env.ref('goods.keyboard').tax_rate = 10
+        self.order.onchange_partner_id()
+        # partner 税率 > 购货单行产品税率
+        self.env.ref('core.lenovo').tax_rate = 11
+        self.env.ref('goods.keyboard').tax_rate = 10
+        self.order.onchange_partner_id()
+        # partner 税率 =< 购货单行产品税率
+        self.env.ref('core.lenovo').tax_rate = 11
+        self.env.ref('goods.keyboard').tax_rate = 12
+        self.order.onchange_partner_id()
+
 
 class test_buy_order_line(TransactionCase):
 
@@ -241,6 +263,30 @@ class test_buy_order_line(TransactionCase):
             self.cable.cost = 0.0
             with self.assertRaises(UserError):
                 line.onchange_goods_id()
+
+    def test_onchange_goods_id_tax_rate(self):
+        ''' 测试 修改产品时，购货单行税率变化 '''
+        self.order_line = self.env.ref('buy.buy_order_line_1')
+        # partner 无 税率，购货单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 0
+        self.env.ref('goods.keyboard').tax_rate = 0
+        self.order_line.onchange_goods_id()
+        # partner 有 税率，购货单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 10
+        self.env.ref('goods.keyboard').tax_rate = 0
+        self.order_line.onchange_goods_id()
+        # partner 无税率，购货单行产品有税率
+        self.env.ref('core.lenovo').tax_rate = 0
+        self.env.ref('goods.keyboard').tax_rate = 10
+        self.order_line.onchange_goods_id()
+        # partner 税率 > 购货单行产品税率
+        self.env.ref('core.lenovo').tax_rate = 11
+        self.env.ref('goods.keyboard').tax_rate = 10
+        self.order_line.onchange_goods_id()
+        # partner 税率 =< 购货单行产品税率
+        self.env.ref('core.lenovo').tax_rate = 9
+        self.env.ref('goods.keyboard').tax_rate = 10
+        self.order_line.onchange_goods_id()
 
     def test_onchange_goods_id_vendor(self):
         '''当订单行的产品变化时，带出产品上供应商价'''
