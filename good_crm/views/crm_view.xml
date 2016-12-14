@@ -59,7 +59,7 @@
 										<t t-esc="record.user_id.value"/>
 									</p>
                                 </div>
-                                <div class="oe_kanban_details ">
+                                <div class="oe_kanban_details">
 									<p>
 										<t t-esc="record.name.value"/>
 									</p>
@@ -96,7 +96,7 @@
                             domain="[('user_id','=', False)]" help="未指派的商机"/>
                     <separator/>
                     <group expand="0" string="分组" colspan="4">
-                        <filter name="user_id" string="指派给" context="{'group_by':'user_id'}"/>
+                        <filter name="group_user_id" string="指派给" context="{'group_by':'user_id'}"/>
                         <filter name="group_status" string="阶段" context="{'group_by':'status'}"/>
                         <separator orientation="vertical" />
                         <filter string="创建月份" context="{'group_by':'create_date:month'}" name="month"/>
