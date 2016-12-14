@@ -159,6 +159,7 @@
 								<field name='just_done'/>
 							</tree>
 						</field>
+						<field name="note" placeholder='描述......'/>
 					</sheet>
 					<div class="oe_chatter">
 						<field name="message_follower_ids" widget="mail_followers"/>
