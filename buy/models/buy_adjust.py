@@ -29,7 +29,7 @@ class buy_adjust(models.Model):
                              help=u'要调整的原始购货订单')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       select=True, copy=False,
+                       index=True, copy=False,
                        help=u'变更单创建日期，默认是当前日期')
     line_ids = fields.One2many('buy.adjust.line', 'order_id', u'变更单行',
                                states=READONLY_STATES, copy=True,
@@ -38,7 +38,7 @@ class buy_adjust(models.Model):
                             copy=False, ondelete='restrict',
                             help=u'审核变更单的人')
     state = fields.Selection(BUY_ORDER_STATES, u'审核状态',
-                             select=True, copy=False,
+                             index=True, copy=False,
                              default='draft',
                              help=u'变更单审核状态')
     note = fields.Text(u'备注',
@@ -154,7 +154,7 @@ class buy_adjust_line(models.Model):
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
         self.amount = self.subtotal - self.tax_amount # 金额
 
-    order_id = fields.Many2one('buy.adjust', u'订单编号', select=True,
+    order_id = fields.Many2one('buy.adjust', u'订单编号', index=True,
                                required=True, ondelete='cascade',
                                help=u'关联的变更单编号')
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',

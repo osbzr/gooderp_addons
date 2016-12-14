@@ -93,12 +93,12 @@ class buy_order(models.Model):
                                  help=u'供应商')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       select=True, copy=False, help=u"默认是订单创建日期")
+                       index=True, copy=False, help=u"默认是订单创建日期")
     planned_date = fields.Date(
                         u'要求交货日期', states=READONLY_STATES,
                         default=lambda self: fields.Date.context_today(self),
-                        select=True, copy=False, help=u"订单的要求交货日期")
-    name = fields.Char(u'单据编号', select=True, copy=False,
+                        index=True, copy=False, help=u"订单的要求交货日期")
+    name = fields.Char(u'单据编号', index=True, copy=False,
                        help=u"购货订单的唯一编号，当创建时它会自动生成下一个编号。")
     type = fields.Selection([('buy', u'购货'), ('return', u'退货')], u'类型',
                             default='buy', states=READONLY_STATES,
@@ -134,11 +134,11 @@ class buy_order(models.Model):
                                   copy=False, ondelete='restrict',
                                   help=u'审核单据的人')
     state = fields.Selection(BUY_ORDER_STATES, u'审核状态', readonly=True,
-                             help=u"购货订单的审核状态", select=True, copy=False,
+                             help=u"购货订单的审核状态", index=True, copy=False,
                              default='draft')
     goods_state = fields.Char(u'收货状态', compute=_get_buy_goods_state,
                               default=u'未入库', store=True,
-                              help=u"购货订单的收货状态", select=True, copy=False)
+                              help=u"购货订单的收货状态", index=True, copy=False)
     cancelled = fields.Boolean(u'已终止',
                                help=u'该单据是否已终止')
     pay_ids=fields.One2many("payment.plan","buy_id",string=u"付款计划",
@@ -355,7 +355,7 @@ class buy_order_line(models.Model):
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
         self.amount = self.subtotal - self.tax_amount # 金额
 
-    order_id = fields.Many2one('buy.order', u'订单编号', select=True,
+    order_id = fields.Many2one('buy.order', u'订单编号', index=True,
                                required=True, ondelete='cascade',
                                help=u'关联订单的编号')
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
