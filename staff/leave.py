@@ -13,7 +13,7 @@ class staff_leave(models.Model):
     name = fields.Text(string=u'请假缘由')
     user_id = fields.Many2one('res.users', string=u'请假人', default=_set_staff_id)
     date_start = fields.Datetime(string=u'离开时间')
-    date_stop = fields.Datetime(string=u'离开时间')
+    date_stop = fields.Datetime(string=u'回来时间')
     leave_type = fields.Selection([('no_pay', u'无薪'),('with_pay', u'带薪'),
                                    ('compensation_day', u'补偿日数'),('sick_leave', u'病假')],
                                     default='no_pay', string=u'准假类型')

@@ -19,28 +19,28 @@ READONLY_STATES = {
 class buy_adjust(models.Model):
     _name = "buy.adjust"
     _inherit = ['mail.thread']
-    _description = u"采购调整单"
+    _description = u"采购变更单"
     _order = 'date desc, id desc'
 
     name = fields.Char(u'单据编号', copy=False,
-                       help=u'调整单编号，保存时可自动生成')
+                       help=u'变更单编号，保存时可自动生成')
     order_id = fields.Many2one('buy.order', u'原始单据', states=READONLY_STATES,
                              copy=False, ondelete='restrict',
                              help=u'要调整的原始购货订单')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       select=True, copy=False,
-                       help=u'调整单创建日期，默认是当前日期')
-    line_ids = fields.One2many('buy.adjust.line', 'order_id', u'调整单行',
+                       index=True, copy=False,
+                       help=u'变更单创建日期，默认是当前日期')
+    line_ids = fields.One2many('buy.adjust.line', 'order_id', u'变更单行',
                                states=READONLY_STATES, copy=True,
-                               help=u'调整单明细行，不允许为空')
+                               help=u'变更单明细行，不允许为空')
     approve_uid = fields.Many2one('res.users', u'审核人',
                             copy=False, ondelete='restrict',
-                            help=u'审核调整单的人')
+                            help=u'审核变更单的人')
     state = fields.Selection(BUY_ORDER_STATES, u'审核状态',
-                             select=True, copy=False,
+                             index=True, copy=False,
                              default='draft',
-                             help=u'调整单审核状态')
+                             help=u'变更单审核状态')
     note = fields.Text(u'备注',
                        help=u'单据备注')
 
@@ -48,7 +48,7 @@ class buy_adjust(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据\n采购调整单%s已经审核'%order.name)
+                raise UserError(u'不能删除已审核的单据\n采购变更单%s已经审核'%order.name)
 
         return super(buy_adjust, self).unlink()
 
@@ -69,14 +69,14 @@ class buy_adjust(models.Model):
 
     @api.one
     def buy_adjust_done(self):
-        '''审核采购调整单：
+        '''审核采购变更单：
         当调整后数量 < 原单据中已入库数量，则报错；
         当调整后数量 > 原单据中已入库数量，则更新原单据及入库单分单的数量；
         当调整后数量 = 原单据中已入库数量，则更新原单据数量，删除入库单分单；
         当新增产品时，则更新原单据及入库单分单明细行。
         '''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！\n采购调整单%s已审核'%self.name)
+            raise UserError(u'请不要重复审核！\n采购变更单%s已审核'%self.name)
         if not self.line_ids:
             raise UserError(u'请输入产品明细行！')
         for line in self.line_ids:
@@ -133,7 +133,7 @@ class buy_adjust(models.Model):
 
 class buy_adjust_line(models.Model):
     _name = 'buy.adjust.line'
-    _description = u'采购调整单明细'
+    _description = u'采购变更单明细'
 
     @api.one
     @api.depends('goods_id')
@@ -154,9 +154,9 @@ class buy_adjust_line(models.Model):
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
         self.amount = self.subtotal - self.tax_amount # 金额
 
-    order_id = fields.Many2one('buy.adjust', u'订单编号', select=True,
+    order_id = fields.Many2one('buy.adjust', u'订单编号', index=True,
                                required=True, ondelete='cascade',
-                               help=u'关联的调整单编号')
+                               help=u'关联的变更单编号')
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
                                help=u'商品')
     using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute,

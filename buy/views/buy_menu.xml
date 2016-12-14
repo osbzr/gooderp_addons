@@ -14,7 +14,7 @@
             parent="menu_buy_manage" sequence="2"/>
         <menuitem id="menu_buy_return" name='采购退货单' action="buy_return_action"
             parent="menu_buy_manage" sequence="3"/>
-        <menuitem id="menu_buy_adjust" name='采购调整单' action="buy_adjust_action"
+        <menuitem id="menu_buy_adjust" name='采购变更单' action="buy_adjust_action"
             parent="menu_buy_manage" sequence="4"
             groups='buy.buy_groups'/>
 

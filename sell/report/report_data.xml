@@ -57,7 +57,7 @@
             </field>
         </record>
         <record id='report_sell_adjust_form' model='ir.actions.report.xml'>
-            <field name='name'>销售调整单</field>
+            <field name='name'>销售变更单</field>
             <field name='model'>sell.adjust</field>
             <field name='report_type'>docx</field>
             <field name='report_name'>sell.adjust</field>

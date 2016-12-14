@@ -88,11 +88,11 @@ class sell_order(models.Model):
                                  help=u'单据负责人')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       select=True, copy=False, help=u"默认是订单创建日期")
+                       index=True, copy=False, help=u"默认是订单创建日期")
     delivery_date = fields.Date(
         u'要求交货日期', states=READONLY_STATES,
         default=lambda self: fields.Date.context_today(self),
-        select=True, copy=False, help=u"订单的要求交货日期")
+        index=True, copy=False, help=u"订单的要求交货日期")
     type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', 
                             default='sell', states=READONLY_STATES,
                             help=u'销货订单的类型，分为销货或退货')
@@ -100,7 +100,7 @@ class sell_order(models.Model):
                                    ondelete='restrict', states=READONLY_STATES,
                                    default=_default_warehouse,
                                    help=u'产品将从该仓库调出')
-    name = fields.Char(u'单据编号', select=True, copy=False,
+    name = fields.Char(u'单据编号', index=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
     line_ids = fields.One2many('sell.order.line', 'order_id', u'销货订单行',
                                states=READONLY_STATES, copy=True,
@@ -126,12 +126,12 @@ class sell_order(models.Model):
                                   ondelete='restrict',
                                   help=u'审核单据的人')
     state = fields.Selection(SELL_ORDER_STATES, u'审核状态', readonly=True,
-                             help=u"销货订单的审核状态", select=True, 
+                             help=u"销货订单的审核状态", index=True,
                              copy=False, default='draft')
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
                               default=u'未出库',
                               store=True,
-                              help=u"销货订单的发货状态", select=True, copy=False)
+                              help=u"销货订单的发货状态", index=True, copy=False)
     money_state = fields.Char(u'收/退款状态',
                               compute=_get_money_state,
                               copy=False,
@@ -373,7 +373,7 @@ class sell_order_line(models.Model):
             self.amount = self.subtotal - self.tax_amount # 本位币金额
             self.currency_amount = currency_amount  # 外币金额
 
-    order_id = fields.Many2one('sell.order', u'订单编号', select=True, 
+    order_id = fields.Many2one('sell.order', u'订单编号', index=True,
                                required=True, ondelete='cascade',
                                help=u'关联订单的编号')
     currency_amount = fields.Float(u'外币金额', compute=_compute_all_amount,

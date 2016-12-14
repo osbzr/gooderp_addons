@@ -1,0 +1,38 @@
+.o_form_view {
+  /*form 中的sheet 的最小的宽度进行调整 降低为手机的屏幕大小就可以了*/
+
+  /*form 中的sheet 的最小的宽度进行调整 降低为手机的屏幕大小就可以了*/
+
+  /*form  中设置field的最小的宽度 保证屏幕在缩小的时候不会导致看不清楚想要的结果*/
+
+}
+.o_form_view.o_form_nosheet {
+  min-width: 250px;
+  padding: 16px;
+}
+.o_form_view.o_form_nosheet.oe_form_nomargin {
+  margin: 0;
+}
+.o_form_view .o_form_sheet_bg {
+  position: relative;
+  padding: 16px 0;
+}
+.o_form_view .o_form_sheet_bg .o_form_sheet {
+  min-width: 340px;
+}
+.o_form_view .o_group .o_form_field {
+  min-width: 120px;
+}
+.o_form_view .o_group.o_inner_group {
+  display: inline-table;
+}
+.o_form_view .o_group.o_inner_group > tbody > tr > td.o_td_label {
+  width: 0%;
+  padding: 0 15px 0 0;
+  min-width: 100px;
+}
+.modal-dialog {
+  position: relative;
+  min-width: 300px;
+  margin: 10px;
+}
