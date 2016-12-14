@@ -60,28 +60,9 @@ odoo.define('core.core', function (require) {
                 .append(new Array(count - this.records.length + 1).join(row));
         },
     });
-    /* 固定表头 */
+
     ListView.include({
-        // load_list: function () {
-        //     var self = this;
-        //     this._super.apply(this, arguments);
-        //     var one2many_length = self.$el.parents('.o_form_field_one2many').length;
-        //     if(one2many_length == 0){
-        //         self.$el.find('table.o_list_view').each(function(){
-        //             $(this).floatThead({
-        //                  position: 'auto',
-        //                  /*Valid values: 'auto', 'fixed', 'absolute'.
-        //                     Position the floated header using absolute or fixed
-        //                     positioning mode (auto picks best for your table scrolling type).
-        //                      Try switching modes if you encounter layout problems.*/
-        //
-        //                  zIndex:5,  //设置float的优先级 保证不会挡住 其他弹出层  default 1001	z-index of the floating header
-        //             });
-        //             $(this).floatThead("reflow");
-        //         });
-        //     }
-        //    return $.when();
-        // },
+        /* 在form中的tree列表行上前添加复制的按钮 以方便创建相同的行 */
         make_empty_record_copy: function (copy_recored) {
             var attrs = { id: false };
             _(this.columns).chain()
@@ -276,6 +257,7 @@ odoo.define('core.core', function (require) {
         },
 
     });
+    /* 鼠标悬停即展开(二级菜单) --前提是在backend_theme 主题下| 在没有安装主题的场景下并没有测试  */
     Menu.include({
         events: {
             mouseenter: "on_open_second_menu",

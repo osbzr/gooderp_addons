@@ -57,13 +57,13 @@
         </record>
 
 		<record id="buy_adjust_action" model="ir.actions.act_window">
-            <field name="name">采购调整单</field>
+            <field name="name">采购变更单</field>
             <field name="res_model">buy.adjust</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="buy_adjust_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
-                点击创建采购调整单
+                点击创建采购变更单
               </p>
             </field>
         </record>

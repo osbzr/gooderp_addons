@@ -103,10 +103,10 @@ class sell_delivery(models.Model):
                                     help=u'销售费用明细行')
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
                               store=True, default=u'未收款',
-                              help=u"销售发货单的收款状态", select=True, copy=False)
+                              help=u"销售发货单的收款状态", index=True, copy=False)
     return_state = fields.Char(u'退款状态', compute=_get_sell_money_state,
                                store=True, default=u'未退款',
-                               help=u"销售退货单的退款状态", select=True, copy=False)
+                               help=u"销售退货单的退款状态", index=True, copy=False)
     contact = fields.Char(u'联系人', states=READONLY_STATES,
                           help=u'客户方的联系人')
     address = fields.Char(u'地址', states=READONLY_STATES,

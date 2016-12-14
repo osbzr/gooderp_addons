@@ -413,7 +413,7 @@ class asset_line(models.Model):
     def _compute_period_id(self):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
-    order_id = fields.Many2one('asset', u'订单编号', select=True,
+    order_id = fields.Many2one('asset', u'订单编号', index=True,
                                required=True, ondelete='cascade')
     cost_depreciation = fields.Float(u'每月折旧额', required=True, digits=dp.get_precision(u'金额'))
     no_depreciation = fields.Float(u'未提折旧额')
@@ -526,7 +526,7 @@ class chang_line(models.Model):
     def _compute_period_id(self):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
-    order_id = fields.Many2one('asset', u'订单编号', select=True,
+    order_id = fields.Many2one('asset', u'订单编号', index=True,
                                required=True, ondelete='cascade')
     chang_name = fields.Char(u'变更内容', required=True)
     date = fields.Date(u'记帐日期', required=True)
