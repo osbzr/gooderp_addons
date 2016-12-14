@@ -166,8 +166,13 @@ class test_sell_order_line(TransactionCase):
 
     def test_compute_all_amount(self):
         ''' 销售订单行计算字段的测试 '''
-        self.assertEqual(self.sell_order_line.amount, 91.45)  # tax_amount subtotal
+        print "e", self.sell_order_line.amount
+        self.assertEqual(self.sell_order_line.amount, 107)  # tax_amount subtotal
+        self.sell_order_line.onchange_goods_id()
         self.assertEqual(self.sell_order_line.tax_rate, 17.0)
+        self.sell_order_line.price_taxed = 11.7
+        self.sell_order_line.tax_rate = 17
+        self.sell_order_line._compute_all_amount()
         self.assertEqual(self.sell_order_line.tax_amount, 15.55)
         self.assertEqual(self.sell_order_line.subtotal, 107)
 
@@ -213,4 +218,4 @@ class test_sell_order_line(TransactionCase):
         ''' 销售订单行 折扣率 on_change'''
         self.sell_order_line.discount_rate = 20
         self.sell_order_line.onchange_discount_rate()
-        self.assertEqual(self.sell_order_line.amount, 82.91)
+        self.assertEqual(self.sell_order_line.amount, 93.6)
