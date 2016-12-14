@@ -52,12 +52,5 @@
         <record id="remove_sell_adjust_line" model="business.data.table">
             <field name="name">sell.adjust.line</field>
         </record>
-        <!--清空报表数据-->
-        <record id="remove_sell_order_track" model="business.data.table">
-            <field name="name">sell.order.track</field>
-        </record>
-        <record id="remove_sell_receipt" model="business.data.table">
-            <field name="name">sell.receipt</field>
-        </record>
     </data>
 </openerp>

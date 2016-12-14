@@ -51,12 +51,5 @@
         <record id="remove_payment" model="business.data.table">
             <field name="name">payment.plan</field>
         </record>
-        <!--清空报表数据-->
-        <record id="remove_buy_order_track" model="business.data.table">
-            <field name="name">buy.order.track</field>
-        </record>
-        <record id="remove_buy_payment" model="business.data.table">
-            <field name="name">buy.payment</field>
-        </record>
     </data>
 </openerp>

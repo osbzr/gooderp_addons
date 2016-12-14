@@ -1,0 +1,126 @@
+<odoo>
+	<data>
+		<record model="ir.ui.view" id="opportunity_form">
+			<field name="name">商机</field>
+			<field name="model">opportunity</field>
+			<field name="arch" type="xml">
+				<form string="商机">
+					<header>
+						<field name="status" widget="statusbar" clickable="True"/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="name"/>
+								<field name="user_id"/>
+								<field name="planned_revenue"/>
+							</group>
+							<group>
+								<field name="next_action"/>
+								<field name="next_datetime"/>
+								<field name="ref"/>
+							</group>
+						</group>
+						<field name="note" placeholder='描述......'/>
+						<field name="timeline_ids">
+							<tree string="进展" editable='bottom'>
+								<field name='just_done' string='跟进记录'/>
+							</tree>
+						</field>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+		<record id="opportunity_kanban" model="ir.ui.view">
+			<field name="name">opportunity kanban</field>
+			<field name="model">opportunity</field>
+			<field name="arch" type="xml">
+				<kanban class="o_kanban_mobile">
+					<field name="name"/>
+					<field name="user_id"/>
+					<field name="planned_revenue"/>
+					<field name="next_action"/>
+					<field name="next_datetime"/>
+					<field name="color"/>
+					<field name="priority"/>
+					<templates>
+						<t t-name="kanban-box">
+							<div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+								<ul class="oe_kanban_colorpicker" data-field="color"/>
+								<div class="o_kanban_image">
+                                    <t>
+                                        <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)"/>
+                                    </t>
+                                    <p>
+										<t t-esc="record.user_id.value"/>
+									</p>
+                                </div>
+                                <div class="oe_kanban_details">
+									<p>
+										<t t-esc="record.name.value"/>
+									</p>
+									<p>
+										<t t-esc="record.planned_revenue.value"/>
+									</p>
+									<p>
+										<t t-esc="record.next_datetime.value"/>
+									</p>
+									<p>
+										<t t-esc="record.next_action.value"/>
+									</p>
+									<field name="priority" widget="priority"/>
+								</div>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
+		<record id="opportunity_search" model="ir.ui.view">
+            <field name="name">opportunity.search</field>
+            <field name="model">opportunity</field>
+            <field name="arch" type="xml">
+                <search string="Search Opportunities">
+                    <field name="name" filter_domain="['|',('project_id','ilike',self),('name', 'ilike', self)]"/>
+                    <field name="user_id"/>
+                    <field name="status"/>
+                    <separator/>
+                    <filter string="我的商机" name="assigned_to_me"
+                            domain="[('user_id', '=', uid)]"
+                            help="指派给我的商机"/>
+                    <filter string="未指派的" name="unassigned"
+                            domain="[('user_id','=', False)]" help="未指派的商机"/>
+                    <separator/>
+                    <group expand="0" string="分组" colspan="4">
+                        <filter name="group_user_id" string="指派给" context="{'group_by':'user_id'}"/>
+                        <filter name="group_status" string="阶段" context="{'group_by':'status'}"/>
+                        <separator orientation="vertical" />
+                        <filter string="创建月份" context="{'group_by':'create_date:month'}" name="month"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+		<!--action-->
+		<record model="ir.actions.act_window" id="action_opportunity">
+			<field name="name">商机</field>
+			<field name="res_model">opportunity</field>
+			<field name="view_mode">kanban,form,search</field>
+			<field name="context">{
+                    'search_default_group_status': 1,
+                }
+            </field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个商机</p>
+			</field>
+		</record>
+
+		<menuitem name="商机" id="menu_crm"/>
+		<menuitem name="商机" id="menu_opportunity" parent="menu_crm"
+		action="action_opportunity" sequence='1'/>
+	</data>
+</odoo>
