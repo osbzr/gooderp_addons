@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models, api
+from odoo import fields, models, api, tools, modules
 from datetime import datetime
 
 class staff_department(models.Model):
@@ -44,11 +44,6 @@ class staff(models.Model):
     _inherit = 'staff'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
 
-    @api.one
-    @api.depends('user_id')
-    def _get_image(self):
-        self.image_medium = self.user_id.image
-
     @api.onchange('job_id')
     def onchange_job_id(self):
         '''选择职位时带出部门和部门经理'''
@@ -68,7 +63,8 @@ class staff(models.Model):
                                     'category_id', u'标签')
     work_email = fields.Char(u'办公邮箱')
     work_phone = fields.Char(u'办公电话')
-    image_medium = fields.Binary(string=u'头像', compute=_get_image)
+    image_medium = fields.Binary(string=u'头像', related="user_id.image", attachment=True,
+                                 readonly=True, store=False)
     # 个人信息
     birthday = fields.Date(u'生日')
     identification_id = fields.Char(u'证照号码')
