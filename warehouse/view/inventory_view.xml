@@ -36,6 +36,8 @@
                     <sheet>
                         <div>
                             <p>在盘点完成前，请不要做出入库单据，盘点库存与查询时的系统库存比较计算盈亏,如果库存在查询后又发生了变化，需要重新查询一次获取最新的库存信息</p>
+                            <label string="扫描条码"/>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                         </div>
 
                         <group >
