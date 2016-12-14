@@ -100,7 +100,7 @@
 		<record id="wh_inventory_0" model="wh.inventory">
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 			<field name="name">WH/INV/16120001</field>
-			<field name="date">2016-04-02</field>
+			<field name="date">2016-12-13</field>
 		</record>
 	</data>
 	<data noupdate="1">
