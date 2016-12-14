@@ -11,6 +11,7 @@ class partner(models.Model):
 
     '''
     _name = 'partner'
+    _inherit = ['mail.thread']
     code = fields.Char(u'编号')
     name = fields.Char(u'名称', required=True,)
     main_mobile = fields.Char(u'主要手机号', required=True,)
@@ -30,7 +31,7 @@ class partner(models.Model):
     bank_name = fields.Char(u'开户行')
     bank_num = fields.Char(u'银行账号')
 
-    credit_limit = fields.Float(u'信用额度',
+    credit_limit = fields.Float(u'信用额度', track_visibility='onchange',
                                 help=u'客户购买产品时，本次发货金额+客户应收余额要小于客户信用额度')
 
     _sql_constraints = [
