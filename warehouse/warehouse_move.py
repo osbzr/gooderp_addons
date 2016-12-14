@@ -88,6 +88,15 @@ class wh_move(models.Model):
         line.goods_uos_qty = line.goods_qty / conversion
         return True
 
+    def scan_barcode_inventory_line_operation(self, line, conversion):
+        '''盘点单明细行数量增加'''
+        line.inventory_qty += 1
+        line.inventory_uos_qty = line.inventory_qty / conversion
+        line.difference_qty += 1
+        line.difference_uos_qty = line.difference_qty / conversion
+
+        return True
+
     def scan_barcode_move_in_out_operation(self, move, att, conversion, goods, val):
         create_line =False
         for line in move.line_out_ids:
@@ -117,12 +126,8 @@ class wh_move(models.Model):
         create_line = False
         for line in move.line_ids:
             # 如果产品属性上存在条码 或 产品上存在条码
-            if line.attribute_id.id == att.id or line.goods_id.id == goods.id:
-                line.inventory_qty += 1
-                line.inventory_uos_qty = line.inventory_qty / conversion
-                line.difference_qty += 1
-                line.difference_uos_qty = line.difference_qty / conversion
-                create_line = True
+            if (att and line.attribute_id == att) or (goods and line.goods_id == goods):
+                create_line = self.scan_barcode_inventory_line_operation(line, conversion)
         return create_line
 
     def scan_barcode_each_model_operation(self, model_name, order_id, att, goods,conversion):
