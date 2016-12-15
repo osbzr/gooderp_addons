@@ -78,7 +78,12 @@ class money_order(models.Model):
             amount += line.amount
         for line in self.source_ids:
             this_reconcile += line.this_reconcile
-        self.advance_payment = amount - this_reconcile + self.discount_amount
+
+        if self.type == 'get':
+            self.advance_payment = amount - this_reconcile + self.discount_amount
+        else:
+            self.advance_payment = amount - this_reconcile - self.discount_amount
+
         self.amount = amount
 
     @api.one
@@ -108,12 +113,12 @@ class money_order(models.Model):
     currency_id = fields.Many2one('res.currency', u'外币币别',
                                   compute='_compute_currency_id', store=True, readonly=True,
                                   help=u'业务伙伴的类别科目上对应的外币币别')
-    discount_amount = fields.Float(string=u'整单折扣', readonly=True,
+    discount_amount = fields.Float(string=u'手续费/折扣', readonly=True,
                                    states={'draft': [('readonly', False)]},
                                    digits=dp.get_precision('Amount'),
-                                   help=u'本次折扣金额')
-    discount_account_id = fields.Many2one('finance.account', u'折扣科目',
-                                       help=u'收付款单审核生成凭证时，折扣额对应的科目')
+                                   help=u'收款时发生的银行手续费或付款时给供应商的现金折扣。')
+    discount_account_id = fields.Many2one('finance.account', u'费用科目',
+                                       help=u'收付款单审核生成凭证时，手续费或折扣对应的科目')
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收付款单行', readonly=True,
                                states={'draft': [('readonly', False)]},
