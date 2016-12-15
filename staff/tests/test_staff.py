@@ -13,7 +13,6 @@ class test_staff(TransactionCase):
                                               'name': 'DemoUser',
                                               'user_id': 1,
                                               'job_id': self.env.ref('staff.staff_job_1').id})
-        staff_pro._get_image()
         staff_pro.onchange_job_id()
 
     def test_staff_contract_over_date(self):
