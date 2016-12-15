@@ -252,21 +252,21 @@ class test_buy_adjust_line(TransactionCase):
         for order_line in self.adjust.line_ids:
             # partner 无 税率，采购调整单行产品无税率
             self.env.ref('core.lenovo').tax_rate = 0
-            self.env.ref('goods.keyboard').tax_rate = 0
+            self.env.ref('goods.cable').tax_rate = 0
             order_line.onchange_goods_id()
             # partner 有 税率，采购调整单行产品无税率
             self.env.ref('core.lenovo').tax_rate = 10
-            self.env.ref('goods.keyboard').tax_rate = 0
+            self.env.ref('goods.cable').tax_rate = 0
             order_line.onchange_goods_id()
             # partner 无税率，采购调整单行产品有税率
             self.env.ref('core.lenovo').tax_rate = 0
-            self.env.ref('goods.keyboard').tax_rate = 10
+            self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
             # partner 税率 > 采购调整单行产品税率
             self.env.ref('core.lenovo').tax_rate = 11
-            self.env.ref('goods.keyboard').tax_rate = 10
+            self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
             # partner 税率 =< 入库单行产品税率
             self.env.ref('core.lenovo').tax_rate = 9
-            self.env.ref('goods.keyboard').tax_rate = 10
+            self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
