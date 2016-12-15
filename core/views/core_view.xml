@@ -212,6 +212,7 @@
 							</group>
 							<group>
 								<field name="c_category_id" required="1"/>
+								<field name="s_category_id"/>
 								<field name="receivable"/>
 							</group>
 						</group>
@@ -292,6 +293,7 @@
 							</group>
 							<group>
 								<field name="s_category_id" required="1"/>
+								<field name="c_category_id" />
 								<field name="bank_name"/>
 								<field name="bank_num"/>
 								<field name="payable"/>
