@@ -22,7 +22,7 @@
             <field name="prefix">OUT/RETURN/</field>
             <field name="padding">5</field>
         </record>
-        <!-- 销售调整单序列号 -->
+        <!-- 销售变更单序列号 -->
         <record id="seq_sell_adjust" model="ir.sequence">
             <field name="name">Sell Adjust</field>
             <field name="code">sell.adjust</field>
@@ -51,13 +51,6 @@
         </record>
         <record id="remove_sell_adjust_line" model="business.data.table">
             <field name="name">sell.adjust.line</field>
-        </record>
-        <!--清空报表数据-->
-        <record id="remove_sell_order_track" model="business.data.table">
-            <field name="name">sell.order.track</field>
-        </record>
-        <record id="remove_sell_receipt" model="business.data.table">
-            <field name="name">sell.receipt</field>
         </record>
     </data>
 </openerp>

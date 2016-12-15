@@ -4,7 +4,6 @@
         <template id="assets_backend" name="Goods" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/warehouse/static/src/js/warehouse_widget.js"></script>
-                <link rel="stylesheet" href="/warehouse/static/src/css/style.css"/>
             </xpath>
         </template>
     </data>

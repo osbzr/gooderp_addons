@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-		<!-- 采购调整单视图 -->
+		<!-- 采购变更单视图 -->
 
     	<record id="buy_adjust_tree" model="ir.ui.view">
             <field name="name">buy.adjust.tree</field>
             <field name="model">buy.adjust</field>
             <field name="arch" type="xml">
-                <tree string="采购调整单">
+                <tree string="采购变更单">
                     <field name="date"/>
                     <field name="name"/>
                     <field name="order_id"/>
@@ -22,7 +22,7 @@
             <field name="name">buy.adjust.form</field>
             <field name="model">buy.adjust</field>
             <field name="arch" type="xml">
-                <form string="采购调整单">
+                <form string="采购变更单">
                 <header>
                 	<button name="buy_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
@@ -39,7 +39,7 @@
                         </group>
                     </group>
                     <field name="line_ids">
-                    	<tree string="采购调整单行" editable="bottom">
+                    	<tree string="采购变更单行" editable="bottom">
                             <field name="goods_id" required='1'/>
                             <field name="attribute_id"
                             	groups='goods.multi_attrs_groups'
@@ -83,7 +83,7 @@
             <field name="name">buy.adjust.search</field>
             <field name="model">buy.adjust</field>
             <field name="arch" type="xml">
-                <search string="采购调整单">
+                <search string="采购变更单">
                     <field name="name"/>
                     <field name="order_id"/>
                     <field name="state"/>

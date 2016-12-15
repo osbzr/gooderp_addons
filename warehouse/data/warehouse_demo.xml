@@ -96,6 +96,12 @@
 			<field name="type">in</field>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/IN/16040002')]"/>
 		</record>
+		<!--盘点单-->
+		<record id="wh_inventory_0" model="wh.inventory">
+			<field name="warehouse_id" ref="warehouse.hd_stock"/>
+			<field name="name">WH/INV/16120001</field>
+			<field name="date">2016-12-13</field>
+		</record>
 	</data>
 	<data noupdate="1">
 		<record id="wh_assembly_ass0" model="wh.assembly">

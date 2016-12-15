@@ -88,6 +88,15 @@ class wh_move(models.Model):
         line.goods_uos_qty = line.goods_qty / conversion
         return True
 
+    def scan_barcode_inventory_line_operation(self, line, conversion):
+        '''盘点单明细行数量增加'''
+        line.inventory_qty += 1
+        line.inventory_uos_qty = line.inventory_qty / conversion
+        line.difference_qty += 1
+        line.difference_uos_qty = line.difference_qty / conversion
+
+        return True
+
     def scan_barcode_move_in_out_operation(self, move, att, conversion, goods, val):
         create_line =False
         for line in move.line_out_ids:
@@ -110,6 +119,15 @@ class wh_move(models.Model):
             # 如果产品上存在条码
             elif goods and line.goods_id.id == goods.id:
                 create_line = self.scan_barcode_move_line_operation(line, conversion)
+        return create_line
+
+    def scan_barcode_inventory_operation(self, move, att, conversion, goods, val):
+        '''盘点单扫码操作'''
+        create_line = False
+        for line in move.line_ids:
+            # 如果产品属性上存在条码 或 产品上存在条码
+            if (att and line.attribute_id == att) or (goods and line.goods_id == goods):
+                create_line = self.scan_barcode_inventory_line_operation(line, conversion)
         return create_line
 
     def scan_barcode_each_model_operation(self, model_name, order_id, att, goods,conversion):
@@ -150,6 +168,12 @@ class wh_move(models.Model):
             val['type'] = 'internal'
             create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
 
+        # 盘点单的扫码
+        if model_name == 'wh.inventory':
+            move = self.env[model_name].browse(order_id)
+            val['type'] = 'in'
+            create_line = self.scan_barcode_inventory_operation(move, att, conversion, goods, val)
+
         return move, create_line, val
 
     def prepare_move_line_data(self, att, val, goods, move):
@@ -187,18 +211,33 @@ class wh_move(models.Model):
             if val['type'] == 'internal':
                 val['type'] = 'out'
 
-        val.update({
-            'goods_id': goods_id,
-            'attribute_id': attribute_id,
-            'warehouse_id': move.warehouse_id.id,
-            'warehouse_dest_id': move.warehouse_dest_id.id,
-            'goods_uos_qty': 1.0 / conversion,
-            'uos_id': uos_id,
-            'goods_qty': 1,
-            'uom_id': uom_id,
-            'price_taxed': price,
-            'cost_unit': cost_unit,
-            'move_id': move.id})
+        if move._name != 'wh.inventory':
+            val.update({
+                'goods_id': goods_id,
+                'attribute_id': attribute_id,
+                'warehouse_id': move.warehouse_id.id,
+                'warehouse_dest_id': move.warehouse_dest_id.id,
+                'goods_uos_qty': 1.0 / conversion,
+                'uos_id': uos_id,
+                'goods_qty': 1,
+                'uom_id': uom_id,
+                'price_taxed': price,
+                'cost_unit': cost_unit,
+                'move_id': move.id})
+        else:
+            val.update({
+                'goods_id': goods_id,
+                'attribute_id': attribute_id,
+                'warehouse_id': move.warehouse_id.id,
+                'inventory_uos_qty': 1.0 / conversion,
+                'uos_id': uos_id,
+                'inventory_qty': 1,
+                'uom_id': uom_id,
+                'real_uos_qty': 0,
+                'real_qty': 0,
+                'difference_uos_qty': 1.0 / conversion,
+                'difference_qty': 1,
+                'inventory_id': move.id})
         return val
 
     @api.model
@@ -209,6 +248,8 @@ class wh_move(models.Model):
     def scan_barcode(self,model_name,barcode,order_id):
         att = self.env['attribute'].search([('ean','=',barcode)])
         goods = self.env['goods'].search([('barcode', '=', barcode)])
+        line_model = (model_name == 'wh.inventory' and 'wh.inventory.line'
+                      or 'wh.move.line')
 
         if not att and not goods:
             raise UserError(u'ean为  %s 的产品不存在' % (barcode))
@@ -217,7 +258,7 @@ class wh_move(models.Model):
             conversion = att and att.goods_id.conversion or goods.conversion
             move, create_line, val = self.scan_barcode_each_model_operation(model_name, order_id, att, goods,conversion)
             if not create_line:
-                self.env['wh.move.line'].create(self.prepare_move_line_data(att, val, goods, move))
+                self.env[line_model].create(self.prepare_move_line_data(att, val, goods, move))
 
     @api.multi
     def unlink(self):

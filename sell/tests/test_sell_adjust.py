@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 class test_sell_adjust(TransactionCase):
 
     def setUp(self):
-        '''销售调整单准备基本数据'''
+        '''销售变更单准备基本数据'''
         super(test_sell_adjust, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
@@ -24,7 +24,7 @@ class test_sell_adjust(TransactionCase):
         warehouse_obj.approve_order()
 
     def test_unlink(self):
-        '''测试删除已审核的销售调整单'''
+        '''测试删除已审核的销售变更单'''
         adjust = self.env['sell.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
@@ -35,12 +35,12 @@ class test_sell_adjust(TransactionCase):
         adjust.sell_adjust_done()
         with self.assertRaises(UserError):
             adjust.unlink()
-        # 删除草稿状态的销售调整单
+        # 删除草稿状态的销售变更单
         new = adjust.copy()
         new.unlink()
 
     def test_sell_adjust_done(self):
-        '''审核销售调整单:正常情况'''
+        '''审核销售变更单:正常情况'''
         # 正常情况下审核，新增产品鼠标（每批次为1的）、键盘（无批次的）
         adjust = self.env['sell.adjust'].create({
             'order_id': self.order.id,
@@ -62,7 +62,7 @@ class test_sell_adjust(TransactionCase):
             adjust.sell_adjust_done()
 
     def test_sell_adjust_done_no_line(self):
-        '''审核销售调整单:没输入明细行，审核时报错'''
+        '''审核销售变更单:没输入明细行，审核时报错'''
         adjust = self.env['sell.adjust'].create({
             'order_id': self.order.id,
         })
@@ -70,7 +70,7 @@ class test_sell_adjust(TransactionCase):
             adjust.sell_adjust_done()
 
     def test_sell_adjust_done_all_in(self):
-        '''审核销售调整单：销货订单生成的发货单已全部出库，审核时报错'''
+        '''审核销售变更单：销货订单生成的发货单已全部出库，审核时报错'''
         new_order = self.order.copy()
         new_order.sell_order_done()
         delivery = self.env['sell.delivery'].search(
@@ -88,7 +88,7 @@ class test_sell_adjust(TransactionCase):
             adjust.sell_adjust_done()
 
     def test_sell_adjust_done_more_same_line(self):
-        '''审核销售调整单：查找到销货订单中多行同一产品，不能调整'''
+        '''审核销售变更单：查找到销货订单中多行同一产品，不能调整'''
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,
@@ -113,7 +113,7 @@ class test_sell_adjust(TransactionCase):
             adjust.sell_adjust_done()
 
     def test_sell_adjust_done_quantity_lt(self):
-        '''审核销售调整单：调整后数量 5 < 原订单已出库数量 6，审核时报错'''
+        '''审核销售变更单：调整后数量 5 < 原订单已出库数量 6，审核时报错'''
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
         for line in delivery.line_out_ids:
@@ -129,7 +129,7 @@ class test_sell_adjust(TransactionCase):
             adjust.sell_adjust_done()
 
     def test_sell_adjust_done_quantity_equal(self):
-        '''审核销售调整单:调整后数量6 == 原订单已出库数量 6，审核后将产生的发货单分单删除'''
+        '''审核销售变更单:调整后数量6 == 原订单已出库数量 6，审核后将产生的发货单分单删除'''
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
         for line in delivery.line_out_ids:
@@ -148,7 +148,7 @@ class test_sell_adjust(TransactionCase):
         self.assertTrue(not new_delivery)
 
     def test_sell_adjust_done_goods_done(self):
-        '''审核销售调整单:原始单据中一行产品已全部出库，另一行没有'''
+        '''审核销售变更单:原始单据中一行产品已全部出库，另一行没有'''
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
@@ -179,7 +179,7 @@ class test_sell_adjust(TransactionCase):
 class test_sell_adjust_line(TransactionCase):
 
     def setUp(self):
-        '''销售调整单明细基本数据'''
+        '''销售变更单明细基本数据'''
         super(test_sell_adjust_line, self).setUp()
         # 销货订单 10个 网线
         self.order = self.env.ref('sell.sell_order_2')

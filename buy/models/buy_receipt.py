@@ -95,11 +95,11 @@ class buy_receipt(models.Model):
     money_state = fields.Char(u'付款状态', compute=_get_buy_money_state,
                               store=True, default=u'未付款',
                               help=u"采购入库单的付款状态",
-                              select=True, copy=False)
+                              index=True, copy=False)
     return_state = fields.Char(u'退款状态', compute=_get_buy_money_state,
                                store=True, default=u'未退款',
                                help=u"采购退货单的退款状态",
-                               select=True, copy=False)
+                               index=True, copy=False)
     modifying = fields.Boolean(u'差错修改中', default=False,
                                help=u'是否处于差错修改中')
     voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True,

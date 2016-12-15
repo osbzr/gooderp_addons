@@ -22,7 +22,7 @@
             <field name="prefix">IN/RETURN/</field>
             <field name="padding">5</field>
         </record>
-        <!-- 采购调整单序列号 -->
+        <!-- 采购变更单序列号 -->
         <record id="seq_buy_adjust" model="ir.sequence">
             <field name="name">Buy Adjust</field>
             <field name="code">buy.adjust</field>
@@ -50,13 +50,6 @@
         </record>
         <record id="remove_payment" model="business.data.table">
             <field name="name">payment.plan</field>
-        </record>
-        <!--清空报表数据-->
-        <record id="remove_buy_order_track" model="business.data.table">
-            <field name="name">buy.order.track</field>
-        </record>
-        <record id="remove_buy_payment" model="business.data.table">
-            <field name="name">buy.payment</field>
         </record>
     </data>
 </openerp>
