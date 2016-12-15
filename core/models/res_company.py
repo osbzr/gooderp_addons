@@ -29,4 +29,4 @@ class res_company(models.Model):
         ''' 默认取 core/static/description 下的 logo.png 作为 logo'''
         return open(misc.file_open('core/static/description/logo.png').name, 'rb') .read().encode('base64')
 
-    logo = fields.Binary(related='partner_id.image', default=_get_logo)
+    logo = fields.Binary(related='partner_id.image', default=_get_logo, attachment=True)
