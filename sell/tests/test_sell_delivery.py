@@ -264,23 +264,23 @@ class test_sell_delivery(TransactionCase):
             [('order_id', '=', self.order.id)])
         # partner 无 税率， 出库单行产品无税率
         self.env.ref('core.jd').tax_rate = 0
-        self.env.ref('goods.mouse').tax_rate = 0
+        self.env.ref('goods.cable').tax_rate = 0
         delivery.onchange_partner_id()
         # partner 有 税率， 出库单行产品无税率
         self.env.ref('core.jd').tax_rate = 10
-        self.env.ref('goods.mouse').tax_rate = 0
+        self.env.ref('goods.cable').tax_rate = 0
         delivery.onchange_partner_id()
         # partner 无税率， 出库单行产品无税率
         self.env.ref('core.jd').tax_rate = 0
-        self.env.ref('goods.mouse').tax_rate = 10
+        self.env.ref('goods.cable').tax_rate = 10
         delivery.onchange_partner_id()
         # partner 税率 >  出库单行产品税率
         self.env.ref('core.jd').tax_rate = 11
-        self.env.ref('goods.mouse').tax_rate = 10
+        self.env.ref('goods.cable').tax_rate = 10
         delivery.onchange_partner_id()
         # partner 税率 =<  出库单行产品税率
         self.env.ref('core.jd').tax_rate = 11
-        self.env.ref('goods.mouse').tax_rate = 12
+        self.env.ref('goods.cable').tax_rate = 12
         delivery.onchange_partner_id()
 
 
@@ -369,20 +369,22 @@ class test_wh_move_line(TransactionCase):
             # partner 无 税率，出库单行产品无税率
             self.env.ref('core.jd').tax_rate = 0
             self.env.ref('goods.mouse').tax_rate = 0
-            order_line.onchange_goods_id()
+            order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 有 税率，出库单行产品无税率
             self.env.ref('core.jd').tax_rate = 10
             self.env.ref('goods.mouse').tax_rate = 0
-            order_line.onchange_goods_id()
+            order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 无税率，出库单行产品有税率
             self.env.ref('core.jd').tax_rate = 0
             self.env.ref('goods.mouse').tax_rate = 10
-            order_line.onchange_goods_id()
+            order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 税率 > 出库单行产品税率
             self.env.ref('core.jd').tax_rate = 11
             self.env.ref('goods.mouse').tax_rate = 10
-            order_line.onchange_goods_id()
+            order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 税率 =< 出库单行产品税率
             self.env.ref('core.jd').tax_rate = 9
             self.env.ref('goods.mouse').tax_rate = 10
-            order_line.onchange_goods_id()
+            order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
+            
+            break

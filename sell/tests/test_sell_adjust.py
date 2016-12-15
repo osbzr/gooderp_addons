@@ -237,21 +237,21 @@ class test_sell_adjust_line(TransactionCase):
         for order_line in self.adjust.line_ids:
             # partner 无 税率，调整单行产品无税率
             self.env.ref('core.jd').tax_rate = 0
-            self.env.ref('goods.mouse').tax_rate = 0
+            self.env.ref('goods.cable').tax_rate = 0
             order_line.onchange_goods_id()
             # partner 有 税率，调整单行产品无税率
             self.env.ref('core.jd').tax_rate = 10
-            self.env.ref('goods.mouse').tax_rate = 0
+            self.env.ref('goods.cable').tax_rate = 0
             order_line.onchange_goods_id()
             # partner 无税率，调整单行产品有税率
             self.env.ref('core.jd').tax_rate = 0
-            self.env.ref('goods.mouse').tax_rate = 10
+            self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
             # partner 税率 > 调整单行产品税率
             self.env.ref('core.jd').tax_rate = 11
-            self.env.ref('goods.mouse').tax_rate = 10
+            self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
             # partner 税率 =< 调整单行产品税率
             self.env.ref('core.jd').tax_rate = 9
-            self.env.ref('goods.mouse').tax_rate = 10
+            self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
