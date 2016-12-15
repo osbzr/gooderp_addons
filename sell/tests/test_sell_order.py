@@ -80,6 +80,27 @@ class test_sell_order(TransactionCase):
         '''选择客户带出其默认地址信息'''
         self.order.onchange_partner_id()
 
+        # partner 无 税率，销货单行产品无税率
+        self.env.ref('core.jd').tax_rate = 0
+        self.env.ref('goods.mouse').tax_rate = 0
+        self.order.onchange_partner_id()
+        # partner 有 税率，销货单行产品无税率
+        self.env.ref('core.jd').tax_rate = 10
+        self.env.ref('goods.mouse').tax_rate = 0
+        self.order.onchange_partner_id()
+        # partner 无税率，销货单行产品无税率
+        self.env.ref('core.jd').tax_rate = 0
+        self.env.ref('goods.mouse').tax_rate = 10
+        self.order.onchange_partner_id()
+        # partner 税率 > 销货单行产品税率
+        self.env.ref('core.jd').tax_rate = 11
+        self.env.ref('goods.mouse').tax_rate = 10
+        self.order.onchange_partner_id()
+        # partner 税率 =< 销货单行产品税率
+        self.env.ref('core.jd').tax_rate = 9
+        self.env.ref('goods.mouse').tax_rate = 10
+        self.order.onchange_partner_id()
+
     def test_onchange_discount_rate(self):
         ''' sell.order onchange test '''
         self.order.discount_rate = 10
@@ -149,7 +170,6 @@ class test_sell_order(TransactionCase):
         with self.assertRaises(UserError):
             self.order.sell_order_draft()
 
-
 class test_sell_order_line(TransactionCase):
 
     def setUp(self):
@@ -166,8 +186,12 @@ class test_sell_order_line(TransactionCase):
 
     def test_compute_all_amount(self):
         ''' 销售订单行计算字段的测试 '''
-        self.assertEqual(self.sell_order_line.amount, 91.45)  # tax_amount subtotal
+        self.assertEqual(self.sell_order_line.amount, 107)  # tax_amount subtotal
+        self.sell_order_line.onchange_goods_id()
         self.assertEqual(self.sell_order_line.tax_rate, 17.0)
+        self.sell_order_line.price_taxed = 11.7
+        self.sell_order_line.tax_rate = 17
+        self.sell_order_line._compute_all_amount()
         self.assertEqual(self.sell_order_line.tax_amount, 15.55)
         self.assertEqual(self.sell_order_line.subtotal, 107)
 
@@ -196,7 +220,31 @@ class test_sell_order_line(TransactionCase):
             self.assertTrue(line.uom_id.name == u'件')
             # 测试价格是否是商品的销售价
             self.assertTrue(line.price_taxed == goods.price)
-                
+
+    def test_onchange_goods_id_tax_rate(self):
+        ''' 测试 修改产品时，产品行税率变化 '''
+        self.order_line = self.env.ref('sell.sell_order_line_1')
+        # partner 无 税率，销货单行产品无税率
+        self.env.ref('core.jd').tax_rate = 0
+        self.env.ref('goods.mouse').tax_rate = 0
+        self.order_line.onchange_goods_id()
+        # partner 有 税率，销货单行产品无税率
+        self.env.ref('core.jd').tax_rate = 10
+        self.env.ref('goods.mouse').tax_rate = 0
+        self.order_line.onchange_goods_id()
+        # partner 无税率，销货单行产品有税率
+        self.env.ref('core.jd').tax_rate = 0
+        self.env.ref('goods.mouse').tax_rate = 10
+        self.order_line.onchange_goods_id()
+        # partner 税率 > 销货单行产品税率
+        self.env.ref('core.jd').tax_rate = 11
+        self.env.ref('goods.mouse').tax_rate = 10
+        self.order_line.onchange_goods_id()
+        # partner 税率 =< 销货单行产品税率
+        self.env.ref('core.jd').tax_rate = 9
+        self.env.ref('goods.mouse').tax_rate = 10
+        self.order_line.onchange_goods_id()
+
     def test_onchange_warehouse_id(self):
         '''仓库和商品带出价格策略的折扣率'''
         order_line=self.env.ref('sell.sell_order_line_1')
@@ -213,4 +261,4 @@ class test_sell_order_line(TransactionCase):
         ''' 销售订单行 折扣率 on_change'''
         self.sell_order_line.discount_rate = 20
         self.sell_order_line.onchange_discount_rate()
-        self.assertEqual(self.sell_order_line.amount, 82.91)
+        self.assertEqual(self.sell_order_line.amount, 93.6)

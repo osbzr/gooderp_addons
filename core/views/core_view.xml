@@ -213,6 +213,7 @@
 							<group>
 								<field name="c_category_id" required="1"/>
 								<field name="receivable"/>
+								<field name="tax_rate"/>
 							</group>
 						</group>
 					</sheet>
@@ -289,6 +290,7 @@
 							<group>
 								<field name="code"/>
 								<field name="main_mobile"/>
+								<field name="tax_rate"/>
 							</group>
 							<group>
 								<field name="s_category_id" required="1"/>

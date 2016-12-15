@@ -124,6 +124,19 @@ class sell_delivery(models.Model):
             self.address = self.partner_id.address
             self.mobile = self.partner_id.mobile
 
+            for line in self.line_out_ids:
+                if line.goods_id.tax_rate and self.partner_id.tax_rate:
+                    if line.goods_id.tax_rate >= self.partner_id.tax_rate:
+                        line.tax_rate = self.partner_id.tax_rate
+                    else:
+                        line.tax_rate = line.goods_id.tax_rate
+                elif line.goods_id.tax_rate and not self.partner_id.tax_rate:
+                    line.tax_rate = line.goods_id.tax_rate
+                elif not line.goods_id.tax_rate and self.partner_id.tax_rate:
+                    line.tax_rate = self.partner_id.tax_rate
+                else:
+                    line.tax_rate = self.env.user.company_id.output_tax_rate
+
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
     def onchange_discount_rate(self):
         '''当优惠率或订单行发生变化时，单据优惠金额发生变化'''
