@@ -97,12 +97,12 @@
 			<field name="create_tag">1</field>
 		</record>
 
-		<!--系统参数-->
+		<!--公司-->
 		<record id="company_form" model="ir.ui.view">
 			<field name="name">company.form</field>
 			<field name="model">res.company</field>
 			<field name="arch" type="xml">
-				<form string="系统参数" create='0'>
+				<form string="公司" create='0'>
 					<group>
 						<field name="logo" widget="image"  class="oe_avatar oe_left"/>
                         <field name="name" class="oe_inline"/>
@@ -123,7 +123,7 @@
 			</field>
 		</record>
 		<record id="company_action" model="ir.actions.act_window">
-			<field name="name">系统参数</field>
+			<field name="name">公司</field>
 			<field name="res_model">res.company</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="view_type">form</field>
@@ -135,7 +135,7 @@
 			<field name="view_id" ref="company_form"/>
 			<field name="act_window_id" ref="company_action"/>
 		</record>
-		<menuitem id='company_menu' name='系统参数' action='company_action' parent='system_menu' sequence='10'/>
+		<menuitem id='company_menu' name='公司' action='company_action' parent='system_menu' sequence='10'/>
 		<!--单位，菜单放在仓库模块下-->
 		<record id="uom_tree" model="ir.ui.view">
 			<field name="name">uom.tree</field>
@@ -212,6 +212,7 @@
 							</group>
 							<group>
 								<field name="c_category_id" required="1"/>
+								<field name="s_category_id"/>
 								<field name="receivable"/>
 								<field name="tax_rate"/>
 							</group>
@@ -294,6 +295,7 @@
 							</group>
 							<group>
 								<field name="s_category_id" required="1"/>
+								<field name="c_category_id" />
 								<field name="bank_name"/>
 								<field name="bank_num"/>
 								<field name="payable"/>
@@ -437,54 +439,8 @@
 			<field name="search_view_id" ref="service_search"/>
 		</record>
 
-		<!--定价策略-->
-		<record id="pricing_tree" model="ir.ui.view">
-			<field name="name">pricing.tree</field>
-			<field name="model">pricing</field>
-			<field name="arch" type="xml">
-				<tree editable="TOP" string="定价策略">
-					<field name="name"/>
-					<field name="warehouse_id"/>
-					<field name="c_category_id"/>
-					<field name="goods_category_id"/>
-					<field name='goods_id'/>
-					<field name="active_date" required='1'/>
-					<field name="deactive_date" required='1'/>
-					<field name="discount_rate"/>
-				</tree>
-			</field>
-		</record>
-		<record id="pricing_search" model="ir.ui.view">
-            <field name="name">pricing.search</field>
-            <field name="model">pricing</field>
-            <field name="arch" type="xml">
-                <search string="定价策略">
-                    <field name="name"/>
-                    <field name="warehouse_id"/>
-                    <field name="c_category_id"/>
-                    <field name="goods_category_id"/>
-                    <field name="goods_id"/>
-                    <field name="active_date"/>
-                    <field name="deactive_date"/>
-                    <field name="discount_rate"/>
-                    <group expand="0" string="分组">
-                        <filter string="仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
-                        <filter string="客户类别" domain="[]" context="{'group_by':'c_category_id'}"/>
-                        <filter string="产品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
-                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
-                    </group>
-                </search>
-            </field>
-        </record>
-		<record id="action_pricing" model="ir.actions.act_window">
-			<field name="name">定价策略</field>
-			<field name="res_model">pricing</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">tree</field>
-			<field name="search_view_id" ref="pricing_search"/>
-		</record>
-		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='system_menu' sequence='30'/>
+
+
         <!-- 用于清理业务数据 -->
 		<record id="business_data_table_tree" model="ir.ui.view">
 			<field name="name">business.data.table.tree</field>
