@@ -12,11 +12,14 @@ odoo.define('core.core', function (require) {
     var PivotView = require('web.PivotView');
     var WebClient = require('web.AbstractWebClient');
     var formats = require('web.formats');
+    var data_manager = require('web.data_manager');
+    var core = require('web.core');
+    var _t = core._t;
     /*
     One2many字段增加复制按钮
     */
     ListView.List.include({
-        /* 绑定事件，监控复制按钮被点击 */
+        /** 绑定事件，监控复制按钮被点击 */
         init: function () {
             this._super.apply(this, arguments);
             var self = this;
@@ -34,7 +37,7 @@ odoo.define('core.core', function (require) {
                 _(this.columns).any(function (column) { return column.meta; })) {
                 return;
             }
-            /* 增加复制按钮 */
+            /** 增加复制按钮 */
             var cells = [];
             if (this.options.deletable) {
                 cells.push('<td class="copy_record"></td>');
@@ -62,7 +65,7 @@ odoo.define('core.core', function (require) {
     });
 
     ListView.include({
-        /* 在form中的tree列表行上前添加复制的按钮 以方便创建相同的行 */
+        /** 在form中的tree列表行上前添加复制的按钮 以方便创建相同的行 */
         make_empty_record_copy: function (copy_recored) {
             var attrs = { id: false };
             _(this.columns).chain()
@@ -97,7 +100,7 @@ odoo.define('core.core', function (require) {
         }
     });
 
-    /*
+    /**
     使用 options="{'color':'random'}" 来实现多对多控件标签显示随机颜色
     */
     form_relational.FieldMany2ManyTags.include({
@@ -113,7 +116,9 @@ odoo.define('core.core', function (require) {
             this._super.apply(this, arguments);
         },
     });
-    //在页面的 表头部分 添加公司图标 及公司名称
+    /**2016-11-15 开阖静静(gilbert@osbzr.com)
+    *在页面的 表头部分 添加公司图标 及公司名称
+     */
     UserMenu.include({
           do_update: function () {
             var self =this;
@@ -130,7 +135,9 @@ odoo.define('core.core', function (require) {
             $company_avatar.attr('src', company_avatar_src);
         },
     });
-    /*把设置默认值的的按钮菜单 放到form菜单的更多里面。
+    /**
+     * 2016-11-15 开阖静静(gilbert@osbzr.com)
+     * 把设置默认值的的按钮菜单 放到form菜单的更多里面。
     */
     FormView.include({
        render_sidebar: function($node) {
@@ -147,7 +154,10 @@ odoo.define('core.core', function (require) {
             this.open_defaults_dialog();
         },
     });
-    //頁面title 換成自己定義的字符！
+    /**2016-11-09  开阖静静(gilbert@osbzr.com)
+     * 頁面title 換成自己定義的字符！
+     */
+
     WebClient.include({
          init: function(parent) {
                 this._super(parent);
@@ -162,7 +172,7 @@ odoo.define('core.core', function (require) {
             this.set("title_part", tmp);
         },
     });
-    /*
+    /**2016-11-23  开阖静静(gilbert@osbzr.com)
     * pivot 视图改造 (在pivot 视图中 特殊颜色 标示满足条件的字段) 只需要在对应的字段上例如
     *<field name="goods_qty" type="measure" pivot_color="{'color':'blue','greater_than_field':'cost'}"/>
     *<field name="goods_uos_qty" type="measure"   pivot_color="{'color':'blue','greater_than':15 }"/>
@@ -170,25 +180,65 @@ odoo.define('core.core', function (require) {
     * greater_than 为对比的字段  类型为float 是个常量
     * greater_than_field 为字段name 是变量
     * greater_than 和 greater_than_field 同时存在,以greater_than_field为优先
+    *2016-12-16  开阖静静(gilbert@osbzr.com)
+    *  pivot 视图中某些字段加了权限组字段 但是不起作用 没在相应权限组里面的人任然能够看到对应的字段
+    *  bug 造成原因 : 系统原生代码里面没有处理这部分的功能 在取数据的时候取出了所有的可以用来显示的数据
+    *  但是系统后台是对前端的数据经过处理的 如果不让看到的字段 会有invisible='1' 和 modifiers:{'invisible':true}
+    *  所以可以根据这点差异进行必要数据处理
+     *   willstart 有个坑.....willstart 中的代码总会执行..
     * */
+
     PivotView.include({
          init: function() {
              this.pivot_color = [];
+             this.invisible_field = [];
              this._super.apply(this, arguments);
          },
          willStart: function () {
              var self = this;
-             var return_value = this._super(parent);
              self.pivot_color_field = [];
+
              this.fields_view.arch.children.forEach(function (field) {
+                  if(field.attrs.invisible==='1') {
+                    self.invisible_field.push(field.attrs.name);
+                  }
                  if (field.attrs && field.attrs.pivot_color!=undefined){
                     self.pivot_color_field.push(field.attrs.name);
                     var pivot_color_obj =py.eval(field.attrs.pivot_color);
                     self.pivot_color.push(pivot_color_obj);
                  }
+            });
+            return this._super.apply(this, arguments);;
+        },
+
+        prepare_fields: function (fields) {
+            var self = this,
+                groupable_types = ['many2one', 'char', 'boolean',
+                                   'selection', 'date', 'datetime'];
+            this.fields = fields;
+            _.each(fields, function (field, name) {
+                if ((name !== 'id') && (field.store === true) && self.invisible_field.indexOf(name)<0) {
+                    // 不在要隐藏的字段的列表里面
+                    if ((field.type === 'integer' || field.type === 'float' || field.type === 'monetary')) {
+                        self.measures[name] = field;
+                    }
+                    if (_.contains(groupable_types, field.type)) {
+                        self.groupable_fields[name] = field;
+                    }
+                }
+            });
+            this.measures.__count__ = {string: _t("Count"), type: "integer"};
+        },
+        start: function () {
+            var self = this;
+             _.each(self.invisible_field, function (field) {
+                 if(self.active_measures.indexOf(field)>=0){
+                        self.active_measures.splice(self.active_measures.indexOf(field)
+                                                   ,self.active_measures.indexOf(field));}
+                 if(self.measures[field]!==undefined){delete self.measures[field]}
              });
-             return return_value
-         },
+             this._super.apply(this, arguments);
+        },
         change_color: function (rows, $cell, i, j, nbr_measures,field_index) {
             var compare_flag = true,
                 greater_than_field = this.pivot_color[field_index].greater_than_field,
@@ -257,7 +307,10 @@ odoo.define('core.core', function (require) {
         },
 
     });
-    /* 鼠标悬停即展开(二级菜单) --前提是在backend_theme 主题下| 在没有安装主题的场景下并没有测试  */
+    /** 2016-11-30  开阖静静(gilbert@osbzr.com)
+    *
+    * 鼠标悬停即展开(二级菜单) --前提是在backend_theme
+     * 主题下| 在没有安装主题的场景下并没有测试  */
     Menu.include({
         events: {
             mouseenter: "on_open_second_menu",

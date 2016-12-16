@@ -119,7 +119,7 @@
 			</field>
 		</record>
 
-		<menuitem name="商机" id="menu_crm"/>
+		<menuitem name="商机" id="menu_crm" web_icon="good_crm,static/description/crm.png"/>
 		<menuitem name="商机" id="menu_opportunity" parent="menu_crm"
 		action="action_opportunity" sequence='1'/>
 	</data>

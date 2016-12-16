@@ -27,6 +27,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>
-         <menuitem id='report_template_action_menu' action='report_template_action' parent='base.menu_reporting_config' sequence='10'/>
+         <menuitem id='report_template_action_menu' action='report_template_action' parent='report.reporting_menuitem' sequence='10'/>
     </data>
 </openerp>
