@@ -98,7 +98,7 @@
             <field name="name">staff.employee.kanban</field>
             <field name="model">staff</field>
             <field name="arch" type="xml">
-                <kanban create="false">
+                <kanban>
                   <field name="name"/>
                   <field name="work_phone"/>
                   <field name="work_email"/>
