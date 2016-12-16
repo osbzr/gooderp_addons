@@ -49,5 +49,11 @@
             <field name='prefix'>DIS/%(y)s%(month)s</field>
         </record>
 
+        <record id='outsource_sequence' model='ir.sequence'>
+            <field name='name'>委外加工单</field>
+            <field name='code'>outsource</field>
+            <field eval='4' name='padding'/>
+            <field name='prefix'>OUT/%(y)s%(month)s</field>
+        </record>
     </data>
 </openerp>

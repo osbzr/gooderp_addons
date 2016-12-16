@@ -63,14 +63,14 @@ class wh_move_line(models.Model):
     @api.depends('move_id.warehouse_id')
     def _get_line_warehouse(self):
         self.warehouse_id = self.move_id.warehouse_id.id
-        if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly') and self.type == 'in':
+        if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly' or self.move_id.origin == 'outsource') and self.type == 'in':
             self.warehouse_id = self.env.ref('warehouse.warehouse_production').id
 
     @api.one
     @api.depends('move_id.warehouse_dest_id')
     def _get_line_warehouse_dest(self):
         self.warehouse_dest_id = self.move_id.warehouse_dest_id.id
-        if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly') and self.type == 'out':
+        if (self.move_id.origin == 'wh.assembly' or self.move_id.origin == 'wh.disassembly' or self.move_id.origin == 'outsource') and self.type == 'out':
             self.warehouse_dest_id = self.env.ref('warehouse.warehouse_production').id
 
     @api.one

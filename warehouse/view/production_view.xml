@@ -248,6 +248,149 @@
             </field>
         </record>
 
+        <record id='outsource_tree' model='ir.ui.view'>
+            <field name='name'>outsource.tree</field>
+            <field name='model'>outsource</field>
+            <field name='arch' type='xml'>
+                <tree string='委外加工单' colors='blue:state == "draft"'>
+                    <field name="outsource_partner_id"/>
+                    <field name='date'/>
+                    <field name='name'/>
+                    <field name='outsource_fee'/>
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='组合件'/>
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='组合件数量'/>
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='组合件单位'/>
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='组合件单位成本'/>
+                    <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost'}" string='组合件成本'/>
+
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='子件'/>
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='子件数量'/>
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'uom_id'}" string='子件单位'/>
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='子件单位成本'/>
+                    <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本'/>
+                    <field name='warehouse_id'/>
+                    <field name='state'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id='outsource_form' model='ir.ui.view'>
+            <field name='name'>outsource.form</field>
+            <field name='model'>outsource</field>
+            <field name='arch' type='xml'>
+                <form string='委外加工单'>
+                    <header>
+                        <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft'/>
+                        <button name='cancel_approved_order' type='object' string='反审核' states='done'/>
+                        <field name='state' widget='statusbar' readonly='1'/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name='outsource_partner_id'/>
+                                <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name='warehouse_id' />
+                                <field name='bom_id' options="{'no_create': 1}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name='goods_id' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}"/>
+                                <field name='goods_qty' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}"/>
+                            </group>
+                            <group>
+                                <field name='outsource_fee' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name='wh_assembly_id'/>
+                                <field name='warehouse_dest_id'/>
+                                <field name='is_many_to_many_combinations'/>
+                                <field name='invoice_id' readonly='1'/>
+                                <field name='voucher_id' readonly='1'/>
+                            </group>
+                        </group>
+
+                        <group string='组合件' attrs="{'invisible': [('is_many_to_many_combinations', '!=', True)]}">
+                            <field nolabel='1' name='line_in_ids' context="{'type': 'in',}"
+                                attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                  <tree string='库存调拨' editable='bottom'>
+                                    <field name='goods_id' required='1'/>
+                                    <field name='attribute_id'
+                                        domain="[('goods_id', '=', goods_id)]"
+                                        attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                                        groups='goods.multi_attrs_groups' />
+                                    <field name='lot'
+                                        attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
+                                    <field name='goods_uos_qty'
+                                        groups='goods.auxiliary_unit_groups' sum='1'/>
+                                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                                    <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1'/>
+                                    <field name='uom_id' required='1'/>
+                                    <field name='cost_unit' string='入库单位成本' readonly='1'/>
+                                    <field name='cost' string='入库金额' readonly='1' sum='1'/>
+                                    <field name='note' string='备注'/>
+                                    <field name='using_batch' invisible='1'/>
+                                    <field name='force_batch_one' invisible='1'/>
+                                    <field name='using_attribute' invisible='1'/>
+                                </tree>
+                            </field>
+                        </group>
+
+                        <group string='子件'>
+                            <field nolabel='1' name='line_out_ids' context="{'lot': True,
+                                'type': 'out',
+                            }" attrs="{'readonly': [('state', '!=', 'draft')]}" >
+                                 <tree string='库存调拨' editable='bottom'>
+                                        <field name='goods_id' required='1' />
+                                        <field name='attribute_id'
+                                            domain="[('goods_id', '=', goods_id)]"
+                                            attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                                            groups='goods.multi_attrs_groups'/>
+                                        <field name='lot_id'
+                                            groups='goods.batch_groups'
+                                            attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
+                                            domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
+                                            context="{'lot': True}"
+                                            options="{'no_open': True, 'no_create': True}" />
+                                        <field name='goods_uos_qty' sum='1'
+                                            widget='float_limit'
+                                            options="{'field': 'lot_uos_qty'}"
+                                            groups='goods.auxiliary_unit_groups'/>
+                                        <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                                        <field name='goods_qty' sum='1'
+                                            widget='float_limit'
+                                            options="{'field': 'lot_qty'}"
+                                            attrs="{'readonly': [('force_batch_one', '=', True)]}" />
+                                        <field name='uom_id' required='1' />
+                                        <field name='cost_unit' string='出库单位成本' readonly='1' />
+                                        <field name='cost' string='出库成本' readonly='1' sum='1' />
+                                        <field name='note' string='备注' />
+                                        <field name='using_attribute' invisible='1' />
+                                        <field name='using_batch' invisible='1' />
+                                        <field name='force_batch_one' invisible='1' />
+                                        <field name='lot_qty' invisible='1' />
+                                        <field name='lot_uos_qty' invisible='1' />
+                                    </tree>
+                            </field>
+                        </group>
+
+                        <group>
+                            <field name='note' nolabel='1' placeholder='备注...' />
+                        </group>
+
+                        <group col='6'>
+                            <group colspan='2'>
+                                <field name='create_uid' string='制单人' readonly='1' />
+                                <field name='create_date' string='录单时间' readonly='1' />
+                            </group>
+                            <group colspan='2'>
+                                <field name='write_uid' string='最后修改人' readonly='1' />
+                                <field name='write_date' string='最后修改时间' readonly='1' />
+                            </group>
+                            <group colspan='2'>
+                                <field name='approve_uid' readonly='1' />
+                                <field name='approve_date' readonly='1' />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
         <record id='wh_disassembly_tree' model='ir.ui.view'>
             <field name='name'>wh.disassembly.tree</field>
             <field name='model'>wh.disassembly</field>
