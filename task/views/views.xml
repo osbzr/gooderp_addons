@@ -159,6 +159,7 @@
 								<field name='just_done'/>
 							</tree>
 						</field>
+						<field name="note" placeholder='描述......'/>
 					</sheet>
 					<div class="oe_chatter">
 						<field name="message_follower_ids" widget="mail_followers"/>
@@ -179,29 +180,69 @@
 					<field name="next_datetime"/>
 					<field name="hours"/>
 					<field name="plan_hours"/>
+					<field name="color"/>
+					<field name="priority"/>
 					<templates>
 						<t t-name="kanban-box">
 							<div t-attf-class="oe_kanban_card oe_kanban_global_click">
-								<p>
-									<t t-esc="record.project_id.value"/>
-									<t t-esc="record.name.value"/>
-									<div groups='task.group_task_hours'>
-										<t t-esc="record.hours.value"/>
-										/
-										<t t-esc="record.plan_hours.value"/>
-									</div>
-								</p>
-								<p>
-									<t t-esc="record.user_id.value"/>
-									<t t-esc="record.next_datetime.value"/>
-									<t t-esc="record.next_action.value"/>
-								</p>
+								<ul class="oe_kanban_colorpicker" data-field="color"/>
+								<div class="o_kanban_image">
+                                    <t>
+                                        <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)"/>
+                                    </t>
+                                    <p>
+										<t t-esc="record.user_id.value"/>
+									</p>
+                                </div>
+                                <div class="oe_kanban_details">
+									<p>
+										<t t-esc="record.project_id.value"/>
+										<t t-esc="record.name.value"/>
+										<div groups='task.group_task_hours'>
+											<t t-esc="record.hours.value"/>
+											/
+											<t t-esc="record.plan_hours.value"/>
+										</div>
+									</p>
+									<p>
+										<t t-esc="record.next_datetime.value"/>
+									</p>
+									<p>
+										<t t-esc="record.next_action.value"/>
+									</p>
+									<field name="priority" widget="priority"/>
+								</div>
 							</div>
 						</t>
 					</templates>
 				</kanban>
 			</field>
 		</record>
+		<record id="task_search" model="ir.ui.view">
+            <field name="name">task.search</field>
+            <field name="model">task</field>
+            <field name="arch" type="xml">
+                <search string="Search Task">
+                    <field name="name" filter_domain="['|',('project_id','ilike',self),('name', 'ilike', self)]"/>
+                    <field name="user_id"/>
+                    <field name="status"/>
+                    <separator/>
+                    <filter string="我的任务" name="assigned_to_me"
+                            domain="[('user_id', '=', uid)]"
+                            help="指派给我的任务"/>
+                    <filter string="未指派的" name="unassigned"
+                            domain="[('user_id','=', False)]" help="未指派的任务"/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter name="group_user_id" string="指派给" context="{'group_by':'user_id'}"/>
+                        <filter name="project_id" string="项目" context="{'group_by':'project_id'}"/>
+                        <filter name="group_status" string="阶段" context="{'group_by':'status'}"/>
+                        <separator orientation="vertical" />
+                        <filter string="创建月份" context="{'group_by':'create_date:month'}" name="month"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 		<record model="ir.ui.view" id="task_calendar">
             <field name="name">task.calendar</field>
             <field name="model">task</field>
@@ -256,7 +297,11 @@
 		<record model="ir.actions.act_window" id="action_task">
 			<field name="name">任务</field>
 			<field name="res_model">task</field>
-			<field name="view_mode">kanban,calendar,tree,form</field>
+			<field name="view_mode">kanban,calendar,tree,form,search</field>
+			<field name="context">{
+                    'search_default_group_status': 1,
+                }
+            </field>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">点击创建一个任务</p>
 			</field>

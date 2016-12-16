@@ -230,4 +230,28 @@ class test_sell_adjust_line(TransactionCase):
             line.price_taxed = 117
             line.discount_rate = 10
             line.onchange_discount_rate()
-            self.assertTrue(line.discount_amount == 10)
+
+    def test_onchange_goods_id_tax_rate(self):
+        ''' 测试 修改产品时，调整单行税率变化 '''
+        self.adjust.partner_id = self.env.ref('core.jd')
+        for order_line in self.adjust.line_ids:
+            # partner 无 税率，调整单行产品无税率
+            self.env.ref('core.jd').tax_rate = 0
+            self.env.ref('goods.cable').tax_rate = 0
+            order_line.onchange_goods_id()
+            # partner 有 税率，调整单行产品无税率
+            self.env.ref('core.jd').tax_rate = 10
+            self.env.ref('goods.cable').tax_rate = 0
+            order_line.onchange_goods_id()
+            # partner 无税率，调整单行产品有税率
+            self.env.ref('core.jd').tax_rate = 0
+            self.env.ref('goods.cable').tax_rate = 10
+            order_line.onchange_goods_id()
+            # partner 税率 > 调整单行产品税率
+            self.env.ref('core.jd').tax_rate = 11
+            self.env.ref('goods.cable').tax_rate = 10
+            order_line.onchange_goods_id()
+            # partner 税率 =< 调整单行产品税率
+            self.env.ref('core.jd').tax_rate = 9
+            self.env.ref('goods.cable').tax_rate = 10
+            order_line.onchange_goods_id()

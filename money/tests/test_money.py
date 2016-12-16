@@ -209,7 +209,7 @@ class test_money_order(TransactionCase):
                 'note': 'note',
                 'line_ids': [(0, 0, {
                     'bank_id': self.env.ref('core.comm').id,
-                    'amount': 200.0, 'note': 'money note'})],
+                    'amount': 220.0, 'note': 'money note'})],
                 'source_ids': [(0, 0, {
                     'name': invoice.id,
                     'category_id': self.env.ref('money.core_category_purchase').id,

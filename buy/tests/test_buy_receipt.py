@@ -276,6 +276,28 @@ class test_buy_receipt(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
         warehouse.scan_barcode(model_name,barcode,buy_order_return.id)
 
+    def test_onchange_partner_id(self):
+        ''' 测试 改变 partner, 入库单行产品税率变化 '''
+        # partner 无 税率，入库单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 0
+        self.env.ref('goods.keyboard').tax_rate = 0
+        self.receipt.onchange_partner_id()
+        # partner 有 税率，入库单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 10
+        self.env.ref('goods.keyboard').tax_rate = 0
+        self.receipt.onchange_partner_id()
+        # partner 无税率，入库单行产品无税率
+        self.env.ref('core.lenovo').tax_rate = 0
+        self.env.ref('goods.keyboard').tax_rate = 10
+        self.receipt.onchange_partner_id()
+        # partner 税率 > 入库单行产品税率
+        self.env.ref('core.lenovo').tax_rate = 11
+        self.env.ref('goods.keyboard').tax_rate = 10
+        self.receipt.onchange_partner_id()
+        # partner 税率 =< 入库单行产品税率
+        self.env.ref('core.lenovo').tax_rate = 11
+        self.env.ref('goods.keyboard').tax_rate = 12
+        self.receipt.onchange_partner_id()
 
 class test_wh_move_line(TransactionCase):
 
@@ -311,3 +333,28 @@ class test_wh_move_line(TransactionCase):
             line.goods_id.cost = 1.0
             line.with_context({'default_is_return': True,
                 'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
+
+    def test_onchange_goods_id_tax_rate(self):
+        ''' 测试 修改产品时，入库单行税率变化 '''
+        self.receipt.partner_id = self.env.ref('core.lenovo')
+        for order_line in self.receipt.line_in_ids:
+            # partner 无 税率，入库单行产品无税率
+            self.env.ref('core.lenovo').tax_rate = 0
+            self.env.ref('goods.keyboard').tax_rate = 0
+            order_line.with_context({'default_partner': self.receipt.partner_id.id}).onchange_goods_id()
+            # partner 有 税率，入库单行产品无税率
+            self.env.ref('core.lenovo').tax_rate = 10
+            self.env.ref('goods.keyboard').tax_rate = 0
+            order_line.with_context({'default_partner': self.receipt.partner_id.id}).onchange_goods_id()
+            # partner 无税率，入库单行产品有税率
+            self.env.ref('core.lenovo').tax_rate = 0
+            self.env.ref('goods.keyboard').tax_rate = 10
+            order_line.with_context({'default_partner': self.receipt.partner_id.id}).onchange_goods_id()
+            # partner 税率 > 入库单行产品税率
+            self.env.ref('core.lenovo').tax_rate = 11
+            self.env.ref('goods.keyboard').tax_rate = 10
+            order_line.with_context({'default_partner': self.receipt.partner_id.id}).onchange_goods_id()
+            # partner 税率 =< 入库单行产品税率
+            self.env.ref('core.lenovo').tax_rate = 9
+            self.env.ref('goods.keyboard').tax_rate = 10
+            order_line.with_context({'default_partner': self.receipt.partner_id.id}).onchange_goods_id()

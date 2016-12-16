@@ -19,7 +19,7 @@ class supplier_statements_report(models.Model):
             ('id', '=', self.id - 1),
             ('partner_id', '=', self.partner_id.id)
         ])
-        # 相邻的两条记录，partner不同，应收款余额重新计算
+        # 相邻的两条记录，partner不同，应付款余额要清零并重新计算
         if pre_record:
             before_balance = pre_record.this_balance_amount
         else:
