@@ -11,6 +11,7 @@
         <menuitem id='wh_out_menu' action='wh_out_action' name='其他出库单' parent='warehouse_order' sequence='8' />
         <menuitem id='wh_assembly_menu' action='wh_assembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='9' />
         <menuitem id='wh_disassembly_menu' action='wh_disassembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='10' />
+        <menuitem id='outsoruce_menu' action='outsource_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='11' />
 
 		<!-- 主数据 -->
 		<menuitem id='warehouse_master' name='主数据' parent='warehouse_root' sequence='2' />
