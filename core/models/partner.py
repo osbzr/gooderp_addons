@@ -28,6 +28,8 @@ class partner(models.Model):
     payable = fields.Float(u'应付余额', readonly=True,
                            digits=dp.get_precision('Amount'))
     tax_num = fields.Char(u'税务登记号')
+    tax_rate = fields.Float(u'税率(%)',
+                            help=u'业务伙伴税率')
     bank_name = fields.Char(u'开户行')
     bank_num = fields.Char(u'银行账号')
 

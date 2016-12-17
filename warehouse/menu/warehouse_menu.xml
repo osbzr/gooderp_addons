@@ -5,12 +5,13 @@
 
         <!-- 出入库单据 -->
         <menuitem id='warehouse_order' name='单据' parent='warehouse_root' sequence='1' />
-        <menuitem id='wh_internal_menu' action='wh_internal_action' name='调拨单' parent='warehouse_order' sequence='5' groups='warehouse.multi_warehouse_groups' />
+        <menuitem id='wh_internal_menu' action='wh_internal_action' name='移库单' parent='warehouse_order' sequence='5' groups='warehouse.multi_warehouse_groups' />
         <menuitem id='wh_inventory_menu' action='wh_inventory_action' name='盘点单' parent='warehouse_order' sequence='6' />
         <menuitem id='wh_in_menu' action='wh_in_action' name='其他入库单' parent='warehouse_order' sequence='7' />
         <menuitem id='wh_out_menu' action='wh_out_action' name='其他出库单' parent='warehouse_order' sequence='8' />
         <menuitem id='wh_assembly_menu' action='wh_assembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='9' />
         <menuitem id='wh_disassembly_menu' action='wh_disassembly_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='10' />
+        <menuitem id='outsoruce_menu' action='outsource_action' parent='warehouse_order' groups='warehouse.assembly_groups' sequence='11' />
 
 		<!-- 主数据 -->
 		<menuitem id='warehouse_master' name='主数据' parent='warehouse_root' sequence='2' />

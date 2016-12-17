@@ -50,6 +50,8 @@ class goods(models.Model):
     cost = fields.Float(u'成本',
                         required=True,
                         digits=dp.get_precision('Amount'))
+    tax_rate = fields.Float(u'税率(%)',
+                            help=u'产品税率')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '产品不能重名'),

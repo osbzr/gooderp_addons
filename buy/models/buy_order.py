@@ -154,6 +154,21 @@ class buy_order(models.Model):
         total = sum(line.subtotal for line in self.line_ids)
         self.discount_amount = total * self.discount_rate * 0.01
 
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        if self.partner_id:
+            for line in self.line_ids:
+                if line.goods_id.tax_rate and self.partner_id.tax_rate:
+                    if line.goods_id.tax_rate >= self.partner_id.tax_rate:
+                        line.tax_rate = self.partner_id.tax_rate
+                    else:
+                        line.tax_rate = line.goods_id.tax_rate
+                elif line.goods_id.tax_rate and not self.partner_id.tax_rate:
+                    line.tax_rate = line.goods_id.tax_rate
+                elif not line.goods_id.tax_rate and self.partner_id.tax_rate:
+                    line.tax_rate = self.partner_id.tax_rate
+                else:
+                    line.tax_rate = self.env.user.company_id.import_tax_rate
 
     @api.multi
     def unlink(self):
@@ -423,6 +438,18 @@ class buy_order_line(models.Model):
                     and self.quantity >= line.min_qty:
                     self.price_taxed = line.price
                     break
+
+            if self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
+                if self.goods_id.tax_rate >= self.order_id.partner_id.tax_rate:
+                    self.tax_rate = self.order_id.partner_id.tax_rate
+                else:
+                    self.tax_rate = self.goods_id.tax_rate
+            elif self.goods_id.tax_rate and not self.order_id.partner_id.tax_rate:
+                self.tax_rate = self.goods_id.tax_rate
+            elif not self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
+                self.tax_rate = self.order_id.partner_id.tax_rate
+            else:
+                self.tax_rate = self.env.user.company_id.import_tax_rate
 
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):

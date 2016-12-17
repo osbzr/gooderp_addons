@@ -66,153 +66,87 @@ class money_order(models.Model):
     def create_money_order_get_voucher(self, line_ids, source_ids, partner, name):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         self.write({'voucher_id': vouch_obj.id})
+        amount_all = 0.0
+        for line in line_ids:
+            if not line.bank_id.account_id:
+                raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
+            # 生成借方明细行
+            # param: line, name, account_id, debit, credit, voucher_id, partner_id
+            self._create_voucher_line(line,
+                                     u"收款单%s" % (name),
+                                     line.bank_id.account_id.id,
+                                     line.amount,
+                                     0,
+                                     vouch_obj.id,
+                                     '')
+            amount_all += line.amount
+        if self.discount_amount != 0:
+            # 生成借方明细行
+            # param: False, name, account_id, debit, credit, voucher_id, partner_id
+            self._create_voucher_line(False,
+                                     u"%s%s收款单%s 现金折扣" % (self.date, partner.name, name),
+                                     self.discount_account_id.id,
+                                     self.discount_amount,
+                                     0,
+                                     vouch_obj.id,
+                                     self.partner_id.id)
 
-        if not source_ids:
-            for line in line_ids:
-                if not line.bank_id.account_id:
-                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
-                # 生成借方明细行
-                # param: line, name, account_id, debit, credit, voucher_id, partner_id
-                vouch_debit_line = self._create_voucher_line(line,
-                                                             u"收款单%s" % (name),
-                                                             line.bank_id.account_id.id,
-                                                             line.amount * (line.currency_id.rate or 1),
-                                                             0,
-                                                             vouch_obj.id,
-                                                             '')
-                # 生成贷方明细行
-                # param: line, name, account_id, debit, credit, voucher_id, partner_id
-                if partner.c_category_id:
-                    partner_account_id = partner.c_category_id.account_id.id
-                vouch_credit_line = self._create_voucher_line(line,
-                                                              u"%s%s收款单%s " % (self.date, partner.name, name),
-                                                              partner_account_id,
-                                                              0,
-                                                              line.amount * (line.currency_id.rate or 1),
-                                                              vouch_obj.id,
-                                                              partner.id)
+        if partner.c_category_id:
+            partner_account_id = partner.c_category_id.account_id.id
 
-                if line.currency_id.id != self.env.user.company_id.currency_id.id:
-                    vouch_credit_line.write({'currency_id': line.currency_id.id,
-                                             'currency_amount': line.amount,
-                                             'rate_silent': line.currency_id.rate})
-                    vouch_debit_line.write({'currency_id': line.currency_id.id,
-                                            'currency_amount': line.amount,
-                                            'rate_silent': line.currency_id.rate
-                                            })
-
-        if source_ids:
-            for line in line_ids:
-                if not line.bank_id.account_id:
-                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
-                # 生成借方明细行
-                # param: line, name, account_id, debit, credit, voucher_id, partner_id
-                self._create_voucher_line(line,
-                                         u"收款单%s" % (name),
-                                         line.bank_id.account_id.id,
-                                         line.amount,
-                                         0,
-                                         vouch_obj.id,
-                                         '')
-
-            if partner.c_category_id:
-                partner_account_id = partner.c_category_id.account_id.id
-            for source in source_ids:
-                # 生成贷方明细行
-                # param: source, name, account_id, debit, credit, voucher_id, partner_id
-                self._create_voucher_line(source,
-                                          u"%s收款单%s " % (partner.name, name),
-                                          partner_account_id,
-                                          0,
-                                          source.this_reconcile,
-                                          vouch_obj.id,
-                                          self.partner_id.id)
-
-            if self.discount_amount != 0:
-                # 生成借方明细行
-                # param: False, name, account_id, debit, credit, voucher_id, partner_id
-                self._create_voucher_line(False,
-                                         u"%s%s收款单%s 折扣" % (self.date, partner.name, name),
-                                         self.discount_account_id.id,
-                                         self.discount_amount,
-                                         0,
-                                         vouch_obj.id,
-                                         self.partner_id.id)
+        # 生成贷方明细行
+        # param: source, name, account_id, debit, credit, voucher_id, partner_id
+        self._create_voucher_line('',
+                                  u"%s收款单%s " % (partner.name, name),
+                                  partner_account_id,
+                                  0,
+                                  amount_all + self.discount_amount,
+                                  vouch_obj.id,
+                                  self.partner_id.id)
         return vouch_obj
 
     @api.multi
     def create_money_order_pay_voucher(self, line_ids, source_ids, partner, name):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         self.write({'voucher_id': vouch_obj.id})
-        if not source_ids:
-            for line in line_ids:
-                if not line.bank_id.account_id:
-                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
-                # 生成贷方明细行
-                # param: line, name, account_id, debit, credit, voucher_id, partner_id
-                vouch_credit_line = self._create_voucher_line(line,
-                                                              u"付款单%s" % (name),
-                                                              line.bank_id.account_id.id,
-                                                              0,
-                                                              line.amount * (line.currency_id.rate or 1),
-                                                              vouch_obj.id,
-                                                              '')
-                # 生成借方明细行
-                # param: line, name, account_id, debit, credit, voucher_id, partner_id
-                if partner.s_category_id:
-                    partner_account_id = partner.s_category_id.account_id.id
-                vouch_debit_line = self._create_voucher_line(line,
-                                                             u"付款单%s" % (name),
-                                                             partner_account_id,
-                                                             line.amount  * (line.currency_id.rate or 1) + self.discount_amount or 0,
-                                                             0,
-                                                             vouch_obj.id,
-                                                             partner.id)
 
-                if line.currency_id.id != self.env.user.company_id.currency_id.id:
-                    vouch_credit_line.write({'currency_id': line.currency_id.id,
-                                             'currency_amount': line.amount,
-                                             'rate_silent': line.currency_id.rate})
-                    vouch_debit_line.write({'currency_id': line.currency_id.id,
-                                            'currency_amount': line.amount,
-                                            'rate_silent': line.currency_id.rate})
+        amount_all = 0.0
+        for line in line_ids:
+            if not line.bank_id.account_id:
+                raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
+            # 生成贷方明细行 credit
+            # param: line, name, account_id, debit, credit, voucher_id, partner_id
+            self._create_voucher_line(line,
+                                      u"付款单%s" % (name),
+                                      line.bank_id.account_id.id,
+                                      0,
+                                      line.amount,
+                                      vouch_obj.id,
+                                      '')
+            amount_all += line.amount
+        if partner.s_category_id:
+            partner_account_id = partner.s_category_id.account_id.id
 
-        if source_ids:
-            for line in line_ids:
-                if not line.bank_id.account_id:
-                    raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
-                # 生成贷方明细行 credit
-                # param: line, name, account_id, debit, credit, voucher_id, partner_id
-                self._create_voucher_line(line,
-                                          u"付款单%s" % (name),
-                                          line.bank_id.account_id.id,
-                                          0,
-                                          line.amount,
-                                          vouch_obj.id,
-                                          '')
-            if partner.s_category_id:
-                partner_account_id = partner.s_category_id.account_id.id
-            for source in source_ids:
-                # 生成借方明细行 debit
-                # param: source, name, account_id, debit, credit, voucher_id, partner_id
-                self._create_voucher_line(source,
-                                          u"%s%s付款单%s" % (self.date,partner.name, name),
-                                          partner_account_id,
-                                          source.this_reconcile,
-                                          0,
-                                          vouch_obj.id,
-                                          self.partner_id.id)
+        # 生成借方明细行 debit
+        # param: source, name, account_id, debit, credit, voucher_id, partner_id
+        self._create_voucher_line('',
+                                  u"%s%s付款单%s" % (self.date,partner.name, name),
+                                  partner_account_id,
+                                  amount_all - self.discount_amount,
+                                  0,
+                                  vouch_obj.id,
+                                  self.partner_id.id)
 
-            if self.discount_amount != 0:
-                # 生成贷方明细行 credit
-                # param: False, name, account_id, debit, credit, voucher_id, partner_id
-                self._create_voucher_line(line,
-                                          u"%s%s付款单%s 折扣" % (self.date, partner.name, name),
-                                          self.discount_account_id.id,
-                                          0,
-                                          self.discount_amount,
-                                          vouch_obj.id,
-                                          self.partner_id.id)
+        if self.discount_amount != 0:
+            # 生成借方明细行 debit
+            # param: False, name, account_id, debit, credit, voucher_id, partner_id
+            self._create_voucher_line(line,
+                                      u"%s%s付款单%s 手续费" % (self.date, partner.name, name),
+                                      self.discount_account_id.id,
+                                      self.discount_amount,
+                                      0,
+                                      vouch_obj.id,
+                                      self.partner_id.id)
         return vouch_obj
 
 

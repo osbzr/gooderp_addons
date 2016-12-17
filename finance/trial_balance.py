@@ -2,6 +2,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from math import fabs
+import copy
 
 class TrialBalance(models.Model):
     """科目余额表"""
@@ -157,7 +158,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
     def construct_trial_balance_dict(self, trial_balance_dict, last_period):
         """ 结合上一期间的 数据 填写  trial_balance_dict(余额表 记录生成dict)   """
-        currency_dcit = trial_balance_dict.copy()
+        currency_dcit = copy.deepcopy(trial_balance_dict)
         for trial_balance in self.env['trial.balance'].search([('period_id', '=', last_period.id)]):
             subject_name_id = trial_balance.subject_name_id.id
             [initial_balance_credit, initial_balance_debit, ending_balance_credit, ending_balance_debit, this_debit,
@@ -418,7 +419,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 if local_currcy_period.is_closed:
                     cumulative_year_occurrence = self.get_year_balance(local_currcy_period, account_line)  # 本期合计 本年累计
                 else:
-                    cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(),
+                    cumulative_year_occurrence = self.get_unclose_year_balance(copy.deepcopy(initial_balance),
                                                                                local_currcy_period, account_line)
                 create_vals += cumulative_year_occurrence
                 if local_currcy_period.id == self.period_end_id.id:
@@ -471,7 +472,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 if local_currcy_period.is_closed:
                     cumulative_year_occurrence = self.get_year_balance(local_currcy_period, account_line)
                 else:
-                    cumulative_year_occurrence = self.get_unclose_year_balance(initial_balance.copy(),
+                    cumulative_year_occurrence = self.get_unclose_year_balance(copy.deepcopy(initial_balance),
                                                                                local_currcy_period, account_line)
                 create_vals += cumulative_year_occurrence
                 if local_currcy_period.id == self.period_end_id.id:
