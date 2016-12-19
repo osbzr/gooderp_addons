@@ -342,8 +342,12 @@ class outsource(models.Model):
                              help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one('voucher', copy=False, ondelete='set null', string=u'凭证号')
 
-    outsource_partner_id = fields.Many2one('partner', string=u'委外供应商')
-    wh_assembly_id = fields.Many2one('wh.assembly', string=u'关联的组装单')
+    outsource_partner_id = fields.Many2one('partner', string=u'委外供应商',
+                                           readonly=True,
+                                           states={'draft': [('readonly', False)]},)
+    wh_assembly_id = fields.Many2one('wh.assembly', string=u'关联的组装单',
+                                     readonly=True,
+                                     states={'draft': [('readonly', False)]},)
     outsource_fee = fields.Float(string=u'委外费用',
                                  digits=dp.get_precision('Amount'))
     invoice_id = fields.Many2one('money.invoice',
@@ -554,7 +558,7 @@ class outsource(models.Model):
     def create_vourcher_line_data(self, outsource, voucher_row):
         line_out_data, line_in_data = [], []
         for line_out in outsource.line_out_ids:
-            account_id = self.env.ref('finance.account_cost').id
+            account_id = line_out.goods_id.category_id.account_id.id
             line_out_data.append({'credit': line_out.cost,
                                   'goods_id': line_out.goods_id.id,
                                   'voucher_id': voucher_row.id,
