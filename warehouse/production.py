@@ -558,7 +558,7 @@ class outsource(models.Model):
     def create_vourcher_line_data(self, outsource, voucher_row):
         line_out_data, line_in_data = [], []
         for line_out in outsource.line_out_ids:
-            account_id = line_out.goods_id.category_id.account_id.id
+            account_id = self.env.ref('finance.account_cost').id
             line_out_data.append({'credit': line_out.cost,
                                   'goods_id': line_out.goods_id.id,
                                   'voucher_id': voucher_row.id,
