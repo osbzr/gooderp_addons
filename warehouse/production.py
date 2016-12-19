@@ -358,8 +358,9 @@ class outsource(models.Model):
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         if self.goods_id:
+            self.line_in_ids = False
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
-                             'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id}]
+                                 'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id}]
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -407,6 +408,8 @@ class outsource(models.Model):
                                      'uos_id': line.goods_id.uos_id.id
                                      })
 
+            self.line_in_ids = False
+            self.line_out_ids = False
             self.line_out_ids = line_out_ids
             self.line_in_ids = line_in_ids
         elif self.line_in_ids: # 不存在 物料清单，有组合单行
