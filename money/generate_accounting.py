@@ -213,17 +213,8 @@ class money_invoice(models.Model):
                 vals.update({'init_obj': 'money_invoice', })
             invoice.create_voucher_line(vals)
 
-            # 删除初始非需要的凭证明细行
-            # else时跟据不同的产品明细行不同
-            if invoice.is_init:
-                vouch_line_ids = self.env['voucher.line'].search([
-                    ('account_id', '=', invoice.category_id.account_id.id),
-                    ('init_obj', '=', 'money_invoice')])
-                for vouch_line_id in vouch_line_ids:
-                    vouch_line_id.unlink()
-            print 'aaaaaaaaaaaaaaa',invoice.category_id.type
+            # 如果为采购或销售，则生成凭证后删除统一的凭证行，按出入库内容明细行生成
             if invoice.category_id.type in ('expense','income'):
-                print 'bbbbbbbbbbbbbbb'
                 vouch_line_ids = self.env['voucher.line'].search([
                     ('account_id', '=', invoice.category_id.account_id.id),
                     ('voucher_id', '=', vouch_obj.id)])
@@ -231,7 +222,6 @@ class money_invoice(models.Model):
                     vouch_line_id.unlink()
                 wh_move = self.env['wh.move'].search([
                     ('name', '=', invoice.name)])
-
                 for wh_move_line in wh_move.line_out_ids:
                     self.env['voucher.line'].create({
                         'name': u"销售%s" % (wh_move_line.goods_id.name),
@@ -244,7 +234,6 @@ class money_invoice(models.Model):
                         'rate_silent':vals.get('rate_silent'),
                         'init_obj':False,
                         })
-
                 for wh_move_line in wh_move.line_in_ids:
                     self.env['voucher.line'].create({
                         'name': u"采购%s" % (wh_move_line.goods_id.name),
@@ -253,8 +242,16 @@ class money_invoice(models.Model):
                         'voucher_id': vouch_obj.id,
                         'auxiliary_id':vals.get('debit_auxiliary_id', False),
                         'init_obj':False,
-
                         })
+
+         # 删除初始非需要的凭证明细行,不审核凭证
+            if invoice.is_init:
+                vouch_line_ids = self.env['voucher.line'].search([
+                    ('account_id', '=', invoice.category_id.account_id.id),
+                    ('init_obj', '=', 'money_invoice')])
+                for vouch_line_id in vouch_line_ids:
+                    vouch_line_id.unlink()
+            else:
                 vouch_obj.voucher_done()
         return res
 
