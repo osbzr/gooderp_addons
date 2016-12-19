@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cost_order,cost_order,model_cost_order,,1,1,1,1
+access_cost_order_line,cost_order_line,model_cost_order_line,,1,1,1,1

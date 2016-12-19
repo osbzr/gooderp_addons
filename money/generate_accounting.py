@@ -212,7 +212,8 @@ class money_invoice(models.Model):
             if invoice.is_init:
                 vals.update({'init_obj': 'money_invoice', })
             invoice.create_voucher_line(vals)
-            # 删除初始非需要的凭证明细行
+
+         # 删除初始非需要的凭证明细行,不审核凭证
             if invoice.is_init:
                 vouch_line_ids = self.env['voucher.line'].search([
                     ('account_id', '=', invoice.category_id.account_id.id),

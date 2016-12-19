@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<!-- 菜单加入采购模块 -->
+
+
+        <menuitem id="menu_cost_order" name='服务订单' action="cost_order_action"
+            parent="buy.menu_buy_manage" sequence="1"
+            groups='buy.buy_groups'/>
+
+	</data>
+</openerp>

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<!-- 购货订单视图 -->
+
+		<record id="cost_order_tree" model="ir.ui.view">
+			<field name="name">cost.order.tree</field>
+			<field name="model">cost.order</field>
+			<field name="arch" type="xml">
+				<tree string="服务订单">
+					<field name="date"/>
+					<field name="name"/>
+					<field name="partner_id"/>
+					<field name="amount" sum="合计"/>
+					<field name="create_uid" string="制单人"/>
+					<field name="approve_uid"/>
+					<field name="state"/>
+				</tree>
+			</field>
+		</record>
+		<record id="cost_order_form" model="ir.ui.view">
+			<field name="name">cost.order.form</field>
+			<field name="model">cost.order</field>
+			<field name="arch" type="xml">
+				<form string="费用订单">
+					<header>
+						<button name="cost_order_confim" states="draft" string="审核" type="object" class="oe_highlight"/>
+						<button name="cost_order_draft" states="done" string="反审核" type="object"/>
+						<field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="partner_id" required="1"
+								domain="[('s_category_id', '!=', False)]"
+								context="{'form_view_ref': 'core.supplier_address_form'}"/>
+								<field name="date" required="1"/>
+							</group>
+						</group>
+						<field name="line_ids">
+							<tree string="费用明细行" editable="bottom">
+								<field name="category_id" required="1"
+								domain="[('type', '=', 'other_pay')]"/>
+								<field name="amount" sum="合计金额"/>
+								<field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+								<field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
+								<field name="note"/>
+							</tree>
+						</field>
+						<field name="note" placeholder="暂无备注信息"/>
+						<group>
+							<field name="prepayment"/>
+							<field name="bank_account_id"/>
+						</group>
+						<group>
+							<group>
+								<field name="create_uid" readonly="1" string="制单人"/>
+								<field name="approve_uid" readonly="1"/>
+							</group>
+							<group>
+								<field name="create_date" readonly="1" string="录单时间"/>
+								<field name="write_date" readonly="1" string="最后修改时间"/>
+							</group>
+						</group>
+						<field name="wh_move_ids"  widget="many2many_tags" domain="[('state', '=', 'done')]" placeholder="关联出入库单"/>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+	</data>
+</openerp>

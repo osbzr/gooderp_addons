@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 服务管理 action -->
+
+        <record id="cost_order_action" model="ir.actions.act_window">
+            <field name="name">服务订单</field>
+            <field name="res_model">cost.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建服务订单，服务不入库
+              </p>
+            </field>
+        </record>
+
+	</data>
+</openerp>
