@@ -27,6 +27,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>
-         <menuitem id='report_template_action_menu' action='report_template_action' parent='report.reporting_menuitem' sequence='10'/>
+         <menuitem id='report_excel_tempalte' parent="base.menu_custom" sequence='10' name="Excel报表模板"/>
+         <menuitem id='report_template_action_menu' action='report_template_action' parent="report_excel_tempalte" sequence='10'/>
     </data>
 </openerp>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-    	<!-- 模板 -->
+    	<!-- 物料清单 -->
         <record id='wh_bom_tree' model='ir.ui.view'>
             <field name='name'>wh.bom.tree</field>
             <field name='model'>wh.bom</field>
             <field name='arch' type='xml'>
-                <tree string='模板'>
+                <tree string='物料清单'>
                     <field name='name' />
                     <field name='type' />
                     <field name='line_parent_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='组合件' />
@@ -21,7 +21,7 @@
             <field name='name'>wh.bom.form</field>
             <field name='model'>wh.bom</field>
             <field name='arch' type='xml'>
-                <form string='模板'>
+                <form string='物料清单'>
                     <sheet>
                         <group>
                             <group>
@@ -58,7 +58,7 @@
             <field name="name">wh.bom.search</field>
             <field name="model">wh.bom</field>
             <field name="arch" type="xml">
-                <search string="模板">
+                <search string="物料清单">
                     <field name="name"/>
                     <field name="type"/>
                     <filter name="assembly" string="组装单" domain="[('type','=','assembly')]"/>
@@ -127,7 +127,7 @@
                     <header>
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
-                        <button name='update_bom' type='object' string='存为模板' />
+                        <button name='update_bom' type='object' string='存为物料清单' />
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
                     <sheet>
@@ -287,7 +287,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name='outsource_partner_id'/>
+                                <field name='outsource_partner_id' domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                                 <field name='warehouse_id' />
                                 <field name='bom_id' options="{'no_create': 1}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
@@ -296,11 +296,11 @@
                             </group>
                             <group>
                                 <field name='outsource_fee' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                <field name='wh_assembly_id'/>
+                                <field name='wh_assembly_id' options="{'no_create': True}"/>
                                 <field name='warehouse_dest_id'/>
                                 <field name='is_many_to_many_combinations'/>
-                                <field name='invoice_id' readonly='1'/>
-                                <field name='voucher_id' readonly='1'/>
+                                <field name='invoice_id' readonly='1' options="{'no_create': True}"/>
+                                <field name='voucher_id' readonly='1' options="{'no_create': True}"/>
                             </group>
                         </group>
 
@@ -423,7 +423,7 @@
                     <header>
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
-                        <button name='update_bom' type='object' string='存为模板' />
+                        <button name='update_bom' type='object' string='存为物料清单' />
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
                     <sheet>

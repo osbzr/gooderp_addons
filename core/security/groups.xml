@@ -74,5 +74,8 @@
 			<field name='category_id' ref="core.Gooderp"/>
 			<field name="comment">用来隐藏管理员也没必要看到的菜单等...(使用时请慎重)!</field>
 		</record>
+		<record id="base.group_user" model="res.groups">
+			 <field name="category_id" ref="base.module_category_usability"/>
+		</record>
     </data>
 </openerp>

@@ -86,7 +86,7 @@
 
         <!-- bom -->
         <record id='wh_bom_action' model='ir.actions.act_window' >
-            <field name='name'>模板</field>
+            <field name='name'>物料清单</field>
             <field name='res_model'>wh.bom</field>
             <field name='view_mode'>tree,form</field>
             <field name='view_id' ref='wh_bom_tree' />

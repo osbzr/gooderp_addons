@@ -19,11 +19,11 @@
         <record id="goods.goods_menu" model="ir.ui.menu">
 			<field name="create_tag">1</field>
 		</record>
-		<menuitem id='wh_bom_menu' name='模板' action='wh_bom_action' parent='warehouse_master' sequence='2' groups='warehouse.assembly_groups' />
+		<menuitem id='wh_bom_menu' name='物料清单' action='wh_bom_action' parent='warehouse_master' sequence='2' groups='warehouse.assembly_groups' />
 
         <!-- 设置 -->
         <menuitem id='warehouse_setting' name='设置' parent='warehouse_root' sequence='4' />
-        <menuitem id='wh_move_matching_menu' name='匹配记录' action='wh_move_matching_action' parent='warehouse_setting' sequence='1' />
+        <menuitem id='wh_move_matching_menu' name='匹配记录' action='wh_move_matching_action' parent='warehouse_setting' sequence='1' groups="base.group_no_one"/>
         <menuitem id='warehouse_menu' name='仓库' action='warehouse_action' parent='warehouse_setting' groups='warehouse.multi_warehouse_groups' sequence='2'/>
         <menuitem id='uom_menu' name='单位' action='core.uom_action' parent='warehouse_setting' sequence='3'/>
 

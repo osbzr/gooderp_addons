@@ -385,12 +385,12 @@
 			<field name="view_mode">tree</field>
 		</record>
 
-		<!--服务，菜单放在资金模块下-->
+		<!--收支项，菜单放在资金模块下-->
 		<record id="service_tree" model="ir.ui.view">
-			<field name="name">服务列表</field>
+			<field name="name">收支项列表</field>
 			<field name="model">service</field>
 			<field name="arch" type="xml">
-				<tree string="服务">
+				<tree string="收支项">
 					<field name="name"/>
 					<field name="get_categ_id"/>
 					<field name="pay_categ_id"/>
@@ -399,7 +399,7 @@
 			</field>
 		</record>
 		<record id="service_form" model="ir.ui.view">
-			<field name="name">服务</field>
+			<field name="name">收支项</field>
 			<field name="model">service</field>
 			<field name="arch" type="xml">
 				<form string="Service">
@@ -420,7 +420,7 @@
             <field name="name">service.search</field>
             <field name="model">service</field>
             <field name="arch" type="xml">
-                <search string="服务">
+                <search string="收支项">
                     <field name="name"/>
                     <field name="get_categ_id"/>
                     <field name="pay_categ_id"/>
@@ -432,7 +432,7 @@
             </field>
         </record>
 		<record id="service_action" model="ir.actions.act_window">
-			<field name="name">服务</field>
+			<field name="name">收支项</field>
 			<field name="res_model">service</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
