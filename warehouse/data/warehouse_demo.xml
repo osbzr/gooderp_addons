@@ -212,6 +212,50 @@
 			<field model="wh.move" name="move_id" search="[('name', '=', u'ASS/16040002')]"/>
 		</record>
 	</data>
+    <!-- 委外加工单 -->
+	<data noupdate="1">
+        <record id="outsource_out1" model="outsource">
+            <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
+            <field name="warehouse_id" ref="warehouse.hd_stock"/>
+            <field name="name">OUT/16040001</field>
+            <field name="date">2016-04-02</field>
+        </record>
+        <record id="wh_move_line_out1" model="wh.move.line">
+            <field eval="1.0" name="goods_uos_qty"/>
+            <field model="wh.move.line" name="lot_id" search="[('lot', '=', 'ms160301')]"/>
+            <field name='uom_id' ref='core.uom_pc' />
+            <field name='uos_id' ref='core.uom_pc' />
+            <field name="goods_id" ref="goods.mouse"/>
+            <field name="production_date">2016-04-02</field>
+            <field eval="1.0" name="goods_qty"/>
+            <field name="type">out</field>
+            <field model="wh.move" name="move_id" search="[('name', '=', u'OUT/16040001')]"/>
+        </record>
+        <record id="wh_move_line_out2" model="wh.move.line">
+            <field eval="1.0" name="goods_uos_qty"/>
+            <field eval="600.0" name="lot_uos_qty"/>
+            <field model="wh.move.line" name="lot_id" search="[('lot', '=', 'kb160000567')]"/>
+            <field name="goods_id" ref="goods.keyboard"/>
+            <field name='attribute_id' ref='goods.keyboard_white' />
+            <field name="production_date">2016-04-02</field>
+            <field name='uom_id' ref='core.uom_pc' />
+            <field name='uos_id' ref='core.uom_pc' />
+            <field eval="2.0" name="goods_qty"/>
+            <field name="type">out</field>
+            <field model="wh.move" name="move_id" search="[('name', '=', u'OUT/16040001')]"/>
+        </record>
+        <record id="wh_move_line_out3" model="wh.move.line">
+            <field eval="1.0" name="goods_uos_qty"/>
+            <field name="goods_id" ref="goods.keyboard_mouse"/>
+            <field name="production_date">2016-04-02</field>
+            <field name='uom_id' ref='core.uom_set' />
+            <field name='uos_id' ref='core.uom_set' />
+            <field eval="2.0" name="goods_qty"/>
+            <field name="type">in</field>
+            <field model="wh.move" name="move_id" search="[('name', '=', u'OUT/16040001')]"/>
+        </record>
+    </data>
+
 	<data noupdate="1">
 		<record id="wh_bom_0" model="wh.bom">
 			<field name="name">拆开套装</field>

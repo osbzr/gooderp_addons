@@ -26,6 +26,8 @@ class TestProduction(TransactionCase):
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
         self.overage_in.approve_order()
 
+        self.outsource_out1 = self.browse_ref('warehouse.outsource_out1')
+
     def test_approve(self):
         # 库存不足的时候直接拆卸，会报没有库存的异常
         with self.assertRaises(UserError):
@@ -252,8 +254,11 @@ class TestProduction(TransactionCase):
         # 组装单 onchange_goods_id
         wh_assembly_ass2 = self.browse_ref('warehouse.wh_assembly_ass2')
         wh_assembly_ass2.goods_id =  self.env.ref('goods.keyboard_mouse').id
-
         wh_assembly_ass2.onchange_goods_id()
+
+        # 委外加工单 onchange_goods_id
+        self.outsource_out1.goods_id =  self.env.ref('goods.keyboard_mouse')
+        self.outsource_out1.onchange_goods_id()
 
         # 拆卸单 onchange_goods_id
         wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
@@ -279,6 +284,87 @@ class TestProduction(TransactionCase):
         wh_assembly_ass2.goods_qty = 1
         wh_assembly_ass2.onchange_goods_qty()
 
+    def test_outsource_onchange_goods_qty_no_bom(self):
+        ''' 测试 委外加工单 onchange_goods_qty 不存在 物料清单 '''
+        # no bom_id
+        self.outsource_out1.bom_id = False
+        self.outsource_out1.goods_qty = 2
+        self.outsource_out1.onchange_goods_qty()
+
+    def test_outsource_onchange_goods_qty_has_bom(self):
+        ''' 测试 委外加工单 onchange_goods_qty 存在 物料清单 '''
+        # has bom_id
+        wh_bom_0 = self.env.ref('warehouse.wh_bom_0')
+        wh_bom_0.type = 'outsource'
+        wh_bom_0.name = 'out source'
+        self.outsource_out1.bom_id = self.env.ref('warehouse.wh_bom_0').id
+        self.outsource_out1.goods_qty = 1
+        self.outsource_out1.onchange_goods_qty()
+
+    def test_outsource_onchange_bom_no_bom(self):
+        ''' 测试  委外加工单 onchange_bom 不存在 物料清单 '''
+        # no bom_id
+        self.outsource_out1.bom_id = False
+        self.outsource_out1.onchange_bom()
+        self.assertEqual(self.outsource_out1.goods_qty, 1.0)
+
+    def test_outsource_onchange_bom_has_bom(self):
+        ''' 测试  委外加工单 onchange_bom 存在 物料清单 '''
+        wh_bom = self.env.ref('warehouse.wh_bom_0')
+        # has bom_id
+        self.outsource_out1.bom_id = wh_bom.id
+        self.outsource_out1.onchange_bom()
+
+    def test_outsource_onchange_bom_has_bom_inLine(self):
+        ''' 测试  委外加工单 onchange_bom 存在 物料清单 line_in_ids > 1'''
+        # has bom_id, line_in_ids > 1
+        wh_bom = self.env.ref('warehouse.wh_bom_0')
+        wh_bom.line_parent_ids.create({
+                                       'bom_id': self.env.ref('warehouse.wh_bom_0').id,
+                                       'type': 'parent',
+                                       'goods_id': self.env.ref('goods.cable').id,
+                                       'goods_qty': 1
+                                       })
+        self.outsource_out1.bom_id = wh_bom.id
+        self.outsource_out1.onchange_bom()
+        self.assertTrue(self.outsource_out1.is_many_to_many_combinations)
+
+    def test_outsource_approve_order_no_in_line(self):
+        ''' 测试  委外加工单 审核：一个明细行没有值 '''
+        # 当一个明细行没有值时，raise 委外加工单必须存在组合件和子件明细行
+        self.outsource_out1.line_in_ids.unlink()
+        with self.assertRaises(UserError):
+            self.outsource_out1.approve_order()
+
+    def test_outsource_approve_order_no_fee(self):
+        ''' 测试  委外加工单 审核: 不存在委外费用 '''
+        self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
+        self.outsource_out1.approve_order()
+
+    def test_outsource_approve_order_has_fee(self):
+        ''' 测试  委外加工单 审核: 存在委外费用生成结算单 '''
+        self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
+        self.outsource_out1.outsource_fee = 100
+        self.outsource_out1.approve_order()
+
+    def test_outsource_cancel_approved_order(self):
+        ''' 测试  委外加工单 反审核 '''
+        self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
+        self.outsource_out1.outsource_fee = 100
+        self.outsource_out1.approve_order()
+        self.outsource_out1.cancel_approved_order()
+
+    def test_outsource_unlink(self):
+        ''' 测试  委外加工单 删除 '''
+        self.outsource_out1.unlink()
+
+    def test_outsource_create(self):
+        ''' 测试  委外加工单 创建 '''
+        self.outsource_out1.create({
+                                    'outsource_partner_id': self.env.ref('core.lenovo').id,
+                                    'outsource_fee': 10,
+                                    })
+
     def test_disassembly_onchange_goods_qty(self):
         ''' 测试 拆卸单 onchange_goods_qty '''
         # has bom_id
@@ -298,21 +384,30 @@ class TestProduction(TransactionCase):
         wh_assembly_ass0 = self.browse_ref('warehouse.wh_assembly_ass0')
         wh_assembly_ass0.onchange_bom()
         self.assertEqual(wh_assembly_ass0.goods_qty, 1.0)
+
+    def test_assembly_has_bom_id(self):
+        '''  测试 组装单 onchange_bom '''
         # has bom_id
-    def test_has_bom_id(self):
         wh_assembly_ass0 = self.env.ref('warehouse.wh_assembly_ass0')
         wh_assembly_ass0.bom_id = self.env.ref('warehouse.wh_bom_0').id
         wh_assembly_ass0.onchange_bom()
+
+    def test_assembly_has_bom_line_in(self):
+        ''' 测试 组装单 bom_id 的组合件 大于 1 '''
         # bom_id 的组合件 大于 1行时，len(line_in_ids)>1
-        wh_assembly_ass0.bom_id.line_parent_ids.create({
-            'type': 'parent',
-            'goods_id': self.env.ref('goods.keyboard_mouse').id,
-            'goods_qty': 1,
-        })
-#         self.disassembly_bom.type = 'assembly'
-#         wh_assembly_ass0.bom_id = self.disassembly_bom.id
+        wh_assembly_ass0 = self.env.ref('warehouse.wh_assembly_ass0')
+        wh_bom = self.env.ref('warehouse.wh_bom_0')
+        wh_bom.type = 'assembly'
+        wh_bom.line_parent_ids.create({
+                                       'bom_id': self.env.ref('warehouse.wh_bom_0').id,
+                                       'type': 'parent',
+                                       'goods_id': self.env.ref('goods.cable').id,
+                                       'goods_qty': 1
+                                       })
+
+        wh_assembly_ass0.bom_id = wh_bom.id
         wh_assembly_ass0.onchange_bom()
-#         self.assertTrue(wh_assembly_ass0.is_many_to_many_combinations)
+        self.assertTrue(wh_assembly_ass0.is_many_to_many_combinations)
 
     def test_disassembly_onchange_bom(self):
         ''' 测试 拆卸单 onchange_bom '''
@@ -324,6 +419,7 @@ class TestProduction(TransactionCase):
         self.assertEqual(wh_disassembly_dis3.goods_qty, 1.0)
 
     def test_disassembly_has_bom(self):
+        ''' 测试拆卸单 存在 bom '''
         # has bom_id
         wh_disassembly_dis3 = self.env.ref('warehouse.wh_disassembly_dis3')
         bom_copy_1 = self.env.ref('warehouse.wh_bom_0').copy()
@@ -331,16 +427,23 @@ class TestProduction(TransactionCase):
         wh_disassembly_dis3.bom_id = bom_copy_1.id
         wh_disassembly_dis3.onchange_bom()
 
-        # bom_id 的组合件 大于 1行时，len(line_out_ids)>1
-        wh_disassembly_dis3.bom_id.line_parent_ids.create({
-            'type': 'parent',
-            'goods_id': self.env.ref('goods.keyboard_mouse').id,
-            'goods_qty': 1,
-        })
+    def test_disassembly_has_bom_out_line(self):
+        ''' 测试拆卸单 bom_id 的组合件 大于 1 '''
+        # 拆卸单 bom_id 的组合件 大于 1行时，len(line_out_ids)>1
+        wh_disassembly_dis3 = self.env.ref('warehouse.wh_disassembly_dis3')
+
+        wh_bom = self.env.ref('warehouse.wh_bom_0')
+        wh_bom.line_parent_ids.create({
+                                       'bom_id': self.env.ref('warehouse.wh_bom_0').id,
+                                       'type': 'parent',
+                                       'goods_id': self.env.ref('goods.cable').id,
+                                       'goods_qty': 1
+                                       })
+
         self.bom_id = self.disassembly_bom.id
-#         wh_disassembly_dis3.bom_id = self.disassembly_bom.id
+        wh_disassembly_dis3.bom_id = wh_bom.id
         wh_disassembly_dis3.onchange_bom()
-#         self.assertTrue(wh_disassembly_dis3.is_many_to_many_combinations)
+        self.assertTrue(wh_disassembly_dis3.is_many_to_many_combinations)
 
     def test_cancel_approve_order_has_voucher(self):
         ''' 测试 拆卸单 反审核 删除发票 '''
