@@ -106,7 +106,7 @@ class bank_account(models.Model):
 class service(models.Model):
     ''' 是对其他收支业务的更细分类 '''
     _name = 'service'
-    _description = u'服务'
+    _description = u'收支项'
 
     name = fields.Char(u'名称', required=True)
     get_categ_id = fields.Many2one('core.category',

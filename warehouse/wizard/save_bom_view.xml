@@ -5,9 +5,9 @@
             <field name='name'>save.bom.memory.form</field>
             <field name='model'>save.bom.memory</field>
             <field name='arch' type='xml'>
-                <form string='模板名称'>
+                <form string='物料清单名称'>
                     <h1>
-                        <p>为你新的模板命名</p>
+                        <p>为你新的物料清单命名</p>
                     </h1>
                     <group>
 

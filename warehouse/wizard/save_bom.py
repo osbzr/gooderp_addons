@@ -5,7 +5,7 @@ from odoo import models, fields, api
 class save_bom_memory(models.TransientModel):
     _name = 'save.bom.memory'
 
-    name = fields.Char(u'模板名称')
+    name = fields.Char(u'物料清单名称')
 
     @api.multi
     def save_bom(self):

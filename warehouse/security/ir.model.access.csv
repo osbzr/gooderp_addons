@@ -3,6 +3,7 @@ access_wh_inventory,access_wh_inventory,warehouse.model_wh_inventory,,1,1,1,1
 access_wh_inventory_line,access_wh_inventory_line,warehouse.model_wh_inventory_line,,1,1,1,1
 access_wh_move_matching,access_wh_move_matching,warehouse.model_wh_move_matching,,1,1,1,1
 access_wh_assembly,access_wh_assembly,warehouse.model_wh_assembly,,1,1,1,1
+access_outsource,access_outsource,warehouse.model_outsource,,1,1,1,1
 access_wh_disassembly,access_wh_disassembly,warehouse.model_wh_disassembly,,1,1,1,1
 access_wh_bom,access_wh_bom,warehouse.model_wh_bom,,1,1,1,1
 access_wh_bom_line,access_wh_bom_line,warehouse.model_wh_bom_line,,1,1,1,1

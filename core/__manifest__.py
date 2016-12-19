@@ -19,7 +19,8 @@
                 'decimal_precision',
                 'web_export_view_good',
                 'home_page',
-                'common_dialog'],
+                'common_dialog',
+                'report'],
     'demo': [
         'data/core_demo.xml',
         ],
