@@ -6,6 +6,8 @@ from odoo.exceptions import UserError
 class res_users(models.Model):
     _inherit = 'res.users'
 
+    employee_ids = fields.One2many('staff', 'user_id', u'对应员工')
+
     @api.multi
     def write(self, vals):
         res = super(res_users, self).write(vals)
