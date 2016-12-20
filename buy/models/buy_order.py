@@ -488,6 +488,8 @@ class payment(models.Model):
                             })
             self.env["money.order"].create({
                                 'partner_id': self.buy_id.partner_id.id,
+                                'bank_name': self.buy_id.partner_id.bank_name,
+                                'bank_num': self.buy_id.partner_id.bank_num,
                                     'date': fields.Date.context_today(self),
                                     'source_ids':
                                     [(0, 0, {'name':source_id.id,
