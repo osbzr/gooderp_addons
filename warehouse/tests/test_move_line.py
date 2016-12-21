@@ -211,6 +211,11 @@ class TestMoveLine(TransactionCase):
         with self.assertRaises(UserError):
             self.mouse_in_line.check_availability()
 
+    def test_onchange_goods_id_no_goods(self):
+        ''' 测试  onchange_goods_id no goods '''
+        self.goods_id = False
+        self.env['wh.move.line'].onchange_goods_id()
+
     def test_name_search(self):
         '''测试批号下拉的时候显示批次和剩余数量'''
         move_line = self.env.ref('warehouse.wh_move_line_12')
