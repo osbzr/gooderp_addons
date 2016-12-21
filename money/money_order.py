@@ -198,11 +198,11 @@ class money_order(models.Model):
         '''对收支单的审核按钮'''
         for order in self:
             if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
-                raise UserError(u'请输入供应商类(%s)别上的科目'%order.partner_id.s_category_id.name)
+                raise UserError(u'请输入供应商类别(%s)上的科目'%order.partner_id.s_category_id.name)
             if order.type == 'get' and not order.partner_id.c_category_id.account_id:
                 raise UserError(u'请输入客户类别(%s)上的科目'%order.partner_id.c_category_id.name)
             if order.advance_payment < 0:
-                raise UserError(u'核销金额不能大于付款金额!\n核销金额:%s'%(order.advance_payment))
+                raise UserError(u'本次核销金额不能大于付款金额!\n差额: %s'%(order.advance_payment))
 
             order.to_reconcile = order.advance_payment
             order.reconciled = order.amount - order.advance_payment
@@ -272,10 +272,6 @@ class money_order(models.Model):
 
             order.state = 'draft'
         return True
-
-#     @api.multi
-#     def print_money_order(self):
-#         return True
 
 
 class money_order_line(models.Model):
@@ -598,10 +594,10 @@ class reconcile_order(models.Model):
                        })
 
             if business_type == 'get_to_get':
-                to_partner_id.receivable += line.this_reconcile
+#                 to_partner_id.receivable += line.this_reconcile
                 partner_id.receivable -= line.this_reconcile
             if business_type == 'pay_to_pay':
-                to_partner_id.payable += line.this_reconcile
+#                 to_partner_id.payable += line.this_reconcile
                 partner_id.payable -= line.this_reconcile
 
         return True
