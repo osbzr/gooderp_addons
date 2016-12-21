@@ -24,7 +24,7 @@ class supplier_statements_report(models.Model):
             before_balance = pre_record.this_balance_amount
         else:
             before_balance = 0
-        self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
+        self.balance_amount += before_balance + self.amount - self.pay_amount + self.discount_money
         self.this_balance_amount = self.balance_amount
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
