@@ -351,8 +351,8 @@ class money_invoice(models.Model):
 
     auxiliary_id = fields.Many2one('auxiliary.financing', u'辅助核算',
                                    help=u'辅助核算')
-    date_due = fields.Date(string=u'开票日',
-                           help=u'发票的开票的日期')
+    date_due = fields.Date(string=u'到期日',
+                           help=u'结算单的到期日')
     currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True,
                                   help=u'原始单据对应的外币币别')
     bill_number = fields.Char(u'发票号',
