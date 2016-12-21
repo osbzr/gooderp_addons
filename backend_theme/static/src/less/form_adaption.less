@@ -20,10 +20,11 @@
             min-width: @sheet-min-width;
         }
     }
-    /*form  中设置field的最小的宽度 保证屏幕在缩小的时候不会导致看不清楚想要的结果*/
+    /*** form  中设置field的最小的宽度 保证屏幕在缩小的时候不会导致看不清楚想要的结果
+  　 这种写法并不全面，影响到了在ｆｏｒｍ　中ｇｒｏｕｐ　内的ｔｒｅｅ列表视图*/
     .o_group {
       .o_form_field {
-        min-width:120px;
+        min-width:100px;
       }
       &.o_inner_group {
         display: inline-table;
