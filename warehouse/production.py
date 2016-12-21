@@ -617,6 +617,9 @@ class outsource(models.Model):
             if outsource.voucher_id:
                 outsource.voucher_id.voucher_draft()
                 outsource.voucher_id.unlink()
+            if outsource.invoice_id:
+                outsource.invoice_id.money_invoice_draft()
+                outsource.invoice_id.unlink()
         return True
 
 
