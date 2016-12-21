@@ -75,7 +75,6 @@ class wh_assembly(models.Model):
             cost = sum(child.cost for child in assembly.line_out_ids) + \
                 assembly.fee
             assembly.apportion_cost(cost)
-
         return True
 
     @api.onchange('goods_id')
@@ -183,8 +182,9 @@ class wh_assembly(models.Model):
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
+        res = self.update_parent_cost()
         self.wh_assembly_create_voucher()
-        return self.update_parent_cost()
+        return res
 
     @api.multi
     @inherits()
@@ -206,14 +206,12 @@ class wh_assembly(models.Model):
     def create(self, vals):
         self = super(wh_assembly, self).create(vals)
         self.update_parent_cost()
-
         return self
 
     @api.multi
     def write(self, vals):
         res = super(wh_assembly, self).write(vals)
         self.update_parent_cost()
-
         return res
 
     @api.onchange('bom_id')
@@ -506,7 +504,6 @@ class outsource(models.Model):
         for outsource in self:
             cost = sum(child.cost for child in outsource.line_out_ids) + outsource.outsource_fee
             outsource.apportion_cost(cost)
-
         return True
 
     @api.multi
@@ -520,14 +517,12 @@ class outsource(models.Model):
     def create(self, vals):
         self = super(outsource, self).create(vals)
         self.update_parent_cost()
-
         return self
 
     @api.multi
     def write(self, vals):
         res = super(outsource, self).write(vals)
         self.update_parent_cost()
-
         return res
 
     @api.multi
@@ -602,7 +597,6 @@ class outsource(models.Model):
         # 如果委外费用存在，生成 结算单
         if self.outsource_fee:
             self._create_money_invoice()
-
         self.outsource_create_voucher()
         self.update_parent_cost()
         return
@@ -682,7 +676,6 @@ class wh_disassembly(models.Model):
         for assembly in self:
             cost = sum(child.cost for child in assembly.line_out_ids) + \
                 assembly.fee
-
             assembly.apportion_cost(cost)
         return True
 
@@ -734,8 +727,9 @@ class wh_disassembly(models.Model):
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
+        res = self.update_child_cost()
         self.wh_disassembly_create_voucher()
-        return self.update_child_cost()
+        return res
 
     @api.multi
     @inherits()
@@ -757,14 +751,12 @@ class wh_disassembly(models.Model):
     def create(self, vals):
         self = super(wh_disassembly, self).create(vals)
         self.update_child_cost()
-
         return self
 
     @api.multi
     def write(self, vals):
         res = super(wh_disassembly, self).write(vals)
         self.update_child_cost()
-
         return res
 
     @api.onchange('goods_id')
