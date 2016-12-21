@@ -128,7 +128,7 @@ class money_order(models.Model):
                                  states={'draft': [('readonly', False)]},
                                  help=u'收付款单原始单据行')
     type = fields.Selection(TYPE_SELECTION, string=u'类型',
-                            default=lambda self: self._context.get('type'),
+                            default=lambda self: self.env.context.get('type'),
                             help=u'类型：收款单 或者 付款单')
     amount = fields.Float(string=u'总金额', compute='_compute_advance_payment',
                           digits=dp.get_precision('Amount'),
@@ -138,7 +138,7 @@ class money_order(models.Model):
                                    compute='_compute_advance_payment',
                                    digits=dp.get_precision('Amount'),
                                    store=True, readonly=True,
-                                   help=u'根据收付款单行金额总和，原始单据行金额总和及折扣额计算得来的预付款，'
+                                   help=u'根据收付款单行金额总和，原始单据行金额总和及折扣额计算得来的预收/预付款，'
                                         u'值>=0')
     to_reconcile = fields.Float(string=u'未核销预收款',
                                 digits=dp.get_precision('Amount'),

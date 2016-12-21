@@ -130,11 +130,6 @@ class other_money_order(models.Model):
         self.state = 'draft'
         return True
 
-#     @api.multi
-#     def print_other_money_order(self):
-#         '''打印 其他收入/支出单'''
-#         assert len(self._ids) == 1, '一次执行只能有一个id'
-#         return self.env['report'].get_action('money.report_other_money_order')
 
 class other_money_order_line(models.Model):
     _name = 'other.money.order.line'
@@ -157,7 +152,7 @@ class other_money_order_line(models.Model):
     other_money_id = fields.Many2one('other.money.order',
                                 u'其他收支', ondelete='cascade',
                                 help=u'其他收支单行对应的其他收支单')
-    service = fields.Many2one('service', u'服务', ondelete='restrict',
+    service = fields.Many2one('service', u'收支项', ondelete='restrict',
                               help=u'其他收支单行上对应的服务')
     category_id = fields.Many2one('core.category',
                         u'类别', ondelete='restrict',
