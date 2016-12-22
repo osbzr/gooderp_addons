@@ -11,7 +11,7 @@
         'views/web_need.xml',
     ],
     "depends":[
-        'web',
+        'core',
     ],
     'auto_install': True,
 }
