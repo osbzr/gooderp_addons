@@ -138,7 +138,7 @@
 			<field name="arch" type="xml">
 				<form string="任务">
 					<header>
-						<field name="status" widget="statusbar"/>
+						<field name="status" widget="statusbar" clickable="True"/>
 					</header>
 					<sheet>
 						<group>
