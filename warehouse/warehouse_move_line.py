@@ -335,10 +335,8 @@ class wh_move_line(models.Model):
                 self.goods_qty = self.goods_id.conversion_unit(
                     self.goods_uos_qty or 1)
         else:
-            self.uom_id = False
-            self.uos_id = False
-            self.attribute_id = False
-            self.cost_unit = False
+            return
+
         self.compute_suggested_cost()
         self.compute_lot_compatible()
         

@@ -475,6 +475,34 @@ class test_money_transfer_order(TransactionCase):
         with self.assertRaises(UserError):
             self.env.ref('money.transfer_400').money_transfer_draft()
 
+    def test_transfer_order_draft_in_bank_currency(self):
+        '''测试 资金转账单 反审核 转入账户存在 币别'''
+        self.env.ref('finance.account_bank').currency_id = self.env.user.company_id.currency_id.id
+        self.env.ref('finance.account_cash').currency_id = self.env.ref('base.USD').id
+        self.env.ref('core.alipay').account_id = self.env.ref('finance.account_cash').id
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.transfer_line_1').currency_amount = 100
+        self.env.ref('money.transfer_300').money_transfer_done()
+        # 正常 反审核
+        self.env.ref('money.transfer_300').money_transfer_draft()
+        # 转入账户余额不足，不能反审核
+        self.env.ref('money.transfer_line_2').currency_amount = 200
+        with self.assertRaises(UserError):
+            self.env.ref('money.transfer_400').money_transfer_draft()
+
+    def test_transfer_order_draft_in_bank_no_currency(self):
+        '''测试 资金转账单 反审核 转入账户不存在 币别'''
+        self.env.ref('finance.account_bank').currency_id = self.env.user.company_id.currency_id.id
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.transfer_line_1').currency_amount = 100
+        self.env.ref('money.transfer_300').money_transfer_done()
+        # 正常 反审核
+        self.env.ref('money.transfer_300').money_transfer_draft()
+        # 转入账户余额不足，不能反审核
+        self.env.ref('money.transfer_line_2').currency_amount = 200
+        with self.assertRaises(UserError):
+            self.env.ref('money.transfer_400').money_transfer_draft()
+
     def test_money_transfer_order(self):
         ''' 测试转账单审核 '''
         comm_balance = self.env.ref('core.comm').balance
