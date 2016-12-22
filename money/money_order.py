@@ -118,7 +118,9 @@ class money_order(models.Model):
                                    digits=dp.get_precision('Amount'),
                                    help=u'收款时发生的银行手续费或付款时给供应商的现金折扣。')
     discount_account_id = fields.Many2one('finance.account', u'费用科目',
-                                       help=u'收付款单审核生成凭证时，手续费或折扣对应的科目')
+                                          readonly=True,
+                                          states={'draft': [('readonly', False)]},
+                                          help=u'收付款单审核生成凭证时，手续费或折扣对应的科目')
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收付款单行', readonly=True,
                                states={'draft': [('readonly', False)]},
@@ -219,7 +221,7 @@ class money_order(models.Model):
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable -= total + self.discount_amount
+                order.partner_id.payable -= total - self.discount_amount
             else:
                 order.partner_id.receivable -= total + self.discount_amount
 
@@ -229,8 +231,8 @@ class money_order(models.Model):
                 if 'value1' is lower than, equal to, or greater than 'value2' at the given precision'''
                 decimal_amount = self.env.ref('core.decimal_amount')
                 if float_compare(source.this_reconcile, abs(source.to_reconcile), precision_digits=decimal_amount.digits) == 1:
-                    raise UserError(u'本次核销金额不能大于未核销金额!\n 核销金额:%s 未审核金额:%s'
-                                    %( abs(source.to_reconcile),source.this_reconcile))
+                    raise UserError(u'本次核销金额不能大于未核销金额!\n 核销金额:%s 未核销金额:%s'
+                                    %(abs(source.to_reconcile),source.this_reconcile))
 
                 source.to_reconcile = (source.to_reconcile - 
                                        source.this_reconcile)
@@ -249,9 +251,9 @@ class money_order(models.Model):
 
             total = 0
             for line in order.line_ids:
-                if order.type == 'pay':  # 付款账号余额减少
+                if order.type == 'pay':  # 反审核：付款账号余额增加
                     line.bank_id.balance += line.amount
-                else:  # 收款账号余额增加
+                else:  # 反审核：收款账号余额减少
                     decimal_amount = self.env.ref('core.decimal_amount')
                     if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError(u'账户余额不足!\n 账户余额:%s 订单金额:%s' % (line.bank_id.balance, line.amount))
@@ -259,8 +261,7 @@ class money_order(models.Model):
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable += total + self.discount_amount
-
+                order.partner_id.payable += total - self.discount_amount
             else:
                 order.partner_id.receivable += total + self.discount_amount
 
