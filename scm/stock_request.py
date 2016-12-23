@@ -52,14 +52,14 @@ class stock_request(models.Model):
             for wh_move_line in wh_move_lines:
                 # 计算当前数量
                 if wh_move_line.state == 'done':
-                    flag = wh_move_line.type == 'in' and 1 or -1  # 入库则flag为1，出库为-1
-                    if wh_move_line.attribute_id:  # 产品存在属性
-                        if wh_move_line.attribute_id not in attribute_dict:
-                            attribute_dict.update({wh_move_line.attribute_id: flag * wh_move_line.goods_qty})
-                        else:
-                            attribute_dict[wh_move_line.attribute_id] += flag * wh_move_line.goods_qty
-                    else:  # 产品不存在属性
-                        qty += flag * wh_move_line.goods_qty
+                    if wh_move_line.warehouse_dest_id.type == 'stock':  # 目的库位为库存库位
+                        if wh_move_line.attribute_id:  # 产品存在属性
+                            if wh_move_line.attribute_id not in attribute_dict:
+                                attribute_dict.update({wh_move_line.attribute_id: wh_move_line.qty_remaining})
+                            else:
+                                attribute_dict[wh_move_line.attribute_id] += wh_move_line.qty_remaining
+                        else:  # 产品不存在属性
+                            qty += wh_move_line.qty_remaining
                 # 计算未发货和未到货数量
                 else:
                     if wh_move_line.type == 'out':
