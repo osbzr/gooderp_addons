@@ -350,7 +350,8 @@ class outsource(models.Model):
 
     outsource_partner_id = fields.Many2one('partner', string=u'委外供应商',
                                            readonly=True,
-                                           states={'draft': [('readonly', False)]},)
+                                           states={'draft': [('readonly', False)]},
+                                           required=True)
     wh_assembly_id = fields.Many2one('wh.assembly', string=u'关联的组装单',
                                      readonly=True,
                                      states={'draft': [('readonly', False)]},)
