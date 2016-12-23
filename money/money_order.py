@@ -43,7 +43,8 @@ class money_order(models.Model):
 
         # 创建时查找该业务伙伴是否存在 未审核 状态下的收付款单
         orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
-                                                 ('state', '=', 'draft')])
+                                                 ('state', '=', 'draft'),
+                                                 ('id', '!=', self.id)])
         if orders:
             raise UserError(u'该业务伙伴存在未审核的收/付款单，请先审核')
 
@@ -54,7 +55,8 @@ class money_order(models.Model):
         # 保存时查找该业务伙伴是否存在 未审核 状态下的收付款单
         if values.get('partner_id'):
             orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
-                                                     ('state', '=', 'draft')])
+                                                     ('state', '=', 'draft'),
+                                                     ('id', '!=', self.id)])
             if orders:
                 raise UserError(u'业务伙伴(%s)存在未审核的收/付款单，请先审核'%orders.partner_id.name)
 
