@@ -322,8 +322,7 @@ class money_invoice(models.Model):
         res = []
 
         for invoice in self:
-            res.append((invoice.id, invoice.bill_number and (
-                invoice.name + '_' + invoice.bill_number) or invoice.name))
+            res.append((invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
         return res
 
     state = fields.Selection([
