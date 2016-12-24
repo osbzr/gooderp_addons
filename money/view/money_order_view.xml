@@ -87,6 +87,7 @@
                     		<field name="name" readonly='1'/>
                     		<field name="category_id" readonly='1'/>
                             <field name="date" readonly='1'/>
+                            <field name="date_due" readonly='1'/>
                             <field name="amount" readonly='1' sum="合计"/>
                             <field name="reconciled" readonly='1' sum="合计"/>
                             <field name="to_reconcile" readonly='1' sum="合计"/>
