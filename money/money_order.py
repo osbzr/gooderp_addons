@@ -316,6 +316,16 @@ class money_invoice(models.Model):
     _description = u'结算单'
     # _rec_name = 'bill_number'
 
+    @api.multi
+    def name_get(self):
+        '''在many2one字段里显示 名称_票号'''
+        res = []
+
+        for invoice in self:
+            res.append((invoice.id, invoice.bill_number and (
+                invoice.name + '_' + invoice.bill_number) or invoice.name))
+        return res
+
     state = fields.Selection([
                           ('draft', u'草稿'),
                           ('done', u'完成')
