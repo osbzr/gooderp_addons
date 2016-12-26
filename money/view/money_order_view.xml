@@ -226,8 +226,8 @@
                     <group expand="0" string="分组">
                         <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
                         <filter string="类别" domain="[]" context="{'group_by':'category_id'}"/>
-                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
-                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:month'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:month'}"/>
                     </group>
                 </search>
             </field>
