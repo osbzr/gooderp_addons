@@ -145,6 +145,10 @@ class task(models.Model):
                                 [('task_id', '=', task.id)]):
                 task.hours += line.hours
 
+    @api.model
+    def _set_default_status(self):
+        return self.env.ref('task.task_status_todo').id
+
     name = fields.Char(
         string=u'名称',
         required=True,
@@ -182,6 +186,7 @@ class task(models.Model):
 
     status = fields.Many2one('task.status',
                              string=u'状态',
+                             default=_set_default_status,
                              track_visibility='onchange')
     plan_hours = fields.Float(u'计划时间')
     hours = fields.Float(u'实际时间',
