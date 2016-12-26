@@ -403,6 +403,71 @@ class money_invoice(models.Model):
 
         return super(money_invoice, self).unlink()
 
+    @api.multi
+    def find_source_order(self):
+        # 查看原始单据，四情况：销货单、销售退货单、采购退货单、采购入库单
+        self.ensure_one()
+        sell = self.env['sell.delivery'].search([('name', '=', self.name)])
+        # 付款单
+        if sell:
+            if sell.is_return:
+                view = self.env.ref('sell.sell_return_form')
+                return {
+                    'name': u'销售退货单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'sell.delivery',
+                    'type': 'ir.actions.act_window',
+                    'res_id': sell.id,
+                    'context': {'type': 'pay'}
+                }
+            else:
+                view = self.env.ref('sell.sell_delivery_form')
+                return {
+                    'name': u'销货单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'sell.delivery',
+                    'type': 'ir.actions.act_window',
+                    'res_id': sell.id,
+                    'context': {'type': 'pay'}
+                }
+
+        # 采购退货单、入库单
+        buy = self.env['buy.receipt'].search([('name', '=', self.name)])
+        if buy:
+            if buy.is_return:
+                view = self.env.ref('buy.buy_return_form')
+                return {
+                    'name': u'采购退货单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'buy.receipt',
+                    'type': 'ir.actions.act_window',
+                    'res_id': buy.id,
+                    'context': {'type': 'pay'}
+                }
+            else:
+                view = self.env.ref('buy.buy_receipt_form')
+                return {
+                    'name': u'采购入库单',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': 'buy.receipt',
+                    'type': 'ir.actions.act_window',
+                    'res_id': buy.id,
+                    'context': {'type': 'pay'}
+                }
+        raise UserError(u'期初余额没有原始单据可供查看！')
+
 
 class source_order_line(models.Model):
     _name = 'source.order.line'
