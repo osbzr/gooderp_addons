@@ -43,7 +43,8 @@ class money_order(models.Model):
 
         # 创建时查找该业务伙伴是否存在 未审核 状态下的收付款单
         orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
-                                                 ('state', '=', 'draft')])
+                                                 ('state', '=', 'draft'),
+                                                 ('id', '!=', self.id)])
         if orders:
             raise UserError(u'该业务伙伴存在未审核的收/付款单，请先审核')
 
@@ -54,7 +55,8 @@ class money_order(models.Model):
         # 保存时查找该业务伙伴是否存在 未审核 状态下的收付款单
         if values.get('partner_id'):
             orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
-                                                     ('state', '=', 'draft')])
+                                                     ('state', '=', 'draft'),
+                                                     ('id', '!=', self.id)])
             if orders:
                 raise UserError(u'业务伙伴(%s)存在未审核的收/付款单，请先审核'%orders.partner_id.name)
 
@@ -118,7 +120,9 @@ class money_order(models.Model):
                                    digits=dp.get_precision('Amount'),
                                    help=u'收款时发生的银行手续费或付款时给供应商的现金折扣。')
     discount_account_id = fields.Many2one('finance.account', u'费用科目',
-                                       help=u'收付款单审核生成凭证时，手续费或折扣对应的科目')
+                                          readonly=True,
+                                          states={'draft': [('readonly', False)]},
+                                          help=u'收付款单审核生成凭证时，手续费或折扣对应的科目')
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收付款单行', readonly=True,
                                states={'draft': [('readonly', False)]},
@@ -128,7 +132,7 @@ class money_order(models.Model):
                                  states={'draft': [('readonly', False)]},
                                  help=u'收付款单原始单据行')
     type = fields.Selection(TYPE_SELECTION, string=u'类型',
-                            default=lambda self: self._context.get('type'),
+                            default=lambda self: self.env.context.get('type'),
                             help=u'类型：收款单 或者 付款单')
     amount = fields.Float(string=u'总金额', compute='_compute_advance_payment',
                           digits=dp.get_precision('Amount'),
@@ -138,7 +142,7 @@ class money_order(models.Model):
                                    compute='_compute_advance_payment',
                                    digits=dp.get_precision('Amount'),
                                    store=True, readonly=True,
-                                   help=u'根据收付款单行金额总和，原始单据行金额总和及折扣额计算得来的预付款，'
+                                   help=u'根据收付款单行金额总和，原始单据行金额总和及折扣额计算得来的预收/预付款，'
                                         u'值>=0')
     to_reconcile = fields.Float(string=u'未核销预收款',
                                 digits=dp.get_precision('Amount'),
@@ -172,12 +176,7 @@ class money_order(models.Model):
                 'date_due': invoice.date_due,
                 }
 
-    @api.onchange('partner_id')
-    def onchange_partner_id(self):
-        if not self.partner_id:
-            return {}
-
-        source_lines = []
+    def _get_invoice_search_list(self):
         invoice_search_list = [('partner_id', '=', self.partner_id.id),
                                ('to_reconcile', '!=', 0)]
         if self.env.context.get('type') == 'get':
@@ -185,10 +184,18 @@ class money_order(models.Model):
         else: # type = 'pay':
             invoice_search_list.append(('category_id.type', '=', 'expense'))
 
-            self.bank_name = self.partner_id.bank_name
-            self.bank_num = self.partner_id.bank_num
+        return invoice_search_list
 
-        for invoice in self.env['money.invoice'].search(invoice_search_list):
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        if not self.partner_id:
+            return {}
+
+        source_lines = []
+        self.bank_name = self.partner_id.bank_name
+        self.bank_num = self.partner_id.bank_num
+
+        for invoice in self.env['money.invoice'].search(self._get_invoice_search_list()):
             source_lines.append(self._get_source_line(invoice))
         if source_lines:
             self.source_ids = source_lines
@@ -198,11 +205,11 @@ class money_order(models.Model):
         '''对收支单的审核按钮'''
         for order in self:
             if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
-                raise UserError(u'请输入供应商类(%s)别上的科目'%order.partner_id.s_category_id.name)
+                raise UserError(u'请输入供应商类别(%s)上的科目'%order.partner_id.s_category_id.name)
             if order.type == 'get' and not order.partner_id.c_category_id.account_id:
                 raise UserError(u'请输入客户类别(%s)上的科目'%order.partner_id.c_category_id.name)
             if order.advance_payment < 0:
-                raise UserError(u'核销金额不能大于付款金额!\n核销金额:%s'%(order.advance_payment))
+                raise UserError(u'本次核销金额不能大于付款金额!\n差额: %s'%(order.advance_payment))
 
             order.to_reconcile = order.advance_payment
             order.reconciled = order.amount - order.advance_payment
@@ -219,7 +226,7 @@ class money_order(models.Model):
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable -= total + self.discount_amount
+                order.partner_id.payable -= total - self.discount_amount
             else:
                 order.partner_id.receivable -= total + self.discount_amount
 
@@ -229,8 +236,8 @@ class money_order(models.Model):
                 if 'value1' is lower than, equal to, or greater than 'value2' at the given precision'''
                 decimal_amount = self.env.ref('core.decimal_amount')
                 if float_compare(source.this_reconcile, abs(source.to_reconcile), precision_digits=decimal_amount.digits) == 1:
-                    raise UserError(u'本次核销金额不能大于未核销金额!\n 核销金额:%s 未审核金额:%s'
-                                    %( abs(source.to_reconcile),source.this_reconcile))
+                    raise UserError(u'本次核销金额不能大于未核销金额!\n 核销金额:%s 未核销金额:%s'
+                                    %(abs(source.to_reconcile),source.this_reconcile))
 
                 source.to_reconcile = (source.to_reconcile - 
                                        source.this_reconcile)
@@ -249,9 +256,9 @@ class money_order(models.Model):
 
             total = 0
             for line in order.line_ids:
-                if order.type == 'pay':  # 付款账号余额减少
+                if order.type == 'pay':  # 反审核：付款账号余额增加
                     line.bank_id.balance += line.amount
-                else:  # 收款账号余额增加
+                else:  # 反审核：收款账号余额减少
                     decimal_amount = self.env.ref('core.decimal_amount')
                     if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError(u'账户余额不足!\n 账户余额:%s 订单金额:%s' % (line.bank_id.balance, line.amount))
@@ -259,8 +266,7 @@ class money_order(models.Model):
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable += total + self.discount_amount
-
+                order.partner_id.payable += total - self.discount_amount
             else:
                 order.partner_id.receivable += total + self.discount_amount
 
@@ -272,10 +278,6 @@ class money_order(models.Model):
 
             order.state = 'draft'
         return True
-
-#     @api.multi
-#     def print_money_order(self):
-#         return True
 
 
 class money_order_line(models.Model):
@@ -315,7 +317,16 @@ class money_order_line(models.Model):
 class money_invoice(models.Model):
     _name = 'money.invoice'
     _description = u'结算单'
-    _rec_name = 'bill_number'
+    # _rec_name = 'bill_number'
+
+    @api.multi
+    def name_get(self):
+        '''在many2one字段里显示 名称_票号'''
+        res = []
+
+        for invoice in self:
+            res.append((invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
+        return res
 
     state = fields.Selection([
                           ('draft', u'草稿'),
@@ -598,10 +609,10 @@ class reconcile_order(models.Model):
                        })
 
             if business_type == 'get_to_get':
-                to_partner_id.receivable += line.this_reconcile
+#                 to_partner_id.receivable += line.this_reconcile
                 partner_id.receivable -= line.this_reconcile
             if business_type == 'pay_to_pay':
-                to_partner_id.payable += line.this_reconcile
+#                 to_partner_id.payable += line.this_reconcile
                 partner_id.payable -= line.this_reconcile
 
         return True

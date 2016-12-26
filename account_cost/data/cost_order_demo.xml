@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--服务订单-->
+        <record id="cost_order_1" model="cost.order">
+            <field name="date">2016-02-22</field>
+            <field name="partner_id" ref="core.lenovo"/>
+        </record>
+        <record id="cost_order_line_1" model="cost.order.line">
+            <field name="category_id" ref="core.cat_freight"/>
+            <field name="order_id" ref="account_cost.cost_order_1"/>
+            <field name="amount">90</field>
+            <field name="tax_amount">10</field>
+            <field name="subtotal">100</field>
+        </record>
+    </data>
+</openerp>

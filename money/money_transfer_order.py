@@ -67,7 +67,8 @@ class money_transfer_order(models.Model):
                                    digits=dp.get_precision('Amount'),
                                    help=u'资金转换时，待抹去的零头数据')
     discount_account_id = fields.Many2one('finance.account', u'折扣科目',
-                                      help=u'资金转换单审核生成凭证时，折扣额对应的科目')
+                                          readonly=True, states={'draft': [('readonly', False)]},
+                                          help=u'资金转换单审核生成凭证时，折扣额对应的科目')
 
     @api.multi
     def money_transfer_done(self):

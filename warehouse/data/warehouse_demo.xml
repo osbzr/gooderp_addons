@@ -217,6 +217,7 @@
         <record id="outsource_out1" model="outsource">
             <field name="warehouse_dest_id" ref="warehouse.hd_stock"/>
             <field name="warehouse_id" ref="warehouse.hd_stock"/>
+            <field name="outsource_partner_id" ref="core.lenovo"/>
             <field name="name">OUT/16040001</field>
             <field name="date">2016-04-02</field>
         </record>

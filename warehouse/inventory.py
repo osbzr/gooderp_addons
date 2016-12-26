@@ -39,9 +39,6 @@ class wh_inventory(models.Model):
                                    help=u'盘点单盘点的仓库')
     goods = fields.Char(u'产品',
                         help=u'盘点单盘点的产品')
-    uos_not_zero = fields.Boolean(u'辅助数量不为0',
-                                  help=u'True: 盘点单盘点的是系统辅助单位库存或系统库存不为0;'
-                                       u'False: 盘点单盘点的是系统库存不为0的情况。')
     out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False,
                              help=u'盘亏生成的其他出库单单据')
     in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False,
@@ -188,12 +185,9 @@ class wh_inventory(models.Model):
 
         return True
 
-    def get_line_detail(self, uos_zero=False):
+    def get_line_detail(self):
         for inventory in self:
-            if uos_zero:
-                remaining_text = 'line.uos_qty_remaining > 0'
-            else:
-                remaining_text = 'line.qty_remaining > 0'
+            remaining_text = 'line.qty_remaining > 0'
 
             sql_text = '''
                 SELECT wh.id as warehouse_id,
@@ -236,7 +230,7 @@ class wh_inventory(models.Model):
         line_obj = self.env['wh.inventory.line']
         for inventory in self:
             inventory.delete_line()
-            line_ids = inventory.get_line_detail(inventory.uos_not_zero)
+            line_ids = inventory.get_line_detail()
             for line in line_ids:
                 line_obj.create_wh_inventory_line_by_data(inventory.id,line)
             if line_ids:

@@ -68,14 +68,7 @@ class TestInventory(TransactionCase):
             self.assertEqual(goods_stock.get('warehouse'), line.warehouse_id.name)
             self.assertEqual(goods_stock.get('qty'), line.real_qty)
 
-        # 当辅助数量不为0勾选后，会选择到temp_mouse_in_zero_qty相关的库存调拨，此时会出现为一行
-        self.assertEqual(len(self.inventory.line_ids), 3)
-        self.inventory.uos_not_zero = True
-        self.inventory.query_inventory()
-        self.assertEqual(len(self.inventory.line_ids), 4)
-
         # 当指定仓库的时候，选择的行必须是该仓库的
-        self.inventory.uos_not_zero = False
         self.inventory.warehouse_id = self.sh_warehouse
         self.inventory.query_inventory()
         for line in self.inventory.line_ids:

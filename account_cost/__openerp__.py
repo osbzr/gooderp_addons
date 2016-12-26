@@ -18,6 +18,7 @@
         'security/cost_sequence.xml',
     ],
     'demo': [
+             'data/cost_order_demo.xml',
     ],
     'qweb': [
         "static/src/xml/*.xml",

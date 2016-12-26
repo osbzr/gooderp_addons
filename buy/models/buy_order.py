@@ -291,7 +291,7 @@ class buy_order(models.Model):
             'warehouse_id': warehouse.id,
             'warehouse_dest_id': warehouse_dest.id,
             'date': self.planned_date,
-            'date_due': fields.Date.context_today(self),
+            'date_due': self.planned_date,
             'order_id': self.id,
             'origin': 'buy.receipt',
             'note': self.note,

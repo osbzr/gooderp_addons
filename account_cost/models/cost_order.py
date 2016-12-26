@@ -173,7 +173,6 @@ class cost_order(models.Model):
                         'tax':cost_line.tax_amount *(mv_amount / all_amount),
                         'buy_id': mv.id
                         })
-                    print cost_mv_in_id
                     self.wm_ids = [(4, cost_mv_in_id.id)]
 
             if mv.origin == 'sell.delivery.sell':
@@ -221,9 +220,7 @@ class cost_order(models.Model):
                 cost_line_id.unlink()
 
         if self.invoice_ids:
-            print self.invoice_ids
             for invoice in self.invoice_ids:
-                print 'aaaaaaa'
                 invoice_id = invoice
                 self.invoice_ids = [(3, invoice.id)]
                 invoice_id.money_invoice_draft()
