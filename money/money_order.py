@@ -176,12 +176,7 @@ class money_order(models.Model):
                 'date_due': invoice.date_due,
                 }
 
-    @api.onchange('partner_id')
-    def onchange_partner_id(self):
-        if not self.partner_id:
-            return {}
-
-        source_lines = []
+    def _get_invoice_search_list(self):
         invoice_search_list = [('partner_id', '=', self.partner_id.id),
                                ('to_reconcile', '!=', 0)]
         if self.env.context.get('type') == 'get':
@@ -189,10 +184,18 @@ class money_order(models.Model):
         else: # type = 'pay':
             invoice_search_list.append(('category_id.type', '=', 'expense'))
 
-            self.bank_name = self.partner_id.bank_name
-            self.bank_num = self.partner_id.bank_num
+        return invoice_search_list
 
-        for invoice in self.env['money.invoice'].search(invoice_search_list):
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        if not self.partner_id:
+            return {}
+
+        source_lines = []
+        self.bank_name = self.partner_id.bank_name
+        self.bank_num = self.partner_id.bank_num
+
+        for invoice in self.env['money.invoice'].search(self._get_invoice_search_list()):
             source_lines.append(self._get_source_line(invoice))
         if source_lines:
             self.source_ids = source_lines
@@ -314,7 +317,16 @@ class money_order_line(models.Model):
 class money_invoice(models.Model):
     _name = 'money.invoice'
     _description = u'结算单'
-    _rec_name = 'bill_number'
+    # _rec_name = 'bill_number'
+
+    @api.multi
+    def name_get(self):
+        '''在many2one字段里显示 名称_票号'''
+        res = []
+
+        for invoice in self:
+            res.append((invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
+        return res
 
     state = fields.Selection([
                           ('draft', u'草稿'),
