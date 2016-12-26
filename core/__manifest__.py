@@ -19,6 +19,7 @@
                 'decimal_precision',
                 'web_export_view_good',
                 'home_page',
+                'web_error_dialog',
                 'common_dialog',
                 'report'],
     'demo': [
