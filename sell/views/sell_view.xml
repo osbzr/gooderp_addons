@@ -267,8 +267,7 @@
 			            </notebook>
 		 				<group>
                 			<group>
-								<field name="discount_rate" groups='sell.sell_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
-								<field name="discount_amount" groups='sell.sell_discount_groups'/>
+								<field name="discount_amount" string="抹零" groups='sell.sell_discount_groups'/>
                     			<field name="amount"/>
                     			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
                 			</group>
