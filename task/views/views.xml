@@ -128,7 +128,8 @@
 					<field name="next_datetime"/>
 					<field name="status"/>
 					<field name="is_schedule"/>
-					<button name='assign_to_me' type='object' string='我来' class='oe_highlight'/>
+					<button name='assign_to_me' type='object' string='指派给我' class='oe_highlight'
+						attrs="{'invisible': [('user_id', '!=', False)]}"/>
 				</tree>
 			</field>
 		</record>

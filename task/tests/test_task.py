@@ -9,6 +9,8 @@ class test_task(TransactionCase):
     def setUp(self):
         super(test_task, self).setUp()
         self.task = self.env.ref('task.task_sell')
+        self.project_id = self.env.ref('task.project_gooderp')
+        self.status = self.env.ref('task.task_status_doing')
 
     def test_compute_hours(self):
         '''计算任务的实际时间'''
@@ -18,7 +20,15 @@ class test_task(TransactionCase):
         '''将任务指派给自己，并修改状态'''
         self.task.assign_to_me()
         self.assertTrue(self.task.user_id == self.env.ref('base.user_root'))
-        self.assertTrue(self.task.status == self.env.ref('task.task_status_doing'))
+        self.assertTrue(self.task.status == self.status)
+
+    def test_default_status(self):
+        '''创建任务时，任务阶段默认为doing状态的阶段'''
+        new_task = self.env['task'].create({
+            'name': u'测试创建任务时任务阶段的默认值',
+            'project_id': self.project_id.id,
+        })
+        self.assertTrue(new_task.status == self.status)
 
 
 class test_timesheet(TransactionCase):

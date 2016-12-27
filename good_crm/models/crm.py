@@ -2,15 +2,6 @@
 
 from odoo import api, fields, models
 
-class task(models.Model):
-    _inherit = 'task'
-
-    @api.model
-    def default_get(self, fields):
-        result = super(task, self).default_get(fields)
-        if 'status' in fields and not result.get('status'):
-            result['res_id'] = self.env.ref('task.task_status_todo').id
-        return result
 
 class opportunity(models.Model):
     _name = 'opportunity'
