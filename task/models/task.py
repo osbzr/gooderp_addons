@@ -288,6 +288,7 @@ class timeline(models.Model):
     user_id = fields.Many2one(
         string=u'指派给',
         comodel_name='res.users',
+        default=lambda self: self.env.uid
     )
 
     hours = fields.Float(
