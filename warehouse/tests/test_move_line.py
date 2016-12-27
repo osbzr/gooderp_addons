@@ -124,6 +124,7 @@ class TestMoveLine(TransactionCase):
             ('state', '=', 'done'),
             ('lot', '!=', False),
             ('qty_remaining', '>', 0),
+            ('warehouse_dest_id.type', '=', 'stock'),
             ('warehouse_dest_id', '=', out_iphone.warehouse_id.id),
             ('attribute_id', '=', black_iphone.attribute_id.id)
         ]
@@ -141,6 +142,7 @@ class TestMoveLine(TransactionCase):
             ('state', '=', 'done'),
             ('lot', '!=', False),
             ('qty_remaining', '>', 0),
+            ('warehouse_dest_id.type', '=', 'stock'),
             ('warehouse_dest_id', '=', self.mouse_in_line.warehouse_id.id)
         ]
 

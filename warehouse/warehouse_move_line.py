@@ -282,7 +282,8 @@ class wh_move_line(models.Model):
 
     def compute_lot_domain(self):
         lot_domain = [('goods_id', '=', self.goods_id.id), ('state', '=', 'done'),
-            ('lot', '!=', False), ('qty_remaining', '>', 0)]
+            ('lot', '!=', False), ('qty_remaining', '>', 0),
+            ('warehouse_dest_id.type', '=', 'stock')]
 
         if self.move_id:
             lot_domain.append(('warehouse_dest_id', '=', self.move_id.warehouse_id.id))
@@ -339,7 +340,7 @@ class wh_move_line(models.Model):
 
         self.compute_suggested_cost()
         self.compute_lot_compatible()
-        
+
         return {'domain': {'lot_id': self.compute_lot_domain()}}
 
     @api.multi
@@ -373,7 +374,7 @@ class wh_move_line(models.Model):
             self.lot_qty = self.lot_id.qty_remaining
             self.lot_uos_qty = self.goods_id.anti_conversion_unit(self.lot_qty)
 
-            if self.env.context.get('type') == 'internal':
+            if self.env.context.get('type') in ['internal', 'out']:
                 self.lot = self.lot_id.lot
 
     @api.onchange('goods_qty', 'price_taxed', 'discount_rate')
