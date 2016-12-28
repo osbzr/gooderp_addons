@@ -218,6 +218,11 @@ class TestMoveLine(TransactionCase):
         self.goods_id = False
         self.env['wh.move.line'].onchange_goods_id()
 
+    def test_onchange_goods_id_in_cost_unit(self):
+        ''' 测试  onchange_goods_id 入库单行默认带出入库成本 '''
+        self.mouse_in_line.goods_id = self.goods_cable
+        self.mouse_in_line.with_context({'type': 'in'}).onchange_goods_id()
+
     def test_name_search(self):
         '''测试批号下拉的时候显示批次和剩余数量'''
         move_line = self.env.ref('warehouse.wh_move_line_12')
