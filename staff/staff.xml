@@ -155,11 +155,11 @@
                 		</group>
                 		<group>
 		                    <field name="manager_id"/>
-		                    <field name="parent_id"/>
+		                    <field name="parent_id" domain="[('name','!=',name)]"/>
                 		</group>
                 	</group>
             		<group>
-	                	<field name="jobs_ids" readonly='1'/>
+	                	<field name="jobs_ids" readonly='0'/>
             		</group>
                 	<field name='note' placeholder='描述...'/>
                 </form>
