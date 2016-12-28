@@ -74,7 +74,7 @@
                             ><div>
                             <t t-if="column.tag !== 'button'"  ><t t-raw="column.heading()"/></t>
                         </div></th>
-                         <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' " t-att-data-id="column.id"   rowspan="1" colspan="2" style='text-align:center;'><div>
+                         <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' "   rowspan="1" colspan="2" style='text-align:center;'><div>
                             <t t-if="column.tag !== 'button'"  ><t t-esc="column.base_string"/></t>
                         </div></th>
                     </t>
@@ -82,8 +82,8 @@
                 </tr>
                 <tr>
                     <t t-foreach="columns" t-as="column">
-                         <th   t-if="!column.meta and column.invisible !== '1' and ( column.merge=='False' or column.merge=='True')" rowspan="1" colspan="1"
-                            t-attf-class="oe_list_header_#{column.widget or column.type} #{((options.sortable and column.tag !== 'button') ? 'oe_sortable' : null)}" align='center' ><div>
+                         <th   t-if="!column.meta and column.invisible !== '1' and ( column.merge=='False' or column.merge=='True')" rowspan="1" colspan="1" t-att-data-id="column.id"
+                           t-attf-class="#{((options.sortable and column.sortable and column.tag !== 'button') ? 'o_column_sortable' : '')}" style='text-align:right;'><div>
                            <t t-esc="column.child_name"/>
                         </div></th>
                      </t>

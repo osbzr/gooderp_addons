@@ -371,12 +371,16 @@ class TestProduction(TransactionCase):
         wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
         wh_disassembly_dis3.goods_qty = 2
         wh_disassembly_dis3.onchange_goods_qty()
-        
+
+    def test_disassembly_onchange_goods_qty_no_bom(self):
+        ''' 测试 拆卸单 onchange_goods_qty 没有物料清单 '''
         # self.line_out_ids
-#         wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
-#         wh_disassembly_dis3.bom_id = False
-#         wh_disassembly_dis3.goods_qty = 2
-#         wh_disassembly_dis3.onchange_goods_qty()
+        wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
+        wh_disassembly_dis3.bom_id = False
+        wh_disassembly_dis3.goods_id = self.env.ref('goods.keyboard_mouse').id
+        wh_disassembly_dis3.onchange_goods_id()
+        wh_disassembly_dis3.goods_qty = 2
+        wh_disassembly_dis3.onchange_goods_qty()
 
     def test_assembly_onchange_bom(self):
         ''' 测试  组装单 onchange_bom '''

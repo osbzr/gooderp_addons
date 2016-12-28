@@ -145,6 +145,13 @@ class task(models.Model):
                                 [('task_id', '=', task.id)]):
                 task.hours += line.hours
 
+    @api.model
+    def _default_status(self):
+        '''创建任务时，任务阶段默认为doing状态的阶段'''
+        status_id = self.env['task.status'].search(
+            [('state', '=', 'doing')])
+        return status_id and status_id[0]
+
     name = fields.Char(
         string=u'名称',
         required=True,
@@ -153,6 +160,7 @@ class task(models.Model):
     user_id = fields.Many2one(
         string=u'指派给',
         comodel_name='res.users',
+        track_visibility='onchange',
     )
 
     project_id = fields.Many2one(
@@ -180,9 +188,12 @@ class task(models.Model):
         track_visibility='onchange',
     )
 
-    status = fields.Many2one('task.status',
-                             string=u'状态',
-                             track_visibility='onchange')
+    status = fields.Many2one(
+        'task.status',
+        string=u'状态',
+        default=_default_status,
+        track_visibility='onchange',
+    )
     plan_hours = fields.Float(u'计划时间')
     hours = fields.Float(u'实际时间',
                          compute=_compute_hours)
@@ -201,8 +212,7 @@ class task(models.Model):
         self.ensure_one()
         next_status = self.env['task.status'].search([('state', '=', 'doing')])
         self.user_id = self.env.user
-        if next_status:
-            self.status = next_status[0]
+        self.status = next_status and next_status[0]
 
 class task_status(models.Model):
     _name = 'task.status'
@@ -324,6 +334,7 @@ class timeline(models.Model):
         task_id = vals.get('task_id')
         next_action = vals.get('next_action')
         next_datetime = vals.get('next_datetime')
+        user_id = vals.get('user_id')
         task = self.env['task'].search([('id', '=', task_id)])
         if set_status:
             task.write({'status': set_status})
@@ -331,4 +342,6 @@ class timeline(models.Model):
             task.write({'next_action': next_action})
         if next_datetime:
             task.write({'next_datetime': next_datetime})
+        if user_id:
+            task.write({'user_id': user_id})
         return res

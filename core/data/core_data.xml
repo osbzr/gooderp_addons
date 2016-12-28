@@ -20,6 +20,7 @@
             <field name="name">GoodERP测试公司</field>
             <field name="currency_id" ref="base.CNY" />
             <field name='cost_method'>average</field>
+            <field name="logo" type="base64" file="core/static/description/logo.png"/>
         </record>
         <!-- 本模块的这些数据表可以清空 -->
         <record id="remove_core_value" model="business.data.table">

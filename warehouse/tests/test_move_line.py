@@ -124,6 +124,7 @@ class TestMoveLine(TransactionCase):
             ('state', '=', 'done'),
             ('lot', '!=', False),
             ('qty_remaining', '>', 0),
+            ('warehouse_dest_id.type', '=', 'stock'),
             ('warehouse_dest_id', '=', out_iphone.warehouse_id.id),
             ('attribute_id', '=', black_iphone.attribute_id.id)
         ]
@@ -141,6 +142,7 @@ class TestMoveLine(TransactionCase):
             ('state', '=', 'done'),
             ('lot', '!=', False),
             ('qty_remaining', '>', 0),
+            ('warehouse_dest_id.type', '=', 'stock'),
             ('warehouse_dest_id', '=', self.mouse_in_line.warehouse_id.id)
         ]
 
@@ -210,6 +212,11 @@ class TestMoveLine(TransactionCase):
         self.mouse_in_line.warehouse_id = self.mouse_in_line.warehouse_dest_id
         with self.assertRaises(UserError):
             self.mouse_in_line.check_availability()
+
+    def test_onchange_goods_id_no_goods(self):
+        ''' 测试  onchange_goods_id no goods '''
+        self.goods_id = False
+        self.env['wh.move.line'].onchange_goods_id()
 
     def test_name_search(self):
         '''测试批号下拉的时候显示批次和剩余数量'''

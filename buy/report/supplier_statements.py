@@ -24,7 +24,7 @@ class supplier_statements_report(models.Model):
             before_balance = pre_record.this_balance_amount
         else:
             before_balance = 0
-        self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
+        self.balance_amount += before_balance + self.amount - self.pay_amount + self.discount_money
         self.this_balance_amount = self.balance_amount
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
@@ -57,7 +57,7 @@ class supplier_statements_report(models.Model):
         tools.drop_view_if_exists(cr, 'supplier_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW supplier_statements_report AS (
-            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id,done_date) AS id,
+            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id) AS id,
                     partner_id,
                     name,
                     date,
@@ -104,6 +104,23 @@ class supplier_statements_report(models.Model):
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
                 LEFT JOIN buy_receipt AS br ON br.buy_move_id = mi.move_id
                 WHERE c.type = 'expense' AND mi.state = 'done'
+                UNION ALL
+                SELECT  ro.partner_id,
+                        ro.name,
+                        ro.date,
+                        ro.write_date AS done_date,
+                        0 AS purchase_amount,
+                        0 AS benefit_amount,
+                        0 AS amount,
+                        sol.this_reconcile AS pay_amount,
+                        0 AS discount_money,
+                        0 AS balance_amount,
+                        Null AS note,
+                        0 AS move_id
+                FROM reconcile_order AS ro
+                LEFT JOIN money_invoice AS mi ON mi.name = ro.name
+                LEFT JOIN source_order_line AS sol ON sol.payable_reconcile_id = ro.id
+                WHERE ro.state = 'done' AND mi.state = 'done' AND mi.name ilike 'RO%'
                 ) AS ps)
         """)
 

@@ -87,6 +87,7 @@
                     		<field name="name" readonly='1'/>
                     		<field name="category_id" readonly='1'/>
                             <field name="date" readonly='1'/>
+                            <field name="date_due" readonly='1'/>
                             <field name="amount" readonly='1' sum="合计"/>
                             <field name="reconciled" readonly='1' sum="合计"/>
                             <field name="to_reconcile" readonly='1' sum="合计"/>
@@ -193,15 +194,16 @@
                 <tree string="Money Invoice" editable='TOP'>
                     <field name="state" invisible="1"/>
                     <field name="name"/>
+                    <button name="find_source_order" type="object" string="查看原始单据" icon="fa-search" class="oe_highlight"/>
                     <field name="partner_id"/>
             		<field name="category_id"/>
             		<field name="auxiliary_id"/>
                     <field name="date"/>
                     <field name="currency_id"
                     	 groups='finance.group_multi_currency'/>
-                    <field name="amount"/>
-                    <field name="reconciled"/>
-                    <field name="to_reconcile"/>
+                    <field name="amount" sum="采购金额"/>
+                    <field name="reconciled" sum="核销金额"/>
+                    <field name="to_reconcile" sum="未核销金额"/>
                     <field name="tax_amount"/>
                     <button name="money_invoice_done" states="draft" string="审核" type="object"/>
                     <field name="bill_number"/>
@@ -224,8 +226,8 @@
                     <group expand="0" string="分组">
                         <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
                         <filter string="类别" domain="[]" context="{'group_by':'category_id'}"/>
-                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
-                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:month'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:month'}"/>
                     </group>
                 </search>
             </field>

@@ -291,7 +291,7 @@ class buy_order(models.Model):
             'warehouse_id': warehouse.id,
             'warehouse_dest_id': warehouse_dest.id,
             'date': self.planned_date,
-            'date_due': fields.Date.context_today(self),
+            'date_due': self.planned_date,
             'order_id': self.id,
             'origin': 'buy.receipt',
             'note': self.note,
@@ -488,6 +488,8 @@ class payment(models.Model):
                             })
             self.env["money.order"].create({
                                 'partner_id': self.buy_id.partner_id.id,
+                                'bank_name': self.buy_id.partner_id.bank_name,
+                                'bank_num': self.buy_id.partner_id.bank_num,
                                     'date': fields.Date.context_today(self),
                                     'source_ids':
                                     [(0, 0, {'name':source_id.id,

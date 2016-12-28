@@ -134,6 +134,7 @@
                     <field name='force_batch_one' invisible='1' />
                     <field name='lot_qty' invisible='1' />
                     <field name='lot_uos_qty' invisible='1' />
+                    <field name='lot' invisible='1'/>
                 </tree>
             </field>
         </record>
@@ -201,7 +202,7 @@
                     <field name='force_batch_one' invisible='1' />
                     <field name='lot_qty' invisible='1' />
                     <field name='lot_uos_qty' invisible='1' />
-                    <field name='lot' invisible='1' /> <!-- 能否去掉？ -->
+                    <field name='lot' invisible='1' /> <!-- 能否去掉？ 不能, lot的值是 onchange 带过来的-->
                 </tree>
             </field>
         </record>

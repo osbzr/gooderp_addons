@@ -29,9 +29,13 @@ class wh_assembly(models.Model):
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个产品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件产品')
-    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'), help="(选择使用物料清单后)当更改这个数量的时候后\
-                                                                                              自动的改变相应的子件的数量")
+    goods_id = fields.Many2one('goods', string=u'组合件产品',
+                               readonly=True,
+                               states={'draft': [('readonly', False)]},)
+    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
+                             readonly=True,
+                             states={'draft': [('readonly', False)]},
+                             help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one('voucher', string='凭证号')
 
     def apportion_cost(self, cost):
@@ -75,7 +79,6 @@ class wh_assembly(models.Model):
             cost = sum(child.cost for child in assembly.line_out_ids) + \
                 assembly.fee
             assembly.apportion_cost(cost)
-
         return True
 
     @api.onchange('goods_id')
@@ -183,8 +186,9 @@ class wh_assembly(models.Model):
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
+        res = self.update_parent_cost()
         self.wh_assembly_create_voucher()
-        return self.update_parent_cost()
+        return res
 
     @api.multi
     @inherits()
@@ -206,14 +210,12 @@ class wh_assembly(models.Model):
     def create(self, vals):
         self = super(wh_assembly, self).create(vals)
         self.update_parent_cost()
-
         return self
 
     @api.multi
     def write(self, vals):
         res = super(wh_assembly, self).write(vals)
         self.update_parent_cost()
-
         return res
 
     @api.onchange('bom_id')
@@ -337,14 +339,19 @@ class outsource(models.Model):
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个产品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件产品')
+    goods_id = fields.Many2one('goods', string=u'组合件产品',
+                               readonly=True,
+                               states={'draft': [('readonly', False)]},)
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
+                             readonly=True,
+                             states={'draft': [('readonly', False)]},
                              help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one('voucher', copy=False, ondelete='set null', string=u'凭证号')
 
     outsource_partner_id = fields.Many2one('partner', string=u'委外供应商',
                                            readonly=True,
-                                           states={'draft': [('readonly', False)]},)
+                                           states={'draft': [('readonly', False)]},
+                                           required=True)
     wh_assembly_id = fields.Many2one('wh.assembly', string=u'关联的组装单',
                                      readonly=True,
                                      states={'draft': [('readonly', False)]},)
@@ -509,7 +516,6 @@ class outsource(models.Model):
         for outsource in self:
             cost = sum(child.cost for child in outsource.line_out_ids) + outsource.outsource_fee
             outsource.apportion_cost(cost)
-
         return True
 
     @api.multi
@@ -523,14 +529,12 @@ class outsource(models.Model):
     def create(self, vals):
         self = super(outsource, self).create(vals)
         self.update_parent_cost()
-
         return self
 
     @api.multi
     def write(self, vals):
         res = super(outsource, self).write(vals)
         self.update_parent_cost()
-
         return res
 
     @api.multi
@@ -605,7 +609,6 @@ class outsource(models.Model):
         # 如果委外费用存在，生成 结算单
         if self.outsource_fee:
             self._create_money_invoice()
-
         self.outsource_create_voucher()
         self.update_parent_cost()
         return
@@ -617,6 +620,9 @@ class outsource(models.Model):
             if outsource.voucher_id:
                 outsource.voucher_id.voucher_draft()
                 outsource.voucher_id.unlink()
+            if outsource.invoice_id:
+                outsource.invoice_id.money_invoice_draft()
+                outsource.invoice_id.unlink()
         return True
 
 
@@ -641,9 +647,13 @@ class wh_disassembly(models.Model):
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个产品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件产品')
-    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'), help="(选择使用物料清单后)当更改这个数量的时候后\
-                                                                                          自动的改变相应的子件的数量")
+    goods_id = fields.Many2one('goods', string=u'组合件产品',
+                               readonly=True,
+                               states={'draft': [('readonly', False)]},)
+    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
+                             readonly=True,
+                             states={'draft': [('readonly', False)]},
+                             help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one('voucher', string='凭证号')
 
     def apportion_cost(self, cost):
@@ -685,7 +695,6 @@ class wh_disassembly(models.Model):
         for assembly in self:
             cost = sum(child.cost for child in assembly.line_out_ids) + \
                 assembly.fee
-
             assembly.apportion_cost(cost)
         return True
 
@@ -737,8 +746,9 @@ class wh_disassembly(models.Model):
     @inherits_after(res_back=False)
     def approve_order(self):
         self.check_parent_length()
+        res = self.update_child_cost()
         self.wh_disassembly_create_voucher()
-        return self.update_child_cost()
+        return res
 
     @api.multi
     @inherits()
@@ -760,14 +770,12 @@ class wh_disassembly(models.Model):
     def create(self, vals):
         self = super(wh_disassembly, self).create(vals)
         self.update_child_cost()
-
         return self
 
     @api.multi
     def write(self, vals):
         res = super(wh_disassembly, self).write(vals)
         self.update_child_cost()
-
         return res
 
     @api.onchange('goods_id')

@@ -115,10 +115,3 @@ class staff(models.Model):
                         self.env.ref('staff.contract_over_due_date_manager').send_mail(self.env.user.id)
 
         return
-
-
-class res_users(models.Model):
-    _name = 'res.users'
-    _inherit = 'res.users'
-
-    employee_ids = fields.One2many('staff', 'user_id', u'对应员工')

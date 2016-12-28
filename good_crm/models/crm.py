@@ -24,3 +24,4 @@ class opportunity(models.Model):
                                    track_visibility='always')
     ref = fields.Reference(string=u'相关记录',
                            selection='_select_objects')
+

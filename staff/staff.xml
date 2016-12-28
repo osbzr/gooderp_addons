@@ -38,6 +38,10 @@
                                         <field name="work_mobile"/>
                                     </group>
                                     <group>
+                                        <field name="identification_id" required="1"/>
+                                        <field name="type_of_certification"/>
+                                    </group>
+                                    <group>
                                         <field name="user_id"/>
                                     </group>
                                 </group>
@@ -46,8 +50,6 @@
                             <page string="个人信息">
                                 <group>
                                     <group string="国籍和其他">
-                                        <field name="identification_id" required="1"/>
-                                        <field name="type_of_certification"/>
                                         <field name="birthday"/>
                                         <field name="is_arbeitnehmer"/>
                                         <field name="is_investoren"/>
@@ -132,6 +134,11 @@
             <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="context">{'type':'member'}</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建员工
+              </p>
+            </field>
         </record>
         
         <menuitem action="staff_action" id="menu_staff" sequence="3" parent="menu_staff_main"/>

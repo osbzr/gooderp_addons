@@ -179,7 +179,7 @@ class wh_in(models.Model):
                 vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
                 vouch_obj_lines = self.env['voucher.line'].search([
                     ('voucher_id', '=', vouch_obj.id),
-                    ('goods_id', '=', self.line_in_ids.goods_id.id),
+                    ('goods_id', 'in', [line.goods_id.id for line in self.line_in_ids]),
                     ('init_obj', '=', 'init_warehouse- %s' % (self.id)),])
                 for vouch_obj_line in vouch_obj_lines:
                     vouch_obj_line.unlink()

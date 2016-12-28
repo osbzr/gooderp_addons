@@ -128,7 +128,8 @@
 					<field name="next_datetime"/>
 					<field name="status"/>
 					<field name="is_schedule"/>
-					<button name='assign_to_me' type='object' string='我来' class='oe_highlight'/>
+					<button name='assign_to_me' type='object' string='指派给我' class='oe_highlight'
+						attrs="{'invisible': [('user_id', '!=', False)]}"/>
 				</tree>
 			</field>
 		</record>
@@ -138,7 +139,7 @@
 			<field name="arch" type="xml">
 				<form string="任务">
 					<header>
-						<field name="status" widget="statusbar"/>
+						<field name="status" widget="statusbar" clickable="True"/>
 					</header>
 					<sheet>
 						<group>
@@ -268,7 +269,6 @@
 					<field name='project_id'/>
 					<field name='just_done'/>
 					<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
-					<field name="user_id"/>
 					<field name='set_status'/>
 					<field name="create_uid" string='创建人'/>
 					<field name="create_date" string='创建时间'/>
