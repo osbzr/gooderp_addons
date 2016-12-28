@@ -269,7 +269,6 @@
 					<field name='project_id'/>
 					<field name='just_done'/>
 					<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
-					<field name="user_id"/>
 					<field name='set_status'/>
 					<field name="create_uid" string='创建人'/>
 					<field name="create_date" string='创建时间'/>

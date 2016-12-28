@@ -59,10 +59,12 @@ class test_timeline(TransactionCase):
             'next_action': u'测试其他内容',
             'next_datetime': (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
             'set_status': self.status_doing.id,
+            'user_id': self.env.ref('base.user_root').id,
         })
         self.assertEqual(self.task.status, self.status_doing)
         self.assertEqual(self.task.next_action, timeline.next_action)
         self.assertEqual(self.task.next_datetime, timeline.next_datetime)
+        self.assertEqual(self.task.user_id, timeline.user_id)
 
 
 class test_project_invoice(TransactionCase):

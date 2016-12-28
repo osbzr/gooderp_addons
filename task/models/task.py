@@ -298,7 +298,6 @@ class timeline(models.Model):
     user_id = fields.Many2one(
         string=u'指派给',
         comodel_name='res.users',
-        default=lambda self: self.env.uid
     )
 
     hours = fields.Float(
@@ -335,6 +334,7 @@ class timeline(models.Model):
         task_id = vals.get('task_id')
         next_action = vals.get('next_action')
         next_datetime = vals.get('next_datetime')
+        user_id = vals.get('user_id')
         task = self.env['task'].search([('id', '=', task_id)])
         if set_status:
             task.write({'status': set_status})
@@ -342,4 +342,6 @@ class timeline(models.Model):
             task.write({'next_action': next_action})
         if next_datetime:
             task.write({'next_datetime': next_datetime})
+        if user_id:
+            task.write({'user_id': user_id})
         return res
