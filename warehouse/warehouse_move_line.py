@@ -302,6 +302,12 @@ class wh_move_line(models.Model):
             self.cost_unit = cost_unit
             self.cost = cost
 
+        if self.env.context.get('type') == 'in' and self.goods_id and self.goods_qty:
+            cost, cost_unit = self.goods_id.get_suggested_cost_by_warehouse(
+                self.warehouse_id, self.goods_qty, self.lot_id, self.attribute_id)
+
+            self.cost_unit = cost_unit
+
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
