@@ -281,12 +281,13 @@ class wh_move_line(models.Model):
             self.lot_id = False
 
     def compute_lot_domain(self):
+        warehouse_id = self.env.context.get('default_warehouse_id')
         lot_domain = [('goods_id', '=', self.goods_id.id), ('state', '=', 'done'),
             ('lot', '!=', False), ('qty_remaining', '>', 0),
             ('warehouse_dest_id.type', '=', 'stock')]
 
-        if self.move_id:
-            lot_domain.append(('warehouse_dest_id', '=', self.move_id.warehouse_id.id))
+        if warehouse_id:
+            lot_domain.append(('warehouse_dest_id', '=', warehouse_id))
 
         if self.attribute_id:
             lot_domain.append(('attribute_id', '=', self.attribute_id.id))

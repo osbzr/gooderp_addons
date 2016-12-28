@@ -174,6 +174,7 @@
                         <group string='子件'>
                             <field nolabel='1' name='line_out_ids' context="{'lot': True,
                                 'type': 'out',
+                                'default_warehouse_id': warehouse_id,
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" >
                                  <tree string='库存调拨' editable='bottom'>
                                         <field name='goods_id' required='1' />
@@ -334,6 +335,7 @@
                         <group string='子件'>
                             <field nolabel='1' name='line_out_ids' context="{'lot': True,
                                 'type': 'out',
+                                'default_warehouse_id': warehouse_id,
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" >
                                  <tree string='库存调拨' editable='bottom'>
                                         <field name='goods_id' required='1' />
@@ -448,6 +450,7 @@
                             <field nolabel='1' name='line_out_ids' context="{
                                 'lot': True,
                                 'type': 'out',
+                                'default_warehouse_id': warehouse_id,
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" >
                                 <tree string='库存调拨' editable='bottom'>
                                     <field name='goods_id' required='1' />
