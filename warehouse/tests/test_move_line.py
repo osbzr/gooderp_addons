@@ -99,6 +99,7 @@ class TestMoveLine(TransactionCase):
                 self.mouse_out_line.lot_id.qty_remaining + 10)
 
     def test_attribute(self):
+        '''在出库类型的明细行中，选择产品属性，lot_id的domain需要包含属性相关'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_wh_in_attribute').date = '2016-02-06'
 
@@ -129,26 +130,31 @@ class TestMoveLine(TransactionCase):
             ('attribute_id', '=', black_iphone.attribute_id.id)
         ]
 
-        domain = out_iphone.onchange_attribute_id().get('domain')
+        domain = out_iphone.with_context({
+            'default_warehouse_id': out_iphone.move_id.warehouse_id.id
+        }).onchange_attribute_id().get('domain')
 
         self.assertEqual(real_domain, domain.get('lot_id'))
         out_iphone.action_done()
         self.assertEqual(out_iphone.cost_unit, black_iphone.cost_unit)
 
     def test_onchange(self):
-        results = self.mouse_in_line.onchange_goods_id()
+        '''在出库类型的明细行中，选择产品，lot_id的domain需要包含仓库相关'''
+        results = self.mouse_out_line.with_context({
+            'default_warehouse_id': self.mouse_out_line.move_id.warehouse_id.id
+        }).onchange_goods_id()
         real_domain = [
-            ('goods_id', '=', self.mouse_in_line.goods_id.id),
+            ('goods_id', '=', self.mouse_out_line.goods_id.id),
             ('state', '=', 'done'),
             ('lot', '!=', False),
             ('qty_remaining', '>', 0),
             ('warehouse_dest_id.type', '=', 'stock'),
-            ('warehouse_dest_id', '=', self.mouse_in_line.warehouse_id.id)
+            ('warehouse_dest_id', '=', self.mouse_out_line.warehouse_id.id)
         ]
 
         # 产品改变的时候，此时仓库存在，lot_id字段的domain值需要包含仓库相关
         self.assertEqual(results['domain']['lot_id'], real_domain)
-        self.assertEqual(self.mouse_in_line.goods_qty, 1)
+        self.assertEqual(self.mouse_out_line.goods_qty, 1)
 
         results = self.keyboard_mouse_out_line.with_context({
             'type': 'out',
