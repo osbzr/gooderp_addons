@@ -405,67 +405,65 @@ class money_invoice(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看原始单据，四情况：销货单、销售退货单、采购退货单、采购入库单
+        # 查看原始单据，四情况：销售发货单、销售退货单、采购退货单、采购入库单、项目、委外加工单等
         self.ensure_one()
+        # FIXME: 判断
         sell = self.env['sell.delivery'].search([('name', '=', self.name)])
-        # 付款单
         if sell:
-            if sell.is_return:
-                view = self.env.ref('sell.sell_return_form')
-                return {
-                    'name': u'销售退货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': sell.id,
-                    'context': {'type': 'pay'}
-                }
-            else:
-                view = self.env.ref('sell.sell_delivery_form')
-                return {
-                    'name': u'销货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': sell.id,
-                    'context': {'type': 'pay'}
-                }
-
-        # 采购退货单、入库单
+            view = (not sell.is_return
+                   and self.env.ref('sell.sell_delivery_form')
+                   or self.env.ref('sell.sell_return_form'))
+            name = (not sell.is_return and u'销售发货单' or u'销售退货单')
+            return {
+                'name': name,
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'sell.delivery',
+                'type': 'ir.actions.act_window',
+                'res_id': sell.id,
+            }
         buy = self.env['buy.receipt'].search([('name', '=', self.name)])
         if buy:
-            if buy.is_return:
-                view = self.env.ref('buy.buy_return_form')
-                return {
-                    'name': u'采购退货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
-            else:
-                view = self.env.ref('buy.buy_receipt_form')
-                return {
-                    'name': u'采购入库单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
+            view = (not buy.is_return
+                   and self.env.ref('buy.buy_receipt_form')
+                   or self.env.ref('buy.buy_return_form'))
+            name = (not buy.is_return and u'采购入库单' or u'采购退货单')
+            return {
+                'name': name,
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'buy.receipt',
+                'type': 'ir.actions.act_window',
+                'res_id': buy.id,
+            }
+        project = self.env['project'].search([('name', '=', self.name)])
+        if project:
+            view = self.env.ref('task.project_form')
+            return {
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'project',
+                'type': 'ir.actions.act_window',
+                'res_id': project.id,
+            }
+        outsource = self.env['outsource'].search([('name', '=', self.name)])
+        if outsource:
+            view = self.env.ref('warehouse.outsource_form')
+            return {
+                'view_type': 'form',
+                'view_mode': 'form',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'res_model': 'outsource',
+                'type': 'ir.actions.act_window',
+                'res_id': outsource.id,
+            }
         raise UserError(u'期初余额没有原始单据可供查看！')
 
 
