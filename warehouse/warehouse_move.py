@@ -103,7 +103,8 @@ class wh_move(models.Model):
 
     def scan_barcode_move_in_out_operation(self, move, att, conversion, goods, val):
         create_line =False
-        for line in move.line_out_ids:
+        loop_field = 'line_out_ids' if val['type'] == 'out' else 'line_in_ids'
+        for line in move[loop_field]:
             line.cost_unit = line.goods_id.price if val['type'] == 'out' else line.goods_id.cost
             # 如果产品属性上存在条码，且明细行上已经存在该产品，则数量累加
             if att and line.attribute_id.id == att.id:
@@ -115,7 +116,8 @@ class wh_move(models.Model):
 
     def scan_barcode_sell_or_buy_operation(self, move, att, conversion, goods, val):
         create_line = False
-        for line in move.line_in_ids:
+        loop_field = 'line_out_ids' if val['type'] == 'out' else 'line_in_ids'
+        for line in move[loop_field]:
             line.price_taxed = line.goods_id.price if val['type'] == 'out' else line.goods_id.cost
             # 如果产品属性上存在条码
             if att and line.attribute_id.id == att.id:
