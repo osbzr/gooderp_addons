@@ -89,7 +89,7 @@ class wh_move_line(models.Model):
         if self.goods_id and self.goods_qty:
             self.goods_uos_qty = self.goods_qty/self.goods_id.conversion
         else:
-            self.goods_uos_qty = 1
+            self.goods_uos_qty = 0
 
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade',
                               help=u'出库/入库/移库单行对应的移库单')
