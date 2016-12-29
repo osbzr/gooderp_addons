@@ -303,7 +303,7 @@ class wh_move_line(models.Model):
             self.cost = cost
 
         if self.env.context.get('type') == 'in' and self.goods_id:
-            self.cost_unit = cost_unit
+            self.cost_unit = self.goods_id.cost
 
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
