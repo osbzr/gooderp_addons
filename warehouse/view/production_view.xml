@@ -36,6 +36,7 @@
                             <field name='line_parent_ids' nolabel='1' >
                                 <tree editable='bottom'>
                                     <field name='goods_id' required='1' />
+                                    <field name='attribute_id' domain="[('goods_id', '=', goods_id)]"/>
                                     <field name='goods_qty' required='1' />
                                 </tree>
                             </field>
@@ -45,6 +46,7 @@
                             <field name='line_child_ids' nolabel='1'>
                                 <tree editable='bottom'>
                                     <field name='goods_id' required='1' />
+                                     <field name='attribute_id' domain="[('goods_id', '=', goods_id)]"/>
                                     <field name='goods_qty' required='1' />
                                 </tree>
                             </field>

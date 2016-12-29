@@ -16,6 +16,7 @@ class wh_assembly(models.Model):
         'wh.move': 'move_id',
     }
 
+
     move_id = fields.Many2one(
         'wh.move', u'移库单', required=True, index=True, ondelete='cascade',
         help=u'组装单对应的移库单')
@@ -235,6 +236,7 @@ class wh_assembly(models.Model):
                 'goods_qty': line.goods_qty,
                 'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                 'uos_id': line.goods_id.uos_id.id,
+                'attribute_id': line.attribute_id,
             } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
@@ -252,6 +254,7 @@ class wh_assembly(models.Model):
                         'cost': cost,
                         'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                         'uos_id': line.goods_id.uos_id.id,
+                        'attribute_id': line.attribute_id,
                     })
             self.line_in_ids = False
             self.line_out_ids = False
@@ -330,7 +333,6 @@ class outsource(models.Model):
     _inherits = {
         'wh.move': 'move_id',
     }
-
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
                               help=u'委外加工单对应的移库单')
     bom_id = fields.Many2one('wh.bom', u'物料清单', domain=[('type', '=', 'outsource')],
@@ -989,3 +991,4 @@ class wh_bom_line(osv.osv):
     goods_qty = fields.Float(
         u'数量', digits=dp.get_precision('Quantity'),
         help=u'子件行/组合件行上的产品数量')
+    attribute_id=fields.Many2one('attribute', u'属性', ondelete='restrict')

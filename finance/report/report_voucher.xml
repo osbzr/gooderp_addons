@@ -109,118 +109,121 @@
                         <table class='col-xs-12'>
                             <thead>
                                 <tr>
-                                    <td rowspan='2' height='80px' class='col-xs-2 text-center' >摘要</td>
-                                    <td rowspan='2' class='col-xs-2 text-center' >会计科目</td>
+                                    <td rowspan='2' height='80px' class='col-xs-2 text-center' style="vertical-align:middle;">摘要</td>
+                                    <td rowspan='2' class='col-xs-2 text-center' style="vertical-align:middle;">会计科目</td>
                                     <td colspan='12' class='col-xs-4 text-center'>借方</td>
                                     <td colspan='12' class='col-xs-4 text-center'>贷方</td>
                                 </tr>
                                 <tr>
-                                    <td  class='text-center'>十</td>
-                                    <td  class='text-center'>亿</td>
-                                    <td  class='text-center'>千</td>
-                                    <td  class='text-center'>佰</td>
-                                    <td  class='text-center'>十</td>
-                                    <td  class='text-center'>万</td>
-                                    <td  class='text-center'>千</td>
-                                    <td  class='text-center'>佰</td>
-                                    <td  class='text-center'>十</td>
-                                    <td  class='text-center'>元</td>
-                                    <td  class='text-center'>角</td>
-                                    <td  class='text-center'>分</td>
-                                    <td  class='text-center'>十</td>
-                                    <td  class='text-center'>亿</td>
-                                    <td  class='text-center'>千</td>
-                                    <td  class='text-center'>佰</td>
-                                    <td  class='text-center'>十</td>
-                                    <td  class='text-center'>万</td>
-                                    <td  class='text-center'>千</td>
-                                    <td  class='text-center'>佰</td>
-                                    <td  class='text-center'>十</td>
-                                    <td  class='text-center'>元</td>
-                                    <td  class='text-center'>角</td>
-                                    <td  class='text-center'>分</td>
+                                    <td style="vertical-align:middle;">十</td>
+                                    <td style="vertical-align:middle;">亿</td>
+                                    <td style="vertical-align:middle;">千</td>
+                                    <td style="vertical-align:middle;">佰</td>
+                                    <td style="vertical-align:middle;">十</td>
+                                    <td style="vertical-align:middle;">万</td>
+                                    <td style="vertical-align:middle;">千</td>
+                                    <td style="vertical-align:middle;">佰</td>
+                                    <td style="vertical-align:middle;">十</td>
+                                    <td style="vertical-align:middle;">元</td>
+                                    <td style="vertical-align:middle;">角</td>
+                                    <td style="vertical-align:middle;">分</td>
+                                    <td style="vertical-align:middle;">十</td>
+                                    <td style="vertical-align:middle;">亿</td>
+                                    <td style="vertical-align:middle;">千</td>
+                                    <td style="vertical-align:middle;">佰</td>
+                                    <td style="vertical-align:middle;">十</td>
+                                    <td style="vertical-align:middle;">万</td>
+                                    <td style="vertical-align:middle;">千</td>
+                                    <td style="vertical-align:middle;">佰</td>
+                                    <td style="vertical-align:middle;">十</td>
+                                    <td style="vertical-align:middle;">元</td>
+                                    <td style="vertical-align:middle;">角</td>
+                                    <td style="vertical-align:middle;">分</td>
                                 </tr>
                             </thead>
                             <tbody class='text-center'>
                                 <t t-foreach='o.line_ids' t-as='l'>
                                     <tr>
-                                        <td height='80px'>
+                                        <td style="vertical-align:middle;" height='80px'>
                                             <span t-field='l.name' />
                                         </td>
-                                        <td>
-                                            <span t-field='l.account_id' />
+                                        <td style="vertical-align:middle;">
+                                            <span t-field='l.account_id' /><br/>
+                                            <span t-field="l.partner_id.name"/><br/>
+                                            <span t-field="l.goods_id.name"/><br/>
+                                            <span t-field="l.auxiliary_id.name"/>
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[0]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[1]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[2]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[3]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[4]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[5]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[6]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[7]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[8]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[9]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[10]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[11]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[0]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[1]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[2]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[3]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[4]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[5]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[6]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[7]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[8]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[9]" />
                                         </td>
-                                        <td>
+                                        <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.credit)[10]" />
                                         </td>
-                                        <td>
-                                            <span t-esc="rmb_format(l.credit)[11]" />
+                                        <td style="vertical-align:bottom;">
+                                            <span t-esc="rmb_format(l.credit)[11]"  />
                                         </td>
                                     </tr>
                                 </t>
