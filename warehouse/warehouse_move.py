@@ -171,7 +171,7 @@ class wh_move(models.Model):
             # 调拔单的扫描条码
         if model_name == 'wh.internal':
             move = self.env[model_name].browse(order_id).move_id
-            val['type'] = 'internal'
+            val['type'] = 'in'
             create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
 
         # 盘点单的扫码
@@ -198,7 +198,7 @@ class wh_move(models.Model):
 
             # 伪装成出库明细，代码结构问题
             if val['type'] == 'internal':
-                val['type'] = 'out'
+                val['type'] = 'in'
 
         elif goods:
             goods_id = goods.id
@@ -215,7 +215,7 @@ class wh_move(models.Model):
 
             # 伪装成出库明细，代码结构问题
             if val['type'] == 'internal':
-                val['type'] = 'out'
+                val['type'] = 'in'
 
         if move._name != 'wh.inventory':
             val.update({
