@@ -62,7 +62,7 @@ class test_goods(TransactionCase):
     def test_copy(self):
         '''测试产品的复制功能'''
         mouse = self.goods_mouse.copy()
-        self.assertEqual(u'鼠标 (副本)', mouse.name)
+        self.assertEqual(u'鼠标 (copy)', mouse.name)
 
 class test_attributes(TransactionCase):
 

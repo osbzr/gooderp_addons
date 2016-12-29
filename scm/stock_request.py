@@ -207,6 +207,7 @@ class stock_request(models.Model):
                                                                })
                     assembly.onchange_goods_qty()
 
+                    # 如果待处理行中有属性，则把它传至组装单的组合件行中
                     if line.attribute_id:
                         for line_in in assembly.line_in_ids:
                             line_in.attribute_id = line.attribute_id
