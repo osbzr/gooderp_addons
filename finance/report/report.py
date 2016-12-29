@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from odoo.osv import osv
 from odoo.report import report_sxw
 from odoo import models, fields, api
