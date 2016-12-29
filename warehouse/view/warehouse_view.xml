@@ -168,7 +168,7 @@
             </field>
         </record>
 
-		<!-- 调拨单明细 -->
+		<!-- 内部调拨明细 -->
         <record id='wh_move_line_internal_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.internal.tree</field>
             <field name='model'>wh.move.line</field>
@@ -243,6 +243,7 @@
                                 'tree_view_ref': 'warehouse.wh_move_line_out_tree',
                                 'lot': True,
                                 'type': 'out',
+                                'default_warehouse_id': warehouse_id,
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
@@ -450,6 +451,7 @@
                             	'tree_view_ref': 'warehouse.wh_move_line_internal_tree',
                             	'lot': True,
                             	'type': 'internal',
+                            	'default_warehouse_id': warehouse_id,
                             	}"
                             	attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
