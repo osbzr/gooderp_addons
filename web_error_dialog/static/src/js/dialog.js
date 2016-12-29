@@ -9,7 +9,7 @@ odoo.define('web.gooderp_dialog', function(require) {
     // @click：参数为点击事件event的函数
     // @close：一个Bool字段，当click属性没值且该值为true的时候点击默认关闭
     var open_help_page = function () {
-        window.open("http://www.gooderp.org");
+        window.open("http://best.gooderp.org");
     };
     var warning_buttons = error_buttons = message_buttons = default_buttons =
         [{text: core._t("确定"), close: true, classes: 'btn btn-primary'},
