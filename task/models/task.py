@@ -145,12 +145,16 @@ class task(models.Model):
                                 [('task_id', '=', task.id)]):
                 task.hours += line.hours
 
-    @api.model
-    def _default_status(self):
-        '''创建任务时，任务阶段默认为doing状态的阶段'''
+    def _default_status_impl(self):
+        '''任务阶段默认值的实现方法'''
         status_id = self.env['task.status'].search(
             [('state', '=', 'doing')])
         return status_id and status_id[0]
+
+    @api.model
+    def _default_status(self):
+        '''创建任务时，任务阶段默认为doing状态的阶段'''
+        return self._default_status_impl()
 
     name = fields.Char(
         string=u'名称',

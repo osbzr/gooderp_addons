@@ -89,7 +89,7 @@
 					<field name='value_ids'>
 						<tree editable='TOP' string='属性值'>
 							<field name='category_id'/>
-							<field name='value_id' />
+							<field name='value_id' context="{'default_category_id': category_id}"/>
 						</tree>
 					</field>
 				</form>

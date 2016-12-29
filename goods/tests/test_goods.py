@@ -5,6 +5,10 @@ from odoo.tests.common import TransactionCase
 
 class test_goods(TransactionCase):
 
+    def setUp(self):
+        super(test_goods, self).setUp()
+        self.goods_mouse = self.env.ref('goods.mouse')
+
     def test_conversion_unit(self):
         ''' 单位转化，1捆网线12根  '''
         res1 = self.env.ref('goods.cable').conversion_unit(10)
@@ -54,6 +58,11 @@ class test_goods(TransactionCase):
             'cost': 1000,
             })
         self.assertTrue(goods.uos_id.id == self.env.ref('core.uom_pc').id)
+
+    def test_copy(self):
+        '''测试产品的复制功能'''
+        mouse = self.goods_mouse.copy()
+        self.assertEqual(u'鼠标 (copy)', mouse.name)
 
 class test_attributes(TransactionCase):
 

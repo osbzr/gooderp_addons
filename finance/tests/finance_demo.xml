@@ -131,16 +131,6 @@
             <field name='account_id' ref='finance.account_ap'/>
             <field name='debit'>15000</field>
         </record>
-        <!-- 2016年2月的凭证-->
-        <record id='voucher_4' model='voucher'>
-            <field name='date'>2016-02-10</field> 
-        </record>
-        <record id='voucher_line_4_debit' model='voucher.line'>
-            <field name='voucher_id' ref='finance.voucher_4'/>
-            <field name='name'>开发票</field>
-            <field name='account_id' ref='finance.account_ap'/>
-            <field name='debit'>15000</field>
-        </record>
         <record id='voucher_line_4_credit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_4'/>
             <field name='name'>开发票</field>

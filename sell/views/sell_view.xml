@@ -215,6 +215,7 @@
 		    						'type':'out',
 		         					'default_date':date,
 		         					'default_partner':partner_id,
+		         					'default_warehouse_id': warehouse_id,
 		    						}">
 		         					<tree string='销售发货单行' editable='bottom'>
 		         						<field name='goods_id'
