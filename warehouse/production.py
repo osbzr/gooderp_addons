@@ -885,7 +885,7 @@ class wh_disassembly(models.Model):
             self.line_in_ids = False
             self.line_out_ids = False
         else:
-               self.goods_qty = 1
+            self.goods_qty = 1
         if len(line_out_ids) == 1 and line_out_ids:
             """当物料清单中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
              使试图只能在 many2one中选择一个产品(并且只能选择在物料清单中的产品),并且回写数量"""
