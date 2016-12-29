@@ -266,5 +266,3 @@ class supplier_statements_report_with_goods(models.TransientModel):
                 }
 
         raise UserError(u'期初余额没有原始单据可供查看！')
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

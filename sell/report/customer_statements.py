@@ -274,5 +274,3 @@ class customer_statements_report_with_goods(models.TransientModel):
                     'context': {'type': 'get'}
                 }
         raise UserError(u'期初余额无原始单据可查看！')
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

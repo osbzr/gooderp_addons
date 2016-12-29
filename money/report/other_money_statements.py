@@ -41,5 +41,3 @@ class other_money_statements_report(models.Model):
             WHERE omo.state = 'done'
             ORDER BY date)
         """)
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
