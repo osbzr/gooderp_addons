@@ -38,6 +38,18 @@ class test_staff(TransactionCase):
         staff_lily.parent_id = self.env.ref('staff.staff_1').id
         self.env['staff'].staff_contract_over_date()
 
+class test_staff_department(TransactionCase):
+    ''' 测试 部门 '''
+    def test_check_parent_id(self):
+        ''' 测试 上级部门不能选择自己和下级的部门 '''
+        department_1 = self.env.ref('staff.department_1')
+        department_2 = self.env['staff.department'].create({
+                                                            'name': '财务部',
+                                                            'parent_id': department_1.id,
+                                                            })
+        with self.assertRaises(ValidationError):
+            department_1.parent_id = department_2.id
+
 
 class test_mail_message(TransactionCase):
 
