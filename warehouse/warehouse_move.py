@@ -187,14 +187,17 @@ class wh_move(models.Model):
             goods_id = att.goods_id.id
             uos_id = att.goods_id.uos_id.id
             uom_id = att.goods_id.uom_id.id
+            tax_rate = att.goods_id.tax_rate
             attribute_id = att.id
             conversion = att.goods_id.conversion
             if val['type'] in ('in','internal'):
                 # 入库操作取产品的成本
-                price = cost_unit = att.goods_id.cost
+                price_taxed = att.goods_id.cost
+                cost_unit = att.goods_id.cost*(100 - tax_rate)/100
             elif val['type'] == 'out':
                 # 出库操作取产品的零售价
-                price = cost_unit = att.goods_id.price
+                price_taxed = att.goods_id.price
+                cost_unit = att.goods_id.price*(100 - tax_rate)/100
 
             # 伪装成出库明细，代码结构问题
             if val['type'] == 'internal':
@@ -204,14 +207,17 @@ class wh_move(models.Model):
             goods_id = goods.id
             uos_id = goods.uos_id.id
             uom_id = goods.uom_id.id
+            tax_rate = goods.tax_rate
             attribute_id = False
             conversion = goods.conversion
             if val['type'] in ('in','internal'):
                 # 入库操作取产品的成本
-                price = cost_unit = goods.cost
+                price_taxed = goods.cost
+                cost_unit = goods.cost*(100 - tax_rate)/100
             elif val['type'] == 'out':
                 # 出库操作取产品的零售价
-                price = cost_unit = goods.price
+                price_taxed = goods.price
+                cost_unit = goods.price*(100 - tax_rate)/100
 
             # 伪装成出库明细，代码结构问题
             if val['type'] == 'internal':
@@ -227,7 +233,8 @@ class wh_move(models.Model):
                 'uos_id': uos_id,
                 'goods_qty': 1,
                 'uom_id': uom_id,
-                'price_taxed': price,
+                'price_taxed': price_taxed,
+                'tax_rate': tax_rate,
                 'cost_unit': cost_unit,
                 'move_id': move.id})
         else:
