@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+	<!--继承币别form,增加取来的汇率-->
+        <record id="view_currency_form_inherit" model="ir.ui.view">
+            <field name="name">view.currency.form.inherit</field>
+            <field name="model">res.currency</field>
+            <field name='inherit_id' ref='base.view_currency_form' />
+            <field name="arch" type="xml">
+                <xpath expr="//group[@col='4']" position="after">
+					<notebook>
+						<page string="每月自动汇率">
+                    		<field name="month_exchange">
+                    			<tree string="中国银行汇率" editable="bottom">
+	                    			<field name="date" required="1"/>
+									<field name="period_id" />
+									<field name="exchange" readonly="1"/>
+									<field name="note"/>
+	                    		</tree>
+	                		</field>
+						</page>
+					</notebook>
+				</xpath>
+				<xpath expr="//button[@type='action']" position="replace">
+					<button name="get_exchange" string="自动取汇率" type="object" class="oe_highlight"/>
+				</xpath>
+            </field>
+        </record>
+
+	</data>
+</openerp>
