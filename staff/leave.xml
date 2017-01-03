@@ -37,7 +37,6 @@
 						<button name="leave_done" states="draft" string="审核" type="object" class="oe_highlight" groups="staff.hr_senior_groups"/>
 						<button name="leave_draft" states="done" string="反审核" type="object" groups="staff.hr_senior_groups"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
-                        <field name="state" invisible="1"/>
 					</header>
                 	<group>
                 		<field name='user_id'/>

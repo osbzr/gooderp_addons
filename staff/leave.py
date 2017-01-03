@@ -41,8 +41,7 @@ class staff_leave(models.Model):
                states = {'draft': [('readonly', False)]})
     state = fields.Selection(LEAVE_STATES, u'审核状态', readonly=True,
                              help=u"购货订单的审核状态", index=True, copy=False,
-                             default='draft',
-                            states = {'draft': [('readonly', False)]})
+                             default='draft')
 
 
     @api.one
