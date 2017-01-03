@@ -193,11 +193,11 @@ class wh_move(models.Model):
             if val['type'] in ('in','internal'):
                 # 入库操作取产品的成本
                 price_taxed = att.goods_id.cost
-                cost_unit = att.goods_id.cost*(100 - tax_rate)/100
+                cost_unit = att.goods_id.cost/(1 + tax_rate*0.01)
             elif val['type'] == 'out':
                 # 出库操作取产品的零售价
                 price_taxed = att.goods_id.price
-                cost_unit = att.goods_id.price*(100 - tax_rate)/100
+                cost_unit = 0
 
             # 伪装成出库明细，代码结构问题
             if val['type'] == 'internal':
@@ -213,11 +213,11 @@ class wh_move(models.Model):
             if val['type'] in ('in','internal'):
                 # 入库操作取产品的成本
                 price_taxed = goods.cost
-                cost_unit = goods.cost*(100 - tax_rate)/100
+                cost_unit = goods.cost/(1 + tax_rate*0.01)
             elif val['type'] == 'out':
                 # 出库操作取产品的零售价
                 price_taxed = goods.price
-                cost_unit = goods.price*(100 - tax_rate)/100
+                cost_unit = 0
 
             # 伪装成出库明细，代码结构问题
             if val['type'] == 'internal':
