@@ -405,68 +405,68 @@ class money_invoice(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看原始单据，四情况：销货单、销售退货单、采购退货单、采购入库单
+        '''
+        查看原始单据，有以下情况：销售发货单、销售退货单、采购退货单、采购入库单、
+        项目、委外加工单、核销单、购货订单、固定资产、固定资产变更以及期初应收应付。
+        '''
         self.ensure_one()
-        sell = self.env['sell.delivery'].search([('name', '=', self.name)])
-        # 付款单
-        if sell:
-            if sell.is_return:
-                view = self.env.ref('sell.sell_return_form')
-                return {
-                    'name': u'销售退货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': sell.id,
-                    'context': {'type': 'pay'}
-                }
-            else:
-                view = self.env.ref('sell.sell_delivery_form')
-                return {
-                    'name': u'销货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': sell.id,
-                    'context': {'type': 'pay'}
-                }
+        code = False
+        res_models = [
+            'reconcile.order',
+        ]
+        views = [
+            'money.reconcile_order_form',
+        ]
+        # 判断当前数据库中否存在该 model
+        if self.env['ir.module.module'].sudo().search([
+            ('state', '=', 'installed'),
+            ('name', '=', 'sell')]):
+            res_models += ['sell.delivery', 'outsource']
+            views += ['sell.sell_delivery_form', 'warehouse.outsource_form']
+        if self.env['ir.module.module'].sudo().search([
+            ('state', '=', 'installed'),
+            ('name', '=', 'buy')]):
+            res_models += ['buy.receipt', 'buy.order']
+            views += ['buy.buy_receipt_form', 'buy.buy_order_form']
+        if self.env['ir.module.module'].sudo().search([
+            ('state', '=', 'installed'),
+            ('name', '=', 'task')]):
+            res_models += ['project']
+            views += ['task.project_form']
+        if self.env['ir.module.module'].sudo().search([
+            ('state', '=', 'installed'),
+            ('name', '=', 'asset')]):
+            res_models += ['asset']
+            views += ['asset.asset_form']
+        if u'固定资产变更' in self.name:
+            code = self.name.replace('固定资产变更', '')
+        elif u'固定资产' in self.name:
+            code = self.name.replace('固定资产', '')
+        domain = code and [('code', '=', code)] or [('name', '=', self.name)]
 
-        # 采购退货单、入库单
-        buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        if buy:
-            if buy.is_return:
-                view = self.env.ref('buy.buy_return_form')
-                return {
-                    'name': u'采购退货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
-            else:
-                view = self.env.ref('buy.buy_receipt_form')
-                return {
-                    'name': u'采购入库单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
-        raise UserError(u'期初余额没有原始单据可供查看！')
+        for i in range(len(res_models)):
+            res_model = code and 'asset' or res_models[i]
+            view = code and self.env.ref('asset.asset_form') or self.env.ref(views[i])
+            res = self.env[res_model].search(domain)
+            if res:
+                break
+
+        if not res:
+            raise UserError(u'没有原始单据可供查看！')
+
+        if res_model == 'sell.delivery' and res.is_return:
+            view = self.env.ref('sell.sell_return_form')
+        elif res_model == 'buy.receipt' and res.is_return:
+            view = self.env.ref('buy.buy_return_form')
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': False,
+            'views': [(view.id, 'form')],
+            'res_model': res_model,
+            'type': 'ir.actions.act_window',
+            'res_id': res.id,
+        }
 
 
 class source_order_line(models.Model):

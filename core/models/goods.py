@@ -59,6 +59,9 @@ class goods(models.Model):
                         digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)',
                             help=u'产品税率')
+    not_saleable = fields.Boolean(u'不可销售',
+                                  default=False,
+                                  help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '产品不能重名'),
