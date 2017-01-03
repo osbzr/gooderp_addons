@@ -173,6 +173,10 @@ class test_period(TransactionCase):
         #     period_row.unlink()
         # period_obj.get_year_fist_period_id()
 
+    def test_compute_name_month_02(self):
+        ''' 测试  compute_name 月份小于10 '''
+        self.env['finance.period'].create({'year':u'2007','month':u'2'})
+
     def test_onchange_account_id(self):
         '''凭证行的科目变更影响到其他字段的可选值'''
         voucher = self.env.ref('finance.voucher_1')
