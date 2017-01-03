@@ -353,7 +353,7 @@ class other_money_order(models.Model):
                     if not line.category_id.account_id:
                         raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
                     vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'string': u'其他收入单',
-                                 'credit_auxiliary_id':line.auxiliary_id,
+                                 'credit_auxiliary_id':line.auxiliary_id.id,
                                  'amount': abs(line.amount + line.tax_amount), 'credit_account_id': line.category_id.account_id.id,
                                  'debit_account_id': money_order.bank_id.account_id.id, 'partner_credit': money_order.partner_id.id, 'partner_debit': '',
                                  'sell_tax_amount': line.tax_amount or 0,
@@ -366,7 +366,7 @@ class other_money_order(models.Model):
                     if not line.category_id.account_id:
                         raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
                     vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'string': u'其他支出单',
-                                 'debit_auxiliary_id':line.auxiliary_id,
+                                 'debit_auxiliary_id':line.auxiliary_id.id,
                                  'amount': abs(line.amount + line.tax_amount), 'credit_account_id': money_order.bank_id.account_id.id,
                                  'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': money_order.partner_id.id,
                                  'buy_tax_amount': line.tax_amount or 0,
