@@ -439,9 +439,9 @@ class money_invoice(models.Model):
             res_models += ['asset']
             views += ['asset.asset_form']
         if u'固定资产变更' in self.name:
-            code = self.name.replace('固定资产变更', '')
+            code = self.name.replace(u'固定资产变更', '')
         elif u'固定资产' in self.name:
-            code = self.name.replace('固定资产', '')
+            code = self.name.replace(u'固定资产', '')
         domain = code and [('code', '=', code)] or [('name', '=', self.name)]
 
         for i in range(len(res_models)):
