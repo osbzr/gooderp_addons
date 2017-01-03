@@ -149,9 +149,15 @@
                                         </td>
                                         <td style="vertical-align:middle;">
                                             <span t-field='l.account_id' /><br/>
-                                            <span t-field="l.partner_id.name"/><br/>
-                                            <span t-field="l.goods_id.name"/><br/>
-                                            <span t-field="l.auxiliary_id.name"/>
+                                            <t t-if="l.partner_id">
+                                                <span t-field="l.partner_id.name"/><br/>
+                                            </t>
+                                            <t t-if="l.goods_id">
+                                                <span t-field="l.goods_id.name"/><br/>
+                                            </t>
+                                            <t t-if="l.auxiliary_id">
+                                                <span t-field="l.auxiliary_id.name"/>
+                                            </t>
                                         </td>
                                         <td style="vertical-align:bottom;">
                                             <span t-esc="rmb_format(l.debit)[0]" />

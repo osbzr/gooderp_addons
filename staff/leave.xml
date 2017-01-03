@@ -24,6 +24,7 @@
                     <field name="name"/>
                     <field name="leave_type"/>
                     <field name="leave_dates"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
@@ -32,6 +33,11 @@
             <field name="model">staff.leave</field>
             <field name="arch" type="xml">
                 <form string="职位">
+                    <header>
+						<button name="leave_done" states="draft" string="审核" type="object" class="oe_highlight" groups="staff.hr_senior_groups"/>
+						<button name="leave_draft" states="done" string="反审核" type="object" groups="staff.hr_senior_groups"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+					</header>
                 	<group>
                 		<field name='user_id'/>
                 		<field name='name'/>
