@@ -58,7 +58,7 @@ class test_voucher(TransactionCase):
     def test_compute(self):
         '''新建凭证时计算字段加载'''
         voucher = self.env.ref('finance.voucher_1')
-        self.assertTrue(voucher.period_id.name == u'2016年 第1期')
+        self.assertTrue(voucher.period_id.name == u'201601')
         self.assertTrue(voucher.amount_text == 50000.0)
         voucher.unlink()
     
@@ -172,6 +172,10 @@ class test_period(TransactionCase):
         # if period_row: # 在相应的年份 会计期间不存在
         #     period_row.unlink()
         # period_obj.get_year_fist_period_id()
+
+    def test_compute_name_month_02(self):
+        ''' 测试  compute_name 月份小于10 '''
+        self.env['finance.period'].create({'year':u'2007','month':u'2'})
 
     def test_onchange_account_id(self):
         '''凭证行的科目变更影响到其他字段的可选值'''

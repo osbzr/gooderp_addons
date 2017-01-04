@@ -27,6 +27,7 @@
 							<group>
 							    <field name='code'/>
 								<field name='name' required='1'/>
+								<field name='not_saleable'/>
 								<field name='category_id'/>
 								<field name='uom_id' required='1' />
 								<field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
@@ -89,7 +90,7 @@
 					<field name='value_ids'>
 						<tree editable='TOP' string='属性值'>
 							<field name='category_id'/>
-							<field name='value_id' />
+							<field name='value_id' context="{'default_category_id': category_id}"/>
 						</tree>
 					</field>
 				</form>

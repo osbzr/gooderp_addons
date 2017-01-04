@@ -13,7 +13,7 @@
     ''',
     'version': '11.11',
     'application':True,
-    'depends': ['core', 'sell', 'buy', 'warehouse'],
+    'depends': ['core', 'sell', 'buy', 'warehouse','web_stock_query','asset'],
     'data': [
              'security/ir.model.access.csv',
              'data/stock_request_data.xml',

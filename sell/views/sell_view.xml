@@ -69,6 +69,7 @@
                  						<field name='quantity' sum='数量合计'/>
                  						<field name="quantity_out" readonly="1" sum="合计已发货数量"/>
                  						<field name='uom_id'/>
+                 						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -80,7 +81,6 @@
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
 				 						<field name='note'/>
 				 						<field name='using_attribute' invisible='1'/>
-				 						<field name='price' invisible='1'/>
 				 					</tree>
 				 				</field>
 				 				<field name="note" placeholder="暂无备注信息"/>
@@ -151,7 +151,7 @@
         	<field name='name'>sell.delivery.tree</field>
         	<field name='model'>sell.delivery</field>
         	<field name='arch' type='xml'> 
-            	<tree string='销售订单发货单'>
+            	<tree string='销售发货单'>
             		<field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -215,6 +215,8 @@
 		    						'type':'out',
 		         					'default_date':date,
 		         					'default_partner':partner_id,
+		         					'default_warehouse_id': warehouse_id,
+		         					'default_is_return': is_return,
 		    						}">
 		         					<tree string='销售发货单行' editable='bottom'>
 		         						<field name='goods_id'
@@ -234,6 +236,7 @@
 				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 				 						<field name='goods_qty' sum='数量合计'/>
 		         						<field name='uom_id'/>
+		         						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -247,7 +250,6 @@
 				 						<field name='using_attribute' invisible='1'/>
 				 						<field name='using_batch' invisible='1'/>
 			                            <field name='lot_qty' invisible='1'/>
-			                            <field name='price' invisible='1'/>
 			                            <field name='lot' invisible='1'/>
 				 					</tree>
 				 				</field>
@@ -394,6 +396,7 @@
 		    					<field name='line_in_ids' attrs="{'readonly': [('state','!=','draft')]}"
 		    						context="{
 		    						'type':'in',
+                                    'default_is_return': is_return,
 		    						}">
 		         					<tree string='销售退货单行' editable='bottom'>
 		         						<field name='goods_id'
@@ -410,6 +413,7 @@
 				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 				 						<field name='goods_qty' sum='数量合计'/>
 				 						<field name='uom_id'/>
+				 						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 				 						<field name='cost_unit'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
@@ -424,7 +428,6 @@
 				 						<field name='using_attribute' invisible='1'/>
 				 						<field name='using_batch' invisible='1'/>
 					                    <field name='force_batch_one' invisible='1'/>
-					                    <field name='price' invisible='1'/>
 				 					</tree>
 				 				</field>
 			 				</page>
@@ -541,6 +544,7 @@
                             	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
                             <field name='quantity' sum='数量合计'/>
      						<field name='uom_id'/>
+     						<field name='price'/>
 	 						<field name='price_taxed' groups='sell.out_tax_groups'/>
 							<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 							<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -550,7 +554,6 @@
 	 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
 	 						<field name='note'/>
 	 						<field name='using_attribute' invisible='1'/>
-	 						<field name='price' invisible='1'/>
                         </tree>
                     </field>
                     <field name="note" placeholder="暂无备注信息"/>

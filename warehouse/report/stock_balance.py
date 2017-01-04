@@ -54,5 +54,3 @@ class report_stock_balance(models.Model):
                 ORDER BY goods.name, wh.name, goods_qty asc
             )
         """)
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

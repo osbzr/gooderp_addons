@@ -117,8 +117,8 @@
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
                         <group>
-                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="discount_amount" groups='buy.buy_discount_groups'/>
+                            <field name="discount_amount" groups='buy.buy_discount_groups'
+                            string="抹零"/>
                             <field name="amount"/>
                         </group>
                         <group>
@@ -236,6 +236,7 @@
 		                    <field name="line_out_ids" attrs="{'readonly': [('state','!=','draft')]}"
 		                    	context="{
 		                    	'type':'out',
+		                    	'default_warehouse_id': warehouse_id,
 		                    	}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
 		                            <field name="goods_id" required='1'

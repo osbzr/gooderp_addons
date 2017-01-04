@@ -154,5 +154,3 @@ class bank_statements_report(models.Model):
             'type': 'ir.actions.act_window',
             'res_id': transfer_order.id
         }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

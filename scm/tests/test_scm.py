@@ -4,9 +4,9 @@ from odoo.exceptions import UserError
 from datetime import datetime
 
 
-class test_crm(TransactionCase):
+class test_scm(TransactionCase):
     def setUp(self):
-        super(test_crm, self).setUp()
+        super(test_scm, self).setUp()
 
         self.stock_request = self.env['stock.request'].create({
                                                                'date': datetime.now(),

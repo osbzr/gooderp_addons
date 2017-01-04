@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
@@ -147,6 +147,16 @@ class sell_adjust_line(models.Model):
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
         self.amount = self.subtotal - self.tax_amount # 金额
 
+    @api.one
+    def _inverse_price(self):
+        '''由不含税价反算含税价，保存时生效'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+
+    @api.onchange('price', 'tax_rate')
+    def onchange_price(self):
+        '''当订单行的不含税单价改变时，改变含税单价'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+
     order_id = fields.Many2one('sell.adjust', u'订单编号', index=True,
                                required=True, ondelete='cascade',
                                help=u'关联的变更单编号')
@@ -163,8 +173,10 @@ class sell_adjust_line(models.Model):
     quantity = fields.Float(u'调整数量', default=1,
                             digits=dp.get_precision('Quantity'),
                             help=u'相对于原单据对应明细行的调整数量，可正可负')
-    price = fields.Float(u'销售单价', compute=_compute_all_amount,
-                         store=True, readonly=True,
+    price = fields.Float(u'销售单价',
+                         compute=_compute_all_amount,
+                         inverse=_inverse_price,
+                         store=True,
                          digits=dp.get_precision('Amount'),
                          help=u'不含税单价，由含税单价计算得出')
     price_taxed = fields.Float(u'含税单价',
@@ -175,18 +187,21 @@ class sell_adjust_line(models.Model):
     discount_amount = fields.Float(u'折扣额',
                                    digits=dp.get_precision('Amount'),
                                    help=u'输入折扣率后自动计算得出，也可手动输入折扣额')
-    amount = fields.Float(u'金额', compute=_compute_all_amount,
-                          store=True, readonly=True,
+    amount = fields.Float(u'金额',
+                          compute=_compute_all_amount,
+                          store=True,
                           digits=dp.get_precision('Amount'),
                           help=u'金额  = 价税合计  - 税额')
     tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate,
                             help=u'默认值取公司销项税率')
-    tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
-                              store=True, readonly=True,
+    tax_amount = fields.Float(u'税额',
+                              compute=_compute_all_amount,
+                              store=True,
                               digits=dp.get_precision('Amount'),
                               help=u'由税率计算得出')
-    subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
-                            store=True, readonly=True,
+    subtotal = fields.Float(u'价税合计',
+                            compute=_compute_all_amount,
+                            store=True,
                             digits=dp.get_precision('Amount'),
                             help=u'含税单价 乘以 数量')
     note = fields.Char(u'备注',
@@ -211,10 +226,15 @@ class sell_adjust_line(models.Model):
             else:
                 self.tax_rate = self.env.user.company_id.output_tax_rate
 
+        goods_saleable_list = []
+        for goods in self.env['goods'].search([('not_saleable', '=', False)]):
+            goods_saleable_list.append(goods.id)
+
+        return {'domain': {'goods_id': [('id', 'in', goods_saleable_list)]}}
+
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、含税单价或优惠率发生变化时，优惠金额发生变化'''
-        price = (self.tax_rate != -100 and
-                 self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = (self.quantity * price *
                                 self.discount_rate * 0.01)

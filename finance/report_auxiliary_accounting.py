@@ -48,4 +48,3 @@ class report_auxiliary_accounting(models.Model):
                   GROUP BY line.account_id, line.auxiliary_id
             )
         """)
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -198,3 +198,10 @@ class TestInventory(TransactionCase):
         '''盘盈盘亏产生的入库单和出库单审核时检查'''
         self.inventory.query_inventory()
         self.inventory.generate_inventory()
+
+    def test_inventory_get_default_warehouse(self):
+        ''' 测试 获取盘点仓库 '''
+        self.env['wh.inventory'].create({
+                                         'date': '2016-12-30',
+                                         'goods': '鼠标',
+                                         })
