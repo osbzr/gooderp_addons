@@ -201,9 +201,11 @@ class voucher_line(models.Model):
         self.state = self.voucher_id.state
 
     @api.multi
-    @api.onchange('account_id','auxiliary_financing')
+    @api.onchange('account_id')
     def onchange_account_id(self):
-        res = {'domain': {}}
+        res = {'domain': {}, 'value': {}}
+        if self.account_id or self.account_id.auxiliary_financing:
+            return res
         if self.account_id.auxiliary_financing == 'partner':
             res['domain']['partner_id'] = [('c_category_id', '!=', False)]
         elif self.account_id.auxiliary_financing == 'supplier':
@@ -222,6 +224,7 @@ class voucher_line(models.Model):
                 raise UserError(u'不能删除已审核的凭证行\n 所属凭证%s  凭证行摘要%s'
                                 %(active_voucher_line.voucher_id.name,active_voucher_line.name))
         return super(voucher_line, self).unlink()
+
     @api.multi
     def view_document(self):
         self.ensure_one()
@@ -229,7 +232,7 @@ class voucher_line(models.Model):
             'name': u'凭证',
             'view_mode': 'form',
             'res_model': 'voucher',
-            'res_id': self.id,
+            'res_id': self.voucher_id.id,
             'type': 'ir.actions.act_window',
         }
 
