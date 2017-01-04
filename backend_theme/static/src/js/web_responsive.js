@@ -88,7 +88,7 @@ odoo.define('web_responsive', function(require) {
                                 'a.oe_menu_toggler'
                                 );
             $clickZones.click($.proxy(this.handleClickZones, this));
-            core.bus.on('resize', this, this.handleWindowResize);
+            //core.bus.on('resize', this, this.handleWindowResize);
             core.bus.on('keydown', this, this.handleNavKeys);
         },
 
@@ -96,17 +96,17 @@ odoo.define('web_responsive', function(require) {
         initDrawer: function() {
             this.$el = $('.drawer');
             this.$el.drawer();
-            this.$el.one('drawer.opened', $.proxy(this.onDrawerOpen, this));
-            this.$el.on('drawer.opened', function setIScrollProbes(){
-                var onIScroll = function() {
-                    var transform = (this.iScroll.y) ? this.iScroll.y * -1 : 0;
-                    $(this).find('#appDrawerAppPanelHead').css(
-                        'transform', 'matrix(1, 0, 0, 1, 0, ' + transform + ')'
-                    );
-                };
-                this.iScroll.options.probeType = 2;
-                this.iScroll.on('scroll', $.proxy(onIScroll, this));
-            });
+            // 手机端的滑动效果不好,先去除 apps 所在的div 的自动定位屏幕最顶端.
+            // this.$el.on('drawer.opened', function setIScrollProbes(){
+            //     var onIScroll = function() {
+            //         var transform = (this.iScroll.y) ? this.iScroll.y * -1 : 0;
+            //         $(this).find('#appDrawerAppPanelHead').css(
+            //             'transform', 'matrix(1, 0, 0, 1, 0, ' + transform + ')'
+            //         );
+            //     };
+            //     this.iScroll.options.probeType = 2;
+            //     this.iScroll.on('scroll', $.proxy(onIScroll, this));
+            // });
             this.initialized = true;
         },
 
