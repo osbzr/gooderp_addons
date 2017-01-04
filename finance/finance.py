@@ -228,7 +228,16 @@ class voucher_line(models.Model):
                 raise UserError(u'不能删除已审核的凭证行\n 所属凭证%s  凭证行摘要%s'
                                 %(active_voucher_line.voucher_id.name,active_voucher_line.name))
         return super(voucher_line, self).unlink()
-
+    @api.multi
+    def view_document(self):
+        self.ensure_one()
+        return {
+            'name': u'凭证',
+            'view_mode': 'form',
+            'res_model': 'voucher',
+            'res_id': self.id,
+            'type': 'ir.actions.act_window',
+        }
 
 class finance_period(models.Model):
     '''会计期间'''

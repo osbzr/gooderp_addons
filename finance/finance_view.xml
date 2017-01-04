@@ -145,6 +145,8 @@
             <field name="arch" type="xml">
                 <tree string='分录查询'  create="false" edit='false'>
                     <field name='voucher_id'/>
+                    <button name="view_document" type="object" string="查看凭证"
+                            icon="fa-search" class="oe_highlight"/>
                     <field name='period_id'/>
                     <field name='date'/>
                     <field name='name'/>
