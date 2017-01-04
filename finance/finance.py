@@ -233,7 +233,7 @@ class voucher_line(models.Model):
 class finance_period(models.Model):
     '''会计期间'''
     _name = 'finance.period'
-    _order = 'year desc,month desc '
+    _order = 'name desc'
     name = fields.Char(
         u'会计期间',
         compute='_compute_name', readonly=True, store=True)
@@ -249,7 +249,10 @@ class finance_period(models.Model):
         :return: None
         """
         if self.year and self.month:
-            self.name = u'%s年 第%s期' % (self.year, self.month)
+            if self.month not in ['10', '11', '12']:
+                self.name = '%s0%s' % (self.year, self.month)
+            else:
+                self.name = '%s%s' % (self.year, self.month)
 
     @api.multi
     def period_compare(self,period_id_one,period_id_two):

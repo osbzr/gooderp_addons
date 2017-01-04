@@ -228,6 +228,12 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.approve_order()
         self.others_in_2.cancel_approved_order()
 
+    def test_create_voucher_no_voucher_line(self):
+        '''初始化其他入库单时生成凭证 没有凭证行，删除凭证  的情况'''
+        self.others_in_2_keyboard_mouse.cost_unit = 0.0
+        self.others_in_2.approve_order()
+        self.others_in_2.cancel_approved_order()
+
     def test_goods_inventory(self):
         ''' 发库单审核产品不足时调用创建盘盈入库方法 '''
         
