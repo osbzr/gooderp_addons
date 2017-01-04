@@ -73,6 +73,7 @@ class wh_move(models.Model):
                                   help=u'移库单的审核人')
     approve_date = fields.Datetime(u'审核日期', copy=False)
     line_out_ids = fields.One2many('wh.move.line', 'move_id', u'出库明细',
+                                   domain=[('type', 'in', ['out', 'internal'])],
                                    copy=True,
                                    help=u'出库类型的移库单对应的出库明细')
     line_in_ids = fields.One2many('wh.move.line', 'move_id', u'入库明细',
