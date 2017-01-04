@@ -386,11 +386,21 @@ class sell_order_line(models.Model):
             self.amount = self.subtotal - self.tax_amount # 本位币金额
             self.currency_amount = currency_amount  # 外币金额
 
+    @api.one
+    def _inverse_price(self):
+        '''由不含税价反算含税价，保存时生效'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+
+    @api.onchange('price', 'tax_rate')
+    def onchange_price(self):
+        '''当订单行的不含税单价改变时，改变含税单价'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+
     order_id = fields.Many2one('sell.order', u'订单编号', index=True,
                                required=True, ondelete='cascade',
                                help=u'关联订单的编号')
     currency_amount = fields.Float(u'外币金额', compute=_compute_all_amount,
-                          store=True, readonly=True,
+                          store=True,
                           digits=dp.get_precision(u'金额'),
                           help=u'外币金额')
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
@@ -409,28 +419,34 @@ class sell_order_line(models.Model):
     quantity_out = fields.Float(u'已执行数量', copy=False,
                                 digits=dp.get_precision('Quantity'),
                                 help=u'销货订单产生的发货单/退货单已执行数量')
-    price = fields.Float(u'销售单价', compute=_compute_all_amount,
-                         store=True, readonly=True,
+    price = fields.Float(u'销售单价',
+                         compute=_compute_all_amount,
+                         inverse=_inverse_price,
+                         store=True,
                          digits=(12, 6),
                          help=u'不含税单价，由含税单价计算得出')
-    price_taxed = fields.Float(u'含税单价',digits=(12, 6),
-                         help=u'含税单价，取商品零售价')
+    price_taxed = fields.Float(u'含税单价',
+                               digits=(12, 6),
+                               help=u'含税单价，取商品零售价')
     discount_rate = fields.Float(u'折扣率%',
                                    help=u'折扣率')
     discount_amount = fields.Float(u'折扣额',
                                    help=u'输入折扣率后自动计算得出，也可手动输入折扣额')
-    amount = fields.Float(u'金额', compute=_compute_all_amount, 
-                          store=True, readonly=True,
+    amount = fields.Float(u'金额',
+                          compute=_compute_all_amount,
+                          store=True,
                           digits=dp.get_precision('Amount'),
                           help=u'金额  = 价税合计  - 税额')
     tax_rate = fields.Float(u'税率(%)',
                             help=u'税率')
-    tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, 
-                              readonly=True,
+    tax_amount = fields.Float(u'税额',
+                              compute=_compute_all_amount,
+                              store=True,
                               digits=dp.get_precision('Amount'),
                               help=u'税额')
-    subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, 
-                            store=True, readonly=True,
+    subtotal = fields.Float(u'价税合计',
+                            compute=_compute_all_amount,
+                            store=True,
                             digits=dp.get_precision('Amount'),
                             help=u'含税单价 乘以 数量')
     note = fields.Char(u'备注',
@@ -478,7 +494,6 @@ class sell_order_line(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        price = (self.tax_rate != -100
-                 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = self.quantity * price \
                 * self.discount_rate * 0.01

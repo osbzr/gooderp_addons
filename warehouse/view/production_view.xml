@@ -145,6 +145,7 @@
                                 <field name='fee' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='warehouse_dest_id' />
                                 <field name='is_many_to_many_combinations' />
+                                <field name='voucher_id' readonly='1' options="{'no_create': True}"/>
                             </group>
                         </group>
 
@@ -445,6 +446,7 @@
                                 <field name='fee' attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='warehouse_dest_id' />
                                 <field name='is_many_to_many_combinations' />
+                                <field name='voucher_id' readonly='1' options="{'no_create': True}"/>
                             </group>
                         </group>
 
