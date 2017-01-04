@@ -383,16 +383,16 @@ class other_money_order(models.Model):
                             'name': u"%s %s" % (vals.get('string'), vals.get('name')),
                             'account_id': self.env.user.company_id.output_tax_account.id, 'credit': line.tax_amount or 0, 'voucher_id': vals.get('vouch_obj_id'),
                     })
-                if vals: # 借方行
-                    self.env['voucher.line'].create({
-                        'name': u"%s %s " % (vals.get('string'), vals.get('name')),
-                        'account_id': vals.get('debit_account_id'),
-                        'debit': debit_sum,
-                        'voucher_id': vals.get('vouch_obj_id'),
-                        'partner_id': vals.get('partner_debit', ''),
-                        'auxiliary_id':vals.get('debit_auxiliary_id', False),
-                        'init_obj':vals.get('init_obj', False),
-                    })
+                # 借方行
+                self.env['voucher.line'].create({
+                    'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                    'account_id': vals.get('debit_account_id'),
+                    'debit': debit_sum,
+                    'voucher_id': vals.get('vouch_obj_id'),
+                    'partner_id': vals.get('partner_debit', ''),
+                    'auxiliary_id':vals.get('debit_auxiliary_id', False),
+                    'init_obj':vals.get('init_obj', False),
+                })
             else: # 其他支出单
                 credit_sum = 0
                 for line in money_order.line_ids:
@@ -424,16 +424,16 @@ class other_money_order(models.Model):
                             'name': u"%s %s" % (vals.get('string'), vals.get('name')),
                             'account_id': self.env.user.company_id.import_tax_account.id, 'debit': line.tax_amount or 0, 'voucher_id': vals.get('vouch_obj_id'),
                         })
-                if vals: # 贷方行
-                    self.env['voucher.line'].create({
-                        'name': u"%s %s" % (vals.get('string'), vals.get('name')),
-                        'partner_id': vals.get('partner_credit', ''),
-                        'account_id': vals.get('credit_account_id'),
-                        'credit': credit_sum,
-                        'voucher_id': vals.get('vouch_obj_id'),
-                        'auxiliary_id':vals.get('credit_auxiliary_id', False),
-                        'init_obj':vals.get('init_obj', False),
-                    })
+                # 贷方行
+                self.env['voucher.line'].create({
+                    'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                    'partner_id': vals.get('partner_credit', ''),
+                    'account_id': vals.get('credit_account_id'),
+                    'credit': credit_sum,
+                    'voucher_id': vals.get('vouch_obj_id'),
+                    'auxiliary_id':vals.get('credit_auxiliary_id', False),
+                    'init_obj':vals.get('init_obj', False),
+                })
             # 删除初始非需要的凭证明细行
             if money_order.is_init:
                 vouch_line_ids = self.env['voucher.line'].search([

@@ -390,6 +390,28 @@ class test_other_money_order(TransactionCase):
         with self.assertRaises(UserError):
             other_get.other_money_done()
 
+    def test_other_money_order_has_tax(self):
+        ''' 测试其他收入支出  税存在 生成凭证的情况 '''
+        self.env.ref('money.other_get_line_1').tax_amount = 10.0
+        self.env.ref('money.other_get_60').other_money_done()
+
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.other_pay_line_2').tax_amount = 10.0
+        self.env.ref('money.other_pay_1000').other_money_done()
+
+    def test_other_money_order_no_company_account(self):
+        ''' 测试其他收入支出  税存在 公司进项税科目、销项税科目 不存在 生成凭证的情况 '''
+        self.env.ref('money.other_get_line_1').tax_amount = 10.0
+        self.env.user.company_id.output_tax_account = False
+        with self.assertRaises(UserError):
+            self.env.ref('money.other_get_60').other_money_done()
+
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.other_pay_line_2').tax_amount = 10.0
+        self.env.user.company_id.import_tax_account = False
+        with self.assertRaises(UserError):
+            self.env.ref('money.other_pay_1000').other_money_done()
+
 
 class test_other_money_order_line(TransactionCase):
     ''' 测试其他收支单明细 '''
