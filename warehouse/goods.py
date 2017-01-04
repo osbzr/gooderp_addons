@@ -7,6 +7,8 @@ from odoo import models, fields, api
 class goods(models.Model):
     _inherit = 'goods'
 
+    net_weight = fields.Float(u'净重', default=0)
+
     # 使用SQL来取得指定产品情况下的库存数量
     def get_stock_qty(self):
         for goods in self:

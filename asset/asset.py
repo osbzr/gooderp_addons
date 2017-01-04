@@ -366,6 +366,7 @@ class CreateChangWizard(models.TransientModel):
     chang_depreciation_number = fields.Float(u'变更折旧期间', required=True)
     chang_tax = fields.Float(u'变更税额', digits=dp.get_precision(u'变更税额'), required=True)
     chang_partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', required=True)
+    change_reason = fields.Text(u'变更原因')
 
     @api.one
     def create_chang_account(self):
@@ -392,16 +393,25 @@ class CreateChangWizard(models.TransientModel):
                         'state': 'draft',
                         'tax_amount': self.chang_tax
                 })
-            chang_account = self.env['voucher.line'].search(['&',('voucher_id', '=', money_invoice.voucher_id.id),('debit', '=', self.chang_cost)])
+            chang_account = self.env['voucher.line'].search(['&',('voucher_id', '=',
+                                                                  money_invoice.voucher_id.id),
+                                                             ('debit', '=', self.chang_cost)])
             chang_account.write({'account_id': asset.account_asset.id})
-            self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,'chang_before':chang_before_cost,
-                                           'chang_after':asset.cost,'chang_name':u'原值变更','order_id':asset.id,'partner_id':self.chang_partner_id.id
+            self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,
+                                           'chang_before':chang_before_cost,
+                                           'change_reason': self.change_reason,
+                                           'chang_after':asset.cost,'chang_name':u'原值变更',
+                                           'order_id':asset.id,'partner_id':self.chang_partner_id.id
             })
         asset.depreciation_number = asset.depreciation_number + self.chang_depreciation_number
-        asset.depreciation_value = asset.depreciation_value + asset.category_id.depreciation_value * self.chang_cost / 100
+        asset.depreciation_value = asset.depreciation_value + asset.category_id.depreciation_value * \
+                                                              self.chang_cost / 100
         if self.chang_depreciation_number:
-            self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,'chang_before':chang_before_depreciation_number,
-                                           'chang_after':asset.depreciation_number,'chang_name':u'折旧期间变更','order_id':asset.id,'partner_id':self.chang_partner_id.id
+            self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,
+                                           'chang_before':chang_before_depreciation_number,
+                                           'change_reason':self.change_reason,
+                                           'chang_after':asset.depreciation_number,'chang_name':u'折旧期间变更',
+                                           'order_id':asset.id,'partner_id':self.chang_partner_id.id
             })
 
 class asset_line(models.Model):
@@ -538,6 +548,7 @@ class chang_line(models.Model):
     chang_after = fields.Float(u'变更后')
     chang_money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
     partner_id = fields.Many2one('partner', u'变更单位')
+    change_reason = fields.Text(u'变更原因')
 
 class voucher(models.Model):
     _inherit = 'voucher'

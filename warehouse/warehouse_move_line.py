@@ -101,6 +101,11 @@ class wh_move_line(models.Model):
         else:
             self.goods_uos_qty = 0
 
+    @api.depends('goods_id', 'goods_qty')
+    def compute_line_net_weight(self):
+        for move_line in self:
+            move_line.line_net_weight = move_line.goods_id.net_weight * move_line.goods_qty
+
     move_id = fields.Many2one('wh.move', string=u'移库单', ondelete='cascade',
                               help=u'出库/入库/移库单行对应的移库单')
     date = fields.Date(u'完成日期', copy=False,
@@ -189,6 +194,7 @@ class wh_move_line(models.Model):
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
                         digits=dp.get_precision('Amount'), store=True,
                         help=u'入库/出库成本')
+    line_net_weight = fields.Float(string=u'净重小计', compute=compute_line_net_weight, store=True)
 
     @api.one
     @api.depends('cost_unit', 'goods_qty')
