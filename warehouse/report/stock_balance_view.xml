@@ -42,8 +42,6 @@
                     <field name='goods' string='产品' filter_domain="[('goods', 'ilike', self)]" />
                     <field name='lot' string='批号' filter_domain="[('lot', 'ilike', self)]" groups='goods.batch_groups' />
                     <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" groups='warehouse.multi_warehouse_groups' />
-                    <field name='uom' string='单位' filter_domain="[('uom', 'ilike', self)]" />
-                    <field name='uos' string='辅助单位' filter_domain="[('uos', 'ilike', self)]" groups='goods.auxiliary_unit_groups' />
 
                     <group expand="0" string="Group By">
                         <filter string="产品" context="{'group_by':'goods'}"/>
