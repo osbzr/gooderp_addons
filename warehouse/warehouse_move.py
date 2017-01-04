@@ -73,8 +73,7 @@ class wh_move(models.Model):
                                   help=u'移库单的审核人')
     approve_date = fields.Datetime(u'审核日期', copy=False)
     line_out_ids = fields.One2many('wh.move.line', 'move_id', u'出库明细',
-                                   domain=[('type', '=', 'out')],
-                                   context={'type': 'out'}, copy=True,
+                                   copy=True,
                                    help=u'出库类型的移库单对应的出库明细')
     line_in_ids = fields.One2many('wh.move.line', 'move_id', u'入库明细',
                                   domain=[('type', '=', 'in')],
@@ -103,9 +102,9 @@ class wh_move(models.Model):
 
     def scan_barcode_move_in_out_operation(self, move, att, conversion, goods, val):
         create_line =False
-        loop_field = 'line_out_ids' if val['type'] == 'out' else 'line_in_ids'
+        loop_field = 'line_out_ids' if val['type'] in ['out', 'internal'] else 'line_in_ids'
         for line in move[loop_field]:
-            line.cost_unit = line.goods_id.price if val['type'] == 'out' else line.goods_id.cost
+            line.cost_unit = line.goods_id.price if val['type'] in ['out', 'internal'] else line.goods_id.cost
             # 如果产品属性上存在条码，且明细行上已经存在该产品，则数量累加
             if att and line.attribute_id.id == att.id:
                 create_line = self.scan_barcode_move_line_operation(line, conversion)
@@ -141,15 +140,15 @@ class wh_move(models.Model):
         create_line =False
         if model_name in ['wh.out', 'wh.in']:
             move = self.env[model_name].browse(order_id).move_id
-            # 在其他出库单上扫描条码
+        # 在其他出库单上扫描条码
         if model_name == 'wh.out':
             val['type'] = 'out'
             create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
-            # 在其他入库单上扫描条码
+        # 在其他入库单上扫描条码
         if model_name == 'wh.in':
             val['type'] = 'in'
             create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
-            # 销售出入库单的二维码
+        # 销售出入库单的二维码
         if model_name == 'sell.delivery':
             move = self.env[model_name].browse(order_id).sell_move_id
             if self.env[model_name].browse(order_id).is_return:
@@ -158,7 +157,7 @@ class wh_move(models.Model):
             else:
                 val['type'] = 'out'
                 create_line = self.scan_barcode_sell_or_buy_operation(move, att, conversion, goods,val)
-                # 采购出入库单的二维码
+        # 采购出入库单的二维码
         if model_name == 'buy.receipt':
             move = self.env[model_name].browse(order_id).buy_move_id
             if self.env[model_name].browse(order_id).is_return:
@@ -168,10 +167,10 @@ class wh_move(models.Model):
                 val['type'] = 'in'
                 create_line = self.scan_barcode_sell_or_buy_operation(move, att, conversion, goods,val)
 
-            # 调拔单的扫描条码
+        # 调拔单的扫描条码
         if model_name == 'wh.internal':
             move = self.env[model_name].browse(order_id).move_id
-            val['type'] = 'out'
+            val['type'] = 'internal'
             create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
 
         # 盘点单的扫码
@@ -199,10 +198,6 @@ class wh_move(models.Model):
                 price_taxed = att.goods_id.price
                 cost_unit = 0
 
-            # 伪装成出库明细，代码结构问题
-            if val['type'] == 'internal':
-                val['type'] = 'out'
-
         elif goods:
             goods_id = goods.id
             uos_id = goods.uos_id.id
@@ -218,10 +213,6 @@ class wh_move(models.Model):
                 # 出库操作取产品的零售价
                 price_taxed = goods.price
                 cost_unit = 0
-
-            # 伪装成出库明细，代码结构问题
-            if val['type'] == 'internal':
-                val['type'] = 'out'
 
         if move._name != 'wh.inventory':
             val.update({

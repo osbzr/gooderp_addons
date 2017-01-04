@@ -402,7 +402,7 @@
 	<data noupdate="1">
 		<record id="wh_internal_whint0" model="wh.internal">
 		    <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
-			<field name="name">WH/INT/16040001</field>
+			<field name="name">TRANSFER/16040001</field>
 			<field name="date">2016-04-02</field>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 		</record>
