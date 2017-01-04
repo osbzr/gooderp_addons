@@ -203,8 +203,12 @@ class voucher_line(models.Model):
     @api.multi
     @api.onchange('account_id')
     def onchange_account_id(self):
-        res = {'domain': {}, 'value': {}}
-        if self.account_id or self.account_id.auxiliary_financing:
+        res = {
+            'domain': {
+                'partner_id': [('name', '=', False)],
+                'goods_id': [('name', '=', False)],
+                'auxiliary_id': [('name', '=', False)]}}
+        if not self.account_id or not self.account_id.auxiliary_financing:
             return res
         if self.account_id.auxiliary_financing == 'partner':
             res['domain']['partner_id'] = [('c_category_id', '!=', False)]
