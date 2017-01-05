@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import test_buy_order
 import test_buy_receipt
 import test_buy_adjust

@@ -230,6 +230,7 @@ class wh_assembly(models.Model):
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
             line_in_ids = [{
+                'type': 'in',
                 'goods_id': line.goods_id.id,
                 'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
                     'production').id,
@@ -246,6 +247,7 @@ class wh_assembly(models.Model):
                     get_suggested_cost_by_warehouse(
                         warehouse_id[0], line.goods_qty)
                 line_out_ids.append({
+                        'type': 'out',
                         'goods_id': line.goods_id.id,
                         'warehouse_id': warehouse_id.id,
                         'warehouse_dest_id': self.env[
