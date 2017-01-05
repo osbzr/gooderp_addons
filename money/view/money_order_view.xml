@@ -44,6 +44,8 @@
                 		type="object" class="oe_highlight" groups='money.group_money_manager'/>
 					<button name="money_order_draft" states="done" string="反审核" 
 						type="object" groups='money.group_money_manager'/>
+                    <button name="write_off_reset" states="draft" string="核销行金额清零" class="oe_highlight"
+						type="object" groups='money.group_money_manager'/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>

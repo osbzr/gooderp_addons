@@ -157,6 +157,15 @@ class money_order(models.Model):
     bank_num = fields.Char(u'银行账号',
                             help=u'银行账号取自业务伙伴，可修改')
 
+    @api.multi
+    def write_off_reset(self):
+        self.ensure_one()
+        if self.state != 'draft':
+            raise ValueError(u'已审核的单据不能，执行这个操作！')
+        for source in self.source_ids:
+            source.this_reconcile = 0
+        return True
+
     @api.onchange('date')
     def onchange_date(self):
         if  self.env.context.get('type') == 'get':
