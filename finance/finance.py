@@ -229,6 +229,16 @@ class voucher_line(models.Model):
                                 %(active_voucher_line.voucher_id.name,active_voucher_line.name))
         return super(voucher_line, self).unlink()
 
+    @api.multi
+    def view_document(self):
+        self.ensure_one()
+        return {
+            'name': u'凭证',
+            'view_mode': 'form',
+            'res_model': 'voucher',
+            'res_id': self.voucher_id.id,
+            'type': 'ir.actions.act_window',
+        }
 
 class finance_period(models.Model):
     '''会计期间'''
