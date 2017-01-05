@@ -55,7 +55,7 @@ class money_order(models.Model):
         }
         if account_row and account_row.currency_id and \
             account_row.currency_id != self.env.user.company_id.currency_id and\
-            account_row.currency_id.rate:
+            account_row.currency_id.rate and self.type == 'pay':
             if debit != 0:
                 res.update({
                     'currency_id': account_row.currency_id.id,
