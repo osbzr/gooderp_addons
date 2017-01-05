@@ -713,7 +713,13 @@
 			<field name="search_view_id" ref="pricing_search"/>
 		</record>
 
-
+        <record id='goods_action_sell' model='ir.actions.act_window'>
+            <field name='name'>商品</field>
+            <field name='res_model'>goods</field>
+            <field name='view_mode'>tree,form</field>
+            <field name='view_id' ref='goods.goods_tree' />
+			<field name="domain">[('not_saleable','=',False)]</field>
+        </record>
     	<!--根菜单-->
         <menuitem id='sell_menu' name='销货' groups='group_sell' web_icon="sell,static/description/sale.png"/>
     	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>
@@ -736,7 +742,7 @@
 		<!-- 销售主数据 -->
 		<menuitem id='menu_sell_master' name='主数据' parent='sell_menu' sequence="2"/>
 		<menuitem id='sell_customer_menu' action='core.customer_action' name="客户" parent='menu_sell_master' sequence='10'/>
-		<menuitem id='sell_goods_menu' name='商品' parent='menu_sell_master' action='goods.goods_action' sequence='20' />
+		<menuitem id='sell_goods_menu' name='商品' parent='menu_sell_master' action='goods_action_sell' sequence='20' />
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='menu_sell_master' sequence='30'/>
 		<record id="sell_goods_menu" model="ir.ui.menu">
 			<field name="create_tag">1</field>
