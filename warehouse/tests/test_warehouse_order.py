@@ -185,9 +185,11 @@ class TestWarehouseOrder(TransactionCase):
         '''获取调出仓库'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         order = self.env['wh.out'].with_context({
-             'warehouse_type': 'stock'
+             'warehouse_type': 'stock',
         }).create({'type': 'others',
-                   'line_out_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id})]})
+                   'line_out_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id,
+                                            'type': 'out',
+                                            })]})
         # 验证明细行上仓库是否是订单上调出仓库
         hd_stock = self.browse_ref('warehouse.hd_stock')
         order.warehouse_id = hd_stock

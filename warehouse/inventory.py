@@ -387,6 +387,7 @@ class wh_inventory_line(models.Model):
                     attribute=inventory.attribute_id)
 
             return {
+                'type': wh_type,
                 'lot': inventory.new_lot,
                 'lot_id': inventory.new_lot_id.id,
                 'goods_id': inventory.goods_id.id,

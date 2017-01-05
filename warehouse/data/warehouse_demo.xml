@@ -402,7 +402,7 @@
 	<data noupdate="1">
 		<record id="wh_internal_whint0" model="wh.internal">
 		    <field name="warehouse_dest_id" ref="warehouse.sh_stock"/>
-			<field name="name">WH/INT/16040001</field>
+			<field name="name">TRANSFER/16040001</field>
 			<field name="date">2016-04-02</field>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 		</record>
@@ -413,8 +413,8 @@
 			<field name='uom_id' ref='core.uom_pc' />
 			<field name='uos_id' ref='core.uom_set' />
 			<field eval="120.0" name="goods_qty"/>
-			<field name="type">out</field>
-			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/INT/16040001')]"/>
+			<field name="type">internal</field>
+			<field model="wh.move" name="move_id" search="[('name', '=', u'TRANSFER/16040001')]"/>
 		</record>
 	</data>
 	<data noupdate="1">
