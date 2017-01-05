@@ -48,14 +48,25 @@ class money_order(models.Model):
         return res
 
     def _prepare_vouch_line_data(self, line, name, account_id, debit, credit, voucher_id, partner_id):
-        return {
-                'name': name,
-                'account_id': account_id,
-                'debit': debit,
-                'credit': credit,
-                'voucher_id': voucher_id,
-                'partner_id': partner_id,
-                }
+        account_row = self.env['finance.account'].browse(account_id)
+        res = {
+            'name': name, 'account_id': account_id, 'debit': debit,
+            'credit': credit, 'voucher_id': voucher_id, 'partner_id': partner_id,
+        }
+        if account_row and account_row.currency_id and \
+            account_row.currency_id != self.env.user.company_id.currency_id and\
+            account_row.currency_id.rate and self.type == 'pay':
+            if debit != 0:
+                res.update({
+                    'currency_id': account_row.currency_id.id,
+                    'currency_amount': debit, 'debit': debit*account_row.currency_id.rate,
+                    'rate_silent': account_row.currency_id.rate})
+            else:
+                res.update({
+                    'currency_id': account_row.currency_id.id,
+                    'currency_amount': credit, 'credit': credit*account_row.currency_id.rate,
+                    'rate_silent': account_row.currency_id.rate})
+        return res
 
     def _create_voucher_line(self, line, name, account_id, debit, credit, voucher_id, partner_id):
         line_data = self._prepare_vouch_line_data(line, name, account_id, debit, credit, voucher_id, partner_id)
