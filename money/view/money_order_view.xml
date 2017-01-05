@@ -73,9 +73,9 @@
                     <field name="line_ids">
                     	<tree string="Money Order Lines" editable="bottom">
                     		<field name="bank_id"/>
+                            <field name="amount" sum="合计"/>
                             <field name="currency_id"
                             	 groups='finance.group_multi_currency'/>
-                            <field name="amount" sum="合计"/>       		
                             <field name="mode_id" groups='core.settle_mode_groups'/>
                             <field name="number" groups='core.settle_mode_groups'/>
                             <field name="note"/>

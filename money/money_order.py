@@ -112,7 +112,7 @@ class money_order(models.Model):
     name = fields.Char(string=u'单据编号', copy=False, readonly=True,
                        help=u'单据编号，创建时会根据类型自动生成')
     note = fields.Text(string=u'备注', help=u'可以为该单据添加一些需要的标识信息')
-    currency_id = fields.Many2one('res.currency', u'外币币别',
+    currency_id = fields.Many2one('res.currency', u'币别',
                                   compute='_compute_currency_id', store=True, readonly=True,
                                   help=u'业务伙伴的类别科目上对应的外币币别')
     discount_amount = fields.Float(string=u'手续费/折扣', readonly=True,
@@ -305,7 +305,7 @@ class money_order_line(models.Model):
     mode_id = fields.Many2one('settle.mode', string=u'结算方式',
                               ondelete='restrict',
                             help=u'结算方式：支票、信用卡等')
-    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id',
+    currency_id = fields.Many2one('res.currency', u'币别', compute='_compute_currency_id',
                                   store=True, readonly=True,
                                   help=u'结算账户对应的外币币别')
     number = fields.Char(string=u'结算号',
