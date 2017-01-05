@@ -48,17 +48,18 @@ class money_order(models.Model):
         return res
 
     def _prepare_vouch_line_data(self, line, name, account_id, debit, credit, voucher_id, partner_id):
-        print self
         account_row = self.env['finance.account'].browse(account_id)
         res = {
             'name': name, 'account_id': account_id, 'debit': debit,
             'credit': credit, 'voucher_id': voucher_id, 'partner_id': partner_id,
         }
-        if account_row.currency_id != self.env.user.company_id.currency_id:
+        if account_row and account_row.currency_id and \
+            account_row.currency_id != self.env.user.company_id.currency_id and\
+            account_row.currency_id.rate:
             if debit != 0:
                 res.update({
                     'currency_id': account_row.currency_id.id,
-                    'currency_amount': debit,'debit': debit*account_row.currency_id.rate,
+                    'currency_amount': debit, 'debit': debit*account_row.currency_id.rate,
                     'rate_silent': account_row.currency_id.rate})
             else:
                 res.update({
