@@ -135,6 +135,7 @@
                     <group expand="0" string="分组">
                         <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="币别" domain="[]" context="{'group_by':'currency_id'}"/>
                     </group>
                 </search>
             </field>
