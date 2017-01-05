@@ -54,17 +54,17 @@ class money_order(models.Model):
             'credit': credit, 'voucher_id': voucher_id, 'partner_id': partner_id,
         }
         if account_row and account_row.currency_id and \
-            account_row.currency_id != self.env.user.company_id.currency_id and\
-            account_row.currency_id.rate and self.type == 'pay':
+            account_row.currency_id != self.env.user.company_id.currency_id and \
+            account_row.currency_id.rate and self.type == 'get':
             if debit != 0:
                 res.update({
                     'currency_id': account_row.currency_id.id,
-                    'currency_amount': debit, 'debit': debit*account_row.currency_id.rate,
+                    'currency_amount': debit, 'debit': debit * account_row.currency_id.rate,
                     'rate_silent': account_row.currency_id.rate})
             else:
                 res.update({
                     'currency_id': account_row.currency_id.id,
-                    'currency_amount': credit, 'credit': credit*account_row.currency_id.rate,
+                    'currency_amount': credit, 'credit': credit * account_row.currency_id.rate,
                     'rate_silent': account_row.currency_id.rate})
         return res
 

@@ -289,7 +289,6 @@
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
                         <group>
-                            <field name="discount_rate" groups='buy.buy_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'/>
                             <field name="amount"/>
                         </group>
