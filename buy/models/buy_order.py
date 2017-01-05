@@ -136,7 +136,7 @@ class buy_order(models.Model):
                                  states=READONLY_STATES,
                                  digits=dp.get_precision('Amount'),
                                  help=u'整单优惠率')
-    discount_amount = fields.Float(u'优惠金额',
+    discount_amount = fields.Float(u'抹零',
                                    states=READONLY_STATES,
                                    track_visibility='always',
                                    digits=dp.get_precision('Amount'),
