@@ -172,6 +172,7 @@
                                     <field name='using_batch' invisible='1' />
                                     <field name='force_batch_one' invisible='1' />
                                     <field name='using_attribute' invisible='1' />
+                                    <field name='type' invisible='1'/>
                                 </tree>
                             </field>
                         </group>
@@ -212,6 +213,7 @@
                                         <field name='lot_qty' invisible='1' />
                                         <field name='lot_uos_qty' invisible='1' />
                                         <field name='lot' invisible='1'/>
+                                        <field name='type' invisible='1'/>
                                     </tree>
                             </field>
                         </group>
@@ -333,6 +335,7 @@
                                     <field name='using_batch' invisible='1'/>
                                     <field name='force_batch_one' invisible='1'/>
                                     <field name='using_attribute' invisible='1'/>
+                                    <field name='type' invisible='1'/>
                                 </tree>
                             </field>
                         </group>
@@ -373,6 +376,7 @@
                                         <field name='lot_qty' invisible='1' />
                                         <field name='lot_uos_qty' invisible='1' />
                                         <field name='lot' invisible='1'/>
+                                        <field name='type' invisible='1'/>
                                     </tree>
                             </field>
                         </group>
@@ -488,6 +492,7 @@
                                     <field name='force_batch_one' invisible='1' />
                                     <field name='lot_qty' invisible='1' />
                                     <field name='lot_uos_qty' invisible='1' />
+                                    <field name='type' invisible='1'/>
                                 </tree>
                             </field>
                         </group>
@@ -515,6 +520,7 @@
                                         <field name='using_batch' invisible='1' />
                                         <field name='force_batch_one' invisible='1' />
                                         <field name='using_attribute' invisible='1' />
+                                        <field name='type' invisible='1'/>
                                     </tree>
                             </field>
                         </group>
