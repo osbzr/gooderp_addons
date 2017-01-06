@@ -48,14 +48,25 @@ class money_order(models.Model):
         return res
 
     def _prepare_vouch_line_data(self, line, name, account_id, debit, credit, voucher_id, partner_id):
-        return {
-                'name': name,
-                'account_id': account_id,
-                'debit': debit,
-                'credit': credit,
-                'voucher_id': voucher_id,
-                'partner_id': partner_id,
-                }
+        account_row = self.env['finance.account'].browse(account_id)
+        res = {
+            'name': name, 'account_id': account_id, 'debit': debit,
+            'credit': credit, 'voucher_id': voucher_id, 'partner_id': partner_id,
+        }
+        if account_row and account_row.currency_id and \
+            account_row.currency_id != self.env.user.company_id.currency_id and \
+            account_row.currency_id.rate and self.type == 'get':
+            if debit != 0:
+                res.update({
+                    'currency_id': account_row.currency_id.id,
+                    'currency_amount': debit, 'debit': debit * account_row.currency_id.rate,
+                    'rate_silent': account_row.currency_id.rate})
+            else:
+                res.update({
+                    'currency_id': account_row.currency_id.id,
+                    'currency_amount': credit, 'credit': credit * account_row.currency_id.rate,
+                    'rate_silent': account_row.currency_id.rate})
+        return res
 
     def _create_voucher_line(self, line, name, account_id, debit, credit, voucher_id, partner_id):
         line_data = self._prepare_vouch_line_data(line, name, account_id, debit, credit, voucher_id, partner_id)
@@ -348,32 +359,92 @@ class other_money_order(models.Model):
                 money_order.write({'voucher_id': vouch_obj.id})
             if not money_order.bank_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (money_order.bank_id.name))
-            if money_order.type == 'other_get':
+
+            if money_order.is_init:
+                vals.update({'init_obj': 'other_money_order-%s' % (money_order.id)})
+
+            if money_order.type == 'other_get': # 其他收入单
+                debit_sum = 0
                 for line in money_order.line_ids:
                     if not line.category_id.account_id:
                         raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
+                    debit_sum += abs(line.amount + line.tax_amount) # 借方和
+
                     vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'string': u'其他收入单',
                                  'credit_auxiliary_id':line.auxiliary_id.id,
                                  'amount': abs(line.amount + line.tax_amount), 'credit_account_id': line.category_id.account_id.id,
                                  'debit_account_id': money_order.bank_id.account_id.id, 'partner_credit': money_order.partner_id.id, 'partner_debit': '',
                                  'sell_tax_amount': line.tax_amount or 0,
                                  })
-                    if money_order.is_init:
-                        vals.update({'init_obj': 'other_money_order-%s' % (money_order.id), })
-                    self.env['money.invoice'].create_voucher_line(vals)
-            else:
+                    # 贷方行
+                    self.env['voucher.line'].create({
+                        'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                        'partner_id': vals.get('partner_credit', ''),
+                        'account_id': vals.get('credit_account_id'),
+                        'credit': line.amount,
+                        'voucher_id': vals.get('vouch_obj_id'),
+                        'auxiliary_id':vals.get('credit_auxiliary_id', False),
+                        'init_obj':vals.get('init_obj', False),
+                    })
+                    # 销项税行
+                    if vals.get('sell_tax_amount'):
+                        if not self.env.user.company_id.output_tax_account:
+                            raise UserError(u'您还没有配置公司的销项税科目!\n请通过"配置-->高级配置-->系统参数"菜单来设置销项税科目!')
+                        self.env['voucher.line'].create({
+                            'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                            'account_id': self.env.user.company_id.output_tax_account.id, 'credit': line.tax_amount or 0, 'voucher_id': vals.get('vouch_obj_id'),
+                    })
+                # 借方行
+                self.env['voucher.line'].create({
+                    'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                    'account_id': vals.get('debit_account_id'),
+                    'debit': debit_sum,
+                    'voucher_id': vals.get('vouch_obj_id'),
+                    'partner_id': vals.get('partner_debit', ''),
+                    'auxiliary_id':vals.get('debit_auxiliary_id', False),
+                    'init_obj':vals.get('init_obj', False),
+                })
+            else: # 其他支出单
+                credit_sum = 0
                 for line in money_order.line_ids:
                     if not line.category_id.account_id:
                         raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
+                    credit_sum += abs(line.amount + line.tax_amount) # 贷方和
+
                     vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'string': u'其他支出单',
                                  'debit_auxiliary_id':line.auxiliary_id.id,
                                  'amount': abs(line.amount + line.tax_amount), 'credit_account_id': money_order.bank_id.account_id.id,
                                  'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': money_order.partner_id.id,
                                  'buy_tax_amount': line.tax_amount or 0,
                                  })
-                    if money_order.is_init:
-                        vals.update({'init_obj': 'other_money_order-%s' % (money_order.id), })
-                    self.env['money.invoice'].create_voucher_line(vals)
+                    # 借方行
+                    self.env['voucher.line'].create({
+                        'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                        'account_id': vals.get('debit_account_id'),
+                        'debit': line.amount,
+                        'voucher_id': vals.get('vouch_obj_id'),
+                        'partner_id': vals.get('partner_debit', ''),
+                        'auxiliary_id':vals.get('debit_auxiliary_id', False),
+                        'init_obj':vals.get('init_obj', False),
+                    })
+                    # 进项税行
+                    if vals.get('buy_tax_amount'):
+                        if not self.env.user.company_id.import_tax_account:
+                            raise UserError(u'请通过"配置-->高级配置-->系统参数"菜单来设置进项税科目')
+                        self.env['voucher.line'].create({
+                            'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                            'account_id': self.env.user.company_id.import_tax_account.id, 'debit': line.tax_amount or 0, 'voucher_id': vals.get('vouch_obj_id'),
+                        })
+                # 贷方行
+                self.env['voucher.line'].create({
+                    'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                    'partner_id': vals.get('partner_credit', ''),
+                    'account_id': vals.get('credit_account_id'),
+                    'credit': credit_sum,
+                    'voucher_id': vals.get('vouch_obj_id'),
+                    'auxiliary_id':vals.get('credit_auxiliary_id', False),
+                    'init_obj':vals.get('init_obj', False),
+                })
             # 删除初始非需要的凭证明细行
             if money_order.is_init:
                 vouch_line_ids = self.env['voucher.line'].search([
