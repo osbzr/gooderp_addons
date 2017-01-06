@@ -329,17 +329,17 @@ class TestProduction(TransactionCase):
         self.outsource_out1.onchange_bom()
         self.assertTrue(self.outsource_out1.is_many_to_many_combinations)
 
-    def test_outsource_approve_order_no_in_line(self):
-        ''' 测试  委外加工单 审核：一个明细行没有值 '''
+    def test_outsource_approve_feeding(self):
+        ''' 测试  委外加工单 审核: 存在委外费用生成结算单 '''
+        self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
+        self.outsource_out1.approve_feeding()
+
+    def test_outsource_approve_feeding_no_in_line(self):
+        ''' 测试  委外加工单 投料：一个明细行没有值 '''
         # 当一个明细行没有值时，raise 委外加工单必须存在组合件和子件明细行
         self.outsource_out1.line_in_ids.unlink()
         with self.assertRaises(UserError):
-            self.outsource_out1.approve_order()
-
-    def test_outsource_approve_order_no_fee(self):
-        ''' 测试  委外加工单 审核: 不存在委外费用 '''
-        self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
-        self.outsource_out1.approve_order()
+            self.outsource_out1.approve_feeding()
 
     def test_outsource_approve_order_has_fee(self):
         ''' 测试  委外加工单 审核: 存在委外费用生成结算单 '''

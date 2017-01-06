@@ -64,8 +64,8 @@ class wh_move(models.Model):
     warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
                                         ondelete='restrict',
                                         required=True,
-                                        readonly=True,
-                                        states={'draft': [('readonly', False)]},
+                                        readonly=False,
+                                        states={'done': [('readonly', True)]},
                                         default=_get_default_warehouse_dest,
                                         help=u'移库单的目的仓库')
     approve_uid = fields.Many2one('res.users', u'审核人',
