@@ -2,6 +2,7 @@
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
+import datetime
 from odoo.exceptions import UserError
 from odoo.tools import float_compare, float_is_zero
 
@@ -9,6 +10,7 @@ from odoo.tools import float_compare, float_is_zero
 READONLY_STATES = {
     'done': [('readonly', True)],
 }
+ISODATEFORMAT = '%Y-%m-%d'
 
 
 class sell_delivery(models.Model):
@@ -115,6 +117,7 @@ class sell_delivery(models.Model):
                          help=u'联系手机')
     modifying = fields.Boolean(u'差错修改中', default=False,
                                help=u'是否处于差错修改中')
+    origin_id = fields.Many2one('sell.delivery', u'来源单据')
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
@@ -349,6 +352,79 @@ class sell_delivery(models.Model):
                 line.sell_line_id.quantity_out -= line.goods_qty
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.sell_move_id.cancel_approved_order()
+
+
+    @api.multi
+    def sell_to_return(self):
+        '''销售发货单转化为销售退货单'''
+        return_goods = {}
+
+        return_order_draft = self.search([
+            ('is_return', '=', True),
+            ('origin_id', '=', self.id),
+            ('state', '=', 'draft')
+        ])
+        if return_order_draft:
+            raise UserError(u'销售出库单存在草稿状态的退货单！')
+
+        return_order = self.search([
+            ('is_return', '=', True),
+            ('origin_id', '=', self.id),
+            ('state', '=', 'done')
+        ])
+        print 'return_order', return_order
+        for order in return_order:
+            for return_line in order.line_in_ids:
+                if return_goods.get(return_line.attribute_id.id):
+                    return_goods[return_line.attribute_id.id] += return_line.goods_qty
+                else:
+                    return_goods[return_line.attribute_id.id] = return_line.goods_qty
+        receipt_line = []
+        for line in self.line_out_ids:
+            qty = line.goods_qty
+            if return_goods.get(line.attribute_id.id):
+                qty = qty - return_goods[line.attribute_id.id]
+                print "ww", qty
+            if qty != 0:
+                dic = {
+                    'goods_id': line.goods_id.id,
+                    'attribute_id': line.attribute_id.id,
+                    'uom_id': line.uom_id.id,
+                    'warehouse_id': line.warehouse_dest_id.id,
+                    'warehouse_dest_id': line.warehouse_id.id,
+                    'goods_qty': qty,
+                    'price_taxed': line.price_taxed,
+                    'discount_rate': line.discount_rate,
+                }
+                receipt_line.append(dic)
+        if len(receipt_line) == 0:
+            raise UserError(u'该订单已全部退货！')
+        vals = {'partner_id': self.partner_id.id,
+                'is_return': True,
+                'origin_id': self.id,
+                'origin': 'sell.delivery.return',
+                'warehouse_dest_id': self.warehouse_id.id,
+                'warehouse_id': self.warehouse_dest_id.id,
+                'bank_account_id': self.bank_account_id.id,
+                'date_due': (datetime.datetime.now()).strftime(ISODATEFORMAT),
+                'date': (datetime.datetime.now()).strftime(ISODATEFORMAT),
+                'line_in_ids': [(0, 0, line) for line in receipt_line],
+                }
+        delivery_return = self.with_context(is_return=True).create(vals)
+        view_id = self.env.ref('sell.sell_return_form').id
+        name = u'销货退货单'
+        return {
+            'name': name,
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': False,
+            'views': [(view_id, 'form')],
+            'res_model': 'sell.delivery',
+            'type': 'ir.actions.act_window',
+            'res_id': delivery_return.id,
+            'target': 'current'
+        }
+
 
 
 class wh_move_line(models.Model):
