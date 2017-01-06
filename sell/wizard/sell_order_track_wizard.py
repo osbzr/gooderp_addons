@@ -80,15 +80,6 @@ class sell_order_track_wizard(models.TransientModel):
             'note': line.note,
         }
 
-    def _prepare_track_summary_line(self, total_qty, total_amount, total_not_out):
-        '''返回跟踪表小计行'''
-        return {
-            'goods_state': u'小计',
-            'qty': total_qty,
-            'amount': total_amount,
-            'qty_not_out': total_not_out,
-        }
-
     @api.multi
     def button_ok(self):
         self.ensure_one()
@@ -96,25 +87,8 @@ class sell_order_track_wizard(models.TransientModel):
         if self.date_end < self.date_start:
             raise UserError(u'开始日期不能大于结束日期！\n所选开始日期:%s 所选结束日期:%s'%(self.date_start, self.date_end))
 
-        index = 0
-        sum_qty = sum_amount = sum_not_out = 0  # 数量、金额、未出库数量合计
-        total_qty = total_amount = total_not_out = 0    # 数量、金额、未出库数量小计
-        line_ids = []
         sell_order_line = self.env['sell.order.line']
         for line in sell_order_line.search(self._get_domain(), order='goods_id'):
-            line_ids.append(line)
-            is_sell = line.order_id.type == 'sell' and 1 or -1 # 是否销货订单
-            # 退货时数量、销售额、未出库数量均取反
-            sum_qty += is_sell * line.quantity
-            sum_amount += is_sell * line.subtotal
-            sum_not_out += is_sell * (line.quantity - line.quantity_out)
-
-        for line in sell_order_line.search(self._get_domain(), order='goods_id'):
-            index += 1
-            after_id = line_ids[index:] and line_ids[index]  # 下一个明细行
-            if after_id:
-                after = sell_order_line.search([('id', '=', after_id.id)])
-
             is_sell = line.order_id.type == 'sell' and 1 or -1 # 是否销货订单
             # 以下分别为明细行上数量、销售额、未出库数量，退货时均取反
             qty = is_sell * line.quantity
@@ -126,32 +100,6 @@ class sell_order_track_wizard(models.TransientModel):
                 self._prepare_track_line(line, qty, amount, qty_not_out))
             res.append(track.id)
 
-            if not after_id:  # 如果是最后一个明细行，则在最后增加一个小计行
-                total_qty += qty
-                total_not_out += qty_not_out
-                total_amount += amount
-                summary_last_track = self.env['sell.order.track'].create(
-                    self._prepare_track_summary_line(total_qty, total_amount, total_not_out))
-                res.append(summary_last_track.id)
-                continue
-
-            # 如果下一个是相同商品，则累加数量、销售额和未出库数量
-            total_qty += qty
-            total_not_out += qty_not_out
-            total_amount += amount
-            if line.goods_id != after.goods_id:  # 如果下一个是不同商品，则增加一个小计行
-                summary_track = self.env['sell.order.track'].create(
-                    self._prepare_track_summary_line(total_qty, total_amount, total_not_out))
-                res.append(summary_track.id)
-                total_qty = total_amount = total_not_out = 0  # 计算不同的商品时先将初始值清零
-
-        sum_track = self.env['sell.order.track'].create({
-                    'goods_state': u'合计',
-                    'qty': sum_qty,
-                    'amount': sum_amount,
-                    'qty_not_out': sum_not_out,
-                })
-        res.append(sum_track.id)
         view = self.env.ref('sell.sell_order_track_tree')
         return {
             'name': u'销售订单跟踪表',
