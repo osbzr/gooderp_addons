@@ -302,6 +302,15 @@ class TestProduction(TransactionCase):
         wh_assembly_ass2.goods_qty = 1
         wh_assembly_ass2.onchange_goods_qty()
 
+    def test_assembly_approve_order_no_feeding(self):
+        ''' 测试 组装单 审核 没有投料 就审核 '''
+        with self.assertRaises(UserError):
+            self.assembly.approve_order()
+
+    def test_assembly_unlink(self):
+        ''' 测试 组装单 删除 '''
+        self.assembly.unlink()
+
     def test_outsource_onchange_goods_qty_no_bom(self):
         ''' 测试 委外加工单 onchange_goods_qty 不存在 物料清单 '''
         # no bom_id
@@ -385,6 +394,11 @@ class TestProduction(TransactionCase):
                                     'outsource_partner_id': self.env.ref('core.lenovo').id,
                                     'outsource_fee': 10,
                                     })
+
+    def test_outsource_approve_order_no_feeding(self):
+        ''' 测试 委外加工单 审核 没有投料 就审核 '''
+        with self.assertRaises(UserError):
+            self.outsource_out1.approve_order()
 
     def test_disassembly_onchange_goods_qty(self):
         ''' 测试 拆卸单 onchange_goods_qty '''
@@ -470,13 +484,19 @@ class TestProduction(TransactionCase):
         wh_disassembly_dis3.onchange_bom()
         self.assertTrue(wh_disassembly_dis3.is_many_to_many_combinations)
 
+    def test_disassembly_approve_order_no_feeding(self):
+        ''' 测试 拆卸单 审核 没有投料 就审核 '''
+        with self.assertRaises(UserError):
+            self.disassembly.approve_order()
+
     def test_cancel_approve_order_has_voucher(self):
         ''' 测试 拆卸单 反审核 删除发票 '''
         self.assembly.approve_feeding()
         self.assembly.approve_order()
-        self.disassembly.fee = 10
-#         print "cost", self.disassembly.line_out_ids[0].cost
-#         print "cost in", self.disassembly.line_in_ids[0].cost, self.disassembly.line_in_ids[1].cost
-#         self.disassembly.approve_order()
-# 
-#         self.disassembly.cancel_approved_order()
+        self.disassembly.approve_feeding()
+        self.disassembly.approve_order()
+        self.disassembly.cancel_approved_order()
+
+    def test_disassembly_unlink(self):
+        ''' 测试 拆卸单 删除 '''
+        self.disassembly.unlink()

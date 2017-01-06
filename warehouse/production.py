@@ -248,7 +248,6 @@ class wh_assembly(models.Model):
     @api.multi
     @inherits_after()
     def unlink(self):
-        print "zxy"
         return super(wh_assembly, self).unlink()
 
     @api.model
@@ -709,7 +708,6 @@ class outsource(models.Model):
     def cancel_approved_order(self):
         for order in self:
             order.line_in_ids.action_cancel()
-
             if order.voucher_id:
                 order.voucher_id.voucher_draft()
                 order.voucher_id.unlink()
