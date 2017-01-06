@@ -67,8 +67,6 @@ class buy_order(models.Model):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_dest_type'))
 
-        return self.env['warehouse'].browse()
-
     @api.model
     def _default_warehouse_dest(self):
         '''获取默认调入仓库'''
@@ -117,6 +115,7 @@ class buy_order(models.Model):
                             help=u'购货订单的类型，分为购货或退货')
     warehouse_dest_id = fields.Many2one('warehouse',
                                         u'调入仓库',
+                                        required=True,
                                         default=_default_warehouse_dest,
                                         ondelete='restrict',
                                         states=READONLY_STATES,
@@ -442,6 +441,7 @@ class buy_order_line(models.Model):
                              help=u'商品计量单位')
     quantity = fields.Float(u'数量',
                             default=1,
+                            required=True,
                             digits=dp.get_precision('Quantity'),
                             help=u'下单数量')
     quantity_in = fields.Float(u'已执行数量',

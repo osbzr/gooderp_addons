@@ -157,7 +157,10 @@ class wh_move_line(models.Model):
                                         store=True,
                                         compute=_get_line_warehouse_dest,
                                         help=u'单据的目的仓库')
-    goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'), default=1,
+    goods_qty = fields.Float(u'数量',
+                             digits=dp.get_precision('Quantity'),
+                             default=1,
+                             required=True,
                              help=u'产品的数量')
     goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),
                                  compute=_get_goods_uos_qty, store=True,
