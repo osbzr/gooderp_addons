@@ -302,7 +302,22 @@ class test_wh_move_line(TransactionCase):
 
         self.goods_cable = self.browse_ref('goods.cable')
         self.goods_keyboard = self.browse_ref('goods.keyboard')
-                
+        self.warehouse_id = self.env.ref('warehouse.hd_stock')
+        self.customer_warehouse_id = self.env.ref('warehouse.warehouse_customer')
+        self.partner = self.env.ref('core.jd')
+
+        vals = {'partner_id': self.partner.id,
+                'is_return': False,
+                'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+                'warehouse_id': self.customer_warehouse_id.id,
+                'warehouse_dest_id': self.warehouse_id.id,
+                'line_out_ids': [(0, 0, {'goods_id': self.goods_cable.id,
+                                         'goods_qty': 5,
+                                         'tax_rate': 17.0,
+                                         'type': 'out'})],
+                }
+        self.new_delivery = self.env['sell.delivery'].create(vals)
+
     def test_onchange_warehouse_id(self):
         '''wh.move.line仓库和商品带出价格策略的折扣率'''
         for line in self.delivery.line_out_ids[0]:
@@ -367,24 +382,37 @@ class test_wh_move_line(TransactionCase):
         ''' 测试 修改产品时，出库单行税率变化 '''
         for order_line in self.delivery.line_out_ids:
             # partner 无 税率，出库单行产品无税率
-            self.env.ref('core.jd').tax_rate = 0
+            self.partner.tax_rate = 0
             self.env.ref('goods.mouse').tax_rate = 0
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 有 税率，出库单行产品无税率
-            self.env.ref('core.jd').tax_rate = 10
+            self.partner.tax_rate = 10
             self.env.ref('goods.mouse').tax_rate = 0
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 无税率，出库单行产品有税率
-            self.env.ref('core.jd').tax_rate = 0
+            self.partner.tax_rate = 0
             self.env.ref('goods.mouse').tax_rate = 10
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 税率 > 出库单行产品税率
-            self.env.ref('core.jd').tax_rate = 11
+            self.partner.tax_rate = 11
             self.env.ref('goods.mouse').tax_rate = 10
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             # partner 税率 =< 出库单行产品税率
-            self.env.ref('core.jd').tax_rate = 9
+            self.partner.tax_rate = 9
             self.env.ref('goods.mouse').tax_rate = 10
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
             
             break
+
+    def test_inverse_price(self):
+        '''由不含税价反算含税价，保存时生效'''
+        for line in self.new_delivery.line_out_ids:
+            line.price = 10
+            self.assertAlmostEqual(line.price_taxed, 11.7)
+
+    def test_onchange_price(self):
+        '''当订单行的不含税单价改变时，改变含税单价'''
+        for line in self.new_delivery.line_out_ids:
+            line.price = 10
+            line.onchange_price()
+            self.assertAlmostEqual(line.price_taxed, 11.7)

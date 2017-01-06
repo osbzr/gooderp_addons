@@ -108,7 +108,7 @@ class sell_order(models.Model):
     note = fields.Text(u'备注', help=u'单据备注')
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
                                  help=u'整单优惠率')
-    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES, 
+    discount_amount = fields.Float(u'抹零', states=READONLY_STATES,
                                    track_visibility='always',
                                    digits=dp.get_precision('Amount'),
                                    help=u'整单优惠金额，可由优惠率自动计算出来，也可手动输入')

@@ -580,6 +580,7 @@ class test_money_transfer_order(TransactionCase):
             self.env.ref('money.transfer_300').money_transfer_done()
 
         # 转入账户与公司币别一致 : in_currency_id == company_currency_id
+        self.env.ref('money.get_40000').partner_id.c_category_id.account_id.currency_id = self.env.ref('base.USD').id
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.transfer_line_1').in_bank_id.account_id = self.env.ref('finance.account_cash').id
         self.env.ref('money.transfer_300').money_transfer_done()
