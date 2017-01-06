@@ -265,6 +265,7 @@ class sell_order(models.Model):
             discount_amount = line.discount_amount
 
         return {
+            'type': self.type == 'sell' and 'out' or 'in',
             'sell_line_id': line.id,
             'goods_id': line.goods_id.id,
             'attribute_id': line.attribute_id.id,

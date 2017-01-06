@@ -150,7 +150,9 @@
                         </group>
 
                         <group string='组合件' attrs="{'invisible': [('is_many_to_many_combinations', '!=', True)]}">
-                            <field nolabel='1' name='line_in_ids'   attrs="{'readonly': [('state', '!=', 'draft')]}" >
+                            <field nolabel='1' name='line_in_ids'
+                            	context="{'type': 'in'}"
+                            	attrs="{'readonly': [('state', '!=', 'draft')]}" >
                                   <tree string='库存调拨' editable='bottom'>
                                     <field name='goods_id' required='1' />
                                     <field name='attribute_id'
@@ -170,6 +172,7 @@
                                     <field name='using_batch' invisible='1' />
                                     <field name='force_batch_one' invisible='1' />
                                     <field name='using_attribute' invisible='1' />
+                                    <field name='type' invisible='1'/>
                                 </tree>
                             </field>
                         </group>
@@ -210,6 +213,7 @@
                                         <field name='lot_qty' invisible='1' />
                                         <field name='lot_uos_qty' invisible='1' />
                                         <field name='lot' invisible='1'/>
+                                        <field name='type' invisible='1'/>
                                     </tree>
                             </field>
                         </group>
@@ -331,6 +335,7 @@
                                     <field name='using_batch' invisible='1'/>
                                     <field name='force_batch_one' invisible='1'/>
                                     <field name='using_attribute' invisible='1'/>
+                                    <field name='type' invisible='1'/>
                                 </tree>
                             </field>
                         </group>
@@ -371,6 +376,7 @@
                                         <field name='lot_qty' invisible='1' />
                                         <field name='lot_uos_qty' invisible='1' />
                                         <field name='lot' invisible='1'/>
+                                        <field name='type' invisible='1'/>
                                     </tree>
                             </field>
                         </group>
@@ -486,12 +492,15 @@
                                     <field name='force_batch_one' invisible='1' />
                                     <field name='lot_qty' invisible='1' />
                                     <field name='lot_uos_qty' invisible='1' />
+                                    <field name='type' invisible='1'/>
                                 </tree>
                             </field>
                         </group>
 
                         <group string='子件'>
-                            <field nolabel='1' name='line_in_ids' attrs="{'readonly': [('state', '!=', 'draft')]}" >
+                            <field nolabel='1' name='line_in_ids'
+                            	context="{'type': 'in'}"
+                            	attrs="{'readonly': [('state', '!=', 'draft')]}" >
                                   <tree string='库存调拨' editable='bottom'>
                                         <field name='goods_id' required='1' />
                                         <field name='attribute_id'
@@ -511,6 +520,7 @@
                                         <field name='using_batch' invisible='1' />
                                         <field name='force_batch_one' invisible='1' />
                                         <field name='using_attribute' invisible='1' />
+                                        <field name='type' invisible='1'/>
                                     </tree>
                             </field>
                         </group>

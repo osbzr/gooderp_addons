@@ -297,20 +297,21 @@ class buy_order(models.Model):
             qty = line.quantity - line.quantity_in
             discount_amount = line.discount_amount
         return {
-                    'buy_line_id': line.id,
-                    'goods_id': line.goods_id.id,
-                    'attribute_id': line.attribute_id.id,
-                    'goods_uos_qty': line.goods_id.conversion and qty / line.goods_id.conversion or qty,
-                    'uos_id': line.goods_id.uos_id.id,
-                    'goods_qty': qty,
-                    'uom_id': line.uom_id.id,
-                    'cost_unit': line.price,
-                    'price_taxed': line.price_taxed,
-                    'discount_rate': line.discount_rate,
-                    'discount_amount': discount_amount,
-                    'tax_rate': line.tax_rate,
-                    'note': line.note or '',
-                }
+            'type': self.type == 'buy' and 'in' or 'out',
+            'buy_line_id': line.id,
+            'goods_id': line.goods_id.id,
+            'attribute_id': line.attribute_id.id,
+            'goods_uos_qty': line.goods_id.conversion and qty / line.goods_id.conversion or qty,
+            'uos_id': line.goods_id.uos_id.id,
+            'goods_qty': qty,
+            'uom_id': line.uom_id.id,
+            'cost_unit': line.price,
+            'price_taxed': line.price_taxed,
+            'discount_rate': line.discount_rate,
+            'discount_amount': discount_amount,
+            'tax_rate': line.tax_rate,
+            'note': line.note or '',
+        }
 
     def _generate_receipt(self, receipt_line):
         '''根据明细行生成入库单或退货单'''

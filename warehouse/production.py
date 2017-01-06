@@ -86,7 +86,8 @@ class wh_assembly(models.Model):
     def onchange_goods_id(self):
         if self.goods_id:
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
-                             'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id}]
+                             'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id,
+                             'type': 'in'}]
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -113,6 +114,7 @@ class wh_assembly(models.Model):
                                'goods_qty': self.goods_qty,
                                'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                                'uos_id': line.goods_id.uos_id.id,
+                               'type': 'in',
                            } for line in self.bom_id.line_parent_ids]
             parent_line_goods_qty = self.bom_id.line_parent_ids[0].goods_qty
             for line in self.bom_id.line_child_ids:
@@ -131,6 +133,7 @@ class wh_assembly(models.Model):
                     'cost': cost,
                     'goods_uos_qty': local_goods_qty / line.goods_id.conversion,
                     'uos_id': line.goods_id.uos_id.id,
+                    'type': 'out',
                 })
             self.line_in_ids = False
             self.line_out_ids = False
@@ -230,6 +233,7 @@ class wh_assembly(models.Model):
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
             line_in_ids = [{
+                'type': 'in',
                 'goods_id': line.goods_id.id,
                 'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
                     'production').id,
@@ -246,6 +250,7 @@ class wh_assembly(models.Model):
                     get_suggested_cost_by_warehouse(
                         warehouse_id[0], line.goods_qty)
                 line_out_ids.append({
+                        'type': 'out',
                         'goods_id': line.goods_id.id,
                         'warehouse_id': warehouse_id.id,
                         'warehouse_dest_id': self.env[
@@ -371,7 +376,8 @@ class outsource(models.Model):
         if self.goods_id:
             self.line_in_ids = False
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
-                                 'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id}]
+                                 'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id,
+                                 'type': 'in'}]
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -397,6 +403,7 @@ class outsource(models.Model):
                             'goods_qty': self.goods_qty,
                             'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                             'uos_id': line.goods_id.uos_id.id,
+                            'type': 'in'
                             } for line in self.bom_id.line_parent_ids]
 
             parent_line_goods_qty = self.bom_id.line_parent_ids[0].goods_qty
@@ -416,7 +423,8 @@ class outsource(models.Model):
                                      'cost_unit': cost_unit,
                                      'cost': cost,
                                      'goods_uos_qty': local_goods_qty / line.goods_id.conversion,
-                                     'uos_id': line.goods_id.uos_id.id
+                                     'uos_id': line.goods_id.uos_id.id,
+                                     'type': 'out',
                                      })
 
             self.line_in_ids = False
@@ -440,6 +448,7 @@ class outsource(models.Model):
                     'goods_qty': line.goods_qty,
                     'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                     'uos_id': line.goods_id.uos_id.id,
+                    'type': 'in',
                 } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
@@ -456,6 +465,7 @@ class outsource(models.Model):
                             'cost': cost,
                             'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                             'uos_id': line.goods_id.uos_id.id,
+                            'type': 'out',
                         })
             self.line_in_ids = False
             self.line_out_ids = False
@@ -796,6 +806,7 @@ class wh_disassembly(models.Model):
                                   'warehouse_dest_id': warehouse_id.id,
                                   'uom_id': self.goods_id.uom_id.id,
                                   'uos_id': self.goods_id.uos_id.id,
+                                  'type': 'out',
                                   }]
 
     @api.onchange('goods_qty')
@@ -831,6 +842,7 @@ class wh_disassembly(models.Model):
                  'uos_id':parent_line.goods_id.uos_id.id,
                  'cost_unit': cost_unit,
                  'cost': cost,
+                 'type': 'out',
              })
 
             line_in_ids = [{
@@ -842,6 +854,7 @@ class wh_disassembly(models.Model):
                             'goods_qty': line.goods_qty / parent_line.goods_qty * self.goods_qty,
                             'goods_uos_qty': line.goods_qty / parent_line.goods_qty * self.goods_qty / line.goods_id.conversion,
                             'uos_id':line.goods_id.uos_id.id,
+                            'type': 'in',
                         } for line in self.bom_id.line_child_ids]
 
             self.line_in_ids = False
@@ -875,6 +888,7 @@ class wh_disassembly(models.Model):
                         'uos_id':line.goods_id.uos_id.id,
                         'cost_unit': cost_unit,
                         'cost': cost,
+                        'type': 'out',
                     })
 
             line_in_ids = [{
@@ -886,6 +900,7 @@ class wh_disassembly(models.Model):
                 'goods_qty': line.goods_qty,
                 'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                 'uos_id':line.goods_id.uos_id.id,
+                'type': 'in',
             } for line in self.bom_id.line_child_ids]
 
             self.line_in_ids = False

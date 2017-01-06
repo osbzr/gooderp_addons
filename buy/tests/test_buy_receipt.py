@@ -227,6 +227,29 @@ class test_buy_receipt(TransactionCase):
         with self.assertRaises(UserError):
             receipt.buy_receipt_done()
 
+    def test_wrong_receipt_done_amount_less_than_zero(self):
+        ''' 测试 购货/退货金额不能小于 0 '''
+        for line in self.receipt.line_in_ids: # 购货金额不能小于 0
+            line.price_taxed = 0.0
+            line.cost_unit = 0.0
+            line.discount_amount = 10.0
+        with self.assertRaises(UserError):
+            self.receipt.buy_receipt_done()
+
+        for line in self.return_receipt.line_out_ids: # 退货金额不能小于 0
+            line.price_taxed = 0.0
+            line.cost_unit = 0.0
+            line.discount_amount = 10.0
+        with self.assertRaises(UserError):
+            self.return_receipt.buy_receipt_done()
+
+    def test_receipt_done_no_voucher(self):
+        ''' 测试 采购入库单  没有凭证行 删除凭证 '''
+        for line in self.receipt.line_in_ids:
+            line.price_taxed = 0.0
+            line.cost_unit = 0.0
+        self.receipt.buy_receipt_done()
+
     def test_receipt_make_invoice(self):
         '''审核入库单：不勾按收货结算时'''
         self.order.buy_order_draft()
