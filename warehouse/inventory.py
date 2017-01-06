@@ -212,6 +212,9 @@ class wh_inventory(models.Model):
 
                 GROUP BY
                   wh.id, line.lot, line.attribute_id, goods.id, uom.id, uos.id
+
+                ORDER BY
+                    goods.id, line.lot
             '''.format(remaining_text)
 
             extra_text = ''
@@ -287,25 +290,27 @@ class wh_inventory_line(models.Model):
     uos_id = fields.Many2one('uom', u'辅助单位', ondelete='restrict',
                              help=u'盘点单行对应的产品的辅助单位')
     real_qty = fields.Float(
-        u'系统库存', digits=dp.get_precision('Quantity'),
-        help=u'盘点单行对应的产品的系统库存')
+        u'实际数量', digits=dp.get_precision('Quantity'),
+        help=u'盘点单行对应的产品的实际数量')
     real_uos_qty = fields.Float(
-        u'系统辅助单位库存', digits=dp.get_precision('Quantity'),
-        help=u'盘点单行对应的产品的系统辅助单位库存')
+        u'实际辅助数量', digits=dp.get_precision('Quantity'),
+        help=u'盘点单行对应的产品的实际辅助数量')
     inventory_qty = fields.Float(
-        u'盘点库存', digits=dp.get_precision('Quantity'),
-        help=u'盘点单行对应的产品的盘点库存')
+        u'账面数量', digits=dp.get_precision('Quantity'),
+        required=True,
+        help=u'盘点单行对应的产品的账面数量')
     inventory_uos_qty = fields.Float(
-        u'盘点辅助单位库存', digits=dp.get_precision('Quantity'),
-        help=u'盘点单行对应的产品的盘点辅助单位库存')
+        u'账面辅助数量', digits=dp.get_precision('Quantity'),
+        required=True,
+        help=u'盘点单行对应的产品的账面辅助数量')
     difference_qty = fields.Float(
-        u'盘盈盘亏', digits=dp.get_precision('Quantity'),
+        u'差异数量', digits=dp.get_precision('Quantity'),
         compute='_get_difference_qty',
-        help=u'盘点单行对应的产品的盘盈盘亏数量')
+        help=u'盘点单行对应的产品的差异数量')
     difference_uos_qty = fields.Float(
-        u'辅助单位盘盈盘亏', digits=dp.get_precision('Quantity'),
+        u'差异辅助数量', digits=dp.get_precision('Quantity'),
         compute='_get_difference_uos_qty',
-        help=u'盘点单行对应的产品的辅助单位盘盈盘亏数量')
+        help=u'盘点单行对应的产品的差异辅助数量')
 
     def check_difference_identical(self):
         if self.difference_qty * self.difference_uos_qty < 0:

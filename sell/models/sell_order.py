@@ -51,13 +51,12 @@ class sell_order(models.Model):
     @api.model
     def _default_warehouse(self):
         return self._default_warehouse_impl()
+
     @api.model
     def _default_warehouse_impl(self):
         if self.env.context.get('warehouse_type'):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_type'))
-
-        return self.env['warehouse'].browse()
 
     @api.one
     @api.depends('type')
@@ -86,18 +85,29 @@ class sell_order(models.Model):
                             ondelete='restrict', states=READONLY_STATES,
                             default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0],
                                  help=u'单据负责人')
-    date = fields.Date(u'单据日期', states=READONLY_STATES,
+    date = fields.Date(u'单据日期',
+                       required=True,
+                       states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       index=True, copy=False, help=u"默认是订单创建日期")
+                       index=True,
+                       copy=False,
+                       help=u"默认是订单创建日期")
     delivery_date = fields.Date(
-        u'要求交货日期', states=READONLY_STATES,
+        u'要求交货日期',
+        required=True,
+        states=READONLY_STATES,
         default=lambda self: fields.Date.context_today(self),
-        index=True, copy=False, help=u"订单的要求交货日期")
+        index=True,
+        copy=False,
+        help=u"订单的要求交货日期")
     type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', 
                             default='sell', states=READONLY_STATES,
                             help=u'销货订单的类型，分为销货或退货')
-    warehouse_id = fields.Many2one('warehouse', u'调出仓库',
-                                   ondelete='restrict', states=READONLY_STATES,
+    warehouse_id = fields.Many2one('warehouse',
+                                   u'调出仓库',
+                                   required=True,
+                                   ondelete='restrict',
+                                   states=READONLY_STATES,
                                    default=_default_warehouse,
                                    help=u'产品将从该仓库调出')
     name = fields.Char(u'单据编号', index=True, copy=False,
@@ -414,7 +424,9 @@ class sell_order_line(models.Model):
                                    help=u'商品的属性，当商品有属性时，该字段必输')
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
                              help=u'商品计量单位')
-    quantity = fields.Float(u'数量', default=1,
+    quantity = fields.Float(u'数量',
+                            default=1,
+                            required=True,
                             digits=dp.get_precision('Quantity'),
                             help=u'下单数量')
     quantity_out = fields.Float(u'已执行数量', copy=False,

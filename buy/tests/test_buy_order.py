@@ -55,7 +55,6 @@ class test_buy_order(TransactionCase):
              'warehouse_dest_type': 'stock'
              }).create({})
         self.assertTrue(order.warehouse_dest_id.type == 'stock')
-        self.env['buy.order'].create({})
 
     def test_get_money_state(self):
         '''计算购货订单付款/退款状态'''

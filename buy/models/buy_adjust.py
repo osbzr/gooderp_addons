@@ -177,7 +177,9 @@ class buy_adjust_line(models.Model):
                                    help=u'商品的属性，当商品有属性时，该字段必输')
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
                              help=u'商品计量单位')
-    quantity = fields.Float(u'调整数量', default=1,
+    quantity = fields.Float(u'调整数量',
+                            default=1,
+                            required=True,
                             digits=dp.get_precision('Quantity'),
                             help=u'相对于原单据对应明细行的调整数量，可正可负')
     price = fields.Float(u'购货单价',

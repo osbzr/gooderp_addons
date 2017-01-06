@@ -429,14 +429,14 @@ class test_other_money_order_line(TransactionCase):
         # 其他收入单
         for line in self.get_order.line_ids:
             line.service = self.service_1  # 咨询服务
-            line.onchange_service()
+            line.with_context({'order_type': 'other_get'}).onchange_service()
             self.assertTrue(line.category_id.id == self.service_1.get_categ_id.id)
             self.assertTrue(line.amount == 500)
 
         # 其他支出单
         for line in self.pay_order.line_ids:
             line.service = self.service_1  # 咨询服务
-            line.onchange_service()
+            line.with_context({'order_type': 'other_pay'}).onchange_service()
             self.assertTrue(line.category_id.id == self.service_1.pay_categ_id.id)
             self.assertTrue(line.amount == 500)
 
