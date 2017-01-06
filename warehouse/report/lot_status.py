@@ -7,6 +7,7 @@ from odoo import models, fields
 
 class report_lot_status(models.Model):
     _name = 'report.lot.status'
+    _description = u'批次余额表'
     _auto = False
 
     goods = fields.Char(u'产品')

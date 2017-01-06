@@ -112,7 +112,10 @@ class wh_move_line(models.Model):
                        help=u'单据完成日期')
     cost_time = fields.Datetime(u'审核时间', copy=False,
                                 help=u'单据审核时间')
-    type = fields.Selection(MOVE_LINE_TYPE, u'类型', default=lambda self: self.env.context.get('type'),
+    type = fields.Selection(MOVE_LINE_TYPE,
+                            u'类型',
+                            required=True,
+                            default=lambda self: self.env.context.get('type'),
                             help=u'类型：出库、入库 或者 内部调拨')
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft',
                              help=u'状态标识，新建时状态为草稿;审核后状态为已审核')
@@ -157,7 +160,10 @@ class wh_move_line(models.Model):
                                         store=True,
                                         compute=_get_line_warehouse_dest,
                                         help=u'单据的目的仓库')
-    goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'), default=1,
+    goods_qty = fields.Float(u'数量',
+                             digits=dp.get_precision('Quantity'),
+                             default=1,
+                             required=True,
                              help=u'产品的数量')
     goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),
                                  compute=_get_goods_uos_qty, store=True,

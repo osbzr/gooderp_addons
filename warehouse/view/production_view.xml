@@ -289,46 +289,56 @@
             <field name='arch' type='xml'>
                 <form string='委外加工单'>
                     <header>
-                        <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft'/>
+                        <button name='approve_feeding' type='object' string='发料' class='oe_highlight' states='draft,feeding'/>
+                        <button name='approve_order' type='object' string='成品入库' class='oe_highlight' states='feeding'/>
                         <button name='cancel_approved_order' type='object' string='反审核' states='done'/>
-                        <field name='state' widget='statusbar' readonly='1'/>
+                        <field name='state' widget='statusbar' statusbar_visible="draft,feeding,done"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name='outsource_partner_id' domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
-                                <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                <field name='warehouse_id' />
-                                <field name='bom_id' options="{'no_create': 1}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name='date' required='1' attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                <field name='warehouse_id'/>
+                                <field name='bom_id' options="{'no_create': 1}"/>
                                 <field name='goods_id' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}"/>
                                 <field name='goods_qty' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}"/>
                             </group>
                             <group>
-                                <field name='outsource_fee' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name='outsource_fee'/>
                                 <field name='wh_assembly_id' options="{'no_create': True}"/>
                                 <field name='warehouse_dest_id'/>
                                 <field name='is_many_to_many_combinations'/>
                                 <field name='invoice_id' readonly='1' options="{'no_create': True}"/>
-                                <field name='voucher_id' readonly='1' options="{'no_create': True}"/>
                             </group>
                         </group>
 
                         <group string='组合件' attrs="{'invisible': [('is_many_to_many_combinations', '!=', True)]}">
                             <field nolabel='1' name='line_in_ids' context="{'type': 'in',}"
-                                attrs="{'readonly': [('state', '!=', 'draft')]}">
-                                  <tree string='库存调拨' editable='bottom'>
-                                    <field name='goods_id' required='1'/>
+                                attrs="{'readonly': [('state', '=', 'done')]}">
+                                <tree string='库存调拨' editable='bottom'>
+                                    <field name='goods_id'
+                                        required='1'
+                                        attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name='attribute_id'
                                         domain="[('goods_id', '=', goods_id)]"
-                                        attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                                        attrs="{'required': [('using_attribute', '=', True)], 'readonly': ['|', ('using_attribute', '=', False), ('state', '=', 'done')]}"
                                         groups='goods.multi_attrs_groups' />
                                     <field name='lot'
-                                        attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
+                                        attrs="{'readonly': ['|', ('using_batch', '=', False), ('state', '=', 'done')], 'required': [('using_batch', '=', True)]}"/>
                                     <field name='goods_uos_qty'
-                                        groups='goods.auxiliary_unit_groups' sum='1'/>
-                                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                                    <field name='goods_qty' attrs="{'readonly': [('force_batch_one', '=', True)]}" sum='1'/>
-                                    <field name='uom_id' required='1'/>
+                                        groups='goods.auxiliary_unit_groups'
+                                        sum='1'
+                                        attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name='uos_id'
+                                        groups='goods.auxiliary_unit_groups'
+                                        attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name='goods_qty'
+                                        attrs="{'readonly': ['|', ('force_batch_one', '=', True), ('state', '=', 'done')]}"
+                                        sum='1'/>
+                                    <field name='uom_id'
+                                        required='1'
+                                        attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name='cost_unit' string='入库单位成本' readonly='1'/>
                                     <field name='cost' string='入库金额' readonly='1' sum='1'/>
                                     <field name='note' string='备注'/>
@@ -336,6 +346,7 @@
                                     <field name='force_batch_one' invisible='1'/>
                                     <field name='using_attribute' invisible='1'/>
                                     <field name='type' invisible='1'/>
+                                    <field name='state' invisible='1'/>
                                 </tree>
                             </field>
                         </group>
@@ -344,40 +355,51 @@
                             <field nolabel='1' name='line_out_ids' context="{'lot': True,
                                 'type': 'out',
                                 'default_warehouse_id': warehouse_id,
-                            }" attrs="{'readonly': [('state', '!=', 'draft')]}" >
+                            }" attrs="{'readonly': [('state', '=', 'done')]}">
                                  <tree string='库存调拨' editable='bottom'>
-                                        <field name='goods_id' required='1' />
-                                        <field name='attribute_id'
-                                            domain="[('goods_id', '=', goods_id)]"
-                                            attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
-                                            groups='goods.multi_attrs_groups'/>
-                                        <field name='lot_id'
-                                            groups='goods.batch_groups'
-                                            attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
-                                            domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
-                                            context="{'lot': True}"
-                                            options="{'no_open': True, 'no_create': True}" />
-                                        <field name='goods_uos_qty' sum='1'
-                                            widget='float_limit'
-                                            options="{'field': 'lot_uos_qty'}"
-                                            groups='goods.auxiliary_unit_groups'/>
-                                        <field name='uos_id' groups='goods.auxiliary_unit_groups' />
-                                        <field name='goods_qty' sum='1'
-                                            widget='float_limit'
-                                            options="{'field': 'lot_qty'}"
-                                            attrs="{'readonly': [('force_batch_one', '=', True)]}" />
-                                        <field name='uom_id' required='1' />
-                                        <field name='cost_unit' string='出库单位成本' readonly='1' />
-                                        <field name='cost' string='出库成本' readonly='1' sum='1' />
-                                        <field name='note' string='备注' />
-                                        <field name='using_attribute' invisible='1' />
-                                        <field name='using_batch' invisible='1' />
-                                        <field name='force_batch_one' invisible='1' />
-                                        <field name='lot_qty' invisible='1' />
-                                        <field name='lot_uos_qty' invisible='1' />
-                                        <field name='lot' invisible='1'/>
-                                        <field name='type' invisible='1'/>
-                                    </tree>
+                                    <field name='state' invisible="1"/>
+                                    <field name='goods_id'
+                                        required='1'
+                                        attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name='attribute_id'
+                                        domain="[('goods_id', '=', goods_id)]"
+                                        attrs="{'required': [('using_attribute', '=', True)], 'readonly': ['|',('using_attribute', '=', False),('state', '=', 'done')]}"
+                                        groups='goods.multi_attrs_groups'/>
+                                    <field name='lot_id'
+                                        groups='goods.batch_groups'
+                                        attrs="{'readonly': ['|', ('using_batch', '=', False), ('state', '=', 'done')], 'required': [('using_batch', '=', True)]}"
+                                        domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
+                                        context="{'lot': True}"
+                                        options="{'no_open': True, 'no_create': True}"/>
+                                    <field name='goods_uos_qty'
+                                        sum='1'
+                                        widget='float_limit'
+                                        options="{'field': 'lot_uos_qty'}"
+                                        groups='goods.auxiliary_unit_groups'
+                                        attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name='uos_id'
+                                        groups='goods.auxiliary_unit_groups'
+                                        attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name='goods_qty'
+                                        sum='1'
+                                        widget='float_limit'
+                                        options="{'field': 'lot_qty'}"
+                                        attrs="{'readonly': ['|', ('force_batch_one', '=', True), ('state', '=', 'done')]}"/>
+                                    <field name='uom_id'
+                                        required='1'
+                                        attrs="{'readonly': [('state', '=', 'done')]}" />
+                                    <field name='cost_unit' string='出库单位成本' readonly='1' />
+                                    <field name='cost' string='出库成本' readonly='1' sum='1' />
+                                    <field name='note' string='备注' />
+                                    <field name='using_attribute' invisible='1' />
+                                    <field name='using_batch' invisible='1' />
+                                    <field name='force_batch_one' invisible='1' />
+                                    <field name='lot_qty' invisible='1' />
+                                    <field name='lot_uos_qty' invisible='1' />
+                                    <field name='lot' invisible='1'/>
+                                    <field name='type' invisible='1'/>
+                                    <field name='state' invisible='1'/>
+                                </tree>
                             </field>
                         </group>
 
