@@ -109,9 +109,9 @@
             <field name='view_id' ref='report_stock_transceive_wizard_form' />
         </record>
 
-        <!-- 批号状态表 -->
+        <!-- 批次余额表 -->
         <record id='report_lot_status_action' model='ir.actions.act_window' >
-            <field name='name'>批号状态表</field>
+            <field name='name'>批次余额表</field>
             <field name='res_model'>report.lot.status</field>
             <field name='view_mode'>pivot,tree</field>
             <field name='view_id' ref='report_lot_status_graph' />
