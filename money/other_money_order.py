@@ -138,9 +138,9 @@ class other_money_order_line(models.Model):
     @api.onchange('service')
     def onchange_service(self):
         # 当选择了服务后，则自动填充上类别和金额
-        if self.env.context.get('type') == 'other_get':
+        if self.env.context.get('order_type') == 'other_get':
             self.category_id = self.service.get_categ_id.id
-        elif self.env.context.get('type') == 'other_pay':
+        elif self.env.context.get('order_type') == 'other_pay':
             self.category_id = self.service.pay_categ_id.id
         self.amount = self.service.price
 
@@ -156,7 +156,6 @@ class other_money_order_line(models.Model):
                               help=u'其他收支单行上对应的服务')
     category_id = fields.Many2one('core.category',
                         u'类别', ondelete='restrict',
-                        domain="[('type', '=', context.get('type'))]",
                         help=u'类型：运费、咨询费等')
     auxiliary_id = fields.Many2one('auxiliary.financing',u'辅助核算',
                                    help=u'其他收支单行上的辅助核算')
