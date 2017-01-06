@@ -11,7 +11,7 @@
 
         <!-- 出入库单 -->
        <record id='wh_out_action' model='ir.actions.act_window'>
-            <field name='name'>出库单</field>
+            <field name='name'>其他出库单</field>
             <field name='res_model'>wh.out</field>
             <field name='view_mode'>tree,form</field>
             <!--readonly_by_pass是否有效？ -->
@@ -20,7 +20,7 @@
         </record>
 
        <record id='wh_in_action' model='ir.actions.act_window'>
-            <field name='name'>入库单</field>
+            <field name='name'>其他入库单</field>
             <field name='res_model'>wh.in</field>
             <field name='view_mode'>tree,form</field>
             <!--readonly_by_pass是否有效？ -->
