@@ -667,7 +667,7 @@ class outsource(models.Model):
         for outsource in self:
             voucher_row = self.env['voucher'].create({'date': fields.Datetime.now()})
             self.outsource_create_voucher_line(outsource, voucher_row)
-            outsource.voucher_id = voucher_row.id
+
             voucher_row.voucher_done()
 
     @api.multi

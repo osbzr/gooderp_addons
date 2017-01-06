@@ -317,7 +317,6 @@
                                 <field name='warehouse_dest_id'/>
                                 <field name='is_many_to_many_combinations'/>
                                 <field name='invoice_id' readonly='1' options="{'no_create': True}"/>
-                                <field name='voucher_id' readonly='1' options="{'no_create': True}"/>
                             </group>
                         </group>
 
