@@ -24,13 +24,11 @@ from odoo.exceptions import UserError
 import urllib
 import httplib2
 from lxml import etree
-import calendar
-import time
+
 
 currency_code = {'GBP':'1314',
 				 'HKD':'1315',
 				 'USD':'1316',
-				 u'瑞士法郎':'1317',
 				 'DEM':'1318',
 				 'CHF':'1319',
 				 'SGD':'1375',
@@ -41,9 +39,7 @@ currency_code = {'GBP':'1314',
 				 'CAD':'1324',
 				 'AUD':'1325',
 				 'EUR':'1326',
-				 u'澳门元':'1327',
 				 'PHP':'1328',
-				 'B Thailand':'1329',
 				 'NZD':'1330',
 				 'KRW':'1331',
 				 'RBL':'1843',
@@ -55,12 +51,7 @@ currency_code = {'GBP':'1314',
 				 'BEF':'1373',
 				 'FIM':'1374',
 				 'IDR':'3030',
-				 'BRL':'3253',
-				 u'阿联酋迪拉姆':'3899',
-				 'Rs India':'3900',
-				 u'南非兰特':'3901',
-				 'SRls Saudi Arabia':'4418',
-				 u'土耳其里拉':'4560'}
+				 'BRL':'3253',}
 
 
 class Currency(models.Model):
@@ -84,13 +75,16 @@ class Currency(models.Model):
                     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.6 Safari/537.36',
                     'Content-type': 'application/x-www-form-urlencoded'
                     }
-        response, content = http.request(url, 'POST', headers=headers, body=urllib.urlencode(body))
-        result=etree.HTML(content).xpath('//table[@cellpadding="0"]/tr[4]/td/text()')
+        try:
+            response, content = http.request(url, 'POST', headers=headers, body=urllib.urlencode(body))
+            result=etree.HTML(content).xpath('//table[@cellpadding="0"]/tr[4]/td/text()')
+        except httplib2.HttpLib2Error:
+            raise UserError(u'网页设置有误(%s)请联系作者：（qq：2201864）'% url)
         return result[5]
 
     @api.multi
     def get_exchange(self):
-        '''当设置自动运行时，传来的self为空值，需要补全所需动行自动的那几个ids'''
+        '''当设置自动运行时，传来的self为空值，需要补全所需自动运行的那几个ids'''
         if not self:
             currency_ids = self.env['res.currency'].search([('active', '=', True)])
         else:
@@ -100,7 +94,6 @@ class Currency(models.Model):
                 '''判断当前日期能不能取到汇率，如发现已有汇率则不重复取,取得的为100人民币汇率，需要／100'''
                 self = currency
                 if line.date <= fields.Date.context_today(self) and not line.exchange:
-                    print fields.Date.context_today(self)
                     line_date = line.date
                     line.exchange = float(self.get_web_exchange(line_date)) / 100
                     line.note = u'系统于(%s)从中国银行网站上取得'%fields.Date.context_today(self)
@@ -126,7 +119,7 @@ class auto_exchange_line(models.Model):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
     date = fields.Date(u'抓取日期',
-                       index=True, copy=False, help=u"因为每个月的第一个工作日")
+                       index=True, copy=False, help=u"应为每个月的第一个工作日")
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
@@ -141,14 +134,18 @@ class auto_exchange_line(models.Model):
     _sql_constraints = [
         ('unique_start_date', 'unique (currency_id,period_id)', u'同币别期间不能重合!'),
     ]
-    '''
-    @api.onchange('date')
-    def onchange_date(self):
-        if self.date :
-            year = self.date[0:4]
-            month = self.date[5:7]
-            self.start_date = '%d-%02d-01' % (int(year), int(month))
-            self.end_date = '%d-%02d-%02d' % (int(year), int(month), calendar.monthrange(int(year), int(month))[1])
-            '''
 
+class currency_money_order(models.Model):
+    _inherit = 'money.order'
 
+    @api.multi
+    def get_rate_silent(self,date,currency_id):
+        currency = self.env['res.currency'].search([('id', '=', currency_id)])
+        period_id = self.env['finance.period'].get_period(date)
+        for line in currency.month_exchange:
+            if period_id == line.period_id:
+                rate = line.exchange
+        if not rate:
+            raise UserError(u'没有设置会计期间内的外币%s汇率'% currency.name)
+
+        return rate
