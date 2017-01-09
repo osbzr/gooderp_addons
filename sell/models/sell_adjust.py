@@ -27,7 +27,7 @@ class sell_adjust(models.Model):
                        help=u'变更单编号，保存时可自动生成')
     order_id = fields.Many2one('sell.order', u'原始单据', states=READONLY_STATES,
                              copy=False, ondelete='restrict',
-                             help=u'要调整的原始销货订单')
+                             help=u'要调整的原始销货订单，只能调整已审核且没有全部出库的销货订单')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        index=True, copy=False,
@@ -79,7 +79,9 @@ class sell_adjust(models.Model):
                 raise UserError(u'要调整的商品 %s 在原始单据中不唯一' % line.goods_id.name)
             if origin_line:
                 origin_line.quantity += line.quantity # 调整后数量
-                origin_line.note = line.note
+                new_note = u'变更单：%s %s。\n' % (self.name, line.note)
+                origin_line.note = (origin_line.note and
+                                    origin_line.note + new_note or new_note)
                 if origin_line.quantity < origin_line.quantity_out:
                     raise UserError(u' %s 调整后数量不能小于原订单已出库数量' % line.goods_id.name)
                 elif origin_line.quantity > origin_line.quantity_out:
@@ -90,7 +92,8 @@ class sell_adjust(models.Model):
                     if move_line:
                         move_line.goods_qty += line.quantity
                         move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
-                        move_line.note = line.note
+                        move_line.note = (move_line.note and
+                                          move_line.note or move_line.note + origin_line.note)
                     else:
                         raise UserError(u'商品 %s 已全部入库，建议新建购货订单' % line.goods_id.name)
                 # 调整后数量与已出库数量相等时，删除产生的发货单分单
@@ -139,9 +142,9 @@ class sell_adjust_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数')
+            raise UserError(u'税率不能输入超过100的数')
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数')
+            raise UserError(u'税率不能输入负数')
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
         self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额

@@ -299,9 +299,10 @@ class sell_delivery(models.Model):
         for record in self:
             record._wrong_delivery_done()
             # 库存不足 生成零的
-            result_vals = self.env['wh.move'].create_zero_wh_in(record,record._name)
-            if result_vals:
-                return result_vals
+            if self.env.user.company_id.is_enable_negative_stock:
+                result_vals = self.env['wh.move'].create_zero_wh_in(record,record._name)
+                if result_vals:
+                    return result_vals
             # 调用wh.move中审核方法，更新审核人和审核状态
             record.sell_move_id.approve_order()
             #将发货/退货数量写入销货订单行

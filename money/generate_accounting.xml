@@ -27,10 +27,12 @@
        	<record id="bank_account_tree_inherit" model="ir.ui.view">
             <field name="name">bank.account.tree.inherit</field>
             <field name="model">bank.account</field>
-            <field name='inherit_id' ref='core.bank_account_tree' />
+            <field name='inherit_id' ref='money.bank_account_tree_inherit_first' />
             <field name="arch" type="xml">
                 <field name="name" position="after">
 					<field name="account_id"/>
+                </field>
+                <field name="balance" position="after">
                     <field name="currency_id"
                     	 groups='finance.group_multi_currency'/>
 				</field>

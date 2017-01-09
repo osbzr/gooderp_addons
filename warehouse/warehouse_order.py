@@ -215,9 +215,10 @@ class wh_internal(models.Model):
     @api.multi
     @inherits()
     def approve_order(self):
-        result_vals = self.env['wh.move'].create_zero_wh_in(self, self._name)
-        if result_vals:
-            return result_vals
+        if self.env.user.company_id.is_enable_negative_stock:
+            result_vals = self.env['wh.move'].create_zero_wh_in(self, self._name)
+            if result_vals:
+                return result_vals
         return True
 
     @api.multi
