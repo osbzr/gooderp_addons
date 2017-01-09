@@ -153,10 +153,9 @@ class wh_in(models.Model):
                 vourch_line.init_obj = 'init_warehouse- %s' % (self.id)
             debit_sum += line.cost
 
-        if self.type == 'inventory':
-            account = self.env.ref('finance.small_business_chart1901')
-        else:
-            account = self.env.ref('finance.small_business_chart5051')
+        # 贷方科目： 主营业务成本
+        account = self.env.ref('finance.account_cost')
+
         if not self.is_init:
             if debit_sum:
                 self.env['voucher.line'].create({
