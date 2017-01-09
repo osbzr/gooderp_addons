@@ -21,7 +21,7 @@
                     <field name="partner_cost" sum="客户承担费用合计"/>
                     <field name="receipt" sum="已收款合计"/>
                     <field name="balance" sum="应收款余额合计"/>
-                    <field name="receipt_rate"/>
+                    <field name="receipt_rate" avg='1'/>
                     <field name="note"/>
                 </tree>
             </field>
