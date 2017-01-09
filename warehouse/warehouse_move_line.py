@@ -46,9 +46,9 @@ class wh_move_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数')
+            raise UserError(u'税率不能输入超过100的数')
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数')
+            raise UserError(u'税率不能输入负数')
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
         self.subtotal = self.price_taxed * self.goods_qty - self.discount_amount # 价税合计
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额

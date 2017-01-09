@@ -57,9 +57,9 @@ class project_invoice(models.Model):
     def _compute_tax_amount(self):
         '''计算税额'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数\n当前税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入超过100的数\n当前税率:%s'%self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数\n当前税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入负数\n当前税率:%s'%self.tax_rate)
         self.tax_amount = self.amount / (100 + self.tax_rate) * self.tax_rate
 
     project_id = fields.Many2one(
@@ -122,7 +122,7 @@ class project_invoice(models.Model):
         for line in self:
             invoice_id = False
             if not line.project_id.customer_id:
-                return
+                raise UserError(u'生成发票前请输入客户')
             category = self.env.ref('money.core_category_sale')
             if not float_is_zero(self.amount, 2):
                 invoice_id = self.env['money.invoice'].create(
