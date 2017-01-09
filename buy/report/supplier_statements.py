@@ -57,7 +57,7 @@ class supplier_statements_report(models.Model):
         tools.drop_view_if_exists(cr, 'supplier_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW supplier_statements_report AS (
-            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id) AS id,
+            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id, date, amount desc) AS id,
                     partner_id,
                     name,
                     date,
