@@ -74,6 +74,7 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_approve_create_zero_wh_in(self):
         ''' 测试 create_zero_wh_in '''
+        self.env.user.company_id.is_enable_negative_stock = True
         self.env.ref('warehouse.wh_move_line_17').goods_qty = 20000
         self.internal.approve_order()
 
