@@ -13,7 +13,8 @@ class other_money_statements_report(models.Model):
     name = fields.Char(string=u'单据编号', readonly=True)
     type = fields.Char(string=u'类别', readonly=True)
     category_id = fields.Many2one('core.category',
-                                  string=u'收支项目', readonly=True)
+                                  string=u'收支项', readonly=True)
+    bank_id = fields.Many2one('bank.account', string='账户')
     get = fields.Float(string=u'收入', readonly=True,
                        digits=dp.get_precision('Amount'))
     pay = fields.Float(string=u'支出', readonly=True,
@@ -30,6 +31,7 @@ class other_money_statements_report(models.Model):
             SELECT  omol.id,
                     omo.date,
                     omo.name,
+                    omo.bank_id,
                     (CASE WHEN omo.type = 'other_get' THEN '其他收入' ELSE '其他支出' END) AS type,
                     omol.category_id,
                     (CASE WHEN omo.type = 'other_get' THEN omol.amount ELSE 0 END) AS get,

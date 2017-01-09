@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
             	<field name='draft_invoice' position='after'>
             		<field name='operating_cost_account_id'/>
+            		<field name='is_enable_negative_stock'/>
             	</field>
             </field>
         </record>

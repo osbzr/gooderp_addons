@@ -44,6 +44,8 @@
                 		type="object" class="oe_highlight" groups='money.group_money_manager'/>
 					<button name="money_order_draft" states="done" string="反审核" 
 						type="object" groups='money.group_money_manager'/>
+                    <button name="write_off_reset" states="draft" string="核销行金额清零" class="oe_highlight"
+						type="object" groups='money.group_money_manager'/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>
@@ -73,9 +75,9 @@
                     <field name="line_ids">
                     	<tree string="Money Order Lines" editable="bottom">
                     		<field name="bank_id"/>
+                            <field name="amount" sum="合计"/>
                             <field name="currency_id"
                             	 groups='finance.group_multi_currency'/>
-                            <field name="amount" sum="合计"/>       		
                             <field name="mode_id" groups='core.settle_mode_groups'/>
                             <field name="number" groups='core.settle_mode_groups'/>
                             <field name="note"/>
@@ -133,6 +135,7 @@
                     <group expand="0" string="分组">
                         <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="币别" domain="[]" context="{'group_by':'currency_id'}"/>
                     </group>
                 </search>
             </field>
