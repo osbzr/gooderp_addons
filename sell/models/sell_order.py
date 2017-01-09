@@ -380,9 +380,9 @@ class sell_order_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数!\n输入税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入超过100的数!\n输入税率:%s'%self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数\n 输入税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入负数\n 输入税率:%s'%self.tax_rate)
         if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
             self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
             self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
