@@ -69,6 +69,7 @@
                  						<field name='quantity' sum='数量合计'/>
                  						<field name="quantity_out" readonly="1" sum="合计已发货数量"/>
                  						<field name='uom_id'/>
+                 						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -80,13 +81,11 @@
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
 				 						<field name='note'/>
 				 						<field name='using_attribute' invisible='1'/>
-				 						<field name='price' invisible='1'/>
 				 					</tree>
 				 				</field>
 				 				<field name="note" placeholder="暂无备注信息"/>
 				 				<group>
                         			<group>
-										<field name="discount_rate" groups='sell.sell_discount_groups'/>
 										<field name="discount_amount" groups='sell.sell_discount_groups'/>
                             			<field name="amount"/>
                         			</group>
@@ -151,7 +150,7 @@
         	<field name='name'>sell.delivery.tree</field>
         	<field name='model'>sell.delivery</field>
         	<field name='arch' type='xml'>
-            	<tree string='销售订单发货单'>
+            	<tree string='销售发货单'>
             		<field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -237,6 +236,7 @@
 				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 				 						<field name='goods_qty' sum='数量合计'/>
 		         						<field name='uom_id'/>
+		         						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -244,12 +244,12 @@
 				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
 		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
+				 						<field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
 				 						<field name='note'/>
 				 						<field name="type" invisible="1"/>
 				 						<field name='using_attribute' invisible='1'/>
 				 						<field name='using_batch' invisible='1'/>
 			                            <field name='lot_qty' invisible='1'/>
-			                            <field name='price' invisible='1'/>
 			                            <field name='lot' invisible='1'/>
 				 					</tree>
 				 				</field>
@@ -413,6 +413,7 @@
 				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 				 						<field name='goods_qty' sum='数量合计'/>
 				 						<field name='uom_id'/>
+				 						<field name='price'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 				 						<field name='cost_unit'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
@@ -421,12 +422,12 @@
 				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
 		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
+				 						<field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
 				 						<field name='note'/>
 				 						<field name="type" invisible="1"/>
 				 						<field name='using_attribute' invisible='1'/>
 				 						<field name='using_batch' invisible='1'/>
 					                    <field name='force_batch_one' invisible='1'/>
-					                    <field name='price' invisible='1'/>
 				 					</tree>
 				 				</field>
 			 				</page>
@@ -446,7 +447,6 @@
 		 				<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
 		 				<group>
                 			<group>
-								<field name="discount_rate" groups='sell.sell_discount_groups' attrs="{'readonly': [('state','!=','draft')]}"/>
 								<field name="discount_amount" groups='sell.sell_discount_groups'/>
                     			<field name="amount"/>
                     			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -543,6 +543,7 @@
                             	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
                             <field name='quantity' sum='数量合计'/>
      						<field name='uom_id'/>
+     						<field name='price'/>
 	 						<field name='price_taxed' groups='sell.out_tax_groups'/>
 							<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 							<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
@@ -552,7 +553,6 @@
 	 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
 	 						<field name='note'/>
 	 						<field name='using_attribute' invisible='1'/>
-	 						<field name='price' invisible='1'/>
                         </tree>
                     </field>
                     <field name="note" placeholder="暂无备注信息"/>
@@ -712,6 +712,13 @@
 			<field name="search_view_id" ref="pricing_search"/>
 		</record>
 
+		<record id='goods_action_sell' model='ir.actions.act_window'>
+			<field name='name'>商品</field>
+			<field name='res_model'>goods</field>
+			<field name='view_mode'>tree,form</field>
+			<field name='view_id' ref='goods.goods_tree' />
+			<field name="domain">[('not_saleable','=',False)]</field>
+		</record>
 
     	<!--根菜单-->
         <menuitem id='sell_menu' name='销货' groups='group_sell' web_icon="sell,static/description/sale.png"/>
@@ -735,7 +742,7 @@
 		<!-- 销售主数据 -->
 		<menuitem id='menu_sell_master' name='主数据' parent='sell_menu' sequence="2"/>
 		<menuitem id='sell_customer_menu' action='core.customer_action' name="客户" parent='menu_sell_master' sequence='10'/>
-		<menuitem id='sell_goods_menu' name='商品' parent='menu_sell_master' action='goods.goods_action' sequence='20' />
+		<menuitem id='sell_goods_menu' name='商品' parent='menu_sell_master' action='goods_action_sell' sequence='20' />
 		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='menu_sell_master' sequence='30'/>
 		<record id="sell_goods_menu" model="ir.ui.menu">
 			<field name="create_tag">1</field>
