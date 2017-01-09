@@ -79,7 +79,7 @@ class sell_adjust(models.Model):
                 raise UserError(u'要调整的商品 %s 在原始单据中不唯一' % line.goods_id.name)
             if origin_line:
                 origin_line.quantity += line.quantity # 调整后数量
-                new_note = u'变更单：' + self.name + line.note + '。\n'
+                new_note = u'变更单：%s %s。\n' % (self.name, line.note)
                 origin_line.note = (origin_line.note and
                                     origin_line.note + new_note or new_note)
                 if origin_line.quantity < origin_line.quantity_out:
