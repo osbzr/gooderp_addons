@@ -414,7 +414,10 @@ class sell_order_line(models.Model):
                           store=True,
                           digits=dp.get_precision(u'金额'),
                           help=u'外币金额')
-    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
+    goods_id = fields.Many2one('goods',
+                               u'商品',
+                               required=True,
+                               ondelete='restrict',
                                help=u'商品')
     using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute,
                                help=u'商品是否使用属性')
