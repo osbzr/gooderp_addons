@@ -12,12 +12,5 @@
 			<field name="report_type_id" ref="home_report_type_ware_house"/>
 		    <field name="note_one" >商品收发明细表</field>
 		</record>
-        <record id="report_lot_track_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
-		    <field name="action" ref="report_lot_track_wizard_action"/>
-		    <field name="menu_type">report</field>
-			<field name="report_type_id" ref="home_report_type_ware_house"/>
-		    <field name="note_one" >批号跟踪表</field>
-		</record>
     </data>
 </openerp>

@@ -117,13 +117,6 @@
             <field name='view_id' ref='report_lot_status_graph' />
         </record>
 
-        <!-- 批号跟踪表 -->
-        <record id='report_lot_track_wizard_action' model='ir.actions.act_window' >
-            <field name='name'>批号跟踪表</field>
-            <field name='res_model'>report.lot.track.wizard</field>
-            <field name='target'>new</field>
-            <field name='view_id' ref='report_lot_track_wizard_form' />
-        </record>
         <!-- 呆滞料报表向导 -->
         <record id='non_active_report_wizard_action' model='ir.actions.act_window' >
             <field name='name'>呆滞料报表</field>

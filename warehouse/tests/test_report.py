@@ -48,21 +48,6 @@ class TestReport(TransactionCase):
         self.assertEqual(report_base.collect_data_by_sql(), [])
 
     def test_open_report(self):
-        # 测试批号跟踪表的wizard
-        self.assertEqual(self.track_wizard.onchange_date(), {})
-
-        self.track_wizard.date_end = '1999-09-09'
-        results = self.track_wizard.onchange_date()
-        real_results = {'warning': {
-            'title': u'错误',
-            'message': u'结束日期不可以小于开始日期'
-        }, 'value': {'date_end': self.track_wizard.date_start}}
-
-        self.assertEqual(results, real_results)
-        self.assertEqual(self.track_wizard.open_report().get('res_model'), 'report.lot.track')
-        # 测试wizard默认日期
-        self.env['report.lot.track.wizard'].create({})
-
         # 测试商品收发明细表的wizard
         self.assertEqual(self.transceive_wizard.onchange_date(), {})
 

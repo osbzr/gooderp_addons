@@ -40,7 +40,6 @@
                                   库存余额表；
                                   商品收发明细表；
                                   批次余额表；
-                                  批号跟踪表；
                                   库存调拨；
                                   呆滞料报表。
     ''',
@@ -49,7 +48,6 @@
         'security/groups.xml',
         'wizard/save_bom_view.xml',
         'wizard/stock_transceive_wizard_view.xml',
-        'wizard/lot_track_wizard_view.xml',
         'wizard/non_active_report_wizard.xml',
         'view/assets_backend.xml',
         'view/warehouse_view.xml',
@@ -60,7 +58,6 @@
         'report/stock_balance_view.xml',
         'report/stock_transceive_view.xml',
         'report/lot_status_view.xml',
-        'report/lot_track_view.xml',
         'action/warehouse_action.xml',
         'menu/warehouse_menu.xml',
         'data/sequence.xml',
