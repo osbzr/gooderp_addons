@@ -30,7 +30,6 @@ class test_money_invoice(TransactionCase):
         warehouse_obj.approve_order()
 
         # 项目相关
-        self.project = self.env.ref('task.project_gooderp')
         self.invoice1 = self.env.ref('task.project_invoice_1')
 
         # 资产相关
