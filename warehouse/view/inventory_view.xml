@@ -57,12 +57,12 @@
                                     <field name='goods_id' readonly='1 '/>
                                     <field name='attribute_id' readonly='1' groups='goods.multi_attrs_groups' />
                                     <field name='lot' readonly='1' groups='goods.batch_groups' />
+                                    <field name='real_uos_qty' readonly='1' sum='1' groups='goods.auxiliary_unit_groups' />
+                                    <field name='real_qty' readonly='1' sum='1' />
                                     <field name='inventory_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' />
                                     <field name='uos_id' readonly='1' groups='goods.auxiliary_unit_groups' />
                                     <field name='inventory_qty' sum='1' />
                                     <field name='uom_id' readonly='1' />
-                                    <field name='real_uos_qty' readonly='1' sum='1' groups='goods.auxiliary_unit_groups' />
-                                    <field name='real_qty' readonly='1' sum='1' />
                                     <!--readonly 应该为invisible ?-->
                                     <field name='new_lot'
                                     	attrs="{'readonly': [('lot_type', '!=', 'in')], 'required': [('lot_type', '=', 'in')]}"

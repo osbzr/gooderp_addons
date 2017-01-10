@@ -141,16 +141,16 @@ class wh_in(models.Model):
         self.voucher_id = vouch_id
         debit_sum = 0
         for line in self.line_in_ids:
+            init_obj = self.is_init and 'init_warehouse - %s' % (self.id) or ''
             if line.cost:
-                vourch_line = self.env['voucher.line'].create({
-                                'name': self.name,
-                                'account_id': line.goods_id.category_id.account_id.id,
-                                'debit': line.cost,
-                                'voucher_id': vouch_id.id,
-                                'goods_id': line.goods_id.id,
-                                })
-            if self.is_init:
-                vourch_line.init_obj = 'init_warehouse- %s' % (self.id)
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': line.goods_id.category_id.account_id.id,
+                    'debit': line.cost,
+                    'voucher_id': vouch_id.id,
+                    'goods_id': line.goods_id.id,
+                    'init_obj': init_obj,
+                })
             debit_sum += line.cost
 
         # 贷方科目： 主营业务成本
