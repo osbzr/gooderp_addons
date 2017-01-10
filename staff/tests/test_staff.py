@@ -86,4 +86,5 @@ class test_leave(TransactionCase):
         ''' 测试 请假人 默认值 '''
         self.env['staff.leave'].create({
                                         'name': 'go back home',
+                                        'leave_type': 'no_pay',
                                         })
