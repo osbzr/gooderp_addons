@@ -7,6 +7,14 @@ from odoo.exceptions import UserError
 class goods(models.Model):
     _name = 'goods'
 
+    @api.model
+    def _get_default_not_saleable_impl(self):
+        return False
+
+    @api.model
+    def _get_default_not_saleable(self):
+        return self._get_default_not_saleable_impl()
+
     @api.multi
     def name_get(self):
         '''在many2one字段里显示 编号_名称'''
@@ -60,7 +68,7 @@ class goods(models.Model):
     tax_rate = fields.Float(u'税率(%)',
                             help=u'产品税率')
     not_saleable = fields.Boolean(u'不可销售',
-                                  default=False,
+                                  default=_get_default_not_saleable,
                                   help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
 
     _sql_constraints = [
