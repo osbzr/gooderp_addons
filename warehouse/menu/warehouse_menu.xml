@@ -33,8 +33,6 @@
         <menuitem id='report_stock_transceive_wizard_menu' name='商品收发明细表' action='report_stock_transceive_wizard_action' parent='report_parent' sequence='2' />
         <menuitem id='report_lot_status_menu' name='批次余额表' action='report_lot_status_action' parent='report_parent' sequence='4'
         	 groups='goods.batch_groups' />
-        <menuitem id='report_lot_track_wizard_menu' name='批号跟踪表' action='report_lot_track_wizard_action' parent='report_parent' sequence='5'
-        	 groups='goods.batch_groups' />
         <menuitem id='wh_move_line_menu' name='库存调拨' action='wh_move_line_action' parent='report_parent' sequence='6' />
         <menuitem id='non_active_report_wizard_menu' name='呆滞料报表' action='non_active_report_wizard_action' parent='report_parent' sequence='10' />
 

@@ -13,7 +13,6 @@ access_wh_out,access_wh_out,warehouse.model_wh_out,,1,1,1,1
 access_wh_in,access_wh_in,warehouse.model_wh_in,,1,1,1,1
 access_wh_internal,access_wh_internal,warehouse.model_wh_internal,,1,1,1,1
 access_report_lot_status,access_report_lot_status,warehouse.model_report_lot_status,,1,1,1,1
-access_report_lot_track,access_report_lot_track,warehouse.model_report_lot_track,,1,1,1,1
 access_report_base,access_report_base,warehouse.model_report_base,,1,1,1,1
 access_report_stock_balance,access_report_stock_balance,warehouse.model_report_stock_balance,,1,1,1,1
 access_report_stock_transceive,access_report_stock_transceive,warehouse.model_report_stock_transceive,,1,1,1,1
