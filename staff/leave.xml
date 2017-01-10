@@ -40,11 +40,11 @@
 					</header>
                 	<group>
                 		<field name='user_id'/>
-                		<field name='name'/>
+                		<field name='name' required="1"/>
                         <field name="leave_type"/>
                 	</group>
                 	<group>
-                		<field name='leave_dates'  />
+                		<field name='leave_dates' required="1" />
                 		<field name='date_start'  />
                 		<field name='date_stop' />
                 	</group>
