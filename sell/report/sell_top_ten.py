@@ -46,6 +46,7 @@ class sell_top_ten(models.Model):
           AND wml.date >= '{date_start}'
           AND wml.date < '{date_end}'
           AND wm.origin like 'sell.delivery%%'
+          AND wh.type = 'stock'
           %s
         ''' % extra
 
