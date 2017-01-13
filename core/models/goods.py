@@ -47,7 +47,8 @@ class goods(models.Model):
     def copy(self, default=None):
         if default is None:
             default = {}
-        default.update(name=_('%s (copy)') % (self.name))
+        if not default.has_key('name'):
+            default.update(name=_('%s (copy)') % (self.name))
         return super(goods, self).copy(default=default)
 
     code = fields.Char(u'编号')
