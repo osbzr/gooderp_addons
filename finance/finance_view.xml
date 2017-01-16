@@ -37,7 +37,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="document_word_id" readonly='1' />
+                                <field name="document_word_id"  widget='selection' readonly='1' />
                                 <field name="name"  readonly='1'  style="width: 30%%"/>
                             </group>
                             <group>

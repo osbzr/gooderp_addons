@@ -34,14 +34,14 @@
             <field name='name'>应收票据</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
-            <field name='auxiliary_financing'>partner</field>
+            <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="account_ar" model='finance.account'>
             <field name='code'>1122</field>
             <field name='name'>应收账款</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
-            <field name='auxiliary_financing'>partner</field>
+            <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="small_business_chart1123" model='finance.account'>
             <field name='code'>1123</field>
@@ -227,7 +227,7 @@
             <field name='name'>预收账款</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
-            <field name='auxiliary_financing'>partner</field>
+            <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="small_business_chart2211001" model='finance.account'>
             <field name='code'>2211001</field>
