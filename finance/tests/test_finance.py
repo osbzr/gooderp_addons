@@ -194,7 +194,7 @@ class test_period(TransactionCase):
             line.account_id = self.env.ref('finance.account_goods').id
             line.account_id.auxiliary_financing = 'goods'
             line.onchange_account_id()
-            line.account_id.auxiliary_financing = 'partner'
+            line.account_id.auxiliary_financing = 'customer'
             line.onchange_account_id()
             line.account_id.auxiliary_financing = 'supplier'
             line.onchange_account_id()

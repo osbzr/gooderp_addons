@@ -29,6 +29,6 @@
         </record>
         <!--结账菜单-->
         <menuitem id='checkout_menu' name='月末结账' parent='finance_menu' sequence='15'/>
-        <menuitem id='preiod_check_menu' action='preiod_check_action' parent='checkout_menu' sequence='10'/>
+        <menuitem id='preiod_check_menu' name='月末结账' action='preiod_check_action' parent='checkout_menu' sequence='10'/>
     </data>
 </openerp>

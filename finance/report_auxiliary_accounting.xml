@@ -11,7 +11,7 @@
                     <field name='debit'  sum="合计"/>
                     <field name='credit' sum="合计"/>
                     <field name='balance' sum="合计"/>
-                    <button name="view_voucher_line_detail" string=""
+                    <button name="view_voucher_line_detail" string="查看凭证明细行"
                             icon="fa-search" type="object" class="oe_highlight"/>
                 </tree>
             </field>

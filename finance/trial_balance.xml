@@ -52,7 +52,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_trial_balance"  string="查看科目余额表" type="object" class="oe_highlight"/>
+                        <button name="create_trial_balance" string="查看科目余额表" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
                     </footer>
@@ -200,6 +200,6 @@
         </record>
      <menuitem id='create_general_ledger_account_menu' action='create_ledger_account_action' parent='voucher_books_menu' sequence='60' name="科目总账"/>
      <menuitem id='create_vouchers_summary_menu' action='create_vouchers_summary_wizard_action' parent='voucher_books_menu' sequence='50' name="科目明细账"/>
-	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='22'/>
+	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='22' name="科目余额表"/>
     </data>
 </openerp>
