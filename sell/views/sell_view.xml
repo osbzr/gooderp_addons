@@ -62,7 +62,7 @@
             				<page string="销货订单行">    		
             					<field name='line_ids'>
                  					<tree string='销货订单行' editable='bottom'>
-                 						<field name='goods_id'/>
+                 						<field name='goods_id' domain="[('not_saleable','=',False)]"/>
                  						<field name='attribute_id'
                  							groups='goods.multi_attrs_groups'
                  							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
@@ -220,6 +220,7 @@
 		    						}">
 		         					<tree string='销售发货单行' editable='bottom'>
 		         						<field name='goods_id'
+										    domain="[('not_saleable','=',False)]"
 		         							context="{'default_partner':parent.partner_id,
 		         									  'default_is_return':parent.is_return,
 		         									  }"/>
@@ -400,6 +401,7 @@
 		    						}">
 		         					<tree string='销售退货单行' editable='bottom'>
 		         						<field name='goods_id'
+										    domain="[('not_saleable','=',False)]"
 		         							context="{'default_partner':parent.partner_id,
 		         									  'default_is_return':parent.is_return}"/>
 		         						<field name='attribute_id'
@@ -537,7 +539,7 @@
                     </group>
                     <field name="line_ids">
                     	<tree string="销售变更单行" editable="bottom">
-                            <field name='goods_id' required='1'/>
+                            <field name='goods_id' required='1' domain="[('not_saleable','=',False)]"/>
                             <field name='attribute_id'
                             	groups='goods.multi_attrs_groups'
                             	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>

@@ -231,12 +231,6 @@ class sell_adjust_line(models.Model):
             else:
                 self.tax_rate = self.env.user.company_id.output_tax_rate
 
-        goods_saleable_list = []
-        for goods in self.env['goods'].search([('not_saleable', '=', False)]):
-            goods_saleable_list.append(goods.id)
-
-        return {'domain': {'goods_id': [('id', 'in', goods_saleable_list)]}}
-
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、含税单价或优惠率发生变化时，优惠金额发生变化'''
