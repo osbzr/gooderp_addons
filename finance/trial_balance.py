@@ -23,7 +23,7 @@ class TrialBalance(models.Model):
 
 
 class CreateTrialBalanceWizard(models.TransientModel):
-    """生成科目余额表的 向导 根据输入的期间"""
+    """根据输入的期间 生成科目余额表的 向导 """
     _name = "create.trial.balance.wizard"
 
     @api.model
@@ -67,8 +67,13 @@ class CreateTrialBalanceWizard(models.TransientModel):
         """取出本期发生额
             返回结果是 科目 借 贷
          """
-        sql = ''' select vol.account_id as account_id,sum(vol.debit) as debit,  sum(vol.credit) as credit  from voucher as vo left join voucher_line as vol
-            on vo.id = vol.voucher_id where vo.period_id=%s
+        sql = '''select vol.account_id as account_id,
+                    sum(vol.debit) as debit,
+                    sum(vol.credit) as credit
+                 from voucher as vo
+                 left join voucher_line as vol
+                 on vo.id = vol.voucher_id
+                 where vo.period_id=%s
                  group by vol.account_id'''
         self.env.cr.execute(sql, (period_id,))
         return self.env.cr.dictfetchall()
@@ -80,7 +85,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
             1.如果所选区间已经关闭则直接调出已有的科目余额表记录
             2.判断如果所选的区间的 前一个期间没有关闭则报错
             3.如果上一个区间不存在则报错
-
         """
         trial_balance_objs = self.env['trial.balance'].search([('period_id', '=', self.period_id.id)])
         trial_balance_ids = [trial_balance_row.id for trial_balance_row in trial_balance_objs]
@@ -131,10 +135,12 @@ class CreateTrialBalanceWizard(models.TransientModel):
             'domain': [('id', 'in', trial_balance_ids)]
         }
 
-    def compute_trial_balance_data(self, trial_balance, last_period, subject_name_id,trial_balance_dict):
+    def compute_trial_balance_data(self, trial_balance, last_period, subject_name_id, trial_balance_dict):
+        ''' 获得 科目余额表 数据 '''
         initial_balance_credit = trial_balance.ending_balance_credit or 0
         initial_balance_debit = trial_balance.ending_balance_debit or 0
         this_debit = this_credit = ending_balance_credit = 0
+
         if subject_name_id in trial_balance_dict:  # 本月有发生额
             this_debit = trial_balance_dict[subject_name_id].get('current_occurrence_debit', 0) or 0
             this_credit = trial_balance_dict[subject_name_id].get('current_occurrence_credit', 0) or 0
@@ -145,12 +151,14 @@ class CreateTrialBalanceWizard(models.TransientModel):
         else:
             ending_balance_credit = initial_balance_credit
             ending_balance_debit = initial_balance_debit
+        # 本年累计发生额
         if self.period_id.year == last_period.year:
             cumulative_occurrence_credit = this_credit + trial_balance.cumulative_occurrence_credit
             cumulative_occurrence_debit = this_debit + trial_balance.cumulative_occurrence_debit
         else:
             cumulative_occurrence_credit = this_credit
             cumulative_occurrence_debit = this_debit
+
         return_vals = [initial_balance_credit, initial_balance_debit, ending_balance_credit,
                        ending_balance_debit, this_debit, this_credit, cumulative_occurrence_credit,
                        cumulative_occurrence_debit]
@@ -158,14 +166,16 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
     def construct_trial_balance_dict(self, trial_balance_dict, last_period):
         """ 结合上一期间的 数据 填写  trial_balance_dict(余额表 记录生成dict)   """
-        currency_dcit = copy.deepcopy(trial_balance_dict)
+        currency_dict = copy.deepcopy(trial_balance_dict)
         for trial_balance in self.env['trial.balance'].search([('period_id', '=', last_period.id)]):
             subject_name_id = trial_balance.subject_name_id.id
+
             [initial_balance_credit, initial_balance_debit, ending_balance_credit, ending_balance_debit, this_debit,
              this_credit, cumulative_occurrence_credit, cumulative_occurrence_debit] = \
-                self.compute_trial_balance_data(trial_balance, last_period, subject_name_id,currency_dcit)
+                self.compute_trial_balance_data(trial_balance, last_period, subject_name_id, currency_dict)
+
             subject_code = trial_balance.subject_code
-            currency_dcit[trial_balance.subject_name_id.id] = {
+            currency_dict[trial_balance.subject_name_id.id] = {
                 'initial_balance_credit': initial_balance_credit,
                 'initial_balance_debit': initial_balance_debit,
                 'ending_balance_credit': ending_balance_credit,
@@ -178,7 +188,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 'period_id': self.period_id.id,
                 'subject_name_id': subject_name_id
             }
-        return currency_dcit
+        return currency_dict
 
 class CreateVouchersSummaryWizard(models.TransientModel):
     """创建 明细账或者总账的向导 """
@@ -214,7 +224,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     subject_name_id = fields.Many2one('finance.account', string=u'科目名称 从', default=_default_subject_name_id,
                                       help=u'默认是所有科目的最小code')
     subject_name_end_id = fields.Many2one('finance.account', string=u'到', default=_default_subject_name_end_id,
-                                          help=u'默认是所有科目的最小code')
+                                          help=u'默认是所有科目的最大code')
     no_occurred = fields.Boolean(u'无发生额不显示', default=True, help=u'无发生额的科目不显示明细账，默认为不显示')
     no_balance = fields.Boolean(u'无余额不显示', default=True, help=u'无余额的科目不显示明细账，默认为不显示')
 
@@ -370,7 +380,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 year_balance_debit = year_balance_debit + sql_results[0].get('debit', 0)
                 year_balance_credit = year_balance_credit + sql_results[0].get('credit', 0)
         direction_tuple_current = self.judgment_lending(initial_balance_new.get('balance', 0) if
-                                    initial_balance_new['direction'] == u'借'else -initial_balance_new.get(
+                                    initial_balance_new['direction'] == u'借' else -initial_balance_new.get(
                                     'balance', 0), current_credit, current_debit)
         current_occurrence.update({
             'date': False,
@@ -542,7 +552,7 @@ class GeneralLedgerAccount(models.TransientModel):
     _name = 'general.ledger.account'
 
     period_id = fields.Many2one('finance.period', string=u'会计期间',  help=u'记录本条记录的期间!')
-    summary = fields.Char(u'摘要', help=u'')
+    summary = fields.Char(u'摘要', help=u'摘要')
     direction = fields.Char(u'方向', help=u'会计术语,主要方向借、贷、平, 当借方金额大于贷方金额 方向为借\n\
      ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
     debit = fields.Float(u'借方金额', help=u'借方金额')

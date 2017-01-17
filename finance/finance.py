@@ -478,9 +478,9 @@ class core_category(models.Model):
 
     account_id = fields.Many2one('finance.account', u'科目', help=u'科目')
 
-class chang_voucher_name(models.Model):
+class change_voucher_name(models.Model):
     ''' 修改凭证编号 '''
-    _name = 'chang.voucher.name'
+    _name = 'change.voucher.name'
     period_id = fields.Many2one('finance.period', u'会计期间')
     before_voucher_name = fields.Char(u'以前凭证号')
     after_voucher_name = fields.Char(u'更新后凭证号')
