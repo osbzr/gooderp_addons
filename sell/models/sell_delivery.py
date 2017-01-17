@@ -467,15 +467,3 @@ class wh_move_line(models.Model):
             # 如果是销售发货单行 或 销售退货单行
             if (self.type == 'out' and not is_return) or (self.type == 'in' and is_return):
                 self._delivery_get_price_and_tax()
-
-        domain = super(wh_move_line,self).onchange_goods_id()
-        if (self.type == 'out' and not is_return) or (self.type == 'in' and is_return):
-            goods_saleable_list = []
-            for goods in self.env['goods'].search([('not_saleable', '=', False)]):
-                goods_saleable_list.append(goods.id)
-
-            if domain:
-                domain['domain'].update({'goods_id': [('id', 'in', goods_saleable_list)]})
-            else:
-                domain = {'domain': {'goods_id': [('id', 'in', goods_saleable_list)]}}
-        return domain
