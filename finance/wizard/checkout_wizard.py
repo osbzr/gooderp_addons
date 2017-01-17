@@ -200,69 +200,68 @@ class checkout_wizard(models.TransientModel):
     # 按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）
     @api.multi
     def recreate_voucher_name(self, period_id):
-        for voucher in self:
-            # 取重排凭证设置
-            # 是否重置凭证号
-            context = dict(self.env.context or {})
-            context['call_module'] = "checkout_wizard"
-            auto_reset = self.env['ir.values'].get_default('finance.config.settings', 'default_auto_reset')
-            # 重置凭证间隔:年  月
-            reset_period = self.env['ir.values'].get_default('finance.config.settings', 'default_reset_period')
-            # 重置后起始数字
-            reset_init_number = self.env['ir.values'].get_default('finance.config.settings', 'default_reset_init_number')
-            if auto_reset is True:
-                # 取ir.sequence中的会计凭证的参数
-                force_company = self._context.get('force_company')
-                if not force_company:
-                    force_company = self.env.user.company_id.id
-                company_ids = self.env['res.company'].search([]).ids + [False]
-                seq_ids = self.env['ir.sequence'].search(['&', ('code', '=', 'voucher'), ('company_id', 'in', company_ids)])
-                preferred_sequences = [s for s in seq_ids if s.company_id and s.company_id.id == force_company]
-                seq_id = preferred_sequences[0] if preferred_sequences else seq_ids[0]
-                voucher_obj = self.env['voucher']
-                # 按年重置
-                last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(period_id)
-                last_voucher_number = 0
-                if reset_period == 'year':
-                    if last_period:
-                        while last_period and last_voucher_number < 1:
-                            if not last_period.is_closed:
-                                raise UserError(u'上一个期间%s未结账' % last_period.name)
-                            if period_id.year != last_period.year:
-                                # 按年，而且是第一个会计期间
-                                last_voucher_number = reset_init_number
-                            else:
-                                # 查找上一期间最后凭证号
-                                last_period_voucher_name = voucher_obj.search([('period_id', '=', last_period.id)],
-                                                                              order="create_date desc", limit=1).name
-                                # 凭证号转换为数字
-                                if last_period_voucher_name:  # 上一期间是否有凭证？
-                                    last_voucher_number = int(filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
-                                #else:
-                                #    raise UserError(u'请核实上一个期间：%s是否有凭证！' % last_period.name)
-                                last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(last_period)
-                    else:
-                        last_voucher_number = reset_init_number
-                    voucher_ids = voucher_obj.search([('period_id', '=', period_id.id)], order='create_date')
-                    for voucher_id in voucher_ids:
-                        # 产生凭证号
-                        next_voucher_name = '%%0%sd' % seq_id.padding % last_voucher_number
-                        last_voucher_number += 1
-                        # 更新凭证号
-                        voucher_id.with_context(context).write({'name': next_voucher_name})
-                # 按月重置
+        # 取重排凭证设置
+        # 是否重置凭证号
+        context = dict(self.env.context or {})
+        context['call_module'] = "checkout_wizard"
+        auto_reset = self.env['ir.values'].get_default('finance.config.settings', 'default_auto_reset')
+        # 重置凭证间隔:年  月
+        reset_period = self.env['ir.values'].get_default('finance.config.settings', 'default_reset_period')
+        # 重置后起始数字
+        reset_init_number = self.env['ir.values'].get_default('finance.config.settings', 'default_reset_init_number')
+        if auto_reset is True:
+            # 取ir.sequence中的会计凭证的参数
+            force_company = self._context.get('force_company')
+            if not force_company:
+                force_company = self.env.user.company_id.id
+            company_ids = self.env['res.company'].search([]).ids + [False]
+            seq_ids = self.env['ir.sequence'].search(['&', ('code', '=', 'voucher'), ('company_id', 'in', company_ids)])
+            preferred_sequences = [s for s in seq_ids if s.company_id and s.company_id.id == force_company]
+            seq_id = preferred_sequences[0] if preferred_sequences else seq_ids[0]
+            voucher_obj = self.env['voucher']
+            # 按年重置
+            last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(period_id)
+            last_voucher_number = 0
+            if reset_period == 'year':
+                if last_period:
+                    while last_period and last_voucher_number < 1:
+                        if not last_period.is_closed:
+                            raise UserError(u'上一个期间%s未结账' % last_period.name)
+                        if period_id.year != last_period.year:
+                            # 按年，而且是第一个会计期间
+                            last_voucher_number = reset_init_number
+                        else:
+                            # 查找上一期间最后凭证号
+                            last_period_voucher_name = voucher_obj.search([('period_id', '=', last_period.id)],
+                                                                          order="create_date desc", limit=1).name
+                            # 凭证号转换为数字
+                            if last_period_voucher_name:  # 上一期间是否有凭证？
+                                last_voucher_number = int(filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
+                            #else:
+                            #    raise UserError(u'请核实上一个期间：%s是否有凭证！' % last_period.name)
+                            last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(last_period)
                 else:
                     last_voucher_number = reset_init_number
-                    voucher_ids = voucher_obj.search([('period_id', '=', period_id.id)], order='create_date')
-                    for voucher_id in voucher_ids:
-                        # 产生凭证号
-                        next_voucher_name = '%%0%sd' % seq_id.padding % last_voucher_number
-                        # 更新凭证号,将老号写到变化表中去！
-                        if voucher_id.name != next_voucher_name:
-                            self.env['change.voucher.name'].create({
-                                'period_id': voucher.period_id.id,
-                                'before_voucher_name': voucher_id.name,
-                                'after_voucher_name': next_voucher_name,
-                            })
-                        voucher_id.with_context(context).write({'name': next_voucher_name})
-                        last_voucher_number += 1
+                voucher_ids = voucher_obj.search([('period_id', '=', period_id.id)], order='create_date')
+                for voucher_id in voucher_ids:
+                    # 产生凭证号
+                    next_voucher_name = '%%0%sd' % seq_id.padding % last_voucher_number
+                    last_voucher_number += 1
+                    # 更新凭证号
+                    voucher_id.with_context(context).write({'name': next_voucher_name})
+            # 按月重置
+            else:
+                last_voucher_number = reset_init_number
+                voucher_ids = voucher_obj.search([('period_id', '=', period_id.id)], order='create_date')
+                for voucher_id in voucher_ids:
+                    # 产生凭证号
+                    next_voucher_name = '%%0%sd' % seq_id.padding % last_voucher_number
+                    # 更新凭证号,将老号写到变化表中去！
+                    if voucher_id.name != next_voucher_name:
+                        self.env['change.voucher.name'].create({
+                            'period_id': self.period_id.id,
+                            'before_voucher_name': voucher_id.name,
+                            'after_voucher_name': next_voucher_name,
+                        })
+                    voucher_id.with_context(context).write({'name': next_voucher_name})
+                    last_voucher_number += 1
