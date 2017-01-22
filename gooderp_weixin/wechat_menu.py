@@ -10,7 +10,6 @@ class wechat_agent_menu(models.Model):
         """
         :return:  applcation 的application_id
         """
-        print "++++++++++++++++"
         ir_model_data = self.env['ir.model.data'].sudo()
         wechat_application = self.env['wechat.application'].sudo()
         application_id = ir_model_data.xmlid_to_res_id('gooderp_weixin.weixin_gooderp_assistant_application')

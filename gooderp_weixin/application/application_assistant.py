@@ -47,30 +47,25 @@ class WxAppCropAssistant(WxApplication):
     def on_subscribe(self, req):
         res = super(WxAppCropAssistant, self).on_unsubscribe(req)
         db = RegistryManager.get(request.session.db)
-        with closing(db.cursor()) as cr:
-            contacts_obj = db.get('weixin.contacts')
-            try:
-                contacts = contacts_obj.browse(cr, SUPERUSER_ID, int(req.FromUserName))
-            except ValueError:
-                return res
-            if contacts.exists():
-                contacts.write({'is_follow': True})
-            cr.commit()
+        contacts_obj = request.env['weixin.contacts'].sudo()
+        try:
+            contacts = contacts_obj.browse(int(req.FromUserName))
+        except ValueError:
+            return res
+        if contacts.exists():
+            contacts.write({'is_follow': True})
         return res
 
     #取消关注事件
     def on_unsubscribe(self, req):
         res = super(WxAppCropAssistant, self).on_unsubscribe(req)
-        db = RegistryManager.get(request.session.db)
-        with closing(db.cursor()) as cr:
-            contacts_obj = db.get('weixin.contacts')
-            try:
-                contacts = contacts_obj.browse(cr, SUPERUSER_ID, int(req.FromUserName))
-            except ValueError:
-                return res
-            if contacts.exists():
-                contacts.write({'is_follow': False})
-            cr.commit()
+        contacts_obj =request.env['weixin.contacts']
+        try:
+            contacts = contacts_obj.browse(int(req.FromUserName))
+        except ValueError:
+            return res
+        if contacts.exists():
+            contacts.write({'is_follow': False})
         return res
 
     # 发送文本回调
@@ -165,8 +160,8 @@ class WeixinAppAssistantController(http.Controller):
     @http.route('/weixin/app/assistant', auth='public', csrf=False)
     def weixin(self, **kw):
         result = self.weixin_app.process(request.httprequest.args, request.httprequest.data)
-        self.login_user = self.weixin_app.uid
-        self.login_session = self.weixin_app.session_id
+        self.login_user = getattr(self.weixin_app,'uid',False)
+        self.login_session = getattr(self.weixin_app,'session_id',False)
         return result
 
     @http.route('/wechat/pulling', auth='public')
