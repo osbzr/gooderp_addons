@@ -1,0 +1,54 @@
+<openerp>
+    <data noupdate="1">
+
+        <record id='weixin_department_user' model='wechat.department'>
+            <field name='name'>企业员工组</field>
+            <field name='parentid'>1</field>
+            <field name='order'>1</field>
+            <field name='department_id'>2</field>
+            <field name='enterprise_id' ref='weixin_gooderp_enterprise' />
+        </record>
+
+        <!-- 企业号应用配置 -->
+        <record id="weixin_gooderp_enterprise" model="wechat.enterprise">
+            <field name="name">gooderp测试号</field>
+            <field name="description">gooderp测试号</field>
+            <!-- 进入企业号设置->功能设置的权限管理，选择某权限组->开发者凭据 -->
+            <field name="corp_id">wxdcd1095d7e66b409</field>
+            <!--<field name="application_ids" eval="[(4, ref('gooderp_weixin.weixin_gooderp_test_application'))]"/>-->
+        </record>
+        <!-- 企业号企业小助手 -->
+        <record id="weixin_gooderp_assistant_application" model="wechat.application">
+            <field name="enterprise_id" ref="weixin_gooderp_enterprise" />
+            <field name="name">企业小助手应用</field>
+            <field name="application_id">0</field>
+            <field name="description">企业小助手应用</field>
+            <field name="callback_mode">true</field>
+            <field name="callback_url">http://gooderp.tunnel.800890.com/weixin/app/assistant</field>
+            <!-- 应用中心->选择应用->回调模式->回调URL及密钥 -->
+            <field name="callback_token">k2MuT</field>
+            <field name="callback_aeskey">yhcHdFOxyCC1vmvW7UWMyQ9GabYIK5DtzINnh6zOCY2</field>
+        </record>
+        <!-- 微信授权所有用户组 -->
+        <record id="gooderp_permission_group_all" model="wechat.permission.group">
+            <field name="name">所有用户权限组</field>
+            <field name="code">all_users</field>
+            <field name="enterprise_id" ref="weixin_gooderp_enterprise" />
+            <field name="secret">3pgGWY7TolOWvqJbFbi2kqyqmQ8AWNYy8LSsMOlZu2ZmhMDazyYndmhO8Rqmp4lU</field>
+            <field name="application_ids" eval="[(4, ref('gooderp_weixin.weixin_gooderp_assistant_application'))]"/>
+            <field name="is_authenticate">True</field>
+        </record>
+        <!-- 微信用户登录odoo验证provider -->
+        <record id="provider_weixin" model="auth.oauth.provider">
+            <field name="name">weixin</field>
+            <field name="client_id">wxdcd1095d7e66b409</field>
+            <field name="auth_endpoint">https://open.weixin.qq.com/connect/oauth2/authorize</field>
+            <field name="scope">snsapi_base</field>
+            <field name="validation_endpoint">https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo</field>
+            <field name="data_endpoint">https://qyapi.weixin.qq.com/cgi-bin/user/get</field>
+            <field name="body">微信验证</field>
+            <field name="wechat_permission_group_id" ref="gooderp_permission_group_all" />
+        </record>
+
+    </data>
+</openerp>

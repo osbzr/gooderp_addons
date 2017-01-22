@@ -1,0 +1,22 @@
+.form-control{
+    height: 28px;
+    padding: 3px 6px;
+}
+
+label.error{
+    color: red;
+}
+
+.exchange-detail-title{
+    white-space: nowrap;
+}
+
+.small-box {
+    width: auto;
+}
+
+@media (min-width: 768px) {
+  .small-box {
+    width: 350px;
+  }
+}

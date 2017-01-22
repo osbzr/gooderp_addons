@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='wechat_menu_tree' model='ir.ui.view'>
+            <field name='name'>wechat.agent.menu.tree</field>
+            <field name='model'>wechat.agent.menu</field>
+            <field name='arch' type='xml'>
+                <tree>
+                    <field name='name' />
+                    <field name='type' />
+                    <field name='key' />
+                    <field name='url' />
+                    <field name='menu_level' />
+                    <field name='parent_menu_id' />
+                    <field name='synced' />
+                    <field name='agent_id' />
+                </tree>
+            </field>
+        </record>
+
+        <record id='wechat_menu_form' model='ir.ui.view'>
+            <field name='name'>wechat.agent.menu.form</field>
+            <field name='model'>wechat.agent.menu</field>
+            <field name='arch' type='xml'>
+                <form>
+                     <header>
+                        <button name='sync_menu' string='同步' type='object' />
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name='name' required='1' placeholder='菜单标题，不超过16个字节，子菜单不超过40个字节' />
+                                <field name='type' attrs="{'invisible': [('has_sub_menu', '=', True)], 'required': [('menu_level', '=', 'second')]}"  />
+                                <field name='menu_level' required='1' />
+                                <field name='agent_id' required='1' />
+                            </group>
+                            <group>
+                                <field name='url' attrs="{'invisible': ['|', ('has_sub_menu', '=', True), ('type', '!=', 'view')], 'required': [('menu_level', '=', 'second'), ('type', '=', 'view')]}" placeholder='网页链接，成员点击菜单可打开链接，不超过256字节' />
+                                <field name='key' attrs="{'invisible': ['|', ('has_sub_menu', '=', True), ('type', '=', 'view')], 'required': [('menu_level', '=', 'second'), ('type', '!=', 'view')]}" placeholder='菜单KEY值，用于消息接口推送，不超过128字节' />
+                                <field name='parent_menu_id' attrs="{'invisible': [('menu_level', '=', 'first')], 'required': [('menu_level', '!=', 'first')]}" domain="[('menu_level', '=', 'first'), ('agent_id', '=', agent_id)]" />
+                                <field name='has_sub_menu' attrs="{'invisible': [('menu_level', '!=', 'first')]}" />
+                                <field name='synced' readonly='1' />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id='wechat_agent_menu_search' model='ir.ui.view'>
+            <field name='name'>wechat.agent.menu.search</field>
+            <field name='model'>wechat.agent.menu</field>
+            <field name='arch' type='xml'>
+                <search>
+                    <filter name='first' string='一级菜单' domain="[('menu_level', '=', 'first')]" />
+                    <filter name='second' string='二级菜单' domain="[('menu_level', '=', 'second')]" />
+                    <filter name='synced' string='已同步' domain="[('synced', '=', True)]" />
+                    <group expand="0" string="Group By">
+                        <filter string="应用" context="{'group_by': 'agent_id'}" icon="terp-stock_effects-object-colorize"/>
+                        <filter string="类型" context="{'group_by': 'type'}" icon="terp-stock_effects-object-colorize"/>
+                        <filter string="应用" context="{'group_by': 'menu_level'}" icon="terp-stock_effects-object-colorize"/>
+                        <filter string="上级菜单" context="{'group_by': 'parent_menu_id'}" icon="terp-stock_effects-object-colorize"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id='wechat_menu_action' model='ir.actions.act_window'>
+            <field name='name'>微信菜单</field>
+            <field name='res_model'>wechat.agent.menu</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+
+        <record model='ir.values' id='sync_menu_action'>
+            <field name='model_id' ref='gooderp_wechat.model_wechat_agent_menu' />
+            <field name='name'>同步菜单</field>
+            <field name='key2'>client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('sync_menu_wizard_action'))" />
+            <field name='key'>action</field>
+            <field name='model'>wechat.agent.menu</field>
+        </record>
+
+        <menuitem id='wechat_menu_menu' parent='base.menu_custom' action='wechat_menu_action' sequence='49' />
+
+    </data>
+</openerp>

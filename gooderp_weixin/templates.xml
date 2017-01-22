@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id='weixin_login' model="mail.channel">
+            <field name="name">Quantity</field>
+            <field name="digits" eval="1"/>
+        </record>
+         <template id="listing">
+           <ul>
+             <li t-foreach="objects" t-as="object">
+               <a t-attf-href="#{ root }/objects/#{ object.id }">
+                 <t t-esc="object.display_name"/>
+               </a>
+             </li>
+           </ul>
+         </template>
+         <template id="object">
+           <h1><t t-esc="object.display_name"/></h1>
+           <dl>
+             <t t-foreach="object._fields" t-as="field">
+               <dt><t t-esc="field"/></dt>
+               <dd><t t-esc="object[field]"/></dd>
+             </t>
+           </dl>
+         </template>
+
+        <!-- 防止website模块对登录页面重载 -->
+        <template id="login_layout" inherit_id="website.login_layout" name="Website Login Layout">
+            <xpath expr="t" position="replace">
+            <t t-call="web.layout">
+                <t t-set="head">
+                    <link href="/web/static/src/css/base.css" rel="stylesheet"/>
+                    <link href="/web/static/lib/bootstrap/css/bootstrap.css" rel="stylesheet"/>
+                    <script type="text/javascript" src="/web/static/lib/underscore/underscore.js"></script>
+                    <script type="text/javascript" src="/web/static/lib/underscore.string/lib/underscore.string.js"></script>
+                    <script type="text/javascript" src="/web/static/lib/jquery/jquery.js"></script>
+                    <script type="text/javascript" src="/web/static/lib/qweb/qweb2.js"></script>
+                    <script type="text/javascript" src="/web/static/src/js/openerpframework.js"></script>
+                    <script type="text/javascript" src="/gooderp_wechat/static/src/js/weixin_login.js?v1.03"></script>
+                </t>
+                <t t-set="body_classname" t-value="'oe_single_form'"/>
+                <div class="oe_single_form_container modal-content">
+                    <div class="oe_single_form_logo">
+                        <!--<img t-attf-src="/web/binary/company_logo{{ '?dbname='+db if db else '' }}"/>-->
+                        <img t-attf-src="{{ '/weixin/weixin_login_qrcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', session_md5, 172, 172) }}" id="img_qr_sid" t-attf-sid="{{ session_md5 }}"
+                        />
+                    </div>
+                    <p class="text-center">微信扫一扫登录</p>
+                    <t t-raw="0"/>
+                    <p class="text-center">
+                        或者在gooderp微信企业号<br />
+                        小助手中回复D加6位数字:<mark>D<t t-esc="temp_password"/></mark>
+                    </p>
+                    <div class="oe_single_form_footer" t-if="not disable_footer">
+                        <!--<t t-if="not disable_database_manager">-->
+                            <!--<a class="oe_login_manage_db" t-attf-href="/web/database/manager{{ '?debug' if debug else '' }}">Manage Databases</a>-->
+                            <!--<span class="oe_footer_seperator"> | </span>-->
+                        <!--</t>-->
+                        <a href="http://www.800890.com" target="_blank">Powered by <span>东方团购中心</span></a>
+                    </div>
+                </div>
+            </t>
+            </xpath>
+        </template>
+
+        <template id="website_login">
+            <t t-call="web.login_layout">
+                <form class="oe_login_form" role="form" t-attf-action="/do_login{{ '?debug' if debug else '' }}" method="post" onsubmit="this.action = this.action + location.hash">
+
+                    <t t-call="web.database_select"/>
+
+                    <div class="form-group field-login">
+                        <label for="login" class="control-label">邮箱或者手机</label>
+                        <input type="text" name="login" t-att-value="login" id="login" class="form-control" required="required" autofocus="autofocus"/>
+                    </div>
+
+                    <div class="form-group field-password">
+                        <label for="password" class="control-label">密码</label>
+                        <input type="password" name="password" id="password" class="form-control" required="required" t-att-autofocus="'autofocus' if login else None"/>
+                    </div>
+
+                    <p class="alert alert-danger" t-if="error">
+                        <t t-esc="error"/>
+                    </p>
+                    <p class="alert alert-success" t-if="message">
+                        <t t-esc="message"/>
+                    </p>
+
+                    <input type="hidden" name="redirect" t-att-value="redirect"/>
+                    <div class="clearfix oe_login_buttons">
+                        <button type="submit" class="btn btn-primary">登录</button>
+                    </div>
+
+                </form>
+            </t>
+        </template>
+    </data>
+</openerp>

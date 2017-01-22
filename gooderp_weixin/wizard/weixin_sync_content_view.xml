@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='weixin_sync_content_form' model='ir.ui.view'>
+            <field name='name'>weixin.sync.content.form</field>
+            <field name='model'>weixin.sync.content</field>
+            <field name='arch' type='xml'>
+                <form>
+                    <div>
+                        <p><h3>同步数据</h3></p>
+                        <p><strong>同步</strong>操作将会将本地选择的数据同步添加到微信客户端上的数据</p>
+                    </div>
+                    <footer>
+                        <button name="sync_content" string="开始同步" type="object" class="oe_highlight"/>
+                        or
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <act_window id="weixin_sync_content_action"
+            name="微信同步"
+            src_model="res.users"
+            res_model="weixin.sync.content"
+            view_type="form" view_mode="form"
+            target="new"/>
+        <act_window id="weixin_sync_content_staff_action"
+            name="微信同步"
+            src_model="staff"
+            res_model="weixin.sync.content"
+            view_type="form" view_mode="form"
+            target="new"/>
+    </data>
+</openerp>

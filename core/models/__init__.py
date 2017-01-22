@@ -8,3 +8,4 @@ import res_company
 import res_users
 import res_currency
 import warehouse
+import pools

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='wechat_enterprise_tree' model='ir.ui.view'>
+            <field name='name'>wechat.enterprise.tree</field>
+            <field name='model'>wechat.enterprise</field>
+            <field name='arch' type='xml'>
+                <tree>
+                    <field name='name' />
+                    <field name='corp_id' />
+                    <field name='description' />
+                </tree>
+            </field>
+        </record>
+
+        <record id='wechat_enterprise_form' model='ir.ui.view'>
+            <field name='name'>wechat.enterprise.form</field>
+            <field name='model'>wechat.enterprise</field>
+            <field name='arch' type='xml'>
+                <form>
+                    <sheet>
+                        <div name="buttons" class="oe_right oe_button_box">
+                        </div>
+
+                        <div class="oe_left" style="width: 500px;">
+                            <field name="logo" widget="image" class="oe_avatar oe_left"/>
+                            <div class="oe_title" style="width: 390px;">
+                                <label class="oe_edit_only" for="name" string="企业号名称"/>
+                                <h1><field name="name" class="oe_inline" required='1' /></h1>
+                            </div>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name='corp_id' required='1' />
+                            </group>
+
+                            <group>
+                                <field name='description' />
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string='微信应用'>
+                                <field name='application_ids' />
+                            </page>
+                            <page string='权限组'>
+                                <field name='permission_group_ids' />
+                            </page>
+                        </notebook> 
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id='wechat_enterprise_action' model='ir.actions.act_window'>
+            <field name='name'>微信企业号</field>
+            <field name='res_model'>wechat.enterprise</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+
+        <menuitem id='wechat_enterprise_menu' parent='base.menu_custom' action='wechat_enterprise_action' sequence='48'/>
+
+    </data>
+</openerp>
