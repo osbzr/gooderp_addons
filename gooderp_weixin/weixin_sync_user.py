@@ -12,6 +12,10 @@ class staff(models.Model):
 
     def sync_weixin_contacts(self):
         for staff_row in self:
+            if not staff_row.user_id:
+                raise ValidationError(u'该员工还没绑定用户！')
+            if not staff_row.work_mobile:
+                raise ValidationError(u'该员工还没有填写工作手机！')
             weixin_contacts = False
             if staff_row.contacts_ids:
                 weixin_contacts = staff.contacts_ids[0]
@@ -22,7 +26,10 @@ class staff(models.Model):
     def create_or_update_weixin_contacts(self, vals):
         print vals
         if vals.get('sync_status') == 'create':
-            self.env['weixin.contacts'].create(vals)
+            weixin_contact_row = self.env['weixin.contacts'].create(vals)
+            if weixin_contact_row.staff_id and weixin_contact_row.staff_id.user_id:
+                weixin_contact_row.staff_id.user_id.oauth_uid = weixin_contact_row.id
+                weixin_contact_row.staff_id.user_id.oauth_access_token = weixin_contact_row.work_mobile
         elif vals.get('sync_status') == 'update':
             self.weixin_contacts[0].write(vals)
         return True

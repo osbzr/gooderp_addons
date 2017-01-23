@@ -5,9 +5,8 @@
             <field name='name'>weixin.contacts.tree</field>
             <field name='model'>weixin.contacts</field>
             <field name='arch' type='xml'>
-                <tree string='微信联系人' editable='top'>
+                <tree string='微信联系人' create="0" edit="0">
                     <field name='staff_id' />
-
                     <field name='name' />
                     <field name='weixinid' />
                     <field name='work_mobile' />

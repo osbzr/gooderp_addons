@@ -1,13 +1,7 @@
 <openerp>
     <data noupdate="1">
 
-        <record id='weixin_department_user' model='wechat.department'>
-            <field name='name'>企业员工组</field>
-            <field name='parentid'>1</field>
-            <field name='order'>1</field>
-            <field name='department_id'>2</field>
-            <field name='enterprise_id' ref='weixin_gooderp_enterprise' />
-        </record>
+
 
         <!-- 企业号应用配置 -->
         <record id="weixin_gooderp_enterprise" model="wechat.enterprise">
@@ -49,6 +43,12 @@
             <field name="body">微信验证</field>
             <field name="wechat_permission_group_id" ref="gooderp_permission_group_all" />
         </record>
-
+        <record id='weixin_department_user' model='wechat.department'>
+            <field name='name'>企业员工组</field>
+            <field name='parentid'>1</field>
+            <field name='order'>1</field>
+            <field name='department_id'>2</field>
+            <field name='enterprise_id' ref='weixin_gooderp_enterprise' />
+        </record>
     </data>
 </openerp>
