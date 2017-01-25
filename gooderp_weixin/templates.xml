@@ -41,7 +41,7 @@
                 <t t-set="body_classname" t-value="'oe_single_form'"/>
                 <div class="oe_single_form_container modal-content">
                     <div class="oe_single_form_logo">
-                        <img t-attf-src="{{ '/weixin/weixin_login_qrcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', session_md5, 172, 172) }}" id="img_qr_sid" t-attf-sid="{{ session_md5 }}"
+                        <img t-attf-src="{{ '/weixin/weixin_login_qrcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', temp_password, 172, 172) }}" id="img_qr_sid" t-attf-sid="{{ session_md5 }}"
                         />
                     </div>
                     <p class="text-center">微信扫一扫登录</p>

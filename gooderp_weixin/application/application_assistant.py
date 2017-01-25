@@ -13,6 +13,7 @@ from odoo.http import request
 from odoo.modules.registry import RegistryManager
 from odoo.addons.gooderp_wechat.enterprise import WxApi, WxApplication, WxTextResponse, WxNewsResponse, WxArticle, WxLink
 from odoo.addons.core.models.pools import ModelPool, CursorProxy, common_functions, PageProxy, _slug
+from odoo.addons.gooderp_weixin.controllers.controller_base import WeiXinLoginBase
 SUPERUSER_ID = 1
 
 ############################################################################################
@@ -143,7 +144,7 @@ env = jinja2.Environment('<%', '%>', '${', '}', '%', loader=loader, autoescape=T
 ################################################################
 # 企业小助手应用微信控制器
 #
-class WeixinAppAssistantController(http.Controller):
+class WeixinAppAssistantController(WeiXinLoginBase):
     weixin_app = None
     def __init__(self):
         env.globals['_pool'] = ModelPool()
@@ -163,15 +164,3 @@ class WeixinAppAssistantController(http.Controller):
         self.login_user = getattr(self.weixin_app,'uid',False)
         self.login_session = getattr(self.weixin_app,'session_id',False)
         return result
-
-    @http.route('/wechat/pulling', auth='public')
-    def wechat_pulling(self, **args):
-        user = request.env['res.users'].sudo()
-        if self.login_user and request.session.sid == self.login_session:
-            users = user.browse(self.login_user)
-            self.login_user = False
-            self.login_session = False
-            uid = request.session.authenticate(request.session.db, users.login, users.oauth_access_token)
-            if uid:
-                return u'ok'
-        return 'error'

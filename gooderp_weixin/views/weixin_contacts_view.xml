@@ -52,7 +52,6 @@
             <field name='view_type'>form</field>
             <field name='view_mode'>tree,form</field>
         </record>
-
         <menuitem id='weixin_contacts_menuitem' action='weixin_contacts_action' parent='gooderp_second_weixin_setting' sequence='110' />
     </data>
 </openerp>

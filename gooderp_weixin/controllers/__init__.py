@@ -1,1 +1,2 @@
+import controller_base
 import controller_weixin_login
