@@ -19,7 +19,7 @@ odoo.define('gooderp.fixed_header', function(require) {
                 }
             });
         },
-    })
+    });
 
     ListView.Groups.include({
         render_groups: function () {
