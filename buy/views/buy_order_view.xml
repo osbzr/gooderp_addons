@@ -117,6 +117,7 @@
 					<field name="name"/>
 					<field name="type"/>
 					<field name="partner_id"/>
+					<field name="goods_id"/>
 					<field name="state"/>
 					<field name="goods_state"/>
 					<field name="create_uid" string="制单人"/>
