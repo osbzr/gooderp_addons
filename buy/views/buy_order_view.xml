@@ -79,6 +79,35 @@
 								<field name="origin" invisible="1"/>
 								<field name='using_attribute' invisible='1'/>
 							</tree>
+							<form string="Purchase Order Line">
+								<sheet>
+									<group>
+										<group>
+											<field name="goods_id" required='1'/>
+											<field name="attribute_id"
+											groups='goods.multi_attrs_groups'
+											attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)],
+											        'invisible': [('using_attribute','=', True)]}"/>
+											<field name="quantity" sum="合计数量"/>
+											<field name="quantity_in" readonly="1" sum="合计已入库数量"/>
+											<field name="uom_id"/>
+										</group>
+										<group>
+											<field name="price"/>
+											<field name="price_taxed" groups='buy.in_tax_groups'/>
+											<field name="discount_rate" groups='buy.buy_line_discount_groups'/>
+											<field name="discount_amount" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
+											<field name="amount" sum="合计金额"/>
+											<field name="tax_rate" groups='buy.in_tax_groups'/>
+											<field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
+											<field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
+										</group>
+										<field name="note"/>
+										<field name="origin" invisible="1"/>
+										<field name='using_attribute' invisible='1'/>
+									</group>
+								</sheet>
+							</form>
 						</field>
 						<field name="pay_ids" attrs="{'invisible': [('invoice_by_receipt','=',True)]}">
 							<tree string="Payment Form" editable="bottom" >
