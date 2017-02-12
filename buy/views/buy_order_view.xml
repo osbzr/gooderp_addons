@@ -33,6 +33,15 @@
 						<field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
 					</header>
 					<sheet>
+						<div class="oe_button_box" name="button_box">
+							<button type="object"
+								name="action_view_receipt"
+								class="oe_stat_button"
+								icon="fa-truck" attrs="{'invisible':[('state', 'in', ('draft')),('receipt_ids','=',[])]}">
+								<field name="receipt_count" widget="statinfo" string="Shipment" help="Incoming Shipments"/>
+								<field name="receipt_ids" invisible="1"/>
+							</button>
+						</div>
 						<group>
 							<group>
 								<field name="partner_id" required="1"
@@ -131,6 +140,8 @@
 					<separator/>
 					<filter name="buy" string="购货" domain="[('type','=','buy')]"/>
 					<filter name="return" string="退货" domain="[('type','=','return')]"/>
+					<separator/>
+					<filter name="createby" string="我创建的" domain="[('create_uid', '=' ,uid)]"/>
 					<group expand="0" string="分组">
 						<filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
 						<filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
