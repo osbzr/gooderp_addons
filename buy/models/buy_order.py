@@ -183,6 +183,7 @@ class buy_order(models.Model):
                               compute=_get_money_state,
                               copy=False,
                               help=u'购货订单生成的采购入库单或退货单的付/退款状态')
+    goods_id = fields.Many2one('goods', related='line_ids.goods_id', string=u'商品')    
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
