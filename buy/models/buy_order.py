@@ -85,6 +85,11 @@ class buy_order(models.Model):
             self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
         else:
             self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
+        
+    @api.depends('receipt_ids')
+    def _compute_receipt(self):
+        for order in self:
+            order.receipt_count = len(order.receipt_ids.ids)        
 
     partner_id = fields.Many2one('partner', u'供应商',
                                  states=READONLY_STATES,
@@ -183,7 +188,9 @@ class buy_order(models.Model):
                               compute=_get_money_state,
                               copy=False,
                               help=u'购货订单生成的采购入库单或退货单的付/退款状态')
-    goods_id = fields.Many2one('goods', related='line_ids.goods_id', string=u'商品')    
+    goods_id = fields.Many2one('goods', related='line_ids.goods_id', string=u'商品')
+    receipt_ids = fields.One2many('buy.receipt', 'order_id', string='Receptions', copy=False)
+    receipt_count = fields.Integer(compute='_compute_receipt', string='Receptions', default=0)
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
