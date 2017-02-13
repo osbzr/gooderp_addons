@@ -37,9 +37,16 @@
 							<button type="object"
 								name="action_view_receipt"
 								class="oe_stat_button"
-								icon="fa-truck" attrs="{'invisible':[('state', 'in', ('draft')),('receipt_ids','=',[])]}">
-								<field name="receipt_count" widget="statinfo" string="Shipment" help="Incoming Shipments"/>
+								icon="fa-truck" attrs="{'invisible':['|', ('state', 'in', ('draft')),('receipt_count','=',0)]}">
+								<field name="receipt_count" widget="statinfo" string="入库/退货单" help="Incoming Shipments"/>
 								<field name="receipt_ids" invisible="1"/>
+							</button>
+							<button type="object"
+								name="action_view_invoice"
+								class="oe_stat_button"
+								icon="fa-truck" attrs="{'invisible':['|', ('state', 'in', ('draft')),('invoice_count','=',0)]}">
+								<field name="invoice_count" widget="statinfo" string="结算单" help="Vendor Invoice"/>
+								<field name="invoice_ids" invisible="1"/>
 							</button>
 						</div>
 						<group>
