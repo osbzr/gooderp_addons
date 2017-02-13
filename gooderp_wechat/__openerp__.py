@@ -4,9 +4,10 @@
     'summary': u"""
         微信sdk和framework7""",
     'description': u"""
+    开阖出品
     """,
-    'author': "nbzx",
-    'website': "http://odoo.nbzx.me",
+    'author': "nbzx, 开阖静静等",
+    'website': "http://www.gooderp.org/",
     'category': 'Uncategorized',
     'version': '0.1',
     # any module necessary for this one to work correctly

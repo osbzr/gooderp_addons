@@ -6,11 +6,11 @@
         gooderp 微信企业号 基本应用""",
 
     'description': u"""
-        微信企业号接入
+        开阖出品
     """,
 
-    'author': "nbzx",
-    'website': "http://odoo.nbzx.me",
+    'author': "nbzx,开阖静静等",
+    'website': "http://www.gooderp.org/",
 
 
     'category': 'Uncategorized',
