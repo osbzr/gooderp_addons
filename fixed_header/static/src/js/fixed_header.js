@@ -4,22 +4,22 @@ odoo.define('gooderp.fixed_header', function(require) {
     ListView.include({
         load_list: function () {
             var self = this;
-            this._super.apply(this, arguments);
-            var form_field_length = self.$el.parents('.o_form_field').length;
-            var scrollArea = $(".o_content")[0];
-            function do_freeze () {
-                self.$el.find('table.o_list_view').each(function () {
-                    $(this).stickyTableHeaders({scrollableArea: scrollArea});
-                });
-            }
+            return this._super.apply(this, arguments).done(function () {
+                var form_field_length = self.$el.parents('.o_form_field').length;
+                var scrollArea = $(".o_content")[0];
+                function do_freeze () {
+                    self.$el.find('table.o_list_view').each(function () {
+                        $(this).stickyTableHeaders({scrollableArea: scrollArea});
+                    });
+                }
 
-            if (form_field_length == 0) {
-                do_freeze();
-                $(window).unbind('resize', do_freeze).bind('resize', do_freeze);
-            }
-            return $.when();
+                if (form_field_length == 0) {
+                    do_freeze();
+                    $(window).unbind('resize', do_freeze).bind('resize', do_freeze);
+                }
+            });
         },
-    })
+    });
 
     ListView.Groups.include({
         render_groups: function () {
