@@ -30,8 +30,6 @@ class wechat_enterprise(models.Model):
                     'order': department.order,
                     'id': department.department_id,
                 }
-                print res
-                print access_token
                 WXSyncOperation.sync_department(access_token, res)
     department_ids = fields.One2many('wechat.department', 'enterprise_id', u'组织架构')
 

@@ -62,9 +62,6 @@ class ir_http(models.AbstractModel):
         code = args.get('code')
         state = args.get('state')
         if code and state:
-            print self
-            print code
-            print state
             uid, state_params = request.env['ir.http'].weixin_auth(code, state)
             kw = request.httprequest.args.to_dict()
             del kw['code']

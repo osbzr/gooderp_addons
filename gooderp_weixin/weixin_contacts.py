@@ -49,11 +49,12 @@ class weixin_contacts(models.Model):
     @api.multi
     def _get_contacts_by_update(self):
         res = {}
+        field_dcit={'work_email': 'email', 'work_mobile': 'mobile'}
         if self.update_list:
             update_list = json.loads(self.update_list)
             res = {'userid': self.id}
             for field_name in update_list:
-                res.update({field_name: getattr(self, field_name)})
+                res.update({field_dcit.get(field_name): getattr(self, field_name)})
         return res
 
     @api.multi
@@ -81,7 +82,6 @@ class weixin_contacts(models.Model):
                     WXSyncOperation.sync_user_by_operation(access_token, contacts._get_contacts_by_create(), operation='create')
                 except Exception, e:
                     raise ValidationError(u'错误, 微信同步用户数量已经超出微信人数上限, %s', e)
-                    # _logger.error(u'错误，微信同步用户数量已经超出微信人数上限, %s', e)
                     break
                 contacts.write({'sync_status': ''})
             elif contacts.sync_status == 'update':
@@ -89,7 +89,9 @@ class weixin_contacts(models.Model):
                 contacts.write({'sync_status': ''})
         if batch_vals:
             WXSyncOperation.sync_user_by_operation(access_token, batch_vals, operation='batchdelete')
-            self.write(cr, uid, batch_vals, {'sync_status': '', 'active': False}, context=context)
+            self.staff_id.contacts_ids = False
+            self.write({'sync_status': '', 'active': False,'staff_id': False})
+
 
     staff_id = fields.Many2one('staff', u'业务伙伴', index=True)
     name = fields.Char(u'姓名')

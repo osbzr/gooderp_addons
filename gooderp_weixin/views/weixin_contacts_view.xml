@@ -8,10 +8,8 @@
                 <tree string='微信联系人' create="0" edit="0">
                     <field name='staff_id' />
                     <field name='name' />
-                    <field name='weixinid' />
                     <field name='work_mobile' />
                     <field name='work_email' />
-                    <field name='position' />
                     <field name='user_id' />
                     <field name='is_follow' />
                     <field name='update_list' />
@@ -30,12 +28,10 @@
                             <group>
                                 <field name='staff_id' />
                                 <field name='name' />
-                                <field name='weixinid' />
                                 <field name='work_mobile' />
                                 <field name='work_email' />
                             </group>
                             <group>
-                                <field name='position' />
                                 <field name='user_id' />
                                 <field name='is_follow' readonly='1' />
                                 <field name='sync_status' readonly='1' />

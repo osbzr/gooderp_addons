@@ -18,15 +18,10 @@
                 </form>
             </field>
         </record>
-        <act_window id="weixin_sync_content_action"
-            name="微信同步"
-            src_model="res.users"
-            res_model="weixin.sync.content"
-            view_type="form" view_mode="form"
-            target="new"/>
         <act_window id="weixin_sync_content_staff_action"
             name="微信同步"
             src_model="staff"
+            multi="True" key2="client_action_multi"
             res_model="weixin.sync.content"
             view_type="form" view_mode="form"
             target="new"/>
