@@ -424,7 +424,7 @@ class buy_order(models.Model):
         # choose the view_mode accordingly
         if len(receipt_ids) > 1:
             action['domain'] = "[('id','in',[" + ','.join(map(str, receipt_ids)) + "])]"
-            action['view_mode'] = 'tree'
+            action['view_mode'] = 'tree,form'
         elif len(receipt_ids) == 1:
             view_id = (self.type == 'buy'
                        and self.env.ref('buy.buy_receipt_form').id
