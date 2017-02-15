@@ -415,9 +415,9 @@
 				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 				 						<field name='goods_qty' sum='数量合计'/>
 				 						<field name='uom_id'/>
-				 						<field name='price'/>
-				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
-				 						<field name='cost_unit'/>
+				 						<field name='price' groups='goods.view_cost_groups'/>
+				 						<field name="price_taxed" groups='sell.out_tax_groups,goods.view_cost_groups'/>
+				 						<field name='cost_unit' groups='goods.view_cost_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
 				 						<field name='amount' string='销售金额' sum='金额合计'/>
