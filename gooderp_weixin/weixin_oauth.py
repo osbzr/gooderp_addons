@@ -66,7 +66,7 @@ class res_users(models.Model):
 
     @api.multi
     def auth_oauth_get_weixin(self, provider_id, access_token, user_id):
-        provider = self.pool.get('auth.oauth.provider').browse(provider_id)
+        provider = self.env['auth.oauth.provider'].browse(provider_id)
 
         return self._auth_oauth_rpc(provider.validation_endpoint,
             {'access_token': access_token, 'userid': user_id})

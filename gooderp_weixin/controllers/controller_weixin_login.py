@@ -7,14 +7,14 @@ import time
 import werkzeug.utils
 from contextlib import closing
 import jinja2,simplejson
-import odoo
-from odoo import SUPERUSER_ID
 from odoo import http
 from odoo.http import request
+from odoo.modules.registry import RegistryManager
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome as Home
 from odoo.addons.web.controllers.main import  db_monodb, ensure_db, set_cookie_and_redirect, login_and_redirect
 from reportlab.graphics.barcode import createBarcodeDrawing
 from odoo.addons.gooderp_weixin.controllers.controller_base import WeiXinLoginBase
+from odoo import api, registry, SUPERUSER_ID
 _logger = logging.getLogger(__name__)
 
 if hasattr(sys, 'frozen'):
@@ -176,3 +176,99 @@ class WeixinLoginController(WeiXinLoginBase):
         })
         return kw
 
+    # @正翔 微信用户绑定操作
+    # @张旭 每个微信用户都对应一个user，但同一个企业的user的partner_id都相同，user根据手机号码查找
+    @http.route('/weixin/do_binding', auth='public')
+    def do_binding(self, user_id, **kw):
+        db_name = request.session.db
+        if not user_id:
+            return '{}'
+        contacts_obj = request.env['weixin.contacts'].sudo()
+        user_obj = request.env['res.users'].sudo()
+        try:
+            contacts = contacts_obj.browse(int(user_id))
+        except ValueError:
+            return '{}'
+        if not contacts.user_id:
+            odoo_user = user_obj.create( self._prepare_user_vals(contacts.staff_id,
+                                                                request.session.oauth_uid or user_id))
+
+        else:
+            odoo_user = contacts.user_id
+
+        weixin_data = user_obj.auth_oauth_get_weixin(request.session.oauth_provider_id,
+                                                     request.session.access_token, user_id)
+        odoo_user.write({
+            'oauth_uid': request.session.oauth_uid,
+            'oauth_access_token': contacts.work_mobile,
+            'oauth_provider_id': request.session.oauth_provider_id,
+            'mobile': contacts.work_mobile,
+            'weixin_id': weixin_data.get('weixinid'),
+        })
+
+        contacts.write({'is_follow': True, 'weixinid': weixin_data.get('weixinid'), 'user_id': odoo_user.id})
+        uid = request.session.authenticate(db_name, odoo_user.login, odoo_user.oauth_access_token)
+        return simplejson.dumps({
+            'partner_id': contacts.staff_id.id,
+            'uid': uid,
+            'login_id': request.session.oauth_uid,
+            'is_exists_mobile': True,
+            'oauth_access_token': request.session.oauth_access_token,
+            'user_id': user_id,
+            'mobile': contacts.work_mobile,
+            'access_token': request.session.access_token,
+        })
+
+    @http.route('/weixin/do_cancel_binding', auth='user')
+    def do_cancel_binding(self, **kw):
+        db_name = request.session.db
+
+        result = ''
+
+        res_users = request.env['res.users']
+        # address_obj = openerp.registry(db_name)['customer.address']
+
+        user_ids = res_users.search([('id', '=', request.session.uid)])
+        if user_ids:
+            user_row = user_ids[0]
+            user_row.write({'oauth_access_token': None, 'oauth_uid': None,
+                            'oauth_provider_id': None, 'mobile': None, 'weixin_id': None})
+            request.session.logout(keep_db=True)
+            result = 'OK'
+        return simplejson.dumps({'result': result})
+
+
+
+    # 微信用户绑定
+    # 开启微信二次验证，让用户确认一下绑定的partner或者联系人
+    @http.route('/weixin/binding', auth='public')
+    def binding(self, **kw):
+        cr, db_name, user_id = request.cr, request.session.db, request.session.user_id
+        oauth_uid = request.session.oauth_uid
+        if not oauth_uid and not 'agentid' in kw:
+            url = self.weixin_app.oauth_authorize_redirect_url(db_name, request.httprequest.host + '/weixin/binding',
+                                                               {})
+            return werkzeug.utils.redirect(url)
+        contacts = False
+        if user_id:
+            contacts_obj = request.env['weixin.contacts'].sudo()
+            try:
+                contacts = contacts_obj.browse(int(user_id))
+            except ValueError:
+                template = env.get_template('no_partner.html')
+                return template.render({})
+
+            if contacts.exists():
+                if not contacts.staff_id:
+                    template = env.get_template('no_partner.html')
+                    return template.render({})
+
+        template = env.get_template('binding.html')
+        return template.render({
+            # 'session': request.session,
+            'user_id': user_id,
+            'partner': contacts and contacts.staff_id or False,
+            'contacts':  False,
+            'user': contacts and contacts.user_id or False,
+            'attention': contacts and contacts.is_follow or False,
+        })
