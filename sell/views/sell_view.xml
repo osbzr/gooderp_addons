@@ -420,7 +420,7 @@
 				 						<field name='cost_unit' groups='goods.view_cost_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
-				 						<field name='amount' string='销售金额' sum='金额合计'/>
+				 						<field name='amount' string='销售金额' sum='金额合计' groups='goods.view_cost_groups'/>
 				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
 		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
