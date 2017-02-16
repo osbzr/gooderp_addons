@@ -85,7 +85,7 @@
 				 					<field name='cost_unit' groups='goods.view_cost_groups'/>
 		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
 		                            <field name="discount_amount" groups='buy.buy_line_discount_groups' readonly="0" sum="合计折扣额"/>
-		                            <field name="amount" string="购货金额" sum="合计金额"/>
+		                            <field name="amount" string="购货金额" sum="合计金额" groups='goods.view_cost_groups'/>
 		                            <field name="tax_rate" groups='buy.in_tax_groups'/>
 		                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
 		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
