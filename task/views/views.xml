@@ -70,6 +70,8 @@
 				<tree>
 					<field name="name"/>
 					<field name="customer_id"/>
+					<field name="plan_hours" groups='task.group_task_hours'/>
+					<field name="hours" groups='task.group_task_hours'/>
 				</tree>
 			</field>
 		</record>
@@ -83,6 +85,11 @@
 							<group>
 								<field name="name"/>
 								<field name="customer_id"/>
+								<field name="address"/>
+							</group>
+							<group>
+								<field name="plan_hours" groups='task.group_task_hours,base.group_portal'/>
+								<field name="hours" groups='task.group_task_hours,base.group_portal'/>
 							</group>
 						</group>
 						<notebook>
@@ -94,6 +101,8 @@
 										<field name="user_id"/>
 										<field name="next_action"/>
 										<field name="next_datetime"/>
+										<field name="plan_hours" groups='task.group_task_hours,base.group_portal' sum="计划工时"/>
+										<field name="hours" groups='task.group_task_hours,base.group_portal' sum="实际工时"/>
 									</tree>
 								</field>
 							</page>
@@ -111,6 +120,11 @@
 								</field>
 							</page>
 						</notebook>
+						<field name="note" placeholder='描述......'/>
+						<div class="oe_chatter">
+							<field name="message_follower_ids" widget="mail_followers"/>
+							<field name="message_ids" widget="mail_thread"/>
+						</div>
 					</sheet>
 				</form>
 			</field>
@@ -351,5 +365,8 @@
 		groups='task.group_task_manager' sequence='15'/>
 		<menuitem name="任务阶段" id="menu_task_status" parent="menu_task_configuration"
 		action="action_task_status" sequence='1'/>
+
+		<menuitem name="项目" id="menu_project_portal" web_icon="task,static/description/task.png"
+		action="action_project" groups='base.group_portal'/>
 	</data>
 </openerp>
