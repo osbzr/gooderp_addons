@@ -1,6 +1,0 @@
-"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-access_wechat_agent_menu,wechat_agent_menu all,gooderp_wechat.model_wechat_agent_menu,,1,1,1,1
-access_wechat_application,wechat_application all,gooderp_wechat.model_wechat_application,,1,1,1,1
-access_wechat_official,wechat_official all,gooderp_wechat.model_wechat_official,,1,1,1,1
-access_wechat_permission_group,wechat_permission_group all,gooderp_wechat.model_wechat_permission_group,,1,1,1,1
-access_wechat_enterprise,wechat_enterprise all,gooderp_wechat.model_wechat_enterprise,,1,1,1,1
