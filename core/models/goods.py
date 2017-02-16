@@ -30,9 +30,12 @@ class goods(models.Model):
         '''在many2one字段中支持按编号搜索'''
         args = args or []
         if name:
-            goods_ids = self.search([('code', 'ilike', name)])
+            args.append(('code', 'ilike', name))
+            goods_ids = self.search(args)
             if goods_ids:
                 return goods_ids.name_get()
+            else:
+                args.remove(('code', 'ilike', name))
         return super(goods, self).name_search(name=name, args=args,
                                               operator=operator, limit=limit)
 
