@@ -53,13 +53,13 @@
             <field name='voucher_id' ref='finance.voucher_12'/>
             <field name='name'>股东投资</field>
             <field name='account_id' ref='finance.account_fund'/>
-            <field name='debit'>1000000</field>
+            <field name='credit'>1000000</field>
         </record>
         <record id='voucher_line_12_credit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_12'/>
             <field name='name'>股东投资</field>
             <field name='account_id' ref='finance.account_bank'/>
-            <field name='credit'>1000000</field>
+            <field name='debit'>1000000</field>
         </record>
         <!-- 2015年12月的收入凭证 -->
         <record id='voucher_12_1' model='voucher'>
@@ -128,7 +128,7 @@
         <record id='voucher_line_4_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_4'/>
             <field name='name'>开发票</field>
-            <field name='account_id' ref='finance.account_ap'/>
+            <field name='account_id' ref='finance.account_ar'/>
             <field name='debit'>15000</field>
         </record>
         <record id='voucher_line_4_credit' model='voucher.line'>
@@ -144,7 +144,7 @@
         <record id='voucher_line_14_12_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_14_12'/>
             <field name='name'>开发票</field>
-            <field name='account_id' ref='finance.account_ap'/>
+            <field name='account_id' ref='finance.account_ar'/>
             <field name='debit'>15000</field>
         </record>
         <record id='voucher_line_14_12_credit' model='voucher.line'>
