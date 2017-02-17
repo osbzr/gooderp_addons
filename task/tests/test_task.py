@@ -99,3 +99,14 @@ class test_project_invoice(TransactionCase):
         self.assertTrue(self.invoice1.project_id.auxiliary_id == invoice.auxiliary_id)
         self.assertTrue(self.invoice1.tax_amount == invoice.tax_amount)
         self.assertTrue(self.invoice1.amount == invoice.amount)
+
+
+class test_project(TransactionCase):
+
+    def setUp(self):
+        super(test_project, self).setUp()
+        self.project_id = self.env.ref('task.project_gooderp')
+
+    def test_compute_hours(self):
+        '''计算项目的实际工时'''
+        self.assertTrue(self.project_id.hours == 1)

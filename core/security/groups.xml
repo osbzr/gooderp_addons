@@ -38,6 +38,10 @@
 			<field name="name">任务</field>
 			<field name="sequence">8</field>
 		</record>
+		<record model="ir.module.category" id="good_crm">
+			<field name="name">商机</field>
+			<field name="sequence">9</field>
+		</record>
 		<!--用户组-->
 		<record id='master_groups' model='res.groups'>
 			<field name='name'>配置</field>

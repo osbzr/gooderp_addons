@@ -20,6 +20,7 @@
 
     'data': [
         'security/ir.model.access.csv',
+        'security/groups.xml',
         'views/crm_view.xml',
     ],
     'application': True,
