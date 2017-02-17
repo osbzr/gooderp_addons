@@ -187,7 +187,7 @@ class wh_inventory(models.Model):
 
     def get_line_detail(self):
         for inventory in self:
-            remaining_text = 'line.qty_remaining > 0'
+            remaining_text = 'line.qty_remaining != 0'
 
             sql_text = '''
                 SELECT wh.id as warehouse_id,
