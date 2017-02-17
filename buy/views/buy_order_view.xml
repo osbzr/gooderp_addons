@@ -33,6 +33,22 @@
 						<field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
 					</header>
 					<sheet>
+						<div class="oe_button_box" name="button_box">
+							<button type="object"
+								name="action_view_receipt"
+								class="oe_stat_button"
+								icon="fa-truck" attrs="{'invisible':['|', ('state', 'in', ('draft')),('receipt_count','=',0)]}">
+								<field name="receipt_count" widget="statinfo" string="入库/退货单" help="Incoming Shipments"/>
+								<field name="receipt_ids" invisible="1"/>
+							</button>
+							<button type="object"
+								name="action_view_invoice"
+								class="oe_stat_button"
+								icon="fa-pencil-square-o" attrs="{'invisible':['|', ('state', 'in', ('draft')),('invoice_count','=',0)]}">
+								<field name="invoice_count" widget="statinfo" string="结算单" help="Vendor Invoice"/>
+								<field name="invoice_ids" invisible="1"/>
+							</button>
+						</div>
 						<group>
 							<group>
 								<field name="partner_id" required="1"
@@ -69,7 +85,7 @@
 								<field name="note"/>
 								<field name="origin" invisible="1"/>
 								<field name='using_attribute' invisible='1'/>
-							</tree>
+							</tree>							
 						</field>
 						<field name="pay_ids" attrs="{'invisible': [('invoice_by_receipt','=',True)]}">
 							<tree string="Payment Form" editable="bottom" >
@@ -117,6 +133,7 @@
 					<field name="name"/>
 					<field name="type"/>
 					<field name="partner_id"/>
+					<field name="goods_id"/>
 					<field name="state"/>
 					<field name="goods_state"/>
 					<field name="create_uid" string="制单人"/>
@@ -130,6 +147,8 @@
 					<separator/>
 					<filter name="buy" string="购货" domain="[('type','=','buy')]"/>
 					<filter name="return" string="退货" domain="[('type','=','return')]"/>
+					<separator/>
+					<filter name="createby" string="我创建的" domain="[('create_uid', '=' ,uid)]"/>
 					<group expand="0" string="分组">
 						<filter string="供应商" domain="[]" context="{'group_by':'partner_id'}"/>
 						<filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
