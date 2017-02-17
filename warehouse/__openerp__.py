@@ -25,7 +25,7 @@
     "author": 'ZhengXiang',
     "website": "http://www.osbzr.com",
     "category": "Generic Modules",
-    "depends": ['core', 'goods', 'decimal_precision', 'web_sublist', 'web_float_limit', 'report_docx','finance','money'],
+    "depends": ['goods', 'web_float_limit','money'],
     "description":
     '''
                         该模块实现了 GoodERP 中 仓库管理的功能。

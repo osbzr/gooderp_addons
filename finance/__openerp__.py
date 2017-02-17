@@ -24,7 +24,7 @@
                                 辅助核算余额表。
     ''',
     'version': '8.0.0.1',
-    'depends': ['base', 'decimal_precision', 'core', 'num_to_china'],
+    'depends': ['core', 'num_to_china', 'web_sublist'],
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
