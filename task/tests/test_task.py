@@ -89,9 +89,9 @@ class test_project_invoice(TransactionCase):
 
     def test_make_invoice(self):
         '''生成结算单'''
-        # 不输入客户时不产生结算单
-        self.invoice1.make_invoice()
-        self.assertTrue(not self.invoice1.invoice_id)
+        # 不输入客户点击生成发票按钮时应报错
+        with self.assertRaises(UserError):
+            self.invoice1.make_invoice()
         # 输入客户产生结算单，验证如下
         self.invoice1.project_id.customer_id = self.env.ref('core.jd')
         invoice = self.invoice1.make_invoice()
@@ -99,3 +99,14 @@ class test_project_invoice(TransactionCase):
         self.assertTrue(self.invoice1.project_id.auxiliary_id == invoice.auxiliary_id)
         self.assertTrue(self.invoice1.tax_amount == invoice.tax_amount)
         self.assertTrue(self.invoice1.amount == invoice.amount)
+
+
+class test_project(TransactionCase):
+
+    def setUp(self):
+        super(test_project, self).setUp()
+        self.project_id = self.env.ref('task.project_gooderp')
+
+    def test_compute_hours(self):
+        '''计算项目的实际工时'''
+        self.assertTrue(self.project_id.hours == 1)

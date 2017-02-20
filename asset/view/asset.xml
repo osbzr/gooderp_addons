@@ -60,6 +60,9 @@
                             <field name="chang_tax"/>
                             <field name="chang_partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
                         </group>
+                        <group>
+                            <field name="change_reason" required="1"/>
+                        </group>
                     </group>
                     <footer>
                         <button name="create_chang_account"  string="生成变更凭证" type="object" class="oe_highlight"/>
@@ -156,6 +159,7 @@
                                           <field name="chang_before"/>
                                           <field name="chang_after"/>
                                           <field name="partner_id"/>
+                                          <field name="change_reason"/>
                                           <field name="create_uid" string="变更人"/>
                                       </tree>
                                  </field>

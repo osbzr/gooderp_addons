@@ -344,4 +344,47 @@ odoo.define('core.core', function (require) {
         }
 
     });
+    /************************************************************
+     *2017-01-10  开阖静静(gilbert@osbzr.com)
+     * 实现在form页面上的 one2many字段 子字段的必输报错的详细提示
+     *对js基础方法的理解不是很深刻，难免用的不是很恰当，有比较好的实现再去修改，
+     * ***********************************************************/
+    FormView.include({
+         on_invalid: function() {
+            var warnings = _(this.fields).chain()
+                .filter(function (f) {return !f.is_valid(); })
+                .map(function (f) {
+                    var  field_list = ''
+                    if((f.field.type=='one2many' || f.field.type=='many2many')){
+                        var list =_.map(f.views[0].fields_view.fields,function (value, key_vals) {
+                            if(value.required ||(value.__attrs && value.__attrs.required==='1')){
+                                return [key_vals,value.string]}
+                        }).filter(function(value){if(value){return value}});
+                        var dict_list = f.dataset.cache;
+                        var list_keys = _.map(list,function (value) {return value[0]});
+                        var list_vals = _.map(list,function (value) {return value[1]});
+                        if(dict_list) {
+                            var index = 0;
+                            var break_flag = false;
+                            field_list = _.map(dict_list, function (value,key) {
+                                index= index+1;
+                                if(break_flag){return undefined}else{
+                                    var field_list_message = _.map(value.values,function (field,field_name) {
+                                        if(field===false &&list_keys.indexOf(field_name)>=0){return field_name
+                                     }else{return undefined}}).filter(function(value){return value});
+                                    if(_.any(field_list_message)){
+                                     break_flag = true
+                                     return "   <li>第"+(index)+"行 "+ list_vals[list_keys.indexOf(field_list_message[0])]+"</li>";}
+                                }
+                           }).filter(function(value){if(value){return value}});
+                        }
+                    }
+                    return _.str.sprintf('<li>%s</li>',_.escape(f.string)+field_list);
+                }).value();
+            warnings.unshift('<ul>');
+            warnings.push('</ul>');
+            this.do_warn(_t("The following fields are invalid:"), warnings.join(''));
+         },
+    });
+
 });

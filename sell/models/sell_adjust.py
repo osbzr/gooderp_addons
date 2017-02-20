@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
@@ -27,7 +27,7 @@ class sell_adjust(models.Model):
                        help=u'变更单编号，保存时可自动生成')
     order_id = fields.Many2one('sell.order', u'原始单据', states=READONLY_STATES,
                              copy=False, ondelete='restrict',
-                             help=u'要调整的原始销货订单')
+                             help=u'要调整的原始销货订单，只能调整已审核且没有全部出库的销货订单')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        index=True, copy=False,
@@ -79,7 +79,9 @@ class sell_adjust(models.Model):
                 raise UserError(u'要调整的商品 %s 在原始单据中不唯一' % line.goods_id.name)
             if origin_line:
                 origin_line.quantity += line.quantity # 调整后数量
-                origin_line.note = line.note
+                new_note = u'变更单：%s %s。\n' % (self.name, line.note)
+                origin_line.note = (origin_line.note and
+                                    origin_line.note + new_note or new_note)
                 if origin_line.quantity < origin_line.quantity_out:
                     raise UserError(u' %s 调整后数量不能小于原订单已出库数量' % line.goods_id.name)
                 elif origin_line.quantity > origin_line.quantity_out:
@@ -90,7 +92,8 @@ class sell_adjust(models.Model):
                     if move_line:
                         move_line.goods_qty += line.quantity
                         move_line.goods_uos_qty = move_line.goods_qty / move_line.goods_id.conversion
-                        move_line.note = line.note
+                        move_line.note = (move_line.note and
+                                          move_line.note or move_line.note + origin_line.note)
                     else:
                         raise UserError(u'商品 %s 已全部入库，建议新建购货订单' % line.goods_id.name)
                 # 调整后数量与已出库数量相等时，删除产生的发货单分单
@@ -139,13 +142,23 @@ class sell_adjust_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数')
+            raise UserError(u'税率不能输入超过100的数')
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数')
+            raise UserError(u'税率不能输入负数')
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
         self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
         self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
         self.amount = self.subtotal - self.tax_amount # 金额
+
+    @api.one
+    def _inverse_price(self):
+        '''由不含税价反算含税价，保存时生效'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+
+    @api.onchange('price', 'tax_rate')
+    def onchange_price(self):
+        '''当订单行的不含税单价改变时，改变含税单价'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
 
     order_id = fields.Many2one('sell.adjust', u'订单编号', index=True,
                                required=True, ondelete='cascade',
@@ -160,11 +173,15 @@ class sell_adjust_line(models.Model):
                                    help=u'商品的属性，当商品有属性时，该字段必输')
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
                              help=u'商品计量单位')
-    quantity = fields.Float(u'调整数量', default=1,
+    quantity = fields.Float(u'调整数量',
+                            default=1,
+                            required=True,
                             digits=dp.get_precision('Quantity'),
                             help=u'相对于原单据对应明细行的调整数量，可正可负')
-    price = fields.Float(u'销售单价', compute=_compute_all_amount,
-                         store=True, readonly=True,
+    price = fields.Float(u'销售单价',
+                         compute=_compute_all_amount,
+                         inverse=_inverse_price,
+                         store=True,
                          digits=dp.get_precision('Amount'),
                          help=u'不含税单价，由含税单价计算得出')
     price_taxed = fields.Float(u'含税单价',
@@ -175,18 +192,21 @@ class sell_adjust_line(models.Model):
     discount_amount = fields.Float(u'折扣额',
                                    digits=dp.get_precision('Amount'),
                                    help=u'输入折扣率后自动计算得出，也可手动输入折扣额')
-    amount = fields.Float(u'金额', compute=_compute_all_amount,
-                          store=True, readonly=True,
+    amount = fields.Float(u'金额',
+                          compute=_compute_all_amount,
+                          store=True,
                           digits=dp.get_precision('Amount'),
                           help=u'金额  = 价税合计  - 税额')
     tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate,
                             help=u'默认值取公司销项税率')
-    tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
-                              store=True, readonly=True,
+    tax_amount = fields.Float(u'税额',
+                              compute=_compute_all_amount,
+                              store=True,
                               digits=dp.get_precision('Amount'),
                               help=u'由税率计算得出')
-    subtotal = fields.Float(u'价税合计', compute=_compute_all_amount,
-                            store=True, readonly=True,
+    subtotal = fields.Float(u'价税合计',
+                            compute=_compute_all_amount,
+                            store=True,
                             digits=dp.get_precision('Amount'),
                             help=u'含税单价 乘以 数量')
     note = fields.Char(u'备注',
@@ -214,7 +234,6 @@ class sell_adjust_line(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、含税单价或优惠率发生变化时，优惠金额发生变化'''
-        price = (self.tax_rate != -100 and
-                 self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = (self.quantity * price *
                                 self.discount_rate * 0.01)

@@ -22,6 +22,14 @@ AVAILABLE_PRIORITIES = [
 class project(models.Model):
     _name = 'project'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
+    _inherit = ['mail.thread']
+
+    @api.multi
+    def _compute_hours(self):
+        '''计算项目的实际工时'''
+        for project in self:
+            for task in project.task_ids:
+                project.hours += task.hours
 
     auxiliary_id = fields.Many2one(
         string=u'辅助核算',
@@ -48,6 +56,13 @@ class project(models.Model):
         inverse_name='project_id',
     )
 
+    plan_hours = fields.Float(u'计划工时',
+                              track_visibility='onchange')
+    hours = fields.Float(u'实际工时',
+                         compute=_compute_hours)
+    address = fields.Char(u'地址')
+    note = fields.Text(u'备注')
+
 
 class project_invoice(models.Model):
     _name = 'project.invoice'
@@ -57,9 +72,9 @@ class project_invoice(models.Model):
     def _compute_tax_amount(self):
         '''计算税额'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数\n当前税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入超过100的数\n当前税率:%s'%self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数\n当前税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入负数\n当前税率:%s'%self.tax_rate)
         self.tax_amount = self.amount / (100 + self.tax_rate) * self.tax_rate
 
     project_id = fields.Many2one(
@@ -122,7 +137,7 @@ class project_invoice(models.Model):
         for line in self:
             invoice_id = False
             if not line.project_id.customer_id:
-                return
+                raise UserError(u'生成发票前请输入客户')
             category = self.env.ref('money.core_category_sale')
             if not float_is_zero(self.amount, 2):
                 invoice_id = self.env['money.invoice'].create(
@@ -139,18 +154,21 @@ class task(models.Model):
 
     @api.multi
     def _compute_hours(self):
-        '''计算任务的实际时间'''
+        '''计算任务的实际工时'''
         for task in self:
-            for line in self.env['timeline'].search(
-                                [('task_id', '=', task.id)]):
+            for line in task.timeline_ids:
                 task.hours += line.hours
+
+    def _default_status_impl(self):
+        '''任务阶段默认值的实现方法'''
+        status_id = self.env['task.status'].search(
+            [('state', '=', 'doing')])
+        return status_id and status_id[0]
 
     @api.model
     def _default_status(self):
         '''创建任务时，任务阶段默认为doing状态的阶段'''
-        status_id = self.env['task.status'].search(
-            [('state', '=', 'doing')])
-        return status_id and status_id[0]
+        return self._default_status_impl()
 
     name = fields.Char(
         string=u'名称',
@@ -194,8 +212,8 @@ class task(models.Model):
         default=_default_status,
         track_visibility='onchange',
     )
-    plan_hours = fields.Float(u'计划时间')
-    hours = fields.Float(u'实际时间',
+    plan_hours = fields.Float(u'计划工时')
+    hours = fields.Float(u'实际工时',
                          compute=_compute_hours)
     sequence = fields.Integer(u'顺序')
     is_schedule = fields.Boolean(u'列入计划')

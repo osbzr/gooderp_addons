@@ -96,21 +96,11 @@ class buy_payment_wizard(models.TransientModel):
             raise UserError(u'开始日期不能大于结束日期！')
 
         receipt_obj = self.env['buy.receipt']
-        count = sum_payment_rate = 0    # 行数及所有行的付款率之和
         for receipt in receipt_obj.search(self._get_domain(), order='partner_id,date'):
             # 用查找到的入库单信息来创建一览表
             line = self.env['buy.payment'].create(self._prepare_buy_payment(receipt))
             res.append(line.id)
-            count += 1
-            sum_payment_rate += line.payment_rate
 
-        # 创建一览表的平均付款率行
-        payment_rate = count != 0 and sum_payment_rate / count or 0
-        line_total = self.env['buy.payment'].create({
-            'order_name': u'平均付款率',
-            'payment_rate': payment_rate,
-        })
-        res.append(line_total.id)
         return {
             'name': u'采购付款一览表',
             'view_mode': 'tree',

@@ -10,10 +10,10 @@
                     <field name='goods' />
                     <field name='attribute' groups='goods.multi_attrs_groups' />
 
-                    <field name='goods_qty_begain' />
-                    <field name='goods_qty_in' />
-                    <field name='goods_qty_out' />
-                    <field name='goods_qty_end' />
+                    <field name='goods_qty_begain' sum="1" />
+                    <field name='goods_qty_in' sum="1" />
+                    <field name='goods_qty_out' sum="1"/>
+                    <field name='goods_qty_end' sum="1" />
 
                     <field name='uom' />
 

@@ -69,6 +69,7 @@
                         <tree editable="bottom">
                             <field name="name" />
                             <field name="account_id" />
+                            <field name="auxiliary_id"/>
                             <field name="partner_id" />
                             <field name="goods_id" />
                         </tree>
@@ -83,6 +84,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-        <menuitem id='voucher_template_menu' action='voucher_template_action' parent='voucher_home_menu' sequence='20'/>
+        <menuitem id='voucher_template_menu' action='voucher_template_action' parent='finance_setting_menu' sequence='20'/>
     </data>
 </openerp>

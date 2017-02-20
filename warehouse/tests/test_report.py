@@ -29,9 +29,6 @@ class TestReport(TransactionCase):
 
         self.env['wh.internal'].search([]).approve_order()
 
-        self.track_wizard = self.env['report.lot.track.wizard'].create({
-                            'date_start': '2016-04-01',
-                            'date_end': '2016-04-03'})
         self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({
                             'date_start': '2016-04-01',
                             'date_end': '2016-04-03'})
@@ -48,21 +45,6 @@ class TestReport(TransactionCase):
         self.assertEqual(report_base.collect_data_by_sql(), [])
 
     def test_open_report(self):
-        # 测试批号跟踪表的wizard
-        self.assertEqual(self.track_wizard.onchange_date(), {})
-
-        self.track_wizard.date_end = '1999-09-09'
-        results = self.track_wizard.onchange_date()
-        real_results = {'warning': {
-            'title': u'错误',
-            'message': u'结束日期不可以小于开始日期'
-        }, 'value': {'date_end': self.track_wizard.date_start}}
-
-        self.assertEqual(results, real_results)
-        self.assertEqual(self.track_wizard.open_report().get('res_model'), 'report.lot.track')
-        # 测试wizard默认日期
-        self.env['report.lot.track.wizard'].create({})
-
         # 测试商品收发明细表的wizard
         self.assertEqual(self.transceive_wizard.onchange_date(), {})
 
@@ -77,98 +59,6 @@ class TestReport(TransactionCase):
         self.assertEqual(self.transceive_wizard.open_report().get('res_model'), 'report.stock.transceive')
         # 测试wizard默认日期
         self.env['report.stock.transceive.wizard'].create({})
-
-    def test_lot_track_search_read(self):
-        lot_track = self.env['report.lot.track'].create({})
-        self.track_wizard.date_start = '2016-02-01'
-        context = self.track_wizard.open_report().get('context')
-
-        real_results = [
-            (u'键盘', 'kb160000567', u'总仓', 600),
-            (u'鼠标', 'ms160301', u'总仓', 1),
-            (u'鼠标', 'ms160302', u'总仓', 1),
-        ]
-        results = lot_track.with_context(context).search_read(domain=[])
-        self.assertEqual(len(results), len(real_results))
-        for result in results:
-            result = (
-                result.get('goods'),
-                result.get('lot'),
-                result.get('warehouse'),
-                result.get('qty')
-            )
-            self.assertTrue(result in real_results)
-
-        domain = ['|', '|', ('lot', 'ilike', '301'), ('lot', '=', 'ms160301'), ('goods', '=', u'键盘')]
-        real_results = [
-            (u'键盘', 'kb160000567', u'总仓', 600),
-            (u'鼠标', 'ms160301', u'总仓', 1),
-        ]
-        domain_results = lot_track.with_context(context).search_read(domain=domain, order='qty DESC')
-        self.assertEqual(sorted(domain_results, key=operator.itemgetter('qty')), domain_results)
-
-        domain_results = lot_track.with_context(context).search_read(domain=domain, order='qty ASC')
-        self.assertEqual(sorted(domain_results, key=operator.itemgetter('qty'), reverse=True), domain_results)
-
-        self.assertEqual(len(domain_results), len(real_results))
-        for result in domain_results:
-            result = (
-                result.get('goods'),
-                result.get('lot'),
-                result.get('warehouse'),
-                result.get('qty')
-            )
-            self.assertTrue(result in real_results)
-
-        # domain条件中不是列表或元祖的
-        with self.assertRaises(UserError):
-            domain = ['domain']
-            lot_track.with_context(context).search_read(domain=domain)
-
-        # domain条件中长度不为3的
-        with self.assertRaises(UserError):
-            domain = [('goods', u'鼠标')]
-            lot_track.with_context(context).search_read(domain=domain)
-
-        # domain条件中使用不合法的操作符
-        with self.assertRaises(UserError):
-            domain = [('goods', 'lg', u'鼠标')]
-            lot_track.with_context(context).search_read(domain=domain)
-
-    def test_lot_track_read_group(self):
-        lot_track = self.env['report.lot.track'].create({})
-        self.track_wizard.date_start = '2016-02-01'
-        context = self.track_wizard.open_report().get('context')
-
-        results = lot_track.with_context(context).read_group([], [], groupby=['goods'])
-        real_results = [
-            (u'键盘', 600, 1),
-            (u'鼠标', 2, 2),
-        ]
-
-        self.assertEqual(len(results), len(real_results))
-        for result in results:
-            result = (
-                result.get('goods'),
-                result.get('qty'),
-                result.get('goods_count'),
-            )
-            self.assertTrue(result in real_results)
-
-        results = lot_track.with_context(context).read_group([('lot', '=', 'ms160301')], [], groupby=['goods', 'warehouse'])
-        real_results = [
-            (u'鼠标', 1, 1, {'group_by': ['warehouse']}),
-        ]
-
-        self.assertEqual(len(results), len(real_results))
-        for result in results:
-            result = (
-                result.get('goods'),
-                result.get('qty'),
-                result.get('goods_count'),
-                result.get('__context'),
-            )
-            self.assertTrue(result in real_results)
 
     def test_stock_transceive_search_read(self):
         stock_transceive = self.env['report.stock.transceive'].create({})

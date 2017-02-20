@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
@@ -51,13 +51,12 @@ class sell_order(models.Model):
     @api.model
     def _default_warehouse(self):
         return self._default_warehouse_impl()
+
     @api.model
     def _default_warehouse_impl(self):
         if self.env.context.get('warehouse_type'):
             return self.env['warehouse'].get_warehouse_by_type(
                         self.env.context.get('warehouse_type'))
-
-        return self.env['warehouse'].browse()
 
     @api.one
     @api.depends('type')
@@ -86,18 +85,29 @@ class sell_order(models.Model):
                             ondelete='restrict', states=READONLY_STATES,
                             default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0],
                                  help=u'单据负责人')
-    date = fields.Date(u'单据日期', states=READONLY_STATES,
+    date = fields.Date(u'单据日期',
+                       required=True,
+                       states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
-                       index=True, copy=False, help=u"默认是订单创建日期")
+                       index=True,
+                       copy=False,
+                       help=u"默认是订单创建日期")
     delivery_date = fields.Date(
-        u'要求交货日期', states=READONLY_STATES,
+        u'要求交货日期',
+        required=True,
+        states=READONLY_STATES,
         default=lambda self: fields.Date.context_today(self),
-        index=True, copy=False, help=u"订单的要求交货日期")
+        index=True,
+        copy=False,
+        help=u"订单的要求交货日期")
     type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', 
                             default='sell', states=READONLY_STATES,
                             help=u'销货订单的类型，分为销货或退货')
-    warehouse_id = fields.Many2one('warehouse', u'调出仓库',
-                                   ondelete='restrict', states=READONLY_STATES,
+    warehouse_id = fields.Many2one('warehouse',
+                                   u'调出仓库',
+                                   required=True,
+                                   ondelete='restrict',
+                                   states=READONLY_STATES,
                                    default=_default_warehouse,
                                    help=u'产品将从该仓库调出')
     name = fields.Char(u'单据编号', index=True, copy=False,
@@ -108,7 +118,7 @@ class sell_order(models.Model):
     note = fields.Text(u'备注', help=u'单据备注')
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
                                  help=u'整单优惠率')
-    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES, 
+    discount_amount = fields.Float(u'抹零', states=READONLY_STATES,
                                    track_visibility='always',
                                    digits=dp.get_precision('Amount'),
                                    help=u'整单优惠金额，可由优惠率自动计算出来，也可手动输入')
@@ -265,6 +275,7 @@ class sell_order(models.Model):
             discount_amount = line.discount_amount
 
         return {
+            'type': self.type == 'sell' and 'out' or 'in',
             'sell_line_id': line.id,
             'goods_id': line.goods_id.id,
             'attribute_id': line.attribute_id.id,
@@ -369,9 +380,9 @@ class sell_order_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError('税率不能输入超过100的数!\n输入税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入超过100的数!\n输入税率:%s'%self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError('税率不能输入负数\n 输入税率:%s'%self.tax_rate)
+            raise UserError(u'税率不能输入负数\n 输入税率:%s'%self.tax_rate)
         if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
             self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
             self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
@@ -386,14 +397,27 @@ class sell_order_line(models.Model):
             self.amount = self.subtotal - self.tax_amount # 本位币金额
             self.currency_amount = currency_amount  # 外币金额
 
+    @api.one
+    def _inverse_price(self):
+        '''由不含税价反算含税价，保存时生效'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+
+    @api.onchange('price', 'tax_rate')
+    def onchange_price(self):
+        '''当订单行的不含税单价改变时，改变含税单价'''
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+
     order_id = fields.Many2one('sell.order', u'订单编号', index=True,
                                required=True, ondelete='cascade',
                                help=u'关联订单的编号')
     currency_amount = fields.Float(u'外币金额', compute=_compute_all_amount,
-                          store=True, readonly=True,
+                          store=True,
                           digits=dp.get_precision(u'金额'),
                           help=u'外币金额')
-    goods_id = fields.Many2one('goods', u'商品', ondelete='restrict',
+    goods_id = fields.Many2one('goods',
+                               u'商品',
+                               required=True,
+                               ondelete='restrict',
                                help=u'商品')
     using_attribute = fields.Boolean(u'使用属性', compute=_compute_using_attribute,
                                help=u'商品是否使用属性')
@@ -403,34 +427,42 @@ class sell_order_line(models.Model):
                                    help=u'商品的属性，当商品有属性时，该字段必输')
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
                              help=u'商品计量单位')
-    quantity = fields.Float(u'数量', default=1,
+    quantity = fields.Float(u'数量',
+                            default=1,
+                            required=True,
                             digits=dp.get_precision('Quantity'),
                             help=u'下单数量')
     quantity_out = fields.Float(u'已执行数量', copy=False,
                                 digits=dp.get_precision('Quantity'),
                                 help=u'销货订单产生的发货单/退货单已执行数量')
-    price = fields.Float(u'销售单价', compute=_compute_all_amount,
-                         store=True, readonly=True,
+    price = fields.Float(u'销售单价',
+                         compute=_compute_all_amount,
+                         inverse=_inverse_price,
+                         store=True,
                          digits=(12, 6),
                          help=u'不含税单价，由含税单价计算得出')
-    price_taxed = fields.Float(u'含税单价',digits=(12, 6),
-                         help=u'含税单价，取商品零售价')
+    price_taxed = fields.Float(u'含税单价',
+                               digits=(12, 6),
+                               help=u'含税单价，取商品零售价')
     discount_rate = fields.Float(u'折扣率%',
                                    help=u'折扣率')
     discount_amount = fields.Float(u'折扣额',
                                    help=u'输入折扣率后自动计算得出，也可手动输入折扣额')
-    amount = fields.Float(u'金额', compute=_compute_all_amount, 
-                          store=True, readonly=True,
+    amount = fields.Float(u'金额',
+                          compute=_compute_all_amount,
+                          store=True,
                           digits=dp.get_precision('Amount'),
                           help=u'金额  = 价税合计  - 税额')
     tax_rate = fields.Float(u'税率(%)',
                             help=u'税率')
-    tax_amount = fields.Float(u'税额', compute=_compute_all_amount, store=True, 
-                              readonly=True,
+    tax_amount = fields.Float(u'税额',
+                              compute=_compute_all_amount,
+                              store=True,
                               digits=dp.get_precision('Amount'),
                               help=u'税额')
-    subtotal = fields.Float(u'价税合计', compute=_compute_all_amount, 
-                            store=True, readonly=True,
+    subtotal = fields.Float(u'价税合计',
+                            compute=_compute_all_amount,
+                            store=True,
                             digits=dp.get_precision('Amount'),
                             help=u'含税单价 乘以 数量')
     note = fields.Char(u'备注',
@@ -450,6 +482,7 @@ class sell_order_line(models.Model):
             else:
                 self.discount_rate = 0
 
+    @api.multi
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格、税率'''
@@ -471,7 +504,6 @@ class sell_order_line(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        price = (self.tax_rate != -100
-                 and self.price_taxed / (1 + self.tax_rate * 0.01) or 0)
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = self.quantity * price \
                 * self.discount_rate * 0.01

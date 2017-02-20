@@ -40,7 +40,7 @@
                                   销售前十商品。
     ''',
     'version': '11.11',
-    'depends': ['core', 'warehouse', 'money', 'partner_address', 'staff'],
+    'depends': ['warehouse', 'partner_address', 'staff'],
     'data': [
             'data/sell_data.xml',
             'security/groups.xml',

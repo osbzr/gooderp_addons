@@ -34,14 +34,14 @@
             <field name='name'>应收票据</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
-            <field name='auxiliary_financing'>partner</field>
+            <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="account_ar" model='finance.account'>
             <field name='code'>1122</field>
             <field name='name'>应收账款</field>
             <field name='costs_types'>assets</field>
             <field name='balance_directions'>in</field>
-            <field name='auxiliary_financing'>partner</field>
+            <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="small_business_chart1123" model='finance.account'>
             <field name='code'>1123</field>
@@ -227,7 +227,7 @@
             <field name='name'>预收账款</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
-            <field name='auxiliary_financing'>partner</field>
+            <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="small_business_chart2211001" model='finance.account'>
             <field name='code'>2211001</field>
@@ -348,12 +348,6 @@
         <record id="small_business_chart2221007" model='finance.account'>
             <field name='code'>2221007</field>
             <field name='name'>应交税费-城市维护建设税</field>
-            <field name='costs_types'>debt</field>
-            <field name='balance_directions'>out</field>
-        </record>
-        <record id="small_business_chart2221008" model='finance.account'>
-            <field name='code'>2221008</field>
-            <field name='name'>应交税费-应交房产税</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
@@ -936,15 +930,6 @@
             <field name='balance_two'>预收账款</field>
             <field name='line_num_two'>34</field>
             <field name='balance_two_formula'>2203~2203999999</field>
-        </record>
-        <record id='bs_5' model='balance.sheet'>
-            <field name="line">6</field>
-            <field name='balance'>预付账款</field>
-            <field name='line_num'>5</field>
-            <field name='balance_formula'>1123~1123999999</field>
-            <field name='balance_two'>应付职工薪酬</field>
-            <field name='line_num_two'>35</field>
-            <field name='balance_two_formula'>2211~2211999999</field>
         </record>
         <record id='bs_5' model='balance.sheet'>
             <field name="line">6</field>

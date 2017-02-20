@@ -21,7 +21,7 @@
                                      其他收支明细。
     ''',
     'version': '11.11',
-    'depends': ['core', 'base', 'finance', 'report_docx'],
+    'depends': ['finance', 'report_docx'],
     'data': [
         'data/money_data.xml',
         'security/groups.xml',

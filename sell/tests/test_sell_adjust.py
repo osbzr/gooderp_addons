@@ -209,6 +209,19 @@ class test_sell_adjust_line(TransactionCase):
             self.assertTrue(line.price_taxed == 117)
             self.assertTrue(line.subtotal == 117)
 
+    def test_inverse_price(self):
+        '''由不含税价反算含税价，保存时生效'''
+        for line in self.adjust.line_ids:
+            line.price = 10
+            self.assertAlmostEqual(line.price_taxed, 11.7)
+
+    def test_onchange_price(self):
+        '''当订单行的不含税单价改变时，改变含税单价'''
+        for line in self.adjust.line_ids:
+            line.price = 10
+            line.onchange_price()
+            self.assertAlmostEqual(line.price_taxed, 11.7)
+
     def test_compute_all_amount_wrong_tax_rate(self):
         '''明细行上输入错误税率，应报错'''
         for line in self.adjust.line_ids:

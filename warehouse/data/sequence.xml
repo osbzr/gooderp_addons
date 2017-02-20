@@ -25,7 +25,7 @@
             <field name='name'>移库单</field>
             <field name='code'>wh.internal</field>
             <field eval='4' name='padding'/>
-            <field name='prefix'>OTHERS/INT/%(y)s%(month)s</field>
+            <field name='prefix'>TRANSFER/%(y)s%(month)s</field>
         </record>
 
         <record id='wh_inventory_sequence' model='ir.sequence'>

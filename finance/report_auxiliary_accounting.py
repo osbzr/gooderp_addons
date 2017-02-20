@@ -12,9 +12,9 @@ class report_auxiliary_accounting(models.Model):
     account_id = fields.Many2one('finance.account', u'会计科目')
     auxiliary_id = fields.Many2one(
         'auxiliary.financing', u'辅助核算', ondelete='restrict')
-    debit = fields.Float(u'借方金额', digits=dp.get_precision(u'金额'))
-    credit = fields.Float(u'贷方金额', digits=dp.get_precision(u'金额'))
-    balance = fields.Float(u'余额', digits=dp.get_precision(u'金额'))
+    debit = fields.Float(u'借方金额', digits=dp.get_precision('Amount'))
+    credit = fields.Float(u'贷方金额', digits=dp.get_precision('Amount'))
+    balance = fields.Float(u'余额', digits=dp.get_precision('Amount'))
 
     @api.multi
     def view_voucher_line_detail(self):
@@ -48,4 +48,3 @@ class report_auxiliary_accounting(models.Model):
                   GROUP BY line.account_id, line.auxiliary_id
             )
         """)
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

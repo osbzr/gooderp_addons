@@ -18,11 +18,12 @@
     'category': 'gooderp',
     'version': '11.11',
 
-    'depends': ['core', 'money'],
+    'depends': ['money'],
 
     'data': [
         'security/ir.model.access.csv',
         'security/groups.xml',
+        'security/rules.xml',
         'views/views.xml',
         'data/data.xml',
         'data/home_page.xml'

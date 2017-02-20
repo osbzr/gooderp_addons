@@ -31,17 +31,21 @@ class TestProduction(TransactionCase):
     def test_approve(self):
         # 库存不足的时候直接拆卸，会报没有库存的异常
         with self.assertRaises(UserError):
-            self.disassembly.approve_order()
+            self.disassembly.approve_feeding()
 
         # 先组装，后拆卸可以正常出入库
+        self.assembly.approve_feeding()
         self.assembly.approve_order()
+        self.disassembly.approve_feeding()
         self.disassembly.approve_order()
 
         self.assertEqual(self.assembly.state, 'done')
         self.assertEqual(self.disassembly.state, 'done')
 
     def test_cancel(self):
+        self.assembly.approve_feeding()
         self.assembly.approve_order()
+        self.disassembly.approve_feeding()
         self.disassembly.approve_order()
 
         # 组装的产品已经被拆卸过了，此时会报异常
@@ -49,34 +53,34 @@ class TestProduction(TransactionCase):
             self.assembly.cancel_approved_order()
 
         self.disassembly.cancel_approved_order()
-        self.assembly.cancel_approved_order()
 
-        # 取消后的单据的状态为draft
-        self.assertEqual(self.assembly.state, 'draft')
-        self.assertEqual(self.disassembly.state, 'draft')
+        # 取消后的单据的状态为 feeding
+        self.assertEqual(self.disassembly.state, 'feeding')
 
     def test_unlink(self):
+        self.assembly.approve_feeding()
         self.assembly.approve_order()
-        self.disassembly.approve_order()
 
         # 没法删除已经审核果的单据
         with self.assertRaises(UserError):
             self.assembly.unlink()
 
+        self.disassembly.approve_feeding()
+        self.disassembly.approve_order()
         # 组装的产品已经被拆卸过了，此时会报异常
         with self.assertRaises(UserError):
             self.assembly.unlink()
 
         self.disassembly.cancel_approved_order()
-        self.assembly.cancel_approved_order()
-
-        # 反审核后可以被删除掉
-        self.assembly.unlink()
-        self.disassembly.unlink()
-
-        # 删除后的单据应该不存在
-        self.assertTrue(not self.disassembly.exists())
-        self.assertTrue(not self.assembly.exists())
+#         self.assembly.cancel_approved_order()
+# 
+#         # 反审核后可以被删除掉
+#         self.assembly.unlink()
+#         self.disassembly.unlink()
+# 
+#         # 删除后的单据应该不存在
+#         self.assertTrue(not self.disassembly.exists())
+#         self.assertTrue(not self.assembly.exists())
 
     def test_create(self):
         temp_assembly = self.env['wh.assembly'].create({'name': '/'})
@@ -92,6 +96,7 @@ class TestProduction(TransactionCase):
 
     def test_apportion(self):
         self.assembly_mutli.fee = 0
+        self.assembly_mutli.approve_feeding()
         self.assembly_mutli.approve_order()
 
         # demo数据中成本为鼠标 40 * 2，键盘 80 * 2，所以成本应该为平摊为120
@@ -106,31 +111,44 @@ class TestProduction(TransactionCase):
         self.assertEqual(self.assembly_mutli_keyboard_mouse_1.cost_unit, 170)
         self.assertEqual(self.assembly_mutli_keyboard_mouse_2.cost_unit, 170)
 
-        # 取消掉当前的单据，防止其他单据的库存不足
-        self.assembly_mutli.cancel_approved_order()
-
+    def test_apportion_assembly_test_cost(self):
+        ''' 测试 组装单 没有费用 组合件成本 '''
         self.assembly.fee = 0
+        self.assembly.approve_feeding()
         self.assembly.approve_order()
 
         # demo数据中入库的成本为鼠标 40 * 1，键盘 80 * 2, 所以成本应该为100
         self.assertEqual(self.assembly.line_in_ids.cost_unit, 100)
 
-        self.assembly.cancel_approved_order()
+    def test_apportion_assembly_cost_has_fee(self):
+        ''' 测试 组装单 有费用 组合件成本 '''
         self.assembly.fee = 100
+        self.assembly.approve_feeding()
         self.assembly.approve_order()
 
         # 指定组装费用位100，此时成本应该位150
         self.assertEqual(self.assembly.line_in_ids.cost_unit, 150)
 
+    def test_apportion_disassembly_no_fee_division(self):
+        ''' 测试 拆卸单 没有费用 子件成本 '''
+        self.assembly.fee = 100
+        self.assembly.approve_feeding()
+        self.assembly.approve_order() # 指定组装费用为100，此时成本应该为150
+        self.disassembly.approve_feeding()
         self.disassembly.approve_order()
 
         # 150的成本被拆分成鼠标 * 1(成本40) + 键盘 * 1（成本80）,所以此时应该均分为50 + 100
         self.assertEqual(self.disassembly_mouse.cost_unit, 50)
         self.assertEqual(self.disassembly_keyboard.cost_unit, 100)
 
-        self.disassembly.cancel_approved_order()
-        self.disassembly.fee = 120
+    def test_apportion_disassembly_has_fee_division(self):
+        ''' 测试 拆卸单 费用分配到 子件成本 '''
+        self.assembly.fee = 100
+        self.assembly.approve_feeding()
+        self.assembly.approve_order() # 指定组装费用为100，此时成本应该为150
 
+        self.disassembly.fee = 120
+        self.disassembly.approve_feeding()
         self.disassembly.approve_order()
         # 指定拆卸费用位120，此时平分270，此时应该位 90 + 180
         self.assertEqual(self.disassembly_mouse.cost_unit, 90)
@@ -284,6 +302,15 @@ class TestProduction(TransactionCase):
         wh_assembly_ass2.goods_qty = 1
         wh_assembly_ass2.onchange_goods_qty()
 
+    def test_assembly_approve_order_no_feeding(self):
+        ''' 测试 组装单 审核 没有投料 就审核 '''
+        with self.assertRaises(UserError):
+            self.assembly.approve_order()
+
+    def test_assembly_unlink(self):
+        ''' 测试 组装单 删除 '''
+        self.assembly.unlink()
+
     def test_outsource_onchange_goods_qty_no_bom(self):
         ''' 测试 委外加工单 onchange_goods_qty 不存在 物料清单 '''
         # no bom_id
@@ -329,28 +356,31 @@ class TestProduction(TransactionCase):
         self.outsource_out1.onchange_bom()
         self.assertTrue(self.outsource_out1.is_many_to_many_combinations)
 
-    def test_outsource_approve_order_no_in_line(self):
-        ''' 测试  委外加工单 审核：一个明细行没有值 '''
+    def test_outsource_approve_feeding(self):
+        ''' 测试  委外加工单 审核: 存在委外费用生成结算单 '''
+        self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
+        self.outsource_out1.approve_feeding()
+        self.outsource_out1.approve_order()
+
+    def test_outsource_approve_feeding_no_in_line(self):
+        ''' 测试  委外加工单 投料：一个明细行没有值 '''
         # 当一个明细行没有值时，raise 委外加工单必须存在组合件和子件明细行
         self.outsource_out1.line_in_ids.unlink()
         with self.assertRaises(UserError):
-            self.outsource_out1.approve_order()
-
-    def test_outsource_approve_order_no_fee(self):
-        ''' 测试  委外加工单 审核: 不存在委外费用 '''
-        self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
-        self.outsource_out1.approve_order()
+            self.outsource_out1.approve_feeding()
 
     def test_outsource_approve_order_has_fee(self):
         ''' 测试  委外加工单 审核: 存在委外费用生成结算单 '''
         self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
         self.outsource_out1.outsource_fee = 100
+        self.outsource_out1.approve_feeding()
         self.outsource_out1.approve_order()
 
     def test_outsource_cancel_approved_order(self):
         ''' 测试  委外加工单 反审核 '''
         self.outsource_out1.outsource_partner_id = self.env.ref('core.lenovo').id
         self.outsource_out1.outsource_fee = 100
+        self.outsource_out1.approve_feeding()
         self.outsource_out1.approve_order()
         self.outsource_out1.cancel_approved_order()
 
@@ -364,6 +394,11 @@ class TestProduction(TransactionCase):
                                     'outsource_partner_id': self.env.ref('core.lenovo').id,
                                     'outsource_fee': 10,
                                     })
+
+    def test_outsource_approve_order_no_feeding(self):
+        ''' 测试 委外加工单 审核 没有投料 就审核 '''
+        with self.assertRaises(UserError):
+            self.outsource_out1.approve_order()
 
     def test_disassembly_onchange_goods_qty(self):
         ''' 测试 拆卸单 onchange_goods_qty '''
@@ -449,12 +484,19 @@ class TestProduction(TransactionCase):
         wh_disassembly_dis3.onchange_bom()
         self.assertTrue(wh_disassembly_dis3.is_many_to_many_combinations)
 
+    def test_disassembly_approve_order_no_feeding(self):
+        ''' 测试 拆卸单 审核 没有投料 就审核 '''
+        with self.assertRaises(UserError):
+            self.disassembly.approve_order()
+
     def test_cancel_approve_order_has_voucher(self):
         ''' 测试 拆卸单 反审核 删除发票 '''
+        self.assembly.approve_feeding()
         self.assembly.approve_order()
-        self.disassembly.fee = 10
-#         print "cost", self.disassembly.line_out_ids[0].cost
-#         print "cost in", self.disassembly.line_in_ids[0].cost, self.disassembly.line_in_ids[1].cost
-#         self.disassembly.approve_order()
-# 
-#         self.disassembly.cancel_approved_order()
+        self.disassembly.approve_feeding()
+        self.disassembly.approve_order()
+        self.disassembly.cancel_approved_order()
+
+    def test_disassembly_unlink(self):
+        ''' 测试 拆卸单 删除 '''
+        self.disassembly.unlink()

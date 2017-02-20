@@ -7,6 +7,14 @@ from odoo.exceptions import UserError
 class goods(models.Model):
     _name = 'goods'
 
+    @api.model
+    def _get_default_not_saleable_impl(self):
+        return False
+
+    @api.model
+    def _get_default_not_saleable(self):
+        return self._get_default_not_saleable_impl()
+
     @api.multi
     def name_get(self):
         '''在many2one字段里显示 编号_名称'''
@@ -22,9 +30,12 @@ class goods(models.Model):
         '''在many2one字段中支持按编号搜索'''
         args = args or []
         if name:
-            goods_ids = self.search([('code', 'ilike', name)])
+            args.append(('code', 'ilike', name))
+            goods_ids = self.search(args)
             if goods_ids:
                 return goods_ids.name_get()
+            else:
+                args.remove(('code', 'ilike', name))
         return super(goods, self).name_search(name=name, args=args,
                                               operator=operator, limit=limit)
 
@@ -39,7 +50,8 @@ class goods(models.Model):
     def copy(self, default=None):
         if default is None:
             default = {}
-        default.update(name=_('%s (copy)') % (self.name))
+        if not default.has_key('name'):
+            default.update(name=_('%s (copy)') % (self.name))
         return super(goods, self).copy(default=default)
 
     code = fields.Char(u'编号')
@@ -59,6 +71,9 @@ class goods(models.Model):
                         digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)',
                             help=u'产品税率')
+    not_saleable = fields.Boolean(u'不可销售',
+                                  default=_get_default_not_saleable,
+                                  help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '产品不能重名'),

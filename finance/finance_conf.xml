@@ -18,7 +18,7 @@
             <field name="name">finance.account.tree</field>
             <field name="model">finance.account</field>
             <field name="arch" type="xml">
-                <tree editable="TOP" string="科目">
+                <tree editable="top" string="科目">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="currency_id" groups='finance.group_multi_currency'/>

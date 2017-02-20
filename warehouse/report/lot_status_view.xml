@@ -5,7 +5,7 @@
             <field name='name'>report.lot.status.tree</field>
             <field name='model'>report.lot.status</field>
             <field name='arch' type='xml'>
-                <tree string='批号状态表'>
+                <tree string='批次余额表'>
                     <field name='goods' />
                     <field name='uom' />
                     <field name='uos' groups='goods.auxiliary_unit_groups' />
@@ -24,7 +24,7 @@
             <field name='name'>report.lot.status.search</field>
             <field name='model'>report.lot.status</field>
             <field name='arch' type='xml'>
-                <search string='批号状态表' >
+                <search string='批次余额表' >
                     <field name='goods' string='产品' filter_domain="[('goods', 'ilike', self)]" />
                     <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]"
                     	 groups='warehouse.multi_warehouse_groups' />
@@ -43,9 +43,9 @@
             <field name='name'>report.lot.status.graph</field>
             <field name='model'>report.lot.status</field>
             <field name='arch' type='xml'>
-                <pivot string='批号状态表'>
+                <pivot string='批次余额表'>
+                	<field name='goods' type='row' />
                     <field name='lot' type='row' groups='goods.batch_groups' />
-                    <field name='goods' type='row' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='qty' type='measure' />
                 </pivot>

@@ -11,11 +11,11 @@ class wh_move_matching(models.Model):
 
     line_in_id = fields.Many2one(
         'wh.move.line', u'入库',
-        ondelete='set null', required=True, index=True,
+        ondelete='set null', index=True,
         help=u'入库单行')
     line_out_id = fields.Many2one(
         'wh.move.line', u'出库',
-        ondelete='set null', required=True, index=True,
+        ondelete='set null', index=True,
         help=u'出库单行')
     qty = fields.Float(
         u'数量',

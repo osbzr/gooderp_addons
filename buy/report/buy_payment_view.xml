@@ -19,7 +19,7 @@
                     <field name="amount" sum="优惠后金额合计" groups='buy.buy_discount_groups'/>
                     <field name="payment" sum="已付款合计"/>
                     <field name="balance" sum="应付款余额合计"/>
-                    <field name="payment_rate"/>
+                    <field name="payment_rate" avg='1'/>
                     <field name="note"/>
                 </tree>
             </field>

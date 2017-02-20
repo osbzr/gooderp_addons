@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    Odoo, Open Source Management Solution
@@ -6,7 +6,7 @@
 #    Copyright (C) 2012-2013 Mrshelly@gmail.com  upgrade to 7.0
 #    Copyright (C) 2014      JianJian@osbzr.com  upgrade to 8.0
 #    Copyright (C) 2016      jeff@osbzr.com  upgrade to 10.0
-#    
+#
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,5 +24,3 @@
 ##############################################################################
 
 import backup_scheduler
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

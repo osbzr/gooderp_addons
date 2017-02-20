@@ -213,6 +213,3 @@ class report_base(models.Model):
                 res.append({field: record.get(field) for field in fields})
 
         return res
-
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

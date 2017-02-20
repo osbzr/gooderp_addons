@@ -14,6 +14,9 @@ class VoucherTemplateLine(models.Model):
     partner_id = fields.Many2one('partner', u'往来单位')
     goods_id = fields.Many2one('goods', u'商品')
     template_id = fields.Many2one('voucher.template', string='模板id')
+    auxiliary_id = fields.Many2one(
+        'auxiliary.financing', u'辅助核算', help='辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\
+        以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现', ondelete='restrict')
 
 
 class voucher_template_wizard(models.TransientModel):
@@ -29,7 +32,8 @@ class voucher_template_wizard(models.TransientModel):
         template_obj = self.env['voucher.template']
         template_line_lsit_dict = [[0, False, {'name': voucher_line.name, 'account_id': voucher_line.account_id.id, \
                                                'partner_id': voucher_line.partner_id.id, \
-                                               'goods_id': voucher_line.goods_id.id}] for voucher_line in
+                                               'goods_id': voucher_line.goods_id.id,
+                                               'auxiliary_id': voucher_line.auxiliary_id.id}] for voucher_line in
                                    self.voucher_id.line_ids]
         if self.is_change_old_template:
             self.old_template_id.line_ids = False
@@ -44,6 +48,6 @@ class Voucher(models.Model):
     @api.onchange('template_id')
     def onchange_template_id(self):
         template_line_lsit_dict = [{'name': line.name, 'account_id': line.account_id.id,'partner_id': line.partner_id.id,
-                                               'goods_id': line.goods_id.id} for line in self.template_id.line_ids]
+                                    'auxiliary_id': line.auxiliary_id.id, 'goods_id': line.goods_id.id} for line in self.template_id.line_ids]
         self.line_ids = False
         self.line_ids =template_line_lsit_dict

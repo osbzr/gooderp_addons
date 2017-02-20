@@ -112,7 +112,7 @@ class money_order(models.Model):
     name = fields.Char(string=u'单据编号', copy=False, readonly=True,
                        help=u'单据编号，创建时会根据类型自动生成')
     note = fields.Text(string=u'备注', help=u'可以为该单据添加一些需要的标识信息')
-    currency_id = fields.Many2one('res.currency', u'外币币别',
+    currency_id = fields.Many2one('res.currency', u'币别',
                                   compute='_compute_currency_id', store=True, readonly=True,
                                   help=u'业务伙伴的类别科目上对应的外币币别')
     discount_amount = fields.Float(string=u'手续费/折扣', readonly=True,
@@ -156,6 +156,15 @@ class money_order(models.Model):
                             help=u'开户行取自业务伙伴，可修改')
     bank_num = fields.Char(u'银行账号',
                             help=u'银行账号取自业务伙伴，可修改')
+
+    @api.multi
+    def write_off_reset(self):
+        self.ensure_one()
+        if self.state != 'draft':
+            raise ValueError(u'已审核的单据不能，执行这个操作！')
+        for source in self.source_ids:
+            source.this_reconcile = 0
+        return True
 
     @api.onchange('date')
     def onchange_date(self):
@@ -305,7 +314,7 @@ class money_order_line(models.Model):
     mode_id = fields.Many2one('settle.mode', string=u'结算方式',
                               ondelete='restrict',
                             help=u'结算方式：支票、信用卡等')
-    currency_id = fields.Many2one('res.currency', u'外币币别', compute='_compute_currency_id',
+    currency_id = fields.Many2one('res.currency', u'币别', compute='_compute_currency_id',
                                   store=True, readonly=True,
                                   help=u'结算账户对应的外币币别')
     number = fields.Char(string=u'结算号',
@@ -405,68 +414,66 @@ class money_invoice(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看原始单据，四情况：销货单、销售退货单、采购退货单、采购入库单
+        '''
+        查看原始单据，有以下情况：销售发货单、销售退货单、采购退货单、采购入库单、
+        项目、委外加工单、核销单、购货订单、固定资产、固定资产变更以及期初应收应付。
+        '''
         self.ensure_one()
-        sell = self.env['sell.delivery'].search([('name', '=', self.name)])
-        # 付款单
-        if sell:
-            if sell.is_return:
-                view = self.env.ref('sell.sell_return_form')
-                return {
-                    'name': u'销售退货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': sell.id,
-                    'context': {'type': 'pay'}
-                }
-            else:
-                view = self.env.ref('sell.sell_delivery_form')
-                return {
-                    'name': u'销货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': sell.id,
-                    'context': {'type': 'pay'}
-                }
+        code = False
+        res_models = [
+            'reconcile.order',
+        ]
+        views = [
+            'money.reconcile_order_form',
+        ]
+        # 判断当前数据库中否存在该 model
+        if self.env.ref('sell.model_sell_delivery'):
+            res_models += ['sell.delivery']
+            views += ['sell.sell_delivery_form']
+        if self.env.ref('warehouse.model_outsource'):
+            res_models += ['outsource']
+            views += ['warehouse.outsource_form']
+        if self.env.ref('buy.model_buy_order'):
+            res_models += ['buy.order']
+            views += ['buy.buy_order_form']
+        if self.env.ref('buy.model_buy_receipt'):
+            res_models += ['buy.receipt']
+            views += ['buy.buy_receipt_form']
+        if self.env.ref('task.model_project'):
+            res_models += ['project']
+            views += ['task.project_form']
+        if self.env.ref('asset.model_asset'):
+            res_models += ['asset']
+            views += ['asset.asset_form']
+        if u'固定资产变更' in self.name:
+            code = self.name.replace(u'固定资产变更', '')
+        elif u'固定资产' in self.name:
+            code = self.name.replace(u'固定资产', '')
+        domain = code and [('code', '=', code)] or [('name', '=', self.name)]
 
-        # 采购退货单、入库单
-        buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        if buy:
-            if buy.is_return:
-                view = self.env.ref('buy.buy_return_form')
-                return {
-                    'name': u'采购退货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
-            else:
-                view = self.env.ref('buy.buy_receipt_form')
-                return {
-                    'name': u'采购入库单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
-        raise UserError(u'期初余额没有原始单据可供查看！')
+        for i in range(len(res_models)):
+            res_model = code and 'asset' or res_models[i]
+            view = code and self.env.ref('asset.asset_form') or self.env.ref(views[i])
+            res = self.env[res_model].search(domain)
+            if res:
+                break
+
+        if not res:
+            raise UserError(u'没有原始单据可供查看！')
+
+        if res_model == 'sell.delivery' and res.is_return:
+            view = self.env.ref('sell.sell_return_form')
+        elif res_model == 'buy.receipt' and res.is_return:
+            view = self.env.ref('buy.buy_return_form')
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': False,
+            'views': [(view.id, 'form')],
+            'res_model': res_model,
+            'type': 'ir.actions.act_window',
+            'res_id': res.id,
+        }
 
 
 class source_order_line(models.Model):

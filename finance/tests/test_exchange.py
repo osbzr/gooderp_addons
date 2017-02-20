@@ -14,7 +14,7 @@ class test_exchange(TransactionCase):
                                                          'balance_directions': 'in',
                                                          'currency_id': self.env.ref('base.USD').id,
                                                          'exchange': True,
-                                                         'auxiliary_financing': 'partner',
+                                                         'auxiliary_financing': 'customer',
                                                          })
         self.create_exchange_wizard = self.env['create.exchange.wizard'].create({
                                                                                  'date': '2015-12-08',

@@ -18,9 +18,9 @@
                     <field name="partner_id"/>
                     <field name="warehouse_id"/>
                     <field name="goods_state"/>
-                    <field name="qty"/>
-                    <field name="amount"/>
-                    <field name="qty_not_out"/>
+                    <field name="qty" sum='1'/>
+                    <field name="amount" sum='1'/>
+                    <field name="qty_not_out" sum='1'/>
                     <field name="delivery_date"/>
                     <field name="wh_out_date"/>
                     <field name="note"/>

@@ -242,7 +242,7 @@ class test_checkout_wizard(TransactionCase):
         wizard = checkout_obj.create({'date':'20160102'})
         #onchange 拿到会计期间
         wizard.onchange_period_id()
-        self.assertTrue(wizard.period_id.name == u'2016年 第1期')
+        self.assertTrue(wizard.period_id.name == u'201601')
         #上期间未关闭报错
         with self.assertRaises(UserError):
             wizard.button_checkout()

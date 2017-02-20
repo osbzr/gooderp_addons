@@ -74,6 +74,7 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_approve_create_zero_wh_in(self):
         ''' 测试 create_zero_wh_in '''
+        self.env.user.company_id.is_enable_negative_stock = True
         self.env.ref('warehouse.wh_move_line_17').goods_qty = 20000
         self.internal.approve_order()
 
@@ -185,9 +186,11 @@ class TestWarehouseOrder(TransactionCase):
         '''获取调出仓库'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         order = self.env['wh.out'].with_context({
-             'warehouse_type': 'stock'
+             'warehouse_type': 'stock',
         }).create({'type': 'others',
-                   'line_out_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id})]})
+                   'line_out_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id,
+                                            'type': 'out',
+                                            })]})
         # 验证明细行上仓库是否是订单上调出仓库
         hd_stock = self.browse_ref('warehouse.hd_stock')
         order.warehouse_id = hd_stock
@@ -225,6 +228,12 @@ class TestWarehouseOrder(TransactionCase):
     def test_create_voucher_init(self):
         '''初始化其他入库单时生成凭证的情况'''
         self.others_in_2.is_init = True
+        self.others_in_2.approve_order()
+        self.others_in_2.cancel_approved_order()
+
+    def test_create_voucher_no_voucher_line(self):
+        '''初始化其他入库单时生成凭证 没有凭证行，删除凭证  的情况'''
+        self.others_in_2_keyboard_mouse.cost_unit = 0.0
         self.others_in_2.approve_order()
         self.others_in_2.cancel_approved_order()
 

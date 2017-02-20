@@ -139,32 +139,36 @@ class wh_in(models.Model):
         else:
             vouch_id = self.env['voucher'].create({'date': self.date})
         self.voucher_id = vouch_id
-        sum = 0
+        debit_sum = 0
         for line in self.line_in_ids:
-            vourch_line = self.env['voucher.line'].create({
-                            'name': self.name,
-                            'account_id': line.goods_id.category_id.account_id.id,
-                            'debit': line.cost,
-                            'voucher_id': vouch_id.id,
-                            'goods_id': line.goods_id.id,
-                            })
-            if self.is_init:
-                vourch_line.init_obj = 'init_warehouse- %s' % (self.id)
-            sum += line.cost
-
-        if self.type == 'inventory':
-            account = self.env.ref('finance.small_business_chart1901')
-        else:
-            account = self.env.ref('finance.small_business_chart5051')
-        if not self.is_init:
-            self.env['voucher.line'].create({
-                'name': self.name,
-                'account_id': account.id,
-                'credit': sum,
-                'voucher_id': vouch_id.id,
+            init_obj = self.is_init and 'init_warehouse - %s' % (self.id) or ''
+            if line.cost:
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': line.goods_id.category_id.account_id.id,
+                    'debit': line.cost,
+                    'voucher_id': vouch_id.id,
+                    'goods_id': line.goods_id.id,
+                    'init_obj': init_obj,
                 })
+            debit_sum += line.cost
+
+        # 贷方科目： 主营业务成本
+        account = self.env.ref('finance.account_cost')
+
+        if not self.is_init:
+            if debit_sum:
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': account.id,
+                    'credit': debit_sum,
+                    'voucher_id': vouch_id.id,
+                    })
         if not self.is_init :
-            self.voucher_id.voucher_done()
+            if len(self.voucher_id.line_ids) > 0:
+                self.voucher_id.voucher_done()
+            else:
+                self.voucher_id.unlink()
         return vouch_id
 
     @api.one
@@ -184,7 +188,7 @@ class wh_in(models.Model):
                 for vouch_obj_line in vouch_obj_lines:
                     vouch_obj_line.unlink()
             else:
-                self.voucher_id.unlink()
+                voucher.unlink()
 
 
 class wh_internal(models.Model):
@@ -210,9 +214,10 @@ class wh_internal(models.Model):
     @api.multi
     @inherits()
     def approve_order(self):
-        result_vals = self.env['wh.move'].create_zero_wh_in(self, self._name)
-        if result_vals:
-            return result_vals
+        if self.env.user.company_id.is_enable_negative_stock:
+            result_vals = self.env['wh.move'].create_zero_wh_in(self, self._name)
+            if result_vals:
+                return result_vals
         return True
 
     @api.multi

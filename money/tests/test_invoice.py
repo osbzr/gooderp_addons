@@ -106,3 +106,22 @@ class test_invoice(TransactionCase):
         with self.assertRaises(UserError):
             sell_invoice.money_invoice_done()
 
+    def test_money_invoice_name_get(self):
+        ''' 测试 money invoice name_get 方法 '''
+        inv = self.env['money.invoice'].create({
+                                                'name': 'invoice', 'date': "2016-02-20",
+                                                'partner_id': self.env.ref('core.jd').id,
+                                                'category_id': self.env.ref('money.core_category_sale').id,
+                                                'amount': 10.0,
+                                                'tax_amount':11.7
+                                                })
+        # 发票号不存在取 订单编号
+        inv_name = inv.name_get()
+        real_name = '%s' % (inv.name)
+        self.assertTrue(inv_name[0][1] == real_name)
+
+        # 发票号存在取 发票号
+        inv.bill_number = '201600001'
+        inv_name_bill = inv.name_get()
+        real_name_bill = '%s' % (inv.bill_number)
+        self.assertTrue(inv_name_bill[0][1] == real_name_bill)

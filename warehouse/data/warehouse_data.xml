@@ -30,5 +30,8 @@
             <field name='code'>others</field>
             <field name='type'>others</field>
         </record>
+         <record id="base.main_company" model="res.company">
+            <field name="is_enable_negative_stock">True</field>
+        </record>
     </data>
 </openerp>

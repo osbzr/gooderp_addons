@@ -37,7 +37,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="document_word_id" readonly='1' />
+                                <field name="document_word_id"  widget='selection' readonly='1' />
                                 <field name="name"  readonly='1'  style="width: 30%%"/>
                             </group>
                             <group>
@@ -51,9 +51,11 @@
                             <tree editable='bottom'>
                                 <field name='name'/>
                                 <field name='account_id'  options="{'no_create': True}"/>
-                                <field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
-                                <field name='goods_id' groups='finance.group_account_goods'/>
-                                <field name='auxiliary_id'/>
+                                <field name='partner_id' options="{'no_open': True, 'no_create': True}"
+                                       domain="[('name','=',False)]"/>
+                                <field name='goods_id' groups='finance.group_account_goods'
+                                        domain="[('name','=',False)]"/>
+                                <field name='auxiliary_id' domain="[('name','=',False)]"/>
                                 <field name='currency_id'  options="{'no_create': True}"
                                 	 groups='finance.group_multi_currency'/>
                                 <field name='currency_amount'  sum='外币合计'
@@ -145,6 +147,8 @@
             <field name="arch" type="xml">
                 <tree string='分录查询'  create="false" edit='false'>
                     <field name='voucher_id'/>
+                    <button name="view_document" type="object" string="查看凭证"
+                            icon="fa-search" class="oe_highlight"/>
                     <field name='period_id'/>
                     <field name='date'/>
                     <field name='name'/>
@@ -177,8 +181,8 @@
         <menuitem id='voucher_line_menu' action='voucher_line_action' parent='voucher_books_menu' sequence='10' />
 
         <record id="chang_voucher_name_tree" model="ir.ui.view">
-            <field name="name">chang.voucher.name.tree</field>
-            <field name="model">chang.voucher.name</field>
+            <field name="name">change.voucher.name.tree</field>
+            <field name="model">change.voucher.name</field>
             <field name="arch" type="xml">
 				<tree string='凭证变更记录' create='0'>
                     <field name="period_id"/>
@@ -191,7 +195,7 @@
 
         <record id="chang_voucher_name_action" model="ir.actions.act_window">
             <field name="name">凭证变更记录</field>
-            <field name="res_model">chang.voucher.name</field>
+            <field name="res_model">change.voucher.name</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>

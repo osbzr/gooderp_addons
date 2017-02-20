@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models, api, tools, modules
 from datetime import datetime
+from odoo.exceptions import UserError
 
 class staff_department(models.Model):
     _name = "staff.department"
@@ -18,6 +19,16 @@ class staff_department(models.Model):
     child_ids = fields.One2many('staff.department', 'parent_id', u'下级部门')
     jobs_ids = fields.One2many('staff.job', 'department_id', u'职位')
     note = fields.Text(u'备注')
+
+    @api.one
+    @api.constrains('parent_id')
+    def _check_parent_id(self):
+        '''上级部门不能选择自己和下级的部门'''
+        if self.parent_id:
+            staffs = self.env['staff.department'].search([('parent_id','=',self.id)])
+            if self.parent_id in staffs:
+                raise UserError(u'上级部门不能选择他自己或者他的下级部门')
+
 
 
 class staff_job(models.Model):

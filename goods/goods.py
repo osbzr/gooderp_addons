@@ -73,6 +73,7 @@ class attribute_value(models.Model):
     value_id = fields.Many2one('attribute.value.value', u'值',
                                 ondelete='restrict', 
                                 domain="[('category_id','=',category_id)]",
+                                default=lambda self: self.env.context.get('default_category_id'),
                                 required='1')
 
 class attribute_value_value(models.Model):

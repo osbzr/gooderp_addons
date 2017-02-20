@@ -38,9 +38,6 @@ class test_sell_order(TransactionCase):
              'warehouse_type': 'stock'
              }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
-        # 不传 warehouse_type 时
-        order2 = self.env['sell.order'].create({})
-        self.assertTrue(not order2.warehouse_id)
 
     def test_get_money_state(self):
         '''计算销货订单收款/退款状态'''
@@ -209,6 +206,19 @@ class test_sell_order_line(TransactionCase):
             with self.assertRaises(UserError):
                 line.tax_rate = 102
 
+    def test_inverse_price(self):
+        '''由不含税价反算含税价，保存时生效'''
+        for line in self.order.line_ids:
+            line.price = 10
+            self.assertAlmostEqual(line.price_taxed, 11.7)
+
+    def test_onchange_price(self):
+        '''当订单行的不含税单价改变时，改变含税单价'''
+        for line in self.order.line_ids:
+            line.price = 10
+            line.onchange_price()
+            self.assertAlmostEqual(line.price_taxed, 11.7)
+
     def test_onchange_goods_id(self):
         '''当销货订单行的产品变化时，带出产品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
@@ -254,7 +264,7 @@ class test_sell_order_line(TransactionCase):
         order_line.onchange_warehouse_id()
 
         # 找不到价格策略时
-        order.date = False
+        order.date = '1999-01-01'
         order_line.onchange_warehouse_id()
 
     def test_onchange_discount_rate(self):

@@ -10,11 +10,13 @@
                 	<field name="date"/>
                     <field name="name"/>
                     <field name="note"/>
+                    <field name="partner_id"/>
+                    <field name="bank_id"/>
                     <field name="type"/>
                     <field name="category_id"/>
                     <field name="get" sum="合计"/>
                     <field name="pay" sum="合计"/>
-                    <field name="partner_id"/>
+
                 </tree>
             </field>
         </record>

@@ -390,6 +390,28 @@ class test_other_money_order(TransactionCase):
         with self.assertRaises(UserError):
             other_get.other_money_done()
 
+    def test_other_money_order_has_tax(self):
+        ''' 测试其他收入支出  税存在 生成凭证的情况 '''
+        self.env.ref('money.other_get_line_1').tax_amount = 10.0
+        self.env.ref('money.other_get_60').other_money_done()
+
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.other_pay_line_2').tax_amount = 10.0
+        self.env.ref('money.other_pay_1000').other_money_done()
+
+    def test_other_money_order_no_company_account(self):
+        ''' 测试其他收入支出  税存在 公司进项税科目、销项税科目 不存在 生成凭证的情况 '''
+        self.env.ref('money.other_get_line_1').tax_amount = 10.0
+        self.env.user.company_id.output_tax_account = False
+        with self.assertRaises(UserError):
+            self.env.ref('money.other_get_60').other_money_done()
+
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.other_pay_line_2').tax_amount = 10.0
+        self.env.user.company_id.import_tax_account = False
+        with self.assertRaises(UserError):
+            self.env.ref('money.other_pay_1000').other_money_done()
+
 
 class test_other_money_order_line(TransactionCase):
     ''' 测试其他收支单明细 '''
@@ -407,14 +429,14 @@ class test_other_money_order_line(TransactionCase):
         # 其他收入单
         for line in self.get_order.line_ids:
             line.service = self.service_1  # 咨询服务
-            line.onchange_service()
+            line.with_context({'order_type': 'other_get'}).onchange_service()
             self.assertTrue(line.category_id.id == self.service_1.get_categ_id.id)
             self.assertTrue(line.amount == 500)
 
         # 其他支出单
         for line in self.pay_order.line_ids:
             line.service = self.service_1  # 咨询服务
-            line.onchange_service()
+            line.with_context({'order_type': 'other_pay'}).onchange_service()
             self.assertTrue(line.category_id.id == self.service_1.pay_categ_id.id)
             self.assertTrue(line.amount == 500)
 
@@ -558,6 +580,7 @@ class test_money_transfer_order(TransactionCase):
             self.env.ref('money.transfer_300').money_transfer_done()
 
         # 转入账户与公司币别一致 : in_currency_id == company_currency_id
+        self.env.ref('money.get_40000').partner_id.c_category_id.account_id.currency_id = self.env.ref('base.USD').id
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.transfer_line_1').in_bank_id.account_id = self.env.ref('finance.account_cash').id
         self.env.ref('money.transfer_300').money_transfer_done()

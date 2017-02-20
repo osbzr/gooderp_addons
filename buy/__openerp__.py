@@ -19,7 +19,7 @@
                                  采购收款一览表。
     ''',
     'version': '11.11',
-    'depends': ['core', 'warehouse', 'money', 'finance'],
+    'depends': ['warehouse'],
     'data': [
         'data/buy_data.xml',
         'security/groups.xml',

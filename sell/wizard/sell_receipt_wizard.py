@@ -100,22 +100,12 @@ class sell_receipt_wizard(models.TransientModel):
             raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s'%(self.date_start, self.date_end))
 
         delivery_obj = self.env['sell.delivery']
-        count = sum_receipt_rate = 0
         for delivery in delivery_obj.search(self._get_domain(), order='partner_id'):
             # 用查找到的发货单信息来创建一览表
             line = self.env['sell.receipt'].create(
                 self._prepare_sell_receipt(delivery))
             res.append(line.id)
-            count += 1
-            sum_receipt_rate += line.receipt_rate
 
-        # 创建一览表的合计行
-        receipt_rate =  count != 0 and sum_receipt_rate / count or 0
-        line_total = self.env['sell.receipt'].create({
-            'order_name': u'平均回款率',
-            'receipt_rate': receipt_rate,
-        })
-        res.append(line_total.id)
         return {
             'name': u'销售收款一览表',
             'view_mode': 'tree',
