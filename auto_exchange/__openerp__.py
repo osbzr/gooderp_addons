@@ -9,7 +9,7 @@
                         该模块实现了自动取汇率的功能。
     ''',
     'version': '11.11',
-    'depends': ['base', 'core', 'finance',],
+    'depends': ['money'],
     'data': [
         'view/auto_exchange_view.xml',
         'view/auto_exchange_action.xml',
