@@ -11,18 +11,8 @@
 			<field name='perm_create' eval='False'/>
 			<field name='perm_unlink' eval='False'/>
 		</record>
-		<!--base 模块中门户用户对res_partner的访问权规则写在了noupdate='1'中，所以要先删掉这个rule再重新建一个-->
+		<!--base 模块中门户用户对res_partner的访问权规则写在了noupdate='1'中，所以要删掉这个rule-->
 		<delete model='ir.rule' search="[('id', '=', ref('base.res_partner_portal_public_rule'))]"/>
-		<record model="ir.rule" id="res_partner_portal_rule">
-			<field name="name">res_partner: portal/public: read access on my commercial partner</field>
-            <field name="model_id" ref="base.model_res_partner"/>
-            <field name="domain_force">[('id', 'child_of', user.commercial_partner_id.id)]</field>
-            <field name="groups" eval="[(4, ref('base.group_public'))]"/>
-            <field name='perm_read' eval='True'/>
-			<field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-            <field name="perm_write" eval="False"/>
-        </record>
 	</data>
 </odoo>
 
