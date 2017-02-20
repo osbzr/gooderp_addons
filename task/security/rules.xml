@@ -11,6 +11,8 @@
 			<field name='perm_create' eval='False'/>
 			<field name='perm_unlink' eval='False'/>
 		</record>
+		<!--base 模块中门户用户对res_partner的访问权规则写在了noupdate='1'中，所以要删掉这个rule-->
+		<delete model='ir.rule' search="[('id', '=', ref('base.res_partner_portal_public_rule'))]"/>
 	</data>
 </odoo>
 
