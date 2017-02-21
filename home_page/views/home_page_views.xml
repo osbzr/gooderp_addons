@@ -8,19 +8,6 @@
             </xpath>
         </template>
 
-
-        <menuitem id="main_home_menu" name="首页" sequence="5" web_icon="home_page,static/description/home_page.png"/>
-
-        <menuitem id="home_page_menu_two" name="首页"
-            parent="main_home_menu" />
-
-        <record id="action_home_page" model="ir.actions.client">
-            <field name="name">首页</field>
-            <field name="tag">home_page.homepage</field>
-        </record>
-        <menuitem id="home_page_menu" name="首页" parent="home_page_menu_two"
-            action="action_home_page" sequence='10'/>
-
         <record model="ir.ui.view" id="financial_home_tree">
             <field name="name">financial_home_tree</field>
             <field name="model">home.page</field>
@@ -34,6 +21,7 @@
                 </tree>
             </field>
         </record>
+
         <record model="ir.ui.view" id="financial_home_form">
             <field name="name">financial_home_form</field>
             <field name="model">home.page</field>
@@ -59,15 +47,6 @@
             </field>
         </record>
 
-        <record model="ir.actions.act_window" id="financial_home_action">
-            <field name="name">设置主页元素</field>
-            <field name="res_model">home.page</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-        <menuitem id="financial_home_action_menu" name="设置主页元素" parent="home_page_menu_two"
-            action="financial_home_action" sequence='20'/>
-
         <record model="ir.ui.view" id="home_report_type_tree">
             <field name="name">financial_home_tree</field>
             <field name="model">home.report.type</field>
@@ -79,13 +58,5 @@
                 </tree>
             </field>
         </record>
-        <record model="ir.actions.act_window" id="home_report_type_action">
-            <field name="name">首页报表分类</field>
-            <field name="res_model">home.report.type</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree</field>
-        </record>
-        <menuitem id="home_report_type_menu" name="报表分类" parent="home_page_menu_two"
-            action="home_report_type_action" sequence='30'/>
     </data>
 </openerp>

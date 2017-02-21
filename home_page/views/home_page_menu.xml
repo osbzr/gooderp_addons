@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <menuitem id="main_home_menu" name="首页" sequence="5" web_icon="home_page,static/description/home_page.png"/>
+
+        <menuitem id="home_page_menu_two" name="首页"
+            parent="main_home_menu" />
+       <menuitem id="home_page_menu" name="首页" parent="home_page_menu_two"
+            action="action_home_page" sequence='10'/>
+       <menuitem id="financial_home_action_menu" name="设置主页元素" parent="home_page_menu_two"
+            action="financial_home_action" sequence='20'/>
+        <menuitem id="home_report_type_menu" name="报表分类" parent="home_page_menu_two"
+            action="home_report_type_action" sequence='30'/>
+    </data>
+</openerp>
