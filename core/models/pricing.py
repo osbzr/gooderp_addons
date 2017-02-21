@@ -13,128 +13,114 @@ class pricing(models.Model):
     def get_condition(self, partner, warehouse, goods, date):
         '''返回定价策略的各种条件及报错信息'''
         # 客户类别、仓库、商品满足条件
-        message = (u'适用于%s,%s,%s,%s 的价格策略不唯一'
-                   % (partner.c_category_id.name,
-                      warehouse.name,
-                      goods.name,
-                      date))
-        res = {'good_pricing': {'domain': [('c_category_id', '=', partner.c_category_id.id),
-                                           ('warehouse_id', '=', warehouse.id),
-                                           ('goods_id', '=', goods.id),
-                                           ('goods_category_id', '=', False),
-                                           ('active_date', '<=', date),
-                                           ('deactive_date', '>=', date)],
-                                'message': message}}
+        message = u'适用于%s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                                warehouse.name,
+                                                goods.name,
+                                                date)
+        res = [{'domain': [('c_category_id', '=', partner.c_category_id.id),
+                           ('warehouse_id', '=', warehouse.id),
+                           ('goods_id', '=', goods.id),
+                           ('goods_category_id', '=', False),
+                           ('active_date', '<=', date),
+                           ('deactive_date', '>=', date)],
+                'message': message}]
         # 客户类别、仓库、商品类别满足条件
-        message = (u'适用于 %s,%s,%s,%s 的价格策略不唯一'
-                   % (partner.c_category_id.name,
-                      warehouse.name,
-                      goods.category_id.name,
-                      date))
-        res.update({'gc_pricing':
-                        {'domain': [('c_category_id', '=', partner.c_category_id.id),
-                                    ('warehouse_id', '=', warehouse.id),
-                                    ('goods_id', '=', False),
-                                    ('goods_category_id', '=', goods.category_id.id),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                                 warehouse.name,
+                                                 goods.category_id.name,
+                                                 date)
+        res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
+                               ('warehouse_id', '=', warehouse.id),
+                               ('goods_id', '=', False),
+                               ('goods_category_id', '=', goods.category_id.id),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 客户类别、仓库满足条件
-        message = (u'适用于 %s,%s,%s 的价格策略不唯一'
-                   % (partner.c_category_id.name,
-                      warehouse.name,
-                      date))
-        res.update({'pw_pricing':
-                        {'domain': [('c_category_id', '=', partner.c_category_id.id),
-                                    ('warehouse_id', '=', warehouse.id),
-                                    ('goods_id', '=', False),
-                                    ('goods_category_id', '=', False),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                              warehouse.name,
+                                              date)
+        res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
+                               ('warehouse_id', '=', warehouse.id),
+                               ('goods_id', '=', False),
+                               ('goods_category_id', '=', False),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 仓库、商品满足
-        message = (u'适用于 %s,%s,%s 的价格策略不唯一'
-                   % (warehouse.name,
-                      goods.name,
-                      date))
-        res.update({'wg_pricing':
-                        {'domain': [('c_category_id', '=', False),
-                                    ('warehouse_id', '=', warehouse.id),
-                                    ('goods_id', '=', goods.id),
-                                    ('goods_category_id', '=', False),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name, goods.name,
+                                              date)
+        res.append({'domain': [('c_category_id', '=', False),
+                               ('warehouse_id', '=', warehouse.id),
+                               ('goods_id', '=', goods.id),
+                               ('goods_category_id', '=', False),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 仓库，商品分类满足条件
-        message = (u'适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name,
-                                               goods.category_id.name,
-                                               date))
-        res.update({'w_gc_pricing':
-                        {'domain': [('c_category_id', '=', False),
-                                    ('warehouse_id', '=', warehouse.id),
-                                    ('goods_id', '=', False),
-                                    ('goods_category_id', '=',
-                                     goods.category_id.id),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name,
+                                              goods.category_id.name,
+                                              date)
+        res.append({'domain': [('c_category_id', '=', False),
+                               ('warehouse_id', '=', warehouse.id),
+                               ('goods_id', '=', False),
+                               ('goods_category_id', '=',
+                                goods.category_id.id),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 仓库满足条件
-        message = (u'适用于 %s,%s 的价格策略不唯一' % (warehouse.name,
-                                            date))
-        res.update({'warehouse_pricing':
-                        {'domain': [('c_category_id', '=', False),
-                                    ('warehouse_id', '=', warehouse.id),
-                                    ('goods_id', '=', False),
-                                    ('goods_category_id', '=', False),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s 的价格策略不唯一' % (warehouse.name,
+                                           date)
+        res.append({'domain': [('c_category_id', '=', False),
+                               ('warehouse_id', '=', warehouse.id),
+                               ('goods_id', '=', False),
+                               ('goods_category_id', '=', False),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 客户类别,商品满足条件
-        message = (u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
-                                               goods.name,
-                                               date))
-        res.update({'ccg_pricing':
-                        {'domain': [('c_category_id', '=', partner.c_category_id.id),
-                                    ('warehouse_id', '=', False),
-                                    ('goods_id', '=', goods.id),
-                                    ('goods_category_id', '=', False),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                              goods.name,
+                                              date)
+        res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
+                               ('warehouse_id', '=', False),
+                               ('goods_id', '=', goods.id),
+                               ('goods_category_id', '=', False),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 客户类别,商品分类满足条件
-        message = (u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
-                                               goods.category_id.name,
-                                               date))
-        res.update({'ccgc_pricing':
-                        {'domain': [('c_category_id', '=', partner.c_category_id.id),
-                                    ('warehouse_id', '=', False),
-                                    ('goods_id', '=', False),
-                                    ('goods_category_id', '=',
-                                     goods.category_id.id),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                              goods.category_id.name,
+                                              date)
+        res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
+                               ('warehouse_id', '=', False),
+                               ('goods_id', '=', False),
+                               ('goods_category_id', '=',
+                                goods.category_id.id),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 客户类别满足条件
-        message = (u'适用于 %s,%s 的价格策略不唯一' % (partner.c_category_id.name,
-                                            date))
-        res.update({'partner_pricing':
-                        {'domain': [('c_category_id', '=', partner.c_category_id.id),
-                                    ('warehouse_id', '=', False),
-                                    ('goods_id', '=', False),
-                                    ('goods_category_id', '=', False),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+                                           date)
+        res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
+                               ('warehouse_id', '=', False),
+                               ('goods_id', '=', False),
+                               ('goods_category_id', '=', False),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 所有商品打折
-        message = (u'适用于 %s 的价格策略不唯一' % (date))
-        res.update({'all_goods_pricing':
-                        {'domain': [('c_category_id', '=', False),
-                                    ('warehouse_id', '=', False),
-                                    ('goods_id', '=', False),
-                                    ('goods_category_id', '=', False),
-                                    ('active_date', '<=', date),
-                                    ('deactive_date', '>=', date)],
-                         'message': message}})
+        message = u'适用于 %s 的价格策略不唯一' % (date)
+        res.append({'domain': [('c_category_id', '=', False),
+                               ('warehouse_id', '=', False),
+                               ('goods_id', '=', False),
+                               ('goods_category_id', '=', False),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         return res
 
     @api.model
@@ -159,14 +145,16 @@ class pricing(models.Model):
         if not goods:
             raise UserError(u'请先输入商品')
         res = self.get_condition(partner, warehouse, goods, date)
+
         sum = 0
-        for k, value in res.items():
+        for value in res:
             pricing = self.search(value['domain'])
+            sum += len(pricing)
             if len(pricing) == 1:
                 return pricing
             if len(pricing) > 1:
                 raise UserError(value['message'])
-            sum += len(pricing)
+
         # 如果日期范围内没有适用的价格策略，则返回空
         if sum == 0:
             return False
