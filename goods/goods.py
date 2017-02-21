@@ -11,7 +11,10 @@ class goods(models.Model):
     force_batch_one = fields.Boolean(u'每批号数量为1')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
     image=fields.Binary(u'图片', attachment=True)
-    supplier_id = fields.Many2one('partner',u'供应商',domain=[('s_category_id','!=',False)])
+    supplier_id = fields.Many2one('partner',
+                                  u'供应商',
+                                  ondelete='restrict',
+                                  domain=[('s_category_id','!=',False)])
     price = fields.Float(u'零售价')
     barcode = fields.Char(u'条形码')
     note = fields.Text(u'备注')
@@ -35,6 +38,7 @@ class goods(models.Model):
 
 class attribute(models.Model):
     _name = 'attribute'
+    _description = u'属性'
 
     @api.one
     @api.depends('value_ids')
@@ -46,9 +50,9 @@ class attribute(models.Model):
         '''在many2one字段中支持按条形码搜索'''
         args = args or []
         if name:
-            goods_ids = self.search([('ean', '=', name)])
-            if goods_ids:
-                return goods_ids.name_get()
+            attribute_ids = self.search([('ean', '=', name)])
+            if attribute_ids:
+                return attribute_ids.name_get()
         return super(attribute, self).name_search(
                 name=name, args=args, operator=operator, limit=limit)
 
@@ -64,6 +68,8 @@ class attribute(models.Model):
 class attribute_value(models.Model):
     _name = 'attribute.value'
     _rec_name = 'value_id'
+    _description = u'属性明细'
+
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='cascade')
     category_id = fields.Many2one('core.category', u'属性',
                                   ondelete='cascade',
@@ -71,13 +77,15 @@ class attribute_value(models.Model):
                                   context={'type':'attribute'},
                                   required='1')
     value_id = fields.Many2one('attribute.value.value', u'值',
-                                ondelete='restrict', 
+                                ondelete='restrict',
                                 domain="[('category_id','=',category_id)]",
                                 default=lambda self: self.env.context.get('default_category_id'),
                                 required='1')
 
 class attribute_value_value(models.Model):
     _name = 'attribute.value.value'
+    _description = u'属性值'
+
     category_id = fields.Many2one('core.category', u'属性',
                                   ondelete='cascade',
                                   domain=[('type', '=', 'attribute')],

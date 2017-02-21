@@ -84,9 +84,11 @@
 			<field name='model'>attribute</field>
 			<field name='arch' type='xml'>
 				<form string='属性'>
+					<div>
+						<label for='ean'/>
+						<field name='ean'/>
+					</div>
 					<field name='name'/>
-					<label for='ean'/>
-					<field name='ean'/>
 					<field name='value_ids'>
 						<tree editable='TOP' string='属性值'>
 							<field name='category_id'/>

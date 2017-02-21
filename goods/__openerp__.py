@@ -24,7 +24,7 @@
     "version": '11.11',
     "author": 'ZhengXiang',
     "website": "http://www.osbzr.com",
-    "category": "Generic Modules",
+    "category": "gooderp",
     "depends": ['core'],
     "description":
     '''
