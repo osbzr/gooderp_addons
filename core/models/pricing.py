@@ -165,7 +165,7 @@ class pricing(models.Model):
             if len(pricing) == 1:
                 return pricing
             if len(pricing) > 1:
-                raise value['message']
+                raise UserError(value['message'])
             sum += len(pricing)
         # 如果日期范围内没有适用的价格策略，则返回空
         if sum == 0:
@@ -191,4 +191,3 @@ class pricing(models.Model):
     active_date = fields.Date(u'开始日期', required=True)
     deactive_date = fields.Date(u'终止日期', required=True)
     discount_rate = fields.Float(u'折扣率%', help=u'商品的价格 × 折扣率 = 商品的实际价格 !')
-    
