@@ -135,7 +135,7 @@ odoo.define('home_page', function (require) {
                 }
             }
         },
-        thrid_part: function () {
+        third_part: function () {
             var index_last = 0;
             var self = this;
             var result_quick = self.result_quick;
@@ -184,7 +184,7 @@ odoo.define('home_page', function (require) {
                     /* 第二块的视图的构建 及跳转的逻辑 */
                     self.second_part();
                     /* 第三块的视图的构建 及跳转的逻辑 */
-                    self.thrid_part()
+                    self.third_part()
                 }
             });
         },
