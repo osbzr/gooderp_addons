@@ -85,6 +85,18 @@ class buy_order(models.Model):
             self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
         else:
             self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
+        
+    @api.depends('receipt_ids')
+    def _compute_receipt(self):
+        for order in self:
+            order.receipt_count = len(order.receipt_ids.ids) 
+        
+    @api.depends('receipt_ids')
+    def _compute_invoice(self):
+        for order in self:
+            order.invoice_ids = order.receipt_ids.mapped('invoice_id')
+            order.invoice_count = len(order.invoice_ids.ids)			
+        
 
     partner_id = fields.Many2one('partner', u'供应商',
                                  states=READONLY_STATES,
@@ -183,6 +195,11 @@ class buy_order(models.Model):
                               compute=_get_money_state,
                               copy=False,
                               help=u'购货订单生成的采购入库单或退货单的付/退款状态')
+    goods_id = fields.Many2one('goods', related='line_ids.goods_id', string=u'商品')
+    receipt_ids = fields.One2many('buy.receipt', 'order_id', string='Receptions', copy=False)
+    receipt_count = fields.Integer(compute='_compute_receipt', string='Receptions Count', default=0)
+    invoice_ids = fields.One2many('money.invoice', compute='_compute_invoice', string='Invoices')
+    invoice_count = fields.Integer(compute='_compute_invoice', string='Invoices Count', default=0)
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
@@ -382,6 +399,68 @@ class buy_order(models.Model):
             'domain': [('id', '=', receipt_id)],
             'target': 'current',
         }
+
+    @api.multi
+    def action_view_receipt(self):
+        '''
+        This function returns an action that display existing picking orders of given purchase order ids.
+        When only one found, show the picking immediately.
+        '''
+		
+        self.ensure_one()
+        name = (self.type == 'buy' and u'采购入库单' or u'采购退货单')
+        action = {
+            'name': name,
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'buy.receipt',
+            'view_id': False,
+            'target': 'current',
+        }
+
+        #receipt_ids = sum([order.receipt_ids.ids for order in self], [])
+        receipt_ids = self.receipt_ids.ids
+        # choose the view_mode accordingly
+        if len(receipt_ids) > 1:
+            action['domain'] = "[('id','in',[" + ','.join(map(str, receipt_ids)) + "])]"
+            action['view_mode'] = 'tree,form'
+        elif len(receipt_ids) == 1:
+            view_id = (self.type == 'buy'
+                       and self.env.ref('buy.buy_receipt_form').id
+                       or self.env.ref('buy.buy_return_form').id)
+            action['views'] = [( view_id, 'form')]
+            action['res_id'] = receipt_ids and receipt_ids[0] or False
+        return action
+
+    @api.multi
+    def action_view_invoice(self):
+        '''
+        This function returns an action that display existing invoices of given purchase order ids( linked/computed via buy.receipt).
+        When only one found, show the invoice immediately.
+        '''
+		
+        self.ensure_one()
+        if self.invoice_count == 0:
+            return False
+        action = {
+            'name': u'结算单（供应商发票）',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'money.invoice',
+            'view_id': False,
+            'target': 'current',
+        }
+        invoice_ids = self.invoice_ids.ids
+        # choose the view_mode accordingly
+        if len(invoice_ids) > 1:
+            action['domain'] = "[('id','in',[" + ','.join(map(str, invoice_ids)) + "])]"
+            action['view_mode'] = 'tree'
+        elif len(invoice_ids) == 1:            
+            action['views'] = [( False, 'form')]
+            action['res_id'] = invoice_ids and invoice_ids[0] or False
+        return action		
 
 
 class buy_order_line(models.Model):

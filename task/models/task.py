@@ -22,6 +22,14 @@ AVAILABLE_PRIORITIES = [
 class project(models.Model):
     _name = 'project'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
+    _inherit = ['mail.thread']
+
+    @api.multi
+    def _compute_hours(self):
+        '''计算项目的实际工时'''
+        for project in self:
+            for task in project.task_ids:
+                project.hours += task.hours
 
     auxiliary_id = fields.Many2one(
         string=u'辅助核算',
@@ -47,6 +55,13 @@ class project(models.Model):
         comodel_name='project.invoice',
         inverse_name='project_id',
     )
+
+    plan_hours = fields.Float(u'计划工时',
+                              track_visibility='onchange')
+    hours = fields.Float(u'实际工时',
+                         compute=_compute_hours)
+    address = fields.Char(u'地址')
+    note = fields.Text(u'备注')
 
 
 class project_invoice(models.Model):
@@ -139,10 +154,9 @@ class task(models.Model):
 
     @api.multi
     def _compute_hours(self):
-        '''计算任务的实际时间'''
+        '''计算任务的实际工时'''
         for task in self:
-            for line in self.env['timeline'].search(
-                                [('task_id', '=', task.id)]):
+            for line in task.timeline_ids:
                 task.hours += line.hours
 
     def _default_status_impl(self):
@@ -198,8 +212,8 @@ class task(models.Model):
         default=_default_status,
         track_visibility='onchange',
     )
-    plan_hours = fields.Float(u'计划时间')
-    hours = fields.Float(u'实际时间',
+    plan_hours = fields.Float(u'计划工时')
+    hours = fields.Float(u'实际工时',
                          compute=_compute_hours)
     sequence = fields.Integer(u'顺序')
     is_schedule = fields.Boolean(u'列入计划')
