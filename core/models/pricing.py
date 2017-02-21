@@ -10,9 +10,18 @@ class pricing(models.Model):
 
     #此逻辑放在这里是为了让采购和销售都有机会使用价格策略，现在只在销售环节读取了这些策略
 
-    def get_condition(self, partner, warehouse, goods, date):
-        '''返回定价策略的各种条件及报错信息'''
+    def get_condition(self, args):
+        """
+        返回定价策略的各种条件及报错信息
+        :param args: 传入的参数字典
+        :return: 取数的条件和按此条件取到多条策略时的报错信息，返回一个有序列表，
+        如前面的条件取不到策略则进入下一个条件。
+        """
         res = []
+        partner = args.get('partner')
+        warehouse = args.get('warehouse')
+        goods = args.get('goods')
+        date = args.get('date')
         # 客户类别、仓库、商品满足条件
         message = u'适用于%s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                                 warehouse.name,
@@ -145,7 +154,11 @@ class pricing(models.Model):
             raise UserError(u'请先输入仓库')
         if not goods:
             raise UserError(u'请先输入商品')
-        res = self.get_condition(partner, warehouse, goods, date)
+        args = {'partner': partner,
+                'warehouse': warehouse,
+                'goods': goods,
+                'date': date}
+        res = self.get_condition(args)
 
         sum = 0
         for value in res:
