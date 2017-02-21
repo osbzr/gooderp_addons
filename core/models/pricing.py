@@ -12,18 +12,19 @@ class pricing(models.Model):
 
     def get_condition(self, partner, warehouse, goods, date):
         '''返回定价策略的各种条件及报错信息'''
+        res = []
         # 客户类别、仓库、商品满足条件
         message = u'适用于%s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                                 warehouse.name,
                                                 goods.name,
                                                 date)
-        res = [{'domain': [('c_category_id', '=', partner.c_category_id.id),
+        res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
                            ('warehouse_id', '=', warehouse.id),
                            ('goods_id', '=', goods.id),
                            ('goods_category_id', '=', False),
                            ('active_date', '<=', date),
                            ('deactive_date', '>=', date)],
-                'message': message}]
+                'message': message})
         # 客户类别、仓库、商品类别满足条件
         message = u'适用于 %s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                                  warehouse.name,
