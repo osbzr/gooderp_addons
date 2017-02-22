@@ -5,6 +5,8 @@ from odoo import models, fields, api
 class MonthProductCost(models.Model):
     _name = 'month.product.cost'
     _order = 'period_id'
+    _description = u'每月发出成本'
+
     period_id = fields.Many2one('finance.period', string='会计期间')
     goods_id = fields.Many2one('goods', string="产品")
     period_begin_qty = fields.Float(string='期初数量')

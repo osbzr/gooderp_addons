@@ -5,6 +5,8 @@ from odoo.exceptions import UserError
 
 class business_data_table(models.Model):
     _name = 'business.data.table'
+    _description = u'业务数据表'
+
     model = fields.Many2one('ir.model', u'需要清理的表')
     name = fields.Char(u'业务数据表名', required=True)
     clean_business_id = fields.Many2one(
@@ -17,6 +19,7 @@ class business_data_table(models.Model):
 
 class clean_business_data(models.Model):
     _name = 'clean.business.data'
+    _description = u'清理记录'
 
     @api.model
     def _get_business_table_name(self):

@@ -37,6 +37,8 @@ CORE_CATEGORY_TYPE = [('customer', u'客户'),
 
 class core_value(models.Model):
     _name = 'core.value'
+    _description = u'可选值'
+
     name = fields.Char(u'名称', required=True)
     type = fields.Char(u'类型', required=True,
                        default=lambda self: self._context.get('type'))
@@ -48,6 +50,8 @@ class core_value(models.Model):
 
 class core_category(models.Model):
     _name = 'core.category'
+    _description = u'类别'
+
     name = fields.Char(u'名称', required=True)
     type = fields.Selection(CORE_CATEGORY_TYPE, u'类型',
                             required=True,
@@ -60,6 +64,8 @@ class core_category(models.Model):
 
 class uom(models.Model):
     _name = 'uom'
+    _description = u'计量单位'
+
     name = fields.Char(u'名称', required=True)
 
     _sql_constraints = [
@@ -69,6 +75,8 @@ class uom(models.Model):
 
 class settle_mode(models.Model):
     _name = 'settle.mode'
+    _description = u'结算方式'
+
     name = fields.Char(u'名称', required=True)
 
     _sql_constraints = [
@@ -78,6 +86,7 @@ class settle_mode(models.Model):
 
 class staff(models.Model):
     _name = 'staff'
+    _description = u'员工'
 
     user_id = fields.Many2one('res.users', u'对应用户')
 
@@ -93,6 +102,8 @@ class staff(models.Model):
 
 class bank_account(models.Model):
     _name = 'bank.account'
+    _description = u'账户'
+
     name = fields.Char(u'名称', required=True)
     balance = fields.Float(u'余额', readonly=True,
                            digits=dp.get_precision('Amount'))

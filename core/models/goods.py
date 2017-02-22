@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 
 class goods(models.Model):
     _name = 'goods'
+    _description = u'商品'
 
     @api.model
     def _get_default_not_saleable_impl(self):

@@ -46,3 +46,4 @@ class report_voucher(osv.AbstractModel):
     _inherit = 'report.abstract_report'
     _template = 'finance.report_voucher_view'
     _wrapped_report_class = action_report_picking_wrapped
+    _description = u'会计凭证打印'

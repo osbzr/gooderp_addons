@@ -8,6 +8,8 @@ from lxml import etree
 
 class non_active_report(models.TransientModel):
     _name = 'non.active.report'
+    _description = u'呆滞料报表'
+
     warehouse_id = fields.Many2one('warehouse', string=u'仓库')
     goods_id = fields.Many2one('goods', string=u'产品')
     first_stage_day_qty = fields.Float(string=u'第一阶段数量')
@@ -47,6 +49,8 @@ class non_active_report(models.TransientModel):
 
 class non_active_report_wizard(models.TransientModel):
     _name = 'non.active.report.wizard'
+    _description = u'呆滞料报表向导'
+
     warehouse_id = fields.Many2one('warehouse', string=u'仓库')
     first_stage_day = fields.Integer(string=u'第一阶段天数', required=True)
     second_stage_day = fields.Integer(string=u'第二阶段天数', required=True)

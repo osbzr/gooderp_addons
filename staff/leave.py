@@ -11,6 +11,7 @@ LEAVE_STATES = [
 
 class staff_leave(models.Model):
     _name = 'staff.leave'
+    _description = u'请假单'
 
     @api.model
     def _set_staff_id(self):

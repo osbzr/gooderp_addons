@@ -34,6 +34,7 @@ import datetime
 
 from odoo import tools
 from odoo import netsvc
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -49,6 +50,7 @@ addons_path = '%s/DBbackups' % (os.environ.get('HOME','') or os.environ.get('HOM
 
 class db_backup(models.Model):
     _name = 'db.backup'
+    _description = u'数据库自动备份'
 
     @api.model
     def get_db_list(self, host='localhost', port='8069'):

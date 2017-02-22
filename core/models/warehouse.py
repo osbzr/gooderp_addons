@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 
 class warehouse(models.Model):
     _name = 'warehouse'
+    _description = u'仓库'
 
     # 用户只能创建stock类型的仓库
     WAREHOUSE_TYPE = [

@@ -41,6 +41,8 @@ import odoo,urllib2
 
 class ReportTemplate(models.Model):
     _name = "report.template"
+    _description = u'报表模板'
+
     model_id = fields.Many2one('ir.model', u'模型')
     file_address = fields.Char(u'模板文件路径')
     active = fields.Boolean(u'可用', default=True)

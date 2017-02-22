@@ -5,6 +5,7 @@ from odoo import api, fields, models
 class CreateExchangeWizard(models.TransientModel):
     """生成每月汇况损益的向导 根据输入的期间"""
     _name = "create.exchange.wizard"
+    _description = u'期末调汇向导'
 
     @api.one
     @api.depends('date')
@@ -172,6 +173,7 @@ class CreateExchangeWizard(models.TransientModel):
 class rate_period(models.Model):
     """记录本月结算汇兑损益时的汇率，用于反结算后，汇兑损益正确时汇率正确"""
     _name = "rate.period"
+    _description = u'记录本月结算汇兑损益时的汇率'
 
     name = fields.Many2one('res.currency', u'币别', required=True)
     account_accumulated_depreciation = fields.Many2one(

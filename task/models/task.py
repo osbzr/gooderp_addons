@@ -21,6 +21,7 @@ AVAILABLE_PRIORITIES = [
 
 class project(models.Model):
     _name = 'project'
+    _description = u'项目'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
     _inherit = ['mail.thread']
 
@@ -66,6 +67,7 @@ class project(models.Model):
 
 class project_invoice(models.Model):
     _name = 'project.invoice'
+    _description = u'项目的发票'
 
     @api.one
     @api.depends('tax_rate', 'amount')
@@ -149,6 +151,7 @@ class project_invoice(models.Model):
 
 class task(models.Model):
     _name = 'task'
+    _description = u'任务'
     _inherit = ['mail.thread']
     _order = 'sequence, priority desc, id'
 
@@ -234,6 +237,7 @@ class task(models.Model):
 
 class task_status(models.Model):
     _name = 'task.status'
+    _description = u'任务阶段'
     _order = 'sequence, id'
     
     name = fields.Char(u'名称')
@@ -245,6 +249,7 @@ class task_status(models.Model):
 
 class timesheet(models.Model):
     _name = 'timesheet'
+    _description = u'今日工作日志'
 
     date = fields.Date(
         string=u'日期',
@@ -293,6 +298,7 @@ class timesheet(models.Model):
 
 class timeline(models.Model):
     _name = 'timeline'
+    _description = u'工作记录'
 
     timesheet_id = fields.Many2one(
         string=u'记录表',

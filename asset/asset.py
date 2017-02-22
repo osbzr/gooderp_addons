@@ -14,6 +14,8 @@ READONLY_STATES = {
 class asset_category(models.Model):
     '''固定资产分类'''
     _name = 'asset.category'
+    _description = u'固定资产分类'
+
     name = fields.Char(u'名称', required=True)
     account_accumulated_depreciation = fields.Many2one(
         'finance.account', u'累计折旧科目', required=True)
@@ -32,6 +34,7 @@ class asset_category(models.Model):
 class asset(models.Model):
     '''固定资产'''
     _name = 'asset'
+    _description = u'固定资产'
     _order = "code"
 
     @api.one
@@ -254,7 +257,7 @@ class asset(models.Model):
 class CreateCleanWizard(models.TransientModel):
     '''固定资产清理'''
     _name = 'create.clean.wizard'
-    _description = 'Create Clean Wizard form'
+    _description = u'固定资产清理向导'
 
     @api.one
     @api.depends('date')
@@ -350,7 +353,7 @@ class CreateCleanWizard(models.TransientModel):
 class CreateChangWizard(models.TransientModel):
     '''固定资产变更'''
     _name = 'create.chang.wizard'
-    _description = 'Create chang Wizard form'
+    _description = u'固定资产变更向导'
 
     @api.one
     @api.depends('chang_date')
@@ -416,7 +419,7 @@ class CreateChangWizard(models.TransientModel):
 
 class asset_line(models.Model):
     _name = 'asset.line'
-    _description = u'折旧明细'
+    _description = u'资产折旧明细'
 
     @api.one
     @api.depends('date')
@@ -438,6 +441,7 @@ class asset_line(models.Model):
 class CreateDepreciationWizard(models.TransientModel):
     """生成每月折旧的向导 根据输入的期间"""
     _name = "create.depreciation.wizard"
+    _description = u'资产折旧向导'
 
     @api.one
     @api.depends('date')
@@ -529,7 +533,7 @@ class CreateDepreciationWizard(models.TransientModel):
 
 class chang_line(models.Model):
     _name = 'chang.line'
-    _description = u'变更明细'
+    _description = u'资产变更明细'
 
     @api.one
     @api.depends('date')

@@ -6,6 +6,7 @@ from odoo import models, fields, api
 
 class report_stock_transceive_wizard(models.TransientModel):
     _name = 'report.stock.transceive.wizard'
+    _description = u'商品收发明细表向导'
 
     @api.model
     def _default_date_start(self):

@@ -6,6 +6,7 @@ import odoo.addons.decimal_precision as dp
 
 class vendor_goods(models.Model):
     _name = 'vendor.goods'
+    _description = u'供应商供货价格表'
 
     goods_id = fields.Many2one(
         string=u'商品',

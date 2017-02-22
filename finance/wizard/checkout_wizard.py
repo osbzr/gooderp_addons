@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 class checkout_wizard(models.TransientModel):
     '''月末结账的向导'''
     _name = 'checkout.wizard'
+    _description = u'月末结账向导'
 
     period_id = fields.Many2one('finance.period', u'结账会计期间')
     date = fields.Date(u'生成凭证日期', required=True)

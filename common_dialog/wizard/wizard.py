@@ -6,6 +6,7 @@ from openerp import fields
 
 class common_dialog_wizard(models.TransientModel):
     _name = 'common.dialog.wizard'
+    _description = u'通用的向导'
 
     message = fields.Text(u'消息', default=lambda self: self.env.context.get('message'))
 

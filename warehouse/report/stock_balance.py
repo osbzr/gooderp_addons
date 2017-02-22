@@ -7,6 +7,7 @@ from odoo import models, fields
 
 class report_stock_balance(models.Model):
     _name = 'report.stock.balance'
+    _description = u'库存余额表'
     _auto = False
 
     goods = fields.Char(u'产品')

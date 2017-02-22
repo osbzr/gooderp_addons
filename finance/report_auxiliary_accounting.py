@@ -8,6 +8,7 @@ from odoo import tools
 class report_auxiliary_accounting(models.Model):
     _name = 'report.auxiliary.accounting'
     _auto = False
+    _description = u'辅助核算余额表'
 
     account_id = fields.Many2one('finance.account', u'会计科目')
     auxiliary_id = fields.Many2one(
