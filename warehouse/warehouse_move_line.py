@@ -10,6 +10,7 @@ env = Environment(loader=PackageLoader('odoo.addons.warehouse', 'html'), autoesc
 
 class wh_move_line(models.Model):
     _name = 'wh.move.line'
+    _description = u'移库单明细'
 
     _rec_name = 'note'
 

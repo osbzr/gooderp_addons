@@ -604,6 +604,8 @@ class buy_order_line(models.Model):
 
 class payment(models.Model):
     _name="payment.plan"
+    _description = u'付款计划'
+
     name=fields.Char(string=u"名称", required=True,
                      help=u'付款计划名称')
     amount_money=fields.Float(string=u"金额", required=True,

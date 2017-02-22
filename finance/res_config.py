@@ -12,6 +12,7 @@ _logger = logging.getLogger(__name__)
 class finance_config_wizard(models.TransientModel):
     _name = 'finance.config.settings'
     _inherit = 'res.config.settings'
+    _description = u'会计默认设置'
 
     # 凭证
     # 凭证日期

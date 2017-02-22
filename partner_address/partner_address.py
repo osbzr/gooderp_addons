@@ -121,7 +121,6 @@ class partner_address(models.Model):
 
 class partner(models.Model):
     _inherit = 'partner'
-    _description = u'业务伙伴'
 
     @api.one
     @api.depends('child_ids.is_default_add', 'child_ids.province_id', 'child_ids.city_id', 'child_ids.county_id', 'child_ids.town', 'child_ids.detail_address')

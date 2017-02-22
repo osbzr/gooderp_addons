@@ -5,8 +5,8 @@ import odoo.addons.decimal_precision as dp
 from odoo.tools import float_is_zero
 
 class partner(models.Model):
+    '''查看业务伙伴对账单'''
     _inherit = 'partner'
-    _description = u'查看业务伙伴对账单'
 
     def _init_source_create(self, name, partner_id, category_id, is_init, date,
                             amount, reconciled, to_reconcile, date_due, state):
@@ -91,8 +91,8 @@ class partner(models.Model):
 
 
 class bank_account(models.Model):
+    '''查看账户对账单'''
     _inherit = 'bank.account'
-    _description = u'查看账户对账单'
 
     @api.one
     def _set_init_balance(self):

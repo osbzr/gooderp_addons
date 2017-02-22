@@ -7,6 +7,7 @@ import datetime
 
 class report_stock_transceive(models.Model):
     _name = 'report.stock.transceive'
+    _description = u'商品收发明细表'
     _inherit = 'report.base'
 
     goods = fields.Char(u'产品')

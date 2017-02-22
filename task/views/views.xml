@@ -85,7 +85,7 @@
 							<group>
 								<field name="name"/>
 								<field name="customer_id"/>
-								<field name="address"/>
+								<field name="address" widget='url'/>
 							</group>
 							<group>
 								<field name="plan_hours" groups='task.group_task_hours,base.group_portal'/>
@@ -275,7 +275,7 @@
             </field>
         </record>
 		<record model="ir.ui.view" id="timeline_tree">
-			<field name="name">工作日志</field>
+			<field name="name">工作记录</field>
 			<field name="model">timeline</field>
 			<field name="arch" type="xml">
 				<tree create='0' edit='0' default_order='create_date desc'>
@@ -324,7 +324,7 @@
 							<group>
 								<field name="name"/>
 								<field name="customer_id"/>
-								<field name="address"/>
+								<field name="address" widget='url'/>
 							</group>
 							<group>
 								<field name="plan_hours" groups='task.group_task_hours,base.group_portal'/>

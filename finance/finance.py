@@ -29,6 +29,7 @@ class voucher(models.Model):
     _name = 'voucher'
     _inherit = ['mail.thread']
     _order = 'period_id, name desc'
+    _description = u'会计凭证'
 
     @api.model
     def _default_voucher_date(self):
@@ -136,6 +137,7 @@ class voucher(models.Model):
 class voucher_line(models.Model):
     '''凭证明细'''
     _name = 'voucher.line'
+    _description = u'会计凭证明细'
 
     @api.model
     def _default_get(self, data):
@@ -242,6 +244,8 @@ class finance_period(models.Model):
     '''会计期间'''
     _name = 'finance.period'
     _order = 'name desc'
+    _description = u'会计期间'
+
     name = fields.Char(
         u'会计期间',
         compute='_compute_name', readonly=True, store=True)
@@ -352,6 +356,8 @@ class finance_period(models.Model):
 class document_word(models.Model):
     '''凭证字'''
     _name = 'document.word'
+    _description = u'凭证字'
+
     name = fields.Char(u'凭证字')
     print_title = fields.Char(u'打印标题',help=u'凭证在打印时的显示的标题')
 
@@ -360,6 +366,7 @@ class finance_account(models.Model):
     '''科目'''
     _name = 'finance.account'
     _order = "code"
+    _description = u'会计科目'
 
     name = fields.Char(u'名称', required="1")
     code = fields.Char(u'编码', required="1")
@@ -433,6 +440,7 @@ class finance_account(models.Model):
 class auxiliary_financing(models.Model):
     '''辅助核算'''
     _name = 'auxiliary.financing'
+    _description = u'辅助核算'
 
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
@@ -473,14 +481,16 @@ class bank_account(models.Model):
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'), readonly=True)
 
 class core_category(models.Model):
+    '''继承core cotegory，添加科目类型'''
     _inherit = 'core.category'
-    _description = u'继承core cotegory，添加科目类型'
 
     account_id = fields.Many2one('finance.account', u'科目', help=u'科目')
 
 class change_voucher_name(models.Model):
     ''' 修改凭证编号 '''
     _name = 'change.voucher.name'
+    _description = u'月末凭证变更记录'
+
     period_id = fields.Many2one('finance.period', u'会计期间')
     before_voucher_name = fields.Char(u'以前凭证号')
     after_voucher_name = fields.Char(u'更新后凭证号')

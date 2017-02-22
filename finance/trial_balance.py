@@ -8,6 +8,7 @@ class TrialBalance(models.Model):
     """科目余额表"""
     _name = "trial.balance"
     _order = 'subject_code'
+    _description = u'科目余额表'
 
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
@@ -25,6 +26,7 @@ class TrialBalance(models.Model):
 class CreateTrialBalanceWizard(models.TransientModel):
     """根据输入的期间 生成科目余额表的 向导 """
     _name = "create.trial.balance.wizard"
+    _description = u'科目余额表的创建向导'
 
     @api.model
     def _default_period_id(self):
@@ -193,6 +195,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
 class CreateVouchersSummaryWizard(models.TransientModel):
     """创建 明细账或者总账的向导 """
     _name = "create.vouchers.summary.wizard"
+    _description = u'明细账或总账创建向导'
 
     @api.model
     def _default_end_period_id(self):
@@ -517,6 +520,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
 class VouchersSummary(models.TransientModel):
     """明细帐"""
     _name = 'vouchers.summary'
+    _description = u'明细账'
 
     date = fields.Date(u'日期', help=u'日期')
     period_id = fields.Many2one('finance.period', string=u'会计期间', help=u'会计期间')
@@ -550,6 +554,7 @@ class VouchersSummary(models.TransientModel):
 class GeneralLedgerAccount(models.TransientModel):
     """总账"""
     _name = 'general.ledger.account'
+    _description = u'总账'
 
     period_id = fields.Many2one('finance.period', string=u'会计期间',  help=u'记录本条记录的期间!')
     summary = fields.Char(u'摘要', help=u'摘要')

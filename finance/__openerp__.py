@@ -23,7 +23,7 @@
                                 科目总账；
                                 辅助核算余额表。
     ''',
-    'version': '8.0.0.1',
+    'version': '11.11',
     'depends': ['core', 'num_to_china', 'web_sublist'],
     'data': [
         'security/groups.xml',
