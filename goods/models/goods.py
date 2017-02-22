@@ -5,16 +5,17 @@ from odoo import models, fields, api
 
 class goods(models.Model):
     _inherit = 'goods'
+    _description = u"继承了core里面定义的goods 模块，并定义了视图和添加字段。"
 
     no_stock = fields.Boolean(u'虚拟商品')
     using_batch = fields.Boolean(u'批号管理')
     force_batch_one = fields.Boolean(u'每批号数量为1')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
-    image=fields.Binary(u'图片', attachment=True)
+    image = fields.Binary(u'图片', attachment=True)
     supplier_id = fields.Many2one('partner',
                                   u'供应商',
                                   ondelete='restrict',
-                                  domain=[('s_category_id','!=',False)])
+                                  domain=[('s_category_id', '!=', False)])
     price = fields.Float(u'零售价')
     barcode = fields.Char(u'条形码')
     note = fields.Text(u'备注')
@@ -25,13 +26,24 @@ class goods(models.Model):
 
     @api.onchange('uom_id')
     def onchange_uom(self):
+        """
+        :return: 当选取单位时辅助单位默认和 单位相等。
+        """
         self.uos_id = self.uom_id
 
     def conversion_unit(self, qty):
+        """ 数量 × 转化率 = 辅助数量
+        :param qty: 传进来数量计算出辅助数量
+        :return: 返回辅助数量
+        """
         self.ensure_one()
         return self.conversion * qty
 
     def anti_conversion_unit(self, qty):
+        """ 数量 = 辅助数量 / 转化率
+        :param qty: 传入值为辅助数量
+        :return: 数量
+        """
         self.ensure_one()
         return self.conversion and qty / self.conversion or 0
 
@@ -74,13 +86,13 @@ class attribute_value(models.Model):
     category_id = fields.Many2one('core.category', u'属性',
                                   ondelete='cascade',
                                   domain=[('type', '=', 'attribute')],
-                                  context={'type':'attribute'},
+                                  context={'type': 'attribute'},
                                   required='1')
     value_id = fields.Many2one('attribute.value.value', u'值',
-                                ondelete='restrict',
-                                domain="[('category_id','=',category_id)]",
-                                default=lambda self: self.env.context.get('default_category_id'),
-                                required='1')
+                               ondelete='restrict',
+                               domain="[('category_id','=',category_id)]",
+                               default=lambda self: self.env.context.get('default_category_id'),
+                               required='1')
 
 class attribute_value_value(models.Model):
     _name = 'attribute.value.value'
@@ -89,6 +101,6 @@ class attribute_value_value(models.Model):
     category_id = fields.Many2one('core.category', u'属性',
                                   ondelete='cascade',
                                   domain=[('type', '=', 'attribute')],
-                                  context={'type':'attribute'},
+                                  context={'type': 'attribute'},
                                   required='1')
     name = fields.Char(u'值')
