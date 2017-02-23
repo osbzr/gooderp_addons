@@ -113,6 +113,8 @@ class staff(models.Model):
     parent_id = fields.Many2one('staff', u'部门经理')
     job_id = fields.Many2one('staff.job', u'职位')
     notes = fields.Text(u'其他信息')
+    emergency_contact = fields.Char(u'紧急联系人')
+    emergency_call = fields.Char(u'紧急联系方式')
 
     @api.model
     def staff_contract_over_date(self):

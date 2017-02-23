@@ -54,6 +54,8 @@
                                         <field name="is_arbeitnehmer"/>
                                         <field name="is_investoren"/>
                                         <field name="is_bsw"/>
+                                        <field name="emergency_contact"/>
+                                        <field name="emergency_call"/>
                                     </group>
                                     <group string="状态">
                                         <field name="gender"/>
