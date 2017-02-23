@@ -11,9 +11,9 @@
     ''',
     'data': [
         'security/groups.xml',
-        "views/home_page_views.xml",
-        "views/home_page_action.xml",
-        "views/home_page_menu.xml",
+        "view/home_page_views.xml",
+        "view/home_page_action.xml",
+        "view/home_page_menu.xml",
         'security/ir.model.access.csv',
     ],
     'depends': ['base','web','mail'],
