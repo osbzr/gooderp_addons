@@ -250,9 +250,9 @@ class money_order(models.Model):
 
                 source.to_reconcile = (source.to_reconcile - 
                                        source.this_reconcile)
+                source.reconciled += source.this_reconcile
                 source.name.to_reconcile = source.to_reconcile
-                source.name.reconciled = (source.reconciled + 
-                                          source.this_reconcile)
+                source.name.reconciled = source.reconciled
 
             order.state = 'done'
         return True
@@ -280,10 +280,10 @@ class money_order(models.Model):
                 order.partner_id.receivable += total + self.discount_amount
 
             for source in order.source_ids:
-                source.name.to_reconcile = (source.to_reconcile + 
-                                            source.this_reconcile)
-                source.name.reconciled = (source.reconciled - 
-                                          source.this_reconcile)
+                source.reconciled -= source.this_reconcile
+                source.to_reconcile += source.this_reconcile
+                source.name.to_reconcile = source.to_reconcile
+                source.name.reconciled = source.reconciled
 
             order.state = 'draft'
         return True
