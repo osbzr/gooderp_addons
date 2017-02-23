@@ -8,6 +8,7 @@ from odoo.exceptions import UserError
 
 class wh_move_matching(models.Model):
     _name = 'wh.move.matching'
+    _description = u'匹配记录'
 
     line_in_id = fields.Many2one(
         'wh.move.line', u'入库',

@@ -10,6 +10,7 @@ from odoo.exceptions import UserError
 
 class wh_assembly(models.Model):
     _name = 'wh.assembly'
+    _description = u'组装单'
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -724,6 +725,7 @@ class outsource(models.Model):
 
 class wh_disassembly(models.Model):
     _name = 'wh.disassembly'
+    _description = u'拆卸单'
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -1091,6 +1093,7 @@ class wh_disassembly(models.Model):
 
 class wh_bom(osv.osv):
     _name = 'wh.bom'
+    _description = u'物料清单'
 
     BOM_TYPE = [
         ('assembly', u'组装单'),
@@ -1115,6 +1118,7 @@ class wh_bom(osv.osv):
 
 class wh_bom_line(osv.osv):
     _name = 'wh.bom.line'
+    _description = u'物料清单明细'
 
     BOM_LINE_TYPE = [
         ('parent', u'组合件'),

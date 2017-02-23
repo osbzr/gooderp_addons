@@ -3,12 +3,16 @@ from odoo import models, fields, api
 
 class VoucherTemplate(models.Model):
     _name = 'voucher.template'
+    _description = u'凭证模板'
+
     name = fields.Char(u'模板名称')
     line_ids = fields.One2many('voucher.template.line', 'template_id', string='模板行')
 
 
 class VoucherTemplateLine(models.Model):
     _name = 'voucher.template.line'
+    _description = u'凭证模板明细'
+
     name = fields.Char(u'摘要')
     account_id = fields.Many2one('finance.account', u'会计科目')
     partner_id = fields.Many2one('partner', u'往来单位')
@@ -21,6 +25,7 @@ class VoucherTemplateLine(models.Model):
 
 class voucher_template_wizard(models.TransientModel):
     _name = 'voucher.template.wizard'
+    _description = u'凭证模板生成向导'
 
     name = fields.Char(string=u'模板名称')
     is_change_old_template = fields.Boolean(u'修改原有模板')

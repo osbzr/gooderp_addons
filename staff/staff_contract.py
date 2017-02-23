@@ -4,6 +4,7 @@ from odoo import fields, models, api
 
 class staff_contract(models.Model):
     _name = 'staff.contract'
+    _description = u'员工合同'
 
     staff_id = fields.Many2one('staff', u'员工', required=True)
 

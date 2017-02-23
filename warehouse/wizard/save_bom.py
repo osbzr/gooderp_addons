@@ -4,6 +4,7 @@ from odoo import models, fields, api
 
 class save_bom_memory(models.TransientModel):
     _name = 'save.bom.memory'
+    _description = u'另存为新的物料清单'
 
     name = fields.Char(u'物料清单名称')
 

@@ -11,7 +11,9 @@ class partner(models.Model):
 
     '''
     _name = 'partner'
+    _description = u'业务伙伴'
     _inherit = ['mail.thread']
+
     code = fields.Char(u'编号')
     name = fields.Char(u'名称', required=True,)
     main_mobile = fields.Char(u'主要手机号', required=True,)

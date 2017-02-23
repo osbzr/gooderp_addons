@@ -8,6 +8,7 @@ class opportunity(models.Model):
     _inherits = {'task': 'task_id'}
     _inherit = ['mail.thread']
     _order = 'planned_revenue desc, priority desc, id'
+    _description = u'商机'
 
     @api.model
     def _select_objects(self):

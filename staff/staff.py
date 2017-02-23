@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 
 class staff_department(models.Model):
     _name = "staff.department"
+    _description = u'员工部门'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
 
     auxiliary_id = fields.Many2one(
@@ -33,6 +34,7 @@ class staff_department(models.Model):
 
 class staff_job(models.Model):
     _name = "staff.job"
+    _description = u'员工职位'
 
     name = fields.Char(u'职位', required=True)
     note = fields.Text(u'描述')
@@ -41,6 +43,7 @@ class staff_job(models.Model):
 
 class staff_employee_category(models.Model):
     _name = "staff.employee.category"
+    _description = u'员工层级'
 
     name = fields.Char(u'名称')
     parent_id = fields.Many2one('staff.employee.category', u'上级标签', index=True)
