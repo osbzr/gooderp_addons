@@ -1,1 +1,1 @@
-import partner_address
+import models

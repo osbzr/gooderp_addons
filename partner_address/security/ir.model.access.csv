@@ -4,3 +4,4 @@ access_country_state,access_country_state,model_country_state,,1,1,1,0
 access_all_city,access_all_city,model_all_city,,1,1,1,0
 access_all_county,access_all_county,model_all_county,,1,1,1,0
 access_partner_address,access_partner_address,model_partner_address,,1,1,1,1
+access_state_city_county,access_state_city_county,model_state_city_county,,1,1,1,1
