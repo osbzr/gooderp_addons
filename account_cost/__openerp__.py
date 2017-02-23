@@ -11,9 +11,9 @@
     'version': '11.11',
     'depends': ['buy'],
     'data': [
-        'view/cost_order_view.xml',
-        'view/cost_action.xml',
-        'view/cost_menu.xml',
+        'views/cost_order_view.xml',
+        'views/cost_action.xml',
+        'views/cost_menu.xml',
         'security/ir.model.access.csv',
         'security/cost_sequence.xml',
     ],

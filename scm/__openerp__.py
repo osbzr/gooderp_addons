@@ -17,6 +17,6 @@
     'data': [
              'security/ir.model.access.csv',
              'data/stock_request_data.xml',
-             'view/stock_request_view.xml',
+             'views/stock_request_view.xml',
              ]
 }

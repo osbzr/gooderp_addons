@@ -16,7 +16,7 @@
         'data/base_data.xml',
         'data/all.city.csv',
         'data/all.county.csv',
-        'view/partner_address.xml',
+        'views/partner_address.xml',
         'security/ir.model.access.csv'
     ],
     'installable': True,
