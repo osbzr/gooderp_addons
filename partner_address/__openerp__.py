@@ -13,10 +13,10 @@
                         实现了选择省过滤出城市，选择城市过滤出县，选择城市不属于省改变省等业务。
     ''',
     'data': [
-        'base_data.xml',
-        'all.city.csv',
-        'all.county.csv',
-        'partner_address.xml',
+        'data/base_data.xml',
+        'data/all.city.csv',
+        'data/all.county.csv',
+        'views/partner_address.xml',
         'security/ir.model.access.csv'
     ],
     'installable': True,

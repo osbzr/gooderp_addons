@@ -32,7 +32,7 @@
     '''对于分组Grouping显示模式，展开关闭分组行时，重新锁定表头的代码还需要完善。
     ''',
     'data': [
-        'fixed_header.xml',
+        'views/fixed_header.xml',
     ],
     'installable': True,
 }

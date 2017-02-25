@@ -31,7 +31,7 @@
         'backend_theme',
     ],
     'data': [
-        'view/web_export_view.xml',
+        'views/web_export_view.xml',
         'security/ir.model.access.csv',
     ],
     'qweb': [

@@ -37,86 +37,91 @@ class all_county(models.Model):
     county_name = fields.Char(u'名称')
     description = fields.Char(u'描述')
 
+class state_city_county(models.Model):
+    _name = 'state.city.county'
 
-class partner_address(models.Model):
-    _name = 'partner.address'
-    _description = u'业务伙伴的联系人地址'
- 
-    partner_id = fields.Many2one('partner', u'业务伙伴')
-    contact = fields.Char(u'联系人')
-    mobile = fields.Char(u'手机')
-    phone = fields.Char(u'座机')
-    qq = fields.Char(u'QQ/微信')
     province_id = fields.Many2one('country.state', u'省/市',
                                   domain="[('country_id.name','=','中国')]")
     city_id = fields.Many2one('all.city', u'市/区')
     county_id = fields.Many2one('all.county', u'县/市')
-    town = fields.Char(u'乡镇')
-    detail_address = fields.Char(u'详细地址')
-    is_default_add = fields.Boolean(u'是否默认地址')
 
     @api.onchange('province_id')
     def onchange_province(self):
         # 为地址填写时方便，当选定省时 ，市区的列表里面只有所选省的
-        domain_dict = {'city_id': [('province_id', '=', self.province_id.id)]}
         if self.province_id:
+            domain_dict = {'city_id': [('province_id', '=', self.province_id.id)]}
             if self.city_id:
-                if self.city_id.province_id.id == self.province_id.id:
+                if self.city_id.province_id == self.province_id:
                     if self.county_id:
-                        if self.county_id.city_id.id == self.city_id.id:
-                            return{}
-                    else:
-                        self.county_id = ''
+                        if self.county_id.city_id == self.city_id:
+                            domain_dict = {}
+                        else:
+                            self.county_id = False
                 else:
-                    self.city_id = ''
+                    self.city_id = False
         else:
-            self.city_id = ''
-            self.county_id = ''
+            self.city_id = False
+            self.county_id = False
             domain_dict = {'city_id': [], 'county_id': []}
-
         return {'domain': domain_dict}
+
 
     @api.onchange('city_id')
     def onchange_city(self):
         # 为地址填写时方便，当选定市时 ，县区的列表里面只有所选市的
-        domain_dict = {'county_id': [('city_id', '=', self.city_id.id)]}
         if self.city_id:
+            domain_dict = {'county_id': [('city_id', '=', self.city_id.id)]}
             province = self.city_id.province_id
             if not self.province_id:
                 if self.county_id:
-                    if self.county_id.city_id.id != self.city_id.id:
-                        self.city_id = ''
-                        self.province_id = province.id
+                    if self.county_id.city_id != self.city_id:
+                        self.county_id = False
+                        self.province_id = province
                 else:
-                    self.province_id = province.id
+                    self.province_id = province
             else:
                 domain_dict.update({'city_id': [('province_id', '=', province.id)]})
                 if self.county_id:
-                    if self.county_id.city_id.id == self.city_id.id:
-                        if province.id != self.province_id.id:
-                            self.province_id = province.id
+                    if self.county_id.city_id == self.city_id:
+                        if province != self.province_id:
+                            self.province_id = province
                     else:
-                        if province.id != self.province_id.id:
-                            self.province_id = province.id
-                            self.county_id = ''
+                        if province != self.province_id:
+                            self.province_id = province
+                            self.county_id = False
                         else:
-                            self.county_id = ''
+                            self.county_id = False
                 else:
-                    if province.id != self.province_id.id:
-                        self.province_id = province.id
+                    if province != self.province_id:
+                        self.province_id = province
         else:
-            self.county_id = ''
+            self.county_id = False
             domain_dict = {'county_id': []}
-
         return {'domain': domain_dict}
 
     @api.onchange('county_id')
     def onchange_county(self):
         # 选定了一个区县，自动填充其所属的省和市
-        if self.county_id:
-            self.city_id = self.county_id.city_id.id
-            self.province_id = self.city_id.province_id.id
-            return {'domain': {'county_id': [('city_id', '=', self.city_id.id)]}}
+        if self.county_id and self.county_id.city_id and self.county_id.city_id.province_id:
+            city_obj = self.county_id.city_id
+            self.city_id = city_obj
+            self.province_id = city_obj.province_id
+            return {'domain': {'county_id': [('city_id', '=', city_obj.id)]}}
+
+class partner_address(models.Model):
+    _name = 'partner.address'
+    _inherit = "state.city.county"
+    _description = u'业务伙伴的联系人地址'
+
+    partner_id = fields.Many2one('partner', u'业务伙伴')
+    contact = fields.Char(u'联系人')
+    mobile = fields.Char(u'手机')
+    phone = fields.Char(u'座机')
+    qq = fields.Char(u'QQ/微信')
+
+    town = fields.Char(u'乡镇')
+    detail_address = fields.Char(u'详细地址')
+    is_default_add = fields.Boolean(u'是否默认地址')
 
 
 class partner(models.Model):

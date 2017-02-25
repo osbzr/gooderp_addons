@@ -56,8 +56,8 @@
 										<field name='using_batch' groups='goods.batch_groups'/>
 										<field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
 										groups='goods.batch_serial_groups' />
-										<field name='attribute_ids' colspan="2" nolabel='1' groups='goods.multi_attrs_groups'/>
 									</group>
+									<field name='attribute_ids' colspan="2" nolabel='1' groups='goods.multi_attrs_groups'/>
 								</group>
 							</page>
 						</notebook>

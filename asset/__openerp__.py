@@ -11,9 +11,9 @@
     'version': '11.11',
     'depends': ['finance', 'money'],
     'data': [
-        'view/asset.xml',
-        'view/asset_action.xml',
-        'view/asset_menu.xml',
+        'views/asset.xml',
+        'views/asset_action.xml',
+        'views/asset_menu.xml',
         'data/asset_data.xml',
         'security/ir.model.access.csv',
     ],
