@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 自动动作 -->
+
+        <record id="auto_exchange_notification" model="ir.cron">
+            <field name="name">每天运行一次取汇率</field>
+            <field eval="True" name="active" />
+            <field name="user_id" ref="base.user_root" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="True" name="doall" />
+            <field eval="'res.currency'" name="model" />
+            <field eval="'get_exchange'" name="function" />
+            <field eval="'()'" name="args" />
+            <field name="priority">9</field>
+        </record>
+
+	</data>
+</openerp>

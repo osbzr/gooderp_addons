@@ -68,8 +68,8 @@ class money_order(models.Model):
                     'rate_silent': account_row.currency_id.rate})
         return res
 
-    def _create_voucher_line(self, line, name, account_id, debit, credit, voucher_id, partner_id):
-        line_data = self._prepare_vouch_line_data(line, name, account_id, debit, credit, voucher_id, partner_id)
+    def _create_voucher_line(self, line, name, account_id, debit, credit, voucher_id, partner_id, currency_id):
+        line_data = self._prepare_vouch_line_data(line, name, account_id, debit, credit, voucher_id, partner_id, currency_id)
         voucher_line = self.env['voucher.line'].create(line_data)
         return voucher_line
 
@@ -89,7 +89,10 @@ class money_order(models.Model):
                                      line.amount,
                                      0,
                                      vouch_obj.id,
-                                     '')
+                                     '',
+                                     line.currency_id.id
+                                     )
+
             amount_all += line.amount
         if self.discount_amount != 0:
             # 生成借方明细行
@@ -100,7 +103,9 @@ class money_order(models.Model):
                                      self.discount_amount,
                                      0,
                                      vouch_obj.id,
-                                     self.partner_id.id)
+                                     self.partner_id.id,
+                                     line.currency_id.id
+                                     )
 
         if partner.c_category_id:
             partner_account_id = partner.c_category_id.account_id.id
@@ -113,7 +118,9 @@ class money_order(models.Model):
                                   0,
                                   amount_all + self.discount_amount,
                                   vouch_obj.id,
-                                  self.partner_id.id)
+                                  self.partner_id.id,
+                                  line.currency_id.id
+                                  )
         return vouch_obj
 
     @api.multi
@@ -133,7 +140,9 @@ class money_order(models.Model):
                                       0,
                                       line.amount,
                                       vouch_obj.id,
-                                      '')
+                                      '',
+                                      line.currency_id.id
+                                      )
             amount_all += line.amount
         if partner.s_category_id:
             partner_account_id = partner.s_category_id.account_id.id
@@ -146,7 +155,9 @@ class money_order(models.Model):
                                   amount_all - self.discount_amount,
                                   0,
                                   vouch_obj.id,
-                                  self.partner_id.id)
+                                  self.partner_id.id,
+                                  line.currency_id.id
+                                  )
 
         if self.discount_amount != 0:
             # 生成借方明细行 debit
@@ -157,7 +168,9 @@ class money_order(models.Model):
                                       self.discount_amount,
                                       0,
                                       vouch_obj.id,
-                                      self.partner_id.id)
+                                      self.partner_id.id,
+                                      line.currency_id.id
+                                      )
         return vouch_obj
 
 
@@ -211,18 +224,51 @@ class money_invoice(models.Model):
                 vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': invoice.partner_id.id, 'name': invoice.name, 'string': u'%s发票%s结算单' % (invoice.date_due,invoice.bill_number or ''),
                              'amount': invoice.amount, 'credit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
                              'debit_account_id': partner_account_id, 'sell_tax_amount': invoice.tax_amount or 0,
-                             'credit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '', 'rate_silent':invoice.currency_id.rate or 0,
+                             'credit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '',
+                             'rate_silent':self.env['res.currency'].get_rate_silent(self.date, invoice.currency_id.id) or 0,
                              })
             else:
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': invoice.name, 'string': u'%s发票%s结算单' % (invoice.date_due,invoice.bill_number or ''),
                              'amount': invoice.amount, 'credit_account_id': partner_account_id,
                              'debit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
                              'partner_credit':invoice.partner_id.id, 'buy_tax_amount': invoice.tax_amount or 0,
-                             'debit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '', 'rate_silent':invoice.currency_id.rate or 0,
+                             'debit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '',
+                             'rate_silent':self.env['res.currency'].get_rate_silent(self.date, invoice.currency_id.id) or 0,
                              })
             if invoice.is_init:
                 vals.update({'init_obj': 'money_invoice', })
             invoice.create_voucher_line(vals)
+
+            # 如果为采购或销售，则生成凭证后删除统一的凭证行，按出入库内容明细行生成
+            if invoice.category_id.type in ('expense','income'):
+                vouch_line_ids = self.env['voucher.line'].search([
+                    ('account_id', '=', invoice.category_id.account_id.id),
+                    ('voucher_id', '=', vouch_obj.id)])
+                for vouch_line_id in vouch_line_ids:
+                    vouch_line_id.unlink()
+                wh_move = self.env['wh.move'].search([
+                    ('name', '=', invoice.name)])
+                for wh_move_line in wh_move.line_out_ids:
+                    self.env['voucher.line'].create({
+                        'name': u"销售%s" % (wh_move_line.goods_id.name),
+                        'account_id': wh_move_line.goods_id.category_id.account_out_id.id,
+                        'credit': wh_move_line.amount * vals.get('rate_silent'),
+                        'voucher_id': vouch_obj.id,
+                        'auxiliary_id':vals.get('debit_auxiliary_id', False),
+                        'currency_id':vals.get('currency_id'),
+                        'currency_amount': wh_move_line.amount,
+                        'rate_silent':vals.get('rate_silent'),
+                        'init_obj':False,
+                        })
+                for wh_move_line in wh_move.line_in_ids:
+                    self.env['voucher.line'].create({
+                        'name': u"采购%s" % (wh_move_line.goods_id.name),
+                        'account_id': wh_move_line.goods_id.category_id.account_in_id.id,
+                        'debit': wh_move_line.cost,
+                        'voucher_id': vouch_obj.id,
+                        'auxiliary_id':vals.get('debit_auxiliary_id', False),
+                        'init_obj':False,
+                        })
 
          # 删除初始非需要的凭证明细行,不审核凭证
             if invoice.is_init:
@@ -537,3 +583,12 @@ class money_transfer_order(models.Model):
             voucher.voucher_draft()
         voucher.unlink()
         return res
+
+class Currency(models.Model):
+    _inherit = 'res.currency'
+
+    @api.multi
+    def get_rate_silent(self,date,currency_id):
+        currency = self.env['res.currency'].search([('id', '=', currency_id)])
+        rate = currency.rate
+        return rate
