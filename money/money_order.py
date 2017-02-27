@@ -248,11 +248,8 @@ class money_order(models.Model):
                     raise UserError(u'本次核销金额不能大于未核销金额!\n 核销金额:%s 未核销金额:%s'
                                     %(abs(source.to_reconcile),source.this_reconcile))
 
-                source.to_reconcile = (source.to_reconcile - 
-                                       source.this_reconcile)
-                source.name.to_reconcile = source.to_reconcile
-                source.name.reconciled = (source.reconciled + 
-                                          source.this_reconcile)
+                source.name.to_reconcile -= source.this_reconcile
+                source.name.reconciled += source.this_reconcile
 
             order.state = 'done'
         return True
@@ -280,10 +277,8 @@ class money_order(models.Model):
                 order.partner_id.receivable += total + self.discount_amount
 
             for source in order.source_ids:
-                source.name.to_reconcile = (source.to_reconcile + 
-                                            source.this_reconcile)
-                source.name.reconciled = (source.reconciled - 
-                                          source.this_reconcile)
+                source.name.to_reconcile += source.this_reconcile
+                source.name.reconciled -= source.this_reconcile
 
             order.state = 'draft'
         return True
