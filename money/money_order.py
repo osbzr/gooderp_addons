@@ -141,9 +141,9 @@ class money_order(models.Model):
                                states={'draft': [('readonly', False)]},
                                help=u'收付款单明细行')
     source_ids = fields.One2many('source.order.line', 'money_id',
-                                 string=u'结算单行', readonly=True,
+                                 string=u'待核销行', readonly=True,
                                  states={'draft': [('readonly', False)]},
-                                 help=u'收付款单原始单据行')
+                                 help=u'收付款单待核销行行')
     type = fields.Selection(TYPE_SELECTION, string=u'类型',
                             default=lambda self: self.env.context.get('type'),
                             help=u'类型：收款单 或者 付款单')
@@ -178,7 +178,7 @@ class money_order(models.Model):
         """
         self.ensure_one()
         if self.state != 'draft':
-            raise ValueError(u'已审核的单据不能，执行这个操作！')
+            raise ValueError(u'已审核的单据不能执行这个操作')
         for source in self.source_ids:
             source.this_reconcile = 0
         return True
@@ -265,7 +265,7 @@ class money_order(models.Model):
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
                     decimal_amount = self.env.ref('core.decimal_amount')
                     if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
-                        raise UserError(u'账户余额不足!\n账户余额:%s 订单金额:%s'%(line.bank_id.balance,line.amount))
+                        raise UserError(u'账户余额不足!\n账户余额:%s 订单行金额:%s'%(line.bank_id.balance,line.amount))
                     line.bank_id.balance -= line.amount
                 else:  # 收款账号余额增加, 退款账号余额减少
                     line.bank_id.balance += line.amount
@@ -304,7 +304,7 @@ class money_order(models.Model):
                 else:  # 反审核：收款账号余额减少
                     decimal_amount = self.env.ref('core.decimal_amount')
                     if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
-                        raise UserError(u'账户余额不足!\n 账户余额:%s 订单金额:%s' % (line.bank_id.balance, line.amount))
+                        raise UserError(u'账户余额不足!\n 账户余额:%s 订单行金额:%s' % (line.bank_id.balance, line.amount))
                     line.bank_id.balance -= line.amount
                 total += line.amount
 
@@ -329,7 +329,7 @@ class money_order_line(models.Model):
     @api.depends('bank_id')
     def _compute_currency_id(self):
         partner_currency_id = self.bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
-        self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
+        self.currency_id = partner_currency_id
         if self.bank_id and self.currency_id.id != self.money_id.currency_id.id :
             raise ValidationError(u'结算帐户与业务伙伴币别不一致\n 结算账户币别:%s 业务伙伴币别:%s'
                                   %(self.currency_id.name,self.money_id.currency_id.name))
@@ -408,7 +408,7 @@ class money_invoice(models.Model):
     currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True,
                                   help=u'原始单据对应的外币币别')
     bill_number = fields.Char(u'发票号',
-                              help=u'结算单对应的会计凭证号')
+                              help=u'发票号')
     is_init = fields.Boolean(u'是否初始化单')
 
     @api.multi
