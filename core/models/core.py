@@ -22,7 +22,7 @@ def create(self, vals):
 @api.multi
 def unlink(self):
     for model_row in self:
-        if getattr(model_row, 'state', False) == 'done':
+        if getattr(model_row, 'state',False) == 'done':
             raise UserError(u"已完成状态的记录不能删除")
     return_vals = unlink_original(self)
     return return_vals

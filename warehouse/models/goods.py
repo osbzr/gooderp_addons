@@ -137,7 +137,15 @@ class goods(models.Model):
                 if not ignore_stock and qty_to_go > 0 and not self.env.context.get('wh_in_line_ids'):
                     raise UserError(u'产品%s的库存数量不够本次出库行为' % (goods.name,))
                 if self.env.context.get('wh_in_line_ids'):
-                    matching_records.append({'line_in_id': self.env.context.get('wh_in_line_ids')[0],
-                                         'qty': qty_to_go, 'uos_qty': uos_qty_to_go})
+                    domain = [('id', 'in', self.env.context.get('wh_in_line_ids')),
+                              ('state', '=', 'done'),
+                              ('warehouse_dest_id', '=', warehouse.id),
+                              ('goods_id', '=', goods.id)]
+                    if attribute:
+                        domain.append(('attribute_id', '=', attribute.id))
+                    line_in_id = self.env['wh.move.line'].search(domain, order='cost_time, id')
+                    if line_in_id:
+                        matching_records.append({'line_in_id': line_in_id.id,
+                                                 'qty': qty_to_go, 'uos_qty': uos_qty_to_go})
 
             return matching_records, cost
