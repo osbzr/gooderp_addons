@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 # 单据自动编号，避免在所有单据对象上重载
 
 create_original = models.BaseModel.create
-
+unlink_original = models.BaseModel.unlink
 
 @api.model
 @api.returns('self', lambda value: value.id)
@@ -19,8 +19,17 @@ def create(self, vals):
     record_id = create_original(self, vals)
     return record_id
 
-models.BaseModel.create = create
+# @api.multi
+# def unlink(self):
+#     for model_row in self:
+#         if getattr(model_row, 'state',False) == 'done':
+#             raise UserError(u"已完成状态的记录不能删除")
+#     return_vals = unlink_original(self)
+#     return return_vals
 
+# 还需测试暂时注释代码
+models.BaseModel.create = create
+#models.BaseModel.unlink = unlink
 # 分类的类别
 
 CORE_CATEGORY_TYPE = [('customer', u'客户'),
