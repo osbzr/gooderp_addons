@@ -23,7 +23,7 @@
             <field name="name">money.order.tree</field>
             <field name="model">money.order</field>
             <field name="arch" type="xml">
-                <tree string="Money Order">
+                <tree string="收付款单">
                     <field name="name" string="单据编号"/>
                     <field name="date"/>
                     <field name="partner_id"/>
@@ -38,15 +38,14 @@
             <field name="name">money.order.form</field>
             <field name="model">money.order</field>
             <field name="arch" type="xml">
-                <form string="Money Order">
+                <form string="收付款单">
                 <header>
                 	<button name="money_order_done" states="draft" string="审核" 
                 		type="object" class="oe_highlight" groups='money.group_money_manager'/>
 					<button name="money_order_draft" states="done" string="反审核" 
 						type="object" groups='money.group_money_manager'/>
-                    <button name="write_off_reset" states="draft" string="核销行金额清零" class="oe_highlight"
-						type="object" groups='money.group_money_manager'/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
+                    <button name="write_off_reset" states="draft" string="核销行金额清零" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -96,7 +95,7 @@
                             <field name="this_reconcile" sum="合计"/>
                        </tree>
                     </field>
-	                <field name="note"  nolabel="1" placeholder="备注信息……"/>
+	                <field name="note"  placeholder="备注信息……"/>
 	                <group>
                     	<group>
 		                	<field name="discount_amount" groups="money.reconcile_groups"/>
@@ -171,30 +170,12 @@
             </field>
         </record>
 
-        <!--核销明细tree-->
-    	<record id="source_order_line_tree" model="ir.ui.view">
-            <field name="name">source.order.line.tree</field>
-            <field name="model">source.order.line</field>
-            <field name="arch" type="xml">
-                <tree string="Source Order Line">
-                    <field name="name" readonly='1'/>
-            		<field name="category_id" readonly='1'/>
-                    <field name="date" readonly='1'/>
-                    <field name="amount" readonly='1'/>
-                    <field name="reconciled" readonly='1'/>
-                    <field name="to_reconcile" readonly='1'/>
-					<field name="this_reconcile"/>
-					<field name="date_due"/>
-                </tree>
-            </field>
-        </record>
-
         <!--结算单tree-->
     	<record id="money_invoice_tree" model="ir.ui.view">
             <field name="name">money.invoice.tree</field>
             <field name="model">money.invoice</field>
             <field name="arch" type="xml">
-                <tree string="Money Invoice" editable='TOP'>
+                <tree string="结算单" editable='top'>
                     <field name="state" invisible="1"/>
                     <field name="name"/>
                     <button name="find_source_order" type="object" string="查看原始单据" icon="fa-search" class="oe_highlight"/>
@@ -225,13 +206,10 @@
                     <field name="partner_id"/>
             		<field name="category_id"/>
                     <field name="amount"/>
-                    <field name="state"/>
-                    <group expand="0" string="分组">
-                        <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="类别" domain="[]" context="{'group_by':'category_id'}"/>
-                        <filter string="单据日期" domain="[]" context="{'group_by':'date:month'}"/>
-                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:month'}"/>
-                    </group>
+                    <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter string="类别" domain="[]" context="{'group_by':'category_id'}"/>
+                    <filter string="单据日期" domain="[]" context="{'group_by':'date:month'}"/>
+                    <filter string="到期日" domain="[]" context="{'group_by':'date_due:month'}"/>
                 </search>
             </field>
         </record>

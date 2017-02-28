@@ -68,10 +68,10 @@
 			<field name="comment">用于显示结算方式和结算编号</field>
 		</record>
 		<record id='service_groups' model='res.groups'>
-			<field name='name'>管理服务</field>
+			<field name='name'>管理收支项</field>
 			<field name='category_id' ref="good_money"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
-			<field name="comment">用于显示服务类产品功能，服务类产品不管理库存数量</field>
+			<field name="comment">用于显示收支项类产品功能，服务类产品不管理库存数量</field>
 		</record>
 		<record id="nobody_can_see" model="res.groups" >
 			<field name="name">彻底隐藏</field>
