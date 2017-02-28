@@ -104,7 +104,7 @@ class other_money_order(models.Model):
     def other_money_done(self):
         '''其他收支单的审核按钮'''
         self.ensure_one()
-        if float_compare(self.total_amount , 0) <= 0:
+        if float_compare(self.total_amount, 0, 3) <= 0:
             raise UserError(u'金额应该大于0!\n金额:%s'%self.total_amount)
 
         # 根据单据类型更新账户余额
