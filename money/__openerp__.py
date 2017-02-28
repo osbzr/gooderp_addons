@@ -41,7 +41,7 @@
         'data/home_page_data.xml',
         'report/report_data.xml',
         'report/print.xml',
-        'report/report_money_order.xml',
+        'report/print_money_order.xml',
     ],
     'demo': [
         'demo/money_demo.xml',
