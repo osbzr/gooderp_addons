@@ -28,6 +28,15 @@ class money_transfer_order(models.Model):
     _name = 'money.transfer.order'
     _description = u'资金转账单'
 
+
+    @api.multi
+    def unlink(self):
+        for order in self:
+            if order.state == 'done':
+                raise UserError(u'不可以删除已经审核的单据\n 资金转账单%s已审核'%order.name)
+
+        return super(money_transfer_order, self).unlink()
+
     state = fields.Selection([
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
