@@ -43,7 +43,7 @@ class warehouse(models.Model):
                   AND line.state = 'done'
                   AND line.warehouse_dest_id = %s
 
-                GROUP BY wh.name, goods.name
+                GROUP BY goods.name
             ''' % (warehouse.id, ))
 
             return self.env.cr.dictfetchall()

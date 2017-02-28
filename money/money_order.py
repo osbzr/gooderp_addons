@@ -64,6 +64,10 @@ class money_order(models.Model):
 
     @api.multi
     def unlink(self):
+        """
+        已审核的money.order不允许删除
+        :return:
+        """
         for order in self:
             if order.state == 'done':
                 raise UserError(u'不可以删除已经审核的单据')
@@ -75,6 +79,11 @@ class money_order(models.Model):
                  'line_ids.amount',
                  'source_ids.this_reconcile')
     def _compute_advance_payment(self):
+        """
+        计算字段advance_payment（本次预收） 监控 discount_amount， source_ids.this_reconcile line_ids.amount
+        对应的字段变化则 执行本方法进行重新计算。
+        :return:
+        """
         amount, this_reconcile = 0.0, 0.0
         for line in self.line_ids:
             amount += line.amount
@@ -91,6 +100,10 @@ class money_order(models.Model):
     @api.one
     @api.depends('partner_id')
     def _compute_currency_id(self):
+        """
+        取出币别
+        :return:
+        """
         partner_currency_id = self.partner_id.c_category_id.account_id.currency_id.id or self.partner_id.s_category_id.account_id.currency_id.id
         self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
 
@@ -159,6 +172,10 @@ class money_order(models.Model):
 
     @api.multi
     def write_off_reset(self):
+        """
+        单据审核前重置计算单行上的本次核销金额
+        :return:
+        """
         self.ensure_one()
         if self.state != 'draft':
             raise ValueError(u'已审核的单据不能，执行这个操作！')
@@ -168,12 +185,24 @@ class money_order(models.Model):
 
     @api.onchange('date')
     def onchange_date(self):
-        if  self.env.context.get('type') == 'get':
+        """
+        当修改日期时，则根据context中的money的type对客户添加过滤 过滤出是供应商还 客户
+        （因为date有默认值所以这个过滤是默认触发的） 其实和dte是否变化没有关系，页面加载就触发下面的逻辑
+        :return:
+        """
+        if self.env.context.get('type') == 'get':
             return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
+
     def _get_source_line(self, invoice):
+        """
+        根据传入的invoice的对象取出对应的值 构造出 source_line的一个dict 包含source line的主要参数
+        :param invoice: money_invoice对象
+        :return: dict
+        """
+
         return {
                 'name': invoice.id,
                 'category_id': invoice.category_id.id,
@@ -186,6 +215,10 @@ class money_order(models.Model):
                 }
 
     def _get_invoice_search_list(self):
+        """
+        构造出 invoice 搜索的domain
+        :return:
+        """
         invoice_search_list = [('partner_id', '=', self.partner_id.id),
                                ('to_reconcile', '!=', 0)]
         if self.env.context.get('type') == 'get':
@@ -197,6 +230,10 @@ class money_order(models.Model):
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
+        """
+        对partner修改的监控当 partner 修改时，就对 页面相对应的字段进行修改（bank_name，bank_num，source_ids）
+        :return:
+        """
         if not self.partner_id:
             return {}
 
@@ -531,6 +568,10 @@ class reconcile_order(models.Model):
 
     @api.multi
     def unlink(self):
+        """
+        核销单已经审核不能再删除
+        :return:
+        """
         for order in self:
             if order.state == 'done':
                 raise UserError(u'不可以删除已经审核的单据')
@@ -602,6 +643,12 @@ class reconcile_order(models.Model):
 
     @api.multi
     def _get_money_invoice(self, way='income'):
+        """
+        搜索到满足条件的money.invoice记录并且取出invoice对象 构造出one2many的
+
+        :param way: money.invoice 中的category_id 的type
+        :return:
+        """
         money_invoice = self.env['money.invoice'].search([
                                     ('category_id.type', '=', way),
                                     ('partner_id', '=', self.partner_id.id),
@@ -622,6 +669,11 @@ class reconcile_order(models.Model):
 
     @api.onchange('partner_id', 'to_partner_id', 'business_type')
     def onchange_partner_id(self):
+        """
+        onchange 类型字段 当改变 客户或者转入往来单位  业务类型 自动生成 对应的
+        核销单各种明细。
+        :return:
+        """
         if not self.partner_id or not self.business_type:
             return {}
 
@@ -629,9 +681,6 @@ class reconcile_order(models.Model):
         self.advance_payment_ids = None
         self.receivable_source_ids = None
         self.payable_source_ids = None
-
-        money_order = self.env['money.order']
-        money_invoice = self.env['money.invoice']
 
         if self.business_type == 'adv_pay_to_get':  # 预收冲应收
             self.advance_payment_ids = self._get_money_order('get')
@@ -654,6 +703,15 @@ class reconcile_order(models.Model):
     @api.multi
     def _get_or_pay(self, line, business_type,
                     partner_id, to_partner_id, name):
+        """
+        核销单 核销时 对具体核销单行进行的操作
+        :param line:
+        :param business_type:
+        :param partner_id:
+        :param to_partner_id:
+        :param name:
+        :return:
+        """
         decimal_amount = self.env.ref('core.decimal_amount')
         if float_compare(line.this_reconcile, line.to_reconcile, precision_digits=decimal_amount.digits) == 1:
             raise UserError(u'核销金额不能大于未核销金额!\n核销金额:%s 未核销金额:%s'%(line.this_reconcile, line.to_reconcile))
@@ -676,10 +734,8 @@ class reconcile_order(models.Model):
                        })
 
             if business_type == 'get_to_get':
-#                 to_partner_id.receivable += line.this_reconcile
                 partner_id.receivable -= line.this_reconcile
             if business_type == 'pay_to_pay':
-#                 to_partner_id.payable += line.this_reconcile
                 partner_id.payable -= line.this_reconcile
 
         return True
@@ -766,6 +822,10 @@ class cost_line(models.Model):
     @api.one
     @api.depends('amount', 'tax_rate')
     def _compute_tax(self):
+        """
+        计算字段根据 amount 和 tax_rate 是否变化进行判定tax 是否需要重新计算
+        :return:
+        """
         self.tax = self.amount * self.tax_rate * 0.01
 
     partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict',

@@ -69,6 +69,10 @@ class partner(models.Model):
 
     @api.multi
     def partner_statements(self):
+        """
+        调用这个方法弹出 业务伙伴对账单向导
+        :return:
+        """
         self.ensure_one()
         view = self.env.ref('money.partner_statements_report_wizard_form')
         ctx = {'default_partner_id': self.id}
@@ -96,6 +100,10 @@ class bank_account(models.Model):
 
     @api.one
     def _set_init_balance(self):
+        """
+        如果  init_balance 字段里面有值则 进行 一系列的操作。
+        :return:
+        """
         if self.init_balance:
             # 如果有前期初值，删掉已前的单据
             other_money_id = self.env['other.money.order'].search([
@@ -122,12 +130,16 @@ class bank_account(models.Model):
             other_money_init.other_money_done()
 
     init_balance = fields.Float(u'期初',
-                               digits=dp.get_precision('Amount'),
-                               inverse=_set_init_balance,
-                               help=u'资金的期初余额')
+                                digits=dp.get_precision('Amount'),
+                                inverse=_set_init_balance,
+                                help=u'资金的期初余额')
 
     @api.multi
     def bank_statements(self):
+        """
+        账户对账单向导 调用这个方法弹出 账户对账单向导
+        :return:
+        """
         self.ensure_one()
         view = self.env.ref('money.bank_statements_report_wizard_form')
 
