@@ -68,35 +68,33 @@ class money_transfer_order(models.Model):
         self.ensure_one()
         if not self.line_ids:
             raise UserError('请先输入转账金额')
+        decimal_amount = self.env.ref('core.decimal_amount')
         for line in self.line_ids:
             company_currency_id = self.env.user.company_id.currency_id.id
             out_currency_id = line.out_bank_id.account_id.currency_id.id or company_currency_id
             in_currency_id = line.in_bank_id.account_id.currency_id.id or company_currency_id
 
-            if line.out_bank_id == line.in_bank_id :
+            if line.out_bank_id == line.in_bank_id:
                 raise UserError('转出账户与转入账户不能相同')
-            if line.amount < 0:
-                raise UserError('转账金额必须大于0!\n 转账金额:%s'%line.amount)
-            if line.amount == 0:
-                raise UserError('转账金额不能为0')
-            if out_currency_id == company_currency_id :
-                if line.out_bank_id.balance < line.amount:
-                    raise UserError('转出账户余额不足!\n转出账户余额:%s 金额:%s'%(line.out_bank_id.balance, line.amount))
-                else:
+            if line.amount <= 0:
+                raise UserError('转账金额必须大于0。\n 转账金额:%s' % line.amount)
+            if out_currency_id == company_currency_id:  # 如果转出账户是公司本位币
+                if float_compare(line.out_bank_id.balance, line.amount, decimal_amount.digits) == -1:
+                    raise UserError('转出账户余额不足。\n转出账户余额:%s 本次转出金额:%s'%(line.out_bank_id.balance, line.amount))
+                else:   # 转出账户余额充足
                     line.out_bank_id.balance -= line.amount
-                if in_currency_id == company_currency_id :
+                if in_currency_id == company_currency_id:   # 如果转入账户是公司本位币
                     line.in_bank_id.balance += line.amount
-                else:
+                else:   # 如果转入账户是外币
                     line.in_bank_id.balance += line.currency_amount
-            else:
-                decimal_amount = self.env.ref('core.decimal_amount')
+            else:   # 如果转出账户是外币
                 if float_compare(line.out_bank_id.balance, line.currency_amount, precision_digits=decimal_amount.digits) == -1:
-                    raise UserError('转出账户余额不足!\n转出账户余额:%s 外币金额:%s'
+                    raise UserError('转出账户余额不足。\n转出账户余额:%s 本次转出外币金额:%s'
                                     % (line.out_bank_id.balance, line.currency_amount))
-                if in_currency_id == company_currency_id:
+                if in_currency_id == company_currency_id:   # 如果转入账户是公司本位币
                     line.in_bank_id.balance += line.amount
                     line.out_bank_id.balance -= line.currency_amount
-                else:
+                else:   # 如果转入账户是外币
                     raise UserError('系统不支持外币转外币')
 
         self.state = 'done'
@@ -109,23 +107,23 @@ class money_transfer_order(models.Model):
         decimal_amount = self.env.ref('core.decimal_amount')
         for line in self.line_ids:
             if line.currency_amount > 0:
-                if line.in_bank_id.currency_id:
+                if line.in_bank_id.currency_id: # 如果填充了转入账户的币别，则说明转入账户为外币
                     if float_compare(line.in_bank_id.balance, line.currency_amount, precision_digits=decimal_amount.digits) == -1:
-                        raise UserError('转入账户余额不足!\n转入账户余额:%s 本次外币金额余额:%s'
+                        raise UserError('转入账户余额不足。\n转入账户余额:%s 本次转出外币金额:%s'
                                 % (line.in_bank_id.balance, line.currency_amount))
-                    else:
+                    else:   # 转入账户余额充足
                         line.in_bank_id.balance -= line.currency_amount
                         line.out_bank_id.balance += line.amount
-                else:
+                else:   # 转入账户为本位币
                     if float_compare(line.in_bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
-                        raise UserError('转入账户余额不足!\n转入账户余额:%s 本次金额:%s'
+                        raise UserError('转入账户余额不足。\n转入账户余额:%s 本次转出金额:%s'
                                 % (line.in_bank_id.balance, line.amount))
                     else:
                         line.in_bank_id.balance -= line.amount
                         line.out_bank_id.balance += line.currency_amount
-            else:
+            else:   # 转入/转出账户都为本位币
                 if float_compare(line.in_bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
-                    raise UserError('转入账户余额不足!\n转入账户余额:%s 本次金额:%s'
+                    raise UserError('转入账户余额不足。\n转入账户余额:%s 本次转出金额:%s'
                                 % (line.in_bank_id.balance, line.amount))
                 else:
                     line.in_bank_id.balance -= line.amount

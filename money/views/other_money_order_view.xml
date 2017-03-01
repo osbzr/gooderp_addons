@@ -6,8 +6,8 @@
             <field name="name">other.money.order.tree</field>
             <field name="model">other.money.order</field>
             <field name="arch" type="xml">
-                <tree string="Other Money Order">
-                    <field name="name" string="单据编号"/>
+                <tree string="其他收支单">
+                    <field name="name"/>
                     <field name="date"/>
                     <field name="partner_id"/>
                     <field name="total_amount"/>
@@ -22,12 +22,12 @@
             <field name="name">other.money.order.form</field>
             <field name="model">other.money.order</field>
             <field name="arch" type="xml">
-                <form string="Other Money Order">
+                <form string="其他收支单">
                 <header>
 					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
 					<button name="other_money_draft" states="done" string="反审核" type="object"/>
 					<!-- <button name="print_other_money_order" states="done" string="打印" type="object" class="oe_highlight"/> -->
-                    <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
+                    <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -90,10 +90,8 @@
                     <field name="state"/>
                     <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
-                    <group expand="0" string="分组">
-                        <filter string="往来单位" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
-                    </group>
+                    <filter string="往来单位" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                 </search>
             </field>
         </record>
@@ -127,7 +125,7 @@
               </p>
             </field>
         </record>
-		<!-- 其他收款单menu、其他付款单menu -->
+		<!-- 其他收入单menu、其他支出单menu -->
         <menuitem id="menu_other_money_receipt_action" action="other_money_receipt_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="5"/>
         <menuitem id="menu_other_money_payment_action" action="other_money_payment_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="6"/>
 	</data>

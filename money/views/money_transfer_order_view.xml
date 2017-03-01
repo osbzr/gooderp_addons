@@ -6,7 +6,7 @@
             <field name="name">money.transfer.order.tree</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
-                <tree string="Money Transfer Order">
+                <tree string="资金转账单">
                     <field name="name"/>
                     <field name="date"/>
                     <field name="state"/>
@@ -19,12 +19,12 @@
             <field name="name">money.transfer.order.form</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
-                <form string="Money Transfer Order">
+                <form string="资金转账单">
                     <header>
                         <button name="money_transfer_done" states="draft" string="审核" type="object"
                                 class="oe_highlight"/>
                         <button name="money_transfer_draft" states="done" string="反审核" type="object"/>
-                        <field name="state" widget="statusbar" readonly="1"/>
+                        <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -57,7 +57,7 @@
                             <group>
                                 <field name="discount_account_id"
                                        attrs="{'required': [('discount_amount', '!=', 0)]}"
-                                       groups="money.reconcile_groups"/>
+                                       />
                             </group>
                         </group>
                         <field name="note"  placeholder="备注信息……"/>
