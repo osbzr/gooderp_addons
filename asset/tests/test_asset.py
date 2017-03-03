@@ -259,6 +259,7 @@ class test_voucher(TransactionCase):
 
     def test_init_asset(self):
         '''引入固定资产'''
+        self.asset.asset_done()
         self.voucher.init_asset()
         # 删除以前引入的固定资产内容，然后再引入
         self.voucher.init_asset()
