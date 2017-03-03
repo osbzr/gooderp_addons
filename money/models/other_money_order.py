@@ -38,12 +38,16 @@ class other_money_order(models.Model):
         if self.env.context.get('type') == 'other_get':
             values.update({'name': self.env['ir.sequence'].next_by_code('other.get.order')})
         if self.env.context.get('type') == 'other_pay' or values.get('name', '/') == '/':
-            values.update({'name': self.env['ir.sequence'].next_by_code('other.pay.order') or '/'})
+            values.update({'name': self.env['ir.sequence'].next_by_code('other.pay.order')})
 
         return super(other_money_order, self).create(values)
 
     @api.multi
     def unlink(self):
+        """
+        只能删除未审核的单据
+        :return: 
+        """
         for order in self:
             if order.state == 'done':
                 raise UserError(u'不可以删除已经审核的单据(%s)'%order.name)
@@ -105,12 +109,13 @@ class other_money_order(models.Model):
         '''其他收支单的审核按钮'''
         self.ensure_one()
         if float_compare(self.total_amount, 0, 3) <= 0:
-            raise UserError(u'金额应该大于0!\n金额:%s'%self.total_amount)
+            raise UserError(u'金额应该大于0。\n金额:%s'%self.total_amount)
 
         # 根据单据类型更新账户余额
         if self.type == 'other_pay':
-            if self.bank_id.balance < self.total_amount:
-                raise UserError(u'账户余额不足!\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
+            decimal_amount = self.env.ref('core.decimal_amount')
+            if float_compare(self.bank_id.balance, self.total_amount, decimal_amount.digits) == -1:
+                raise UserError(u'账户余额不足。\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
         else:
             self.bank_id.balance += self.total_amount
@@ -125,8 +130,9 @@ class other_money_order(models.Model):
         if self.type == 'other_pay':
             self.bank_id.balance += self.total_amount
         else:
-            if self.bank_id.balance < self.total_amount:
-                raise UserError(u'账户余额不足!\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
+            decimal_amount = self.env.ref('core.decimal_amount')
+            if float_compare(self.bank_id.balance, self.total_amount, decimal_amount.digits) == -1:
+                raise UserError(u'账户余额不足。\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
         self.state = 'draft'
         return True
