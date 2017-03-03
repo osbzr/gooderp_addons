@@ -566,7 +566,8 @@ class voucher(models.Model):
 
         '''引入固定资产初始化单据'''
         res = {}
-        for asset in self.env['asset'].search([('is_init', '=', True)]):
+        for asset in self.env['asset'].search([('is_init', '=', True),
+                                               ('state', '=', 'done')]):
             cost = asset.cost
             depreciation_previous = asset.depreciation_previous
             '''固定资产'''
