@@ -15,14 +15,8 @@ class bank_statements_report(models.Model):
     def _compute_balance(self):
         # 相邻的两条记录，bank_id不同，重新计算账户余额
         pre_record = self.search([('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
-        if pre_record:
-            if pre_record.name != '期初':
-                before_balance = pre_record.this_balance
-            else:
-                before_balance = pre_record.get
-        else:
-            before_balance = 0
-        self.balance += before_balance + self.get - self.pay
+        before_balance = pre_record and pre_record.this_balance or 0
+        self.balance = before_balance + self.get - self.pay
         self.this_balance = self.balance
 
     bank_id = fields.Many2one('bank.account', string=u'账户名称', readonly=True)
@@ -35,6 +29,7 @@ class bank_statements_report(models.Model):
     balance = fields.Float(string=u'账户余额',
                            compute='_compute_balance', readonly=True,
                            digits=dp.get_precision('Amount'))
+    # 加this_balance这个字段，并将balance的值赋给该字段，是为了提高性能
     this_balance = fields.Float(string=u'账户余额',
                                 digits=dp.get_precision('Amount'))
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
@@ -112,45 +107,29 @@ class bank_statements_report(models.Model):
     @api.multi
     def find_source_order(self):
         # 查看原始单据，三种情况：收付款单、其他收支单、资金转换单
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        other_money = self.env['other.money.order'].search([('name', '=', self.name)])
-
-        if money:
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'收付款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id
-            }
-        elif other_money:
-            view = self.env.ref('money.other_money_order_form')
-            return {
-                'name': u'其他收支单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'other.money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': other_money.id,
-                'context': {'type': False}
-            }
-
-        transfer_order = self.env['money.transfer.order'].search([('name', '=', self.name)])
-        view = self.env.ref('money.money_transfer_order_form')
-
-        return {
-            'name': u'资金转换单',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': False,
-            'views': [(view.id, 'form')],
-            'res_model': 'money.transfer.order',
-            'type': 'ir.actions.act_window',
-            'res_id': transfer_order.id
-        }
+        models = ['money.order', 'other.money.order', 'money.transfer.order']
+        views = ['money.money_order_form',
+                 'money.other_money_order_form',
+                 'money.money_transfer_order_form']
+        model_view = {
+            'money.order': {'name': u'收付款单',
+                            'view': 'money.money_order_form'},
+            'other.money.order': {'name': u'其他收支单',
+                                  'view': 'money.other_money_order_form'},
+            'money.transfer.order': {'name': u'资金转换单',
+                                     'view': 'money.money_transfer_order_form'}}
+        for model,view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = view_dict['name']
+            view = self.env.ref(view_dict['view'])
+            if res:
+                return {
+                    'name': name,
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': model,
+                    'type': 'ir.actions.act_window',
+                    'res_id': res.id
+                }

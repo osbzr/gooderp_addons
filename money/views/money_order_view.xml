@@ -57,6 +57,7 @@
                         <group>
 				            <field name="partner_id"
 				            	options="{'no_open': True, 'no_create': True}"/>
+                            <field name="voucher_id"/>
 				            <field name="bank_name"
 				            	invisible="context.get('default_get', 0)"
 				            	required="context.get('default_pay', 0)"/>
@@ -181,6 +182,7 @@
                     <button name="find_source_order" type="object" string="查看原始单据" icon="fa-search" class="oe_highlight"/>
                     <field name="partner_id"/>
             		<field name="category_id"/>
+                    <field name="voucher_id"/>
             		<field name="auxiliary_id"/>
                     <field name="date"/>
                     <field name="currency_id"
