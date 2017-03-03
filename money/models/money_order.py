@@ -166,9 +166,13 @@ class money_order(models.Model):
     origin_name = fields.Char(u'原始单据编号',
                             help=u'原始单据编号')
     bank_name = fields.Char(u'开户行',
+                            readonly=True,
+                            states={'draft': [('readonly', False)]},
                             help=u'开户行取自业务伙伴，可修改')
     bank_num = fields.Char(u'银行账号',
-                            help=u'银行账号取自业务伙伴，可修改')
+                           readonly=True,
+                           states={'draft': [('readonly', False)]},
+                           help=u'银行账号取自业务伙伴，可修改')
 
     @api.multi
     def write_off_reset(self):
