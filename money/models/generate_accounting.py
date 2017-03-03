@@ -139,8 +139,6 @@ class money_order(models.Model):
                                      0,
                                      vouch_obj.id,
                                      False)
-        if not partner.c_category_id:
-            raise UserError(u'请输入客户%s的客户类别' % (partner.name))
         partner_account_id = partner.c_category_id.account_id.id
 
         # 生成贷方明细行
@@ -181,8 +179,6 @@ class money_order(models.Model):
                                       vouch_obj.id,
                                       False)
             amount_all += line.amount
-        if not partner.s_category_id:
-            raise UserError(u'请输入供应商%s的供应商类别' % (partner.name))
         partner_account_id = partner.s_category_id.account_id.id
 
         # 生成借方明细行 debit

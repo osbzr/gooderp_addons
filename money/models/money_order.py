@@ -722,9 +722,11 @@ class reconcile_order(models.Model):
 
         if self.business_type == 'get_to_get':  # 应收转应收
             self.receivable_source_ids = self._get_money_invoice('income')
+            return {'domain': {'to_partner_id': [('c_category_id', '!=', False)]}}
 
         if self.business_type == 'pay_to_pay':  # 应付转应付
             self.payable_source_ids = self._get_money_invoice('expense')
+            return {'domain': {'to_partner_id': [('s_category_id', '!=', False)]}}
 
     @api.multi
     def _get_or_pay(self, line, business_type,
