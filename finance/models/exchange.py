@@ -11,8 +11,6 @@ class Currency(models.Model):
     def get_rate_silent(self,date,currency_id):
         currency = self.env['res.currency'].search([('id', '=', currency_id)])
         rate = currency.rate
-        if not rate:
-            raise UserError(u'外币汇率为0，请检查')
         return rate
 
 
