@@ -104,6 +104,7 @@ class Currency(models.Model):
         date = self._context.get('date') or fields.Datetime.now()
         period_id = self.env['finance.period'].get_period(date).id
         for currency in self:
+            currency.rate = 1.0
             for line in currency.month_exchange:
                 if period_id == line.period_id.id:
                     currency.rate = line.exchange or 1.0
