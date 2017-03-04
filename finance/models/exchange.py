@@ -2,6 +2,17 @@
 
 from odoo import api, fields, models
 
+
+class Currency(models.Model):
+    _inherit = 'res.currency'
+
+    @api.multi
+    def get_rate_silent(self,date,currency_id):
+        currency = self.env['res.currency'].search([('id', '=', currency_id)])
+        rate = currency.rate
+        return rate
+
+
 class CreateExchangeWizard(models.TransientModel):
     """生成每月汇况损益的向导 根据输入的期间"""
     _name = "create.exchange.wizard"

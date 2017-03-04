@@ -621,12 +621,3 @@ class money_transfer_order(models.Model):
             voucher.voucher_draft()
         voucher.unlink()
         return res
-
-class Currency(models.Model):
-    _inherit = 'res.currency'
-
-    @api.multi
-    def get_rate_silent(self,date,currency_id):
-        currency = self.env['res.currency'].search([('id', '=', currency_id)])
-        rate = currency.rate
-        return rate
