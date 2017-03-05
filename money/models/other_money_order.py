@@ -21,6 +21,7 @@
 from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
+from odoo.tools import float_compare
 
 class other_money_order(models.Model):
     _name = 'other.money.order'
@@ -35,14 +36,18 @@ class other_money_order(models.Model):
     def create(self, values):
         # 创建单据时，更新订单类型的不同，生成不同的单据编号
         if self.env.context.get('type') == 'other_get':
-            values.update({'name': self.env['ir.sequence'].next_by_code('other.get.order') or '/'})
+            values.update({'name': self.env['ir.sequence'].next_by_code('other.get.order')})
         if self.env.context.get('type') == 'other_pay' or values.get('name', '/') == '/':
-            values.update({'name': self.env['ir.sequence'].next_by_code('other.pay.order') or '/'})
+            values.update({'name': self.env['ir.sequence'].next_by_code('other.pay.order')})
 
         return super(other_money_order, self).create(values)
 
     @api.multi
     def unlink(self):
+        """
+        只能删除未审核的单据
+        :return: 
+        """
         for order in self:
             if order.state == 'done':
                 raise UserError(u'不可以删除已经审核的单据(%s)'%order.name)
@@ -60,7 +65,7 @@ class other_money_order(models.Model):
                           ('done', u'已审核'),
                            ], string=u'状态', readonly=True,
                              default='draft', copy=False,
-                        help=u'其他收单状态标识，新建时状态为未审核;审核后状态为已审核')
+                        help=u'其他收支单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位',
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
@@ -103,13 +108,14 @@ class other_money_order(models.Model):
     def other_money_done(self):
         '''其他收支单的审核按钮'''
         self.ensure_one()
-        if self.total_amount <= 0:
-            raise UserError(u'金额应该大于0!\n金额:%s'%self.total_amount)
+        if float_compare(self.total_amount, 0, 3) <= 0:
+            raise UserError(u'金额应该大于0。\n金额:%s'%self.total_amount)
 
         # 根据单据类型更新账户余额
         if self.type == 'other_pay':
-            if self.bank_id.balance < self.total_amount:
-                raise UserError(u'账户余额不足!\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
+            decimal_amount = self.env.ref('core.decimal_amount')
+            if float_compare(self.bank_id.balance, self.total_amount, decimal_amount.digits) == -1:
+                raise UserError(u'账户余额不足。\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
         else:
             self.bank_id.balance += self.total_amount
@@ -124,8 +130,9 @@ class other_money_order(models.Model):
         if self.type == 'other_pay':
             self.bank_id.balance += self.total_amount
         else:
-            if self.bank_id.balance < self.total_amount:
-                raise UserError(u'账户余额不足!\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
+            decimal_amount = self.env.ref('core.decimal_amount')
+            if float_compare(self.bank_id.balance, self.total_amount, decimal_amount.digits) == -1:
+                raise UserError(u'账户余额不足。\n账户余额:%s 本次支出金额:%s' % (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
         self.state = 'draft'
         return True
@@ -137,7 +144,7 @@ class other_money_order_line(models.Model):
 
     @api.onchange('service')
     def onchange_service(self):
-        # 当选择了服务后，则自动填充上类别和金额
+        # 当选择了收支项后，则自动填充上类别和金额
         if self.env.context.get('order_type') == 'other_get':
             self.category_id = self.service.get_categ_id.id
         elif self.env.context.get('order_type') == 'other_pay':
@@ -153,7 +160,7 @@ class other_money_order_line(models.Model):
                                 u'其他收支', ondelete='cascade',
                                 help=u'其他收支单行对应的其他收支单')
     service = fields.Many2one('service', u'收支项', ondelete='restrict',
-                              help=u'其他收支单行上对应的服务')
+                              help=u'其他收支单行上对应的收支项')
     category_id = fields.Many2one('core.category',
                         u'类别', ondelete='restrict',
                         help=u'类型：运费、咨询费等')

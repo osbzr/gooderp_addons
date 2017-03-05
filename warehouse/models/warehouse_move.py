@@ -331,9 +331,12 @@ class wh_move(models.Model):
 
     @api.multi
     def create_zero_wh_in(self,wh_in,model_name):
+        all_line_message = ""
+        today = fields.Datetime.now()
+        line_in_ids = []
+        goods_list = []
         for line in wh_in.line_out_ids:
             vals={}
-            result = False
             if line.goods_id.no_stock:
                 continue
             else:
@@ -341,30 +344,36 @@ class wh_move(models.Model):
                 result = result[0] or 0
             if line.goods_qty > result and not line.lot_id and not self.env.context.get('wh_in_line_ids'):
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
-                today = fields.Datetime.now()
-                vals.update({
-                        'type':'inventory',
-                        'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
-                        'warehouse_dest_id':wh_in.warehouse_id.id,
-                        'state':'done',
-                        'date':today,
-                        'line_in_ids':[(0, 0, {
-                                    'goods_id':line.goods_id.id,
-                                    'attribute_id':line.attribute_id.id,
-                                    'goods_uos_qty':0,
-                                    'uos_id':line.uos_id.id,
-                                    'goods_qty':0,
-                                    'uom_id':line.uom_id.id,
-                                    'cost_unit':line.goods_id.cost,
-                                    'state': 'done',
-                                    'date': today,
-                                                }
-                                        )]
-                            })
-                return self.env[model_name].open_dialog('goods_inventory', {
-                    'message': u'产品 %s 当前库存量不足，继续出售请点击确定，并及时盘点库存' % line.goods_id.name,
-                    'args': [vals],
-                })
+                if (line.goods_id.id, line.attribute_id.id) in goods_list:
+                    continue
+                else:
+                    goods_list.append((line.goods_id.id, line.attribute_id.id))
+                all_line_message += u'产品 %s ' % line.goods_id.name
+                if line.attribute_id:
+                    all_line_message += u' 型号%s' % line.attribute_id.name
+                line_in_ids.append((0, 0, {
+                            'goods_id': line.goods_id.id,
+                            'attribute_id': line.attribute_id.id,
+                            'goods_uos_qty': 0,
+                            'uos_id': line.uos_id.id,
+                            'goods_qty': 0,
+                            'uom_id': line.uom_id.id,
+                            'cost_unit': line.goods_id.cost,
+                            'state': 'done',
+                            'date': today}))
+                all_line_message += u" 当前库存量不足，继续出售请点击确定，并及时盘点库存\n"
 
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+        if line_in_ids:
+            vals.update({
+                'type': 'inventory',
+                'warehouse_id': self.env.ref('warehouse.warehouse_inventory').id,
+                'warehouse_dest_id': wh_in.warehouse_id.id,
+                'state': 'done',
+                'date': today,
+                'line_in_ids': line_in_ids})
+            return self.env[model_name].open_dialog('goods_inventory', {
+                'message': all_line_message,
+                'args': [vals],
+            })

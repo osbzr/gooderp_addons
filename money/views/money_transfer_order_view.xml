@@ -6,7 +6,7 @@
             <field name="name">money.transfer.order.tree</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
-                <tree string="Money Transfer Order">
+                <tree string="资金转账单">
                     <field name="name"/>
                     <field name="date"/>
                     <field name="state"/>
@@ -19,12 +19,12 @@
             <field name="name">money.transfer.order.form</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
-                <form string="Money Transfer Order">
+                <form string="资金转账单">
                     <header>
                         <button name="money_transfer_done" states="draft" string="审核" type="object"
                                 class="oe_highlight"/>
                         <button name="money_transfer_draft" states="done" string="反审核" type="object"/>
-                        <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
+                        <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -52,21 +52,22 @@
                         </field>
                         <group>
                             <group>
-                                <field name="discount_amount" groups="money.reconcile_groups"/>
+                                <field name="discount_amount"/>
                             </group>
                             <group>
                                 <field name="discount_account_id"
                                        attrs="{'required': [('discount_amount', '!=', 0)]}"
-                                       groups="money.reconcile_groups"/>
+                                       />
                             </group>
                         </group>
-                        <field name="note" nolabel="1" placeholder="备注信息……"/>
+                        <field name="note"  placeholder="备注信息……"/>
                         <group>
                             <group>
                                 <field name="create_uid" string="制单人" readonly="1"/>
                                 <field name="create_date" string="录单时间" readonly="1"/>
                             </group>
                             <group>
+                                <field name="write_uid" string="最后修改人" readonly="1"/>
                                 <field name="write_date" string="最后修改时间" readonly="1"/>
                             </group>
                         </group>
@@ -86,9 +87,7 @@
                     <field name="state"/>
                     <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
-                    <group expand="0" string="分组">
-                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
-                    </group>
+                    <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                 </search>
             </field>
         </record>

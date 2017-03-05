@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
+
+
+class Currency(models.Model):
+    _inherit = 'res.currency'
+
+    @api.multi
+    def get_rate_silent(self,date,currency_id):
+        currency = self.env['res.currency'].search([('id', '=', currency_id)])
+        rate = currency.rate
+        return rate
+
 
 class CreateExchangeWizard(models.TransientModel):
     """生成每月汇况损益的向导 根据输入的期间"""
@@ -152,7 +164,7 @@ class CreateExchangeWizard(models.TransientModel):
             ('currency_id','!=', False),
             ('exchange','=', True)]):
             vals = {}
-            rate_silent = account_id.currency_id.rate or 0
+            rate_silent = self.env['res.currency'].get_rate_silent(self.date, account_id.currency_id.id) or 0
             vals.update({'account_id': account_id.id,
                          'account':account_id,
                          'vouch_obj_id': vouch_obj.id,
