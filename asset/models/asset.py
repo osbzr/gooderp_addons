@@ -519,7 +519,7 @@ class CreateDepreciationWizard(models.TransientModel):
 
         if not vouch_obj.line_ids:
             vouch_obj.unlink()
-            raise UserError(u'本期没有需要折旧的固定资产啦！')
+            raise UserError(u'本期没有需要折旧的固定资产。')
         vouch_obj.voucher_done()
         view = self.env.ref('asset.asset_line_tree')
         return {
@@ -566,6 +566,9 @@ class voucher(models.Model):
 
         '''引入固定资产初始化单据'''
         res = {}
+        if self.env['asset'].search([('is_init', '=', True),
+                                     ('state', '=', 'draft')]):
+            raise UserError(u'有未审核的固定资产初始化单据。')
         for asset in self.env['asset'].search([('is_init', '=', True),
                                                ('state', '=', 'done')]):
             cost = asset.cost
