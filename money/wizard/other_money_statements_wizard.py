@@ -22,9 +22,13 @@ class other_money_statements_report_wizard(models.Model):
 
     @api.multi
     def confirm_other_money_statements(self):
-        # 现金银行报表
+        """
+        其他收支明细表
+        :return: action
+        """
+        self.ensure_one()
         if self.from_date > self.to_date:
-            raise UserError(u'结束日期不能小于开始日期！')
+            raise UserError(u'结束日期不能小于开始日期。')
 
         view = self.env.ref('money.other_money_statements_report_tree')
 
