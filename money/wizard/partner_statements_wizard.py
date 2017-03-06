@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 from odoo import fields, models, api
-import datetime
 
 class partner_statements_report_wizard(models.TransientModel):
     _name = "partner.statements.report.wizard"
@@ -25,8 +24,11 @@ class partner_statements_report_wizard(models.TransientModel):
 
     @api.multi
     def partner_statements_without_goods(self):
+        """
+        业务伙伴对账单: 不带商品明细
+        :return: action
+        """
         for s in self:
-            # 业务伙伴对账单: 不带商品明细
             if s.from_date > s.to_date:
                 raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' % (s.from_date, s.to_date))
 
@@ -55,6 +57,9 @@ class partner_statements_report_wizard(models.TransientModel):
     def _create_statements_report_with_goods(self, partner_id, name, date, done_date, order_amount,
                                              benefit_amount, fee, amount, pay_amount, discount_money,
                                              balance_amount, note, move_id, ptype):
+        """
+        生成无商品明细的对账单记录
+        """
         if ptype == 'customer':
             model = self.env['customer.statements.report.with.goods']
         else:
@@ -79,6 +84,9 @@ class partner_statements_report_wizard(models.TransientModel):
     def _create_statements_report_with_goods_line(self, goods_code, goods_name, attribute_id, uom_id,
                                                   quantity, price, discount_amount, without_tax_amount,
                                                   tax_amount, order_amount, balance_amount, ptype):
+        """
+        生成带商品明细的对账单记录
+        """
         if ptype == 'customer':
             model = self.env['customer.statements.report.with.goods']
         else:
@@ -101,18 +109,21 @@ class partner_statements_report_wizard(models.TransientModel):
 
     @api.multi
     def partner_statements_with_goods(self):
+        """
+        业务伙伴对账单: 带商品明细
+        :return: action
+        """
         for s in self:
-            # 业务伙伴对账单: 带商品明细
             res_ids = []
             if s.from_date > s.to_date:
-                raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' % (s.from_date, s.to_date))
+                raise UserError(u'结束日期不能小于开始日期。\n开始日期:%s 结束日期:%s ' % (s.from_date, s.to_date))
 
             if self.env.context.get('default_customer'):  # 客户
                 reports = self.env['customer.statements.report'].search([('partner_id', '=', s.partner_id.id),
                                                                         ('date', '>=', s.from_date),
                                                                         ('date', '<=', s.to_date)])
                 for report in reports:
-                    # 生成带商品明细的对账单记录
+                    # 生成无商品明细的对账单记录
                     record_id = self._create_statements_report_with_goods(report.partner_id.id,
                                                                         report.name,
                                                                         report.date,
@@ -131,37 +142,23 @@ class partner_statements_report_wizard(models.TransientModel):
 
                     # 生成带商品明细的对账单记录
                     if report.move_id:
-                        if report.amount < 0: # 销售退货单
-                            for line in report.move_id.line_in_ids:
-                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
-                                                                                        line.goods_id.name,
-                                                                                        line.attribute_id.id,
-                                                                                        line.uom_id.id,
-                                                                                        line.goods_qty,
-                                                                                        line.price,
-                                                                                        line.discount_amount,
-                                                                                        line.amount,
-                                                                                        line.tax_amount,
-                                                                                        line.subtotal,
-                                                                                        report.balance_amount,
-                                                                                        'customer')
-                                res_ids.append(record_id)
-                        else:
-                            for line in report.move_id.line_out_ids: # 销售发货单
-                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
-                                                                                        line.goods_id.name,
-                                                                                        line.attribute_id.id,
-                                                                                        line.uom_id.id,
-                                                                                        line.goods_qty,
-                                                                                        line.price,
-                                                                                        line.discount_amount,
-                                                                                        line.amount,
-                                                                                        line.tax_amount,
-                                                                                        line.subtotal,
-                                                                                        report.balance_amount,
-                                                                                        'customer')
-                                res_ids.append(record_id)
-
+                        # report.amount<0时为销售退货单，否则为销售发货单
+                        line_ids = (report.amount < 0 and report.move_id.line_in_ids
+                                    or report.move_id.line_out_ids)
+                        for line in line_ids:
+                            record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
+                                                                                    line.goods_id.name,
+                                                                                    line.attribute_id.id,
+                                                                                    line.uom_id.id,
+                                                                                    line.goods_qty,
+                                                                                    line.price,
+                                                                                    line.discount_amount,
+                                                                                    line.amount,
+                                                                                    line.tax_amount,
+                                                                                    line.subtotal,
+                                                                                    report.balance_amount,
+                                                                                    'customer')
+                            res_ids.append(record_id)
                 view = self.env.ref('sell.customer_statements_report_with_goods_tree')
 
                 return {
@@ -200,37 +197,23 @@ class partner_statements_report_wizard(models.TransientModel):
 
                     # 生成带商品明细的对账单记录
                     if report.move_id:
-                        if report.amount < 0: # 采购退货单
-                            for line in report.move_id.line_out_ids:
-                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
-                                                                                        line.goods_id.name,
-                                                                                        line.attribute_id.id,
-                                                                                        line.uom_id.id,
-                                                                                        line.goods_qty,
-                                                                                        line.price,
-                                                                                        line.discount_amount,
-                                                                                        line.amount,
-                                                                                        line.tax_amount,
-                                                                                        line.subtotal,
-                                                                                        report.balance_amount,
-                                                                                        'supplier')
-                                res_ids.append(record_id)
-
-                        else: # 采购入库单
-                            for line in report.move_id.line_in_ids:
-                                record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
-                                                                                        line.goods_id.name,
-                                                                                        line.attribute_id.id,
-                                                                                        line.uom_id.id,
-                                                                                        line.goods_qty,
-                                                                                        line.price,
-                                                                                        line.discount_amount,
-                                                                                        line.amount,
-                                                                                        line.tax_amount,
-                                                                                        line.subtotal,
-                                                                                        report.balance_amount,
-                                                                                        'supplier')
-                                res_ids.append(record_id)
+                        # report.amount<0时为采购退货单，否则为采购入库单
+                        line_ids = (report.amount < 0 and report.move_id.line_out_ids
+                                    or report.move_id.line_in_ids)
+                        for line in line_ids:
+                            record_id = self._create_statements_report_with_goods_line(line.goods_id.code,
+                                                                                    line.goods_id.name,
+                                                                                    line.attribute_id.id,
+                                                                                    line.uom_id.id,
+                                                                                    line.goods_qty,
+                                                                                    line.price,
+                                                                                    line.discount_amount,
+                                                                                    line.amount,
+                                                                                    line.tax_amount,
+                                                                                    line.subtotal,
+                                                                                    report.balance_amount,
+                                                                                    'supplier')
+                            res_ids.append(record_id)
 
                 view = self.env.ref('buy.supplier_statements_report_with_goods_tree')
 
@@ -249,6 +232,10 @@ class partner_statements_report_wizard(models.TransientModel):
 
     @api.onchange('from_date')
     def onchange_from_date(self):
+        """
+        客户对账单向导上过滤出是客户的业务伙伴，供应商上过滤出是供应商的业务伙伴
+        :return: domain
+        """
         if self.env.context.get('default_customer'):
             return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
         else:
