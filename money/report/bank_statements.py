@@ -107,10 +107,7 @@ class bank_statements_report(models.Model):
     @api.multi
     def find_source_order(self):
         # 查看原始单据，三种情况：收付款单、其他收支单、资金转换单
-        models = ['money.order', 'other.money.order', 'money.transfer.order']
-        views = ['money.money_order_form',
-                 'money.other_money_order_form',
-                 'money.money_transfer_order_form']
+        self.ensure_one()
         model_view = {
             'money.order': {'name': u'收付款单',
                             'view': 'money.money_order_form'},

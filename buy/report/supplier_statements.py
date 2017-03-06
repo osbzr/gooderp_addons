@@ -126,54 +126,36 @@ class supplier_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看原始单据，三情况：收付款单、采购退货单、采购入库单
+        # 查看原始单据，三情况：收付款单、采购退货单、采购入库单、核销单
         self.ensure_one()
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        # 付款单
-        if money:
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'付款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id,
-                'context': {'type': 'pay'}
-            }
-
-        # 采购退货单、入库单
-        buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        if buy:
-            if buy.is_return:
-                view = self.env.ref('buy.buy_return_form')
+        model_view = {
+            'money.order': {'name': u'付款单',
+                            'view': 'money.money_order_form'},
+            'buy.receipt': {'name': u'采购入库单',
+                            'view': 'buy.buy_receipt_form',
+                            'name_return': u'采购退货单',
+                            'view_return': 'buy.buy_return_form'},
+            'reconcile.order': {'name': u'核销单',
+                                'view': 'money.reconcile_order_form'}
+        }
+        for model, view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = model == 'buy.receipt' and res.is_return and \
+                   view_dict['name_return'] or view_dict['name']
+            view = model == 'buy.receipt' and res.is_return and \
+                   self.env.ref(view_dict['view_return']) \
+                   or self.env.ref(view_dict['view'])
+            if res:
                 return {
-                    'name': u'采购退货单',
-                    'view_type': 'form',
+                    'name': name,
                     'view_mode': 'form',
                     'view_id': False,
                     'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
+                    'res_model': model,
                     'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
+                    'res_id': res.id,
                 }
-            else:
-                view = self.env.ref('buy.buy_receipt_form')
-                return {
-                    'name': u'采购入库单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
-        raise UserError(u'期初余额没有原始单据可供查看！')
+        raise UserError(u'期初余额没有原始单据可供查看。')
 
 
 class supplier_statements_report_with_goods(models.TransientModel):
@@ -218,51 +200,33 @@ class supplier_statements_report_with_goods(models.TransientModel):
 
     @api.multi
     def find_source_order(self):
-        # 三情况：收付款单、采购退货单、采购入库单
+        # 三情况：收付款单、采购退货单、采购入库单、核销单
         self.ensure_one()
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        if money:  # 付款单
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'付款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id,
-                'context': {'type': 'pay'}
-            }
-
-        # 采购退货单、入库单
-        buy = self.env['buy.receipt'].search([('name', '=', self.name)])
-        if buy:
-            if buy.is_return:
-                view = self.env.ref('buy.buy_return_form')
+        model_view = {
+            'money.order': {'name': u'付款单',
+                            'view': 'money.money_order_form'},
+            'buy.receipt': {'name': u'采购入库单',
+                            'view': 'buy.buy_receipt_form',
+                            'name_return': u'采购退货单',
+                            'view_return': 'buy.buy_return_form'},
+            'reconcile.order': {'name': u'核销单',
+                                'view': 'money.reconcile_order_form'}
+        }
+        for model, view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = model == 'buy.receipt' and res.is_return and \
+                   view_dict['name_return'] or view_dict['name']
+            view = model == 'buy.receipt' and res.is_return and \
+                   self.env.ref(view_dict['view_return']) \
+                   or self.env.ref(view_dict['view'])
+            if res:
                 return {
-                    'name': u'采购退货单',
-                    'view_type': 'form',
+                    'name': name,
                     'view_mode': 'form',
                     'view_id': False,
                     'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
+                    'res_model': model,
                     'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
+                    'res_id': res.id,
                 }
-            else:
-                view = self.env.ref('buy.buy_receipt_form')
-                return {
-                    'name': u'采购入库单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'buy.receipt',
-                    'type': 'ir.actions.act_window',
-                    'res_id': buy.id,
-                    'context': {'type': 'pay'}
-                }
-
-        raise UserError(u'期初余额没有原始单据可供查看！')
+        raise UserError(u'期初余额没有原始单据可供查看。')

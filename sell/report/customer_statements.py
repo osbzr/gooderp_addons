@@ -146,55 +146,37 @@ class customer_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看原始单据，三种情况：收款单、销售退货单、销售发货单
+        # 查看原始单据，三种情况：收款单、销售退货单、销售发货单、核销单
         self.ensure_one()
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        # 收款单
-        if money:
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'收款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id,
-                'context': {'type': 'get'}
-            }
-
-        # 销售退货单、发货单
-        delivery = self.env['sell.delivery'].search([('name', '=', self.name)])
-        if delivery:
-            if delivery.is_return:
-                view = self.env.ref('sell.sell_return_form')
+        model_view = {
+            'money.order': {'name': u'收款单',
+                            'view': 'money.money_order_form'},
+            'sell.delivery': {'name': u'销售发货单',
+                              'view': 'sell.sell_delivery_form',
+                              'name_return': u'销售退货单',
+                              'view_return': 'sell.sell_return_form'},
+            'reconcile.order': {'name': u'核销单',
+                                'view': 'money.reconcile_order_form'}
+        }
+        for model, view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = model == 'sell.delivery' and res.is_return and \
+                   view_dict['name_return'] or view_dict['name']
+            view = model == 'sell.delivery' and res.is_return and \
+                   self.env.ref(view_dict['view_return']) \
+                   or self.env.ref(view_dict['view'])
+            if res:
                 return {
-                    'name': u'销售退货单',
-                    'view_type': 'form',
+                    'name': name,
                     'view_mode': 'form',
                     'view_id': False,
                     'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
+                    'res_model': model,
                     'type': 'ir.actions.act_window',
-                    'res_id': delivery.id,
-                    'context': {'type': 'get'}
-                    }
-            else:
-                view = self.env.ref('sell.sell_delivery_form')
-                return {
-                    'name': u'销售发货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': delivery.id,
-                    'context': {'type': 'get'}
-            }
+                    'res_id': res.id,
+                }
+        raise UserError(u'期初余额无原始单据可查看。')
 
-        raise UserError(u'期初余额无原始单据可查看！')
 
 class customer_statements_report_with_goods(models.TransientModel):
     _name = "customer.statements.report.with.goods"
@@ -229,48 +211,29 @@ class customer_statements_report_with_goods(models.TransientModel):
     def find_source_order(self):
         # 查看原始单据，三种情况：收款单、销售退货单、销售发货单
         self.ensure_one()
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        if money:  # 收款单
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'收款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id,
-                'context': {'type': 'get'}
-            }
-
-        # 销售退货单、发货单
-        delivery = self.env['sell.delivery'].search([('name', '=', self.name)])
-        if delivery:
-            if delivery.is_return:
-                view = self.env.ref('sell.sell_return_form')
+        model_view = {
+            'money.order': {'name': u'收款单',
+                            'view': 'money.money_order_form'},
+            'sell.delivery': {'name': u'销售发货单',
+                              'view': 'sell.sell_delivery_form',
+                              'name_return': u'销售退货单',
+                              'view_return': 'sell.sell_return_form'},
+            'reconcile.order': {'name': u'核销单',
+                                'view': 'money.reconcile_order_form'}
+        }
+        for model, view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = model == 'sell.delivery' and res.is_return and view_dict['name_return'] or view_dict['name']
+            view = model == 'sell.delivery' and res.is_return and self.env.ref(view_dict['view_return']) \
+                   or self.env.ref(view_dict['view'])
+            if res:
                 return {
-                    'name': u'销售退货单',
-                    'view_type': 'form',
+                    'name': name,
                     'view_mode': 'form',
                     'view_id': False,
                     'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
+                    'res_model': model,
                     'type': 'ir.actions.act_window',
-                    'res_id': delivery.id,
-                    'context': {'type': 'get'}
-                    }
-            elif not delivery.is_return:
-                view = self.env.ref('sell.sell_delivery_form')
-                return {
-                    'name': u'销售发货单',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'res_model': 'sell.delivery',
-                    'type': 'ir.actions.act_window',
-                    'res_id': delivery.id,
-                    'context': {'type': 'get'}
+                    'res_id': res.id,
                 }
-        raise UserError(u'期初余额无原始单据可查看！')
+        raise UserError(u'期初余额无原始单据可查看。')
