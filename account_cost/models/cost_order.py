@@ -147,9 +147,9 @@ class cost_order(models.Model):
                     'partner_id': self.partner_id.id,
                     'category_id': line.category_id.id,
                     'date': self.date,
-                    'amount': line.amount,
+                    'amount': line.subtotal,
                     'reconciled': 0,
-                    'to_reconcile': line.amount,
+                    'to_reconcile': line.subtotal,
                     'tax_amount': line.tax_amount,
                     'date_due': self.date,
                     'state': 'draft',
@@ -251,7 +251,7 @@ class cost_order_line(models.Model):
     category_id = fields.Many2one('core.category', u'类别',
                                   required=True,
                                   ondelete='restrict',
-                                  help=u'分类：其他支出')
+                                  help=u'分类：采购')
     amount = fields.Float(u'金额',
                           digits=dp.get_precision('Amount'),
                           help=u'金额  = 价税合计  - 税额')

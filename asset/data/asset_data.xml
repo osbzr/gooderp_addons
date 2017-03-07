@@ -131,6 +131,12 @@
             <field name='type'>other_pay</field>
             <field name='note'>由系统创建</field>
         </record>
+        <record id="asset_expense" model='core.category'>
+            <field name='name'>固定资产(应付)</field>
+            <field name='account_id' ref='small_business_chart160101'/>
+            <field name='type'>expense</field>
+            <field name='note'>由系统创建</field>
+        </record>
         <record id="asset_clean_get" model='core.category'>
             <field name='name'>固定资产清理收入</field>
             <field name='account_id' ref='small_business_chart530101'/>

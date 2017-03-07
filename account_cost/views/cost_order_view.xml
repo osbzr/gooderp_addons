@@ -40,7 +40,7 @@
 						<field name="line_ids">
 							<tree string="费用明细行" editable="bottom">
 								<field name="category_id" required="1"
-								domain="[('type', '=', 'other_pay')]"/>
+								domain="[('type', '=', 'expense')]"/>
 								<field name="amount" sum="合计金额"/>
 								<field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
 								<field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
