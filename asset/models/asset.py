@@ -143,7 +143,7 @@ class asset(models.Model):
     @api.one
     def _partner_generate_invoice(self):
         ''' 赊购的方式，选择往来单位时，生成结算单 '''
-        categ = self.env.ref('asset.asset')
+        categ = self.env.ref('asset.asset_expense')
         money_invoice = self.env['money.invoice'].create({
                 'name': u'固定资产'+self.code,
                 'partner_id': self.partner_id.id,
