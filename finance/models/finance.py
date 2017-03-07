@@ -186,7 +186,7 @@ class voucher_line(models.Model):
     date = fields.Date(compute='_compute_voucher_date', store=True, string=u'凭证日期')
     state = fields.Selection([('draft', u'草稿'),('done', u'已审核')], compute='_compute_voucher_state',
                              store=True, string=u'状态')
-    init_obj = fields.Char(u'摘要', help=u'描述本条凭证行由哪个单证生成而来！')
+    init_obj = fields.Char(u'初始化对象', help=u'描述本条凭证行由哪个单证生成而来！')
 
     @api.one
     @api.depends('voucher_id.date')
