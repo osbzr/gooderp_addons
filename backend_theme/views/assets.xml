@@ -31,6 +31,10 @@
             <link rel="stylesheet"
                   href="/backend_theme/static/src/less/variables.less"
                   />
+             <link rel="stylesheet"
+                  href="/backend_theme/static/src/less/left_button.css"
+                  />
+
             <script type="application/javascript"
                     src="/backend_theme/static/lib/js/iscroll-probe.5.2.0.js"
                     />
