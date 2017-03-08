@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_trial_balance(TransactionCase):
@@ -61,13 +61,13 @@ class test_trial_balance(TransactionCase):
         self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_last_year)
         self.env['create.trial.balance.wizard'].compute_last_period_id(self.period_last)
         self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_last)
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.period_201511_wizard.create_trial_balance()
         self.trial_balance_wizard_last.create_trial_balance()
         self.period_last.is_closed = True
         self.trial_balance_wizard_now.create_trial_balance()
 
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.trial_balance_wizard_period_last_year.create_trial_balance()
 
     def test_create_vouchers_summary(self):
@@ -77,13 +77,13 @@ class test_trial_balance(TransactionCase):
 
         self.period_2016_01_03_04.create_vouchers_summary()
         self.period_2016_04_04.create_vouchers_summary()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.period_2016_01_04.create_vouchers_summary()
 
         self.period_2016__01_03.period_end_id = self.period_201511.id
         self.period_2016__01_03.onchange_period()
         self.period_2016__01_03.period_begin_id = self.period_201511.id
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.period_2016__01_03.create_vouchers_summary()
         self.period_last.is_closed = False
         self.period_2016_11_03.create_vouchers_summary()
@@ -100,3 +100,17 @@ class test_trial_balance(TransactionCase):
         self.balance_sheet_wizard_last.create_balance_sheet()
         self.period_last.is_closed = True
         self.balance_sheet_wizard.create_profit_statement()
+
+    def test_default_period(self):
+        self.env['create.trial.balance.wizard']._default_peroid_id()
+        self.env['create.vouchers.summary.wizard']._default_end_peroid_id()
+        self.env['create.vouchers.summary.wizard']._default_begin_peroid_id()
+        self.env['create.vouchers.summary.wizard']._default_subject_name_id()
+        self.env['create.vouchers.summary.wizard']._default_subject_name_end_id()
+        vouchers_summary_row = self.env['create.vouchers.summary.wizard'].create({
+                'period_begin_id':self.period_now.id,
+                'period_end_id':self.period_last.id, })
+        with self.assertRaises(UserError):
+            vouchers_summary_row.onchange_period()
+
+

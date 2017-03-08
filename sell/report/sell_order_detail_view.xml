@@ -8,22 +8,34 @@
                 <tree string="销售明细表" create="false">
                 	<field name="date"/>
                 	<field name="order_name"/>
-                	<button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"/>
+                	<button name="view_detail" type="object" string="查看明细" icon="fa-search"/>
                 	<field name="type"/>
                 	<field name="staff_id"/>
                 	<field name="partner_id"/>
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
-                    <field name="uom"/>
-                    <field name="warehouse" groups='warehouse.multi_warehouse_groups'/>
+                    <field name="warehouse_id" groups='warehouse.multi_warehouse_groups'/>
                     <field name="qty" sum="数量合计"/>
+                    <field name="uom"/>
                     <field name="price"/>
                     <field name="amount" sum="销售收入合计"/>
                     <field name="tax_amount" sum="税额合计" groups='sell.out_tax_groups'/>
                     <field name="subtotal" sum="价税合计的合计" groups='sell.out_tax_groups'/>
+                    <field name="margin" sum="毛利合计"/>
                     <field name="note"/>
                 </tree>
+            </field>
+        </record>
+    	<record id="sell_order_detail_graph" model="ir.ui.view">
+            <field name="name">sell.order.detail.graph</field>
+            <field name="model">sell.order.detail</field>
+            <field name="arch" type="xml">
+                <pivot string="销售明细表">
+                    <field name='goods_id' type='row'/>
+                    <field name='warehouse_id' type='col'/>
+                    <field name='qty' type='measure' />
+                </pivot>
             </field>
         </record>
     </data>

@@ -1,0 +1,755 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<!--销货订单tree视图-->
+    	<record id='sell_order_tree' model='ir.ui.view'>
+        	<field name='name'>sell.order.tree</field>
+        	<field name='model'>sell.order</field>
+        	<field name='arch' type='xml'>
+            	<tree string='销货订单'>
+            		<field name='date'/>
+            		<field name='name'/>
+            		<field name='type'/>
+            		<field name='staff_id'/>
+            		<field name='partner_id'/>
+            		<field name="amount" sum="合计"/>
+            		<field name='delivery_date'/>
+            		<field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <field name='state'/>
+            		<field name='goods_state'/>
+            		<field name="money_state"/>
+					<field name='currency_id'
+						 groups='finance.group_multi_currency'/>
+            	</tree>
+        	</field>
+    	</record>
+
+    	<!--销货订单form视图-->
+    	<record id='sell_order_form' model='ir.ui.view'>
+        	<field name='name'>sell.order.form</field>
+        	<field name='model'>sell.order</field>
+        	<field name='arch' type='xml'> 
+            	<form string='销货订单'>
+            		<header>
+            			<button name='sell_order_done' states='draft' string='审核' type='object' class='oe_highlight'/>
+            			<button name="sell_order_draft" states="done" string="反审核" type="object"/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
+            		</header>
+            		<sheet>
+            			<group>
+            				<group>
+            					<field name='partner_id' required='1'
+            						domain="[('c_category_id', '!=', False)]"
+            						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            					<field name='contact'/>
+            				    <field name='address'/>
+            				    <field name='mobile'/>
+            					<field name='staff_id'/>
+            					<field name='date'/>
+            					<field name='warehouse_id'/>
+            				</group>
+            				<group>
+            					<field name='delivery_date'/>
+            					<field name='type' widget='radio'/>
+            					<field name='goods_state' readonly='1'/>
+            					<field name='money_state' readonly='1'/>
+								<field name='currency_id' readonly='1'
+									 groups='finance.group_multi_currency'/>
+							</group>
+            			</group>
+            			<notebook>
+            				<page string="销货订单行">    		
+            					<field name='line_ids'>
+                 					<tree string='销货订单行' editable='bottom'>
+                 						<field name='goods_id' domain="[('not_saleable','=',False)]"/>
+                 						<field name='attribute_id'
+                 							groups='goods.multi_attrs_groups'
+                 							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
+                 						<field name='quantity' sum='数量合计'/>
+                 						<field name="quantity_out" readonly="1" sum="合计已发货数量"/>
+                 						<field name='uom_id'/>
+                 						<field name='price'/>
+				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
+										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
+										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
+				 						<field name='currency_amount' sum='外币合计'
+				 							 groups='finance.group_multi_currency'/>
+										<field name='amount' sum='金额合计'/>
+				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
+                 						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
+				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
+				 						<field name='note'/>
+				 						<field name='using_attribute' invisible='1'/>
+				 					</tree>
+				 				</field>
+				 				<field name="note" placeholder="暂无备注信息"/>
+				 				<group>
+                        			<group>
+										<field name="discount_amount" groups='sell.sell_discount_groups'/>
+                            			<field name="amount"/>
+                        			</group>
+                        			<group>
+										<field name="pre_receipt"/>
+                            			<field name="bank_account_id"/>
+                        			</group>
+                    			</group>
+                    			<group>
+                        			<group>
+                            			<field name="create_uid" readonly="1" string="制单人"/>
+                            			<field name="approve_uid" readonly="1"/>
+                            		</group>
+                        			<group>
+                            			<field name="create_date" readonly="1" string="录单时间"/>
+                            			<field name="write_date" readonly="1" string="最后修改时间"/>
+                        			</group>
+                    			</group>
+				 			</page>
+				 		</notebook>
+            		</sheet>
+                	<div class="oe_chatter">
+                    	<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    	<field name="message_ids" widget="mail_thread"/>
+                	</div>
+            	</form>
+        	</field>
+    	</record>
+
+    	<record id="sell_order_search" model="ir.ui.view">
+            <field name="name">sell.order.search</field>
+            <field name="model">sell.order</field>
+            <field name="arch" type="xml">
+                <search string="销货订单">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="goods_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not out" string="未出库" domain="[('goods_state','=',u'未出库')]"/>
+                    <filter name="part out" string="部分出库" domain="[('goods_state','=',u'部分出库')]"/>
+                    <filter name="all out" string="全部出库" domain="[('goods_state','=',u'全部出库')]"/>
+                    <separator/>
+                    <filter name="sell" string="销货" domain="[('type','=','sell')]"/>
+                    <filter name="return" string="退货" domain="[('type','=','return')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="要求交货日期" domain="[]" context="{'group_by':'delivery_date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+    	<!--销售订单发货单tree视图-->
+    	<record id='sell_delivery_tree' model='ir.ui.view'>
+        	<field name='name'>sell.delivery.tree</field>
+        	<field name='model'>sell.delivery</field>
+        	<field name='arch' type='xml'>
+            	<tree string='销售发货单'>
+            		<field name='date'/>
+            		<field name='name'/>
+            		<field name="order_id"/>
+            		<field name='staff_id'/>
+            		<field name='partner_id'/>
+					<field name='total_qty'/>
+            		<field name="amount"/>
+            		<field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <field name='state'/>
+            		<field name='money_state'/>
+            	</tree>
+        	</field>
+    	</record>
+
+    	<!--销售发货单form视图-->
+    	<record id='sell_delivery_form' model='ir.ui.view'>
+        	<field name='name'>sell.delivery.form</field>
+        	<field name='model'>sell.delivery</field>
+        	<field name='arch' type='xml'>
+            	<form string='销售发货单'>
+            		<header>
+						<button name='sell_to_return' type='object' states="done" string='生成退货单' class="oe_highlight"/>
+            			<button name='sell_delivery_done' states='draft' type='object' string='审核' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
+            		</header>
+            		<sheet>
+            			<div class="oe_title">
+                            <label string="扫描条码"/>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
+                     	</div>
+            			<group>
+            				<group>
+            					<field name='partner_id' required='1'
+            						attrs="{'readonly': [('state','!=','draft')]}"
+            						domain="[('c_category_id', '!=', False)]"
+            						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            				    <field name='contact'/>
+            				    <field name="address"/>
+            				    <field name="mobile"/>
+            					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name="warehouse_id"/>
+								<field name="warehouse_dest_id" invisible="1"/>
+								<field name="is_return" invisible="1"/>
+            				</group>
+            				<group>
+            					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='order_id' readonly='1'/>
+            					<field name='invoice_id' readonly='1'/>
+            					<field name="money_state" readonly="1"/>
+								<field name="currency_id" readonly="1"
+									 groups='finance.group_multi_currency'/>
+								<field name="modifying" invisible="1"/>
+            				</group>
+            			</group>
+            			<notebook>
+                    		<page string="发库单行">
+		    					<field name='line_out_ids' attrs="{'readonly': [('state','!=','draft')]}"
+		    						context="{
+		    						'type':'out',
+		         					'default_date':date,
+		         					'default_partner':partner_id,
+		         					'default_warehouse_id': warehouse_id,
+		         					'default_is_return': is_return,
+		    						}">
+		         					<tree string='销售发货单行' editable='bottom'>
+		         						<field name='goods_id'
+										    domain="[('not_saleable','=',False)]"
+		         							context="{'default_partner':parent.partner_id,
+		         									  'default_is_return':parent.is_return,
+		         									  }"/>
+		         						<field name='attribute_id'
+		         							domain="[('goods_id', '=', goods_id)]"
+		         							groups='goods.multi_attrs_groups'
+		         							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
+	                    				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
+	                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
+	                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
+	                    					groups='goods.batch_groups'/>
+		         						<field name='goods_uos_qty' sum='辅助数量合计'
+		         							groups='goods.auxiliary_unit_groups'/>
+				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
+				 						<field name='goods_qty' sum='数量合计'/>
+		         						<field name='uom_id'/>
+		         						<field name='price'/>
+				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
+										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
+										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
+				 						<field name='amount' string='销售金额' sum='金额合计'/>
+				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
+		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
+				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
+				 						<field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
+				 						<field name='note'/>
+				 						<field name="type" invisible="1"/>
+				 						<field name='using_attribute' invisible='1'/>
+				 						<field name='using_batch' invisible='1'/>
+			                            <field name='lot_qty' invisible='1'/>
+			                            <field name='lot' invisible='1'/>
+				 					</tree>
+				 				</field>
+			 				</page>
+			                <page string="销售费用行">
+			                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
+			                		<tree string="Cost Lines" editable="bottom">
+			                			<field name="partner_id"
+			                				domain="[('s_category_id', '!=', False)]"
+			                				context="{'form_view_ref': 'core.supplier_address_form'}"/>
+				                		<field name="category_id"/>
+				                		<field name="amount"/>
+				                		<field name='tax_rate' groups="sell.out_tax_groups"/>
+				                		<field name="tax" groups="sell.out_tax_groups"/>
+				                		<field name="note"/>
+				                	</tree>
+			                	</field>
+			                </page>
+			            </notebook>
+		 				<group>
+                			<group>
+								<field name="discount_amount" string="抹零" groups='sell.sell_discount_groups'/>
+                    			<field name="amount"/>
+                    			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
+                			</group>
+                			<group>
+                				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="debt"/>
+                				<field name="total_debt"/>
+                			</group>
+            			</group>
+						<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+		 				<group>
+						    <group>
+                    			<field name="create_uid" readonly="1" string="制单人"/>
+                    			<field name="approve_uid" readonly="1"/>
+                			</group>
+                			<group>
+                				<field name="create_date" readonly="1" string="录单时间"/>
+                				<field name="write_date" readonly="1" string="最后修改时间"/>
+                			</group>
+					    </group>
+            		</sheet>
+	                <div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+	                </div>
+            	</form>
+        	</field>
+    	</record>
+
+		<record id="sell_delivery_search" model="ir.ui.view">
+            <field name="name">sell.delivery.search</field>
+            <field name="model">sell.delivery</field>
+            <field name="arch" type="xml">
+                <search string="销售发货单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="money_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not paid" string="未收款" domain="[('money_state','=',u'未收款')]"/>
+                    <filter name="part paid" string="部分收款" domain="[('money_state','=',u'部分收款')]"/>
+                    <filter name="all paid" string="全部收款" domain="[('money_state','=',u'全部收款')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+    	<!--销售退货单tree视图-->
+    	<record id='sell_return_tree' model='ir.ui.view'>
+        	<field name='name'>sell.return.tree</field>
+        	<field name='model'>sell.delivery</field>
+        	<field name='arch' type='xml'>
+            	<tree string='销售退货单'>
+            		<field name='date'/>
+            		<field name='name'/>
+            		<field name="order_id"/>
+            		<field name='staff_id'/>
+            		<field name='partner_id'/>
+					<field name='total_qty'/>
+            		<field name="amount"/>
+            		<field name='receipt'/>
+            		<field name='date_due'/>
+            		<field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <field name='state'/>
+            		<field name='return_state'/>
+            	</tree>
+        	</field>
+    	</record>
+
+    	<!--销售退货单form视图-->
+    	<record id='sell_return_form' model='ir.ui.view'>
+        	<field name='name'>sell.return.form</field>
+        	<field name='model'>sell.delivery</field>
+        	<field name='arch' type='xml'>
+            	<form string='销售退货单'>
+            		<header>
+            			<button name='sell_delivery_done' states="draft" type='object' string='审核' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
+            		</header>
+            		<sheet>
+            			<div class="oe_title">
+                        	<label string="扫描条码"/>
+                        	<input type='text' class="ge_scan_barcode" autofocus="true"/>
+                     	</div>
+            			<group>
+            				<group>
+            					<field name='partner_id' required='1'
+            						attrs="{'readonly': [('state','!=','draft')]}"
+            						domain="[('c_category_id', '!=', False)]"
+            						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            					<field name='contact'/>
+            				    <field name="address"/>
+            				    <field name="mobile"/>
+            					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name="warehouse_dest_id"/>
+								<field name="warehouse_id" invisible="1"/>
+								<field name="is_return" invisible="1"/>
+            				</group>
+            				<group>
+            					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='order_id' readonly='1'/>
+            					<field name='invoice_id' readonly='1'/>
+            					<field name="return_state" readonly="1"/>
+            					<field name="modifying" invisible="1"/>
+            				</group>
+            			</group>
+            			<notebook>
+                    		<page string="退货单行">
+		    					<field name='line_in_ids' attrs="{'readonly': [('state','!=','draft')]}"
+		    						context="{
+		    						'type':'in',
+                                    'default_is_return': is_return,
+		    						}">
+		         					<tree string='销售退货单行' editable='bottom'>
+		         						<field name='goods_id'
+										    domain="[('not_saleable','=',False)]"
+		         							context="{'default_partner':parent.partner_id,
+		         									  'default_is_return':parent.is_return}"/>
+		         						<field name='attribute_id'
+		         							domain="[('goods_id', '=', goods_id)]"
+		         							groups='goods.multi_attrs_groups'
+		         							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
+					                    <field name='lot' groups='goods.batch_groups'
+					                    	attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
+		         						<field name='goods_uos_qty' sum='辅助数量合计'
+		         							groups='goods.auxiliary_unit_groups'/>
+				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
+				 						<field name='goods_qty' sum='数量合计'/>
+				 						<field name='uom_id'/>
+				 						<field name='price' groups='goods.view_cost_groups'/>
+				 						<field name="price_taxed" groups='sell.out_tax_groups,goods.view_cost_groups'/>
+				 						<field name='cost_unit' groups='goods.view_cost_groups'/>
+										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
+										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
+				 						<field name='amount' string='销售金额' sum='金额合计' groups='goods.view_cost_groups'/>
+				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
+		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
+				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
+				 						<field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
+				 						<field name='note'/>
+				 						<field name="type" invisible="1"/>
+				 						<field name='using_attribute' invisible='1'/>
+				 						<field name='using_batch' invisible='1'/>
+					                    <field name='force_batch_one' invisible='1'/>
+				 					</tree>
+				 				</field>
+			 				</page>
+			                <page string="销售费用行">
+			                	<field name="cost_line_ids" attrs="{'readonly': [('state','!=','draft')]}">
+			                		<tree string="Cost Lines" editable="bottom">
+			                			<field name="partner_id" domain="[('s_category_id', '!=', False)]"/>
+				                		<field name="category_id" domain="[('type', '=', 'income')]"/>
+				                		<field name="amount"/>
+                                        <field name="tax_rate" groups="sell.out_tax_groups"/>
+                                        <field name="tax" groups="sell.out_tax_groups"/>
+				                		<field name="note"/>
+				                	</tree>
+			                	</field>
+			                </page>
+			            </notebook>
+		 				<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+		 				<group>
+                			<group>
+								<field name="discount_amount" groups='sell.sell_discount_groups'/>
+                    			<field name="amount"/>
+                    			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
+                    			<field name="create_uid" readonly="1" string="制单人"/>
+                    			<field name="approve_uid" readonly="1"/>
+                			</group>
+                			<group>
+                				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="debt"/>
+                				<field name="total_debt"/>
+                				<field name="create_date" readonly="1" string="录单时间"/>
+                				<field name="write_date" readonly="1" string="最后修改时间"/>
+                			</group>
+            			</group>
+            		</sheet>
+	                <div class="oe_chatter">
+	                    <field name="message_follower_ids" widget="mail_followers"/>
+	                    <field name="message_ids" widget="mail_thread"/>
+	                </div>
+            	</form>
+        	</field>
+    	</record>
+
+		<record id="sell_return_search" model="ir.ui.view">
+            <field name="name">sell.return.search</field>
+            <field name="model">sell.delivery</field>
+            <field name="arch" type="xml">
+                <search string="销售退货单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="return_state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <separator/>
+                    <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
+                    <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
+                    <filter name="all refund" string="全部退款" domain="[('return_state','=',u'全部退款')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+		<!-- 销售变更单视图 -->
+
+    	<record id="sell_adjust_tree" model="ir.ui.view">
+            <field name="name">sell.adjust.tree</field>
+            <field name="model">sell.adjust</field>
+            <field name="arch" type="xml">
+                <tree string="销售变更单">
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sell_adjust_form" model="ir.ui.view">
+            <field name="name">sell.adjust.form</field>
+            <field name="model">sell.adjust</field>
+            <field name="arch" type="xml">
+                <form string="销售变更单">
+                <header>
+                	<button name="sell_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id" required="1"
+                            	domain="[('state', '=', 'done'), ('type', '=', 'sell')]"
+                            	options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                        	<field name="date" required="1"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                    	<tree string="销售变更单行" editable="bottom">
+                            <field name='goods_id' required='1' domain="[('not_saleable','=',False)]"/>
+                            <field name='attribute_id'
+                            	groups='goods.multi_attrs_groups'
+                            	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
+                            <field name='quantity' sum='数量合计'/>
+     						<field name='uom_id'/>
+     						<field name='price'/>
+	 						<field name='price_taxed' groups='sell.out_tax_groups'/>
+							<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
+							<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
+	 						<field name='amount' sum='金额合计'/>
+	 						<field name='tax_rate' groups='sell.out_tax_groups'/>
+     						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
+	 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
+	 						<field name='note'/>
+	 						<field name='using_attribute' invisible='1'/>
+                        </tree>
+                    </field>
+                    <field name="note" placeholder="暂无备注信息"/>
+                    <group>
+                        <group>
+                            <field name="create_uid" readonly="1" string="制单人"/>
+                            <field name="approve_uid" readonly="1"/>
+                        </group>
+                    	<group>
+                            <field name="create_date" readonly="1" string="录单时间"/>
+                            <field name="write_date" readonly="1" string="最后修改时间"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+        </record>
+
+		<record id="sell_adjust_search" model="ir.ui.view">
+            <field name="name">sell.adjust.search</field>
+            <field name="model">sell.adjust</field>
+            <field name="arch" type="xml">
+                <search string="销售变更单">
+                    <field name="name"/>
+                    <field name="order_id"/>
+                    <field name="state"/>
+                    <field name="create_uid" string="制单人"/>
+                    <field name="approve_uid"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <group expand="0" string="分组">
+                        <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+    	<!--销货订单，销售发货单action-->
+    	<record id='sell_order_action' model='ir.actions.act_window'>
+        	<field name='name'>销货订单</field>
+        	<field name='res_model'>sell.order</field>
+        	<field name='view_type'>form</field>
+        	<field name='view_mode'>tree,form</field>
+        	<field name='view_id' ref='sell_order_tree'/>
+        	<field name="context">{'warehouse_type': 'stock'}</field>
+        	<field name="help" type="html">
+               <p class="oe_view_nocontent_create">
+                	 点击创建销货订单
+               </p>
+             </field>
+    	</record>
+
+    	<record id='sell_delivery_action' model='ir.actions.act_window'>
+        	<field name='name'>销售发货单</field>
+        	<field name='res_model'>sell.delivery</field>
+        	<field name='view_type'>form</field>
+        	<field name='view_mode'>tree,form</field>
+        	<field name="context">{'is_return':False, 'warehouse_dest_type': 'customer','search_default_draft':1}</field>
+        	<field name="domain">[('is_return','=',False)]</field>
+        	<field name='view_id' ref='sell_delivery_tree'/>
+        	<field name="search_view_id" ref="sell_delivery_search"/>
+        	<field name="help" type="html">
+               <p class="oe_view_nocontent_create">
+                	 点击创建销售发货单
+               </p>
+             </field>
+    	</record>
+
+		<record id="sell_return_action" model="ir.actions.act_window">
+            <field name="name">销售退货单</field>
+            <field name="res_model">sell.delivery</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'is_return':True, 'warehouse_type': 'customer'}</field>
+            <field name="domain">[('is_return','=',True)]</field>
+            <field name="search_view_id" ref="sell_return_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建销售退货单
+              </p>
+            </field>
+        </record>
+
+		<record id="sell_return_action_tree" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="sell_return_tree"/>
+            <field name="act_window_id" ref="sell_return_action"/>
+        </record>
+        <record id="sell_return_action_form" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="sell_return_form"/>
+            <field name="act_window_id" ref="sell_return_action"/>
+        </record>
+
+		<record id="sell_adjust_action" model="ir.actions.act_window">
+            <field name="name">销售变更单</field>
+            <field name="res_model">sell.adjust</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="sell_adjust_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建销售变更单
+              </p>
+            </field>
+        </record>
+
+		<!--定价策略-->
+		<record id="pricing_tree" model="ir.ui.view">
+			<field name="name">pricing.tree</field>
+			<field name="model">pricing</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="定价策略">
+					<field name="name"/>
+					<field name="warehouse_id"/>
+					<field name="c_category_id"/>
+					<field name="goods_category_id"/>
+					<field name='goods_id'/>
+					<field name="active_date" required='1'/>
+					<field name="deactive_date" required='1'/>
+					<field name="discount_rate"/>
+				</tree>
+			</field>
+		</record>
+		<record id="pricing_search" model="ir.ui.view">
+            <field name="name">pricing.search</field>
+            <field name="model">pricing</field>
+            <field name="arch" type="xml">
+                <search string="定价策略">
+                    <field name="name"/>
+                    <field name="warehouse_id"/>
+                    <field name="c_category_id"/>
+                    <field name="goods_category_id"/>
+                    <field name="goods_id"/>
+                    <field name="active_date"/>
+                    <field name="deactive_date"/>
+                    <field name="discount_rate"/>
+                    <group expand="0" string="分组">
+                        <filter string="仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
+                        <filter string="客户类别" domain="[]" context="{'group_by':'c_category_id'}"/>
+                        <filter string="产品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
+                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+		<record id="action_pricing" model="ir.actions.act_window">
+			<field name="name">定价策略</field>
+			<field name="res_model">pricing</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+			<field name="search_view_id" ref="pricing_search"/>
+		</record>
+
+		<record id='goods_action_sell' model='ir.actions.act_window'>
+			<field name='name'>商品</field>
+			<field name='res_model'>goods</field>
+			<field name='view_mode'>tree,form</field>
+			<field name='view_id' ref='goods.goods_tree' />
+			<field name="domain">[('not_saleable','=',False)]</field>
+		</record>
+
+    	<!--根菜单-->
+        <menuitem id='sell_menu' name='销货' groups='group_sell' web_icon="sell,static/description/sale.png"/>
+    	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>
+    	<menuitem id='sell_order_menu' name='销货订单' action='sell_order_action'
+			parent='sell_order_menu_root' sequence='1'
+			groups='sell.sell_groups'/>
+    	<menuitem id='sell_delivery_menu' name='销售发货单' action='sell_delivery_action'
+			parent='sell_order_menu_root' sequence='2'/>
+		<menuitem id="sell_return_menu" name='销售退货单' action="sell_return_action"
+            parent="sell_order_menu_root" sequence="3"/>
+        <menuitem id="sell_adjust_menu" name='销售变更单' action="sell_adjust_action"
+            parent="sell_order_menu_root" sequence="4"
+            groups='sell.sell_groups'/>
+
+		<!-- 仓库菜单下增加菜单 -->
+		<menuitem id='sell_wh_delivery_menu' name='销售发货单' action='sell_delivery_action'
+			parent='warehouse.warehouse_order' sequence='1'/>
+		<menuitem id="sell_wh_return_menu" name='销售退货单' action="sell_return_action"
+            parent="warehouse.warehouse_order" sequence="2"/>
+		<!-- 销售主数据 -->
+		<menuitem id='menu_sell_master' name='主数据' parent='sell_menu' sequence="2"/>
+		<menuitem id='sell_customer_menu' action='core.customer_action' name="客户" parent='menu_sell_master' sequence='10'/>
+		<menuitem id='sell_goods_menu' name='商品' parent='menu_sell_master' action='goods_action_sell' sequence='20' />
+		<menuitem id='pricing_menu' name='定价策略' action='action_pricing' parent='menu_sell_master' sequence='30'/>
+		<record id="sell_goods_menu" model="ir.ui.menu">
+			<field name="create_tag">1</field>
+		</record>
+		<!-- 销售报表 -->
+		<menuitem id="menu_sell_report" name="报表" parent="sell_menu" sequence="3"/>
+    </data>
+</openerp>

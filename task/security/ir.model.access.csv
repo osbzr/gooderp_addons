@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_project,access_project,model_project,,1,1,1,0
+access_project_invoice,access_project_invoice,model_project_invoice,,1,1,1,0
+access_task,access_task,model_task,,1,1,1,0
+access_timesheet,access_timesheet,model_timesheet,,1,1,1,0
+access_timeline,access_timeline,model_timeline,,1,1,1,0
+access_task_status,access_task_status,model_task_status,,1,1,1,0

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+        <!--创建系统启用日期所属会计期间-->
+        <function model="finance.period" name="init_period"/>
+        <!-- 会计凭证序列号 -->
+        <record id="seq_voucher" model="ir.sequence">
+            <field name="name">会计凭证</field>
+            <field name="code">voucher</field>
+            <field name="prefix"></field>
+            <field name="padding">5</field>
+            <field name="implementation">no_gap</field>
+        </record>
+
+        <!--凭证字-->
+        <record id='document_word_1' model='document.word'>
+            <field name='name'>记</field>
+            <field name='print_title'>记账凭证</field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    <template id="assets_backend" name="osbzr_assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/fixed_header/static/src/lib/jquery.stickytableheaders.js"/>
+            <script type="text/javascript" src="/fixed_header/static/src/js/fixed_header.js"/>
+        </xpath>
+    </template>
+    </data>
+</openerp> 

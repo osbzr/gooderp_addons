@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date, timedelta
-from openerp import models, fields, api
-from openerp.exceptions import except_orm
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class sell_top_ten_wizard(models.TransientModel):
@@ -19,18 +19,23 @@ class sell_top_ten_wizard(models.TransientModel):
     def _default_date_end(self):
         return date.today()
 
-    date_start = fields.Date(u'开始日期', default=_default_date_start)
-    date_end = fields.Date(u'结束日期', default=_default_date_end)
+    date_start = fields.Date(u'开始日期', default=_default_date_start,
+                             help=u'报表汇总的开始日期，默认为一周前日期')
+    date_end = fields.Date(u'结束日期', default=_default_date_end,
+                           help=u'报表汇总的结束日期，默认为当前日期')
+    warehouse_id = fields.Many2one('warehouse', u'仓库',
+                                   help=u'按指定仓库进行统计')
 
     @api.multi
     def button_ok(self):
+        self.ensure_one()
         if self.date_end < self.date_start:
-            raise except_orm(u'错误', u'开始日期不能大于结束日期！')
+            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' % (self.date_start, self.date_end))
 
         return {
             'name': u'销量前十商品',
             'view_mode': 'tree',
             'res_model': 'sell.top.ten',
             'type': 'ir.actions.act_window',
-            'context': self.read(['date_start', 'date_end'])[0],
+            'context': self.read(['date_start', 'date_end', 'warehouse_id'])[0],
         }

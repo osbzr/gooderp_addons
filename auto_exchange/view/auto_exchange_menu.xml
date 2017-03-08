@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<!-- 菜单加入自动汇率模块 -->
+        <menuitem id="menu_auto_exchange" name='设置自动汇率' action="auto_exchange_action"
+            parent="core.config_data_menu" sequence="9"/>
+	</data>
+</openerp>

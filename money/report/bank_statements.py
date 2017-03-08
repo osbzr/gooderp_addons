@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api, tools
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api, tools
 
 
 class bank_statements_report(models.Model):
@@ -15,30 +15,29 @@ class bank_statements_report(models.Model):
     def _compute_balance(self):
         # 相邻的两条记录，bank_id不同，重新计算账户余额
         pre_record = self.search([('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
-        if pre_record:
-            if pre_record.name != u'期初余额':
-                before_balance = pre_record.balance
-            else:
-                before_balance = pre_record.get
-        else:
-            before_balance = 0
-        self.balance += before_balance + self.get - self.pay
+        before_balance = pre_record and pre_record.this_balance or 0
+        self.balance = before_balance + self.get - self.pay
+        self.this_balance = self.balance
 
     bank_id = fields.Many2one('bank.account', string=u'账户名称', readonly=True)
     date = fields.Date(string=u'日期', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     get = fields.Float(string=u'收入', readonly=True,
-                       digits_compute=dp.get_precision('Amount'))
+                       digits=dp.get_precision('Amount'))
     pay = fields.Float(string=u'支出', readonly=True,
-                       digits_compute=dp.get_precision('Amount'))
+                       digits=dp.get_precision('Amount'))
     balance = fields.Float(string=u'账户余额',
                            compute='_compute_balance', readonly=True,
-                           digits_compute=dp.get_precision('Amount'))
+                           digits=dp.get_precision('Amount'))
+    # 加this_balance这个字段，并将balance的值赋给该字段，是为了提高性能
+    this_balance = fields.Float(string=u'账户余额',
+                                digits=dp.get_precision('Amount'))
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
     note = fields.Char(string=u'备注', readonly=True)
 
-    def init(self, cr):
+    def init(self):
         # union money_order, other_money_order, money_transfer_order
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'bank_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW bank_statements_report AS (
@@ -49,19 +48,11 @@ class bank_statements_report(models.Model):
                     get,
                     pay,
                     balance,
+                    0 AS this_balance,
                     partner_id,
                     note
             FROM
-                (SELECT go.bank_id AS bank_id,
-                        go.date AS date,
-                        '期初余额' AS name,
-                        go.balance AS get,
-                        0 AS pay,
-                        0 AS balance,
-                        NULL AS partner_id,
-                        NULL AS note
-                FROM go_live_order AS go
-                UNION ALL
+                (
                 SELECT mol.bank_id,
                         mo.date,
                         mo.name,
@@ -81,7 +72,7 @@ class bank_statements_report(models.Model):
                         (CASE WHEN omo.type = 'other_pay' THEN omo.total_amount ELSE 0 END) AS pay,
                         0 AS balance,
                         omo.partner_id,
-                        NULL AS note
+                        omo.note AS note
                 FROM other_money_order AS omo
                 WHERE omo.state = 'done'
                 UNION ALL
@@ -89,12 +80,14 @@ class bank_statements_report(models.Model):
                         mto.date,
                         mto.name,
                         0 AS get,
-                        mtol.amount AS pay,
+                        (CASE WHEN ba.currency_id IS NULL OR rc.name='CNY' THEN mtol.amount ELSE mtol.currency_amount END) AS pay,
                         0 AS balance,
                         NULL AS partner_id,
                         mto.note
                 FROM money_transfer_order_line AS mtol
                 LEFT JOIN money_transfer_order AS mto ON mtol.transfer_id = mto.id
+                LEFT JOIN bank_account AS ba ON ba.id = mtol.out_bank_id
+                LEFT JOIN res_currency AS rc ON rc.id = ba.currency_id
                 WHERE mto.state = 'done'
                 UNION ALL
                 SELECT  mtol.in_bank_id AS bank_id,
@@ -113,48 +106,27 @@ class bank_statements_report(models.Model):
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三种情况：收付款单、其他收支单、资金转换单
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        other_money = self.env['other.money.order'].search([('name', '=', self.name)])
-
-        if money:
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'收付款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id
-            }
-        elif other_money:
-            view = self.env.ref('money.other_money_order_form')
-            return {
-                'name': u'其他收支单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'other.money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': other_money.id,
-                'context': {'type': False}
-            }
-
-        transfer_order = self.env['money.transfer.order'].search([('name', '=', self.name)])
-        view = self.env.ref('money.money_transfer_order_form')
-
-        return {
-            'name': u'资金转换单',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': False,
-            'views': [(view.id, 'form')],
-            'res_model': 'money.transfer.order',
-            'type': 'ir.actions.act_window',
-            'res_id': transfer_order.id
-        }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+        # 查看原始单据，三种情况：收付款单、其他收支单、资金转换单
+        self.ensure_one()
+        model_view = {
+            'money.order': {'name': u'收付款单',
+                            'view': 'money.money_order_form'},
+            'other.money.order': {'name': u'其他收支单',
+                                  'view': 'money.other_money_order_form'},
+            'money.transfer.order': {'name': u'资金转换单',
+                                     'view': 'money.money_transfer_order_form'}}
+        for model,view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = view_dict['name']
+            view = self.env.ref(view_dict['view'])
+            if res:
+                return {
+                    'name': name,
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': model,
+                    'type': 'ir.actions.act_window',
+                    'res_id': res.id
+                }

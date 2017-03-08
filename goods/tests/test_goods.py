@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from openerp.tests.common import TransactionCase
+from odoo.tests.common import TransactionCase
 
 
 class test_goods(TransactionCase):
+
+    def setUp(self):
+        super(test_goods, self).setUp()
+        self.goods_mouse = self.env.ref('goods.mouse')
 
     def test_conversion_unit(self):
         ''' 单位转化，1捆网线12根  '''
@@ -43,3 +47,30 @@ class test_goods(TransactionCase):
         # 使用code来搜索键盘
         result = self.env['goods'].name_search('001')
         self.assertEqual(result, real_result)
+
+    def test_create(self):
+        '''导入产品时，如果辅助单位为空，则用计量单位来填充它'''
+        goods = self.env['goods'].create({
+            'name': u'显示器',
+            'category_id': self.env.ref('core.goods_category_1').id,
+            'uom_id': self.env.ref('core.uom_pc').id,
+            'conversion': 1,
+            'cost': 1000,
+            })
+        self.assertTrue(goods.uos_id.id == self.env.ref('core.uom_pc').id)
+
+    def test_copy(self):
+        '''测试产品的复制功能'''
+        mouse = self.goods_mouse.copy()
+        self.assertEqual(u'鼠标 (copy)', mouse.name)
+
+class test_attributes(TransactionCase):
+
+    def test_ean_search(self):
+        '''测试goods的按ean搜索'''
+        iphone_value_white = self.env.ref('goods.iphone_value_white')
+        result = self.env['attribute'].name_search('12345678987')
+        real_result = [(iphone_value_white.id,
+                        iphone_value_white.category_id.name + ':' +iphone_value_white.value_id.name)]
+        self.assertEqual(result, real_result)
+

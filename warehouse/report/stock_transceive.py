@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import models, fields, api
+import odoo.addons.decimal_precision as dp
+from odoo import models, fields, api
 import datetime
 
 
 class report_stock_transceive(models.Model):
     _name = 'report.stock.transceive'
+    _description = u'商品收发明细表'
     _inherit = 'report.base'
 
     goods = fields.Char(u'产品')
@@ -15,21 +16,21 @@ class report_stock_transceive(models.Model):
     uom = fields.Char(u'单位')
     warehouse = fields.Char(u'仓库')
     goods_qty_begain = fields.Float(
-        '期初数量', digits_compute=dp.get_precision('Quantity'))
+        u'期初数量', digits=dp.get_precision('Quantity'))
     cost_begain = fields.Float(
-        u'期初成本', digits_compute=dp.get_precision('Amount'))
+        u'期初成本', digits=dp.get_precision('Amount'))
     goods_qty_end = fields.Float(
-        u'期末数量', digits_compute=dp.get_precision('Quantity'))
+        u'期末数量', digits=dp.get_precision('Quantity'))
     cost_end = fields.Float(
-        u'期末成本', digits_compute=dp.get_precision('Amount'))
+        u'期末成本', digits=dp.get_precision('Amount'))
     goods_qty_out = fields.Float(
-        u'出库数量', digits_compute=dp.get_precision('Quantity'))
+        u'出库数量', digits=dp.get_precision('Quantity'))
     cost_out = fields.Float(
-        u'出库成本', digits_compute=dp.get_precision('Amount'))
+        u'出库成本', digits=dp.get_precision('Amount'))
     goods_qty_in = fields.Float(
-        '入库数量', digits_compute=dp.get_precision('Quantity'))
+        u'入库数量', digits=dp.get_precision('Quantity'))
     cost_in = fields.Float(
-        u'入库成本', digits_compute=dp.get_precision('Amount'))
+        u'入库成本', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
@@ -144,8 +145,7 @@ class report_stock_transceive(models.Model):
                     (sql_type == 'in' and record.get('goods_qty', 0) or 0),
                 'cost_in': value.get('cost_in', 0) +
                     (sql_type == 'in' and record.get('cost', 0) or 0),
-                'id_lists': value.get('id_lists', []) +
-                    record.get('id_lists', []),
+                'id_lists': value.get('id_lists', []) + record.get('id_lists', []),
             })
 
     def compute_history_stock_by_collect(self, res, records, sql_type='out'):

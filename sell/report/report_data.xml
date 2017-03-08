@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id='report_sell_delivery_out' model='ir.actions.report.xml'>
+            <field name='name'>销售发库单</field>
+            <field name='model'>sell.delivery</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.delivery.out</field>
+            <field name='template_file'>sell/template/sell.delivery.out.docx</field>
+        </record>
+
+        <record id='report_sell_delivery_in' model='ir.actions.report.xml'>
+            <field name='name'>销售退货单</field>
+            <field name='model'>sell.delivery</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.delivery.in</field>
+            <field name='template_file'>sell/template/sell.delivery.in.docx</field>
+        </record>
+
+        <record id="sell_delivery_form_print_inherit" model="ir.ui.view">
+            <field name="name">sell_delivery_form</field>
+            <field name="model">sell.delivery</field>
+            <field name='inherit_id' ref='sell.sell_delivery_form' />
+            <field name="arch" type="xml">
+                <button name="sell_delivery_draft" position="after" >
+                    <button name="%(sell.report_sell_delivery_out)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+
+        <record id="sell_sell_return_form_print_inherit" model="ir.ui.view">
+            <field name="name">sell_return_form</field>
+            <field name="model">sell.delivery</field>
+            <field name='inherit_id' ref='sell.sell_return_form' />
+            <field name="arch" type="xml">
+                <button name="sell_delivery_draft" position="after" >
+                    <button name="%(sell.report_sell_delivery_in)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+        <record id='report_sell_order' model='ir.actions.report.xml'>
+            <field name='name'>销货订单</field>
+            <field name='model'>sell.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.order</field>
+            <field name='template_file'>sell/template/sell.order.docx</field>
+        </record>
+
+        <record id="sell_sell_order_form_print_inherit" model="ir.ui.view">
+            <field name="name">sell_order_form</field>
+            <field name="model">sell.order</field>
+            <field name='inherit_id' ref='sell.sell_order_form' />
+            <field name="arch" type="xml">
+                <button name="sell_order_draft" position="after" >
+                    <button name="%(sell.report_sell_order)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+        <record id='report_sell_adjust_form' model='ir.actions.report.xml'>
+            <field name='name'>销售变更单</field>
+            <field name='model'>sell.adjust</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.adjust</field>
+            <field name='template_file'>sell/template/sell.adjust.docx</field>
+        </record>
+
+        <record id="sell_sell_adjust_form_print_inherit" model="ir.ui.view">
+            <field name="name">sell_order_form</field>
+            <field name="model">sell.adjust</field>
+            <field name='inherit_id' ref='sell.sell_adjust_form' />
+            <field name="arch" type="xml">
+                <button name="sell_adjust_done" position="after" >
+                    <button name="%(sell.report_sell_adjust_form)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+    </data>
+</openerp>

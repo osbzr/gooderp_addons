@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<openerp>
+    <data>
+        <record id='non_active_report_wizard_form' model='ir.ui.view'>
+            <field name='name'>non.active.report.wizard.form</field>
+            <field name='model'>non.active.report.wizard</field>
+            <field name='arch' type='xml'>
+                <form string='呆滞料报表'>
+                    <group>
+                        <group>
+                            <field name='warehouse_id'/>
+                        </group>
+                        <group>
+                            <field name="first_stage_day" />
+                            <field name="second_stage_day"/>
+                            <field name='third_stage_day'/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name='open_non_active_report' string='确定' type='object' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id='non_active_report_tree' model='ir.ui.view'>
+            <field name='name'>non.active.report.tree</field>
+            <field name='model'>non.active.report</field>
+            <field name='arch' type='xml'>
+                <tree string='批号跟踪表'>
+                  <field name="warehouse_id"/>
+                  <field name="goods_id"/>
+                  <field name="first_stage_day_qty" />
+                  <field name="second_stage_day_qty"/>
+                  <field name="third_stage_day_qty"/>
+                  <field name="four_stage_day_qty"/>
+                  <field name="subtotal"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>

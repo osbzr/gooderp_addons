@@ -1,2 +1,2 @@
-
-import home_page
+# -*- coding: utf-8 -*-
+import models

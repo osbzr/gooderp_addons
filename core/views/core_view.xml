@@ -1,0 +1,508 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+
+		<!--根菜单-->
+		<menuitem id='setting_menu' name='配置' groups="core.master_groups" web_icon="core,static/description/core.png"/>
+		<menuitem id='config_data_menu' name='基本配置' parent='setting_menu' sequence='20'/>
+		<menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
+
+		<!--类别-->
+		<record id="core_category_tree" model="ir.ui.view">
+			<field name="name">core.category.tree</field>
+			<field name="model">core.category</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="类别">
+					<field name="name"/>
+					<field name="type"/>
+				</tree>
+			</field>
+		</record>
+		<record id="core_category_form" model="ir.ui.view">
+			<field name="name">core.category.form</field>
+			<field name="model">core.category</field>
+			<field name="arch" type="xml">
+				<form string="类别">
+					<group>
+						<group>
+							<field name="name"/>
+							<field name="type"/>
+						</group>
+						<group>
+							<field name="note"/>
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
+		<record id="core_category_search" model="ir.ui.view">
+            <field name="name">core.category.search</field>
+            <field name="model">core.category</field>
+            <field name="arch" type="xml">
+                <search string="类别">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter string="类型" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+		<record id="core_category_action" model="ir.actions.act_window">
+			<field name="name">类别</field>
+			<field name="res_model">core.category</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+			<field name="search_view_id" ref="core_category_search"/>
+		</record>
+		<menuitem id='core_category_menu' name='类别' action='core_category_action' parent='config_data_menu' sequence='2'/>
+
+		<!--可选值-->
+		<record id="core_value_tree" model="ir.ui.view">
+			<field name="name">core.value.tree</field>
+			<field name="model">core.value</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="可选值">
+					<field name="name"/>
+					<field name="type"/>
+				</tree>
+			</field>
+		</record>
+		<record id="core_value_search" model="ir.ui.view">
+            <field name="name">core.value.search</field>
+            <field name="model">core.value</field>
+            <field name="arch" type="xml">
+                <search string="可选值">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter string="类型" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+		<record id="core_value_action" model="ir.actions.act_window">
+			<field name="name">可选值</field>
+			<field name="res_model">core.value</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+			<field name="search_view_id" ref="core_value_search"/>
+		</record>
+		<menuitem id='core_value_menu' name='可选值' action='core_value_action' parent='config_data_menu' sequence='3'/>
+		<record id="core_value_menu" model="ir.ui.menu">
+			<field name="create_tag">1</field>
+		</record>
+
+		<!--公司-->
+		<record id="company_form" model="ir.ui.view">
+			<field name="name">company.form</field>
+			<field name="model">res.company</field>
+			<field name="arch" type="xml">
+				<form string="公司" create='0'>
+					<group>
+						<field name="logo" widget="image"  class="oe_avatar oe_left"/>
+                        <field name="name" class="oe_inline"/>
+						<field name="street" required="1"/>
+						<field name="phone" required="1"/>
+						<field name="fax" string="手机"/>
+						<field name='email' string='公司邮箱'/>
+						<field name="zip"/>
+						<field name="start_date" readonly="1" />
+						<field name="currency_id"/>
+						<field name="cost_method"/>
+						<field name="draft_invoice"/>
+						<field name="import_tax_rate"/>
+						<field name="output_tax_rate"/>
+						<field name="bank_account_id"/>
+					</group>
+				</form>
+			</field>
+		</record>
+		<record id="company_action" model="ir.actions.act_window">
+			<field name="name">公司</field>
+			<field name="res_model">res.company</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="res_id">1</field>
+		</record>
+		<record id="company_action_view_form" model="ir.actions.act_window.view">
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="company_form"/>
+			<field name="act_window_id" ref="company_action"/>
+		</record>
+		<menuitem id='company_menu' name='公司' action='company_action' parent='system_menu' sequence='10'/>
+		<!--单位，菜单放在仓库模块下-->
+		<record id="uom_tree" model="ir.ui.view">
+			<field name="name">uom.tree</field>
+			<field name="model">uom</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="单位">
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+		<record id="uom_search" model="ir.ui.view">
+            <field name="name">uom.search</field>
+            <field name="model">uom</field>
+            <field name="arch" type="xml">
+                <search string="单位">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+		<record id="uom_action" model="ir.actions.act_window">
+			<field name="name">单位</field>
+			<field name="res_model">uom</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<!--结算方式，菜单放在资金模块下-->
+		<record id="settle_mode_tree" model="ir.ui.view">
+			<field name="name">settle.mode.tree</field>
+			<field name="model">settle.mode</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="结算方式">
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+		<record id="settle_mode_search" model="ir.ui.view">
+            <field name="name">settle.mode.search</field>
+            <field name="model">settle.mode</field>
+            <field name="arch" type="xml">
+                <search string="结算方式">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+		<record id="settle_mode_action" model="ir.actions.act_window">
+			<field name="name">结算方式</field>
+			<field name="res_model">settle.mode</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<!--客户， 菜单放在资金和销售模块下-->
+		<record id="customer_address_form" model="ir.ui.view">
+			<field name="name">customer.address.form</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<form string="GOODERP PARTNER FORM">
+					<sheet>
+						<div class="oe_title">
+							<div class="oe_edit_only">
+								<label for='name' string='名称'/>
+							</div>
+							<h1>
+								<field name="name" required="1"/>
+							</h1>
+						</div>
+						<group>
+							<group>
+								<field name="code"/>
+								<field name="main_mobile"/>
+								<field name="tax_num"/>
+								<field name="credit_limit"/>
+							</group>
+							<group>
+								<field name="c_category_id" required="1"/>
+								<field name="s_category_id"/>
+								<field name="receivable"/>
+								<field name="tax_rate"/>
+							</group>
+						</group>
+					</sheet>
+					<div class="oe_chatter">
+						 <field name="message_follower_ids" widget="mail_followers"/>
+						 <field name="message_ids" widget="mail_thread"/>
+                 	</div>
+				</form>
+			</field>
+		</record>
+		<record id="customer_tree" model="ir.ui.view">
+			<field name="name">客户列表</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<tree string="客户">
+					<field name="c_category_id" required="1"/>
+					<field name="code"/>
+					<field name="main_mobile"/>
+					<field name="name"/>
+					<field name="receivable" sum='sum'/>
+				</tree>
+			</field>
+		</record>
+		<record id="customer_search" model="ir.ui.view">
+            <field name="name">customer.search</field>
+            <field name="model">partner</field>
+            <field name="arch" type="xml">
+                <search string="客户">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="c_category_id"/>
+                    <field name="main_mobile"/>
+                    <field name="receivable"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户类别" domain="[]" context="{'group_by':'c_category_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+		<record id="customer_action" model="ir.actions.act_window">
+			<field name="name">客户</field>
+			<field name="res_model">partner</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="search_view_id" ref="customer_search"/>
+			<field name="domain">[('c_category_id','!=',False)]</field>
+		</record>
+		<record id="customer_address_action_tree" model="ir.actions.act_window.view">
+			<field eval="1" name="sequence"/>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="customer_tree"/>
+			<field name="act_window_id" ref="customer_action"/>
+		</record>
+		<record id="customer_address_action_form" model="ir.actions.act_window.view">
+			<field eval="2" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="customer_address_form"/>
+			<field name="act_window_id" ref="customer_action"/>
+		</record>
+		<!--供应商 菜单放在采购模块下-->
+		<record id="supplier_address_form" model="ir.ui.view">
+			<field name="name">supplier.address.form</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<form string="GOODERP PARTNER FORM">
+					<sheet>
+						<div class="oe_title">
+							<h1>
+								<field name="name" required="1"/>
+							</h1>
+						</div>
+						<group>
+							<group>
+								<field name="code"/>
+								<field name="main_mobile"/>
+								<field name="tax_rate"/>
+							</group>
+							<group>
+								<field name="s_category_id" required="1"/>
+								<field name="c_category_id" />
+								<field name="bank_name"/>
+								<field name="bank_num"/>
+								<field name="payable"/>
+							</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record id="vendor_tree" model="ir.ui.view">
+			<field name="name">供应商列表</field>
+			<field name="model">partner</field>
+			<field name="arch" type="xml">
+				<tree string="供应商">
+					<field name="s_category_id" required="1"/>
+					<field name="code"/>
+					<field name="main_mobile"/>
+					<field name="name"/>
+					<field name="payable" sum='sum'/>
+				</tree>
+			</field>
+		</record>
+		<record id="vendor_search" model="ir.ui.view">
+            <field name="name">vendor.search</field>
+            <field name="model">partner</field>
+            <field name="arch" type="xml">
+                <search string="客户">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="s_category_id"/>
+                    <field name="main_mobile"/>
+                    <field name="payable"/>
+                    <group expand="0" string="分组">
+                        <filter string="供应商类别" domain="[]" context="{'group_by':'s_category_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+		<record id="vendor_action" model="ir.actions.act_window">
+			<field name="name">供应商</field>
+			<field name="res_model">partner</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="search_view_id" ref="vendor_search"/>
+			<field name="domain">[('s_category_id','!=',False)]</field>
+		</record>
+		<record id="supplier_address_action_tree" model="ir.actions.act_window.view">
+			<field eval="1" name="sequence"/>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="vendor_tree"/>
+			<field name="act_window_id" ref="vendor_action"/>
+		</record>
+		<record id="supplier_address_action_form" model="ir.actions.act_window.view">
+			<field eval="2" name="sequence"/>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="supplier_address_form"/>
+			<field name="act_window_id" ref="vendor_action"/>
+		</record>
+		<!--用户-->
+		<menuitem id='users_menu' name="用户" action='base.action_res_users' parent='config_data_menu' sequence='1' groups="base.group_erp_manager"/>
+		<!--账户，菜单放在资金模块下-->
+		<record id="bank_account_tree" model="ir.ui.view">
+			<field name="name">bank.account.tree</field>
+			<field name="model">bank.account</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="账户">
+					<field name="name"/>
+					<field name="balance" sum='sum'/>
+				</tree>
+			</field>
+		</record>
+		<record id="bank_account_search" model="ir.ui.view">
+            <field name="name">bank.account.search</field>
+            <field name="model">bank.account</field>
+            <field name="arch" type="xml">
+                <search string="账户">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+		<record id="bank_account_action" model="ir.actions.act_window">
+			<field name="name">账户</field>
+			<field name="res_model">bank.account</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+
+		<!--收支项，菜单放在资金模块下-->
+		<record id="service_tree" model="ir.ui.view">
+			<field name="name">收支项列表</field>
+			<field name="model">service</field>
+			<field name="arch" type="xml">
+				<tree string="收支项">
+					<field name="name"/>
+					<field name="get_categ_id"/>
+					<field name="pay_categ_id"/>
+					<field name="price"/>
+				</tree>
+			</field>
+		</record>
+		<record id="service_form" model="ir.ui.view">
+			<field name="name">收支项</field>
+			<field name="model">service</field>
+			<field name="arch" type="xml">
+				<form string="Service">
+					<group>
+						<group>
+							<field name="name"/>
+							<field name="price"/>
+						</group>
+						<group>
+							<field name="get_categ_id"/>
+							<field name="pay_categ_id"/>
+						</group>
+					</group>
+				</form>
+			</field>
+		</record>
+		<record id="service_search" model="ir.ui.view">
+            <field name="name">service.search</field>
+            <field name="model">service</field>
+            <field name="arch" type="xml">
+                <search string="收支项">
+                    <field name="name"/>
+                    <field name="get_categ_id"/>
+                    <field name="pay_categ_id"/>
+                    <group expand="0" string="分组">
+                        <filter string="收入类别" domain="[]" context="{'group_by':'get_categ_id'}"/>
+                        <filter string="支出类别" domain="[]" context="{'group_by':'pay_categ_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+		<record id="service_action" model="ir.actions.act_window">
+			<field name="name">收支项</field>
+			<field name="res_model">service</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="search_view_id" ref="service_search"/>
+		</record>
+
+
+
+        <!-- 用于清理业务数据 -->
+		<record id="business_data_table_tree" model="ir.ui.view">
+			<field name="name">business.data.table.tree</field>
+			<field name="model">business.data.table</field>
+			<field name="arch" type="xml">
+				<tree editable="TOP" string="业务数据表">
+				    <field name="model"/>
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+		<record id="action_business_data_table" model="ir.actions.act_window">
+			<field name="name">业务数据表名</field>
+			<field name="res_model">business.data.table</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+		<menuitem id='menu_business_data' name='清空业务数据' parent='base.menu_custom' sequence='60'/>
+		<menuitem id='menu_business_data_table' name='业务数据表名' action='action_business_data_table' parent='menu_business_data' sequence='2'/>
+
+		<record id="clean_business_data_form" model="ir.ui.view">
+			<field name="name">清空业务数据向导</field>
+			<field name="model">clean.business.data</field>
+			<field name="arch" type="xml">
+				<form string="Service">
+					<header>
+						<h2 style="color:red">数据清理后不能恢复，请先备份再进行操作！</h2>
+					</header>
+					<group>
+						<field name="need_clean_table" widget="many2many_tags" options="{'color':'random','no_create':True}"/>
+					</group>
+					<footer>
+						<button name="remove_data"  string="清除业务数据" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="action_clean_business_data" model="ir.actions.act_window">
+			<field name="name">清空业务数据表</field>
+			<field name="res_model">clean.business.data</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+		<menuitem id='menu_clean_business_data' name='清理业务数据表' action='action_clean_business_data' parent='base.menu_custom' sequence='70'/>
+
+
+        <!-- 用权限组来隐藏系统自带的根菜单 -->
+		<record model="ir.ui.menu" id="base.menu_administration">
+            <field name="groups_id" eval="[(3, ref('base.group_erp_manager'))]"/>
+        </record>
+		<menuitem id="home_page.main_home_menu" name="首页" groups="home_page.group_all_manager"/>
+		<menuitem id="mail.mail_channel_menu_root_chat" name="消息" groups="-base.group_user,home_page.group_mail" />
+		<menuitem id="base.module_mi"  groups="-base.group_no_one,core.nobody_can_see" />
+		<menuitem id="base.menu_module_updates"  sequence="20"  groups="-base.group_no_one,core.nobody_can_see" parent="base.menu_management"  />
+		<menuitem  id="base.menu_view_base_module_update" groups="-base.group_no_one"  parent="base.menu_management" />
+		<menuitem  groups="base.group_no_one" id="base.menu_view_base_module_upgrade"  parent="base.menu_management" />
+		<menuitem  groups="-base.group_no_one,core.nobody_can_see" id="web_settings_dashboard.web_dashboard_menu" parent="base.menu_administration"  />
+	</data>
+</openerp>

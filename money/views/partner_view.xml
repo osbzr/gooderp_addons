@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--继承账户 tree，添加"查看现金银行报表"按钮-->
+		<record id="bank_account_tree_inherit_first" model="ir.ui.view">
+            <field name="name">bank.account.tree.inherit</field>
+            <field name="model">bank.account</field>
+            <field name='inherit_id' ref='core.bank_account_tree' />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+					<field name="account_id"/>
+                    <field name="init_balance"/>
+                </field>
+                <field name="balance" position="after">
+                    <field name="currency_id"
+                    	 groups='finance.group_multi_currency'/>
+                    <button name="bank_statements" type="object" string="查看现金银行报表" icon="fa-search" class="oe_highlight"/>
+				</field>
+            </field>
+        </record>
+        <!-- 增加期初字段 -->
+        <record id="customer_address_form" model="ir.ui.view">
+            <field name="model">partner</field>
+			<field name='inherit_id' ref='core.customer_address_form'/>
+            <field name="arch" type="xml">
+                <field name='receivable' position='after'>
+                	<field name='receivable_init' groups="base.group_erp_manager"/>
+                </field>
+            </field>
+        </record>
+        <record id="supplier_address_form" model="ir.ui.view">
+            <field name="model">partner</field>
+			<field name='inherit_id' ref='core.supplier_address_form'/>
+            <field name="arch" type="xml">
+                <field name='payable' position='after'>
+                	<field name='payable_init' groups="base.group_erp_manager"/>
+                </field>
+            </field>
+        </record>
+	</data>
+</openerp>
+	

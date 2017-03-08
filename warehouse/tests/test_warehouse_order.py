@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 import time
 
 
@@ -8,6 +8,11 @@ class TestWarehouseOrder(TransactionCase):
     ''' 测试仓库的其他出库单单据和调拨单 '''
     def setUp(self):
         super(TestWarehouseOrder, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
         self.overage_in_cable = self.browse_ref('warehouse.wh_move_line_14')
@@ -46,6 +51,7 @@ class TestWarehouseOrder(TransactionCase):
         self.others_out_2.approve_order()
 
     def test_approve(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
 
         # 此时其他入库单的others_in的剩余数量应该为0
         self.assertEqual(self.others_in_cable.qty_remaining, 0)
@@ -66,22 +72,28 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(self.others_out_2.state, 'done')
         self.assertEqual(self.internal.state, 'done')
 
+    def test_approve_create_zero_wh_in(self):
+        ''' 测试 create_zero_wh_in '''
+        self.env.user.company_id.is_enable_negative_stock = True
+        self.env.ref('warehouse.wh_move_line_17').goods_qty = 20000
+        self.internal.approve_order()
+
     def test_unlink(self):
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.others_in.unlink()
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.overage_in.unlink()
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.internal.unlink()
 
         # 审核后的单据无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.others_out.unlink()
 
         self.others_out.cancel_approved_order()
@@ -105,9 +117,10 @@ class TestWarehouseOrder(TransactionCase):
         self.assertTrue(not self.others_out.exists())
 
     def test_cancel_approve(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
 
         # 存在已经被匹配的出库时入库无法被取消
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.others_in.cancel_approved_order()
 
         # 取消键盘套装的出库，此时others_in的键盘套装数量回复到48
@@ -136,9 +149,9 @@ class TestWarehouseOrder(TransactionCase):
         self.assertEqual(self.internal.state, 'draft')
 
         # 没有明细行的单据不可以被审核通过
-        with self.assertRaises(except_orm):
-            self.overage_in.line_in_ids.unlink()
-            self.overage_in.approve_order()
+        with self.assertRaises(UserError):
+            self.internal.line_out_ids.unlink()
+            self.internal.approve_order()
 
         # 测试utils里面对于多重继承的时候报错
         # 在with里面，with接收之后里面的代码会生效，没有回溯
@@ -150,10 +163,11 @@ class TestWarehouseOrder(TransactionCase):
             self.others_in.approve_order()
 
     def test_origin(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.assertEqual(self.others_in.origin, 'wh.in.others')
         self.assertEqual(self.others_out.origin, 'wh.out.others')
         self.assertEqual(self.internal.origin, 'wh.internal')
-        self.assertEqual(self.overage_in.origin, 'wh.in.overage')
+        self.assertEqual(self.overage_in.origin, 'wh.in.inventory')
 
     def test_create(self):
         temp_out = self.env['wh.out'].create({'name': '/', 'type': 'others'})
@@ -170,28 +184,61 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_get_default_warehouse(self):
         '''获取调出仓库'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         order = self.env['wh.out'].with_context({
-             'warehouse_type': 'stock'
-        }).create({'type': 'others'})
+             'warehouse_type': 'stock',
+        }).create({'type': 'others',
+                   'line_out_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id,
+                                            'type': 'out',
+                                            })]})
         # 验证明细行上仓库是否是订单上调出仓库
         hd_stock = self.browse_ref('warehouse.hd_stock')
         order.warehouse_id = hd_stock
-        line = order.line_out_ids.with_context({
-            'default_warehouse_id': order.warehouse_id}).create({
-            'goods_id': self.browse_ref('goods.mouse').id})
+        line = order.line_out_ids[0]
         self.assertTrue(line.warehouse_id == hd_stock)
         self.env['wh.out'].create({'type': 'others'})
 
-    def test__get_default_warehouse_dest(self):
+    def test_get_default_warehouse_dest(self):
         '''获取调入仓库'''
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         order = self.env['wh.in'].with_context({
              'warehouse_dest_type': 'stock'
-        }).create({'type': 'others'})
+        }).create({'type': 'others',
+                   'line_in_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id})]})
         # 验证明细行上仓库是否是订单上调入仓库
         hd_stock = self.browse_ref('warehouse.hd_stock')
         order.warehouse_dest_id = hd_stock
-        line = order.line_in_ids.with_context({
-            'default_warehouse_dest_id': order.warehouse_dest_id}).create({
-            'goods_id': self.browse_ref('goods.mouse').id})
+        line = order.line_in_ids[0]
         self.assertTrue(line.warehouse_dest_id == hd_stock)
         self.env['wh.in'].create({'type': 'others'})
+
+    def test_onchange_type(self):
+        '''当业务类别变化时，调入库位也发生变化'''
+        # 其它出库单
+        self.others_out.type = 'inventory'
+        warehouse_inventory = self.browse_ref('warehouse.warehouse_inventory')
+        self.others_out.onchange_type()
+        self.assertTrue(self.others_out.warehouse_dest_id == warehouse_inventory)
+
+        # 其它入库单
+        self.others_in_2.type = 'inventory'
+        self.others_in_2.onchange_type()
+        self.assertTrue(self.others_in_2.warehouse_id == warehouse_inventory)
+
+    def test_create_voucher_init(self):
+        '''初始化其他入库单时生成凭证的情况'''
+        self.others_in_2.is_init = True
+        self.others_in_2.approve_order()
+        self.others_in_2.cancel_approved_order()
+
+    def test_create_voucher_no_voucher_line(self):
+        '''初始化其他入库单时生成凭证 没有凭证行，删除凭证  的情况'''
+        self.others_in_2_keyboard_mouse.cost_unit = 0.0
+        self.others_in_2.approve_order()
+        self.others_in_2.cancel_approved_order()
+
+    def test_goods_inventory(self):
+        ''' 发库单审核产品不足时调用创建盘盈入库方法 '''
+        
+        
+        

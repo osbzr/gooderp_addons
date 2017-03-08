@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class TestInventory(TransactionCase):
     def setUp(self):
         super(TestInventory, self).setUp()
+
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
+        self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
 
         self.others_in = self.browse_ref('warehouse.wh_in_whin1')
         self.others_in_2 = self.browse_ref('warehouse.wh_in_whin3')
@@ -15,9 +19,9 @@ class TestInventory(TransactionCase):
 
         # 创建一个临时的一个库存调拨，将1个产品调拨到上海仓库
         self.temp_mouse_in = self.env['wh.move.line'].with_context({
-            'warehouse_type': 'others',
             'type': 'in',
         }).create({
+            'move_id': self.others_in.move_id.id,
             'goods_id': self.goods_mouse.id,
             'uom_id': self.goods_mouse.uom_id.id,
             'uos_id': self.goods_mouse.uos_id.id,
@@ -28,11 +32,18 @@ class TestInventory(TransactionCase):
             'lot': 'MOUSE0001',
         })
 
+        # 产品     实际数量 实际辅助数量
+        # 键鼠套装  96     2
+        # 鼠标     1      1
+        # 网线     48     1
+        self.others_in.approve_order()
+        self.others_in_2.approve_order()
+        self.temp_mouse_in.action_done()
         # 创建一个临时的库存调拨，此时数量为0，但是辅助数量为1
         self.temp_mouse_in_zero_qty = self.env['wh.move.line'].with_context({
-            'warehouse_type': 'others',
             'type': 'in',
         }).create({
+            'move_id': self.others_in.move_id.id,
             'goods_id': self.goods_mouse.id,
             'uom_id': self.goods_mouse.uom_id.id,
             'uos_id': self.goods_mouse.uos_id.id,
@@ -43,16 +54,11 @@ class TestInventory(TransactionCase):
             'lot': 'MOUSE0002',
         })
 
-        # 产品     实际数量 实际辅助数量
-        # 键鼠套装  96     2
-        # 鼠标     1      1
-        # 网线     48     1
-        self.others_in.approve_order()
-        self.others_in_2.approve_order()
-        self.temp_mouse_in.action_done()
         self.temp_mouse_in_zero_qty.action_done()
 
-        self.inventory = self.env['wh.inventory'].create({})
+        self.inventory = self.env['wh.inventory'].create({
+                'warehouse_id': self.browse_ref('warehouse.hd_stock').id,
+                })
         self.inventory.query_inventory()
 
     def test_query_inventory(self):
@@ -62,14 +68,7 @@ class TestInventory(TransactionCase):
             self.assertEqual(goods_stock.get('warehouse'), line.warehouse_id.name)
             self.assertEqual(goods_stock.get('qty'), line.real_qty)
 
-        # 当辅助数量不为0勾选后，会选择到temp_mouse_in_zero_qty相关的库存调拨，此时会出现为一行
-        self.assertEqual(len(self.inventory.line_ids), 3)
-        self.inventory.uos_not_zero = True
-        self.inventory.query_inventory()
-        self.assertEqual(len(self.inventory.line_ids), 4)
-
         # 当指定仓库的时候，选择的行必须是该仓库的
-        self.inventory.uos_not_zero = False
         self.inventory.warehouse_id = self.sh_warehouse
         self.inventory.query_inventory()
         for line in self.inventory.line_ids:
@@ -134,7 +133,7 @@ class TestInventory(TransactionCase):
         # 盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致的时候，此时没法生成盘盈盘亏单据
         mouse.difference_qty = -1
         mouse.difference_uos_qty = 1
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.inventory.generate_inventory()
 
         mouse.line_role_back()
@@ -158,7 +157,7 @@ class TestInventory(TransactionCase):
 
         # 重新盘点的时候相关的出入库单的单据必须未审核
         self.inventory.in_id.approve_order()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.inventory.requery_inventory()
 
         self.inventory.in_id.cancel_approved_order()
@@ -172,7 +171,7 @@ class TestInventory(TransactionCase):
         self.assertEqual(self.inventory.state, 'done')
 
         # 完成的单据不应该被删除
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.inventory.unlink()
 
         results = self.inventory.open_in()
@@ -194,3 +193,15 @@ class TestInventory(TransactionCase):
         }
 
         self.assertEqual(results, real_results)
+
+    def test_check_done(self):
+        '''盘盈盘亏产生的入库单和出库单审核时检查'''
+        self.inventory.query_inventory()
+        self.inventory.generate_inventory()
+
+    def test_inventory_get_default_warehouse(self):
+        ''' 测试 获取盘点仓库 '''
+        self.env['wh.inventory'].create({
+                                         'date': '2016-12-30',
+                                         'goods': '鼠标',
+                                         })

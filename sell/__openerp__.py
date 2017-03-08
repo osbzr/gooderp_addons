@@ -21,14 +21,30 @@
 ##############################################################################
 {
     'name': 'GOODERP 销售模块',
-    'author': 'jeff@osbzr.com,jacky@osbzr.com',
+    'author': 'jeff@osbzr.com,flora@osbzr.com',
     'website': 'https://www.osbzr.com',
-    'description': '''gooderp销售实例，通过安装gooderp模块展示openerp的销售流程''',
-    'depends': ['mail', 'core', 'warehouse', 'money'],
+    'category': 'gooderp',
+    'description':
+     '''
+                            该模块可以方便的管理销货。
+
+                            通过创建销货订单，审核后将销货订单行中的商品销售给客户，来完成销货功能。
+                            通过创建销货退货订单，审核后将退货订单行中的商品退回，来完成销货退货功能。
+                            通过创建销售变更单，选择原始销货订单，审核后将销售变更单行中的商品调整到原始销货订单行，来完成销售调整功能。
+
+                            销货管理的报表有：
+                                  销售订单跟踪表；
+                                  销售明细表；
+                                  销售汇总表（按商品、按客户、按销售人员）；
+                                  销售收款一览表；
+                                  销售前十商品。
+    ''',
+    'version': '11.11',
+    'depends': ['warehouse', 'partner_address', 'staff'],
     'data': [
-            'sell_data.xml',
+            'data/sell_data.xml',
             'security/groups.xml',
-            'sell_view.xml',
+            'views/sell_view.xml',
             'report/customer_statements_view.xml',
             'report/sell_order_track_view.xml',
             'report/sell_order_detail_view.xml',
@@ -46,11 +62,12 @@
             'wizard/sell_receipt_wizard_view.xml',
             'wizard/sell_top_ten_wizard_view.xml',
             'security/ir.model.access.csv',
+            'report/report_data.xml',
+            'data/home_page_data.xml'
             ],
     'demo': [
-             'sell_demo.xml',
+             'data/sell_demo.xml',
              ],
     'installable': True,
     'auto_install': False,
-    'application': True,
 }

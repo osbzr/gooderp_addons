@@ -19,14 +19,17 @@
 #
 ##############################################################################
 
-from openerp import fields, models, api, tools
-import openerp.addons.decimal_precision as dp
+from odoo import fields, models, api, tools
+import odoo.addons.decimal_precision as dp
+
+from odoo.exceptions import UserError
+
 
 class customer_statements_report(models.Model):
     _name = "customer.statements.report"
     _description = u"客户对账单"
     _auto = False
-    _order = 'date'
+    _order = 'id, date'
 
     @api.one
     @api.depends('amount', 'pay_amount', 'partner_id')
@@ -34,42 +37,43 @@ class customer_statements_report(models.Model):
         pre_record = self.search([('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
         # 相邻的两条记录，partner不同，应收款余额重新计算
         if pre_record:
-            if pre_record.name != u'期初余额':
-                before_balance = pre_record.balance_amount
-            else:
-                before_balance = pre_record.amount
+            before_balance = pre_record.this_balance_amount
         else:
             before_balance = 0
         self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
+        self.this_balance_amount = self.balance_amount
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
     date = fields.Date(string=u'单据日期', readonly=True)
     done_date = fields.Datetime(string=u'完成日期', readonly=True)
     sale_amount = fields.Float(string=u'销售金额', readonly=True, 
-                               digits_compute=dp.get_precision('Amount'))
+                               digits=dp.get_precision('Amount'))
     benefit_amount = fields.Float(string=u'优惠金额', readonly=True,
-                                  digits_compute=dp.get_precision('Amount'))
+                                  digits=dp.get_precision('Amount'))
     fee = fields.Float(string=u'客户承担费用', readonly=True,
-                       digits_compute=dp.get_precision('Amount'))
+                       digits=dp.get_precision('Amount'))
     amount = fields.Float(string=u'应收金额', readonly=True,
-                          digits_compute=dp.get_precision('Amount'))
+                          digits=dp.get_precision('Amount'))
     pay_amount = fields.Float(string=u'实际收款金额', readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     balance_amount = fields.Float(string=u'应收款余额',
                                   compute='_compute_balance_amount',
-                                  digits_compute=dp.get_precision('Amount'))
+                                  digits=dp.get_precision('Amount'))
+    this_balance_amount = fields.Float(string=u'应收款余额',
+                                  digits=dp.get_precision('Amount'))
     discount_money = fields.Float(string=u'收款折扣', readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
-    def init(self, cr):
+    def init(self):
         # union money_order(type = 'get'), money_invoice(type = 'income')
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'customer_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW customer_statements_report AS (
-            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id,done_date) AS id,
+            SELECT  ROW_NUMBER() OVER(ORDER BY partner_id, date, amount desc) AS id,
                     partner_id,
                     name,
                     date,
@@ -81,28 +85,12 @@ class customer_statements_report(models.Model):
                     pay_amount,
                     discount_money,
                     balance_amount,
+                    0 AS this_balance_amount,
                     note,
                     move_id
             FROM
-                (SELECT go.partner_id AS partner_id,
-                        '期初余额' AS name,
-                        go.date AS date,
-                        go.write_date AS done_date,
-                        0 AS sale_amount,
-                        0 AS benefit_amount,
-                        0 AS fee,
-                        go.receivable AS amount,
-                        0 AS pay_amount,
-                        0 as discount_money,
-                        0 AS balance_amount,
-                        Null AS note,
-                        0 AS move_id
-                FROM go_live_order AS go
-                LEFT JOIN partner AS p ON go.partner_id = p.id
-                LEFT JOIN core_category AS c ON p.c_category_id = c.id
-                WHERE c.type = 'customer'
-                UNION ALL
-                SELECT m.partner_id,
+                (
+               SELECT m.partner_id,
                         m.name,
                         m.date,
                         m.write_date AS done_date,
@@ -133,58 +121,62 @@ class customer_statements_report(models.Model):
                         mi.move_id
                 FROM money_invoice AS mi
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
-                JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
+                LEFT JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
                 WHERE c.type = 'income' AND mi.state = 'done'
+                UNION ALL
+                SELECT ro.partner_id,
+                        ro.name,
+                        ro.date,
+                        ro.write_date AS done_date,
+                        0 AS sale_amount,
+                        0 AS benefit_amount,
+                        0 AS fee,
+                        0 AS amount,
+                        sol.this_reconcile AS pay_amount,
+                        0 AS discount_money,
+                        0 AS balance_amount,
+                        Null AS note,
+                        0 AS move_id
+                FROM reconcile_order AS ro
+                LEFT JOIN money_invoice AS mi ON mi.name = ro.name
+                LEFT JOIN source_order_line AS sol ON sol.receivable_reconcile_id = ro.id
+                WHERE ro.state = 'done' AND mi.state = 'done' AND mi.name ilike 'RO%'
                 ) AS ps)
         """)
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三种情况：收款单、销售退货单、销售发货单
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        # 收款单
-        if money:
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'收款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id,
-                'context': {'type': 'get'}
-            }
-
-        # 销售退货单、发货单
-        delivery = self.env['sell.delivery'].search([('name', '=', self.name)])
-        if delivery.is_return:
-            view = self.env.ref('sell.sell_return_form')
-            return {
-                'name': u'销售退货单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'sell.delivery',
-                'type': 'ir.actions.act_window',
-                'res_id': delivery.id,
-                'context': {'type': 'get'}
-                }
-        else:
-            view = self.env.ref('sell.sell_delivery_form')
-            return {
-                'name': u'销售发货单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'sell.delivery',
-                'type': 'ir.actions.act_window',
-                'res_id': delivery.id,
-                'context': {'type': 'get'}
+        # 查看原始单据，三种情况：收款单、销售退货单、销售发货单、核销单
+        self.ensure_one()
+        model_view = {
+            'money.order': {'name': u'收款单',
+                            'view': 'money.money_order_form'},
+            'sell.delivery': {'name': u'销售发货单',
+                              'view': 'sell.sell_delivery_form',
+                              'name_return': u'销售退货单',
+                              'view_return': 'sell.sell_return_form'},
+            'reconcile.order': {'name': u'核销单',
+                                'view': 'money.reconcile_order_form'}
         }
+        for model, view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = model == 'sell.delivery' and res.is_return and \
+                   view_dict['name_return'] or view_dict['name']
+            view = model == 'sell.delivery' and res.is_return and \
+                   self.env.ref(view_dict['view_return']) \
+                   or self.env.ref(view_dict['view'])
+            if res:
+                return {
+                    'name': name,
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': model,
+                    'type': 'ir.actions.act_window',
+                    'res_id': res.id,
+                }
+        raise UserError(u'期初余额无原始单据可查看。')
+
 
 class customer_statements_report_with_goods(models.TransientModel):
     _name = "customer.statements.report.with.goods"
@@ -199,67 +191,49 @@ class customer_statements_report_with_goods(models.TransientModel):
     goods_name = fields.Char(u'商品名称')
     attribute_id = fields.Many2one('attribute', u'规格型号')
     uom_id = fields.Many2one('uom', u'单位')
-    quantity = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
-    price = fields.Float(u'单价', digits_compute=dp.get_precision('Amount'))
-    discount_amount = fields.Float(u'折扣额', digits_compute=dp.get_precision('Amount'))
-    without_tax_amount = fields.Float(u'不含税金额', digits_compute=dp.get_precision('Amount'))
-    tax_amount = fields.Float(u'税额', digits_compute=dp.get_precision('Amount'))
-    order_amount = fields.Float(string=u'销售金额', digits_compute=dp.get_precision('Amount'))
-    benefit_amount = fields.Float(string=u'优惠金额', digits_compute=dp.get_precision('Amount'))
-    fee = fields.Float(string=u'客户承担费用', digits_compute=dp.get_precision('Amount'))
-    amount = fields.Float(string=u'应收金额', digits_compute=dp.get_precision('Amount'))
-    pay_amount = fields.Float(string=u'实际收款金额', digits_compute=dp.get_precision('Amount'))
+    quantity = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
+    price = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    discount_amount = fields.Float(u'折扣额', digits=dp.get_precision('Amount'))
+    without_tax_amount = fields.Float(u'不含税金额', digits=dp.get_precision('Amount'))
+    tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
+    order_amount = fields.Float(string=u'销售金额', digits=dp.get_precision('Amount'))
+    benefit_amount = fields.Float(string=u'优惠金额', digits=dp.get_precision('Amount'))
+    fee = fields.Float(string=u'客户承担费用', digits=dp.get_precision('Amount'))
+    amount = fields.Float(string=u'应收金额', digits=dp.get_precision('Amount'))
+    pay_amount = fields.Float(string=u'实际收款金额', digits=dp.get_precision('Amount'))
     discount_money = fields.Float(string=u'收款折扣', readonly=True,
-                              digits_compute=dp.get_precision('Amount'))
-    balance_amount = fields.Float(string=u'应收款余额', digits_compute=dp.get_precision('Amount'))
+                              digits=dp.get_precision('Amount'))
+    balance_amount = fields.Float(string=u'应收款余额', digits=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
     @api.multi
     def find_source_order(self):
-        # 查看源单，三种情况：收款单、销售退货单、销售发货单
-        money = self.env['money.order'].search([('name', '=', self.name)])
-        if money:  # 收款单
-            view = self.env.ref('money.money_order_form')
-            return {
-                'name': u'收款单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'money.order',
-                'type': 'ir.actions.act_window',
-                'res_id': money.id,
-                'context': {'type': 'get'}
-            }
-
-        # 销售退货单、发货单
-        delivery = self.env['sell.delivery'].search([('name', '=', self.name)])
-        if delivery.is_return:
-            view = self.env.ref('sell.sell_return_form')
-            return {
-                'name': u'销售退货单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'sell.delivery',
-                'type': 'ir.actions.act_window',
-                'res_id': delivery.id,
-                'context': {'type': 'get'}
+        # 查看原始单据，三种情况：收款单、销售退货单、销售发货单
+        self.ensure_one()
+        model_view = {
+            'money.order': {'name': u'收款单',
+                            'view': 'money.money_order_form'},
+            'sell.delivery': {'name': u'销售发货单',
+                              'view': 'sell.sell_delivery_form',
+                              'name_return': u'销售退货单',
+                              'view_return': 'sell.sell_return_form'},
+            'reconcile.order': {'name': u'核销单',
+                                'view': 'money.reconcile_order_form'}
+        }
+        for model, view_dict in model_view.iteritems():
+            res = self.env[model].search([('name', '=', self.name)])
+            name = model == 'sell.delivery' and res.is_return and view_dict['name_return'] or view_dict['name']
+            view = model == 'sell.delivery' and res.is_return and self.env.ref(view_dict['view_return']) \
+                   or self.env.ref(view_dict['view'])
+            if res:
+                return {
+                    'name': name,
+                    'view_mode': 'form',
+                    'view_id': False,
+                    'views': [(view.id, 'form')],
+                    'res_model': model,
+                    'type': 'ir.actions.act_window',
+                    'res_id': res.id,
                 }
-        else:
-            view = self.env.ref('sell.sell_delivery_form')
-            return {
-                'name': u'销售发货单',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'view_id': False,
-                'views': [(view.id, 'form')],
-                'res_model': 'sell.delivery',
-                'type': 'ir.actions.act_window',
-                'res_id': delivery.id,
-                'context': {'type': 'get'}
-            }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+        raise UserError(u'期初余额无原始单据可查看。')

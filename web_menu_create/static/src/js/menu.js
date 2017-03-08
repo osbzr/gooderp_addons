@@ -1,12 +1,14 @@
-openerp.web_menu_create = function(instance) {
-    instance.web.Menu.include({
+odoo.define('web.menu_create', function(require) {
+    var Menu = require('web.Menu');
+    var Model = require('web.DataModel');
+    
+    Menu.include({
         init: function() {
             this._super.apply(this, arguments);
             var self = this;
             this.on('menu_bound', this, function() {
-                var $all_menus = self.$el.parents('body').find('.oe_webclient').find('[data-menu]');
+                var $all_menus = self.$el.parents('.o_web_client').find('.o_sub_menu').find('[data-menu]');
                 var all_menu_ids = _.map($all_menus, function (menu) {return parseInt($(menu).attr('data-menu'), 10);});
-
                 this.do_load_create_tag(all_menu_ids);
             });
         },
@@ -17,7 +19,7 @@ openerp.web_menu_create = function(instance) {
                 return $.when();
             }
 
-            return new instance.web.Model('ir.ui.menu').call('load_create_tag', [menu_ids]).then(function(result) {
+            return new Model('ir.ui.menu').call('load_create_tag', [menu_ids]).then(function(result) {
                 _.each(result, function(menu_id) {
                     var $item = self.$secondary_menus.find('a[data-menu="' + menu_id + '"]');
                     $item.append("<span class='menu-create-tag'>新建</span>");
@@ -45,7 +47,6 @@ openerp.web_menu_create = function(instance) {
             return parent.menu_dm.add(parent.rpc("/web/action/load", { action_id: action_id }))
                 .then(function (result) {
                     result.view_mode = 'form';
-                    // result.views = [[false, 'form']]
                     var form_views = _.find(result.views, function(view) { return view[1] == 'form'})
                     result.views = (_.isUndefined(form_views))? [[false, 'form']] : [form_views];
 
@@ -64,5 +65,5 @@ openerp.web_menu_create = function(instance) {
                     });
                 });
         },
-    });
-};
+    }); 
+});

@@ -8,7 +8,7 @@
                 <tree string="销售订单跟踪表" create="false">
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
-                    <button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"
+                    <button name="view_detail" type="object" string="查看明细" icon="fa-search"
                     	attrs="{'invisible': [('goods_id','=', False)]}"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
                     <field name="uom"/>
@@ -16,10 +16,11 @@
                     <field name="order_name"/>
                     <field name="staff_id"/>
                     <field name="partner_id"/>
+                    <field name="warehouse_id"/>
                     <field name="goods_state"/>
-                    <field name="qty"/>
-                    <field name="amount"/>
-                    <field name="qty_not_out"/>
+                    <field name="qty" sum='1'/>
+                    <field name="amount" sum='1'/>
+                    <field name="qty_not_out" sum='1'/>
                     <field name="delivery_date"/>
                     <field name="wh_out_date"/>
                     <field name="note"/>

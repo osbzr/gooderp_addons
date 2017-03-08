@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!-- 其他出库单打印 -->
+        <record id='report_wh_out' model='ir.actions.report.xml'>
+            <field name='name'>其他出库单</field>
+            <field name='model'>wh.out</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.out</field>
+            <field name='template_file'>warehouse/template/wh.out.docx</field>
+        </record>
+        <record id="warehouse_wh_out_form_print_inherit" model="ir.ui.view">
+            <field name="name">wh_out_form</field>
+            <field name="model">wh.out</field>
+            <field name='inherit_id' ref='warehouse.wh_out_form' />
+            <field name="arch" type="xml">
+                <button name="cancel_approved_order" position="after" >
+                    <button name="%(warehouse.report_wh_out)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+        <!-- 其他入库单打印 -->
+        <record id='report_wh_in' model='ir.actions.report.xml'>
+            <field name='name'>其他入库单</field>
+            <field name='model'>wh.in</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.in</field>
+            <field name='template_file'>warehouse/template/wh.in.docx</field>
+        </record>
+        <record id='wh_in_form_inherit' model='ir.ui.view'>
+            <field name='name'>wh.in.form</field>
+            <field name='model'>wh.in</field>
+            <field name='inherit_id' ref='warehouse.wh_in_form'/>
+                <field name='arch' type='xml'>
+                	<button name='cancel_approved_order' position='after'>
+                		<button name='%(warehouse.report_wh_in)d' type='action' string='打印' class='oe_highlight' states='done' />
+                	</button>
+                </field>
+        </record>
+        <!-- 调拨单打印 -->
+        <record id='report_wh_internal' model='ir.actions.report.xml'>
+            <field name='name'>调拨单</field>
+            <field name='model'>wh.internal</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.internal</field>
+            <field name='template_file'>warehouse/template/wh.internal.docx</field>
+        </record>
+        <record id='wh_internal_form_inherit' model='ir.ui.view'>
+            <field name='name'>wh.internal.form</field>
+            <field name='model'>wh.internal</field>
+            <field name='inherit_id' ref='warehouse.wh_internal_form'/>
+                <field name='arch' type='xml'>
+                	<button name='cancel_approved_order' position='after'>
+                		<button name='%(warehouse.report_wh_internal)d' type='action' string='打印' class='oe_highlight' states='done' />
+                	</button>
+                </field>
+        </record>
+        <!-- 盘点单打印 -->
+        <record id='report_wh_inventory' model='ir.actions.report.xml'>
+            <field name='name'>盘点单</field>
+            <field name='model'>wh.inventory</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.inventory</field>
+            <field name='template_file'>warehouse/template/wh.inventory.docx</field>
+        </record>
+        <record id='wh_inventory_form_inherit' model='ir.ui.view'>
+            <field name='name'>wh.inventory.form</field>
+            <field name='model'>wh.inventory</field>
+            <field name='inherit_id' ref='warehouse.wh_inventory_form'/>
+                <field name='arch' type='xml'>
+                	<button name='requery_inventory' position='after'>
+                		<button name='%(warehouse.report_wh_inventory)d' type='action' string='打印' class='oe_highlight' states='done' />
+                	</button>
+                </field>
+        </record>
+        <!-- 组装单打印 -->
+        <record id='report_wh_assembly' model='ir.actions.report.xml'>
+            <field name='name'>组装单</field>
+            <field name='model'>wh.assembly</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.assembly</field>
+            <field name='template_file'>warehouse/template/wh.assembly.docx</field>
+        </record>
+        <record id='wh_assembly_form_print_inherit' model='ir.ui.view'>
+            <field name='name'>wh.assembly.form</field>
+            <field name='model'>wh.assembly</field>
+            <field name='inherit_id' ref='warehouse.wh_assembly_form'/>
+                <field name='arch' type='xml'>
+                	<button name='update_bom' position='after'>
+                		<button name='%(warehouse.report_wh_assembly)d' type='action' string='打印' class='oe_highlight' states='done' />
+                	</button>
+                </field>
+        </record>
+        <!-- 拆卸单打印 -->
+        <record id='report_wh_disassembly' model='ir.actions.report.xml'>
+            <field name='name'>拆卸单</field>
+            <field name='model'>wh.disassembly</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>wh.disassembly</field>
+            <field name='template_file'>warehouse/template/wh.disassembly.docx</field>
+        </record>
+        <record id='wh_disassembly_form_print_inherit' model='ir.ui.view'>
+            <field name='name'>wh.disassembly.form</field>
+            <field name='model'>wh.disassembly</field>
+            <field name='inherit_id' ref='warehouse.wh_disassembly_form'/>
+                <field name='arch' type='xml'>
+                	<button name='update_bom' position='after'>
+                		<button name='%(warehouse.report_wh_disassembly)d' type='action' string='打印' class='oe_highlight' states='done' />
+                	</button>
+                </field>
+        </record>
+    </data>
+</openerp>

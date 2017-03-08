@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data noupdate="0">
-		<record id="group_all_manager" model="res.groups">
-			<field name='name'>总经理</field>
-			<field name='category_id' ref="core.Gooderp"/>
-			<field name="users" eval="[(4, ref('base.user_root'))]"/>
-		</record>
+
 	</data>
 </openerp>

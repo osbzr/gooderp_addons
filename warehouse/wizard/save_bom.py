@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields, api
+from odoo import models, fields, api
 
 
 class save_bom_memory(models.TransientModel):
     _name = 'save.bom.memory'
+    _description = u'另存为新的物料清单'
 
-    name = fields.Char(u'模板名称')
+    name = fields.Char(u'物料清单名称')
 
     @api.multi
     def save_bom(self):

@@ -19,6 +19,8 @@
                             	options="{'no_open': True, 'no_create': True}"/>
                             <field name="order_id"
                             	options="{'no_open': True, 'no_create': True}"/>
+                            <field name='warehouse_dest_id'
+                            	options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <footer>
                             <button name="button_ok" type="object" string="确定" class="oe_highlight"/>
@@ -36,7 +38,7 @@
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
-        <menuitem id="menu_buy_report" name="报表" parent="menu_buy_root" sequence="2"/>
+
         <menuitem id="menu_buy_order_track" name="采购订单跟踪表" action="buy_order_track_wizard_action"
         	parent="menu_buy_report" sequence="1"
         	groups='buy.buy_groups'/>

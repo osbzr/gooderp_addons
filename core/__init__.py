@@ -1,3 +1,3 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import core
-import warehouse
+import models

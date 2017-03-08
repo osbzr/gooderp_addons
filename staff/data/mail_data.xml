@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="0">
+		<record id="ir_cron_module_update_notification_birthday" model="ir.cron">
+			<field name="name">Update Notification Birthday</field>
+			<field eval="True" name="active" />
+			<field name="user_id" ref="base.user_root" />
+			<field name="interval_number">1</field>
+			<field name="interval_type">days</field>
+			<field name="numbercall">-1</field>
+			<field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+			<field eval="False" name="doall" />
+			<field eval="'mail.message'" name="model" />
+			<field eval="'staff_birthday_message'" name="function" />
+			<field eval="'()'" name="args" />
+			<field name="priority">5</field>
+		</record>
+		<record id="ir_cron_module_remind_contract_over_date" model="ir.cron">
+			<field name="name">Remind Contract Over Date</field>
+			<field eval="True" name="active" />
+			<field name="user_id" ref="base.user_root" />
+			<field name="interval_number">1</field>
+			<field name="interval_type">days</field>
+			<field name="numbercall">-1</field>
+			<field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+			<field eval="False" name="doall" />
+			<field eval="'staff'" name="model" />
+			<field eval="'staff_contract_over_date'" name="function" />
+			<field eval="'()'" name="args" />
+			<field name="priority">5</field>
+		</record>
+
+		<!-- Email template for contract over due date -->
+		<record id="contract_over_due_date_employee" model="mail.template">
+			<field name="name">Staff: Your Contract Over Due Date</field>
+			<field name="model_id" ref="staff.model_staff"/>
+			<field name="email_from">
+				<![CDATA[${user.company_id.name} <${(user.company_id.email)|safe}>]]>
+			</field>
+			<field name="email_to">${object.work_email|safe}</field>
+			<field name="subject">
+				<![CDATA[${object.name}：你的合同到期了]]>
+			</field>
+			<field name="body_html">
+				<![CDATA[
+					<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+						<table cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;background:inherit;color:inherit">
+							<tbody>
+								<tr>
+									<td valign="center" width="200" style="padding:10px 10px 10px 5px;font-size: 12px">
+										<img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${object.name}">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+						<p>亲爱的： ${object.name},</p>
+						<p>
+							你的合同到期了，请联系部门经理${object.parent_id.name}
+						</p>
+						<p>Best regards,</p>
+					</div>
+					<div style="padding:0px;width:600px;margin:auto; margin-top: 10px; background: #fff repeat top /100%;color:#777777">
+						<p style="font-size: 11px; margin-top: 10px;">
+							<strong>发送人： ${user.company_id.name} using <a href="www.odoo.com" style="text-decoration:none; color: #875A7B;">Odoo</a></strong>
+						</p>
+					</div>
+					]]>
+			</field>
+		</record>
+
+		<!-- Email template for contract over due date -->
+		<record id="contract_over_due_date_manager" model="mail.template">
+			<field name="name">Staff: Your Contract Over Due Date</field>
+			<field name="model_id" ref="staff.model_staff"/>
+			<field name="email_from">
+				<![CDATA[${user.company_id.name} <${(user.company_id.email)|safe}>]]>
+			</field>
+			<field name="email_to">${object.parent_id.work_email|safe}</field>
+			<field name="subject">
+				<![CDATA[员工：${object.name} 的合同到期]]>
+			</field>
+			<field name="body_html">
+				<![CDATA[
+					<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+						<table cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;background:inherit;color:inherit">
+							<tbody>
+								<tr>
+									<td valign="center" width="200" style="padding:10px 10px 10px 5px;font-size: 12px">
+										<img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${object.name}">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+						<p>亲爱的： ${object.parent_id.name},</p>
+						<p>
+							你的部门员工： ${object.name} 的合同到期了，请进行处理
+						</p>
+						<p>Best regards,</p>
+					</div>
+					<div style="padding:0px;width:600px;margin:auto; margin-top: 10px; background: #fff repeat top /100%;color:#777777">
+						<p style="font-size: 11px; margin-top: 10px;">
+							<strong>发送人： ${user.company_id.name} using <a href="www.odoo.com" style="text-decoration:none; color: #875A7B;">Odoo</a></strong>
+						</p>
+					</div>
+					]]>
+			</field>
+		</record>
+	</data>
+</openerp>

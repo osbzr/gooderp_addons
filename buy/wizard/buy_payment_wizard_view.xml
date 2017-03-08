@@ -20,6 +20,9 @@
                             	domain="[('s_category_id', '!=', False)]"
                             	options="{'no_open': True, 'no_create': True}"/>
                             <field name="order_id"
+                            	domain="[('state', '=', 'done')]"
+                            	options="{'no_open': True, 'no_create': True}"/>
+                            <field name="warehouse_dest_id"
                             	options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <footer>

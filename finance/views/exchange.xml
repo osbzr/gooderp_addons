@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+        <!--期末汇兑损益-->
+        <record id="create_exchange_wizard_form" model="ir.ui.view">
+            <field name="name">create.exchange.wizard.form</field>
+            <field name="model">create.exchange.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+                        <group>
+                            <field name="date" />
+                            <field name="period_id" />
+                        </group>
+                    </group>
+                    <footer>
+					    <button name="create_exchange"  string="期末调汇" type="object" class="oe_highlight"/>
+                         或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+            	</form>
+            </field>
+        </record>
+
+        <act_window id="create_exchange_action"
+            name='期末调汇'
+            res_model="create.exchange.wizard"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new"
+            />
+
+        <menuitem id='create_exchange_menu_finance' name="期末调汇"
+                  action='create_exchange_action' parent='finance.checkout_menu' sequence='11'/>
+
+	</data>
+</openerp>

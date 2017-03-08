@@ -7,3 +7,5 @@
 .DS_Store
 *~
 *.orig
+.vscode
+.vscode/*

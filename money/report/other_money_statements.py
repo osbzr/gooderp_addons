@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api, tools
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api, tools
 
 
 class other_money_statements_report(models.Model):
@@ -13,22 +13,25 @@ class other_money_statements_report(models.Model):
     name = fields.Char(string=u'单据编号', readonly=True)
     type = fields.Char(string=u'类别', readonly=True)
     category_id = fields.Many2one('core.category',
-                                  string=u'收支项目', readonly=True)
+                                  string=u'收支项', readonly=True)
+    bank_id = fields.Many2one('bank.account', string='账户')
     get = fields.Float(string=u'收入', readonly=True,
-                       digits_compute=dp.get_precision('Amount'))
+                       digits=dp.get_precision('Amount'))
     pay = fields.Float(string=u'支出', readonly=True,
-                       digits_compute=dp.get_precision('Amount'))
+                       digits=dp.get_precision('Amount'))
     partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
     note = fields.Char(string=u'备注', readonly=True)
 
-    def init(self, cr):
+    def init(self):
         # select other_money_order_line、other_money_order
+        cr = self._cr
         tools.drop_view_if_exists(cr, 'other_money_statements_report')
         cr.execute("""
             CREATE or REPLACE VIEW other_money_statements_report AS (
             SELECT  omol.id,
                     omo.date,
                     omo.name,
+                    omo.bank_id,
                     (CASE WHEN omo.type = 'other_get' THEN '其他收入' ELSE '其他支出' END) AS type,
                     omol.category_id,
                     (CASE WHEN omo.type = 'other_get' THEN omol.amount ELSE 0 END) AS get,
@@ -40,5 +43,3 @@ class other_money_statements_report(models.Model):
             WHERE omo.state = 'done'
             ORDER BY date)
         """)
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -10,18 +10,18 @@
                     <field name='goods' />
                     <field name='attribute' groups='goods.multi_attrs_groups' />
 
-                    <field name='goods_qty_begain' />
-                    <field name='goods_qty_out' />
-                    <field name='goods_qty_in' />
-                    <field name='goods_qty_end' />
+                    <field name='goods_qty_begain' sum="1" />
+                    <field name='goods_qty_in' sum="1" />
+                    <field name='goods_qty_out' sum="1"/>
+                    <field name='goods_qty_end' sum="1" />
 
                     <field name='uom' />
 
 					<field name='cost_begain' groups='goods.view_cost_groups'/>
-                    <field name='cost_out' groups='goods.view_cost_groups'/>
                     <field name='cost_in' groups='goods.view_cost_groups'/>
+                    <field name='cost_out' groups='goods.view_cost_groups'/>
                     <field name='cost_end' groups='goods.view_cost_groups'/>
-                    <button name="find_source_move_line" type="object" string="查看库存调拨明细" icon="terp-stock_zoom" class="oe_highlight"/>
+                    <button name="find_source_move_line" type="object" string="查看库存调拨明细" icon="fa-search" class="oe_highlight"/>
                 </tree>
             </field>
         </record>
@@ -49,12 +49,12 @@
             <field name='name'>report.stock.transceive.graph</field>
             <field name='model'>report.stock.transceive</field>
             <field name='arch' type='xml'>
-                <graph type='pivot'>
+                <pivot string="商品收发明细表">
                     <field name='goods' type='row' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
                     <field name='goods_qty_begain' type='measure' />
                     <field name='cost_begain' type='measure' groups='goods.view_cost_groups'/>
-                </graph>
+                </pivot>
             </field>
         </record>
 

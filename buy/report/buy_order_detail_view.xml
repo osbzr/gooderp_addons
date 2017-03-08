@@ -8,15 +8,15 @@
                 <tree string="采购明细表" create="false">
                 	<field name="date"/>
                 	<field name="order_name"/>
-                	<button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"/>
+                	<button name="view_detail" type="object" string="查看明细" icon="fa-search"/>
                 	<field name="type"/>
                 	<field name="partner_id"/>
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
-                    <field name="uom"/>
-                    <field name="warehouse_dest" groups='warehouse.multi_warehouse_groups'/>
+                    <field name="warehouse_dest_id" groups='warehouse.multi_warehouse_groups'/>
                     <field name="qty" sum="数量合计"/>
+                    <field name="uom"/>
                     <field name="price"/>
                     <field name="amount" sum="采购金额合计"/>
                     <field name="tax_amount" sum="税额合计" groups='buy.in_tax_groups'/>

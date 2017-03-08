@@ -1,0 +1,157 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="sell_order_1" model="sell.order">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="type">sell</field>
+            <field eval="32.0" name="discount_amount"/>
+            <field name="warehouse_id" ref="warehouse.bj_stock"/>
+            <field name="delivery_date">2016-11-02</field>
+        </record>
+        <record id="sell_order_line_1" model="sell.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.mouse"/>
+            <field name="order_id" ref="sell_order_1"/>
+            <field eval="2808.0" name="price_taxed"/>
+            <field eval="17.0" name="tax_rate"/>
+            <field eval="14400.0" name="discount_amount"/>
+            <field eval="60.0" name="quantity"/>
+        </record>
+        <record id="sell_order_2" model="sell.order">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="type">sell</field>
+            <field eval="32.0" name="discount_amount"/>
+            <field name="warehouse_id" ref="warehouse.hd_stock"/>
+            <field name="delivery_date">2016-03-02</field>
+        </record>
+        <record id="sell_order_line_2_3" model="sell.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.cable"/>
+            <field name="order_id" ref="sell_order_2"/>
+            <field eval="11.7" name="price_taxed"/>
+            <field eval="10" name="discount_amount"/>
+            <field eval="10.0" name="quantity"/>
+        </record>
+        <record id="sell_order_3" model="sell.order">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="type">sell</field>
+            <field eval="32.0" name="discount_amount"/>
+            <field name="warehouse_id" ref="warehouse.hd_stock"/>
+            <field name="delivery_date">2016-03-02</field>
+        </record>
+
+        <record id="sell_order_line_3" model="sell.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.cable"/>
+            <field name="order_id" ref="sell_order_3"/>
+            <field eval="11.7" name="price_taxed"/>
+            <field eval="10" name="discount_amount"/>
+            <field eval="10.0" name="quantity"/>
+        </record>
+        <!--销售退货定单-->
+        <record id="sell_order_return" model="sell.order">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="type">return</field>
+            <field eval="32.0" name="discount_amount"/>
+            <field name="warehouse_id" ref="warehouse.hd_stock"/>
+            <field name="delivery_date">2016-03-02</field>
+        </record>
+        <record id="sell_order_return_line" model="sell.order.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.cable"/>
+            <field name="order_id" ref="sell_order_return"/>
+            <field eval="11.7" name="price_taxed"/>
+            <field eval="10" name="discount_amount"/>
+            <field eval="10.0" name="quantity"/>
+        </record>
+        <!--价格策略-->
+        <record id="pricing_1" model="pricing">
+        	<field name="name">测试价格策略1</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_id" ref='goods.mouse'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-04-30</field>
+        	<field name="discount_rate">10</field>
+        </record>
+        <record id="pricing_2" model="pricing">
+        	<field name="name">测试价格策略2</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_category_id" ref='core.goods_category_1'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-05-30</field>
+        	<field name="discount_rate">20</field>
+        </record>
+        <record id="pricing_3" model="pricing">
+        	<field name="name">测试价格策略3</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-06-30</field>
+        	<field name="discount_rate">30</field>
+        </record>
+        <record id="pricing_4" model="pricing">
+        	<field name="name">测试价格策略4</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="goods_id" ref='goods.mouse'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-07-30</field>
+        	<field name="discount_rate">40</field>
+        </record>
+        <record id="pricing_5" model="pricing">
+        	<field name="name">测试价格策略5</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="goods_category_id" ref='core.goods_category_1'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-08-30</field>
+        	<field name="discount_rate">50</field>
+        </record>
+        <record id="pricing_6" model="pricing">
+        	<field name="name">测试价格策略6</field>
+        	<field name="warehouse_id" ref='warehouse.bj_stock'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-09-30</field>
+        	<field name="discount_rate">60</field>
+        </record>
+        <record id="pricing_7" model="pricing">
+        	<field name="name">测试价格策略7</field>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_id" ref='goods.mouse'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-10-30</field>
+        	<field name="discount_rate">70</field>
+        </record>
+        <record id="pricing_8" model="pricing">
+        	<field name="name">测试价格策略8</field>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="goods_category_id" ref='core.goods_category_1'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-11-30</field>
+        	<field name="discount_rate">80</field>
+        </record>
+        <record id="pricing_9" model="pricing">
+        	<field name="name">测试价格策略9</field>
+        	<field name="c_category_id" ref='core.customer_category_1'/>
+        	<field name="active_date">2016-04-1</field>
+        	<field name="deactive_date">2016-12-30</field>
+        	<field name="discount_rate">90</field>
+        </record>
+        <record id='report_sell_order_1' model='ir.actions.report.xml'>
+            <field name='name'>销货订单</field>
+            <field name='model'>sell.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.order</field>
+            <field name='template_file'>sell/template/sell.order.docx</field>
+            <field name='output_type'>docx</field>
+        </record>
+        <record id='report_sell_order_2' model='ir.actions.report.xml'>
+            <field name='name'>销货订单</field>
+            <field name='model'>sell.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.order.pdf</field>
+            <field name='template_file'>sell/tests/sell.order.docx</field>
+            <field name='output_type'>pdf</field>
+        </record>
+    </data>
+</openerp>

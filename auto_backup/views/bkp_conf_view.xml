@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+    <!-- db.backup -->
+        <record model="ir.ui.view" id="view_db_backup_form">
+                <field name="name">Configure Backup</field>
+                <field name="model">db.backup</field>
+                <field name="type">form</field>
+                <field name="arch" type="xml">
+                    <form string="Configure Backup">
+                        <group col="4" colspan="4">
+                            <group col="2" colspan="2">
+                                <separator col="2" string="IP Configuration"/>
+                                <newline/>
+                                <field name="host" colspan="2"/>
+                                <field name="port" />
+                            </group>
+                            <group col="2" colspan="2">
+                                <separator col="2" string="Database Configuration"/>
+                                <newline/>
+                                <field name="name" />
+                                <field name="bkp_dir" />
+                            </group>
+                        </group>
+                        <newline/>
+                        <separator string="Help" colspan="2" />
+                        <newline/>
+                        <label   align="0.0" string="This configures the scheduler for automatic backup of the given database running on given host at given port on regular intervals." />
+                        <newline/>
+                        <label  align="0.0"  string="Automatic backup of all the databases under this can be scheduled as follows: "/>
+                        <newline/>
+                         <label  align="0.0" string="1) Go to Settings / Technical / Automation / Scheduled Actions"/>
+                         <newline/>
+                         <label align="0.0"  string="2) Schedule new action(create a new record)"/>
+                         <newline/>
+                         <label align="0.0"  string="3) Set 'Object' to 'db.backup' and 'Method' to 'schedule_backup_pgtool' under page 'Technical Data'"/>
+                         <newline/>
+                         <label align="0.0"  string="4) Set other values as per your preference"/>
+                    </form>
+                </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_db_backup_tree">
+                <field name="name">Configure Backup</field>
+                <field name="model">db.backup</field>
+                <field name="type">tree</field>
+                <field name="arch" type="xml">
+                    <tree string="Configure Backup">
+                        <field name='host'/>
+                        <field name='port'/>
+                        <field name='name'/>
+                        <field name='bkp_dir'/>
+                    </tree>
+                </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_backup_conf_search">
+                <field name="name">Configure Backup</field>
+                <field name="model">db.backup</field>
+                <field name="type">search</field>
+                <field name="arch" type="xml">
+                    <search string="Configure Backup">
+                        <field name='host' select="1"/>
+                        <field name='port' select="1"/>
+                        <field name='name' select="1"/>
+                        <field name='bkp_dir' select="1"/>
+                    </search>
+                </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_db_backup_tree">
+            <field name="name">Configure Backup</field>
+            <field name="res_model">db.backup</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_backup_conf_search"/>
+        </record>
+
+        <menuitem parent="base.menu_automation" action="action_db_backup_tree" id="menu_db_backup_tree"/>
+    </data>
+</openerp>

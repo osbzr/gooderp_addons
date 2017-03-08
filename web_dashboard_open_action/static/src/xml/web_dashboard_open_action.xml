@@ -1,0 +1,7 @@
+<templates>
+    <t t-extend="DashBoard.action">
+        <t t-jquery="span.oe_minimize" t-operation="after">
+            <span class="oe_icon oe_web_dashboard_open_action fa fa-arrows-alt" />
+        </t>
+    </t>
+</templates>

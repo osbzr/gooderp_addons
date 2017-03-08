@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!--会计根菜单-->
+        <menuitem id='finance_menu' name='会计' groups='group_accountant'  web_icon="finance,static/description/finance.png"/>
+
+        <menuitem id='finance_setting_menu' name='设置' parent='finance_menu' sequence='20'/>
+
+        <menuitem id="menu_finance_setting_default" name="默认设置" parent="finance_setting_menu"
+                  action="view_finance_config_setting_action" sequence="0"/>
+
+        <menuitem action="base.action_currency_form" id="menu_action_currency_form" parent="finance_setting_menu" name='币别'
+                  sequence="13" groups="finance.group_multi_currency"/>
+
+        <!--会计科目-->
+        <record id="finance_account_tree" model="ir.ui.view">
+            <field name="name">finance.account.tree</field>
+            <field name="model">finance.account</field>
+            <field name="arch" type="xml">
+                <tree editable="top" string="科目">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="currency_id" groups='finance.group_multi_currency'/>
+                    <field name="exchange"/>
+                    <field name="costs_types"/>
+                    <field name="balance_directions"/>
+                    <field name="auxiliary_financing"/>
+                </tree>
+            </field>
+        </record>
+
+		<record id="finance_account_search" model="ir.ui.view">
+            <field name="name">finance.account.search</field>
+            <field name="model">finance.account</field>
+            <field name="arch" type="xml">
+                <search string="科目">
+                	<field name="name" filter_domain="['|', ('name', 'ilike', self),('code', 'ilike', self)]"/>
+                    <group expand="0" string="分组">
+                        <filter string="类型" domain="[]" context="{'group_by':'costs_types'}"/>
+                        <filter string="辅助核算" domain="[]" context="{'group_by':'auxiliary_financing'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="finance_account_action" model="ir.actions.act_window">
+            <field name="name">会计科目</field>
+            <field name="res_model">finance.account</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='finance_account_menu' action='finance_account_action' parent='finance_setting_menu' sequence='15'/>
+
+        <!--辅助核算-->
+        <record id="auxiliary_financing_tree" model="ir.ui.view">
+            <field name="name">auxiliary.financing.tree</field>
+            <field name="model">auxiliary.financing</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" string="辅助核算">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+		<record id="auxiliary_financing_search" model="ir.ui.view">
+            <field name="name">auxiliary.financing.search</field>
+            <field name="model">auxiliary.financing</field>
+            <field name="arch" type="xml">
+                <search string="辅助核算">
+                	<field name="name" filter_domain="['|', ('name', 'ilike', self),('code', 'ilike', self)]"/>
+                    <group expand="0" string="分组">
+                        <filter string="分类" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="auxiliary_financing_action" model="ir.actions.act_window">
+            <field name="name">辅助核算</field>
+            <field name="res_model">auxiliary.financing</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='25'/>       
+
+        <!--会计期间-->
+        <record id="period_tree" model="ir.ui.view">
+            <field name="name">finance.period.tree</field>
+            <field name="model">finance.period</field>
+            <field name="arch" type="xml">
+                <tree editable="TOP" delete='false' string="会计期间">
+                    <field name="name"/>
+                    <field name="year" attrs="{'readonly': [('is_closed','=',True)]}"/>
+                    <field name="month" attrs="{'readonly': [('is_closed','=',True)]}"/>
+                    <field name="is_closed" readonly='1'/>
+                </tree>
+            </field>
+        </record>
+        <record id="finance_period_search" model="ir.ui.view">
+            <field name="name">finance.period.search</field>
+            <field name="model">finance.period</field>
+            <field name="arch" type="xml">
+                <search string="会计期间">
+                	<filter name='unclosed' string='未结账' domain="[('is_closed', '=', False)]"/>
+                    <filter name='closed' string='已结账' domain="[('is_closed', '=', True)]"/>
+                    <group expand="0" string="分组">
+                        <filter string="会计年度" domain="[]" context="{'group_by':'year'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="period_action" model="ir.actions.act_window">
+            <field name="name">会计期间</field>
+            <field name="res_model">finance.period</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+        <menuitem id='period_menu' action='period_action' parent='finance_setting_menu' sequence='10'/>
+    </data>
+</openerp>

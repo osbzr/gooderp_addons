@@ -1,17 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data noupdate="0">
-		<!--category-->
+		<!--
+		为了满足用户界面的权限设置需要，将用户组分成这些功能类别 
+		-->
+		<!-- 通用，所有GoodERP模块使用这个类别 -->
 		<record model="ir.module.category" id="Gooderp">
 			<field name="name">Gooderp</field>
+			<field name="sequence">1</field>
+		</record>
+		<!-- 以下为功能模块相关，给每个主菜单设置一个组便于理解 -->
+		<record model="ir.module.category" id="good_buy">
+			<field name="name">采购</field>
+			<field name="sequence">2</field>
+		</record>
+		<record model="ir.module.category" id="good_sell">
+			<field name="name">销售</field>
+			<field name="sequence">3</field>
+		</record>
+		<record model="ir.module.category" id="good_warehouse">
+			<field name="name">仓库</field>
+			<field name="sequence">4</field>
+		</record>
+		<record model="ir.module.category" id="good_finance">
+			<field name="name">会计</field>
+			<field name="sequence">5</field>
+		</record>
+		<record model="ir.module.category" id="good_money">
+			<field name="name">资金</field>
+			<field name="sequence">6</field>
+		</record>
+		<record model="ir.module.category" id="good_staff">
+			<field name="name">人事</field>
+			<field name="sequence">7</field>
+		</record>
+		<record model="ir.module.category" id="good_task">
+			<field name="name">任务</field>
+			<field name="sequence">8</field>
+		</record>
+		<record model="ir.module.category" id="good_crm">
+			<field name="name">商机</field>
+			<field name="sequence">9</field>
+		</record>
+		<!--用户组-->
+		<record id='master_groups' model='res.groups'>
+			<field name='name'>配置</field>
+			<field name='category_id' ref="Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="comment">用于显示【配置】根菜单。建议分配给公司IT部门</field>
+		</record>
+		<record id="home_page.group_all_manager" model="res.groups">
+			<field name='name'>总经理</field>
+			<field name='category_id' ref="core.Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="comment">用于显示【首页】根菜单</field>
+		</record>
+		<record id="home_page.group_mail" model="res.groups">
+			<field name='name'>查看消息</field>
+			<field name='category_id' ref="core.Gooderp"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="comment">用于显示【消息】根菜单</field>
 		</record>
 		<record id='settle_mode_groups' model='res.groups'>
 			<field name='name'>管理结算方式</field>
-			<field name='category_id' ref="Gooderp"/>
+			<field name='category_id' ref="good_money"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="comment">用于显示结算方式和结算编号</field>
 		</record>
 		<record id='service_groups' model='res.groups'>
-			<field name='name'>管理服务</field>
-			<field name='category_id' ref="Gooderp"/>
+			<field name='name'>管理收支项</field>
+			<field name='category_id' ref="good_money"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="comment">用于显示收支项类产品功能，服务类产品不管理库存数量</field>
 		</record>
-	</data>
+		<record id="nobody_can_see" model="res.groups" >
+			<field name="name">彻底隐藏</field>
+			<field name='category_id' ref="core.Gooderp"/>
+			<field name="comment">用来隐藏管理员也没必要看到的菜单等...(使用时请慎重)!</field>
+		</record>
+		<record id="base.group_user" model="res.groups">
+			 <field name="category_id" ref="base.module_category_usability"/>
+		</record>
+    </data>
 </openerp>

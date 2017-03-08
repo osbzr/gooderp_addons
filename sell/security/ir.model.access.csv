@@ -7,3 +7,6 @@ access_sell_summary_goods,access_sell_summary_goods,model_sell_summary_goods,,1,
 access_sell_summary_partner,access_sell_summary_partner,model_sell_summary_partner,,1,1,1,1
 access_sell_summary_staff,access_sell_summary_staff,model_sell_summary_staff,,1,1,1,1
 access_sell_top_ten,access_sell_top_ten,model_sell_top_ten,,1,1,1,1
+access_sell_order_detail,access_sell_order_detail,model_sell_order_detail,,1,1,1,1
+access_sell_adjust,access_sell_adjust,model_sell_adjust,,1,1,1,1
+access_sell_adjust_line,access_sell_adjust_line,model_sell_adjust_line,,1,1,1,1

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_finance_config" model="ir.ui.view">
+            <field name="name">finance_settings</field>
+            <field name="model">finance.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Configure finance" class="oe_form_configuration">
+                    <header>
+                        <button string="应用" type="object" name="execute" class="oe_highlight"/>
+                        或
+                        <button string="取消" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <div id="main" position="inside">
+                        <group string="凭证设置">
+                            <label for="id" string="凭证日期"/>
+                            <div>
+                                <label for="default_voucher_date"/>
+                                <field name="default_voucher_date" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="自动重置凭证号"/>
+                            <div>
+                                <label for="default_auto_reset"/>
+                                <field name="default_auto_reset" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="凭证号重置间隔"/>
+                            <div>
+                                <label for="default_reset_period"/>
+                                <field name="default_reset_period" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="重置后起始数字"/>
+                            <div>
+                                <label for="default_reset_init_number"/>
+                                <field name="default_reset_init_number" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group string="资产负债表 利润表">
+                            <label for="id" string="未结账期间"/>
+                            <div>
+                                <label for="default_period_domain"/>
+                                <field name="default_period_domain" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_finance_config_setting_action" model="ir.actions.act_window">
+            <field name="name">会计设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">finance.config.settings</field>
+            <field name="view_id" ref="view_finance_config"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+
+    </data>
+</openerp>

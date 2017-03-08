@@ -28,6 +28,22 @@
             <field name='year'>2016</field>
             <field name='month'>2</field>
         </record>
+        <record id='period_201603' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>3</field>
+        </record>
+        <record id='period_201604' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>4</field>
+        </record>
+        <record id='period_201605' model='finance.period'>
+            <field name='year'>2016</field>
+            <field name='month'>5</field>
+        </record>
+        <!--<record id='period_201611' model='finance.period'>-->
+            <!--<field name='year'>2016</field>-->
+            <!--<field name='month'>11</field>-->
+        <!--</record>-->
         <!--凭证-->
         <!-- 2015年12月的凭证 -->
         <record id='voucher_12' model='voucher'>
@@ -37,13 +53,13 @@
             <field name='voucher_id' ref='finance.voucher_12'/>
             <field name='name'>股东投资</field>
             <field name='account_id' ref='finance.account_fund'/>
-            <field name='debit'>1000000</field>
+            <field name='credit'>1000000</field>
         </record>
         <record id='voucher_line_12_credit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_12'/>
             <field name='name'>股东投资</field>
             <field name='account_id' ref='finance.account_bank'/>
-            <field name='credit'>1000000</field>
+            <field name='debit'>1000000</field>
         </record>
         <!-- 2015年12月的收入凭证 -->
         <record id='voucher_12_1' model='voucher'>
@@ -112,17 +128,7 @@
         <record id='voucher_line_4_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_4'/>
             <field name='name'>开发票</field>
-            <field name='account_id' ref='finance.account_ap'/>
-            <field name='debit'>15000</field>
-        </record>
-        <!-- 2016年2月的凭证-->
-        <record id='voucher_4' model='voucher'>
-            <field name='date'>2016-02-10</field> 
-        </record>
-        <record id='voucher_line_4_debit' model='voucher.line'>
-            <field name='voucher_id' ref='finance.voucher_4'/>
-            <field name='name'>开发票</field>
-            <field name='account_id' ref='finance.account_ap'/>
+            <field name='account_id' ref='finance.account_ar'/>
             <field name='debit'>15000</field>
         </record>
         <record id='voucher_line_4_credit' model='voucher.line'>
@@ -138,7 +144,7 @@
         <record id='voucher_line_14_12_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_14_12'/>
             <field name='name'>开发票</field>
-            <field name='account_id' ref='finance.account_ap'/>
+            <field name='account_id' ref='finance.account_ar'/>
             <field name='debit'>15000</field>
         </record>
         <record id='voucher_line_14_12_credit' model='voucher.line'>
@@ -153,18 +159,7 @@
             <field name="output_tax_rate">17</field>
         </record>
 
-        <record id='account_other_in' model='finance.account'>
-            <field name='code'>12334</field>
-            <field name='name'>其他应收款</field>
-            <field name='costs_types'>assets</field>
-            <field name='balance_directions'>in</field>
-        </record>
-        <record id='account_other_out' model='finance.account'>
-            <field name='code'>12334</field>
-            <field name='name'>其他应付款</field>
-            <field name='costs_types'>assets</field>
-            <field name='balance_directions'>in</field>
-        </record>
+
         <record id="core.customer_category_1" model="core.category">
             <field name="account_id" ref="finance.account_ar"/>
         </record>
@@ -179,16 +174,19 @@
           <field name="account_id" ref="finance.account_ap"/>
         </record>
         <record id="core.cat_freight" model="core.category">
-           <field name="account_id" ref="finance.account_other_in"/>
+           <field name="account_id" ref="finance.bs_8"/>
         </record>
         <record id="core.cat_consult" model="core.category">
-           <field name="account_id" ref="finance.account_other_out"/>
+           <field name="account_id" ref="finance.bs_9"/>
         </record>
         <record id="core.alipay" model="bank.account">
              <field name="account_id" ref="finance.account_bank"/>
         </record>
         <record id="core.comm" model="bank.account">
            <field name="account_id" ref="finance.account_bank"/>
+        </record>
+        <record id="core.goods_category_1" model="core.category">
+            <field name="account_id" ref="finance.account_goods"/>
         </record>
     </data>
 </openerp>

@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--资金转账单tree-->
+        <record id="money_transfer_order_tree" model="ir.ui.view">
+            <field name="name">money.transfer.order.tree</field>
+            <field name="model">money.transfer.order</field>
+            <field name="arch" type="xml">
+                <tree string="资金转账单">
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--资金转账单form-->
+        <record id="money_transfer_order_form" model="ir.ui.view">
+            <field name="name">money.transfer.order.form</field>
+            <field name="model">money.transfer.order</field>
+            <field name="arch" type="xml">
+                <form string="资金转账单">
+                    <header>
+                        <button name="money_transfer_done" states="draft" string="审核" type="object"
+                                class="oe_highlight"/>
+                        <button name="money_transfer_draft" states="done" string="反审核" type="object"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" class="oe_inline" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date"/>
+                                <field name="voucher_id"/>
+                            </group>
+                        </group>
+                        <field name="line_ids">
+                            <tree string="Money Transfer Order Lines" editable="bottom">
+                                <field name="out_bank_id"/>
+                                <field name="in_bank_id"/>
+                                <field name="currency_amount" sum="外币合计"
+                                	 groups='finance.group_multi_currency'/>
+                                <field name="amount" sum="合计"/>
+                                <field name="mode_id" groups='core.settle_mode_groups'/>
+                                <field name="number" groups='core.settle_mode_groups'/>
+                                <field name="note"/>
+                            </tree>
+                        </field>
+                        <group>
+                            <group>
+                                <field name="discount_amount"/>
+                            </group>
+                            <group>
+                                <field name="discount_account_id"
+                                       attrs="{'required': [('discount_amount', '!=', 0)]}"
+                                       />
+                            </group>
+                        </group>
+                        <field name="note"  placeholder="备注信息……"/>
+                        <group>
+                            <group>
+                                <field name="create_uid" string="制单人" readonly="1"/>
+                                <field name="create_date" string="录单时间" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="write_uid" string="最后修改人" readonly="1"/>
+                                <field name="write_date" string="最后修改时间" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--资金转账单 search 视图-->
+        <record id="money_transfer_order_search" model="ir.ui.view">
+            <field name="name">money.transfer.order.search</field>
+            <field name="model">money.transfer.order</field>
+            <field name="arch" type="xml">
+                <search string="资金转账单">
+                    <field name="name"/>
+                    <field name="create_uid" string='制单人'/>
+                    <field name="state"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- 资金转账单action -->
+        <record id="money_transfer_order_action" model="ir.actions.act_window">
+            <field name="name">资金转账单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">money.transfer.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    点击创建资金转账单
+                </p>
+            </field>
+        </record>
+
+        <!-- 资金转账单menu -->
+        <menuitem id="menu_money_transfer_order_action" action="money_transfer_order_action" parent="menu_money_manage"
+                  sequence="7"/>
+    </data>
+</openerp>
+	

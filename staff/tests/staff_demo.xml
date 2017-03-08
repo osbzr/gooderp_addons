@@ -9,6 +9,13 @@
         <!--员工-->
         <record id='staff_1' model='staff'>
             <field name='name'>Admin</field>
+            <field name='identification_id'>12345678</field>
+            <field name='work_phone'>12345678901</field>
+        </record>
+        <record id="lili" model="staff">
+        	<field name="name">丽丽</field>
+            <field name='identification_id'>87654321</field>
+            <field name='work_phone'>18823456789</field>
         </record>
         <!--部门-->
         <record id='department_1' model='staff.department'>

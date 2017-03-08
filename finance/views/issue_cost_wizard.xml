@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="month_product_cost_tree" model="ir.ui.view">
+            <field name="name">month.product.cost.tree</field>
+            <field name="model">month.product.cost</field>
+            <field name="arch" type="xml">
+                <tree string="产品"  edit="false">
+                    <field name="goods_id"/>
+                    <field name="period_id"/>
+                    <field name="period_begin_qty" sum="1"/>
+                    <field name="period_begin_cost" sum="1"/>
+                    <field name="current_period_out_qty" sum="1"/>
+                    <field name="current_period_out_cost" sum="1"/>
+                    <field name="current_period_in_qty" sum="1"/>
+                    <field name="current_period_in_cost" sum="1"/>
+                    <field name="current_period_remaining_qty" sum="1"/>
+                    <field name = "current_period_remaining_cost" sum="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="month_product_cost_search" model="ir.ui.view">
+            <field name="name">发出成本</field>
+            <field name="model">month.product.cost</field>
+            <field name="arch" type="xml">
+                <search string="Search Voucher">
+                    <field name='goods_id' filter_domain="[('name','ilike',self)]"/>
+                    <field name='period_id'/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
+                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="month_product_cost_action" model="ir.actions.act_window">
+            <field name="name">发出成本</field>
+            <field name="res_model">month.product.cost</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="target"></field>
+        </record>
+        <menuitem id='month_product_cost_menu' action='month_product_cost_action' parent='voucher_books_menu' sequence='40'/>
+    </data>
+</openerp>

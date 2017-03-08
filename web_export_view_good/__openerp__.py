@@ -21,20 +21,21 @@
 
 {
     'name': 'Export Current View',
-    'version': '8.0.1.2.0',
+    'version': '11.11',
     'category': 'Web',
     'author': "Agile Business Group,Odoo Community Association (OCA)",
     'website': 'http://www.agilebg.com',
     'license': 'AGPL-3',
-    'depends': [
-        'web', 'core',
+    'depends': ['base',
+        'web',
+        'backend_theme',
     ],
     'data': [
-        'view/web_export_view.xml',
+        'views/web_export_view.xml',
         'security/ir.model.access.csv',
     ],
     'qweb': [
-        'static/src/xml/web_export_view_template.xml',
+        'static/src/xml/*.xml',
     ],
     'installable': True,
     'auto_install': False,

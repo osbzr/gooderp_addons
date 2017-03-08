@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_invoice(TransactionCase):
@@ -44,7 +44,7 @@ class test_invoice(TransactionCase):
         # 客户的应收余额
         self.assertEqual(self.partner.receivable, 10.0)
         # 已审核的发票应该不可删除
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             invoice.unlink()
         # 发票取消审核
         invoice.money_invoice_draft()
@@ -61,3 +61,67 @@ class test_invoice(TransactionCase):
                                                         'amount': 10.0})
         invoice_buy.money_invoice_done()
         invoice_buy.money_invoice_draft()
+
+    def test_money_invoice_draft_voucher_done(self):
+        '''发票生成的凭证已审核时，反审核发票'''
+        supplier= self.env.ref('core.lenovo')
+        supplier.s_category_id.account_id=self.env.ref("finance.account_ap").id
+        invoice_buy = self.env['money.invoice'].create({'name': 'buy_invoice', 'date': "2016-02-20",
+                                                        'partner_id':supplier.id,
+                                                        'category_id': self.env.ref('money.core_category_purchase').id,
+                                                        'amount': 10.0})
+        invoice_buy.money_invoice_done()
+        invoice_buy.money_invoice_draft()
+
+    def test_money_invoice_voucher_line_currency(self):
+        ''' 创建凭证行时，invoice与公司的币别不同的情况 '''
+        invoice = self.env['money.invoice'].create({
+                                                    'name': 'invoice', 'date': "2016-02-20",
+                                                    'partner_id': self.env.ref('core.jd').id,
+                                                    'category_id': self.env.ref('money.core_category_sale').id,
+                                                    'amount': 10.0,
+                                                    'currency_id': self.env.ref('base.USD').id})
+        invoice.money_invoice_done()
+
+    def test_money_invoice_company_no_tax_account(self):
+        ''' 创建 进项税行 公司 进项税科目 未设置 '''
+        # 进项税行 import_tax_account
+        buy_invoice = self.env['money.invoice'].create({
+                                                    'name': 'invoice', 'date': "2016-02-20",
+                                                    'partner_id': self.env.ref('core.lenovo').id,
+                                                    'category_id': self.env.ref('money.core_category_purchase').id,
+                                                    'amount': 10.0,
+                                                    'tax_amount': 11.7})
+        self.env.user.company_id.import_tax_account = False
+        with self.assertRaises(UserError):
+            buy_invoice.money_invoice_done()
+        # 销项税行 output_tax_account
+        sell_invoice = self.env['money.invoice'].create({
+                                                    'name': 'invoice', 'date': "2016-02-20",
+                                                    'partner_id': self.env.ref('core.jd').id,
+                                                    'category_id': self.env.ref('money.core_category_sale').id,
+                                                    'amount': 10.0,
+                                                    'tax_amount':11.7})
+        self.env.user.company_id.output_tax_account = False
+        with self.assertRaises(UserError):
+            sell_invoice.money_invoice_done()
+
+    def test_money_invoice_name_get(self):
+        ''' 测试 money invoice name_get 方法 '''
+        inv = self.env['money.invoice'].create({
+                                                'name': 'invoice', 'date': "2016-02-20",
+                                                'partner_id': self.env.ref('core.jd').id,
+                                                'category_id': self.env.ref('money.core_category_sale').id,
+                                                'amount': 10.0,
+                                                'tax_amount':11.7
+                                                })
+        # 发票号不存在取 订单编号
+        inv_name = inv.name_get()
+        real_name = '%s' % (inv.name)
+        self.assertTrue(inv_name[0][1] == real_name)
+
+        # 发票号存在取 发票号
+        inv.bill_number = '201600001'
+        inv_name_bill = inv.name_get()
+        real_name_bill = '%s' % (inv.bill_number)
+        self.assertTrue(inv_name_bill[0][1] == real_name_bill)

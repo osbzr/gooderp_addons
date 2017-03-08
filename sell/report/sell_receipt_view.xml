@@ -8,11 +8,12 @@
                 <tree string="销售收款一览表" create="false">
                 	<field name="c_category_id"/>
                 	<field name="partner_id"/>
-                	<button name="view_detail" type="object" string="查看明细" icon="terp-stock_zoom"
+                	<button name="view_detail" type="object" string="查看明细" icon="fa-search"
                 		attrs="{'invisible': [('partner_id', '=', False)]}"/>
                 	<field name="staff_id"/>
                 	<field name="type"/>
                     <field name="date"/>
+                    <field name="warehouse_id"/>
                     <field name="order_name"/>
                     <field name="sell_amount" sum="销售金额合计"/>
                     <field name="discount_amount" sum="优惠金额合计" groups='sell.sell_discount_groups'/>
@@ -20,7 +21,7 @@
                     <field name="partner_cost" sum="客户承担费用合计"/>
                     <field name="receipt" sum="已收款合计"/>
                     <field name="balance" sum="应收款余额合计"/>
-                    <field name="receipt_rate"/>
+                    <field name="receipt_rate" avg='1'/>
                     <field name="note"/>
                 </tree>
             </field>

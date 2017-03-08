@@ -4,28 +4,33 @@
 		<!--添加管理采购组-->
 		<record id="group_buy" model="res.groups">
 			<field name='name'>采购</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_buy"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+			<field name="implied_ids" eval="[(4, ref('goods.view_cost_groups'))]"/>
 		</record>
 		<!--添加管理采购订单组-->
 		<record id='buy_groups' model='res.groups'>
 			<field name='name'>管理采购订单</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_buy"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理采购订单行上的折扣组-->
 		<record id='buy_line_discount_groups' model='res.groups'>
 			<field name='name'>管理采购行上的折扣</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_buy"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理采购订单的折扣组-->
 		<record id='buy_discount_groups' model='res.groups'>
 			<field name='name'>管理采购单的折扣</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_buy"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 		<!--添加管理进项税组-->
 		<record id='in_tax_groups' model='res.groups'>
 			<field name='name'>管理进项税</field>
-			<field name='category_id' ref="core.Gooderp"/>
+			<field name='category_id' ref="core.good_buy"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
 
 	</data>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!-- 收款单打印 -->
+        <record id='report_money_order_get' model='ir.actions.report.xml'>
+            <field name='name'>收款单</field>
+            <field name='model'>money.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>money.order.get</field>
+            <field name='template_file'>money/template/money.order.get.docx</field>
+        </record>
+        <record id="money_order_form_print_inherit_get" model="ir.ui.view">
+            <field name="name">money.order.form</field>
+            <field name="model">money.order</field>
+            <field name='inherit_id' ref='money.money_order_form'/>
+            <field name="arch" type="xml">
+                <button name="money_order_draft" position="after">
+                	<field name="type" invisible="1"/>
+                    <button name="%(money.report_money_order_get)d" string="打印" type="action"
+                            attrs="{'invisible': [('type','=','pay')]}"/>
+                </button>
+            </field>
+        </record>
+
+        <!-- 付款单打印 -->
+        <record id='report_money_order_pay' model='ir.actions.report.xml'>
+            <field name='name'>付款单</field>
+            <field name='model'>money.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>money.order.pay</field>
+            <field name='template_file'>money/template/money.order.pay.docx</field>
+        </record>
+        <record id="money_order_form_print_inherit_pay" model="ir.ui.view">
+            <field name="name">money.order.form</field>
+            <field name="model">money.order</field>
+            <field name='inherit_id' ref='money.money_order_form'/>
+            <field name="arch" type="xml">
+                <button name="money_order_draft" position="after">
+                	<field name="type" invisible="1"/>
+                    <button name="%(money.report_money_order_pay)d" string="打印" type="action"
+                    	attrs="{'invisible': [('type','=','get')]}"/>
+                </button>
+            </field>
+        </record>
+
+		<!-- 核销单打印：预收冲应收 -->
+        <record id='reconcile_order_adv_pay_to_get' model='ir.actions.report.xml'>
+            <field name='name'>核销单:预收冲应收</field>
+            <field name='model'>reconcile.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>reconcile.order.1</field>
+            <field name='template_file'>money/template/reconcile.order.advance.pay.docx</field>
+        </record>
+        <record id="transfer_order_form_print_inherit_adv_pay" model="ir.ui.view">
+            <field name="name">reconcile.order.form</field>
+            <field name="model">reconcile.order</field>
+            <field name='inherit_id' ref='money.reconcile_order_form'/>
+            <field name="arch" type="xml">
+                <button name="reconcile_order_done" position="after">
+                	<field name="business_type" invisible="1"/>
+                    <button name="%(money.reconcile_order_adv_pay_to_get)d" string="打印" type="action"
+                    	attrs="{'invisible': [('business_type','!=','adv_pay_to_get')]}"/>
+                </button>
+            </field>
+        </record>
+
+        <!-- 核销单打印：预付冲应付 -->
+        <record id='reconcile_order_adv_get_to_pay' model='ir.actions.report.xml'>
+            <field name='name'>核销单:预付冲应付</field>
+            <field name='model'>reconcile.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>reconcile.order.2</field>
+            <field name='template_file'>money/template/reconcile.order.advance.get.docx</field>
+        </record>
+        <record id="transfer_order_form_print_inherit_adv_get" model="ir.ui.view">
+            <field name="name">reconcile.order.form</field>
+            <field name="model">reconcile.order</field>
+            <field name='inherit_id' ref='money.reconcile_order_form'/>
+            <field name="arch" type="xml">
+                <button name="reconcile_order_done" position="after">
+                	<field name="business_type" invisible="1"/>
+                    <button name="%(money.reconcile_order_adv_get_to_pay)d" string="打印" type="action"
+                    	attrs="{'invisible': [('business_type','!=','adv_get_to_pay')]}"/>
+                </button>
+            </field>
+        </record>
+
+        <!-- 核销单打印：应收冲应付 -->
+        <record id='reconcile_order_get_to_pay' model='ir.actions.report.xml'>
+            <field name='name'>核销单:应收冲应付</field>
+            <field name='model'>reconcile.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>reconcile.order.3</field>
+            <field name='template_file'>money/template/reconcile.order.getTopay.docx</field>
+        </record>
+        <record id="transfer_order_form_print_inherit_get_to_pay" model="ir.ui.view">
+            <field name="name">reconcile.order.form</field>
+            <field name="model">reconcile.order</field>
+            <field name='inherit_id' ref='money.reconcile_order_form'/>
+            <field name="arch" type="xml">
+                <button name="reconcile_order_done" position="after">
+                	<field name="business_type" invisible="1"/>
+                    <button name="%(money.reconcile_order_get_to_pay)d" string="打印" type="action"
+                    	attrs="{'invisible': [('business_type','!=','get_to_pay')]}"/>
+                </button>
+            </field>
+        </record>
+
+        <!-- 核销单打印：应收转应收 -->
+        <record id='reconcile_order_get_to_get' model='ir.actions.report.xml'>
+            <field name='name'>核销单:应收转应收</field>
+            <field name='model'>reconcile.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>reconcile.order.4</field>
+            <field name='template_file'>money/template/reconcile.order.getToget.docx</field>
+        </record>
+        <record id="transfer_order_form_print_inherit_get_to_get" model="ir.ui.view">
+            <field name="name">reconcile.order.form</field>
+            <field name="model">reconcile.order</field>
+            <field name='inherit_id' ref='money.reconcile_order_form'/>
+            <field name="arch" type="xml">
+                <button name="reconcile_order_done" position="after">
+                	<field name="business_type" invisible="1"/>
+                    <button name="%(money.reconcile_order_get_to_get)d" string="打印" type="action"
+                    	attrs="{'invisible': [('business_type','!=','get_to_get')]}"/>
+                </button>
+            </field>
+        </record>
+
+        <!-- 核销单打印：应付转应付 -->
+        <record id='reconcile_order_pay_to_pay' model='ir.actions.report.xml'>
+            <field name='name'>核销单:应付转应付</field>
+            <field name='model'>reconcile.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>reconcile.order.5</field>
+            <field name='template_file'>money/template/reconcile.order.payTopay.docx</field>
+        </record>
+        <record id="transfer_order_form_print_inherit_pay_to_pay" model="ir.ui.view">
+            <field name="name">reconcile.order.form</field>
+            <field name="model">reconcile.order</field>
+            <field name='inherit_id' ref='money.reconcile_order_form'/>
+            <field name="arch" type="xml">
+                <button name="reconcile_order_done" position="after">
+                	<field name="business_type" invisible="1"/>
+                    <button name="%(money.reconcile_order_pay_to_pay)d" string="打印" type="action"
+                    	attrs="{'invisible': [('business_type','!=','pay_to_pay')]}"/>
+                </button>
+            </field>
+        </record>
+
+        <!-- 其他收支单打印 -->
+        <record id='other_money_order_print' model='ir.actions.report.xml'>
+            <field name='name'>其他收支单</field>
+            <field name='model'>other.money.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>other.money.order</field>
+            <field name='template_file'>money/template/other.money.order.docx</field>
+        </record>
+        <record id="other_money_order_form_print_inherit" model="ir.ui.view">
+            <field name="name">other.money.order.form</field>
+            <field name="model">other.money.order</field>
+            <field name='inherit_id' ref='money.other_money_order_form'/>
+            <field name="arch" type="xml">
+                <button name="other_money_draft" position="after">
+                    <button name="%(money.other_money_order_print)d" string="打印" type="action"/>
+                </button>
+            </field>
+        </record>
+
+        <!-- 资金转账单打印 -->
+        <record id='money_transfer_order_print' model='ir.actions.report.xml'>
+            <field name='name'>资金转账单</field>
+            <field name='model'>money.transfer.order</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>money.transfer.order</field>
+            <field name='template_file'>money/template/money.transfer.order.docx</field>
+        </record>
+        <record id="money_transfer_order_form_print_inherit" model="ir.ui.view">
+            <field name="name">money.transfer.order.form</field>
+            <field name="model">money.transfer.order</field>
+            <field name='inherit_id' ref='money.money_transfer_order_form'/>
+            <field name="arch" type="xml">
+                <button name="money_transfer_draft" position="after">
+                    <button name="%(money.money_transfer_order_print)d" string="打印" type="action"/>
+                </button>
+            </field>
+        </record>
+    </data>
+</openerp>

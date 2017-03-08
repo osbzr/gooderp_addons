@@ -47,6 +47,7 @@
 }
 
 .stock-query-search-list > ul {
+    z-index: 10;
     position: absolute;
     right: 0px;
     width: 240px;

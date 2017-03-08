@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <!-- 固定资产 -->
+        <record id="asset_car" model="asset">
+        	<field name="code">001</field>
+            <field name="date">2016-04-01</field>
+            <field name="name">汽车</field>
+            <field name="cost">1000</field>
+            <field name="tax">170</field>
+            <field name="depreciation_number">48</field>
+            <field name="depreciation_value">50</field>
+            <field name="depreciation_previous">100</field>
+            <field name="partner_id" ref="core.lenovo"/>
+            <field name="category_id" ref="asset.transport_tool"/>
+            <field name='account_accumulated_depreciation' ref='finance.small_business_chart1602'/>
+            <field name='account_asset' ref='asset.small_business_chart160101'/>
+            <field name='account_depreciation' ref='asset.small_business_chart410101'/>
+            <field name='account_credit' ref='finance.account_ap'/>
+        </record>
+    </data>
+</openerp>

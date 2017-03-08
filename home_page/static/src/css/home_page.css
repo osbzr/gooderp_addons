@@ -1,1 +1,47 @@
-@charset "utf-8";
+.openerp .btn-primary-outline, .btn-primary-outline.disabled, .btn-primary-outline.disabled.active, .btn-primary-outline.disabled.focus, .btn-primary-outline.disabled:active, .btn-primary-outline.disabled:focus, .btn-primary-outline.disabled:hover, .btn-primary-outline[disabled], .btn-primary-outline[disabled].active, .btn-primary-outline[disabled].focus, .btn-primary-outline[disabled]:active, .btn-primary-outline[disabled]:focus, .btn-primary-outline[disabled]:hover, fieldset[disabled] .btn-primary-outline, fieldset[disabled] .btn-primary-outline.active, fieldset[disabled] .btn-primary-outline.focus, fieldset[disabled] .btn-primary-outline:active, fieldset[disabled] .btn-primary-outline:focus, fieldset[disabled] .btn-primary-outline:hover {
+    border-color: #138de6
+}
+
+.openerp .btn-default-outline .badge {
+    color: #fff;
+    background-color: #333
+}
+
+.openerp .btn-primary-outline {
+    color: #138de6;
+    background-color: transparent
+}
+
+.openerp .btn-primary-outline.active, .btn-primary-outline.focus, .btn-primary-outline:active, .btn-primary-outline:focus, .open > .dropdown-toggle.btn-primary-outline {
+    color: #fff;
+    background-color: #138de6;
+    -webkit-box-shadow: none;
+
+}
+
+.openerp .btn-success-outline, .btn-success-outline.disabled, .btn-success-outline.disabled.active, .btn-success-outline.disabled.focus, .btn-success-outline.disabled:active, .btn-success-outline.disabled:focus, .btn-success-outline.disabled:hover, .btn-success-outline[disabled], .btn-success-outline[disabled].active, .btn-success-outline[disabled].focus, .btn-success-outline[disabled]:active, .btn-success-outline[disabled]:focus, .btn-success-outline[disabled]:hover, fieldset[disabled] .btn-success-outline, fieldset[disabled] .btn-success-outline.active, fieldset[disabled] .btn-success-outline.focus, fieldset[disabled] .btn-success-outline:active, fieldset[disabled] .btn-success-outline:focus, fieldset[disabled] .btn-success-outline:hover {
+    border-color: #4cae4c
+}
+
+.openerp .btn-pill {
+    padding-left: 1.25em;
+    padding-right: 1.25em;
+    border-radius: 1000em
+}
+
+
+.m-b-lg, .m-y-lg {
+    margin-bottom: 60px !important
+}
+
+
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+    display: block
+}
+
+.button-circle {width:30px;height:30px;border-radius:100px;}
+.gooderp-colour { background-color:#9f5000;color: white}
+
+.gooderp-title {
+  color: #337ab7;
+}

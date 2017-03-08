@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.tests.common import TransactionCase
-from openerp.exceptions import except_orm
+from odoo.tests.common import TransactionCase
+from odoo.exceptions import UserError
 
 
 class test_supplier_statements(TransactionCase):
@@ -14,15 +14,18 @@ class test_supplier_statements(TransactionCase):
             'partner_id': self.env.ref('core.lenovo').id,
             'from_date': '2016-01-01',
             'to_date': '2016-11-01'}).with_context({'default_supplier': True})
-        # 创建期初余额记录
-        self.env['go.live.order'].create({
-            'partner_id': self.env.ref('core.lenovo').id,
-            'balance': 200.0})
+
+        # 供应商期初余额，查看原始单据应报错
+        self.env.ref('core.lenovo').payable_init = 1000
+        partner = self.env['partner'].search([('id', '=', self.env.ref('core.lenovo').id)])
+
         # 创建付款记录
         money_get = self.env.ref('money.get_40000')
         money_get.money_order_done()
         money_order = self.env.ref('money.pay_2000')
         money_order.money_order_done()
+        # 给buy_order_1中的产品“键盘”的分类设置科目
+        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         # 创建采购入库单记录
         buy_order = self.env.ref('buy.buy_order_1')
         buy_order.bank_account_id = False
@@ -48,9 +51,9 @@ class test_supplier_statements(TransactionCase):
         '''供应商对账单向导'''
         # 测试'结束日期不能小于开始日期！'
         self.statement.from_date = '2016-11-03'
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.statement.partner_statements_without_goods()
-        with self.assertRaises(except_orm):
+        with self.assertRaises(UserError):
             self.statement.partner_statements_with_goods()
         # 测试from_date的默认值是否是公司启用日期
         objStatements = self.env['partner.statements.report.wizard']
@@ -67,12 +70,26 @@ class test_supplier_statements(TransactionCase):
         # 查看不带商品明细源单
         self.statement.partner_statements_without_goods()
         supplier_statement = self.env['supplier.statements.report'].search([])
-        for record in supplier_statement:
-            record.find_source_order()
+        supplier_statement_init = self.env['supplier.statements.report'].search([('move_id', '=', False),
+                                                                                 ('amount', '!=', 0)])
+        # 如果对账单中是期初余额行，点击查看按钮应报错
+        with self.assertRaises(UserError):
+            supplier_statement_init.find_source_order()
+
+        for report in list(set(supplier_statement) - set(supplier_statement_init)):
+            report.find_source_order()
+
         # 查看带商品明细源单
         self.statement.partner_statements_with_goods()
         objGoods = self.env['supplier.statements.report.with.goods']
-        supplier_statement_goods = objGoods.search([])
-        for record in supplier_statement_goods:
-            self.assertNotEqual(str(record.balance_amount), 'kaihe11')
-            record.find_source_order()
+        supplier_statement_goods = objGoods.search([('name', '!=', False)])
+        supplier_statement_goods_init = objGoods.search([('move_id', '=', False),
+                                                         ('amount', '!=', 0)])
+
+        # 如果对账单中是期初余额行，点击查看按钮应报错
+        with self.assertRaises(UserError):
+            supplier_statement_goods_init.find_source_order()
+
+        for report in list(set(supplier_statement_goods) - set(supplier_statement_goods_init)):
+            self.assertNotEqual(str(report.balance_amount), 'kaihe11')
+            report.find_source_order()

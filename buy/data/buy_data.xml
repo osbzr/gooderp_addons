@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 购货订单序列号 -->
+        <record id="seq_buy_order" model="ir.sequence">
+            <field name="name">Buy Order</field>
+            <field name="code">buy.order</field>
+            <field name="prefix">BO</field>
+            <field name="padding">5</field>
+        </record>
+		<!-- 采购入库单序列号 -->
+        <record id="seq_buy_receipt" model="ir.sequence">
+            <field name="name">Buy Receipt</field>
+            <field name="code">buy.receipt</field>
+            <field name="prefix">WH/IN/</field>
+            <field name="padding">5</field>
+        </record>
+        <!-- 采购退货单序列号 -->
+        <record id="seq_buy_return" model="ir.sequence">
+            <field name="name">Buy Return</field>
+            <field name="code">buy.return</field>
+            <field name="prefix">IN/RETURN/</field>
+            <field name="padding">5</field>
+        </record>
+        <!-- 采购变更单序列号 -->
+        <record id="seq_buy_adjust" model="ir.sequence">
+            <field name="name">Buy Adjust</field>
+            <field name="code">buy.adjust</field>
+            <field name="prefix">BA</field>
+            <field name="padding">5</field>
+        </record>
+        <!-- 本模块的以下数据表可以清空 -->
+        <record id="remove_buy_order" model="business.data.table">
+            <field name="name">buy.order</field>
+        </record>
+        <record id="remove_buy_order_line" model="business.data.table">
+            <field name="name">buy.order.line</field>
+        </record>
+        <record id="remove_buy_receipt" model="business.data.table">
+            <field name="name">buy.receipt</field>
+        </record>
+        <record id="remove_buy_adjust" model="business.data.table">
+            <field name="name">buy.adjust</field>
+        </record>
+        <record id="remove_buy_adjust_line" model="business.data.table">
+            <field name="name">buy.adjust.line</field>
+        </record>
+        <record id="remove_vendor_goods" model="business.data.table">
+            <field name="name">vendor.goods</field>
+        </record>
+        <record id="remove_payment" model="business.data.table">
+            <field name="name">payment.plan</field>
+        </record>
+    </data>
+</openerp>

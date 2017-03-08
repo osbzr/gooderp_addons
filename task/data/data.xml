@@ -1,0 +1,24 @@
+<openerp>
+	<data noupdate='1'>
+		<!-- 项目数据 -->
+		<record id="project_other" model="project">
+			<field name="name">其他</field>
+		</record>
+		<record id="task_rest" model="task">
+			<field name="name">休息</field>
+			<field name="project_id" ref='task.project_other'/>
+		</record>
+		<record id="task_status_todo" model="task.status">
+			<field name="name">未开始</field>
+			<field name="state">todo</field>
+		</record>
+		<record id="task_status_done" model="task.status">
+			<field name="name">已完成</field>
+			<field name="state">done</field>
+		</record>
+		<record id="task_status_cancel" model="task.status">
+			<field name="name">已取消</field>
+			<field name="state">cancel</field>
+		</record>
+	</data>
+</openerp>

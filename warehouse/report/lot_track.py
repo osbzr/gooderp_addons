@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import models, fields
+import odoo.addons.decimal_precision as dp
+from odoo import models, fields
 import datetime
 
 
@@ -16,8 +16,8 @@ class report_lot_track(models.Model):
     attribute_id = fields.Many2one('attribute', u'属性')
     warehouse = fields.Char(u'仓库')
     date = fields.Date(u'日期')
-    uos_qty = fields.Float(u'辅助数量', digits_compute=dp.get_precision('Quantity'))
-    qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
+    uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'))
+    qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     origin = fields.Char(u'业务类型')
 
     def compute_origin(self, results):

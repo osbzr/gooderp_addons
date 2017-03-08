@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 购货管理 action -->
+
+        <record id="buy_order_action" model="ir.actions.act_window">
+            <field name="name">购货订单</field>
+            <field name="res_model">buy.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'warehouse_dest_type': 'stock'}</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建购货订单
+              </p>
+            </field>
+        </record>
+
+        <record id="buy_receipt_action" model="ir.actions.act_window">
+            <field name="name">采购入库单</field>
+            <field name="res_model">buy.receipt</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'is_return':False, 'warehouse_type': 'supplier','search_default_draft':1}</field>
+            <field name="domain">[('is_return','=',False)]</field>
+            <field name="search_view_id" ref="buy_receipt_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建采购入库单
+              </p>
+            </field>
+        </record>
+
+        <record id="buy_return_action" model="ir.actions.act_window">
+            <field name="name">采购退货单</field>
+            <field name="res_model">buy.receipt</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'is_return':True, 'warehouse_dest_type': 'supplier'}</field>
+            <field name="domain">[('is_return','=',True)]</field>
+            <field name="search_view_id" ref="buy_return_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建采购退货单
+              </p>
+            </field>
+        </record>
+
+		<record id="buy_return_action_tree" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="buy_return_tree"/>
+            <field name="act_window_id" ref="buy_return_action"/>
+        </record>
+        <record id="buy_return_action_form" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="buy_return_form"/>
+            <field name="act_window_id" ref="buy_return_action"/>
+        </record>
+
+		<record id="buy_adjust_action" model="ir.actions.act_window">
+            <field name="name">采购变更单</field>
+            <field name="res_model">buy.adjust</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="buy_adjust_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建采购变更单
+              </p>
+            </field>
+        </record>
+	</data>
+</openerp>

@@ -1,19 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
-        <!-- 收入类型：销售 -->
-        <record id="core_category_sale" model="core.category">
-            <field name="name">销售</field>
-            <field name="type">income</field>
-            <field name="account_id" ref="finance.account_income"/>
-        </record>
+	<data noupdate="0">
+		<!-- 收入类型：销售 -->
+		<record id="core_category_sale" model="core.category">
+			<field name="name">销售</field>
+			<field name="type">income</field>
+			<field name="account_id" ref="finance.account_income"/>
+		</record>
 
-        <!-- 支出类型：采购 -->
-        <record id="core_category_purchase" model="core.category">
-            <field name="name">采购</field>
-            <field name="type">expense</field>
-             <field name="account_id" ref="finance.account_ppe"/>
-        </record>
-        
-    </data>
+		<!-- 支出类型：采购 -->
+		<record id="core_category_purchase" model="core.category">
+			<field name="name">采购</field>
+			<field name="type">expense</field>
+			<field name="account_id" ref="finance.small_business_chart1401"/>
+		</record>
+
+		<!-- 其他支出：期初 -->
+		<record id="core_category_init" model="core.category">
+			<field name="name">期初</field>
+			<field name="type">other_get</field>
+			<field name="account_id" ref="finance.account_init"/>
+		</record>
+
+		<!-- 添加 money 模块 business data table 数据 -->
+		<record id="remove_money_order" model="business.data.table">
+			<field name="name">money.order</field>
+		</record>
+		<record id="remove_money_order_line" model="business.data.table">
+			<field name="name">money.order.line</field>
+		</record>
+		<record id="remove_money_invoice" model="business.data.table">
+			<field name="name">money.invoice</field>
+		</record>
+		<record id="remove_source_order_line" model="business.data.table">
+			<field name="name">source.order.line</field>
+		</record>
+		<record id="remove_reconcile_order" model="business.data.table">
+			<field name="name">reconcile.order</field>
+		</record>
+		<record id="remove_advance_payment" model="business.data.table">
+			<field name="name">advance.payment</field>
+		</record>
+		<record id="remove_cost_line" model="business.data.table">
+			<field name="name">cost.line</field>
+		</record>
+		<record id="remove_money_transfer_order" model="business.data.table">
+			<field name="name">money.transfer.order</field>
+		</record>
+		<record id="remove_money_transfer_order_line" model="business.data.table">
+			<field name="name">money.transfer.order.line</field>
+		</record>
+		<record id="remove_other_money_order" model="business.data.table">
+			<field name="name">other.money.order</field>
+		</record>
+		<record id="remove_other_money_order_line" model="business.data.table">
+			<field name="name">other.money.order.line</field>
+		</record>
+	</data>
 </openerp>

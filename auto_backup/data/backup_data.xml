@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_db_backup_scheduler" model="ir.cron">
+            <field eval="&quot;&quot;&quot;schedule_backup_pgtool&quot;&quot;&quot;" name="function"/>
+            <field eval="&quot;&quot;&quot;work_days&quot;&quot;&quot;" name="interval_type"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field eval="&quot;&quot;&quot;Backup scheduler&quot;&quot;&quot;" name="name"/>
+            <field eval="-1" name="numbercall"/>
+            <field eval="&quot;&quot;&quot;1970-01-01 00:00:00&quot;&quot;&quot;" name="nextcall"/>
+            <field eval="5" name="priority"/>
+            <field eval="0" name="doall"/>
+            <field eval="1" name="active"/>
+            <field eval="1" name="interval_number"/>
+            <field eval="&quot;&quot;&quot;db.backup&quot;&quot;&quot;" name="model"/>
+        </record>
+    </data>
+</odoo>

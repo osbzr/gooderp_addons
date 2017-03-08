@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api
 
 
 class buy_payment(models.TransientModel):
@@ -12,18 +12,20 @@ class buy_payment(models.TransientModel):
     partner_id = fields.Many2one('partner', u'供应商')
     type = fields.Char(u'业务类别')
     date = fields.Date(u'单据日期')
+    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
     order_name = fields.Char(u'单据编号')
-    purchase_amount = fields.Float(u'采购金额', digits_compute=dp.get_precision('Amount'))
-    discount_amount = fields.Float(u'优惠金额', digits_compute=dp.get_precision('Amount'))
-    amount = fields.Float(u'优惠后金额', digits_compute=dp.get_precision('Amount'))
-    payment = fields.Float(u'已付款', digits_compute=dp.get_precision('Amount'))
-    balance = fields.Float(u'应付款余额', digits_compute=dp.get_precision('Amount'))
+    purchase_amount = fields.Float(u'采购金额', digits=dp.get_precision('Amount'))
+    discount_amount = fields.Float(u'优惠金额', digits=dp.get_precision('Amount'))
+    amount = fields.Float(u'优惠后金额', digits=dp.get_precision('Amount'))
+    payment = fields.Float(u'已付款', digitse=dp.get_precision('Amount'))
+    balance = fields.Float(u'应付款余额', digits=dp.get_precision('Amount'))
     payment_rate = fields.Float(u'付款率(%)')
     note = fields.Char(u'备注')
 
     @api.multi
     def view_detail(self):
         '''查看明细按钮'''
+        self.ensure_one()
         order = self.env['buy.receipt'].search([('name', '=', self.order_name)])
         if order:
             if not order.is_return:

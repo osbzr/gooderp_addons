@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--其他收入/支出tree-->
+    	<record id="other_money_order_tree" model="ir.ui.view">
+            <field name="name">other.money.order.tree</field>
+            <field name="model">other.money.order</field>
+            <field name="arch" type="xml">
+                <tree string="其他收支单">
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="partner_id"/>
+                    <field name="total_amount"/>
+                    <field name="state"/>
+                    <field name="is_init" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--其他收入/支出form-->
+        <record id="other_money_order_form" model="ir.ui.view">
+            <field name="name">other.money.order.form</field>
+            <field name="model">other.money.order</field>
+            <field name="arch" type="xml">
+                <form string="其他收支单">
+                <header>
+					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+					<button name="other_money_draft" states="done" string="反审核" type="object"/>
+					<!-- <button name="print_other_money_order" states="done" string="打印" type="object" class="oe_highlight"/> -->
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" class="oe_inline" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+							<field name='type' invisible='1'/>
+							<field name="partner_id"
+								options="{'no_open': True, 'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="voucher_id"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" context="{'order_type': type}">
+                    	<tree string="其他收支单明细" editable="bottom">
+                    		<field name="service" groups="core.service_groups"/>
+							<field name="category_id" required="1" domain="[('type', '=', parent.type)]"/>
+                    		<field name="auxiliary_id"/>
+                            <field name="amount" sum="合计"/>
+                            <field name="tax_rate" groups="money.tax_groups"/>
+                            <field name="tax_amount" groups="money.tax_groups" sum="合计"/>
+                            <field name="note"/>
+                       </tree>
+                    </field>
+                    <group>
+                    	<group>
+		                	<field name="bank_id"/>
+		                </group>
+		                <group>	
+		                	<field name="total_amount"/>
+		                </group>
+		            </group>
+                    <field name="note" placeholder="备注"/>
+		            <group>
+						<group>
+		                	<field name="create_date" string="录单时间" readonly="1"/>
+		                </group>
+		                <group>	
+		                	<field name="write_date" string="最后修改时间"  readonly="1"/>
+		                </group>
+		            </group>
+                </sheet>
+                </form>
+            </field>
+        </record>
+
+		<!--其他收入/支出单 search 视图-->
+		<record id="other_money_order_search" model="ir.ui.view">
+            <field name="name">other.money.order.search</field>
+            <field name="model">other.money.order</field>
+            <field name="arch" type="xml">
+                <search string="其他收入/支出单 ">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="total_amount"/>
+                    <field name="state"/>
+                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter string="往来单位" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- 其他收入单 action -->
+        <record id="other_money_receipt_action" model="ir.actions.act_window">
+            <field name="name">其他收入单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">other.money.order</field>
+            <field name="view_mode">tree,form</field>
+            <field  name='context'>{'type':'other_get'}</field>
+            <field name="domain">[('type','=','other_get')]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建其他收入单
+              </p>
+            </field>
+        </record>
+        
+        <!-- 其他支出单 action -->
+        <record id="other_money_payment_action" model="ir.actions.act_window">
+            <field name="name">其他支出单</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">other.money.order</field>
+            <field name="view_mode">tree,form</field>
+            <field  name='context'>{'type':'other_pay'}</field>
+            <field name="domain">[('type','=','other_pay')]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建其他支出单
+              </p>
+            </field>
+        </record>
+		<!-- 其他收入单menu、其他支出单menu -->
+        <menuitem id="menu_other_money_receipt_action" action="other_money_receipt_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="5"/>
+        <menuitem id="menu_other_money_payment_action" action="other_money_payment_action" parent="menu_money_manage" groups='money.other_get_pay_groups' sequence="6"/>
+	</data>
+</openerp>
+	

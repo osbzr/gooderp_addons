@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import openerp.addons.decimal_precision as dp
-from openerp import fields, models, api
+import odoo.addons.decimal_precision as dp
+from odoo import fields, models, api
 
 class sell_order_track(models.TransientModel):
     _name = 'sell.order.track'
@@ -15,10 +15,11 @@ class sell_order_track(models.TransientModel):
     order_name = fields.Char(u'销售订单编号')
     staff_id = fields.Many2one('staff', u'销售员')
     partner_id = fields.Many2one('partner', u'客户')
+    warehouse_id = fields.Many2one('warehouse', u'仓库')
     goods_state = fields.Char(u'状态')
-    qty = fields.Float(u'数量', digits_compute=dp.get_precision('Quantity'))
-    amount = fields.Float(u'销售额', digits_compute=dp.get_precision('Amount'))  # 商品的价税合计
-    qty_not_out = fields.Float(u'未出库数量', digits_compute=dp.get_precision('Quantity'))
+    qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
+    amount = fields.Float(u'销售额', digits=dp.get_precision('Amount'))  # 商品的价税合计
+    qty_not_out = fields.Float(u'未出库数量', digits=dp.get_precision('Quantity'))
     delivery_date = fields.Date(u'要求交货日期')
     wh_out_date = fields.Date(u'出库日期')
     note = fields.Char(u'备注')
@@ -26,6 +27,7 @@ class sell_order_track(models.TransientModel):
     @api.multi
     def view_detail(self):
         '''查看明细按钮'''
+        self.ensure_one()
         order = self.env['sell.order'].search([('name', '=', self.order_name)])
         if order:
             view = self.env.ref('sell.sell_order_form')
