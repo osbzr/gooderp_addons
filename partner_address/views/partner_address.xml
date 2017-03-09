@@ -30,6 +30,7 @@
 	                    	<field name="mobile"/>
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>
+                            <field name="email" widget="email"/>
 	                    	<field name="province_id" required="1"/>
         					<field name="city_id" required="1"/>
         					<field name="county_id"/>
@@ -71,6 +72,7 @@
 	                    	<field name="mobile" required="1"/>
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>
+                            <field name="email" widget="email"/>
 	                    	<field name="province_id" />
         			<field name="city_id" />
         			<field name="county_id"  />
