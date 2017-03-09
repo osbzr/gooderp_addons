@@ -373,11 +373,14 @@ class money_invoice(models.Model):
 
     @api.multi
     def name_get(self):
-        '''在many2one字段里显示 名称_票号'''
+        '''在many2one字段里有order则显示单号否则显示名称_票号'''
         res = []
 
         for invoice in self:
-            res.append((invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
+            if self.env.context.get('order'):
+                res.append((invoice.id, invoice.name))
+            else:
+                res.append((invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
         return res
 
     state = fields.Selection([
