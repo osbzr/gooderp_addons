@@ -111,13 +111,13 @@ class state_city_county(models.Model):
 class partner_address(models.Model):
     _name = 'partner.address'
     _inherit = "state.city.county"
-    _description = u'业务伙伴的联系人地址'
+    _description = u'联系人地址'
 
     partner_id = fields.Many2one('partner', u'业务伙伴')
     contact = fields.Char(u'联系人')
     mobile = fields.Char(u'手机')
     phone = fields.Char(u'座机')
-    qq = fields.Char(u'QQ/微信')
+    qq = fields.Char(u'QQ')
     email = fields.Char(u'邮箱')
     town = fields.Char(u'乡镇')
     detail_address = fields.Char(u'详细地址')
