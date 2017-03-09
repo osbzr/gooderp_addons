@@ -118,7 +118,7 @@ class partner_address(models.Model):
     mobile = fields.Char(u'手机')
     phone = fields.Char(u'座机')
     qq = fields.Char(u'QQ/微信')
-
+    email = fields.Char(u'邮箱')
     town = fields.Char(u'乡镇')
     detail_address = fields.Char(u'详细地址')
     is_default_add = fields.Boolean(u'是否默认地址')
