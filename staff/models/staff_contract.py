@@ -10,4 +10,8 @@ class staff_contract(models.Model):
 
     over_date = fields.Date(u'到期日', required=True)
     basic_wage = fields.Float(u'基础工资')
+    endowment = fields.Float(u'个人养老保险')
+    health = fields.Float(u'个人医疗保险')
+    unemployment = fields.Float(u'个人失业保险')
+    housing_fund = fields.Float(u'个人住房公积金')
     job_id = fields.Many2one('staff.job', u'岗位', required=True)
