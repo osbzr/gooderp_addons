@@ -209,7 +209,7 @@
             				</group>
             			</group>
             			<notebook>
-                    		<page string="发库单行">
+                    		<page string="发货单行">
 		    					<field name='line_out_ids' attrs="{'readonly': [('state','!=','draft')]}"
 		    						context="{
 		    						'type':'out',
