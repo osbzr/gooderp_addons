@@ -4,7 +4,7 @@ from odoo.tools.safe_eval import safe_eval as eval
 
 class home_report_type(models.Model):
     _name = "home.report.type"
-    _description = "用来分类报表,让相似的报表显示在一起"
+    _description = u"用来分类报表,让相似的报表显示在一起"
     name = fields.Char(u'报表类别', help=u'在home.page 中报表类别不同类别的可以分组,组别的名称!')
     sequence = fields.Integer(u'序列', help=u'在home.page 中报表类别分组 时的顺序进行调整!')
 
