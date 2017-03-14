@@ -8,8 +8,8 @@ class goods(models.Model):
     _description = u"继承了core里面定义的goods 模块，并定义了视图和添加字段。"
 
     no_stock = fields.Boolean(u'虚拟商品')
-    using_batch = fields.Boolean(u'批号管理')
-    force_batch_one = fields.Boolean(u'序列号管理唯一')
+    using_batch = fields.Boolean(u'管理批号')
+    force_batch_one = fields.Boolean(u'管理序列号')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
     image = fields.Binary(u'图片', attachment=True)
     supplier_id = fields.Many2one('partner',
