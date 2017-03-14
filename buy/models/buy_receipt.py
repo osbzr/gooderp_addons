@@ -279,6 +279,8 @@ class buy_receipt(models.Model):
         rec = self.with_context(type='pay')
         money_order = rec.env['money.order'].create({
             'partner_id': self.partner_id.id,
+            'bank_name':self.partner_id.bank_name,
+            'bank_num':self.partner_id.bank_num,
             'date': fields.Date.context_today(self),
             'line_ids':
                 [(0, 0, line) for line in money_lines],
