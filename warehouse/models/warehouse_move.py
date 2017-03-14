@@ -155,12 +155,14 @@ class wh_move(models.Model):
         # 调拔单的扫描条码
         if model_name == 'wh.internal':
             val['type'] = 'internal'
-        create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
+        if model_name != 'wh.inventory':
+            create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
 
         # 盘点单的扫码
         if model_name == 'wh.inventory':
+            move = order
             val['type'] = 'out'
-            create_line = self.scan_barcode_inventory_operation(order, att, conversion, goods, val)
+            create_line = self.scan_barcode_inventory_operation(move, att, conversion, goods, val)
 
         return move, create_line, val
 
@@ -342,7 +344,7 @@ class wh_move(models.Model):
                             'uos_id': line.uos_id.id,
                             'goods_qty': 0,
                             'uom_id': line.uom_id.id,
-                            'cost_unit': self.goods_id.cost / (1 + self.goods_id.tax_rate * 0.01),
+                            'cost_unit': line.goods_id.cost / (1 + line.goods_id.tax_rate * 0.01),
                             'state': 'done',
                             'date': today}))
                 all_line_message += u" 当前库存量不足，继续出售请点击确定，并及时盘点库存\n"
