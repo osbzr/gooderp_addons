@@ -9,7 +9,7 @@ class goods(models.Model):
 
     no_stock = fields.Boolean(u'虚拟商品')
     using_batch = fields.Boolean(u'批号管理')
-    force_batch_one = fields.Boolean(u'每批号数量为1')
+    force_batch_one = fields.Boolean(u'序列号管理唯一')
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
     image = fields.Binary(u'图片', attachment=True)
     supplier_id = fields.Many2one('partner',
