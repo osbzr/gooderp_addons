@@ -31,6 +31,14 @@ class goods(models.Model):
         """
         self.uos_id = self.uom_id
 
+    @api.onchange('using_batch')
+    def onchange_using_batch(self):
+        """
+        :return: 当将管理批号的勾去掉后，自动将管理序列号的勾去掉
+        """
+        if not self.using_batch:
+            self.force_batch_one = False
+
     def conversion_unit(self, qty):
         """ 数量 × 转化率 = 辅助数量
         :param qty: 传进来数量计算出辅助数量
