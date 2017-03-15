@@ -290,11 +290,11 @@ class sell_delivery(models.Model):
             'date': self.date,
             'line_ids': [(0, 0, line) for line in money_lines],
             'source_ids': [(0, 0, line) for line in source_lines],
-            'type': 'get',
             'amount': amount,
             'reconciled': this_reconcile,
             'to_reconcile': amount,
             'state': 'draft',
+            'origin_name': self.name,
         })
         return money_order
 

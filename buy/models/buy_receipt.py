@@ -286,11 +286,11 @@ class buy_receipt(models.Model):
                 [(0, 0, line) for line in money_lines],
             'source_ids':
                 [(0, 0, line) for line in source_lines],
-            'type': 'pay',
             'amount': amount,
             'reconciled': this_reconcile,
             'to_reconcile': amount,
-            'state': 'draft'})
+            'state': 'draft',
+            'origin_name': self.name})
         return money_order
 
     def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id):
