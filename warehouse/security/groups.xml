@@ -13,9 +13,15 @@
 			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
-		<!--添加管理组装拆卸组-->
+		<!--添加管理净重组-->
 		<record id='manager_net_weight_group' model='res.groups'>
 			<field name='name'>管理净重组</field>
+			<field name='category_id' ref="core.good_warehouse"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+		</record>
+		<!--管理保质期组-->
+		<record id='group_expiration_date' model='res.groups'>
+			<field name='name'>管理保质期</field>
 			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
