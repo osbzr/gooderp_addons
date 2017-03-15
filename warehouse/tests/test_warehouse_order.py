@@ -237,8 +237,42 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.approve_order()
         self.others_in_2.cancel_approved_order()
 
-    def test_goods_inventory(self):
-        ''' 发库单审核产品不足时调用创建盘盈入库方法 '''
-        
-        
-        
+    def test_goods_inventory_others_out(self):
+        ''' 其他出库单审核产品不足时调用创建盘盈入库方法 '''
+        for line in self.others_out.line_out_ids:
+            vals = {
+                    'type':'inventory',
+                    'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
+                    'warehouse_dest_id':self.others_out.warehouse_id.id,
+                    'line_in_ids':[(0, 0, {
+                                'goods_id':line.goods_id.id,
+                                'attribute_id':line.attribute_id.id,
+                                'goods_uos_qty':line.goods_uos_qty,
+                                'uos_id':line.uos_id.id,
+                                'goods_qty':line.goods_qty,
+                                'uom_id':line.uom_id.id,
+                                'cost_unit':line.goods_id.cost
+                                            }
+                                    )]
+                        }
+            self.others_out.goods_inventory(vals)
+
+    def test_goods_inventory_internal(self):
+        ''' 内部调拨单审核产品不足时调用创建盘盈入库方法 '''
+        for line in self.internal.line_out_ids:
+            vals = {
+                    'type':'inventory',
+                    'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
+                    'warehouse_dest_id':self.internal.warehouse_id.id,
+                    'line_in_ids':[(0, 0, {
+                                'goods_id':line.goods_id.id,
+                                'attribute_id':line.attribute_id.id,
+                                'goods_uos_qty':line.goods_uos_qty,
+                                'uos_id':line.uos_id.id,
+                                'goods_qty':line.goods_qty,
+                                'uom_id':line.uom_id.id,
+                                'cost_unit':line.goods_id.cost
+                                            }
+                                    )]
+                        }
+            self.internal.goods_inventory(vals)

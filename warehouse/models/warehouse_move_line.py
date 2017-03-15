@@ -328,7 +328,7 @@ class wh_move_line(models.Model):
             self.cost_unit = cost_unit
 
         if self.env.context.get('type') == 'in' and self.goods_id:
-            self.cost_unit = self.goods_id.cost*(100-self.goods_id.tax_rate)/100
+            self.cost_unit = self.goods_id.cost / (1 + self.goods_id.tax_rate * 0.01)
 
     @api.multi
     @api.onchange('goods_id', 'tax_rate')

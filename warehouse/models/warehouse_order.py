@@ -60,6 +60,17 @@ class wh_out(models.Model):
     def onchange_type(self):
         self.warehouse_dest_id = self.env['warehouse'].get_warehouse_by_type(self.type)
 
+    def goods_inventory(self, vals):
+        """
+        审核时若仓库中商品不足，则产生补货向导生成其他入库单并审核。
+        :param vals: 创建其他入库单需要的字段及取值信息构成的字典
+        :return:
+        """
+        auto_in = self.env['wh.in'].create(vals)
+        self.with_context({'wh_in_line_ids': [line.id for line in
+                                              auto_in.line_in_ids]}).approve_order()
+
+
 class wh_in(models.Model):
     _name = 'wh.in'
     _description = u'其他入库单'
@@ -208,8 +219,12 @@ class wh_internal(models.Model):
                                 store=True, readonly=True, digits=dp.get_precision('Amount'),
                                 help=u'该调拨单的出库金额总和')
 
-
     def goods_inventory(self, vals):
+        """
+        审核时若仓库中商品不足，则产生补货向导生成其他入库单并审核。
+        :param vals: 创建其他入库单需要的字段及取值信息构成的字典
+        :return:
+        """
         auto_in = self.env['wh.in'].create(vals)
         self.with_context({'wh_in_line_ids': [line.id for line in
                                               auto_in.line_in_ids]}).approve_order()
