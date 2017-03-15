@@ -113,8 +113,7 @@ class bank_account(models.Model):
                 other_money_id.other_money_draft()
                 other_money_id.unlink()
             # 资金期初 生成 其他收入
-            other_money_init = self.env['other.money.order'].create({
-                'type': 'other_get',
+            other_money_init = self.with_context(type='other_get').env['other.money.order'].create({
                 'bank_id': self.id,
                 'date': self.env.user.company_id.start_date,
                 'is_init': True,
@@ -122,6 +121,7 @@ class bank_account(models.Model):
                     'category_id': self.env.ref('money.core_category_init').id,
                     'amount': self.init_balance,
                     'tax_rate': 0,
+                    'tax_amount': 0,
                 })],
                 'state': 'draft'
             })

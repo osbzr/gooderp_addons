@@ -6,17 +6,16 @@
             <field name="name">other.money.statements.report.tree</field>
             <field name="model">other.money.statements.report</field>
             <field name="arch" type="xml">
-                <tree string="Other Money Partner Statements Report">
+                <tree string="其他收支明细表" create='0'>
                 	<field name="date"/>
                     <field name="name"/>
                     <field name="note"/>
                     <field name="partner_id"/>
                     <field name="bank_id"/>
-                    <field name="type"/>
+                    <field name="service"/>
                     <field name="category_id"/>
                     <field name="get" sum="合计"/>
                     <field name="pay" sum="合计"/>
-
                 </tree>
             </field>
         </record>
