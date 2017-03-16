@@ -21,6 +21,8 @@
 			<field name="arch" type="xml">
 				<form string="费用订单">
 					<header>
+						<button name="staff_wages_accrued" states="draft" string="计提" type="object" class="oe_highlight"/>
+						<button name="staff_wages_unaccrued" states="draft" string="反计提" type="object" class="oe_highlight"/>
 						<button name="staff_wages_confim" states="draft" string="审核" type="object" class="oe_highlight"/>
 						<button name="staff_wages_draft" states="done" string="反审核" type="object"/>
 						<field name="state" widget="statusbar" readonly="1"/>
@@ -31,9 +33,11 @@
 								<field name="date" required="1"/>
 								<field name="name" required="1"/>
 								<field name="payment" required="1"/>
-								<field name="other_money_order"/>
 							</group>
 							<group>
+								<field name="other_money_order"/>
+								<field name="voucher_id"/>
+								<field name="change_voucher_id"/>
 								<field name="totoal_wage" invisible="1"/>
 								<field name="totoal_endowment" invisible="1"/>
 								<field name="totoal_health" invisible="1"/>
@@ -47,8 +51,8 @@
 							<tree string="工资明细" editable="bottom">
 								<field name="name"/>
 								<field name="basic_wage"/>
-								<field name="basic_date"/>
-								<field name="date_number" sum="出勤天数"/>
+								<field name="basic_date" required="1"/>
+								<field name="date_number" required="1" sum="出勤天数"/>
 								<field name="wage" sum="出勤工资金额"/>
 								<field name="add_hour" sum="加班小时数"/>
 								<field name="add_wage" sum="加班工资金额"/>

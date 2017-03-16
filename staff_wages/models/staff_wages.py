@@ -32,7 +32,9 @@ class staff_wages(models.Model):
                                states=READONLY_STATES, copy=False)
     payment = fields.Many2one('bank.account', u'付款方式')
     other_money_order = fields.Many2one('other.money.order', u'对应付款单', readonly=True, ondelete='restrict',
-                                 help=u'收付款单审核时生成的对应凭证')
+                                 help=u'审核时生成的对应付款单', copy=False)
+    voucher_id = fields.Many2one('voucher', u'计提工资凭证', readonly=True, ondelete='restrict', copy=False)
+    change_voucher_id = fields.Many2one('voucher', u'修正计提凭证', readonly=True, ondelete='restrict', copy=False)
     note = fields.Char(u'备注',help=u'本月备注')
     totoal_wage = fields.Float(u'应发工资合计')
     totoal_endowment = fields.Float(u'应扣养老合计')
@@ -44,6 +46,7 @@ class staff_wages(models.Model):
 
     @api.onchange('line_ids')
     def _total_amount_wage(self):
+        #todo 测试onchange + compute
         self.totoal_amount = sum(line.amount_wage for line in self.line_ids)
         self.totoal_wage = sum(line.all_wage for line in self.line_ids)
         self.totoal_endowment = sum(line.endowment for line in self.line_ids)
@@ -54,8 +57,75 @@ class staff_wages(models.Model):
 
     @api.one
     def staff_wages_confim(self):
+        self.staff_wages_accrued()
         self._other_pay()
         self.state = 'done'
+
+    @api.one
+    def staff_wages_accrued(self):
+        if self.change_voucher_id:
+            #删除原来的change_voucher_id ,生成新的change_voucher_id
+            change_voucher_id, self.change_voucher_id = self.change_voucher_id, False
+            if change_voucher_id.state == 'done':
+                change_voucher_id.voucher_draft()
+            change_voucher_id.unlink()
+            self.change_voucher()
+        elif self.voucher_id:
+            #生成change_voucher_id
+            self.change_voucher()
+        else:
+            #生成voucher_id
+            date = self.date
+            vouch_obj = self.create_voucher(date)[0]
+            self.write({'voucher_id': vouch_obj.id})
+
+    @api.one
+    def change_voucher(self):
+        before_voucher = self.voucher_id
+        date = fields.Date.context_today(self)
+        change_voucher = self.create_voucher(date)[0]
+        for change_line in change_voucher.line_ids:
+            for before_line in before_voucher.line_ids:
+                if change_line.account_id.id == before_line.account_id.id:
+                    change_line.credit -= before_line.credit
+                    change_line.debit -= before_line.debit
+                    continue
+
+        for change_line in change_voucher.line_ids:
+            if change_line.credit == 0 and change_line.debit == 0:
+                change_line.unlink()
+
+        if not change_voucher.line_ids:
+            change_voucher.unlink()
+        else:
+            self.write({'change_voucher_id': change_voucher.id})
+
+    @api.one
+    def create_voucher(self,date):
+        if self.voucher_id and self.voucher_id.period_id == self.env['finance.period'].get_period(date):
+            raise UserError(u'同一会计期间内请使用反计提')
+        vouch_obj = self.env['voucher'].create({'date': date})
+        credit_account = self.env.ref('staff_wages.staff_wages')
+        res = {}
+        for line in self.line_ids:
+            staff = self.env['staff.contract'].search([('staff_id', '=', line.name.id)])
+            debite_account = staff.job_id and staff.job_id.account_id.id or self.env.ref('finance.small_business_chart5602001').id
+            if debite_account not in res:
+                res[debite_account] = {'debit': 0}
+            val = res[debite_account]
+            val.update({'debit': val.get('debit') + line.all_wage,
+                        'voucher_id': vouch_obj.id,
+                        'account_id': debite_account,
+                        'name': u'提本月工资'})
+        #生成借方凭证行
+        for account_id,val in res.iteritems():
+            self.env['voucher.line'].create(dict(val,account_id = account_id))
+        #生成贷方凭证行
+        self.env['voucher.line'].create({'credit': self.totoal_wage,
+                                         'voucher_id': vouch_obj.id,
+                                         'account_id': credit_account.account_id.id,
+                                         'name': u'提本月工资'})
+        return vouch_obj
 
     @api.one
     def _other_pay(self):
@@ -120,6 +190,17 @@ class staff_wages(models.Model):
             other_money_order.unlink()
         self.state = 'draft'
 
+    @api.one
+    def staff_wages_unaccrued(self):
+        if self.change_voucher_id:
+            raise UserError(u'跨期间不可以使用计提，请使用计提来补充计提')
+        if self.voucher_id:
+            voucher_id, self.voucher_id = self.voucher_id, False
+            if voucher_id.state == 'done':
+                voucher_id.voucher_draft()
+            voucher_id.unlink()
+        self.state = 'draft'
+
     @api.multi
     def unlink(self):
         for record in self:
@@ -131,7 +212,7 @@ class wages_line(models.Model):
     _description = u'工资明细'
 
     name = fields.Many2one('staff', u'员工', required=True)
-    date_number = fields.Float(u'出勤天数', required=True)
+    date_number = fields.Float(u'出勤天数')
     basic_wage = fields.Float(u'基础工资')
     basic_date = fields.Float(u'基础天数')
     wage = fields.Float(u'出勤工资')
@@ -151,6 +232,7 @@ class wages_line(models.Model):
     @api.onchange('date_number','basic_wage','basic_date')
     def change_wage_addhour(self):
         if self.date_number > 31 or self.basic_date > 31:
+            #todo 修正月份日期判断
             raise UserError(u'一个月不可能超过31天')
         if self.date_number >= self.basic_date:
             self.add_hour = 8 * (self.date_number - self.basic_date)

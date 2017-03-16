@@ -9,25 +9,25 @@
         </record>
         <record id="endowment" model='core.category'>
             <field name='name'>代扣养老保险</field>
-            <field name='account_id' ref='finance.small_business_chart2211003'/>
+            <field name='account_id' ref='finance.small_business_chart2241001'/>
             <field name='type'>other_pay</field>
             <field name='note'>由系统创建</field>
         </record>
         <record id="health" model='core.category'>
             <field name='name'>代扣医疗保险</field>
-            <field name='account_id' ref='finance.small_business_chart2211005'/>
+            <field name='account_id' ref='finance.small_business_chart2241002'/>
             <field name='type'>other_pay</field>
             <field name='note'>由系统创建</field>
         </record>
         <record id="unemployment" model='core.category'>
             <field name='name'>代扣失业保险</field>
-            <field name='account_id' ref='finance.small_business_chart2211006'/>
+            <field name='account_id' ref='finance.small_business_chart2241003'/>
             <field name='type'>other_pay</field>
             <field name='note'>由系统创建</field>
         </record>
         <record id="housing_fund" model='core.category'>
             <field name='name'>代扣住房公积金</field>
-            <field name='account_id' ref='finance.small_business_chart2211007'/>
+            <field name='account_id' ref='finance.small_business_chart2241004'/>
             <field name='type'>other_pay</field>
             <field name='note'>由系统创建</field>
         </record>
