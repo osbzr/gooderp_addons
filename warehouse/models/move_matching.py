@@ -26,13 +26,17 @@ class wh_move_matching(models.Model):
         u'辅助数量',
         digits=dp.get_precision('Quantity'), required=True,
         help=u'出库单行产品的辅助数量')
+    expiration_date = fields.Date(
+        u'过保日',
+        help=u'商品保质期截止日期')
 
-    def create_matching(self, line_in_id, line_out_id, qty, uos_qty):
+    def create_matching(self, line_in_id, line_out_id, qty, uos_qty, expiration_date):
         res = {
             'line_out_id': line_out_id,
             'line_in_id': line_in_id,
             'qty': qty,
             'uos_qty': uos_qty,
+            'expiration_date': expiration_date,
         }
 
         return self.create(res)
@@ -74,7 +78,9 @@ class wh_move_line(models.Model):
         matching_obj.create_matching(
             matching.get('line_in_id'),
             line.id, matching.get('qty'),
-            matching.get('uos_qty'))
+            matching.get('uos_qty'),
+            matching.get('expiration_date'),
+        )
 
     def prev_action_done(self):
         for line in self:
@@ -96,6 +102,8 @@ class wh_move_line(models.Model):
                         self.create_matching_obj(line , matching)
                 line.cost_unit = safe_division(cost, line.goods_qty)
                 line.cost = cost
+                # 将过保日填充到出库明细行
+                line.expiration_date = matching_records and matching_records[0].get('expiration_date')
 
         return super(wh_move_line, self).prev_action_done()
 
@@ -106,5 +114,6 @@ class wh_move_line(models.Model):
 
             line.matching_in_ids.unlink()
             line.matching_out_ids.unlink()
+            line.expiration_date = False
 
         return super(wh_move_line, self).prev_action_cancel()

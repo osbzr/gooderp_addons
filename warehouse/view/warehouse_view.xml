@@ -78,6 +78,7 @@
                     <field name='cost_unit' groups='goods.view_cost_groups' />
                     <field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
                     <field name='cost' sum='1' groups='goods.view_cost_groups' />
+                    <field name='expiration_date' groups='warehouse.group_expiration_date' />
                     <field name='note' />
                     <field name='type' />
                     <field name='state' />
@@ -139,6 +140,9 @@
                     <field name='uom_id' required='1' />
                     <field name='cost_unit' string='出库单位成本' readonly='1' />
                     <field name='cost' string='出库成本' readonly='1' sum='1' />
+                    <field name='expiration_date'
+                           readonly='1'
+                           groups='warehouse.group_expiration_date' />
                     <field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
                     <field name='note' string='备注' />
                     <field name='using_attribute' invisible='1' />
@@ -173,6 +177,7 @@
                     <field name='uom_id' required='1' />
                     <field name='cost_unit' string='入库单价' />
                     <field name='cost' string='入库金额' sum='1' readonly='1' />
+                    <field name='expiration_date' groups='warehouse.group_expiration_date' />
                     <field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
                     <field name='note' string='备注' />
                     <field name='using_attribute' invisible='1' />
@@ -210,6 +215,7 @@
                     	options="{'field': 'lot_qty'}"
                     	attrs="{'readonly': [('force_batch_one', '=', True)]}" />
                     <field name='uom_id' required='1' />
+                    <field name='expiration_date' groups='warehouse.group_expiration_date' />
                     <field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
                     <field name='note' string='备注' />
                     <field name='using_attribute' invisible='1' />

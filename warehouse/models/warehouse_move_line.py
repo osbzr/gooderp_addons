@@ -202,6 +202,8 @@ class wh_move_line(models.Model):
                         digits=dp.get_precision('Amount'), store=True,
                         help=u'入库/出库成本')
     line_net_weight = fields.Float(string=u'净重小计', compute=compute_line_net_weight, store=True)
+    expiration_date = fields.Date(u'过保日',
+                                  help=u'商品保质期截止日期')
 
     @api.one
     @api.depends('cost_unit', 'goods_qty')

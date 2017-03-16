@@ -15,6 +15,7 @@
                     <field name="pay"/>
                     <field name="partner_id"/>
                     <field name="this_balance"/>
+                    <field name="balance" invisible='1'/>
                 </tree>
             </field>
         </record>
