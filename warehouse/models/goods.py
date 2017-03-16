@@ -108,7 +108,8 @@ class goods(models.Model):
         if qty > lot_id.qty_remaining and not self.env.context.get('wh_in_line_ids'):
             raise UserError(u'产品%s的库存数量不够本次出库行为' % (self.name,))
 
-        return [{'line_in_id': lot_id.id, 'qty': qty, 'uos_qty': uos_qty}], \
+        return [{'line_in_id': lot_id.id, 'qty': qty, 'uos_qty': uos_qty,
+                 'expiration_date': lot_id.expiration_date}], \
             lot_id.get_real_cost_unit() * qty
 
     def get_matching_records(self, warehouse, qty, uos_qty=0,
@@ -137,7 +138,7 @@ class goods(models.Model):
                 domain.append(('attribute_id', '=', attribute.id))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
-            lines = self.env['wh.move.line'].search(domain, order='cost_time, id')
+            lines = self.env['wh.move.line'].search(domain, order='cost_time, id, expiration_date')
 
             qty_to_go, uos_qty_to_go, cost = qty, uos_qty, 0    # 分别为待出库商品的数量、辅助数量和成本
             for line in lines:
@@ -147,7 +148,7 @@ class goods(models.Model):
                 matching_qty = min(line.qty_remaining, qty_to_go)
                 matching_uos_qty = matching_qty/goods.conversion
 
-                matching_records.append({'line_in_id': line.id,
+                matching_records.append({'line_in_id': line.id, 'expiration_date': line.expiration_date,
                                          'qty': matching_qty, 'uos_qty': matching_uos_qty})
 
                 cost += matching_qty * line.get_real_cost_unit()
@@ -163,9 +164,9 @@ class goods(models.Model):
                               ('goods_id', '=', goods.id)]
                     if attribute:
                         domain.append(('attribute_id', '=', attribute.id))
-                    line_in_id = self.env['wh.move.line'].search(domain, order='cost_time, id')
+                    line_in_id = self.env['wh.move.line'].search(domain, order='cost_time, id, expiration_date')
                     if line_in_id:
-                        matching_records.append({'line_in_id': line_in_id.id,
+                        matching_records.append({'line_in_id': line_in_id.id, 'expiration_date': line_in_id.expiration_date,
                                                  'qty': qty_to_go, 'uos_qty': uos_qty_to_go})
 
             return matching_records, cost
