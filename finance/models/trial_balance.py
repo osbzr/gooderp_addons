@@ -41,6 +41,11 @@ class CreateTrialBalanceWizard(models.TransientModel):
         return self.env['finance.period'].get_date_now_period_id()
 
     period_id = fields.Many2one('finance.period', default=_default_period_id, string=u'会计期间', help=u'限定生成期间的范围')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def compute_last_period_id(self, period_id):
@@ -230,6 +235,11 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                                           help=u'默认是所有科目的最大code')
     no_occurred = fields.Boolean(u'无发生额不显示', default=True, help=u'无发生额的科目不显示明细账，默认为不显示')
     no_balance = fields.Boolean(u'无余额不显示', default=True, help=u'无余额的科目不显示明细账，默认为不显示')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('period_begin_id', 'period_end_id')
     def onchange_period(self):

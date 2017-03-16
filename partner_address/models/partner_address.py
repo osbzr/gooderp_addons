@@ -7,6 +7,11 @@ class Country(models.Model):
     _description = u'国家'
 
     name = fields.Char(u'国家名')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
     
 class CountryState(models.Model):
     _name = 'country.state'
@@ -16,6 +21,11 @@ class CountryState(models.Model):
     name = fields.Char(u'名称')
     code = fields.Char(u'编号')
     city_ids = fields.One2many('all.city', 'province_id', u'下辖市/区')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class all_city(models.Model):
@@ -26,6 +36,11 @@ class all_city(models.Model):
     country_ids = fields.One2many('all.county', 'city_id', u'下辖县/市')
     province_id = fields.Many2one('country.state', u'省/直辖市/自治区',
                                   domain="[('country_id.name','=','中国')]")
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class all_county(models.Model):
@@ -36,6 +51,11 @@ class all_county(models.Model):
     city_id = fields.Many2one('all.city', u'地级市')
     county_name = fields.Char(u'名称')
     description = fields.Char(u'描述')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 class state_city_county(models.Model):
     _name = 'state.city.county'
@@ -44,6 +64,11 @@ class state_city_county(models.Model):
                                   domain="[('country_id.name','=','中国')]")
     city_id = fields.Many2one('all.city', u'市/区')
     county_id = fields.Many2one('all.county', u'县/市')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('province_id')
     def onchange_province(self):
@@ -150,5 +175,5 @@ class partner(models.Model):
     contact = fields.Char(u'联系人', compute='_compute_partner_address')
     mobile = fields.Char(u'手机', compute='_compute_partner_address')
     phone = fields.Char(u'座机', compute='_compute_partner_address')
-    qq = fields.Char(u'QQ/微信', compute='_compute_partner_address')
+    qq = fields.Char(u'QQ', compute='_compute_partner_address')
     address = fields.Char(u'送货地址', compute='_compute_partner_address')

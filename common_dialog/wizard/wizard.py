@@ -9,6 +9,11 @@ class common_dialog_wizard(models.TransientModel):
     _description = u'通用的向导'
 
     message = fields.Text(u'消息', default=lambda self: self.env.context.get('message'))
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     def do_confirm(self):
         active_model = self.env.context.get('active_model')

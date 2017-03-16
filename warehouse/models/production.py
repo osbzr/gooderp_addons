@@ -1114,6 +1114,11 @@ class wh_bom(osv.osv):
         'wh.bom.line', 'bom_id', u'子件', domain=[('type', '=', 'child')],
         context={'type': 'child'}, copy=True,
         help=u'物料清单对应的子件行')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class wh_bom_line(osv.osv):
@@ -1137,3 +1142,8 @@ class wh_bom_line(osv.osv):
         u'数量', digits=dp.get_precision('Quantity'),
         help=u'子件行/组合件行上的产品数量')
     attribute_id=fields.Many2one('attribute', u'属性', ondelete='restrict')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

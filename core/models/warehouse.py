@@ -21,6 +21,11 @@ class warehouse(models.Model):
     code = fields.Char(u'编号')
     type = fields.Selection(WAREHOUSE_TYPE, u'类型', default='stock')
     active = fields.Boolean(u'有效', default=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '仓库不能重名')

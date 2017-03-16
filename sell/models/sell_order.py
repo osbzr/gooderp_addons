@@ -154,6 +154,11 @@ class sell_order(models.Model):
                                   store=True,
                                   readonly=True,
                                   help=u'外币币别')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
@@ -467,6 +472,11 @@ class sell_order_line(models.Model):
                             help=u'含税单价 乘以 数量')
     note = fields.Char(u'备注',
                        help=u'本行备注')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('goods_id')
     def onchange_warehouse_id(self):

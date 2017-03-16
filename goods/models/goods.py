@@ -4,8 +4,10 @@ from odoo import models, fields, api
 
 
 class goods(models.Model):
+    """
+    继承了core里面定义的goods 模块，并定义了视图和添加字段。
+    """
     _inherit = 'goods'
-    _description = u"继承了core里面定义的goods 模块，并定义了视图和添加字段。"
 
     no_stock = fields.Boolean(u'虚拟商品')
     using_batch = fields.Boolean(u'管理批号')
@@ -80,6 +82,11 @@ class attribute(models.Model):
     name = fields.Char(u'属性', compute='_compute_name', store=True, readonly=True)
     goods_id = fields.Many2one('goods', u'商品', ondelete='cascade')
     value_ids = fields.One2many('attribute.value', 'attribute_id', string=u'属性')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
         ('ean_uniq', 'unique (ean)', u'该条码已存在'),
@@ -101,6 +108,11 @@ class attribute_value(models.Model):
                                domain="[('category_id','=',category_id)]",
                                default=lambda self: self.env.context.get('default_category_id'),
                                required='1')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 class attribute_value_value(models.Model):
     _name = 'attribute.value.value'
@@ -112,3 +124,8 @@ class attribute_value_value(models.Model):
                                   context={'type': 'attribute'},
                                   required='1')
     name = fields.Char(u'值')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

@@ -75,6 +75,11 @@ class goods(models.Model):
     not_saleable = fields.Boolean(u'不可销售',
                                   default=_get_default_not_saleable,
                                   help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '产品不能重名'),

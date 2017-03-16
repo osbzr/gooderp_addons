@@ -116,6 +116,12 @@ class project_invoice(models.Model):
         ondelete='set null',
         help=u'产生的发票号',
     )
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get()
+    )
 
     def _get_invoice_vals(self, category_id, project_id, amount, tax_amount):
         '''返回创建 money_invoice 时所需数据'''
@@ -226,6 +232,12 @@ class task(models.Model):
                                 default=AVAILABLE_PRIORITIES[0][0])
     color = fields.Integer('Color Index',
                            default=0)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get()
+    )
 
     @api.multi
     def assign_to_me(self):
@@ -245,6 +257,11 @@ class task_status(models.Model):
                              string=u'任务状态',
                              default='doing')
     sequence = fields.Integer(u'顺序')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class timesheet(models.Model):
@@ -283,6 +300,12 @@ class timesheet(models.Model):
         domain=[],
         context={},
         limit=None
+    )
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get()
     )
     _sql_constraints = [
         ('user_uniq', 'unique(user_id,date)', '同一个人一天只能创建一个工作日志')
@@ -349,6 +372,12 @@ class timeline(models.Model):
     )
     set_status = fields.Many2one('task.status',
                              string=u'状态更新到')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get()
+    )
 
     @api.model
     def create(self, vals):

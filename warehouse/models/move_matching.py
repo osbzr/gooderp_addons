@@ -29,6 +29,11 @@ class wh_move_matching(models.Model):
     expiration_date = fields.Date(
         u'过保日',
         help=u'商品保质期截止日期')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     def create_matching(self, line_in_id, line_out_id, qty, uos_qty, expiration_date):
         res = {

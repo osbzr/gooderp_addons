@@ -96,6 +96,11 @@ class other_money_order(models.Model):
                        help=u'可以为该单据添加一些需要的标识信息')
 
     is_init = fields.Boolean(u'初始化应收应付', help=u'此单是否为初始化单')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('date')
     def onchange_date(self):
@@ -177,3 +182,8 @@ class other_money_order_line(models.Model):
                               help=u'其他收支单行上的税额')
     note = fields.Char(u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

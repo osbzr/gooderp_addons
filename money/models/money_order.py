@@ -173,6 +173,11 @@ class money_order(models.Model):
                            readonly=True,
                            states={'draft': [('readonly', False)]},
                            help=u'银行账号取自业务伙伴，可修改')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def write_off_reset(self):
@@ -364,6 +369,11 @@ class money_order_line(models.Model):
                                   help=u'本次结算号')
     note = fields.Char(string=u'备注',
                        help=u'可以为本次结算添加一些需要的标识信息')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class money_invoice(models.Model):
@@ -424,6 +434,11 @@ class money_invoice(models.Model):
     bill_number = fields.Char(u'发票号',
                               help=u'纸质发票号')
     is_init = fields.Boolean(u'是否初始化单')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def money_invoice_done(self):
@@ -576,6 +591,11 @@ class source_order_line(models.Model):
                         help=u'本次要核销掉的金额')
     date_due = fields.Date(string=u'到期日',
                            help=u'待核销行的到期日')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class reconcile_order(models.Model):
@@ -645,6 +665,11 @@ class reconcile_order(models.Model):
                        help=u'单据创建日期')
     note = fields.Text(string=u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def _get_money_order(self, way='get'):
@@ -844,6 +869,11 @@ class advance_payment(models.Model):
     this_reconcile = fields.Float(string=u'本次核销金额',
                         digits=dp.get_precision('Amount'),
                         help=u'本次核销的预收/预付款金额')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class cost_line(models.Model):
@@ -879,3 +909,8 @@ class cost_line(models.Model):
                        help=u'采购/销售费用税额')
     note = fields.Char(u'备注',
                        help=u'该采购/销售费用添加的一些标识信息')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

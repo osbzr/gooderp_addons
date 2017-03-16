@@ -29,6 +29,11 @@ class asset_category(models.Model):
         'finance.account', u'固定资产清理收入科目', required=True)
     clean_costs = fields.Many2one(
         'finance.account', u'固定资产清理成本科目', required=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class asset(models.Model):
@@ -97,6 +102,11 @@ class asset(models.Model):
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict', copy=False)
     money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict', copy=False)
     other_money_order = fields.Many2one('other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('category_id')
     def onchange_category_id(self):
@@ -273,6 +283,11 @@ class CreateCleanWizard(models.TransientModel):
     residual_income = fields.Float(u'残值收入', required=True)
     sell_tax_amount = fields.Float(u'销项税额', required=True)
     bank_account = fields.Many2one('bank.account', u'结算账户')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.one
     def _generate_other_get(self):
@@ -370,6 +385,11 @@ class CreateChangWizard(models.TransientModel):
     chang_tax = fields.Float(u'变更税额', digits=dp.get_precision(u'变更税额'), required=True)
     chang_partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', required=True)
     change_reason = fields.Text(u'变更原因')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.one
     def create_chang_account(self):
@@ -437,6 +457,11 @@ class asset_line(models.Model):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 class CreateDepreciationWizard(models.TransientModel):
     """生成每月折旧的向导 根据输入的期间"""
@@ -453,6 +478,11 @@ class CreateDepreciationWizard(models.TransientModel):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def _get_voucher_line(self, asset, cost_depreciation, vouch_obj):
@@ -553,6 +583,11 @@ class chang_line(models.Model):
     chang_money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
     partner_id = fields.Many2one('partner', u'变更单位')
     change_reason = fields.Text(u'变更原因')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 class voucher(models.Model):
     _inherit = 'voucher'

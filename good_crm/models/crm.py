@@ -25,4 +25,8 @@ class opportunity(models.Model):
                                    track_visibility='always')
     ref = fields.Reference(string=u'相关记录',
                            selection='_select_objects')
-
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

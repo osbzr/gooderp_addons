@@ -87,6 +87,11 @@ class wh_move(models.Model):
                                help=u'该移库单的入/出库明细行包含的产品总数')
     staff_id = fields.Many2one('staff', u'经办人',
                                default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0])
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     def scan_barcode_move_line_operation(self, line, conversion):
         """
