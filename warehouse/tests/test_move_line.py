@@ -89,6 +89,7 @@ class TestMoveLine(TransactionCase):
             'line_in_id': self.mouse_out_line.lot_id.id,
             'qty': self.mouse_out_line.goods_qty,
             'uos_qty': self.mouse_out_line.goods_uos_qty,
+            'expiration_date': False,
         }
         self.assertEqual(results[0], real_results)
 
