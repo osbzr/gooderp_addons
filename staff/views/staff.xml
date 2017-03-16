@@ -204,7 +204,8 @@
                 <form string="职位">
                 	<group>
                 		<field name='name'/>
-                		<field name='department_id'/>
+                        <field name='department_id'/>
+                		<field name='account_id'/>
                 	</group>
                 	<group>
                 		<field name='note' placeholder='描述...'/>
