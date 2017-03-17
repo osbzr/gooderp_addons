@@ -267,7 +267,7 @@
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211008" model='finance.account'>
-            <field name='code'>2211007</field>
+            <field name='code'>2211008</field>
             <field name='name'>应付职工薪酬-工伤保险费</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
