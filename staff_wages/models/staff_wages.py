@@ -27,9 +27,7 @@ class staff_wages(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核')], u'状态', default='draft')
-
-    line_ids = fields.One2many('wages.line', 'order_id', u'工资明细行',
-                               states=READONLY_STATES, copy=False)
+    line_ids = fields.One2many('wages.line', 'order_id', u'工资明细行',states=READONLY_STATES)
     payment = fields.Many2one('bank.account', u'付款方式')
     other_money_order = fields.Many2one('other.money.order', u'对应付款单', readonly=True, ondelete='restrict',
                                  help=u'审核时生成的对应付款单', copy=False)

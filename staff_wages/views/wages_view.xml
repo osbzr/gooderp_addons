@@ -85,5 +85,30 @@
             </field>
         </record>
 
+		<!-- 引入员工wizard-->
+        <record id="create_wages_line_form" model="ir.ui.view">
+            <field name="name">create_wages_line_form</field>
+            <field name="model">create.wages.line.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+						<field name="wages_change"/>
+                    </group>
+                    <footer>
+                        <button name="input_change_wages"  string="引入员工信息" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+            	</form>
+            </field>
+        </record>
+        <act_window id="create_wages_line_action"
+            name="引入员工信息"
+            src_model="staff.wages"
+            res_model="create.wages.line.wizard"
+            view_type="form"
+            view_mode="form"
+            target="new"/>
+
 	</data>
 </openerp>
