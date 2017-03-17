@@ -139,7 +139,7 @@ class staff_wages(models.Model):
 
         other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
-            'date': self.date,
+            'date': fields.Date.context_today(self),
             'bank_id': self.payment.id,
         })
         self.write({'other_money_order': other_money_order.id})
