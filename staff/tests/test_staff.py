@@ -82,9 +82,35 @@ class test_res_users(TransactionCase):
 
 class test_leave(TransactionCase):
     ''' 测试 请假 '''
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_leave, self).setUp()
+        self.leave = self.browse_ref('staff.leave_1')
+
     def test_set_staff_id(self):
         ''' 测试 请假人 默认值 '''
         self.env['staff.leave'].create({
                                         'name': 'go back home',
                                         'leave_type': 'no_pay',
                                         })
+    def test_leave_done(self):
+        '''审核请假单'''
+        self.leave.leave_done()
+        self.assertTrue(self.leave.state == 'done')
+        # 重复审核报错
+        with self.assertRaises(UserError):
+            self.leave.leave_done()
+
+    def test_leave_draft(self):
+        '''反审核请假单'''
+        self.leave.leave_done()
+        self.leave.leave_draft()
+        self.assertTrue(self.leave.state == 'draft')
+         # 重复反审核审核报错
+        with self.assertRaises(UserError):
+            self.leave.leave_draft()
+
+    def test_check_leave_dates(self):
+        '''请假天数不能小于或等于零'''
+        with self.assertRaises(ValidationError):
+            self.leave.leave_dates = 0
