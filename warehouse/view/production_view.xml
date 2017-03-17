@@ -232,6 +232,10 @@
                         <group>
                             <field name='note' nolabel='1' placeholder='备注...' />
                         </group>
+                        <group>
+                            <field name='qc_result' widget='pdf_viewer'
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                        </group>
 
                         <group col='6'>
                             <group colspan='2'>
@@ -421,6 +425,10 @@
                         <group>
                             <field name='note' nolabel='1' placeholder='备注...' />
                         </group>
+                        <group>
+                            <field name='qc_result' widget='pdf_viewer'
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                        </group>
 
                         <group col='6'>
                             <group colspan='2'>
@@ -587,6 +595,10 @@
 
                         <group>
                             <field name='note' nolabel='1' placeholder='备注...' />
+                        </group>
+                        <group>
+                            <field name='qc_result' widget='pdf_viewer'
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
                         <group col='6'>

@@ -54,6 +54,7 @@
         'view/inventory_view.xml',
         'view/production_view.xml',
         'view/res_company.xml',
+        'view/qc_rule.xml',
         'report/report_data.xml',
         'report/stock_balance_view.xml',
         'report/stock_transceive_view.xml',
