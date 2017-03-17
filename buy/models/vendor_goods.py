@@ -39,6 +39,12 @@ class vendor_goods(models.Model):
                            digits=dp.get_precision('Quantity'),
                            help=u'采购产品时，大于或等于最低订购量时，产品的价格才取该行的供货价')
 
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
+
 
 class partner(models.Model):
     _inherit = 'partner'

@@ -30,3 +30,8 @@ class res_company(models.Model):
         return open(misc.file_open('core/static/description/logo.png').name, 'rb') .read().encode('base64')
 
     logo = fields.Binary(related='partner_id.image', default=_get_logo, attachment=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

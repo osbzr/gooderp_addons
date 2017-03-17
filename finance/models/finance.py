@@ -54,21 +54,26 @@ class voucher(models.Model):
         'document.word', u'凭证字', ondelete='restrict', required=True,
         default=lambda self: self.env.ref('finance.document_word_1'))
     date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date,
-                       track_visibility='always', help=u'本张凭证创建的时间！', copy=False)
+                       track_visibility='always', help=u'本张凭证创建的时间', copy=False)
     name = fields.Char(u'凭证号', track_visibility='always', copy=False)
-    att_count = fields.Integer(u'附单据', default=1, help=u'原始凭证的张数！')
+    att_count = fields.Integer(u'附单据', default=1, help=u'原始凭证的张数')
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
-        compute='_compute_period_id', ondelete='restrict', store=True, help=u'本张凭证发生日期对应的，会计期间！')
+        compute='_compute_period_id', ondelete='restrict', store=True, help=u'本张凭证发生日期对应的，会计期间')
     line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细', copy=True)
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
                                track_visibility='always',help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核')], u'状态', default='draft',
                              track_visibility='always', help=u'凭证所属状态!')
-    is_checkout = fields.Boolean(u'结账凭证', help=u'是否是结账凭证!')
-    is_init = fields.Boolean(u'是否初始化凭证', help=u'是否是初始化凭证!')
+    is_checkout = fields.Boolean(u'结账凭证', help=u'是否是结账凭证')
+    is_init = fields.Boolean(u'是否初始化凭证', help=u'是否是初始化凭证')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.one
     def voucher_done(self):
@@ -164,15 +169,15 @@ class voucher_line(models.Model):
         return data
 
     voucher_id = fields.Many2one('voucher', u'对应凭证', ondelete='cascade')
-    name = fields.Char(u'摘要', required=True, help=u'描述本条凭证行的缘由！')
+    name = fields.Char(u'摘要', required=True, help=u'描述本条凭证行的缘由')
     account_id = fields.Many2one(
         'finance.account', u'会计科目',
         ondelete='restrict', required=True)
 
     debit = fields.Float(u'借方金额', digits=dp.get_precision('Amount'), help=u'每条凭证行中只能记录借方金额或者贷方金额中的一个，\
-    一张凭证中所有的凭证行的借方余额，必须等于贷方余额！')
+    一张凭证中所有的凭证行的借方余额，必须等于贷方余额。')
     credit = fields.Float(u'贷方金额', digits=dp.get_precision('Amount'), help=u'每条凭证行中只能记录借方金额或者贷方金额中的一个，\
-    一张凭证中所有的凭证行的借方余额，必须等于贷方余额！')
+    一张凭证中所有的凭证行的借方余额，必须等于贷方余额。')
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', help=u'凭证行的对应的往来单位')
 
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
@@ -186,7 +191,12 @@ class voucher_line(models.Model):
     date = fields.Date(compute='_compute_voucher_date', store=True, string=u'凭证日期')
     state = fields.Selection([('draft', u'草稿'),('done', u'已审核')], compute='_compute_voucher_state',
                              store=True, string=u'状态')
-    init_obj = fields.Char(u'初始化对象', help=u'描述本条凭证行由哪个单证生成而来！')
+    init_obj = fields.Char(u'初始化对象', help=u'描述本条凭证行由哪个单证生成而来')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.one
     @api.depends('voucher_id.date')
@@ -249,9 +259,14 @@ class finance_period(models.Model):
     name = fields.Char(
         u'会计期间',
         compute='_compute_name', readonly=True, store=True)
-    is_closed = fields.Boolean(u'已结账',help=u'这个字段用于标识期间是否已结账，已结账的期间不能生成会计凭证！')
+    is_closed = fields.Boolean(u'已结账',help=u'这个字段用于标识期间是否已结账，已结账的期间不能生成会计凭证。')
     year = fields.Char(u'会计年度', required=True,help=u'会计期间对应的年份')
     month = fields.Selection(MONTH_SELECTION, string=u'会计月份', required=True,help=u'会计期间对应的月份')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.one
     @api.depends('year', 'month')
@@ -360,6 +375,11 @@ class document_word(models.Model):
 
     name = fields.Char(u'凭证字')
     print_title = fields.Char(u'打印标题',help=u'凭证在打印时的显示的标题')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class finance_account(models.Model):
@@ -388,10 +408,15 @@ class finance_account(models.Model):
     ], u'类型', required="1")
     currency_id = fields.Many2one('res.currency', u'外币币别')
     exchange = fields.Boolean(u'是否期末调汇')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', u'科目名称必须唯一!'),
-        ('code', 'unique(code)', u'科目代码必须唯一!'),
+        ('name_uniq', 'unique(name)', u'科目名称必须唯一。'),
+        ('code', 'unique(code)', u'科目代码必须唯一。'),
     ]
 
     @api.multi
@@ -449,6 +474,11 @@ class auxiliary_financing(models.Model):
         ('project', u'项目'),
         ('department', u'部门'),
     ], u'分类', default=lambda self: self.env.context.get('type'))
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', u'辅助核算不能重名')
@@ -459,8 +489,8 @@ class res_company(models.Model):
     '''继承公司对象,添加字段'''
     _inherit = 'res.company'
 
-    profit_account = fields.Many2one('finance.account', u'本年利润科目', ondelete='restrict', help=u'本年利润科目,本年中盈利的科目！在结转时会用到!')
-    remain_account = fields.Many2one('finance.account', u'未分配利润科目', ondelete='restrict', help=u'未分配利润科目！')
+    profit_account = fields.Many2one('finance.account', u'本年利润科目', ondelete='restrict', help=u'本年利润科目,本年中盈利的科目,在结转时会用到。')
+    remain_account = fields.Many2one('finance.account', u'未分配利润科目', ondelete='restrict', help=u'未分配利润科目。')
     import_tax_account = fields.Many2one('finance.account', u"进项税科目", ondelete='restrict', 
                                          help=u'进项税额，是指纳税人购进货物、加工修理修配劳务、服务、无形资产或者不动产，支付或者负担的增值税额。')
     output_tax_account = fields.Many2one('finance.account', u"销项税科目", ondelete='restrict')
@@ -494,3 +524,8 @@ class change_voucher_name(models.Model):
     period_id = fields.Many2one('finance.period', u'会计期间')
     before_voucher_name = fields.Char(u'以前凭证号')
     after_voucher_name = fields.Char(u'更新后凭证号')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

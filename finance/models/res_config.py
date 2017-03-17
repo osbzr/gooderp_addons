@@ -28,6 +28,11 @@ class finance_config_wizard(models.TransientModel):
     # 是否能查看未结账期间
     default_period_domain = fields.Selection([('can', u'能'), ('cannot', u'不能')],
                                              string=u'是否能查看未结账期间', default='can', help=u'是否能查看未结账期间')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def set_default_voucher_date(self):

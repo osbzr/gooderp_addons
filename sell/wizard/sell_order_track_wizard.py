@@ -29,6 +29,11 @@ class sell_order_track_wizard(models.TransientModel):
                                help=u'按指定销售员进行统计')
     warehouse_id = fields.Many2one('warehouse', u'仓库',
                                    help=u'按指定仓库进行统计')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     def _get_domain(self):
         '''返回wizard界面上条件'''

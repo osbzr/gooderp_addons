@@ -17,6 +17,11 @@ class MonthProductCost(models.Model):
     current_period_in_cost = fields.Float(string='本期入库成本')
     current_period_remaining_qty = fields.Float(string='本期剩余数量')
     current_period_remaining_cost = fields.Float(string='剩余数量成本')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     # 使用SQL来取得指定产品情况下的库存数量
     @api.multi

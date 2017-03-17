@@ -29,6 +29,11 @@ class buy_summary_partner_wizard(models.TransientModel):
                              help=u'按指定供应商类别进行统计')
     warehouse_dest_id = fields.Many2one('warehouse', u'仓库',
                              help=u'按指定仓库进行统计')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def button_ok(self):

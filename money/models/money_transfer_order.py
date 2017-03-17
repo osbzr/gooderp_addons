@@ -61,6 +61,11 @@ class money_transfer_order(models.Model):
     discount_account_id = fields.Many2one('finance.account', u'折扣科目', ondelete='restrict',
                                           readonly=True, states={'draft': [('readonly', False)]},
                                           help=u'资金转换单审核生成凭证时，折扣额对应的科目')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def money_transfer_done(self):
@@ -157,3 +162,8 @@ class money_transfer_order_line(models.Model):
     number = fields.Char(string=u'结算号', help=u'本次结算号')
     note = fields.Char(string=u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

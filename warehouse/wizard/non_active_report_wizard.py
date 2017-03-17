@@ -55,6 +55,11 @@ class non_active_report_wizard(models.TransientModel):
     first_stage_day = fields.Integer(string=u'第一阶段天数', required=True)
     second_stage_day = fields.Integer(string=u'第二阶段天数', required=True)
     third_stage_day = fields.Integer(string=u'第三阶段天数', required=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def get_warehouse_goods_stage_data(self, warehouse_id, first_stage_day, second_stage_day, third_stage_day):
