@@ -244,7 +244,31 @@
         </record>
         <record id="small_business_chart2211003" model='finance.account'>
             <field name='code'>2211003</field>
-            <field name='name'>应付职工薪酬-社会保险费</field>
+            <field name='name'>应付职工薪酬-养老保险费</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2211005" model='finance.account'>
+            <field name='code'>2211005</field>
+            <field name='name'>应付职工薪酬-医疗保险费</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2211006" model='finance.account'>
+            <field name='code'>2211006</field>
+            <field name='name'>应付职工薪酬-失业保险费</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2211007" model='finance.account'>
+            <field name='code'>2211007</field>
+            <field name='name'>应付职工薪酬-生育保险费</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2211008" model='finance.account'>
+            <field name='code'>2211008</field>
+            <field name='name'>应付职工薪酬-工伤保险费</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
@@ -411,6 +435,12 @@
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
+                <record id="small_business_chart2221018" model='finance.account'>
+            <field name='code'>2221018</field>
+            <field name='name'>应交税费-印花税</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
 
         <record id="small_business_chart2231" model='finance.account'>
             <field name='code'>2231</field>
@@ -424,9 +454,27 @@
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
-        <record id="small_business_chart2241" model='finance.account'>
-            <field name='code'>2241</field>
-            <field name='name'>其他应付款</field>
+        <record id="small_business_chart2241001" model='finance.account'>
+            <field name='code'>2241001</field>
+            <field name='name'>其他应付款-代扣个人养老保险</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2241002" model='finance.account'>
+            <field name='code'>2241002</field>
+            <field name='name'>其他应付款-代扣个人医疗保险</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2241003" model='finance.account'>
+            <field name='code'>2241003</field>
+            <field name='name'>其他应付款-代扣个人失业保险</field>
+            <field name='costs_types'>debt</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2241004" model='finance.account'>
+            <field name='code'>2241004</field>
+            <field name='name'>其他应付款-代扣个人住房公积金</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
