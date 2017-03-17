@@ -113,4 +113,5 @@ class test_leave(TransactionCase):
     def test_check_leave_dates(self):
         '''请假天数不能小于或等于零'''
         self.leave.leave_dates = 0
-        self.leave.check_leave_dates()
+        with self.assertRaises(UserError):
+            self.leave.check_leave_dates()
