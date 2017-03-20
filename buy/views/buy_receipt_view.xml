@@ -118,6 +118,10 @@
 		            </notebook>
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
                     <group>
+                        <field name='qc_result' widget='pdf_viewer'
+                               attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                    </group>
+                    <group>
                         <group>
                             <field name="discount_amount" groups='buy.buy_discount_groups'
                             string="抹零"/>
@@ -292,6 +296,10 @@
 		                </page>
 		            </notebook>
                     <field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
+                    <group>
+                        <field name='qc_result' widget='pdf_viewer'
+                               attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                    </group>
                     <group>
                         <group>
                             <field name="discount_amount" groups='buy.buy_discount_groups'/>

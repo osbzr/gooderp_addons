@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="qc_rule_tree" model="ir.ui.view">
+            <field name="name">qc.rule.tree</field>
+            <field name="model">qc.rule</field>
+            <field name="arch" type="xml">
+                <tree string='质检规则' editable='bottom'>
+                    <field name='move_type'/>
+                    <field name='warehouse_id'/>
+                    <field name='warehouse_dest_id'/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</openerp>

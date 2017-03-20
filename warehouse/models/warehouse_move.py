@@ -92,6 +92,8 @@ class wh_move(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    qc_result = fields.Binary(u'质检报告',
+                              help=u'点击上传质检报告')
 
     def scan_barcode_move_line_operation(self, line, conversion):
         """
@@ -258,6 +260,12 @@ class wh_move(models.Model):
         for order in self:
             if not order.line_out_ids and not order.line_in_ids:
                 raise UserError(u'单据的明细行不可以为空')
+            qc_rule = self.env['qc.rule'].search([
+                ('move_type', '=', order.origin),
+                ('warehouse_id', '=', order.warehouse_id.id),
+                ('warehouse_dest_id', '=', order.warehouse_dest_id.id)])
+            if qc_rule and not order.qc_result:
+                raise UserError(u'请先上传质检报告')
 
     @api.multi
     def approve_order(self):
