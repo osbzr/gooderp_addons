@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--员工工资-->
+        <record id='staff_wages_lili' model='staff.wages'>
+            <field name='date'>2017-03-20</field>
+            <field name='payment' ref='core.alipay'/>
+        </record>
+        <record id='staff_wages_line' model='wages.line'>
+            <field name='order_id' ref='staff_wages_lili'/>
+            <field name='name' ref='staff.lili'/>
+            <field name='basic_date'>22</field>
+            <field name='date_number'>21</field>
+        </record>
+    </data>
+</openerp>

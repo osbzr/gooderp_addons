@@ -36,5 +36,16 @@
             <field name='date_start'>2017-03-17 09:00:00</field>
             <field name='date_stop'>2017-03-17 18:00:00</field>
         </record>
+        <!--员工合同-->
+        <record id='contract_staff_lili' model='staff.contract'>
+            <field name='staff_id' ref='staff.lili'/>
+            <field name='basic_wage'>3000</field>
+            <field name='endowment'>100</field>
+            <field name='health'>100</field>
+            <field name='unemployment'>100</field>
+            <field name='housing_fund'>100</field>
+            <field name='over_date'>2020-01-01</field>
+            <field name='job_id' ref='staff.staff_job_1'/>
+        </record>
     </data>
 </openerp>
