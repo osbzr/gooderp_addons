@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_staff_wages,access.staff.wages,model_staff_wages,,1,1,1,1
+access_wages_line,access.wages.line,model_wages_line,,1,1,1,1

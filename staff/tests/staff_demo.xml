@@ -26,5 +26,15 @@
             <field name='name'>人事专员</field>
             <field name='department_id' ref='staff.department_1'/>
         </record>
+
+        <!--请假单-->
+        <record id='leave_1' model='staff.leave'>
+            <field name='user_id' ref='base.user_root'/>
+            <field name='name'>事假</field>
+            <field name='leave_type'>no_pay</field>
+            <field name='leave_dates'>1</field>
+            <field name='date_start'>2017-03-17 09:00:00</field>
+            <field name='date_stop'>2017-03-17 18:00:00</field>
+        </record>
     </data>
 </openerp>

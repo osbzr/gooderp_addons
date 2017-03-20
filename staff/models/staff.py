@@ -38,6 +38,7 @@ class staff_job(models.Model):
 
     name = fields.Char(u'职位', required=True)
     note = fields.Text(u'描述')
+    account_id = fields.Many2one('finance.account', u'计提工资科目')
     department_id = fields.Many2one('staff.department', u'部门')
 
 
