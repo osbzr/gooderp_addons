@@ -43,6 +43,11 @@ class staff_leave(models.Model):
     state = fields.Selection(LEAVE_STATES, u'审核状态', readonly=True,
                              help=u"购货订单的审核状态", index=True, copy=False,
                              default='draft')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
     @api.one
