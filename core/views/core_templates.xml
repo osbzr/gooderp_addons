@@ -8,6 +8,7 @@
                 使用 options="{'color':'random'}" 来实现多对多控件标签显示随机颜色
                  -->
                 <script type="text/javascript" src="/core/static/src/js/core.js"></script>
+                <link rel="stylesheet" type="text/less" href="/core/static/src/less/core.less"/>
             </xpath>
         </template>
         <template  id="login_layout"  inherit_id="web.login_layout" name="login" priority="1">
