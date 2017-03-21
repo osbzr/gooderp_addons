@@ -9,12 +9,12 @@ class test_staff_wages(TransactionCase):
 
     def test_compute_period_id(self):
         self.staff_wages._compute_period_id()
-        self.assertTrue(self.staff_wages.name == self.env.ref('finance.period_201703'))
+        self.assertTrue(self.staff_wages.name == self.env.ref('finance.period_201701'))
     
     def test_total_amount_wage(self):
         for line in self.staff_wages.line_ids:
             line.change_social_security()
-        self.staff_wages.total_amount_wage()
+        self.staff_wages._total_amount_wage()
         self.assertAlmostEqual(self.staff_wages.totoal_amount, 2463.64)
         self.assertAlmostEqual(self.staff_wages.totoal_wage, 2863.64)
         self.assertAlmostEqual(self.staff_wages.totoal_endowment, 100)
