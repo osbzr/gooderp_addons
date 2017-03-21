@@ -3,7 +3,7 @@
     <data>
         <!--员工工资-->
         <record id='staff_wages_lili' model='staff.wages'>
-            <field name='date'>2017-03-20</field>
+            <field name='date'>2017-01-20</field>
             <field name='payment' ref='core.alipay'/>
         </record>
         <record id='staff_wages_line' model='wages.line'>

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 
+
 class test_staff_wages(TransactionCase):
 
     def setUp(self):
@@ -14,6 +15,8 @@ class test_staff_wages(TransactionCase):
     def test_total_amount_wage(self):
         for line in self.staff_wages.line_ids:
             line.change_social_security()
+            line._all_wage_value()
+            line.change_wage_addhour()
         self.staff_wages._total_amount_wage()
         self.assertAlmostEqual(self.staff_wages.totoal_amount, 2463.64)
         self.assertAlmostEqual(self.staff_wages.totoal_wage, 2863.64)
@@ -22,5 +25,4 @@ class test_staff_wages(TransactionCase):
         self.assertAlmostEqual(self.staff_wages.totoal_unemployment, 100)
         self.assertAlmostEqual(self.staff_wages.totoal_housing_fund, 100)
         self.assertAlmostEqual(self.staff_wages.totoal_personal_tax, 0)
-
 
