@@ -45,6 +45,7 @@ class staff_wages(models.Model):
     @api.onchange('line_ids')
     def _total_amount_wage(self):
         #todo 测试onchange + compute
+
         self.totoal_amount = sum(line.amount_wage for line in self.line_ids)
         self.totoal_wage = sum(line.all_wage for line in self.line_ids)
         self.totoal_endowment = sum(line.endowment for line in self.line_ids)
@@ -54,7 +55,7 @@ class staff_wages(models.Model):
         self.totoal_personal_tax = sum(line.personal_tax for line in self.line_ids)
 
     @api.one
-    def staff_wages_confim(self):
+    def staff_wages_confirm(self):
         self.staff_wages_accrued()
         self._other_pay()
         self.state = 'done'
@@ -204,6 +205,7 @@ class staff_wages(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise UserError(u'不能删除已审核的单据(%s)'%self.period_id)
+        return super(staff_wages, self).unlink()
 
 class wages_line(models.Model):
     _name = 'wages.line'

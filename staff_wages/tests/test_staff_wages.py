@@ -26,3 +26,26 @@ class test_staff_wages(TransactionCase):
         self.assertAlmostEqual(self.staff_wages.totoal_housing_fund, 100)
         self.assertAlmostEqual(self.staff_wages.totoal_personal_tax, 0)
 
+    def test_staff_wages_confirm(self):
+        self.staff_wages.staff_wages_confirm()
+        self.assertTrue(self.staff_wages.state == 'done')
+
+    def test_staff_wages_accrued(self):
+        self.staff_wages.staff_wages_accrued()
+        self.assertTrue(self.staff_wages.voucher_id != 'False')
+        self.staff_wages.staff_wages_accrued()
+        self.env['wages.line'].create({'name': self.env.ref('staff.staff_1').id,
+                                         'basic_date': 22,
+                                         'date_number': 22,
+                                         'basic_wage': 3000,
+                                         'order_id': self.staff_wages.id,
+                                         })
+        self.staff_wages.staff_wages_accrued() # 会生成change_voucher_id
+        self.staff_wages.staff_wages_accrued()
+
+
+
+
+
+
+
