@@ -10,7 +10,7 @@ MOVE_TYPE = [
     ('wh.out.inventory', u'盘亏'),
     ('wh.in.others', u'其他入库单'),
     ('wh.in.inventory', u'盘盈'),
-    ('wh.internal', u'内部调拨单'),
+    ('wh.internal', u'移库单'),
     ('wh.assembly', u'组装单'),
     ('wh.disassembly', u'拆卸单'),
     ('outsource', u'委外加工单'),
