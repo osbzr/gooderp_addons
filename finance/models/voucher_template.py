@@ -7,6 +7,11 @@ class VoucherTemplate(models.Model):
 
     name = fields.Char(u'模板名称')
     line_ids = fields.One2many('voucher.template.line', 'template_id', string='模板行')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class VoucherTemplateLine(models.Model):
@@ -21,6 +26,11 @@ class VoucherTemplateLine(models.Model):
     auxiliary_id = fields.Many2one(
         'auxiliary.financing', u'辅助核算', help='辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\
         以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现', ondelete='restrict')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class voucher_template_wizard(models.TransientModel):
@@ -31,6 +41,11 @@ class voucher_template_wizard(models.TransientModel):
     is_change_old_template = fields.Boolean(u'修改原有模板')
     old_template_id = fields.Many2one('voucher.template', string=u'旧模板')
     voucher_id = fields.Many2one('voucher', u'凭证id', default=lambda self: self.env.context.get('active_id'))
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def save_as_template(self):

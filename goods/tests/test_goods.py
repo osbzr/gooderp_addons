@@ -28,6 +28,15 @@ class test_goods(TransactionCase):
 
         self.assertEqual(cable.uos_id, cable.uom_id)
 
+    def test_onchange_using_batch(self):
+        '''当将管理批号的勾去掉后，自动将管理序列号的勾去掉'''
+        self.goods_mouse.using_batch = True
+        self.goods_mouse.force_batch_one = True
+        self.goods_mouse.using_batch = False
+        self.goods_mouse.onchange_using_batch()
+
+        self.assertEqual(self.goods_mouse.force_batch_one, False)
+
     def test_unlink(self):
         ''' 删除商品其对应属性也删除  '''
         self.env.ref('goods.keyboard').unlink()

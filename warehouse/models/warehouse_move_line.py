@@ -202,6 +202,13 @@ class wh_move_line(models.Model):
                         digits=dp.get_precision('Amount'), store=True,
                         help=u'入库/出库成本')
     line_net_weight = fields.Float(string=u'净重小计', compute=compute_line_net_weight, store=True)
+    expiration_date = fields.Date(u'过保日',
+                                  help=u'商品保质期截止日期')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.one
     @api.depends('cost_unit', 'goods_qty')
@@ -328,7 +335,7 @@ class wh_move_line(models.Model):
             self.cost_unit = cost_unit
 
         if self.env.context.get('type') == 'in' and self.goods_id:
-            self.cost_unit = self.goods_id.cost*(100-self.goods_id.tax_rate)/100
+            self.cost_unit = self.goods_id.cost / (1 + self.goods_id.tax_rate * 0.01)
 
     @api.multi
     @api.onchange('goods_id', 'tax_rate')

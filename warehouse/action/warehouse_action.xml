@@ -140,5 +140,16 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <!-- 质检规则 action -->
+        <record id="action_qc_rule" model="ir.actions.act_window">
+            <field name="name">质检规则</field>
+            <field name="res_model">qc.rule</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建质检规则
+              </p>
+            </field>
+        </record>
     </data>
 </openerp>

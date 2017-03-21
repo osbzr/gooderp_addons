@@ -87,8 +87,19 @@ class wh_move(models.Model):
                                help=u'该移库单的入/出库明细行包含的产品总数')
     staff_id = fields.Many2one('staff', u'经办人',
                                default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0])
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
+    qc_result = fields.Binary(u'质检报告',
+                              help=u'点击上传质检报告')
 
     def scan_barcode_move_line_operation(self, line, conversion):
+        """
+        在原移库明细行中更新数量和辅助数量，不创建新行
+        :return:
+        """
         line.goods_qty += 1
         line.goods_uos_qty = line.goods_qty / conversion
         return True
@@ -103,28 +114,19 @@ class wh_move(models.Model):
         return True
 
     def scan_barcode_move_in_out_operation(self, move, att, conversion, goods, val):
-        create_line =False
-        loop_field = 'line_out_ids' if val['type'] in ['out', 'internal'] else 'line_in_ids'
-        for line in move[loop_field]:
-            line.cost_unit = line.goods_id.price if val['type'] in ['out', 'internal'] else line.goods_id.cost
-            # 如果产品属性上存在条码，且明细行上已经存在该产品，则数量累加
-            if att and line.attribute_id.id == att.id:
-                create_line = self.scan_barcode_move_line_operation(line, conversion)
-            # 如果产品上存在条码，且明细行上已经存在该产品，则数量累加
-            elif goods and line.goods_id.id == goods.id:
-                create_line = self.scan_barcode_move_line_operation(line, conversion)
-        return create_line
-
-    def scan_barcode_sell_or_buy_operation(self, move, att, conversion, goods, val):
+        """
+        对仓库各种移库单据上扫码的统一处理
+        :return: 是否创建新的明细行
+        """
         create_line = False
-        loop_field = 'line_out_ids' if val['type'] == 'out' else 'line_in_ids'
+        loop_field = 'line_in_ids' if val['type'] == 'in' else 'line_out_ids'
         for line in move[loop_field]:
-            line.price_taxed = line.goods_id.price if val['type'] == 'out' else line.goods_id.cost
-            # 如果产品属性上存在条码
-            if att and line.attribute_id.id == att.id:
-                create_line = self.scan_barcode_move_line_operation(line, conversion)
-            # 如果产品上存在条码
-            elif goods and line.goods_id.id == goods.id:
+            line.cost_unit = (line.goods_id.price if val['type'] in ['out', 'internal']
+                              else line.goods_id.cost) # 其他出入库单 、内部调拨单
+            line.price_taxed = (line.goods_id.price if val['type'] == 'out'
+                                else line.goods_id.cost) # 采购或销售单据
+            # 如果产品属性或产品上存在条码，且明细行上已经存在该产品，则数量累加
+            if (att and line.attribute_id == att) or (goods and line.goods_id == goods):
                 create_line = self.scan_barcode_move_line_operation(line, conversion)
         return create_line
 
@@ -138,107 +140,76 @@ class wh_move(models.Model):
         return create_line
 
     def scan_barcode_each_model_operation(self, model_name, order_id, att, goods,conversion):
-        val ={}
-        create_line =False
-        if model_name in ['wh.out', 'wh.in']:
-            move = self.env[model_name].browse(order_id).move_id
+        val = {}
+        create_line = False # 是否创建新的明细行
+        order = self.env[model_name].browse(order_id)
+        if model_name in ['wh.out', 'wh.in', 'wh.internal']:
+            move = order.move_id
         # 在其他出库单上扫描条码
         if model_name == 'wh.out':
             val['type'] = 'out'
-            create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
         # 在其他入库单上扫描条码
         if model_name == 'wh.in':
             val['type'] = 'in'
-            create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
         # 销售出入库单的二维码
         if model_name == 'sell.delivery':
-            move = self.env[model_name].browse(order_id).sell_move_id
-            if self.env[model_name].browse(order_id).is_return:
-                val['type'] = 'in'
-                create_line = self.scan_barcode_sell_or_buy_operation(move, att, conversion, goods,val)
-            else:
-                val['type'] = 'out'
-                create_line = self.scan_barcode_sell_or_buy_operation(move, att, conversion, goods,val)
+            move = order.sell_move_id
+            val['type'] = order.is_return and 'in' or 'out'
         # 采购出入库单的二维码
         if model_name == 'buy.receipt':
-            move = self.env[model_name].browse(order_id).buy_move_id
-            if self.env[model_name].browse(order_id).is_return:
-                val['type'] = 'out'
-                create_line = self.scan_barcode_sell_or_buy_operation(move, att, conversion, goods,val)
-            else:
-                val['type'] = 'in'
-                create_line = self.scan_barcode_sell_or_buy_operation(move, att, conversion, goods,val)
-
+            move = order.buy_move_id
+            val['type'] = order.is_return and 'out' or 'in'
         # 调拔单的扫描条码
         if model_name == 'wh.internal':
-            move = self.env[model_name].browse(order_id).move_id
             val['type'] = 'internal'
+        if model_name != 'wh.inventory':
             create_line = self.scan_barcode_move_in_out_operation(move, att, conversion, goods,val)
 
         # 盘点单的扫码
         if model_name == 'wh.inventory':
-            move = self.env[model_name].browse(order_id)
+            move = order
             val['type'] = 'out'
             create_line = self.scan_barcode_inventory_operation(move, att, conversion, goods, val)
 
         return move, create_line, val
 
     def prepare_move_line_data(self, att, val, goods, move):
-        if att:
-            goods_id = att.goods_id.id
-            uos_id = att.goods_id.uos_id.id
-            uom_id = att.goods_id.uom_id.id
-            tax_rate = att.goods_id.tax_rate
-            attribute_id = att.id
-            conversion = att.goods_id.conversion
-            if val['type'] in ('in','internal'):
-                # 入库操作取产品的成本
-                price_taxed = att.goods_id.cost
-                cost_unit = att.goods_id.cost/(1 + tax_rate*0.01)
-            elif val['type'] == 'out':
-                # 出库操作取产品的零售价
-                price_taxed = att.goods_id.price
-                cost_unit = 0
+        """
+        准备移库单明细数据
+        :return: 字典
+        """
+        # 若传入的商品属性 att 上条码存在则取属性对应的商品，否则取传入的商品 goods
+        goods = att and att.goods_id or goods
+        goods_id = goods.id
+        uos_id = goods.uos_id.id
+        uom_id = goods.uom_id.id
+        tax_rate = goods.tax_rate
+        attribute_id = att and att.id or False
+        conversion = goods.conversion
+        # 采购入库取成本价，销售退货取销售价;采购退货取成本价，销售发货取销售价
+        price_taxed = move._name == 'buy.receipt' and goods.cost or goods.price
+        cost_unit = val['type'] == 'out' and 0 or goods.cost/(1 + tax_rate*0.01)
 
-        elif goods:
-            goods_id = goods.id
-            uos_id = goods.uos_id.id
-            uom_id = goods.uom_id.id
-            tax_rate = goods.tax_rate
-            attribute_id = False
-            conversion = goods.conversion
-            if val['type'] in ('in','internal'):
-                # 入库操作取产品的成本
-                price_taxed = goods.cost
-                cost_unit = goods.cost/(1 + tax_rate*0.01)
-            elif val['type'] == 'out':
-                # 出库操作取产品的零售价
-                price_taxed = goods.price
-                cost_unit = 0
-
+        val.update({
+            'goods_id': goods_id,
+            'attribute_id': attribute_id,
+            'warehouse_id': move.warehouse_id.id,
+            'uos_id': uos_id,
+            'uom_id': uom_id,
+        })
         if move._name != 'wh.inventory':
             val.update({
-                'goods_id': goods_id,
-                'attribute_id': attribute_id,
-                'warehouse_id': move.warehouse_id.id,
                 'warehouse_dest_id': move.warehouse_dest_id.id,
                 'goods_uos_qty': 1.0 / conversion,
-                'uos_id': uos_id,
                 'goods_qty': 1,
-                'uom_id': uom_id,
                 'price_taxed': price_taxed,
                 'tax_rate': tax_rate,
                 'cost_unit': cost_unit,
                 'move_id': move.id})
         else:
             val.update({
-                'goods_id': goods_id,
-                'attribute_id': attribute_id,
-                'warehouse_id': move.warehouse_id.id,
                 'inventory_uos_qty': 1.0 / conversion,
-                'uos_id': uos_id,
                 'inventory_qty': 1,
-                'uom_id': uom_id,
                 'real_uos_qty': 0,
                 'real_qty': 0,
                 'difference_uos_qty': 1.0 / conversion,
@@ -252,13 +223,20 @@ class wh_move(models.Model):
 
     @api.model
     def scan_barcode(self,model_name,barcode,order_id):
+        """
+        扫描条码
+        :param model_name: 模型名
+        :param barcode: 条码
+        :param order_id: 单据id
+        :return:
+        """
         att = self.env['attribute'].search([('ean','=',barcode)])
         goods = self.env['goods'].search([('barcode', '=', barcode)])
         line_model = (model_name == 'wh.inventory' and 'wh.inventory.line'
                       or 'wh.move.line')
 
         if not att and not goods:
-            raise UserError(u'ean为  %s 的产品不存在' % (barcode))
+            raise UserError(u'条码为  %s 的产品不存在' % (barcode))
         else:
             self.check_barcode(model_name, order_id, att, goods)
             conversion = att and att.goods_id.conversion or goods.conversion
@@ -275,12 +253,26 @@ class wh_move(models.Model):
         return super(wh_move, self).unlink()
 
     def prev_approve_order(self):
+        """
+        审核单据之前所做的处理
+        :return:
+        """
         for order in self:
             if not order.line_out_ids and not order.line_in_ids:
                 raise UserError(u'单据的明细行不可以为空')
+            qc_rule = self.env['qc.rule'].search([
+                ('move_type', '=', order.origin),
+                ('warehouse_id', '=', order.warehouse_id.id),
+                ('warehouse_dest_id', '=', order.warehouse_dest_id.id)])
+            if qc_rule and not order.qc_result:
+                raise UserError(u'请先上传质检报告')
 
     @api.multi
     def approve_order(self):
+        """
+        审核单据
+        :return:
+        """
         for order in self:
             order.prev_approve_order()
             order.line_out_ids.action_done()
@@ -297,6 +289,10 @@ class wh_move(models.Model):
 
     @api.multi
     def cancel_approved_order(self):
+        """
+        反审核单据
+        :return:
+        """
         for order in self:
             order.prev_cancel_approved_order()
             order.line_out_ids.action_cancel()
@@ -331,23 +327,26 @@ class wh_move(models.Model):
 
     @api.multi
     def create_zero_wh_in(self,wh_in,model_name):
+        """
+        创建一个缺货向导
+        :param wh_in: 单据实例
+        :param model_name: 单据模型
+        :return:
+        """
         all_line_message = ""
         today = fields.Datetime.now()
         line_in_ids = []
         goods_list = []
         for line in wh_in.line_out_ids:
-            vals={}
             if line.goods_id.no_stock:
                 continue
-            else:
-                result = self.env['wh.move'].check_goods_qty(line.goods_id, line.attribute_id, wh_in.warehouse_id)
-                result = result[0] or 0
+            result = self.check_goods_qty(line.goods_id, line.attribute_id, wh_in.warehouse_id)
+            result = result[0] or 0
             if line.goods_qty > result and not line.lot_id and not self.env.context.get('wh_in_line_ids'):
                 #在销售出库时如果临时缺货，自动生成一张盘盈入库单
                 if (line.goods_id.id, line.attribute_id.id) in goods_list:
                     continue
-                else:
-                    goods_list.append((line.goods_id.id, line.attribute_id.id))
+                goods_list.append((line.goods_id.id, line.attribute_id.id))
                 all_line_message += u'产品 %s ' % line.goods_id.name
                 if line.attribute_id:
                     all_line_message += u' 型号%s' % line.attribute_id.name
@@ -358,21 +357,21 @@ class wh_move(models.Model):
                             'uos_id': line.uos_id.id,
                             'goods_qty': 0,
                             'uom_id': line.uom_id.id,
-                            'cost_unit': line.goods_id.cost,
+                            'cost_unit': line.goods_id.cost / (1 + line.goods_id.tax_rate * 0.01),
                             'state': 'done',
                             'date': today}))
                 all_line_message += u" 当前库存量不足，继续出售请点击确定，并及时盘点库存\n"
 
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'产品 %s 的数量和含税单价不能小于0。' % line.goods_id.name)
         if line_in_ids:
-            vals.update({
+            vals = {
                 'type': 'inventory',
                 'warehouse_id': self.env.ref('warehouse.warehouse_inventory').id,
                 'warehouse_dest_id': wh_in.warehouse_id.id,
                 'state': 'done',
                 'date': today,
-                'line_in_ids': line_in_ids})
+                'line_in_ids': line_in_ids}
             return self.env[model_name].open_dialog('goods_inventory', {
                 'message': all_line_message,
                 'args': [vals],

@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<!-- 员工工资tree -->
+		<record id="staff_wages_tree" model="ir.ui.view">
+			<field name="name">staff.wages.tree</field>
+			<field name="model">staff.wages</field>
+			<field name="arch" type="xml">
+				<tree string="员工工资表">
+					<field name="date"/>
+					<field name="name"/>
+					<field name="payment"/>
+					<field name="state"/>
+				</tree>
+			</field>
+		</record>
+		<!-- 员工工资form -->
+		<record id="staff_wages_form" model="ir.ui.view">
+			<field name="name">staff.wages.form</field>
+			<field name="model">staff.wages</field>
+			<field name="arch" type="xml">
+				<form string="费用订单">
+					<header>
+						<button name="staff_wages_accrued" states="draft" string="计提" type="object" class="oe_highlight"/>
+						<button name="staff_wages_unaccrued" states="draft" string="反计提" type="object" class="oe_highlight"/>
+						<button name="staff_wages_confim" states="draft" string="审核" type="object" class="oe_highlight"/>
+						<button name="staff_wages_draft" states="done" string="反审核" type="object"/>
+						<field name="state" widget="statusbar" readonly="1"/>
+					</header>
+					<sheet>
+						<group>
+							<group>
+								<field name="date" required="1"/>
+								<field name="name" required="1"/>
+								<field name="payment" required="1"/>
+							</group>
+							<group>
+								<field name="other_money_order"/>
+								<field name="voucher_id"/>
+								<field name="change_voucher_id"/>
+								<field name="totoal_wage" invisible="1"/>
+								<field name="totoal_endowment" invisible="1"/>
+								<field name="totoal_health" invisible="1"/>
+								<field name="totoal_unemployment" invisible="1"/>
+								<field name="totoal_housing_fund" invisible="1"/>
+								<field name="totoal_personal_tax" invisible="1"/>
+								<field name="totoal_amount" invisible="1"/>
+							</group>
+						</group>
+						<field name="line_ids">
+							<tree string="工资明细" editable="bottom">
+								<field name="name"/>
+								<field name="basic_wage"/>
+								<field name="basic_date" required="1"/>
+								<field name="date_number" required="1" sum="出勤天数"/>
+								<field name="wage" sum="出勤工资金额"/>
+								<field name="add_hour" sum="加班小时数"/>
+								<field name="add_wage" sum="加班工资金额"/>
+								<field name="other_wage" sum="其它奖金金额"/>
+								<field name="all_wage" sum="应发工资金额"/>
+								<field name="endowment" sum="养老保险金额"/>
+								<field name="health" sum="医疗保险金额"/>
+								<field name="unemployment" sum="失业保险金额"/>
+								<field name="housing_fund" sum="住房公积金金额"/>
+								<field name="personal_tax" sum="个人所得税金额"/>
+								<field name="amount_wage" sum="实发工资金额"/>
+							</tree>
+						</field>
+						<group>
+							<field name="note"/>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="view_staff_employee_form_inherit" model="ir.ui.view">
+            <field name="name">staff.employee.form.inherit</field>
+            <field name="model">staff</field>
+            <field name='inherit_id' ref='staff.view_staff_employee_form' />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='basic_wage']" position="after">
+                    <field name="wages_change" required="1"/>
+				</xpath>
+            </field>
+        </record>
+
+		<!-- 引入员工wizard-->
+        <record id="create_wages_line_form" model="ir.ui.view">
+            <field name="name">create_wages_line_form</field>
+            <field name="model">create.wages.line.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+						<field name="wages_change"/>
+                    </group>
+                    <footer>
+                        <button name="input_change_wages"  string="引入员工信息" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+            	</form>
+            </field>
+        </record>
+        <act_window id="create_wages_line_action"
+            name="引入员工信息"
+            src_model="staff.wages"
+            res_model="create.wages.line.wizard"
+            view_type="form"
+            view_mode="form"
+            target="new"/>
+
+	</data>
+</openerp>

@@ -60,7 +60,7 @@ class bank_statements_report(models.Model):
                         (CASE WHEN mo.type = 'pay' THEN mol.amount ELSE 0 END) AS pay,
                         0 AS balance,
                         mo.partner_id,
-                        mol.note
+                        mo.note
                 FROM money_order_line AS mol
                 LEFT JOIN money_order AS mo ON mol.money_id = mo.id
                 WHERE mo.state = 'done'

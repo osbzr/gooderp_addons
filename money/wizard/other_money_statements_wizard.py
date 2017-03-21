@@ -19,6 +19,11 @@ class other_money_statements_report_wizard(models.Model):
     to_date = fields.Date(string=u'结束日期', required=True,
                           default=lambda self: fields.Date.context_today(self),
                           help=u'查看本次报表的结束日期')  # 默认当前日期
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def confirm_other_money_statements(self):

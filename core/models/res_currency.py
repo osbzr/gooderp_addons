@@ -4,6 +4,12 @@ from odoo import api, fields, models
 class res_currency(models.Model):
     _inherit = 'res.currency'
 
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
+
     @api.model
     def rmb_upper(self, value):
         """

@@ -132,6 +132,12 @@ class auto_exchange_line(models.Model):
     currency_id = fields.Many2one('res.currency', u'币别', index=True,
                                required=True, ondelete='cascade',
                                help=u'关联订单的编号')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
+
     _sql_constraints = [
         ('unique_start_date', 'unique (currency_id,period_id)', u'同币别期间不能重合!'),
     ]

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    	<!-- 菜单加入人力资源模块 -->
+
+        <menuitem id="menu_staff_wages" name="工资" parent="staff.menu_staff_root"/>
+
+        <menuitem id="menu_emp_staff_wages" name='员工工资' action="staff_wages_action"
+            parent="menu_staff_wages" sequence="0"/>
+
+	</data>
+</openerp>

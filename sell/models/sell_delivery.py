@@ -183,6 +183,11 @@ class sell_delivery(models.Model):
         return super(sell_delivery, self).unlink()
 
     def goods_inventory(self, vals):
+        """
+        审核时若仓库中商品不足，则产生补货向导生成其他入库单并审核。
+        :param vals: 创建其他入库单需要的字段及取值信息构成的字典
+        :return:
+        """
         auto_in = self.env['wh.in'].create(vals)
         line_ids = [line.id for line in auto_in.line_in_ids]
         self.with_context({'wh_in_line_ids':line_ids}).sell_delivery_done()
@@ -285,11 +290,11 @@ class sell_delivery(models.Model):
             'date': self.date,
             'line_ids': [(0, 0, line) for line in money_lines],
             'source_ids': [(0, 0, line) for line in source_lines],
-            'type': 'get',
             'amount': amount,
             'reconciled': this_reconcile,
             'to_reconcile': amount,
             'state': 'draft',
+            'origin_name': self.name,
         })
         return money_order
 

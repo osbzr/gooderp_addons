@@ -28,6 +28,11 @@ class report_stock_transceive_wizard(models.TransientModel):
                             help=u'本次报表查看的仓库')
     goods = fields.Char(u'产品',
                         help=u'本次报表查看的产品')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('date_start', 'date_end')
     def onchange_date(self):

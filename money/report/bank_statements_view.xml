@@ -14,7 +14,7 @@
                     <field name="get"/>
                     <field name="pay"/>
                     <field name="partner_id"/>
-                    <field name="this_balance"/>
+                    <field name="balance"/>
                 </tree>
             </field>
         </record>

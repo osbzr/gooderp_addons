@@ -63,6 +63,11 @@ class db_backup(models.Model):
     port = fields.Char('Port', size=10, required='True',default='8888')
     name = fields.Char('Database', size=100, required='True',help='Database you want to schedule backups for')
     bkp_dir = fields.Char('Backup Directory', size=100, help='Absolute path for storing the backups', required='True', default=addons_path)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
     @api.constrains('name')

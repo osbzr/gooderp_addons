@@ -20,20 +20,31 @@ class BalanceSheet(models.Model):
     balance = fields.Char(u'资产')
     line_num = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
     ending_balance = fields.Float(u'期末余额')
-    balance_formula = fields.Text(u'科目范围', help=u'设定本行的资产负债表的科目范围!例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    balance_formula = fields.Text(u'科目范围', help=u'设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
     beginning_balance = fields.Float(u'年初余额')
 
     balance_two = fields.Char(u'负债和所有者权益')
     line_num_two = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
     ending_balance_two = fields.Float(u'期末余额')
-    balance_two_formula = fields.Text(u'科目范围', help=u'设定本行的资产负债表的科目范围!例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    balance_two_formula = fields.Text(u'科目范围', help=u'设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
     beginning_balance_two = fields.Float(u'年初余额', help=u'报表行本年的年余额')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class create_balance_sheet_wizard(models.TransientModel):
     """创建资产负债 和利润表的 wizard"""
     _name = "create.balance.sheet.wizard"
     _description = u'资产负债表和利润表的向导'
+
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.model
     def _default_period_domain(self):
@@ -201,6 +212,11 @@ class ProfitStatement(models.Model):
 
     balance = fields.Char(u'项目', help=u'报表的行次的总一个名称')
     line_num = fields.Char(u'行次', help=u'生成报表的行次')
-    cumulative_occurrence_balance = fields.Float(u'本年累计金额', help=u'本年利润金额!')
-    occurrence_balance_formula = fields.Text(u'科目范围', help=u'设定本行的利润的科目范围!例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
-    current_occurrence_balance = fields.Float(u'本月金额', help=u'本月的利润的金额!')
+    cumulative_occurrence_balance = fields.Float(u'本年累计金额', help=u'本年利润金额')
+    occurrence_balance_formula = fields.Text(u'科目范围', help=u'设定本行的利润的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    current_occurrence_balance = fields.Float(u'本月金额', help=u'本月的利润的金额')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

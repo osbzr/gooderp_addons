@@ -27,6 +27,11 @@ class stock_request(models.Model):
     state = fields.Selection(STOCK_REQUEST_STATES, u'审核状态', readonly=True,
                              help=u"补货申请的审核状态", copy=False,
                              default='unsubmit')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.one
     def stock_query(self):
@@ -293,3 +298,8 @@ class stock_request_line(models.Model):
     uom_id = fields.Many2one('uom', u'单位')
     supplier_id = fields.Many2one('partner', u'供应商')
     is_buy = fields.Boolean(u'采购', default=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())

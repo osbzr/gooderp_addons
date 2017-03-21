@@ -11,6 +11,11 @@ class business_data_table(models.Model):
     name = fields.Char(u'业务数据表名', required=True)
     clean_business_id = fields.Many2one(
         'clean.business.data', string=u'清理数据对象')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('model')
     def onchange_model(self):
@@ -34,6 +39,11 @@ class clean_business_data(models.Model):
     need_clean_table = fields.One2many('business.data.table', 'clean_business_id',
                                        default=_get_business_table_name,
                                        string='要清理的业务数据表')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def remove_data(self):

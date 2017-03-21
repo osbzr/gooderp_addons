@@ -44,6 +44,11 @@ class sell_adjust(models.Model):
                              help=u'变更单审核状态')
     note = fields.Text(u'备注',
                        help=u'单据备注')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def unlink(self):
@@ -211,6 +216,11 @@ class sell_adjust_line(models.Model):
                             help=u'含税单价 乘以 数量')
     note = fields.Char(u'备注',
                        help=u'本行备注')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):

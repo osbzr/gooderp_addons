@@ -55,6 +55,11 @@ class wh_inventory(models.Model):
         help=u'盘点单的明细行')
     note = fields.Text(u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def requery_inventory(self):
@@ -313,6 +318,11 @@ class wh_inventory_line(models.Model):
         u'差异辅助数量', digits=dp.get_precision('Quantity'),
         compute='_get_difference_uos_qty',
         help=u'盘点单行对应的产品的差异辅助数量')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     def check_difference_identical(self):
         if self.difference_qty * self.difference_uos_qty < 0:

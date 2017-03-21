@@ -171,6 +171,7 @@
                                     <field name='uom_id' required='1' attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name='cost_unit' string='入库单位成本' readonly='1' />
                                     <field name='cost' string='入库金额' readonly='1' sum='1' />
+                                      <field name='expiration_date' groups='warehouse.group_expiration_date' />
                                     <field name='note' string='备注' />
                                     <field name='using_batch' invisible='1' />
                                     <field name='force_batch_one' invisible='1' />
@@ -212,6 +213,9 @@
                                         <field name='uom_id' required='1' attrs="{'readonly': [('state', '=', 'done')]}"/>
                                         <field name='cost_unit' string='出库单位成本' readonly='1' />
                                         <field name='cost' string='出库成本' readonly='1' sum='1' />
+                                        <field name='expiration_date'
+                                               readonly='1'
+                                               groups='warehouse.group_expiration_date' />
                                         <field name='note' string='备注' />
                                         <field name='using_attribute' invisible='1' />
                                         <field name='using_batch' invisible='1' />
@@ -227,6 +231,10 @@
 
                         <group>
                             <field name='note' nolabel='1' placeholder='备注...' />
+                        </group>
+                        <group>
+                            <field name='qc_result' widget='pdf_viewer'
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
                         <group col='6'>
@@ -348,6 +356,7 @@
                                         attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name='cost_unit' string='入库单位成本' readonly='1'/>
                                     <field name='cost' string='入库金额' readonly='1' sum='1'/>
+                                    <field name='expiration_date' groups='warehouse.group_expiration_date' />
                                     <field name='note' string='备注'/>
                                     <field name='using_batch' invisible='1'/>
                                     <field name='force_batch_one' invisible='1'/>
@@ -397,6 +406,9 @@
                                         attrs="{'readonly': [('state', '=', 'done')]}" />
                                     <field name='cost_unit' string='出库单位成本' readonly='1' />
                                     <field name='cost' string='出库成本' readonly='1' sum='1' />
+                                    <field name='expiration_date'
+                                           readonly='1'
+                                           groups='warehouse.group_expiration_date' />
                                     <field name='note' string='备注' />
                                     <field name='using_attribute' invisible='1' />
                                     <field name='using_batch' invisible='1' />
@@ -412,6 +424,10 @@
 
                         <group>
                             <field name='note' nolabel='1' placeholder='备注...' />
+                        </group>
+                        <group>
+                            <field name='qc_result' widget='pdf_viewer'
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
                         <group col='6'>
@@ -522,6 +538,9 @@
                                         attrs="{'readonly': [('state', '=', 'done')]}" />
                                     <field name='cost_unit' string='出库单位成本' readonly='1' />
                                     <field name='cost' string='出库成本' readonly='1' sum='1' />
+                                    <field name='expiration_date'
+                                           readonly='1'
+                                           groups='warehouse.group_expiration_date' />
                                     <field name='note' string='备注' />
                                     <field name='using_attribute' invisible='1' />
                                     <field name='using_batch' invisible='1' />
@@ -563,6 +582,7 @@
                                             attrs="{'readonly': [('state', '=', 'done')]}" />
                                         <field name='cost_unit' string='入库单位成本' readonly='1' />
                                         <field name='cost' string='入库金额' readonly='1' sum='1' />
+                                        <field name='expiration_date' groups='warehouse.group_expiration_date' />
                                         <field name='note' string='备注' />
                                         <field name='using_batch' invisible='1' />
                                         <field name='force_batch_one' invisible='1' />
@@ -575,6 +595,10 @@
 
                         <group>
                             <field name='note' nolabel='1' placeholder='备注...' />
+                        </group>
+                        <group>
+                            <field name='qc_result' widget='pdf_viewer'
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}" />
                         </group>
 
                         <group col='6'>

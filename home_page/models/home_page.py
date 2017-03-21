@@ -4,9 +4,14 @@ from odoo.tools.safe_eval import safe_eval as eval
 
 class home_report_type(models.Model):
     _name = "home.report.type"
-    _description = "用来分类报表,让相似的报表显示在一起"
+    _description = u"用来分类报表,让相似的报表显示在一起"
     name = fields.Char(u'报表类别', help=u'在home.page 中报表类别不同类别的可以分组,组别的名称!')
     sequence = fields.Integer(u'序列', help=u'在home.page 中报表类别分组 时的顺序进行调整!')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class home_page(models.Model):
@@ -31,6 +36,11 @@ class home_page(models.Model):
     report_type_id = fields.Many2one('home.report.type', string='报表类别', help=u'类型为 实时报表时 要选择报表类别,\
                                     可以对不同类型的报表进行分组!')
     group_ids = fields.Many2many('res.groups','home_page_group_rel','home_page_id','group_id',string='用户组')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.onchange('action')
     def onchange_action(self):

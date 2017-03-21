@@ -7,3 +7,4 @@ import production
 import warehouse_move_line
 import move_matching
 import res_company
+import qc_rule

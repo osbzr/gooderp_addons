@@ -30,6 +30,11 @@ class CreateExchangeWizard(models.TransientModel):
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     #todo 增加一个可以看到最后汇率的界面
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def create_partner_exchange_line(self,vals):
@@ -194,6 +199,11 @@ class rate_period(models.Model):
         'finance.account', u'固定资产科目', required=True)
     account_depreciation = fields.Many2one(
         'finance.account', u'折旧费用科目', required=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 
