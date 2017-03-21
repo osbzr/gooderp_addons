@@ -40,6 +40,11 @@ class staff_job(models.Model):
     note = fields.Text(u'描述')
     account_id = fields.Many2one('finance.account', u'计提工资科目')
     department_id = fields.Many2one('staff.department', u'部门')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class staff_employee_category(models.Model):
@@ -53,6 +58,11 @@ class staff_employee_category(models.Model):
                                     'employee_category_rel',
                                     'category_id',
                                     'emp_id', u'员工')
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
 
 
 class staff(models.Model):

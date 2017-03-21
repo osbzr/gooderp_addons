@@ -15,3 +15,8 @@ class staff_contract(models.Model):
     unemployment = fields.Float(u'个人失业保险')
     housing_fund = fields.Float(u'个人住房公积金')
     job_id = fields.Many2one('staff.job', u'岗位', required=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
