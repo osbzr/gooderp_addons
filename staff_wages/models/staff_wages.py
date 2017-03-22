@@ -215,7 +215,7 @@ class wages_line(models.Model):
     date_number = fields.Float(u'出勤天数')
     basic_wage = fields.Float(u'基础工资')
     basic_date = fields.Float(u'基础天数')
-    wage = fields.Float(u'出勤工资')
+    wage = fields.Float(u'出勤工资', compute='_all_wage_value', store=True)
     add_hour = fields.Float(u'加班小时')
     add_wage = fields.Float(u'加班工资')
     other_wage = fields.Float(u'其它')
@@ -237,10 +237,8 @@ class wages_line(models.Model):
         if self.date_number >= self.basic_date:
             self.add_hour = 8 * (self.date_number - self.basic_date)
             self.date_number = self.basic_date
-            self.wage = self.basic_wage
             self.add_wage = round(2 * (self.add_hour / 8) *  (self.basic_wage /(self.basic_date or 1)),2)
-        else:
-            self.wage = round((self.date_number / self.basic_date or 1) * self.basic_wage,2)
+
 
     @api.onchange('add_hour')
     def change_add_wage(self):
@@ -257,8 +255,13 @@ class wages_line(models.Model):
         self.housing_fund = social_security.housing_fund
 
     @api.one
-    @api.depends('wage','add_wage','other_wage')
+    @api.depends('date_number','basic_date','add_wage','other_wage','basic_wage')
     def _all_wage_value(self):
+        if self.date_number >= self.basic_date:
+            self.wage = self.basic_wage
+        else:
+            self.wage = round((self.date_number / self.basic_date or 1) * self.basic_wage, 2)
+
         self.all_wage = self.wage + self.add_wage + self.other_wage
 
     @api.one

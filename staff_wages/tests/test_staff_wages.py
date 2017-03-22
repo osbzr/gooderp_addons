@@ -31,20 +31,24 @@ class test_staff_wages(TransactionCase):
         self.assertTrue(self.staff_wages.state == 'done')
 
     def test_staff_wages_accrued(self):
+        # 计提lili的工资
         self.staff_wages.staff_wages_accrued()
-        self.assertTrue(self.staff_wages.voucher_id != 'False')
+        self.assertTrue(self.staff_wages.voucher_id)
+        # 修改lili的基本工资并重新计提
+        for line in self.staff_wages.line_ids:
+            line.basic_wage = 5000
         self.staff_wages.staff_wages_accrued()
-        self.env['wages.line'].create({'name': self.env.ref('staff.staff_1').id,
-                                         'basic_date': 22,
-                                         'date_number': 22,
+        # 在工资表上增加人员并重新计提
+        self.env['wages.line'].create({'name': self.env.ref('staff.lili').id,
                                          'basic_wage': 3000,
+                                         'basic_date': 22,
+                                         'date_number':22,
                                          'order_id': self.staff_wages.id,
                                          })
-        self.staff_wages.staff_wages_accrued() # 会生成change_voucher_id
         self.staff_wages.staff_wages_accrued()
-
-
-
+        # 如果修改凭证已审核，反审核凭证后重新生成
+        self.staff_wages.change_voucher_id.voucher_done()
+        self.staff_wages.staff_wages_accrued()
 
 
 
