@@ -25,6 +25,12 @@
 			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
+		<!--管理质检报告组-->
+		<record id='group_qc' model='res.groups'>
+			<field name='name'>管理质检</field>
+			<field name='category_id' ref="core.good_warehouse"/>
+			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+		</record>
 		<!--添加管理其它出库单审核组-->
 		<record id='other_out_picking_groups' model='res.groups'>
 			<field name='name'>其它出库单审核</field>
