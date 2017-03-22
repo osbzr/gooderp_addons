@@ -11,6 +11,7 @@
             <field name='name' ref='staff.lili'/>
             <field name='basic_date'>22</field>
             <field name='date_number'>21</field>
+            <field name='basic_wage'>3000</field>
         </record>
     </data>
 </openerp>

@@ -45,6 +45,7 @@ class staff_wages(models.Model):
     @api.onchange('line_ids')
     def _total_amount_wage(self):
         #todo 测试onchange + compute
+
         self.totoal_amount = sum(line.amount_wage for line in self.line_ids)
         self.totoal_wage = sum(line.all_wage for line in self.line_ids)
         self.totoal_endowment = sum(line.endowment for line in self.line_ids)
@@ -54,7 +55,7 @@ class staff_wages(models.Model):
         self.totoal_personal_tax = sum(line.personal_tax for line in self.line_ids)
 
     @api.one
-    def staff_wages_confim(self):
+    def staff_wages_confirm(self):
         self.staff_wages_accrued()
         self._other_pay()
         self.state = 'done'
@@ -204,6 +205,7 @@ class staff_wages(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise UserError(u'不能删除已审核的单据(%s)'%self.period_id)
+        return super(staff_wages, self).unlink()
 
 class wages_line(models.Model):
     _name = 'wages.line'
@@ -213,7 +215,7 @@ class wages_line(models.Model):
     date_number = fields.Float(u'出勤天数')
     basic_wage = fields.Float(u'基础工资')
     basic_date = fields.Float(u'基础天数')
-    wage = fields.Float(u'出勤工资')
+    wage = fields.Float(u'出勤工资', compute='_all_wage_value', store=True)
     add_hour = fields.Float(u'加班小时')
     add_wage = fields.Float(u'加班工资')
     other_wage = fields.Float(u'其它')
@@ -235,10 +237,8 @@ class wages_line(models.Model):
         if self.date_number >= self.basic_date:
             self.add_hour = 8 * (self.date_number - self.basic_date)
             self.date_number = self.basic_date
-            self.wage = self.basic_wage
             self.add_wage = round(2 * (self.add_hour / 8) *  (self.basic_wage /(self.basic_date or 1)),2)
-        else:
-            self.wage = round((self.date_number / self.basic_date or 1) * self.basic_wage,2)
+
 
     @api.onchange('add_hour')
     def change_add_wage(self):
@@ -255,8 +255,13 @@ class wages_line(models.Model):
         self.housing_fund = social_security.housing_fund
 
     @api.one
-    @api.depends('wage','add_wage','other_wage')
+    @api.depends('date_number','basic_date','add_wage','other_wage','basic_wage')
     def _all_wage_value(self):
+        if self.date_number >= self.basic_date:
+            self.wage = self.basic_wage
+        else:
+            self.wage = round((self.date_number / self.basic_date or 1) * self.basic_wage, 2)
+
         self.all_wage = self.wage + self.add_wage + self.other_wage
 
     @api.one
