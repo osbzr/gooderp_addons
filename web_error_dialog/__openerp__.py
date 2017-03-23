@@ -28,6 +28,7 @@
     "author": "zhengXiang",
     "website": "http://www.osbzr.com",
     'category': 'Technical Settings',
+    'depends': ['web'],
     'data': [
         'views/assets_backend.xml',
     ],
