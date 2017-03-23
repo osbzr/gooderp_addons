@@ -371,7 +371,7 @@ class sell_delivery(models.Model):
             ('state', '=', 'draft')
         ])
         if return_order_draft:
-            raise UserError(u'销售出库单存在草稿状态的退货单！')
+            raise UserError(u'销售发货单存在草稿状态的退货单！')
 
         return_order = self.search([
             ('is_return', '=', True),
