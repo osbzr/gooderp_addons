@@ -64,10 +64,17 @@ class test_staff_wages(TransactionCase):
 
     def test_staff_wages_confirm(self):
         '''test_staff_wages_confirm'''
+        #审核之后验证工资单状态是否为done
+        for line in self.staff_wages.line_ids:
+            line.change_social_security()
+            line._all_wage_value()
+            line.change_wage_addhour()
+        self.staff_wages._total_amount_wage()
         self.staff_wages.staff_wages_confirm()
         self.assertTrue(self.staff_wages.state == 'done')
-
-
+        #测试审核之后不能删除已审核单据
+        with self.assertRaises(UserError):
+            self.staff_wages.unlink()
 
     def test_create_voucher(self):
         '''test_create_voucher'''
@@ -88,6 +95,28 @@ class test_staff_wages(TransactionCase):
         self.staff_wages.other_money_order.other_money_done()
         #调用员工工资单的反审核方法
         self.staff_wages.staff_wages_draft()
+
+    def test_unlink(self):
+        self.staff_wages.unlink()
+
+    def test_staff_wages_unaccrued(self):
+        self.staff_wages._total_amount_wage()
+        self.staff_wages.staff_wages_accrued()
+        self.assertTrue(self.staff_wages.voucher_id)
+        self.staff_wages._total_amount_wage()
+        self.staff_wages.change_voucher()
+        self.staff_wages.voucher_id.voucher_done()
+        self.staff_wages.staff_wages_unaccrued()
+        self.staff_wages.staff_wages_accrued()
+        for line in self.staff_wages.line_ids:
+            line.basic_wage = 5000
+        self.staff_wages.staff_wages_accrued()
+        with self.assertRaises(UserError):
+            self.staff_wages.staff_wages_unaccrued()
+
+
+
+
 
 
 
