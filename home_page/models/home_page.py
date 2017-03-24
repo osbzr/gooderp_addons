@@ -22,7 +22,8 @@ class home_page(models.Model):
     sequence = fields.Integer(u'序列', help=u'用来确定 每条记录在首页中的显示的顺序(而不仅仅是记录的顺序)')
     action = fields.Many2one('ir.actions.act_window', string=u'快捷页面', required='1', help=u'设置首页点击事假,\
                                                                                          的跳转的对应的模型的action')
-    view_id = fields.Many2one('ir.ui.view', string=u'对应的视图', help=u'设置首页点击事假,的跳转的对应的模型的视图')
+    #view_id = fields.Many2one('ir.ui.view', string=u'对应的视图', help=u'设置首页点击事假,的跳转的对应的模型的视图')
+    #TODO 试用一段时间 如果确实不需要则删除
     menu_type = fields.Selection([(u'all_business', u'业务总览'), (u'amount_summary', u'金额汇总'), (u'report', u'实时报表')],
                                  string=u'类型', required="1", help=u'选定本条记录的类型,本字段会决定本条记录属于那一块')
     domain = fields.Char(u'页面的过滤', default='[]', help=u'字符串条件,用来过滤出您所选的视图中的数据!')
@@ -53,10 +54,12 @@ class home_page(models.Model):
         """
         通过填写的自定义的action，构造出要用到的action的参数
         :param action:
-        :return:
+        :return:  view_id 从action上读取，如果为空则 视图取默认值！
         """
+        views_ids = [view.view_id.id for view in action.action.view_ids]
         note_one, view_mode, res_model = action.note_one, action.action.view_mode, action.action.res_model
-        domain, action_id, context, view_id = action.action.domain, action.id, action.action.context, action.view_id.id
+        domain, action_id, context, view_id = action.action.domain, action.id, action.action.context, \
+                                              views_ids or False
         action_name, target = action.action.name, action.action.target
         return [note_one, view_mode, res_model, domain, context, view_id, action_name, target]
 
