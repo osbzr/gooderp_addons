@@ -51,7 +51,7 @@
             <field name="view_id" ref="core.customer_tree"/>
             <field name="menu_type">amount_summary</field>
             <field name="note_one">应收余额</field>
-            <field name="compute_field_one" ref="core.field_partner_payable"/>
+            <field name="compute_field_one" ref="core.field_partner_receivable"/>
             <field name="domain" >[('c_category_id','!=',False)]</field>
             <field name="context" >{}</field>
         </record>

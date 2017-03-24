@@ -59,9 +59,9 @@
 			<field name="report_type_id" ref="money.home_report_type_3"/>
 		    <field name="note_one" >供应商对账单向导</field>
 		</record>
-		<record id="amount_summary_customer_action" model="home.page">
+		<record id="amount_summary_vendor_action" model="home.page">
         	<field name="sequence">1</field>
-            <field name="action" ref="core.customer_action"/>
+            <field name="action" ref="core.vendor_action"/>
             <field name="view_id" ref="core.vendor_tree"/>
             <field name="menu_type">amount_summary</field>
             <field name="note_one">应付余额</field>
