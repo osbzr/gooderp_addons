@@ -221,6 +221,7 @@ class wh_assembly(models.Model):
         for order in self:
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
+            order.move_id.check_qc_result() # 检验质检报告是否上传
             order.line_in_ids.action_done() # 完成成品入库
 
             self.update_parent_cost()
@@ -690,6 +691,7 @@ class outsource(models.Model):
         for order in self:
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
+            order.move_id.check_qc_result() # 检验质检报告是否上传
             order.line_in_ids.action_done() # 完成成品入库
 
             # 如果委外费用存在，生成 结算单
@@ -874,6 +876,7 @@ class wh_disassembly(models.Model):
         for order in self:
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
+            order.move_id.check_qc_result() # 检验质检报告是否上传
             order.line_in_ids.action_done() # 完成成品入库
 
             self.update_child_cost()
