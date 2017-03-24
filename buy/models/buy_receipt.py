@@ -106,6 +106,10 @@ class buy_receipt(models.Model):
     voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True,
                                  help=u'审核时产生的入库凭证')
     origin_id = fields.Many2one('buy.receipt', u'来源单据')
+    currency_id = fields.Many2one('res.currency',
+                                  u'外币币别',
+                                  readonly=True,
+                                  help=u'外币币别')
 
     def _compute_total(self, line_ids):
         return sum(line.subtotal for line in line_ids)
@@ -231,7 +235,8 @@ class buy_receipt(models.Model):
             'to_reconcile': amount,
             'tax_amount': tax_amount,
             'date_due': self.date_due,
-            'state': 'draft'
+            'state': 'draft',
+            'currency_id': self.currency_id.id,
         }
 
     def _receipt_make_invoice(self):

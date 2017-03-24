@@ -145,6 +145,15 @@ class test_buy_order(TransactionCase):
         with self.assertRaises(UserError):
             self.order.buy_order_done()
 
+    def test_buy_order_done_foreign_currency(self):
+        """测试审核购货订单，外币免税"""
+        self.order.currency_id = self.env.ref('base.USD')
+        for line in self.order.line_ids:
+            line.price_taxed = 1170
+            line.tax_rate = 17
+        with self.assertRaises(UserError):
+            self.order.buy_order_done()
+
     def test_buy_order_draft(self):
         '''采购订单反审核'''
         # 正常反审核
@@ -240,6 +249,12 @@ class test_buy_order_line(TransactionCase):
             self.assertTrue(line.tax_amount == 17)
             self.assertAlmostEqual(line.price_taxed, 11.7)
             self.assertTrue(line.subtotal == 117)
+
+    def test_compute_all_amount_foreign_currency(self):
+        '''外币测试：当订单行的数量、含税单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
+        self.order.currency_id = self.env.ref('base.EUR')
+        for line in self.order.line_ids:
+            line.price_taxed = 11.7
 
     def test_compute_all_amount_wrong_tax_rate(self):
         '''明细行上输入错误税率，应报错'''
