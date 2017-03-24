@@ -28,7 +28,7 @@
 							<page name='timeline' string='工作记录'>
 								<field name="timeline_ids">
 									<tree string="进展"  editable='BOTTOM'>
-										<field name='task_id' domain="[('user_id', 'in', [uid, False])]"/>
+										<field name='task_id' domain="[('user_id', 'in', [uid, False]),('status.state', '!=', 'done')]"/>
 										<field name='just_done'/>
 										<field name='next_action'/>
 										<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
