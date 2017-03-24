@@ -16,6 +16,8 @@
 					<field name="planned_date"/>
 					<field name="create_uid" string="制单人"/>
 					<field name="approve_uid"/>
+					<field name='currency_id'
+						 groups='finance.group_multi_currency'/>
 					<field name="state"/>
 					<field name="goods_state"/>
 					<field name="money_state"/>
@@ -63,6 +65,8 @@
 								<field name="type" widget="radio"/>
 								<field name="goods_state" readonly="1"/>
 								<field name="money_state" readonly="1"/>
+								<field name='currency_id' readonly='1'
+									   groups='finance.group_multi_currency'/>
 							</group>
 						</group>
 						<field name="line_ids">
@@ -78,6 +82,8 @@
 								<field name="price_taxed" groups='buy.in_tax_groups'/>
 								<field name="discount_rate" groups='buy.buy_line_discount_groups'/>
 								<field name="discount_amount" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
+								<field name='currency_amount' sum='外币合计'
+									   groups='finance.group_multi_currency'/>
 								<field name="amount" sum="合计金额"/>
 								<field name="tax_rate" groups='buy.in_tax_groups'/>
 								<field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>

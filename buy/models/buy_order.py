@@ -85,18 +85,28 @@ class buy_order(models.Model):
             self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
         else:
             self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
-        
+
     @api.depends('receipt_ids')
     def _compute_receipt(self):
         for order in self:
             order.receipt_count = len(order.receipt_ids.ids) 
-        
+
     @api.depends('receipt_ids')
     def _compute_invoice(self):
         for order in self:
             order.invoice_ids = order.receipt_ids.mapped('invoice_id')
             order.invoice_count = len(order.invoice_ids.ids)			
-        
+
+    @api.one
+    @api.depends('partner_id')
+    def _compute_currency_id(self):
+        """
+        计算货币
+        :return:
+        """
+        self.currency_id = self.partner_id.s_category_id.account_id.currency_id.id or self.partner_id.c_category_id.account_id.currency_id.id
+        if not self.currency_id:
+            self.currency_id = self.env.user.company_id.currency_id.id
 
     partner_id = fields.Many2one('partner', u'供应商',
                                  states=READONLY_STATES,
@@ -200,6 +210,11 @@ class buy_order(models.Model):
     receipt_count = fields.Integer(compute='_compute_receipt', string='Receptions Count', default=0)
     invoice_ids = fields.One2many('money.invoice', compute='_compute_invoice', string='Invoices')
     invoice_count = fields.Integer(compute='_compute_invoice', string='Invoices Count', default=0)
+    currency_id = fields.Many2one('res.currency',
+                                  u'外币币别',
+                                  compute='_compute_currency_id',
+                                  store=True,
+                                  help=u'外币币别')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -273,14 +288,16 @@ class buy_order(models.Model):
     def buy_order_done(self):
         '''审核购货订单'''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复审核')
         if not self.line_ids:
-            raise UserError(u'请输入产品明细行！')
+            raise UserError(u'请输入产品明细行')
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'产品 %s 的数量和含税单价不能小于0' % line.goods_id.name)
+            if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
+                raise UserError(u'外贸免税')
         if not self.bank_account_id and self.prepayment:
-            raise UserError(u'预付款不为空时，请选择结算账户！')
+            raise UserError(u'预付款不为空时，请选择结算账户')
         # 采购预付款生成付款单
         self.generate_payment_order()
         self.buy_generate_receipt()
@@ -359,6 +376,7 @@ class buy_order(models.Model):
             'discount_rate': self.discount_rate,
             'discount_amount': self.discount_amount,
             'invoice_by_receipt':self.invoice_by_receipt,
+            'currency_id': self.currency_id.id,
         })
         if self.type == 'buy':
             receipt_id.write({'line_in_ids': [
@@ -488,10 +506,23 @@ class buy_order_line(models.Model):
             raise UserError(u'税率不能输入超过100的数')
         if self.tax_rate < 0:
             raise UserError(u'税率不能输入负数')
-        self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
-        self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
-        self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
-        self.amount = self.subtotal - self.tax_amount # 金额
+        if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
+            # 单据上外币是公司本位币
+            self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
+            self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
+            self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
+            self.amount = self.subtotal - self.tax_amount # 金额
+        else:
+            # 非公司本位币
+            rate_silent = (self.env['res.currency'].get_rate_silent(
+                self.order_id.date,
+                self.order_id.currency_id.id) or 0)
+            currency_amount = self.quantity * self.price_taxed - self.discount_amount
+            self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
+            self.subtotal = (self.price_taxed * self.quantity - self.discount_amount) * rate_silent  # 价税合计
+            self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate  # 税额
+            self.amount = self.subtotal - self.tax_amount  # 本位币金额
+            self.currency_amount = currency_amount  # 外币金额
 
     @api.one
     def _inverse_price(self):
@@ -553,6 +584,11 @@ class buy_order_line(models.Model):
                           store=True,
                           digits=dp.get_precision('Amount'),
                           help=u'金额  = 价税合计  - 税额')
+    currency_amount = fields.Float(u'外币金额',
+                                   compute=_compute_all_amount,
+                                   store=True,
+                                   digits=dp.get_precision(u'金额'),
+                                   help=u'外币金额')
     tax_rate = fields.Float(u'税率(%)',
                             default=lambda self:self.env.user.company_id.import_tax_rate,
                             help=u'默认值取公司进项税率')

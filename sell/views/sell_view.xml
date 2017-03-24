@@ -398,6 +398,8 @@
             					<field name='order_id' readonly='1'/>
             					<field name='invoice_id' readonly='1'/>
             					<field name="return_state" readonly="1"/>
+								<field name='currency_id' readonly='1'
+									   groups='finance.group_multi_currency'/>
             					<field name="modifying" invisible="1"/>
             				</group>
             			</group>
