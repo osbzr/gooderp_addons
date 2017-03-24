@@ -252,6 +252,18 @@ class wh_move(models.Model):
 
         return super(wh_move, self).unlink()
 
+    def check_qc_result(self):
+        """
+        检验质检报告是否上传
+        :return:
+        """
+        qc_rule = self.env['qc.rule'].search([
+            ('move_type', '=', self.origin),
+            ('warehouse_id', '=', self.warehouse_id.id),
+            ('warehouse_dest_id', '=', self.warehouse_dest_id.id)])
+        if qc_rule and not self.qc_result:
+            raise UserError(u'请先上传质检报告')
+
     def prev_approve_order(self):
         """
         审核单据之前所做的处理
@@ -260,12 +272,7 @@ class wh_move(models.Model):
         for order in self:
             if not order.line_out_ids and not order.line_in_ids:
                 raise UserError(u'单据的明细行不可以为空')
-            qc_rule = self.env['qc.rule'].search([
-                ('move_type', '=', order.origin),
-                ('warehouse_id', '=', order.warehouse_id.id),
-                ('warehouse_dest_id', '=', order.warehouse_dest_id.id)])
-            if qc_rule and not order.qc_result:
-                raise UserError(u'请先上传质检报告')
+            order.check_qc_result()
 
     @api.multi
     def approve_order(self):

@@ -234,7 +234,7 @@
                         </group>
                         <group>
                             <field name='qc_result' widget='pdf_viewer'
-                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   attrs="{'readonly': [('state', '=', 'done')]}"
                                    groups='warehouse.group_qc'
                             />
                         </group>
@@ -429,7 +429,7 @@
                         </group>
                         <group>
                             <field name='qc_result' widget='pdf_viewer'
-                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   attrs="{'readonly': [('state', '=', 'done')]}"
                                    groups='warehouse.group_qc'
                             />
                         </group>
@@ -602,7 +602,7 @@
                         </group>
                         <group>
                             <field name='qc_result' widget='pdf_viewer'
-                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   attrs="{'readonly': [('state', '=', 'done')]}"
                                    groups='warehouse.group_qc'
                             />
                         </group>
