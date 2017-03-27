@@ -204,7 +204,7 @@ class staff_wages(models.Model):
     def unlink(self):
         for record in self:
             if record.state != 'draft':
-                raise UserError(u'不能删除已审核的单据(%s)'%self.period_id)
+                raise UserError(u'不能删除已审核的单据(%s)'%self.name)
         return super(staff_wages, self).unlink()
 
 class wages_line(models.Model):

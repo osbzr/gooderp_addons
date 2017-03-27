@@ -16,6 +16,7 @@ odoo.define('home_page', function (require) {
             'click .oe_quick_link': 'on_click_quick',
             'click .oe_main_link': 'on_click_main',
         },
+
         /**
          *把后端传进来的action的数据进行还原 并且
          * 替换掉tree为list 因为在js里面 tree表示为list
@@ -23,10 +24,7 @@ odoo.define('home_page', function (require) {
         get_action_vals: function (vals) {
             vals[1] = vals[1].replace('tree','list');
             var view_mode_list = vals[1].split(',')
-            var views = [];
-            for(var i=0;i<view_mode_list.length;i++){
-                views.push([false, view_mode_list[i]])
-            }
+            var views = this.constract_views(view_mode_list, vals);
             return {
                 type: 'ir.actions.act_window',
                 res_model: vals[2],
@@ -37,6 +35,22 @@ odoo.define('home_page', function (require) {
                 name: vals[6],
                 target: vals[7],
             };
+        },
+        /***
+         *针对传入的
+         */
+        constract_views: function (view_mode_list, vals) {
+            var views = []
+            if(typeof vals[5]=='object'){
+                for(var i=0;i < (vals[5]).length;i++){
+                    views.push([vals[5][i], view_mode_list[i]])
+                }
+            }else{
+                for(var i=0;i < vals[5].length;i++){
+                    views.push([false, view_mode_list[i]])
+                }
+            }
+            return views
         },
         /***
          *以下三个on_clik 是点击事件，因为取值定位有差别所以要用三个方法
