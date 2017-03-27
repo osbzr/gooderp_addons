@@ -42,5 +42,8 @@ Automatic backup for all such configured databases under this can then be schedu
     "data" : ["views/bkp_conf_view.xml",
               "security/ir.model.access.csv",
               "data/backup_data.xml"],
+    'demo': [
+        'data/backup_demo.xml',
+    ],
     "installable": True
 }
