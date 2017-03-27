@@ -300,6 +300,12 @@ class buy_receipt(models.Model):
 
     def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id):
         '''返回voucher line'''
+        rate_silent = currency_amount = 0
+        if self.currency_id:
+            rate_silent = self.env['res.currency'].get_rate_silent(self.date, self.currency_id.id)
+            currency_amount = debit or credit
+            debit = debit * (rate_silent or 1)
+            credit = credit * (rate_silent or 1)
         voucher = self.env['voucher.line'].create({
             'name': self.name,
             'account_id': account_id and account_id.id,
@@ -307,6 +313,9 @@ class buy_receipt(models.Model):
             'credit': credit,
             'voucher_id': voucher_id and voucher_id.id,
             'goods_id': goods_id and goods_id.id,
+            'currency_id': self.currency_id.id,
+            'currency_amount': currency_amount,
+            'rate_silent': rate_silent,
         })
         return voucher
 
