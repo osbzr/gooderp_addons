@@ -73,7 +73,33 @@ class test_staff_wages(TransactionCase):
             self.staff_wages.line_ids[0].basic_wage = line + 3500 + 1
             self.assertTrue(self.staff_wages.line_ids[0].personal_tax)
 
+    def test_unlink(self):
+        # 审核工资单
+        self.staff_wages.staff_wages_confirm()
+        with self.assertRaises(UserError):
+            self.staff_wages.unlink()
 
+    def test_create_voucher(self):
+        #修改单据日期
+        self.staff_wages.date = datetime.now()
+        self.staff_wages.staff_wages_accrued()
+        with self.assertRaises(UserError):
+            self.staff_wages.staff_wages_accrued()
+
+    def test_staff_wages_unaccrued(self):
+        # #修改单据上的信息并审核
+        self.staff_wages.staff_wages_accrued()
+        for line in self.staff_wages.line_ids:
+            line.basic_wage = 5000
+        self.staff_wages.staff_wages_accrued()
+        with self.assertRaises(UserError):
+            self.staff_wages.staff_wages_unaccrued()
+
+    def test_change_wage_addhour(self):
+        for line in self.staff_wages.line_ids:
+            line.date_number = 32
+        with self.assertRaises(UserError):
+            line.change_wage_addhour()
 
 
 
