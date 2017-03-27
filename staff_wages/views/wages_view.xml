@@ -32,7 +32,7 @@
 							<group>
 								<field name="date" required="1"/>
 								<field name="name" required="1"/>
-								<field name="payment" required="1"/>
+								<field name="payment" required="1" options="{'no_open': True, 'no_create': True}"/>
 							</group>
 							<group>
 								<field name="other_money_order"/>
