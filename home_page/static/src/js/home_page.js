@@ -46,7 +46,7 @@ odoo.define('home_page', function (require) {
                     views.push([vals[5][i], view_mode_list[i]])
                 }
             }else{
-                for(var i=0;i < vals[5].length;i++){
+                for(var i=0;i < view_mode_list.length;i++){
                     views.push([false, view_mode_list[i]])
                 }
             }
