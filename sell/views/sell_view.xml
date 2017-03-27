@@ -20,7 +20,7 @@
             		<field name='goods_state'/>
             		<field name="money_state"/>
 					<field name='currency_id'
-						 groups='finance.group_multi_currency'/>
+						   groups='finance.group_multi_currency'/>
             	</tree>
         	</field>
     	</record>
@@ -160,6 +160,8 @@
             		<field name="amount"/>
             		<field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
+					<field name='currency_id'
+						   groups='finance.group_multi_currency'/>
                     <field name='state'/>
             		<field name='money_state'/>
             	</tree>
@@ -356,6 +358,8 @@
             		<field name='date_due'/>
             		<field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
+					<field name='currency_id'
+						   groups='finance.group_multi_currency'/>
                     <field name='state'/>
             		<field name='return_state'/>
             	</tree>
