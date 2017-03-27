@@ -298,9 +298,10 @@
                     <field name="task_id"/>
                     <separator/>
                     <filter string="今日" name="today_timeline"
-                            domain="[('create_date', '&lt;', datetime.datetime.now())]"
+                            domain="[('create_date', '&gt;=', time.strftime('%Y-%m-%d 00:00:00')),
+                            	('create_date', '&lt;=', time.strftime('%Y-%m-%d 23:59:59'))]"
                             help="今日工作记录"/>
-					<filter name="group_user_id" string="指派给" context="{'group_by':'user_id'}"/>
+					<filter name="group_create_uid" string="创建人" context="{'group_by':'create_uid'}"/>
 					<separator/>
 					<filter string="创建月份" context="{'group_by':'create_date:month'}" name="month"/>
                 </search>
