@@ -38,6 +38,44 @@ class test_voucher(TransactionCase):
         with self.assertRaises(UserError):
             voucher.voucher_draft()
 
+    def test_voucher_done_costs_types_out(self):
+        '''费用类科目只能在借方记账'''
+        voucher = self.env['voucher'].create({
+            'date': '2017-01-01',
+            'line_ids': [(0, 0, {
+                'name': u'收利息', # 贷方行
+                'account_id': self.env.ref('finance.small_business_chart5603002').id,
+                'debit': 0,
+                'credit': 1.0,
+            }),
+                (0, 0, {
+                    'name': u'收利息', # 借方行
+                    'account_id': self.env.ref('finance.account_bank').id,
+                    'debit': 1.0,
+                    'credit': 0,
+              })]
+        })
+        voucher.voucher_done()
+
+    def test_voucher_done_costs_types_in(self):
+        '''收入类科目只能在贷方记账'''
+        voucher = self.env['voucher'].create({
+            'date': '2017-01-01',
+            'line_ids': [(0, 0, {
+                'name': u'退款给客户', # 贷方行
+                'account_id': self.env.ref('finance.account_bank').id,
+                'debit': 0,
+                'credit': 50.0,
+            }),
+                (0, 0, {
+                    'name': u'退款给客户', # 借方行
+                    'account_id': self.env.ref('finance.account_income').id,
+                    'debit': 50.0,
+                    'credit': 0,
+              })]
+        })
+        voucher.voucher_done()
+
     def test_line_unlink(self):
         '''测试可正常删除未审核的凭证行'''
         voucher = self.env.ref('finance.voucher_1')

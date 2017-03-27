@@ -318,8 +318,8 @@ TODO：这段代码未经严格测试验证，暂时注释掉 -- jeff 2017-3-4
             debit = credit = vals.get('amount')
             sell_tax_amount = vals.get('sell_tax_amount')
         else:
+            # 外币免税
             debit = credit = vals.get('amount') * vals.get('rate_silent')
-            sell_tax_amount = vals.get('sell_tax_amount') * vals.get('rate_silent')
         # 把税从金额中减去
         if vals.get('buy_tax_amount'):  # 如果传入了进项税
             debit = vals.get('amount') - vals.get('buy_tax_amount')

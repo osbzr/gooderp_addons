@@ -192,7 +192,7 @@ class staff_wages(models.Model):
     @api.one
     def staff_wages_unaccrued(self):
         if self.change_voucher_id:
-            raise UserError(u'跨期间不可以使用计提，请使用计提来补充计提')
+            raise UserError(u'存在修正计提凭证，请点击计提按钮来更新修正计提凭证')
         if self.voucher_id:
             voucher_id, self.voucher_id = self.voucher_id, False
             if voucher_id.state == 'done':
