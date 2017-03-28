@@ -209,13 +209,19 @@
 								<field name="main_mobile"/>
 								<field name="tax_num"/>
 								<field name="credit_limit"/>
+								<field name="responsible_id"/>
+								<field name="share_id"/>
+								<field name="main_contact"/>
 							</group>
 							<group>
 								<field name="c_category_id" required="1"/>
 								<field name="s_category_id"/>
 								<field name="receivable"/>
 								<field name="tax_rate"/>
+								<field name="tag_ids" widget="many2many_tags"/>
+								<field name="source"/>
 							</group>
+							<field name="note" placeholder="暂无备注信息"/>
 						</group>
 					</sheet>
 					<div class="oe_chatter">
@@ -299,7 +305,9 @@
 								<field name="bank_name"/>
 								<field name="bank_num"/>
 								<field name="payable"/>
+								<field name="tag_ids" widget="many2many_tags"/>
 							</group>
+							<field name="note" placeholder="暂无备注信息"/>
 						</group>
 					</sheet>
 				</form>
