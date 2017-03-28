@@ -57,33 +57,61 @@ class staff_wages(models.Model):
 
     @api.one
     def staff_wages_confirm(self):
-        self.staff_wages_accrued()
+        """
+        审核方法
+        :return:
+        """
+        if not self.voucher_id:
+            raise UserError(u'工资单还未计提，请先计提')
         self._other_pay()
         self.state = 'done'
 
+    def voucher_unlink(self, voucher):
+        """
+        删除凭证时，判断如果已审核则反审核并删除
+        :param voucher: 凭证
+        :return:
+        """
+        if voucher.state == 'done':
+            voucher.voucher_draft()
+        return voucher.unlink()
+
     @api.one
     def staff_wages_accrued(self):
-        if self.change_voucher_id:
-            #删除原来的change_voucher_id ,生成新的change_voucher_id
-            change_voucher_id, self.change_voucher_id = self.change_voucher_id, False
-            if change_voucher_id.state == 'done':
-                change_voucher_id.voucher_draft()
-            change_voucher_id.unlink()
-            self.change_voucher()
-        elif self.voucher_id:
-            #生成change_voucher_id
-            self.change_voucher()
+        """
+        计提方法，如计提凭证已存在，判断当前期间是否与工资期间相同。
+        如相同，反审核计提凭证并重新生成计提凭证；
+        如不同，生成并审核修正凭证。
+        :return:
+        """
+        if not self.voucher_id:
+            # 生成并审核计提凭证
+            voucher = self.create_voucher(self.date)
+            voucher.voucher_done()
+            self.voucher_id = voucher.id
         else:
-            #生成voucher_id
-            date = self.date
-            vouch_obj = self.create_voucher(date)[0]
-            self.write({'voucher_id': vouch_obj.id})
+            # 如计提凭证已存在，判断当前期间是否与工资期间相同
+            date = fields.Date.context_today(self)
+            if self.voucher_id.period_id == self.env['finance.period'].get_period(date):
+                # 如相同，反审核计提凭证并重新生成计提凭证
+                voucher, self.voucher_id = self.voucher_id, False
+                self.voucher_unlink(voucher)
+                voucher = self.create_voucher(self.date)
+                voucher.voucher_done()
+                self.voucher_id = voucher.id
+            else:
+                # 如不同，生成并审核修正凭证
+                self.change_voucher()
 
     @api.one
     def change_voucher(self):
+        """
+        生成并审核修正计提凭证
+        :return:
+        """
         before_voucher = self.voucher_id
         date = fields.Date.context_today(self)
-        change_voucher = self.create_voucher(date)[0]
+        change_voucher = self.create_voucher(date)
         for change_line in change_voucher.line_ids:
             for before_line in before_voucher.line_ids:
                 if change_line.account_id.id == before_line.account_id.id:
@@ -98,12 +126,17 @@ class staff_wages(models.Model):
         if not change_voucher.line_ids:
             change_voucher.unlink()
         else:
+            change_voucher.voucher_done()
             self.write({'change_voucher_id': change_voucher.id})
 
-    @api.one
-    def create_voucher(self,date):
-        if self.voucher_id and self.voucher_id.period_id == self.env['finance.period'].get_period(date):
-            raise UserError(u'同一会计期间内请使用反计提')
+    @api.multi
+    def create_voucher(self, date):
+        """
+        生成并审核计提凭证
+        :param date: 一个日期
+        :return:
+        """
+        self.ensure_one()
         vouch_obj = self.env['voucher'].create({'date': date})
         credit_account = self.env.ref('staff_wages.staff_wages')
         res = {}
@@ -119,7 +152,7 @@ class staff_wages(models.Model):
                         'name': u'提本月工资'})
         #生成借方凭证行
         for account_id,val in res.iteritems():
-            self.env['voucher.line'].create(dict(val,account_id = account_id))
+            self.env['voucher.line'].create(dict(val, account_id=account_id))
         #生成贷方凭证行
         self.env['voucher.line'].create({'credit': self.totoal_wage,
                                          'voucher_id': vouch_obj.id,
@@ -190,28 +223,21 @@ class staff_wages(models.Model):
             other_money_order.unlink()
         self.state = 'draft'
 
-    @api.one
-    def staff_wages_unaccrued(self):
-        if self.change_voucher_id:
-            raise UserError(u'存在修正计提凭证，请点击计提按钮来更新修正计提凭证')
-        if self.voucher_id:
-            voucher_id, self.voucher_id = self.voucher_id, False
-            if voucher_id.state == 'done':
-                voucher_id.voucher_draft()
-            voucher_id.unlink()
-        self.state = 'draft'
-
     @api.multi
     def unlink(self):
+        """
+        删除工资单同时（反审核并）删除对应的会计凭证
+        :return:
+        """
         for record in self:
             if record.state != 'draft':
-                raise UserError(u'不能删除已审核的单据(%s)'%self.name)
+                raise UserError(u'不能删除已审核的单据(%s)' % record.name)
 
             # 先解除凭证和工资单关系，再将它们删除
-            voucher_id, record.voucher_id = record.voucher_id, False
-            change_id, record.change_voucher_id = record.change_voucher_id, False
-            voucher_id.unlink()
-            change_id.unlink()
+            voucher, record.voucher_id = record.voucher_id, False
+            change_voucher, record.change_voucher_id = record.change_voucher_id, False
+            self.voucher_unlink(voucher)
+            self.voucher_unlink(change_voucher)
         return super(staff_wages, self).unlink()
 
 class wages_line(models.Model):

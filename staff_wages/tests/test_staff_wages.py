@@ -18,11 +18,6 @@ class test_staff_wages(TransactionCase):
         self.staff_wages.staff_wages_accrued()
         self.assertTrue(self.staff_wages.voucher_id)
 
-        #反计提
-        self.staff_wages.voucher_id.voucher_done()
-        self.staff_wages.staff_wages_unaccrued()
-        self.staff_wages.staff_wages_accrued()
-
         # 再次调用方法不修改数据不生成修正凭证
         self.staff_wages.staff_wages_accrued()
         self.assertTrue(not self.staff_wages.change_voucher_id)
@@ -50,8 +45,6 @@ class test_staff_wages(TransactionCase):
         self.assertTrue(self.staff_wages.change_voucher_id != l_change_voucher)
 
         # 审核工资单
-        self.staff_wages.change_voucher_id.voucher_done()
-        self.staff_wages._total_amount_wage()
         self.staff_wages.staff_wages_confirm()
 
         # 反审核工资单
@@ -74,26 +67,21 @@ class test_staff_wages(TransactionCase):
             self.assertTrue(self.staff_wages.line_ids[0].personal_tax)
 
     def test_unlink(self):
-        # 审核工资单
+        # 删除工资单
+        self.staff_wages._total_amount_wage()
+        self.staff_wages.staff_wages_accrued()
         self.staff_wages.staff_wages_confirm()
         with self.assertRaises(UserError):
             self.staff_wages.unlink()
 
     def test_create_voucher(self):
-        #修改单据日期
+        '''当前期间与工资期间相同,使用计提按钮'''
+        # 修改单据日期
         self.staff_wages.date = datetime.now()
+        self.staff_wages._total_amount_wage()
         self.staff_wages.staff_wages_accrued()
-        with self.assertRaises(UserError):
-            self.staff_wages.staff_wages_accrued()
-
-    def test_staff_wages_unaccrued(self):
-        # #修改单据上的信息并审核
+        # 如当前期间与工资期间相同，反审核计提凭证并重新生成计提凭证
         self.staff_wages.staff_wages_accrued()
-        for line in self.staff_wages.line_ids:
-            line.basic_wage = 5000
-        self.staff_wages.staff_wages_accrued()
-        with self.assertRaises(UserError):
-            self.staff_wages.staff_wages_unaccrued()
 
     def test_change_wage_addhour(self):
         for line in self.staff_wages.line_ids:
@@ -101,6 +89,11 @@ class test_staff_wages(TransactionCase):
         with self.assertRaises(UserError):
             line.change_wage_addhour()
 
+    def test_staff_wages_confirm_error(self):
+        '''审核方法异常:工资单还未计提，请先计提'''
+        self.staff_wages._total_amount_wage()
+        with self.assertRaises(UserError):
+            self.staff_wages.staff_wages_confirm()
 
 
 
