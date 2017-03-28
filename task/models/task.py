@@ -339,6 +339,7 @@ class timeline(models.Model):
     project_id = fields.Many2one(
         string=u'项目',
         related='task_id.project_id',
+        store=True,
         ondelete='cascade',
     )
 

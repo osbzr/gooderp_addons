@@ -19,10 +19,9 @@
 			<field name="name">staff.wages.form</field>
 			<field name="model">staff.wages</field>
 			<field name="arch" type="xml">
-				<form string="费用订单">
+				<form string="员工工资单">
 					<header>
 						<button name="staff_wages_accrued" states="draft" string="计提" type="object" class="oe_highlight"/>
-						<button name="staff_wages_unaccrued" states="draft" string="反计提" type="object" class="oe_highlight"/>
 						<button name="staff_wages_confirm" states="draft" string="审核" type="object" class="oe_highlight"/>
 						<button name="staff_wages_draft" states="done" string="反审核" type="object"/>
 						<field name="state" widget="statusbar" readonly="1"/>
