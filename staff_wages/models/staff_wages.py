@@ -27,7 +27,8 @@ class staff_wages(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核')], u'状态', default='draft')
-    line_ids = fields.One2many('wages.line', 'order_id', u'工资明细行',states=READONLY_STATES)
+    line_ids = fields.One2many('wages.line', 'order_id', u'工资明细行', states=READONLY_STATES,
+                               copy=True)
     payment = fields.Many2one('bank.account', u'付款方式')
     other_money_order = fields.Many2one('other.money.order', u'对应付款单', readonly=True, ondelete='restrict',
                                  help=u'审核时生成的对应付款单', copy=False)
@@ -205,6 +206,12 @@ class staff_wages(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise UserError(u'不能删除已审核的单据(%s)'%self.name)
+
+            # 先解除凭证和工资单关系，再将它们删除
+            voucher_id, record.voucher_id = record.voucher_id, False
+            change_id, record.change_voucher_id = record.change_voucher_id, False
+            voucher_id.unlink()
+            change_id.unlink()
         return super(staff_wages, self).unlink()
 
 class wages_line(models.Model):
