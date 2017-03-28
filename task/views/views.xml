@@ -296,12 +296,15 @@
             <field name="arch" type="xml">
                 <search string="工作记录">
                     <field name="task_id"/>
+					<field name="project_id"/>
+					<field name="create_uid" string='创建人'/>
                     <separator/>
                     <filter string="今日" name="today_timeline"
                             domain="[('create_date', '&gt;=', time.strftime('%Y-%m-%d 00:00:00')),
                             	('create_date', '&lt;=', time.strftime('%Y-%m-%d 23:59:59'))]"
                             help="今日工作记录"/>
 					<filter name="group_create_uid" string="创建人" context="{'group_by':'create_uid'}"/>
+					<filter name="group_project_id" string="项目" context="{'group_by':'project_id'}"/>
 					<separator/>
 					<filter string="创建月份" context="{'group_by':'create_date:month'}" name="month"/>
                 </search>
