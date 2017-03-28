@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <!-- 固定资产 -->
+        <record id="backup_demo" model="db.backup">
+            <field name="name">openerp_test</field>
+        </record>
+    </data>
+</openerp>
