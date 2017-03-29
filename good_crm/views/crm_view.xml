@@ -182,7 +182,7 @@
 		<menuitem name="商机" id="menu_crm" web_icon="good_crm,static/description/crm.png"
 		groups='good_crm.group_crm'/>
 		<menuitem name="商机" id="menu_opportunity" parent="menu_crm"
-		action="action_opportunity" sequence='1' groups="sell.group_manager"/>
+		action="action_opportunity" sequence='1' groups="good_crm.group_manager"/>
 		<menuitem name="私海" id="menu_opportunity_private" parent="menu_crm"
 		action="action_opportunity_private" sequence='5'/>
 		<menuitem name="公海" id="menu_opportunity_public" parent="menu_crm"
