@@ -39,7 +39,8 @@ CORE_CATEGORY_TYPE = [('customer', u'客户'),
                       ('income', u'收入'),
                       ('other_pay', u'其他支出'),
                       ('other_get', u'其他收入'),
-                      ('attribute', u'属性')]
+                      ('attribute', u'属性'),
+                      ('finance', u'核算')]
 
 # 当客户要求下拉字段可编辑，可使用此表存储可选值，按type分类，在字段上用domain和context筛选
 

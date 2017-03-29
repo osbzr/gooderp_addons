@@ -100,6 +100,15 @@ class wh_move(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
     qc_result = fields.Binary(u'质检报告',
                               help=u'点击上传质检报告')
+    finance_category_id = fields.Many2one(
+        'core.category',
+        string=u'核算类别',
+        ondelete='restrict',
+        states={'done': [('readonly', True)]},
+        domain=[('type', '=', 'finance')],
+        context={'type': 'finance'},
+        help=u'如果业务类别选其他则此字段显示并必输,生成凭证时从此字段上取商品科目的对方科目',
+    )
 
     def scan_barcode_move_line_operation(self, line, conversion):
         """
