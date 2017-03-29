@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_opportunity,access_opportunity,model_opportunity,,1,1,1,0
+access_goods_quotation,access_goods_quotation,model_goods_quotation,,1,1,1,0
