@@ -43,7 +43,9 @@ class partner(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     tag_ids = fields.Many2many('core.value',
-                               string=u'标签')
+                               string=u'标签',
+                               domain=[('type', '=', 'partner_tag')],
+                               context={'type': 'partner_tag'})
     source = fields.Char(u'来源')
     note = fields.Text(u'备注')
     main_contact = fields.Char(u'主联系人')
