@@ -12,14 +12,34 @@
 						<group>
 							<group>
 								<field name="name"/>
-								<field name="user_id"/>
+								<field name="partner_id"
+									   domain="[('c_category_id', '!=', False)]"
+									   context="{'form_view_ref': 'core.customer_address_form'}"
+									   options="{'no_create': True,'no_open': True}"
+								/>
+								<field name="user_id"
+									   options="{'no_create': True,'no_open': True}"/>
+								<field name="date"/>
 								<field name="planned_revenue"/>
 							</group>
 							<group>
 								<field name="next_action"/>
 								<field name="next_datetime"/>
 								<field name="ref"/>
+								<field name="tag_ids" widget="many2many_tags"/>
+								<field name="success_reason_id"/>
 							</group>
+						</group>
+						<field name="line_ids">
+							<tree string="商品报价" editable='bottom'>
+								<field name='goods_id'/>
+								<field name='quantity' sum="数量总计"/>
+								<field name='price'/>
+								<field name='note'/>
+							</tree>
+						</field>
+						<group>
+							<field name="total_amount"/>
 						</group>
 						<field name="note" placeholder='描述......'/>
 						<field name="timeline_ids">

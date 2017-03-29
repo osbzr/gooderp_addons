@@ -168,6 +168,7 @@
 								<field name="next_action"/>
 								<field name="next_datetime"/>
 								<field name="hours" groups='task.group_task_hours'/>
+								<field name="tag_ids" widget="many2many_tags"/>
 							</group>
 						</group>
 						<field name="timeline_ids">
