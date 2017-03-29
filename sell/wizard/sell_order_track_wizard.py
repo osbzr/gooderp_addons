@@ -25,8 +25,8 @@ class sell_order_track_wizard(models.TransientModel):
                                  help=u'按指定客户进行统计')
     goods_id = fields.Many2one('goods', u'商品',
                                help=u'按指定商品进行统计')
-    staff_id = fields.Many2one('staff', u'销售员',
-                               help=u'按指定销售员进行统计')
+    user_id = fields.Many2one('res.users', u'销售员',
+                              help=u'按指定销售员进行统计')
     warehouse_id = fields.Many2one('warehouse', u'仓库',
                                    help=u'按指定仓库进行统计')
     company_id = fields.Many2one(
@@ -45,8 +45,8 @@ class sell_order_track_wizard(models.TransientModel):
             domain.append(('goods_id', '=', self.goods_id.id))
         if self.partner_id:
             domain.append(('order_id.partner_id', '=', self.partner_id.id))
-        if self.staff_id:
-            domain.append(('order_id.staff_id', '=', self.staff_id.id))
+        if self.user_id:
+            domain.append(('order_id.user_id', '=', self.user_id.id))
         if self.warehouse_id:
             domain.append(('order_id.warehouse_id', '=', self.warehouse_id.id))
         return domain
@@ -73,7 +73,7 @@ class sell_order_track_wizard(models.TransientModel):
             'uom': line.uom_id.name,
             'date': line.order_id.date,
             'order_name': line.order_id.name,
-            'staff_id': line.order_id.staff_id.id,
+            'user_id': line.order_id.user_id.id,
             'partner_id': line.order_id.partner_id.id,
             'warehouse_id': line.order_id.warehouse_id.id,
             'goods_state': line.order_id.goods_state,

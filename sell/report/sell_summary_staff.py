@@ -11,7 +11,7 @@ class sell_summary_staff(models.Model):
     _description = u'销售汇总表（按销售人员）'
 
     id_lists = fields.Text(u'移动明细行id列表')
-    staff_id = fields.Many2one('staff', u'销售人员')
+    user_id = fields.Many2one('res.users', u'销售员')
     goods_code = fields.Char(u'商品编号')
     goods = fields.Char(u'商品名称')
     attribute = fields.Char(u'属性')
@@ -30,7 +30,7 @@ class sell_summary_staff(models.Model):
         return '''
         SELECT MIN(wml.id) as id,
                array_agg(wml.id) AS id_lists,
-               staff.id AS staff_id,
+               res_users.id AS user_id,
                goods.code AS goods_code,
                goods.name AS goods,
                attr.name AS attribute,
@@ -66,8 +66,8 @@ class sell_summary_staff(models.Model):
             LEFT JOIN wh_move wm ON wml.move_id = wm.id
             LEFT JOIN sell_delivery AS sd
                  ON wm.id = sd.sell_move_id
-            LEFT JOIN staff
-                 ON wm.staff_id = staff.id
+            LEFT JOIN res_users
+                 ON wm.user_id = res_users.id
             LEFT JOIN goods ON wml.goods_id = goods.id
             LEFT JOIN core_category AS categ ON goods.category_id = categ.id
             LEFT JOIN attribute AS attr ON wml.attribute_id = attr.id
@@ -79,8 +79,8 @@ class sell_summary_staff(models.Model):
 
     def where_sql(self, sql_type='out'):
         extra = ''
-        if self.env.context.get('staff_id'):
-            extra += 'AND staff.id = {staff_id}'
+        if self.env.context.get('user_id'):
+            extra += 'AND res_users.id = {user_id}'
         if self.env.context.get('goods_id'):
             extra += 'AND goods.id = {goods_id}'
         if self.env.context.get('goods_categ_id'):
@@ -99,12 +99,12 @@ class sell_summary_staff(models.Model):
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY staff.id,goods_code,goods,attribute,warehouse,uos,uom,wml.cost_unit
+        GROUP BY res_users.id,goods_code,goods,attribute,warehouse,uos,uom,wml.cost_unit
         '''
 
     def order_sql(self, sql_type='out'):
         return '''
-        ORDER BY staff,goods_code,attribute,warehouse
+        ORDER BY user_id,goods_code,attribute,warehouse
         '''
 
     def get_context(self, sql_type='out', context=None):
@@ -114,8 +114,8 @@ class sell_summary_staff(models.Model):
         return {
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
-            'staff_id': context.get('staff_id') and
-                context.get('staff_id')[0] or '',
+            'user_id': context.get('user_id') and
+                context.get('user_id')[0] or '',
             'goods_id': context.get('goods_id') and
                 context.get('goods_id')[0] or '',
             'goods_categ_id': context.get('goods_categ_id') and
@@ -125,7 +125,7 @@ class sell_summary_staff(models.Model):
         }
 
     def _compute_order(self, result, order):
-        order = order or 'staff ASC'
+        order = order or 'user_id ASC'
         return super(sell_summary_staff, self)._compute_order(result, order)
 
     def collect_data_by_sql(self, sql_type='out'):

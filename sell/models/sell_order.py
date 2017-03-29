@@ -81,10 +81,14 @@ class sell_order(models.Model):
                                  help=u'联系地址')
     mobile = fields.Char(u'手机', states=READONLY_STATES,
                                  help=u'联系手机')
-    staff_id = fields.Many2one('staff', u'销售员',
-                            ondelete='restrict', states=READONLY_STATES,
-                            default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0],
-                                 help=u'单据负责人')
+    user_id = fields.Many2one(
+        'res.users',
+        u'销售员',
+        ondelete='restrict',
+        states=READONLY_STATES,
+        default=lambda self: self.env.user,
+        help=u'单据负责人',
+    )
     date = fields.Date(u'单据日期',
                        required=True,
                        states=READONLY_STATES,
@@ -310,7 +314,7 @@ class sell_order(models.Model):
             'partner_id': self.partner_id.id,
             'warehouse_id': warehouse.id,
             'warehouse_dest_id': warehouse_dest.id,
-            'staff_id': self.staff_id.id,
+            'user_id': self.user_id.id,
             'date': self.delivery_date,
             'order_id': self.id,
             'origin': 'sell.delivery',

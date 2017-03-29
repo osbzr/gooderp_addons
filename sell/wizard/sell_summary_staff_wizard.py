@@ -21,8 +21,8 @@ class sell_summary_staff_wizard(models.TransientModel):
                              help=u'报表汇总的开始日期，默认为公司启用日期')
     date_end = fields.Date(u'结束日期', default=_default_date_end,
                            help=u'报表汇总的结束日期，默认为当前日期')
-    staff_id = fields.Many2one('staff', u'销售人员',
-                               help=u'按指定销售员进行统计')
+    user_id = fields.Many2one('res.users', u'销售员',
+                              help=u'按指定销售员进行统计')
     goods_id = fields.Many2one('goods', u'商品',
                                help=u'按指定商品进行统计')
     goods_categ_id = fields.Many2one('core.category', u'商品类别',
@@ -42,7 +42,7 @@ class sell_summary_staff_wizard(models.TransientModel):
         self.ensure_one()
         if self.date_end < self.date_start:
             raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' % (self.date_start, self.date_end))
-        read_fields = ['date_start', 'date_end', 'staff_id',
+        read_fields = ['date_start', 'date_end', 'user_id',
                        'goods_id', 'goods_categ_id', 'warehouse_id']
         return {
             'name': u'销售汇总表（按销售人员）',

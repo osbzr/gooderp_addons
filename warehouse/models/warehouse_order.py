@@ -166,8 +166,10 @@ class wh_in(models.Model):
                 })
             debit_sum += line.cost
 
-        # 贷方科目： 主营业务成本
-        account = self.env.ref('finance.account_cost')
+        # 贷方科目： 如果是盘盈则取主营业务成本，否则取核算类别上的科目
+        account = self.type == 'inventory' \
+                  and self.env.ref('finance.account_cost') \
+                  or self.finance_category_id.account_id
 
         if not self.is_init:
             if debit_sum:

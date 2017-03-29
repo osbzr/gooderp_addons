@@ -13,7 +13,7 @@ class sell_order_track(models.TransientModel):
     uom = fields.Char(u'单位')
     date = fields.Date(u'订单日期')
     order_name = fields.Char(u'销售订单编号')
-    staff_id = fields.Many2one('staff', u'销售员')
+    user_id = fields.Many2one('res.users', u'销售员')
     partner_id = fields.Many2one('partner', u'客户')
     warehouse_id = fields.Many2one('warehouse', u'仓库')
     goods_state = fields.Char(u'状态')

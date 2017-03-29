@@ -25,8 +25,8 @@ class sell_order_detail_wizard(models.TransientModel):
                                  help=u'按指定客户进行统计')
     goods_id = fields.Many2one('goods', u'商品',
                                help=u'按指定商品进行统计')
-    staff_id = fields.Many2one('staff', u'销售员',
-                               help=u'按指定销售员进行统计')
+    user_id = fields.Many2one('res.users', u'销售员',
+                              help=u'按指定销售员进行统计')
     warehouse_id = fields.Many2one('warehouse', u'仓库',
                                    help=u'按指定仓库进行统计')
     company_id = fields.Many2one(
@@ -50,8 +50,8 @@ class sell_order_detail_wizard(models.TransientModel):
             domain.append(('goods_id', '=', self.goods_id.id))
         if self.partner_id:
             domain.append(('partner_id', '=', self.partner_id.id))
-        if self.staff_id:
-            domain.append(('staff_id', '=', self.staff_id.id))
+        if self.user_id:
+            domain.append(('user_id', '=', self.user_id.id))
         if self.warehouse_id:
             domain.append(('warehouse_id', '=', self.warehouse_id.id))
 

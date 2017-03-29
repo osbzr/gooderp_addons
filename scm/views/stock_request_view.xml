@@ -16,7 +16,7 @@
             <field name='model'>stock.request</field>
             <field name='arch' type='xml'>
                 <tree string='补货申请'>
-                    <field name="staff_id"/>
+                    <field name="user_id"/>
                     <field name="date"/>
                     <field name="state"/>
                 </tree>
@@ -35,7 +35,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="staff_id"/>
+                                <field name="user_id"/>
                             </group>
                             <group>
                                 <field name="date"/>

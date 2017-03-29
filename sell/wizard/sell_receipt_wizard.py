@@ -27,8 +27,8 @@ class sell_receipt_wizard(models.TransientModel):
                                     help=u'按指定客户类别进行统计')
     partner_id = fields.Many2one('partner', u'客户',
                                  help=u'按指定客户进行统计')
-    staff_id = fields.Many2one('staff', u'销售员',
-                               help=u'按指定销售员进行统计')
+    user_id = fields.Many2one('res.users', u'销售员',
+                              help=u'按指定销售员进行统计')
     warehouse_id = fields.Many2one('warehouse', u'仓库',
                                    help=u'按指定仓库进行统计')
     company_id = fields.Many2one(
@@ -48,8 +48,8 @@ class sell_receipt_wizard(models.TransientModel):
             )
         if self.partner_id:
             cond.append(('partner_id', '=', self.partner_id.id))
-        if self.staff_id:
-            cond.append(('staff_id', '=', self.staff_id.id))
+        if self.user_id:
+            cond.append(('user_id', '=', self.user_id.id))
         if self.warehouse_id:
             cond += ['|',('warehouse_id', '=', self.warehouse_id.id),
                      ('warehouse_dest_id', '=', self.warehouse_id.id)]
@@ -82,7 +82,7 @@ class sell_receipt_wizard(models.TransientModel):
         return {
             'c_category_id': delivery.partner_id.c_category_id.id,
             'partner_id': delivery.partner_id.id,
-            'staff_id': delivery.staff_id.id,
+            'user_id': delivery.user_id.id,
             'type': order_type,
             'date': delivery.date,
             'order_name': delivery.name,

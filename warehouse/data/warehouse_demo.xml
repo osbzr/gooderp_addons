@@ -23,6 +23,7 @@
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040003</field>
 			<field name="type">others</field>
+			<field name="finance_category_id" ref='core.cat_donate'/>
 			<field name="date">2016-04-02</field>
 		</record>
 		<record id="wh_move_line_keyboard_mouse_in_2" model="wh.move.line">
@@ -339,6 +340,7 @@
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040001</field>
 			<field name="type">others</field>
+			<field name="finance_category_id" ref='core.cat_donate'/>
 			<field name="date">2016-04-02</field>
 		</record>
 		<record id="wh_move_line_16" model="wh.move.line">
@@ -370,6 +372,7 @@
 			<field name="warehouse_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/IN/16040004</field>
 			<field name="type">others</field>
+			<field name="finance_category_id" ref='core.cat_donate'/>
 			<field name="date">2016-04-02</field>
 		</record>
 		<record id="wh_move_line_iphone_in_1" model="wh.move.line">
@@ -421,6 +424,7 @@
 		<record id="wh_out_wh_out_attribute" model="wh.out">
 			<field name="name">WH/OUT/16040003</field>
 			<field name="type">others</field>
+			<field name="finance_category_id" ref='core.cat_donate'/>
 			<field name="date">2016-04-02</field>
 			<field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
@@ -442,6 +446,7 @@
 			<field name="warehouse_id" ref="warehouse.sh_stock"/>
 			<field name="name">WH/OUT/16040001</field>
 			<field name="type">others</field>
+			<field name="finance_category_id" ref='core.cat_donate'/>
 			<field name="date">2016-04-02</field>
 		</record>
 		<record id="wh_move_line_18" model="wh.move.line">
@@ -459,6 +464,7 @@
 		    <field name="warehouse_dest_id" ref="warehouse.warehouse_others"/>
 			<field name="name">WH/OUT/16040002</field>
 			<field name="type">others</field>
+			<field name="finance_category_id" ref='core.cat_donate'/>
 			<field name="date">2016-04-02</field>
 			<field name="warehouse_id" ref="warehouse.hd_stock"/>
 		</record>

@@ -85,8 +85,14 @@ class wh_move(models.Model):
                        help=u'可以为该单据添加一些需要的标识信息')
     total_qty = fields.Integer(u'产品总数', compute=_compute_total_qty, store=True,
                                help=u'该移库单的入/出库明细行包含的产品总数')
-    staff_id = fields.Many2one('staff', u'经办人',
-                               default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0])
+    user_id = fields.Many2one(
+        'res.users',
+        u'经办人',
+        ondelete='restrict',
+        states={'done': [('readonly', True)]},
+        default=lambda self: self.env.user,
+        help=u'单据经办人',
+    )
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -94,6 +100,15 @@ class wh_move(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
     qc_result = fields.Binary(u'质检报告',
                               help=u'点击上传质检报告')
+    finance_category_id = fields.Many2one(
+        'core.category',
+        string=u'核算类别',
+        ondelete='restrict',
+        states={'done': [('readonly', True)]},
+        domain=[('type', '=', 'finance')],
+        context={'type': 'finance'},
+        help=u'如果业务类别选其他则此字段显示并必输,生成凭证时从此字段上取商品科目的对方科目',
+    )
 
     def scan_barcode_move_line_operation(self, line, conversion):
         """
