@@ -10,7 +10,7 @@
             		<field name='date'/>
             		<field name='name'/>
             		<field name='type'/>
-            		<field name='staff_id'/>
+            		<field name='user_id'/>
             		<field name='partner_id'/>
             		<field name="amount" sum="合计"/>
             		<field name='delivery_date'/>
@@ -45,7 +45,7 @@
             					<field name='contact'/>
             				    <field name='address'/>
             				    <field name='mobile'/>
-            					<field name='staff_id'/>
+            					<field name='user_id'/>
             					<field name='date'/>
             					<field name='warehouse_id'/>
             				</group>
@@ -154,7 +154,7 @@
             		<field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
-            		<field name='staff_id'/>
+            		<field name='user_id'/>
             		<field name='partner_id'/>
 					<field name='total_qty'/>
             		<field name="amount"/>
@@ -194,7 +194,7 @@
             				    <field name='contact'/>
             				    <field name="address"/>
             				    <field name="mobile"/>
-            					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='user_id'/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="warehouse_id"/>
 								<field name="warehouse_dest_id" invisible="1"/>
@@ -350,7 +350,7 @@
             		<field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
-            		<field name='staff_id'/>
+            		<field name='user_id'/>
             		<field name='partner_id'/>
 					<field name='total_qty'/>
             		<field name="amount"/>
@@ -391,7 +391,7 @@
             					<field name='contact'/>
             				    <field name="address"/>
             				    <field name="mobile"/>
-            					<field name='staff_id' attrs="{'readonly': [('state','!=','draft')]}"/>
+            					<field name='user_id'/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="warehouse_dest_id"/>
 								<field name="warehouse_id" invisible="1"/>

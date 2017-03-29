@@ -14,7 +14,7 @@
                     <field name="uom"/>
                     <field name="date"/>
                     <field name="order_name"/>
-                    <field name="staff_id"/>
+                    <field name="user_id"/>
                     <field name="partner_id"/>
                     <field name="warehouse_id"/>
                     <field name="goods_state"/>

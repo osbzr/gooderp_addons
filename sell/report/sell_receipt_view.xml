@@ -10,7 +10,7 @@
                 	<field name="partner_id"/>
                 	<button name="view_detail" type="object" string="查看明细" icon="fa-search"
                 		attrs="{'invisible': [('partner_id', '=', False)]}"/>
-                	<field name="staff_id"/>
+                	<field name="user_id"/>
                 	<field name="type"/>
                     <field name="date"/>
                     <field name="warehouse_id"/>

@@ -11,7 +11,7 @@ class sell_order_detail(models.Model):
     date = fields.Date(u'销售日期')
     order_name = fields.Char(u'销售单据号')
     type = fields.Char(u'业务类型')
-    staff_id = fields.Many2one('staff', u'销售员')
+    user_id = fields.Many2one('res.users', u'销售员')
     partner_id = fields.Many2one('partner', u'客户')
     goods_code = fields.Char(u'商品编码')
     goods_id = fields.Many2one('goods', u'商品名称')
@@ -36,7 +36,7 @@ class sell_order_detail(models.Model):
                     wm.name AS order_name,
                     (CASE WHEN wm.origin = 'sell.delivery.sell' THEN '销货'
                     ELSE '退货' END) AS type,
-                    wm.staff_id AS staff_id,
+                    wm.user_id AS user_id,
                     wm.partner_id AS partner_id,
                     goods.code AS goods_code,
                     goods.id AS goods_id,
@@ -70,7 +70,7 @@ class sell_order_detail(models.Model):
                   AND wm.origin like 'sell.delivery%%'
                   AND wh.type = 'stock'
 
-                GROUP BY wm.date, wm.name, origin, wm.staff_id, partner_id,
+                GROUP BY wm.date, wm.name, origin, wm.user_id, partner_id,
                     goods_code, goods.id, attribute, wh.id, uom,
                     wml.price, wml.cost_unit, wml.note
                 )

@@ -19,11 +19,21 @@ class stock_request(models.Model):
     _description = u'补货申请'
 
     name = fields.Char(u'编号')
-    date = fields.Date(u'日期', default=lambda self: fields.Date.context_today(self))
-    staff_id = fields.Many2one('staff',
-                               u'经办人',
-                               default=lambda self: self.env.user.employee_ids and self.env.user.employee_ids[0])
-    line_ids = fields.One2many('stock.request.line', 'request_id', u'补货申请行')
+    date = fields.Date(u'日期',
+                       default=lambda self: fields.Date.context_today(self),
+                       states={'done': [('readonly', True)]})
+    user_id = fields.Many2one(
+        'res.users',
+        u'经办人',
+        ondelete='restrict',
+        states={'done': [('readonly', True)]},
+        default=lambda self: self.env.user,
+        help=u'单据经办人',
+    )
+    line_ids = fields.One2many('stock.request.line',
+                               'request_id',
+                               u'补货申请行',
+                               states={'done': [('readonly', True)]})
     state = fields.Selection(STOCK_REQUEST_STATES, u'审核状态', readonly=True,
                              help=u"补货申请的审核状态", copy=False,
                              default='unsubmit')

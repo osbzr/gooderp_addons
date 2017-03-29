@@ -19,7 +19,7 @@
                             <field name="partner_id"
                             	domain="[('c_category_id', '!=', False)]"
                             	options="{'no_open': True, 'no_create': True}"/>
-                            <field name="staff_id"
+                            <field name="user_id"
                             	options="{'no_open': True, 'no_create': True}"/>
                             <field name="warehouse_id"
                             	options="{'no_open': True, 'no_create': True}"/>

@@ -10,7 +10,7 @@ class sell_receipt(models.TransientModel):
 
     c_category_id = fields.Many2one('core.category', u'客户类别')
     partner_id = fields.Many2one('partner', u'客户')
-    staff_id = fields.Many2one('staff', u'销售员')
+    user_id = fields.Many2one('res.users', u'销售员')
     type = fields.Char(u'业务类别')
     date = fields.Date(u'单据日期')
     warehouse_id = fields.Many2one('warehouse', u'仓库')

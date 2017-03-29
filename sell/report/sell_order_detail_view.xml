@@ -10,7 +10,7 @@
                 	<field name="order_name"/>
                 	<button name="view_detail" type="object" string="查看明细" icon="fa-search"/>
                 	<field name="type"/>
-                	<field name="staff_id"/>
+                	<field name="user_id"/>
                 	<field name="partner_id"/>
                 	<field name="goods_code"/>
                     <field name="goods_id"/>
