@@ -58,6 +58,7 @@ class test_sell_delivery(TransactionCase):
         '''测试返回收款状态'''
         # 未收款
         self.delivery.sell_delivery_done()
+        self.delivery.sell_to_return()
         self.delivery._get_sell_money_state()
         self.assertEqual(self.delivery.money_state, u'未收款')
 
