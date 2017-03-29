@@ -70,6 +70,19 @@
 				</tree>
 			</field>
 		</record>
+		<record id="core_value_form" model="ir.ui.view">
+			<field name="name">core.value.form</field>
+			<field name="model">core.value</field>
+			<field name="arch" type="xml">
+				<form string="可选值">
+					<group>
+						<field name="name"/>
+						<field name="note"/>
+						<field name="type" invisible="1"/>
+					</group>
+				</form>
+			</field>
+		</record>
 		<record id="core_value_search" model="ir.ui.view">
             <field name="name">core.value.search</field>
             <field name="model">core.value</field>
