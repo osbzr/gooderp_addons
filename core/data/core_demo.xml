@@ -32,6 +32,10 @@
             <field name="name">运费</field>
             <field name="type">other_pay</field>
         </record>
+        <record id="cat_donate" model="core.category">
+            <field name="name">赠送</field>
+            <field name="type">finance</field>
+        </record>
 
          <record id="uom_pc" model="uom">
             <field name="name">件</field>
