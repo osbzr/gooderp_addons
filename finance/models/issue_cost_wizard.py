@@ -118,7 +118,7 @@ class MonthProductCost(models.Model):
             goods_row = self.env['goods'].browse(create_vals.get('goods_id'))
             current_period_out_cost = self.compute_balance_price(create_vals)
             if self.compute_balance_price(create_vals)!=0:
-                voucher_line_data = {'name': u'发出成本', 'credit':current_period_out_cost,
+                voucher_line_data = {'name': u'发出成本adjust', 'credit':current_period_out_cost,
                                      'account_id': goods_row.category_id.account_id.id,
                                      'goods_id': create_vals.get('goods_id')}
                 voucher_line_data_list.append([0, 0, voucher_line_data.copy()])

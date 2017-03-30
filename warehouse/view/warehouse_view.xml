@@ -258,6 +258,7 @@
                                 <field name='finance_category_id'
                                        attrs="{'invisible': [('type', '!=', 'others')],'required': [('type', '=', 'others')]}"/>
                                 <field name='warehouse_id'/>
+                                <field name='voucher_id'/>
                                 <field name='warehouse_dest_id' invisible='1'/>
                             </group>
                         </group>

@@ -1354,7 +1354,7 @@
         <record id="categ_outsource" model="core.category">
             <field name="name">委外</field>
             <field name="type">finance</field>
-            <field name="account_id" ref="finance.small_business_chart4001001"/>
+            <field name="account_id" ref="finance.small_business_chart1408"/>
         </record>
 
     </data>
