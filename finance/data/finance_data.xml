@@ -564,37 +564,37 @@
         <record id="small_business_chart4001001" model='finance.account'>
             <field name='code'>4001001</field>
             <field name='name'>生产成本-基本生产成本</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4001002" model='finance.account'>
             <field name='code'>4001002</field>
             <field name='name'>生产成本-辅助生产成本</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4101" model='finance.account'>
             <field name='code'>4101</field>
             <field name='name'>制造费用</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4301" model='finance.account'>
             <field name='code'>4301</field>
             <field name='name'>研发支出</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4401" model='finance.account'>
             <field name='code'>4401</field>
             <field name='name'>工程施工</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4403" model='finance.account'>
             <field name='code'>4403</field>
             <field name='name'>机械作业</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <!-- 损益类 -->
