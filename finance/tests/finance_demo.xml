@@ -188,6 +188,7 @@
         <record id="core.goods_category_1" model="core.category">
             <field name="account_id" ref="finance.account_goods"/>
         </record>
+        <!-- 赠送 -->
         <record id="core.cat_donate" model="core.category">
             <field name="account_id" ref="finance.small_business_chart1221"/>
         </record>

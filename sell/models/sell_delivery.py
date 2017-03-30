@@ -171,6 +171,7 @@ class sell_delivery(models.Model):
 
         vals.update({
             'origin': self.get_move_origin(vals),
+            'finance_category_id': self.env.ref('finance.categ_sell_goods').id,
         })
 
         return super(sell_delivery, self).create(vals)

@@ -1337,5 +1337,25 @@
             <field name='note'>由系统创建</field>
 		</record>
 
+        <!--核算类别-->
+        <!-- 销售发货 借方科目：主营业务成本-->
+        <record id="categ_sell_goods" model="core.category">
+            <field name="name">销售发货</field>
+            <field name="type">finance</field>
+            <field name="account_id" ref="finance.account_cost"/>
+        </record>
+        <!-- 组装单、拆卸单 借方科目：生产成本-基本生产成本 -->
+        <record id="categ_ass_disass" model="core.category">
+            <field name="name">生产</field>
+            <field name="type">finance</field>
+            <field name="account_id" ref="finance.small_business_chart4001001"/>
+        </record>
+        <!-- 委外 借方科目： -->
+        <record id="categ_outsource" model="core.category">
+            <field name="name">委外</field>
+            <field name="type">finance</field>
+            <field name="account_id" ref="finance.small_business_chart4001001"/>
+        </record>
+
     </data>
 </openerp>
