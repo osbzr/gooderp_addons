@@ -101,6 +101,9 @@ class voucher(models.Model):
         if debit_sum != credit_sum:
             raise ValidationError(u'借贷方不平!\n 借方合计:%s 贷方合计:%s' % (debit_sum, credit_sum))
 
+        self.state = 'done'
+        if self.is_checkout:   # 月结凭证不做反转
+            return True
         for line in self.line_ids:
             if line.account_id.costs_types == 'out' and line.credit:
                 # 费用类科目只能在借方记账,比如银行利息收入
@@ -110,7 +113,7 @@ class voucher(models.Model):
                 # 收入类科目只能在贷方记账,比如退款给客户的情况
                 line.credit = -line.debit
                 line.debit = 0
-        self.state = 'done'
+        
 
     @api.one
     def voucher_draft(self):
