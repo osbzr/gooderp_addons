@@ -413,7 +413,8 @@ class finance_account(models.Model):
         ('debt', u'负债'),
         ('equity', u'所有者权益'),
         ('in', u'收入类'),
-        ('out', u'费用类')
+        ('out', u'费用类'),
+        ('cost', u'成本类'),
     ], u'类型', required="1")
     currency_id = fields.Many2one('res.currency', u'外币币别')
     exchange = fields.Boolean(u'是否期末调汇')

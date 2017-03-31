@@ -564,37 +564,37 @@
         <record id="small_business_chart4001001" model='finance.account'>
             <field name='code'>4001001</field>
             <field name='name'>生产成本-基本生产成本</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4001002" model='finance.account'>
             <field name='code'>4001002</field>
             <field name='name'>生产成本-辅助生产成本</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4101" model='finance.account'>
             <field name='code'>4101</field>
             <field name='name'>制造费用</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4301" model='finance.account'>
             <field name='code'>4301</field>
             <field name='name'>研发支出</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4401" model='finance.account'>
             <field name='code'>4401</field>
             <field name='name'>工程施工</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4403" model='finance.account'>
             <field name='code'>4403</field>
             <field name='name'>机械作业</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <!-- 损益类 -->
@@ -1336,6 +1336,26 @@
 			<field name="account_id" ref="small_business_chart5603003"/>
             <field name='note'>由系统创建</field>
 		</record>
+
+        <!--核算类别-->
+        <!-- 销售发货 借方科目：主营业务成本-->
+        <record id="categ_sell_goods" model="core.category">
+            <field name="name">销售发货</field>
+            <field name="type">finance</field>
+            <field name="account_id" ref="finance.account_cost"/>
+        </record>
+        <!-- 组装单、拆卸单 借方科目：生产成本-基本生产成本 -->
+        <record id="categ_ass_disass" model="core.category">
+            <field name="name">生产</field>
+            <field name="type">finance</field>
+            <field name="account_id" ref="finance.small_business_chart4001001"/>
+        </record>
+        <!-- 委外 借方科目： -->
+        <record id="categ_outsource" model="core.category">
+            <field name="name">委外</field>
+            <field name="type">finance</field>
+            <field name="account_id" ref="finance.small_business_chart1408"/>
+        </record>
 
     </data>
 </openerp>

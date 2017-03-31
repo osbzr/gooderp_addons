@@ -46,7 +46,8 @@ class wh_assembly(models.Model):
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
                              help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
-    voucher_id = fields.Many2one('voucher', string='凭证号')
+    voucher_id = fields.Many2one('voucher', string=u'入库凭证号')
+    out_voucher_id = fields.Many2one('voucher', string=u'出库凭证号')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -195,12 +196,70 @@ class wh_assembly(models.Model):
 
         self.create_voucher_line(voucher_line_data)
 
+    def pre_out_vourcher_line_data(self, assembly, voucher):
+        """
+        准备出库凭证行数据
+        借：生产成本-基本生产成本（核算分类上）
+        贷：库存商品（商品上）
+        :param assembly: 组装单
+        :param voucher: 出库凭证
+        :return: 出库凭证行数据
+        """
+        line_out_data, line_in_data = [], []
+        line_out_debit = 0.0
+        for line_out in assembly.line_out_ids:
+            if line_out.cost:
+                line_out_debit += line_out.cost
+
+        if line_out_debit: # 借方行
+            account_id = self.finance_category_id.account_id.id
+            line_out_data.append({'debit': line_out_debit,
+                                  'goods_id': False,
+                                  'voucher_id': voucher.id,
+                                  'account_id': account_id,
+                                  'name': u'%s组合单 原料' % assembly.move_id.name
+                                  })
+        for line_in in assembly.line_in_ids: # 贷方行
+            if line_in.cost:
+                account_id = line_in.goods_id.category_id.account_id.id
+                line_in_data.append({'credit': line_in.cost,
+                                    'goods_id':line_in.goods_id.id,
+                                    'voucher_id': voucher.id,
+                                    'account_id': account_id,
+                                    'name': u'%s组合单 成品' % assembly.move_id.name})
+        return line_out_data + line_in_data
+
+    def create_out_voucher_line(self, assembly, voucher):
+        """
+        创建出库凭证行
+        :param assembly: 组装单
+        :param voucher: 出库凭证
+        :return:
+        """
+        voucher_line_data = []
+        # 借方行
+        if assembly.fee:
+            account = assembly.create_uid.company_id.operating_cost_account_id
+            voucher_line_data.append({'name': '组装费用', 'account_id': account.id,
+                                      'debit': assembly.fee, 'voucher_id': voucher.id})
+        voucher_line_data += self.pre_out_vourcher_line_data(assembly, voucher)
+
+        self.create_voucher_line(voucher_line_data)
+
     def wh_assembly_create_voucher(self):
+        """
+        生成入库和出库凭证并审核
+        :return:
+        """
         for assembly in self:
             voucher_row = self.env['voucher'].create({'date': fields.Datetime.now()})
-            self.wh_assembly_create_voucher_line(assembly, voucher_row)
+            out_voucher = self.env['voucher'].create({'date': fields.Datetime.now()})
+            self.wh_assembly_create_voucher_line(assembly, voucher_row) # 入库凭证
+            self.create_out_voucher_line(assembly, out_voucher) # 出库凭证
             assembly.voucher_id = voucher_row.id
+            assembly.out_voucher_id = out_voucher.id
             voucher_row.voucher_done()
+            out_voucher.voucher_done()
 
     @api.multi
     def approve_feeding(self):
@@ -225,7 +284,7 @@ class wh_assembly(models.Model):
             order.line_in_ids.action_done() # 完成成品入库
 
             self.update_parent_cost()
-            self.wh_assembly_create_voucher() # 生成成品入库凭证
+            self.wh_assembly_create_voucher() # 生成凭证
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -238,9 +297,14 @@ class wh_assembly(models.Model):
         for order in self:
             order.line_in_ids.action_cancel()
 
-            if order.voucher_id:
+            if order.voucher_id:    # 删除入库凭证
                 order.voucher_id.voucher_draft()
                 order.voucher_id.unlink()
+            # 删除出库凭证
+            voucher, order.out_voucher_id = order.out_voucher_id, False
+            if voucher.state == 'done':
+                voucher.voucher_draft()
+            voucher.unlink()
 
             order.approve_uid = False
             order.approve_date = False
@@ -256,6 +320,7 @@ class wh_assembly(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
+        vals.update({'finance_category_id': self.env.ref('finance.categ_ass_disass').id})
         self = super(wh_assembly, self).create(vals)
         self.update_parent_cost()
         return self
@@ -593,6 +658,7 @@ class outsource(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
+        vals.update({'finance_category_id': self.env.ref('finance.categ_outsource').id})
         self = super(outsource, self).create(vals)
         self.update_parent_cost()
         return self
@@ -911,6 +977,7 @@ class wh_disassembly(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
+        vals.update({'finance_category_id': self.env.ref('finance.categ_ass_disass').id})
         self = super(wh_disassembly, self).create(vals)
         self.update_child_cost()
         return self

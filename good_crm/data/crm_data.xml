@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 商机成功原因分析 -->
+        <record id="success_1" model="core.value">
+            <field name="name">产品报价准确</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_2" model="core.value">
+            <field name="name">客户需求分析到位</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_3" model="core.value">
+            <field name="name">方案专业</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_4" model="core.value">
+            <field name="name">有发展内线</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_5" model="core.value">
+            <field name="name">在沟通期间响应及时</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_6" model="core.value">
+            <field name="name">产品的表现力优于竞争对手</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_7" model="core.value">
+            <field name="name">客户预算充足</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_8" model="core.value">
+            <field name="name">公司品牌影响力较大</field>
+            <field name="type">success_reason</field>
+        </record>
+        <record id="success_9" model="core.value">
+            <field name="name">有关键口碑介绍</field>
+            <field name="type">success_reason</field>
+        </record>
+    </data>
+</openerp>

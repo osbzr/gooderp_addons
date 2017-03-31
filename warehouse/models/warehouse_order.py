@@ -25,15 +25,20 @@ class wh_out(models.Model):
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
                                 store=True, readonly=True, digits=dp.get_precision('Amount'),
                                 help=u'该出库单的出库金额总和')
+    voucher_id = fields.Many2one('voucher', u'出库凭证',
+                                 readonly=True,
+                                 help=u'该出库单的审核后生成的出库凭证')
 
     @api.multi
     @inherits(res_back=False)
     def approve_order(self):
+        self.create_voucher()
         return True
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
+        self.delete_voucher()
         return True
 
     @api.multi
@@ -69,6 +74,51 @@ class wh_out(models.Model):
         auto_in = self.env['wh.in'].create(vals)
         self.with_context({'wh_in_line_ids': [line.id for line in
                                               auto_in.line_in_ids]}).approve_order()
+
+    @api.one
+    def create_voucher(self):
+        '''
+        其他出库单生成出库凭证
+        借：如果出库类型为盘亏，取科目 1901 待处理财产损益；如果为其他，取核算类别的会计科目
+        贷：库存商品（商品分类上会计科目）
+        '''
+        voucher = self.env['voucher'].create({'date': self.date})
+        credit_sum = 0 # 贷方之和
+        for line in self.line_out_ids:
+            if line.cost:   # 贷方行（多行）
+                self.env['voucher.line'].create({
+                    'name': self.name,
+                    'account_id': line.goods_id.category_id.account_id.id,
+                    'credit': line.cost,
+                    'voucher_id': voucher.id,
+                    'goods_id': line.goods_id.id,
+                })
+            credit_sum += line.cost
+        account = self.type == 'inventory' \
+                  and self.env.ref('finance.small_business_chart1901') \
+                  or self.finance_category_id.account_id
+        if credit_sum:  # 借方行（汇总一行）
+            self.env['voucher.line'].create({
+                'name': self.name,
+                'account_id': account.id,
+                'debit': credit_sum,
+                'voucher_id': voucher.id,
+            })
+        self.voucher_id = voucher
+        if len(self.voucher_id.line_ids) > 0:
+            self.voucher_id.voucher_done()
+        else:
+            self.voucher_id.unlink()
+        return voucher
+
+    @api.one
+    def delete_voucher(self):
+        # 反审核其他出库单时删除对应的出库凭证
+        voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
+
+        voucher.unlink()
 
 
 class wh_in(models.Model):
@@ -140,7 +190,7 @@ class wh_in(models.Model):
         '''
         借：商品分类对应的会计科目 一般是库存商品
         贷：如果入库类型为盘盈，取科目 1901 待处理财产损益（暂时写死）
-        如果入库类型为其他，取科目 5051 其他业务收入
+        如果入库类型为其他，取核算类别的会计科目
         '''
 
         # 初始化单的话，先找是否有初始化凭证，没有则新建一个
@@ -168,7 +218,7 @@ class wh_in(models.Model):
 
         # 贷方科目： 如果是盘盈则取主营业务成本，否则取核算类别上的科目
         account = self.type == 'inventory' \
-                  and self.env.ref('finance.account_cost') \
+                  and self.env.ref('finance.small_business_chart1901') \
                   or self.finance_category_id.account_id
 
         if not self.is_init:

@@ -107,7 +107,7 @@ class wh_move(models.Model):
         states={'done': [('readonly', True)]},
         domain=[('type', '=', 'finance')],
         context={'type': 'finance'},
-        help=u'如果业务类别选其他则此字段显示并必输,生成凭证时从此字段上取商品科目的对方科目',
+        help=u'生成凭证时从此字段上取商品科目的对方科目',
     )
 
     def scan_barcode_move_line_operation(self, line, conversion):

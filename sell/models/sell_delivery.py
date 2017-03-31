@@ -118,6 +118,8 @@ class sell_delivery(models.Model):
     modifying = fields.Boolean(u'差错修改中', default=False,
                                help=u'是否处于差错修改中')
     origin_id = fields.Many2one('sell.delivery', u'来源单据')
+    voucher_id = fields.Many2one('voucher', u'出库凭证', readonly=True,
+                                 help=u'审核时产生的出库凭证')
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
@@ -169,6 +171,7 @@ class sell_delivery(models.Model):
 
         vals.update({
             'origin': self.get_move_origin(vals),
+            'finance_category_id': self.env.ref('finance.categ_sell_goods').id,
         })
 
         return super(sell_delivery, self).create(vals)
@@ -298,6 +301,68 @@ class sell_delivery(models.Model):
         })
         return money_order
 
+    def _create_voucher_line(self, account_id, debit, credit, voucher, goods_id):
+        """
+        创建凭证明细行
+        :param account_id: 科目
+        :param debit: 借方
+        :param credit: 贷方
+        :param voucher: 凭证
+        :param goods_id: 商品
+        :return:
+        """
+        rate_silent = currency_amount = 0
+        if self.currency_id:
+            rate_silent = self.env['res.currency'].get_rate_silent(self.date, self.currency_id.id)
+            currency_amount = debit or credit
+            debit = debit * (rate_silent or 1)
+            credit = credit * (rate_silent or 1)
+        voucher_line = self.env['voucher.line'].create({
+            'name': self.name,
+            'account_id': account_id and account_id.id,
+            'debit': debit,
+            'credit': credit,
+            'voucher_id': voucher and voucher.id,
+            'goods_id': goods_id and goods_id.id,
+            'currency_id': self.currency_id.id,
+            'currency_amount': currency_amount,
+            'rate_silent': rate_silent,
+        })
+        return voucher_line
+
+    @api.multi
+    def create_voucher(self):
+        '''
+        销售发货单、退货单审核时生成会计凭证
+        借：主营业务成本（核算分类上会计科目）
+        贷：库存商品（商品分类上会计科目）
+
+        当一张发货单有多个产品的时候，按对应科目汇总生成多个贷方凭证行。
+
+        退货单生成的金额为负
+        '''
+        self.ensure_one()
+        voucher = self.env['voucher'].create({'date': self.date})
+
+        sum_amount = 0
+        line_ids = self.is_return and self.line_in_ids or self.line_out_ids
+        for line in line_ids:   # 发货单/退货单明细
+            amount = self.is_return and -line.amount or line.amount
+            sum_amount += amount
+            if line.amount:  # 贷方明细
+                self._create_voucher_line(line.goods_id.category_id.account_id,
+                                          0, amount, voucher, line.goods_id)
+        if sum_amount:  # 借方明细
+            self._create_voucher_line(self.sell_move_id.finance_category_id.account_id,
+                                      sum_amount, 0, voucher, False)
+
+        self.voucher_id = voucher
+        if len(self.voucher_id.line_ids) > 0:
+            self.voucher_id.voucher_done()
+        else:
+            self.voucher_id.unlink()
+        return voucher
+
     @api.multi
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
@@ -313,6 +378,8 @@ class sell_delivery(models.Model):
             #将发货/退货数量写入销货订单行
             if record.order_id:
                 record._line_qty_write()
+            # 创建出库的会计凭证
+            record.create_voucher()
             # 发货单/退货单 生成结算单
             invoice_id = record._delivery_make_invoice()
             # 销售费用产生结算单
