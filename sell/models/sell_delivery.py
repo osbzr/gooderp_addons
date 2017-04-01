@@ -445,7 +445,6 @@ class sell_delivery(models.Model):
             ('origin_id', '=', self.id),
             ('state', '=', 'done')
         ])
-        print 'return_order', return_order
         for order in return_order:
             for return_line in order.line_in_ids:
                 if return_goods.get(return_line.attribute_id.id):
@@ -457,7 +456,6 @@ class sell_delivery(models.Model):
             qty = line.goods_qty
             if return_goods.get(line.attribute_id.id):
                 qty = qty - return_goods[line.attribute_id.id]
-                print "ww", qty
             if qty != 0:
                 dic = {
                     'goods_id': line.goods_id.id,
