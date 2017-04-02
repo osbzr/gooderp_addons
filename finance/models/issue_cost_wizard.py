@@ -110,22 +110,38 @@ class MonthProductCost(models.Model):
         return round(month_cost, 2)
 
     @api.multi
+    def compute_real_out_cost(self, data_dict, period_id):
+        """
+        计算当期库存商品科目（所有商品类别涉及的科目）贷方金额合计
+        :param data_dict:
+        :return: 贷方金额合计
+        """
+        line = self.env['voucher.line'].search([
+            ('goods_id', '=', data_dict.get('goods_id')),
+            ('voucher_id.period_id', '=', period_id.id),
+            ('credit', '>', 0)
+        ])
+        cost = sum(l.credit for l in line)
+        return cost
+
+    @api.multi
     def create_month_product_cost_voucher(self, period_id, month_product_cost_dict):
         voucher_line_data_list = []
         account_row = self.env.ref('finance.account_cost')
         all_balance_price = 0
         for create_vals in month_product_cost_dict.values():
             goods_row = self.env['goods'].browse(create_vals.get('goods_id'))
-            current_period_out_cost = self.compute_balance_price(create_vals)
-            if self.compute_balance_price(create_vals)!=0:
-                voucher_line_data = {'name': u'发出成本adjust', 'credit':current_period_out_cost,
+            current_period_out_cost = self.compute_balance_price(create_vals) # 当期发出成本
+            real_out_cost = self.compute_real_out_cost(create_vals, period_id)
+            if self.compute_balance_price(create_vals)!=0:  # 贷方
+                voucher_line_data = {'name': u'发出成本adjust', 'credit':current_period_out_cost-real_out_cost,
                                      'account_id': goods_row.category_id.account_id.id,
                                      'goods_id': create_vals.get('goods_id')}
                 voucher_line_data_list.append([0, 0, voucher_line_data.copy()])
-            create_vals.update({'current_period_out_cost':current_period_out_cost})
-            all_balance_price += self.compute_balance_price(create_vals)
+            create_vals.update({'current_period_out_cost':current_period_out_cost-real_out_cost})
+            all_balance_price += self.compute_balance_price(create_vals)-real_out_cost
             self.create(create_vals)
-        if all_balance_price != 0:
+        if all_balance_price != 0: # 借方
             voucher_line_data_list.append(
                 [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
         if voucher_line_data_list:

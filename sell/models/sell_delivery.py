@@ -426,6 +426,12 @@ class sell_delivery(models.Model):
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.sell_move_id.cancel_approved_order()
 
+        # 删除产生的出库凭证
+        voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
+        voucher.unlink()
+
 
     @api.multi
     def sell_to_return(self):

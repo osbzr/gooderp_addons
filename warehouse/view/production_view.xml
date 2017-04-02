@@ -330,6 +330,8 @@
                                 <field name='is_many_to_many_combinations'/>
                                 <field name='invoice_id' readonly='1' options="{'no_create': True}"/>
                                 <field name='finance_category_id'/>
+                                <field name='voucher_id' readonly='1'/>
+                                <field name='out_voucher_id' readonly='1'/>
                             </group>
                         </group>
 
@@ -506,7 +508,8 @@
                                 <field name='warehouse_dest_id' />
                                 <field name='is_many_to_many_combinations' />
                                 <field name='finance_category_id'/>
-                                <field name='voucher_id' readonly='1' options="{'no_create': True}"/>
+                                <field name='voucher_id' readonly='1'/>
+                                <field name='out_voucher_id' readonly='1'/>
                             </group>
                         </group>
 
