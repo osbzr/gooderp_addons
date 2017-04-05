@@ -57,3 +57,21 @@ class partner(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '业务伙伴不能重名')
     ]
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """
+        在many2one字段中支持按编号搜索
+        """
+        args = args or []
+        if name:
+            args.append(('code', 'ilike', name))
+            partners = self.search(args)
+            if partners:
+                return partners.name_get()
+            else:
+                args.remove(('code', 'ilike', name))
+        return super(partner, self).name_search(name=name,
+                                                args=args,
+                                                operator=operator,
+                                                limit=limit)
