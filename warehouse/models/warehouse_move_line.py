@@ -173,10 +173,10 @@ class wh_move_line(models.Model):
                          compute=_compute_all_amount,
                          inverse=_inverse_price,
                          store=True,
-                         digits=dp.get_precision('Amount'),
+                         digits=dp.get_precision('Price'),
                          help=u'产品的单价')
     price_taxed = fields.Float(u'含税单价',
-                               digits=dp.get_precision('Amount'),
+                               digits=dp.get_precision('Price'),
                                help=u'产品的含税单价')
     discount_rate = fields.Float(u'折扣率%',
                                  help=u'单据的折扣率%')

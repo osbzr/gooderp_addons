@@ -569,10 +569,10 @@ class buy_order_line(models.Model):
                          compute=_compute_all_amount,
                          inverse=_inverse_price,
                          store=True,
-                         digits=dp.get_precision('Amount'),
+                         digits=dp.get_precision('Price'),
                          help=u'不含税单价，由含税单价计算得出')
     price_taxed = fields.Float(u'含税单价',
-                               digits=dp.get_precision('Amount'),
+                               digits=dp.get_precision('Price'),
                                help=u'含税单价，取自商品成本或对应供应商的购货价')
     discount_rate = fields.Float(u'折扣率%',
                                  help=u'折扣率')
@@ -587,7 +587,7 @@ class buy_order_line(models.Model):
     currency_amount = fields.Float(u'外币金额',
                                    compute=_compute_all_amount,
                                    store=True,
-                                   digits=dp.get_precision(u'金额'),
+                                   digits=dp.get_precision('Amount'),
                                    help=u'外币金额')
     tax_rate = fields.Float(u'税率(%)',
                             default=lambda self:self.env.user.company_id.import_tax_rate,

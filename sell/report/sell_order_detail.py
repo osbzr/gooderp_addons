@@ -19,7 +19,7 @@ class sell_order_detail(models.Model):
     warehouse_id = fields.Many2one('warehouse', u'仓库')
     qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     uom = fields.Char(u'单位')
-    price = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    price = fields.Float(u'单价', digits=dp.get_precision('Price'))
     amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))

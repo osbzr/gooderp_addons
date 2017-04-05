@@ -88,7 +88,7 @@ class goods_quotation(models.Model):
                             help=u'数量')
     price = fields.Float(u'单价',
                          required=True,
-                         digits=dp.get_precision('Amount'),
+                         digits=dp.get_precision('Price'),
                          help=u'商品报价')
     note = fields.Char(u'描述',
                        help=u'商品描述')
