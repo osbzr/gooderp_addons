@@ -12,6 +12,19 @@ class test_core(TransactionCase):
         with self.assertRaises(IntegrityError):
             self.env.ref('core.customer_category_1').unlink()
 
+    def test_partner_name_search(self):
+        """
+        partner在many2one字段中支持按编号搜索
+        """
+        partner = self.env.ref('core.jd')
+        # 使用 name 来搜索京东
+        result = self.env['partner'].name_search(u'京东')
+        real_result = [(partner.id, partner.name)]
+        self.assertEqual(result, real_result)
+        # 使用 code 来搜索京东
+        res = self.env['partner'].name_search('jd')
+        self.assertEqual(res, real_result)
+
     def test_res_currency(self):
         """测试阿拉伯数字转换成中文大写数字的方法"""
         self.env['res.currency'].rmb_upper(10000100.3)
