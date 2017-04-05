@@ -192,7 +192,7 @@ class customer_statements_report_with_goods(models.TransientModel):
     attribute_id = fields.Many2one('attribute', u'规格型号')
     uom_id = fields.Many2one('uom', u'单位')
     quantity = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
-    price = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    price = fields.Float(u'单价', digits=dp.get_precision('Price'))
     discount_amount = fields.Float(u'折扣额', digits=dp.get_precision('Amount'))
     without_tax_amount = fields.Float(u'不含税金额', digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))

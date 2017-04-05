@@ -22,7 +22,7 @@ class buy_summary_partner(models.Model):
     uos = fields.Char(u'辅助单位')
     qty = fields.Float(u'基本数量', digits=dp.get_precision('Quantity'))
     uom = fields.Char(u'基本单位')
-    price = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    price = fields.Float(u'单价', digits=dp.get_precision('Price'))
     amount = fields.Float(u'采购金额', digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))

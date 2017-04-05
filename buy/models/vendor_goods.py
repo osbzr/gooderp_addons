@@ -26,7 +26,7 @@ class vendor_goods(models.Model):
     )
 
     price = fields.Float(u'供货价',
-                         digits=dp.get_precision('Amount'),
+                         digits=dp.get_precision('Price'),
                          help=u'供应商提供的价格')
 
     code = fields.Char(u'供应商产品编号',

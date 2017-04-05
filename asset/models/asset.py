@@ -74,18 +74,18 @@ class asset(models.Model):
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核'),
                               ('clean', u'已清理')], u'状态', default='draft')
-    cost = fields.Float(u'金额', digits=dp.get_precision(u'金额'), required=True, states=READONLY_STATES)
-    tax = fields.Float(u'税额', digits=dp.get_precision(u'税额'), required=True, states=READONLY_STATES)
-    amount = fields.Float(u'价税合计', digits=dp.get_precision(u'金额'), store=True, compute='_get_amount')
+    cost = fields.Float(u'金额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
+    tax = fields.Float(u'税额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
+    amount = fields.Float(u'价税合计', digits=dp.get_precision('Amount'), store=True, compute='_get_amount')
     bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict', states=READONLY_STATES)
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', states=READONLY_STATES)
     is_init = fields.Boolean(u'初始化固定资产', states=READONLY_STATES)
     no_depreciation = fields.Boolean(u'不折旧')
     category_id = fields.Many2one('asset.category', u'固定资产分类', ondelete='restrict', required=True, states=READONLY_STATES)
-    depreciation_previous = fields.Float(u'以前折旧', digits=dp.get_precision(u'金额'), required=True, states=READONLY_STATES)
+    depreciation_previous = fields.Float(u'以前折旧', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
     depreciation_number = fields.Float(u'折旧期间数', required=True, states=READONLY_STATES)
-    surplus_value = fields.Float(u'残值', digits=dp.get_precision(u'金额'), store=True, compute='_get_surplus_value')
-    depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision(u'金额'), required=True, states=READONLY_STATES)
+    surplus_value = fields.Float(u'残值', digits=dp.get_precision('Amount'), store=True, compute='_get_surplus_value')
+    depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
     account_credit = fields.Many2one(
         'finance.account', u'固定资产贷方科目', required=True, states=READONLY_STATES)
     account_depreciation = fields.Many2one(
@@ -94,7 +94,7 @@ class asset(models.Model):
         'finance.account', u'累计折旧科目', required=True, states=READONLY_STATES)
     account_asset = fields.Many2one(
         'finance.account', u'固定资产科目', required=True, states=READONLY_STATES)
-    cost_depreciation = fields.Float(u'每月折旧额', digits=dp.get_precision(u'金额'), store=True, compute='_get_cost_depreciation')
+    cost_depreciation = fields.Float(u'每月折旧额', digits=dp.get_precision('Amount'), store=True, compute='_get_cost_depreciation')
     line_ids = fields.One2many('asset.line', 'order_id', u'折旧明细行',
                                states=READONLY_STATES, copy=False)
     chang_ids = fields.One2many('chang.line', 'order_id', u'变更明细行',
@@ -380,9 +380,9 @@ class CreateChangWizard(models.TransientModel):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    chang_cost = fields.Float(u'变更金额', required=True, digits=dp.get_precision(u'金额'))
+    chang_cost = fields.Float(u'变更金额', required=True, digits=dp.get_precision('Amount'))
     chang_depreciation_number = fields.Float(u'变更折旧期间', required=True)
-    chang_tax = fields.Float(u'变更税额', digits=dp.get_precision(u'变更税额'), required=True)
+    chang_tax = fields.Float(u'变更税额', digits=dp.get_precision('Amount'), required=True)
     chang_partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', required=True)
     change_reason = fields.Text(u'变更原因')
     company_id = fields.Many2one(
@@ -448,7 +448,7 @@ class asset_line(models.Model):
 
     order_id = fields.Many2one('asset', u'订单编号', index=True,
                                required=True, ondelete='cascade')
-    cost_depreciation = fields.Float(u'每月折旧额', required=True, digits=dp.get_precision(u'金额'))
+    cost_depreciation = fields.Float(u'每月折旧额', required=True, digits=dp.get_precision('Amount'))
     no_depreciation = fields.Float(u'未提折旧额')
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
