@@ -348,6 +348,9 @@ class sell_delivery(models.Model):
         line_ids = self.is_return and self.line_in_ids or self.line_out_ids
         for line in line_ids:   # 发货单/退货单明细
             cost = self.is_return and -line.cost or line.cost
+            if not cost:
+                # 缺货审核发货单时不产生出库凭证
+                return True
             sum_amount += cost
             if line.amount:  # 贷方明细
                 self._create_voucher_line(line.goods_id.category_id.account_id,
@@ -378,7 +381,7 @@ class sell_delivery(models.Model):
             #将发货/退货数量写入销货订单行
             if record.order_id:
                 record._line_qty_write()
-            # 创建出库的会计凭证
+            # 创建出库的会计凭证，生成盘盈的入库单的不产生出库凭证
             record.create_voucher()
             # 发货单/退货单 生成结算单
             invoice_id = record._delivery_make_invoice()
