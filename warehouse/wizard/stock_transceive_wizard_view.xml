@@ -13,10 +13,10 @@
                                 <field name="date_start" class="oe_inline" nolabel='1' required='1' /> - 
                                 <field name="date_end" class="oe_inline" nolabel='1' required='1' />
                             </div>
-                            <field name='goods' />
+                            <field name='goods_id' />
                         </group>
                         <group>
-                            <field name='warehouse' groups='warehouse.multi_warehouse_groups' />
+                            <field name='warehouse_id' groups='warehouse.multi_warehouse_groups' />
                         </group>
                     </group>
                     <footer>
