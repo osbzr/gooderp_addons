@@ -292,6 +292,7 @@ class sell_order(models.Model):
             'uos_id': line.goods_id.uos_id.id,
             'goods_qty': qty,
             'uom_id': line.uom_id.id,
+            'cost_unit': line.goods_id.cost,
             'price_taxed': line.price_taxed,
             'discount_rate': line.discount_rate,
             'discount_amount': discount_amount,
