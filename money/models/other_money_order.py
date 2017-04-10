@@ -101,6 +101,13 @@ class other_money_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    receiver_id = fields.Many2one('res.users',
+                                   u'收款人',
+                                   ondelete='restrict',
+                                   default=lambda self: self.env.user,
+                                   help=u'收款人')
+    bank_name = fields.Char(u'开户行')
+    bank_num = fields.Char(u'银行账号')
 
     @api.onchange('date')
     def onchange_date(self):
@@ -108,6 +115,19 @@ class other_money_order(models.Model):
             return {'domain': {'partner_id': [('c_category_id', '!=', False)]}}
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
+
+    @api.onchange('receiver_id', 'partner_id')
+    def onchange_receiver_id(self):
+        """
+        更改收款人，自动填入开户行和银行帐号
+        """
+        if self.receiver_id:
+            self.bank_name = self.receiver_id.employee_ids and self.receiver_id.employee_ids[0].bank_name or ''
+            self.bank_num = self.receiver_id.employee_ids and self.receiver_id.employee_ids[0].bank_num or ''
+        if self.partner_id:
+            self.receiver_id = False
+            self.bank_name = self.partner_id.bank_name
+            self.bank_num = self.partner_id.bank_num
 
     @api.multi
     def other_money_done(self):

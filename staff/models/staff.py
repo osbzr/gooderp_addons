@@ -126,6 +126,13 @@ class staff(models.Model):
     notes = fields.Text(u'其他信息')
     emergency_contact = fields.Char(u'紧急联系人')
     emergency_call = fields.Char(u'紧急联系方式')
+    receiver_id = fields.Many2one('res.users',
+                                  u'收款人',
+                                  ondelete='restrict',
+                                  default=lambda self: self.env.user,
+                                  help=u'收款人')
+    bank_name = fields.Char(u'开户行')
+    bank_num = fields.Char(u'银行账号')
 
     @api.model
     def staff_contract_over_date(self):
