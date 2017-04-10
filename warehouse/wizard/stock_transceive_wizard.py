@@ -24,10 +24,10 @@ class report_stock_transceive_wizard(models.TransientModel):
                              help=u'查看本次报表的开始日期')
     date_end = fields.Date(u'结束日期', default=_default_date_end,
                            help=u'查看本次报表的结束日期')
-    warehouse = fields.Char(u'仓库',
-                            help=u'本次报表查看的仓库')
-    goods = fields.Char(u'产品',
-                        help=u'本次报表查看的产品')
+    warehouse_id = fields.Many2one('warehouse', u'仓库',
+                                   help=u'本次报表查看的仓库')
+    goods_id = fields.Many2one('goods', u'产品',
+                               help=u'本次报表查看的产品')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -51,6 +51,6 @@ class report_stock_transceive_wizard(models.TransientModel):
             'res_model': 'report.stock.transceive',
             'view_mode': 'tree',
             'name': u'商品收发明细表 %s 至  %s ' % (self.date_start, self.date_end),
-            'context': self.read(['date_start', 'date_end', 'warehouse', 'goods'])[0],
+            'context': self.read(['date_start', 'date_end', 'warehouse_id', 'goods_id'])[0],
             'limit': 65535,
         }

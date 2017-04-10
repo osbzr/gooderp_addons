@@ -125,27 +125,36 @@ class MonthProductCost(models.Model):
         return cost
 
     @api.multi
-    def create_month_product_cost_voucher(self, period_id, month_product_cost_dict):
+    def create_month_product_cost_voucher(self, period_id, date, month_product_cost_dict):
+        """
+        月底成本结转生成的凭证，算出借贷方金额后，借贷方金额全部减去本期间库存商品科目（所有商品类别涉及的科目）贷方金额合计
+        :param period_id:
+        :param date:
+        :param month_product_cost_dict:
+        :return:
+        """
         voucher_line_data_list = []
         account_row = self.env.ref('finance.account_cost')
         all_balance_price = 0
         for create_vals in month_product_cost_dict.values():
             goods_row = self.env['goods'].browse(create_vals.get('goods_id'))
-            current_period_out_cost = self.compute_balance_price(create_vals) # 当期发出成本
-            real_out_cost = self.compute_real_out_cost(create_vals, period_id)
+            current_period_out_cost = self.compute_balance_price(create_vals)   # 当期加权平均成本
+            real_out_cost = self.compute_real_out_cost(create_vals, period_id)  # 当期实际成本
+            diff_cost = current_period_out_cost - real_out_cost # 两者之差
             if self.compute_balance_price(create_vals)!=0:  # 贷方
-                voucher_line_data = {'name': u'发出成本adjust', 'credit':current_period_out_cost-real_out_cost,
+                voucher_line_data = {'name': u'发出成本', 'credit': diff_cost,
                                      'account_id': goods_row.category_id.account_id.id,
                                      'goods_id': create_vals.get('goods_id')}
                 voucher_line_data_list.append([0, 0, voucher_line_data.copy()])
-            create_vals.update({'current_period_out_cost':current_period_out_cost-real_out_cost})
-            all_balance_price += self.compute_balance_price(create_vals)-real_out_cost
+            create_vals.update({'current_period_out_cost': diff_cost})
+            all_balance_price += diff_cost
             self.create(create_vals)
         if all_balance_price != 0: # 借方
             voucher_line_data_list.append(
                 [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
         if voucher_line_data_list:
-            voucher_id = self.env['voucher'].create({'period_id': period_id.id, 'line_ids': voucher_line_data_list,
+            voucher_id = self.env['voucher'].create({'date': date, 'period_id': period_id.id,
+                                                     'line_ids': voucher_line_data_list,
                                                      'is_checkout':True})
             voucher_id.voucher_done()
 
@@ -177,16 +186,16 @@ class MonthProductCost(models.Model):
         return month_product_cost_dict
 
     @api.multi
-    def generate_issue_cost(self, period_id):
+    def generate_issue_cost(self, period_id, date):
         """
-
+        生成成本的凭证
         :param period_id:
         :return:
         """
         list_dict_data = self.get_stock_qty(period_id)
         issue_cost_exists = self.search([('period_id', '=', period_id.id)])
         issue_cost_exists.unlink()
-        self.create_month_product_cost_voucher(period_id, self.data_structure(list_dict_data, period_id))
+        self.create_month_product_cost_voucher(period_id, date, self.data_structure(list_dict_data, period_id))
 
 
 class CheckOutWizard(models.TransientModel):
@@ -201,6 +210,6 @@ class CheckOutWizard(models.TransientModel):
         """
         if self.period_id:
             if self.env['ir.module.module'].sudo().search([('state', '=', 'installed'), ('name', '=', 'warehouse')]):
-                self.env['month.product.cost'].generate_issue_cost(self.period_id)
+                self.env['month.product.cost'].generate_issue_cost(self.period_id, self.date)
         res = super(CheckOutWizard, self).button_checkout()
         return res

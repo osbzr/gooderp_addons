@@ -74,13 +74,18 @@ class report_stock_transceive(models.Model):
         ''' % (sql_type == 'out' and 'warehouse_id' or 'warehouse_dest_id')
 
     def where_sql(self, sql_type='out'):
+        extra = ''
+        if self.env.context.get('warehouse_id'):
+            extra += 'AND wh.id = {warehouse_id}'
+        if self.env.context.get('goods_id'):
+            extra += 'AND goods.id = {goods_id}'
         return '''
         WHERE line.state = 'done'
           AND wh.type = 'stock'
+          AND line.date >= '{date_start}'
           AND line.date < '{date_end}'
-          AND wh.name ilike '%{warehouse}%'
-          AND goods.name ilike '%{goods}%'
-        '''
+          %s
+        ''' % extra
 
     def group_sql(self, sql_type='out'):
         return '''
@@ -100,8 +105,8 @@ class report_stock_transceive(models.Model):
         return {
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
-            'warehouse': context.get('warehouse') or '',
-            'goods': context.get('goods') or '',
+            'warehouse_id': context.get('warehouse_id') and context.get('warehouse_id')[0] or '',
+            'goods_id': context.get('goods_id') and context.get('goods_id')[0] or '',
         }
 
     def get_record_key(self, record, sql_type='out'):

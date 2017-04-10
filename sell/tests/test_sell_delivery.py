@@ -159,8 +159,8 @@ class test_sell_delivery(TransactionCase):
 
     def test_sell_delivery_done(self):
         """审核退货单正常流程"""
-        vals = {'partner_id': self.partner.id, 
-                'is_return': True, 
+        vals = {'partner_id': self.partner.id,
+                'is_return': True,
                 'date_due': (datetime.now()).strftime(ISODATEFORMAT),
                 'warehouse_id': self.customer_warehouse_id.id,
                 'warehouse_dest_id': self.warehouse_id.id,

@@ -264,8 +264,8 @@ class wh_assembly(models.Model):
         :return:
         """
         for assembly in self:
-            voucher_row = self.env['voucher'].create({'date': fields.Datetime.now()})
-            out_voucher = self.env['voucher'].create({'date': fields.Datetime.now()})
+            voucher_row = self.env['voucher'].create({'date': assembly.date})
+            out_voucher = self.env['voucher'].create({'date': assembly.date})
             self.wh_assembly_create_voucher_line(assembly, voucher_row) # 入库凭证
             self.create_out_voucher_line(assembly, out_voucher) # 出库凭证
             assembly.voucher_id = voucher_row.id
@@ -814,8 +814,8 @@ class outsource(models.Model):
         :return:
         """
         for outsource in self:
-            voucher_row = self.env['voucher'].create({'date': fields.Datetime.now()})
-            out_voucher = self.env['voucher'].create({'date': fields.Datetime.now()})
+            voucher_row = self.env['voucher'].create({'date': outsource.date})
+            out_voucher = self.env['voucher'].create({'date': outsource.date})
             self.outsource_create_voucher_line(outsource, voucher_row)  # 入库凭证
             self.create_out_voucher_line(outsource, out_voucher)  # 出库凭证
 
@@ -1079,8 +1079,8 @@ class wh_disassembly(models.Model):
         :return:
         """
         for disassembly in self:
-            voucher_row = self.env['voucher'].create({'date': fields.Datetime.now()})
-            out_voucher = self.env['voucher'].create({'date': fields.Datetime.now()})
+            voucher_row = self.env['voucher'].create({'date': disassembly.date})
+            out_voucher = self.env['voucher'].create({'date': disassembly.date})
             self.wh_disassembly_create_voucher_line(disassembly, voucher_row)   # 入库凭证
             self.create_out_voucher_line(disassembly, out_voucher)  # 出库凭证
             disassembly.voucher_id = voucher_row.id

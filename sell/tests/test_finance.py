@@ -23,5 +23,5 @@ class test_month_product_cost(TransactionCase):
         [wh_in_row.approve_order() for wh_in_row in wh_in_rows]
         [wh_out_row.approve_order() for wh_out_row in wh_out_rows]
         # [wh_internal_row.approve_order() for wh_internal_row in wh_internal_rows]
-        self.env['month.product.cost'].generate_issue_cost(self.period_id)
+        self.env['month.product.cost'].generate_issue_cost(self.period_id, '2016-01-31')
 

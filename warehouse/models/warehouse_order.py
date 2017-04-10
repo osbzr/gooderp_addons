@@ -30,7 +30,7 @@ class wh_out(models.Model):
                                  help=u'该出库单的审核后生成的出库凭证')
 
     @api.multi
-    @inherits(res_back=False)
+    @inherits_after()
     def approve_order(self):
         self.create_voucher()
         return True

@@ -91,3 +91,17 @@ class TestReport(TransactionCase):
             self.assertTrue(result in real_results)
 
         stock_transceive.with_context(context).find_source_move_line()
+
+    def test_stock_transceive_search_by_goods_warehouse(self):
+        """
+        商品收发明细表:按商品和仓库查询
+        """
+        self.transceive_wizard.date_start = '2016-02-01'
+        self.transceive_wizard.goods_id = self.env.ref('goods.mouse').id
+        self.transceive_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        context = self.transceive_wizard.open_report().get('context')
+        stock_transceive = self.env['report.stock.transceive'].create({})
+        results = stock_transceive.with_context(context).search_read(domain=[])
+        self.assertEqual(len(results), 1)
+        # 查看库存调拨明细
+        stock_transceive.with_context(context).find_source_move_line()
