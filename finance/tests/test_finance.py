@@ -267,7 +267,7 @@ class test_finance_account(TransactionCase):
 
     def test_name_get(self):
         name = self.cash.name_get()
-        real_name = '%s %s' % (self.cash.code, self.cash.name)
+        real_name = '%s %s %s' % (self.cash.code, self.cash.name, self.cash.balance)
         self.assertTrue(name[0][1] == real_name)
 
     def test_name_search(self):
