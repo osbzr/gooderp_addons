@@ -40,6 +40,9 @@
                                     <group>
                                         <field name="identification_id" required="1"/>
                                         <field name="type_of_certification"/>
+                                        <field name="receiver_id"/>
+                                        <field name="bank_name"/>
+                                        <field name="bank_num"/>
                                     </group>
                                     <group>
                                         <field name="user_id"/>

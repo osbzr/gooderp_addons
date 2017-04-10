@@ -400,6 +400,16 @@ class finance_account(models.Model):
     _order = "code"
     _description = u'会计科目'
 
+    @api.one
+    def compute_balance(self):
+        """
+        计算会计科目的当前余额
+        :return:
+        """
+        lines = self.env['voucher.line'].search(
+            [('account_id', '=', self.id)])
+        self.balance = sum((line.debit - line.credit) for line in lines)
+
     name = fields.Char(u'名称', required="1")
     code = fields.Char(u'编码', required="1")
     balance_directions = fields.Selection(BALANCE_DIRECTIONS_TYPE, u'余额方向', required="1", help=u'根据科目的类型，判断余额方向是借方或者贷方！')
@@ -426,6 +436,12 @@ class finance_account(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    balance = fields.Float(u'当前余额',
+                           compute='compute_balance',
+                           store=True,
+                           digits=dp.get_precision('Amount'),
+                           help=u'科目的当前余额',
+                           )
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', u'科目名称必须唯一。'),
@@ -436,12 +452,12 @@ class finance_account(models.Model):
     @api.depends('name', 'code')
     def name_get(self):
         """
-        在其他model中用到account时在页面显示 code name 如：2202 应付账款 （更有利于会计记账）
+        在其他model中用到account时在页面显示 code name balance如：2202 应付账款 当前余额（更有利于会计记账）
         :return:
         """
         result = []
         for line in self:
-            account_name = line.code + ' ' + line.name
+            account_name = line.code + ' ' + line.name + ' ' + str(line.balance)
             result.append((line.id, account_name))
         return result
 

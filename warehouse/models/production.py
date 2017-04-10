@@ -163,6 +163,8 @@ class wh_assembly(models.Model):
     def create_vourcher_line_data(self, assembly, voucher_row):
         """
         准备入库凭证行数据
+        借：库存商品（商品上）
+        贷：生产成本-基本生产成本（核算分类上）
         :param assembly: 组装单
         :param voucher_row: 入库凭证
         :return:
@@ -174,7 +176,7 @@ class wh_assembly(models.Model):
                 line_out_credit += line_out.cost
 
         if line_out_credit: # 贷方行
-            account_id = self.env.ref('finance.account_cost').id
+            account_id = self.finance_category_id.account_id.id
             line_out_data.append({'credit': line_out_credit,
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
@@ -712,6 +714,8 @@ class outsource(models.Model):
     def create_vourcher_line_data(self, outsource, voucher_row):
         """
         准备入库凭证行数据
+        借：库存商品（商品上）
+        贷：生产成本-基本生产成本（核算分类上）
         :param outsource: 委外加工单
         :param voucher_row: 入库凭证
         :return:
@@ -723,7 +727,7 @@ class outsource(models.Model):
                 line_out_credit += line_out.cost
 
         if line_out_credit: # 贷方行
-            account_id = self.env.ref('finance.account_cost').id
+            account_id = self.finance_category_id.account_id.id
             line_out_data.append({'credit': line_out_credit,
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
@@ -978,6 +982,8 @@ class wh_disassembly(models.Model):
     def create_vourcher_line_data(self, disassembly, voucher_row):
         """
         准备入库凭证行数据
+        借：库存商品（商品上）
+        贷：生产成本-基本生产成本（核算分类上）
         :param disassembly: 拆卸单
         :param voucher_row: 入库库凭证
         :return:
@@ -989,7 +995,7 @@ class wh_disassembly(models.Model):
                 line_out_credit += line_out.cost
 
         if line_out_credit: # 贷方行
-            account_id = self.env.ref('finance.account_cost').id
+            account_id = self.finance_category_id.account_id.id
             line_out_data.append({'credit': line_out_credit,
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,

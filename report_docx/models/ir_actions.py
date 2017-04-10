@@ -35,8 +35,3 @@ class IrActionsReportXml(models.Model):
         ],
         'Output Type', required=True, default='docx'
     )
-    company_id = fields.Many2one(
-        'res.company',
-        string=u'公司',
-        change_default=True,
-        default=lambda self: self.env['res.company']._company_default_get())
