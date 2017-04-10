@@ -274,7 +274,7 @@ class test_finance_account(TransactionCase):
         '''会计科目按名字和编号搜索'''
         result = self.env['finance.account'].name_search('库存现金')
         real_result = [(self.cash.id,
-                        self.cash.code + ' ' + self.cash.name)]
+                        self.cash.code + ' ' + self.cash.name + ' ' + str(self.cash.balance))]
 
         self.assertEqual(result, real_result)
 
