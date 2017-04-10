@@ -23,6 +23,7 @@ from odoo.exceptions import UserError, ValidationError
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
 from odoo.tools import float_compare, float_is_zero
+from datetime import datetime
 
 
 class money_order(models.Model):
@@ -393,6 +394,19 @@ class money_invoice(models.Model):
                 res.append((invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
         return res
 
+    @api.one
+    @api.depends('date_due', 'to_reconcile')
+    def compute_overdue(self):
+        """
+        计算逾期天数： 当前日期 - 到期日
+        计算逾期金额： 逾期时等于未核销金额，否则为0
+        :return: 逾期天数
+        """
+        d1 = datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
+        d2 = self.date_due and datetime.strptime(self.date_due, '%Y-%m-%d') or d1
+        self.overdue_days = (d1 - d2).days
+        self.overdue_amount = self.overdue_days > 0 and self.to_reconcile or 0.0
+
     state = fields.Selection([
                           ('draft', u'草稿'),
                           ('done', u'完成')
@@ -439,6 +453,14 @@ class money_invoice(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    overdue_days = fields.Float(u'逾期天数',
+                                compute='compute_overdue',
+                                help=u'当前日期 - 到期日')
+    overdue_amount = fields.Float(u'逾期金额',
+                                  compute='compute_overdue',
+                                  help=u'超过到期日后仍未核销的金额')
+    note = fields.Char(u'备注',
+                       help=u'可填入到期日计算的依据')
 
     @api.multi
     def money_invoice_done(self):
