@@ -163,6 +163,8 @@ class wh_assembly(models.Model):
     def create_vourcher_line_data(self, assembly, voucher_row):
         """
         准备入库凭证行数据
+        借：库存商品（商品上）
+        贷：生产成本-基本生产成本（核算分类上）
         :param assembly: 组装单
         :param voucher_row: 入库凭证
         :return:
