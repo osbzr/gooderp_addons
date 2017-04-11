@@ -407,7 +407,8 @@ class finance_account(models.Model):
         :return:
         """
         lines = self.env['voucher.line'].search(
-            [('account_id', '=', self.id)])
+            [('account_id', '=', self.id),
+             ('voucher_id.state', '=', 'done')])
         self.balance = sum((line.debit - line.credit) for line in lines)
 
     name = fields.Char(u'名称', required="1")
@@ -457,7 +458,9 @@ class finance_account(models.Model):
         """
         result = []
         for line in self:
-            account_name = line.code + ' ' + line.name + ' ' + str(line.balance)
+            account_name = line.code + ' ' + line.name
+            if line.env.context.get('show_balance'):
+                account_name += ' ' + str(line.balance)
             result.append((line.id, account_name))
         return result
 
