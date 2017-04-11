@@ -452,7 +452,7 @@
 				<p class="oe_view_nocontent_create">点击创建一个任务阶段</p>
 			</field>
 		</record>
-		<menuitem name="任务" id="menu_task_root" web_icon="task,static/description/task.png"
+		<menuitem name="任务" id="menu_task_root" web_icon="task,static/description/icon.png"
 		groups='task.group_task'/>
 		<menuitem name="今日" id="menu_timesheet" parent="menu_task_root"
 		action="action_timesheet_today" sequence='1'/>
@@ -471,7 +471,7 @@
 		action="action_task_status" sequence='1'/>
 
 		<!--门户用户的项目菜单-->
-		<menuitem name="项目" id="menu_project_portal" web_icon="task,static/description/task.png"
+		<menuitem name="项目" id="menu_project_portal" web_icon="task,static/description/icon.png"
 		action="action_project_portal" groups='base.group_portal'/>
 	</data>
 </openerp>

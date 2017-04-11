@@ -2,7 +2,7 @@
 <openerp>
     <data>
     	<!-- 根菜单 -->
-        <menuitem id="menu_buy_root" name="采购" groups='group_buy' web_icon="buy,static/description/buy.png"/>
+        <menuitem id="menu_buy_root" name="采购" groups='group_buy' web_icon="buy,static/description/icon.png"/>
 
         <menuitem id="menu_buy_manage" name="采购" parent="menu_buy_root" sequence="1"/>
 

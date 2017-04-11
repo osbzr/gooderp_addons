@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem id='warehouse_root' name='仓库' groups='group_warehouse' web_icon="warehouse,static/description/warehouse.png"/>
+        <menuitem id='warehouse_root' name='仓库' groups='group_warehouse' web_icon="warehouse,static/description/icon.png"/>
 
         <!-- 出入库单据 -->
         <menuitem id='warehouse_order' name='单据' parent='warehouse_root' sequence='1' />
