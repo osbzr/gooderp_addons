@@ -977,14 +977,14 @@ class wh_disassembly(models.Model):
         :return:
         """
         line_out_data, line_in_data = [], []
-        line_out_credit = 0.0
-        for line_out in disassembly.line_out_ids:
-            if line_out.cost:
-                line_out_credit += line_out.cost
+        line_in_credit = 0.0
+        for line_in in disassembly.line_in_ids:
+            if line_in.cost:
+                line_in_credit += line_in.cost
 
-        if line_out_credit: # 贷方行
+        if line_in_credit: # 贷方行
             account_id = self.finance_category_id.account_id.id
-            line_out_data.append({'credit': line_out_credit,
+            line_out_data.append({'credit': line_in_credit,
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
                                   'account_id': account_id,
@@ -1013,8 +1013,7 @@ class wh_disassembly(models.Model):
         line_out_data, line_in_data = [], []
         line_out_debit = 0.0
         for line_out in disassembly.line_out_ids:
-            if line_out.cost:
-                line_out_debit += line_out.cost
+            line_out_debit += line_out.cost
 
         if line_out_debit: # 借方行
             account_id = self.finance_category_id.account_id.id
@@ -1027,7 +1026,7 @@ class wh_disassembly(models.Model):
         for line_out in disassembly.line_out_ids: # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
-                line_out_data.append({'credit': line_out.cost,
+                line_out_data.append({'credit': line_out.cost + disassembly.fee,
                                     'goods_id':line_out.goods_id.id,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
