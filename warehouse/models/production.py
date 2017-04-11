@@ -227,17 +227,17 @@ class wh_assembly(models.Model):
 
         if line_out_debit: # 借方行
             account_id = self.finance_category_id.account_id.id
-            line_out_data.append({'debit': line_out_debit,
+            line_in_data.append({'debit': line_out_debit,
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
                                   'name': u'%s组合单 原料' % assembly.move_id.name
                                   })
-        for line_in in assembly.line_in_ids: # 贷方行
-            if line_in.cost:
-                account_id = line_in.goods_id.category_id.account_id.id
-                line_in_data.append({'credit': line_in.cost,
-                                    'goods_id':line_in.goods_id.id,
+        for line_out in assembly.line_out_ids: # 贷方行
+            if line_out.cost:
+                account_id = line_out.goods_id.category_id.account_id.id
+                line_out_data.append({'credit': line_out.cost,
+                                    'goods_id':line_out.goods_id.id,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
                                     'name': u'%s组合单 成品' % assembly.move_id.name})
@@ -250,13 +250,7 @@ class wh_assembly(models.Model):
         :param voucher: 出库凭证
         :return:
         """
-        voucher_line_data = []
-        # 借方行
-        if assembly.fee:
-            account = assembly.create_uid.company_id.operating_cost_account_id
-            voucher_line_data.append({'name': u'组装费用', 'account_id': account.id,
-                                      'debit': assembly.fee, 'voucher_id': voucher.id})
-        voucher_line_data += self.pre_out_vourcher_line_data(assembly, voucher)
+        voucher_line_data = self.pre_out_vourcher_line_data(assembly, voucher)
 
         self.create_voucher_line(voucher_line_data)
 
@@ -762,17 +756,17 @@ class outsource(models.Model):
 
         if line_out_debit: # 借方行
             account_id = self.finance_category_id.account_id.id
-            line_out_data.append({'debit': line_out_debit,
+            line_in_data.append({'debit': line_out_debit,
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
                                   'name': u'%s委外加工单 原料' % outsource.move_id.name
                                   })
-        for line_in in outsource.line_in_ids: # 贷方行
-            if line_in.cost:
-                account_id = line_in.goods_id.category_id.account_id.id
-                line_in_data.append({'credit': line_in.cost,
-                                    'goods_id':line_in.goods_id.id,
+        for line_out in outsource.line_out_ids: # 贷方行
+            if line_out.cost:
+                account_id = line_out.goods_id.category_id.account_id.id
+                line_out_data.append({'credit': line_out.cost,
+                                    'goods_id': line_out.goods_id.id,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
                                     'name': u'%s委外加工单 成品' % outsource.move_id.name})
@@ -802,13 +796,7 @@ class outsource(models.Model):
         :param voucher: 出库凭证
         :return:
         """
-        voucher_line_data = []
-        # 借方行
-        if outsource.outsource_fee:
-            account = outsource.create_uid.company_id.operating_cost_account_id
-            voucher_line_data.append({'name': u'委外费用', 'account_id': account.id,
-                                      'debit': outsource.outsource_fee, 'voucher_id': voucher.id})
-        voucher_line_data += self.pre_out_vourcher_line_data(outsource, voucher)
+        voucher_line_data = self.pre_out_vourcher_line_data(outsource, voucher)
 
         self.create_voucher_line(voucher_line_data)
 
@@ -1030,17 +1018,17 @@ class wh_disassembly(models.Model):
 
         if line_out_debit: # 借方行
             account_id = self.finance_category_id.account_id.id
-            line_out_data.append({'debit': line_out_debit,
+            line_in_data.append({'debit': line_out_debit,
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
                                   'name': u'%s拆卸单 原料' % disassembly.move_id.name
                                   })
-        for line_in in disassembly.line_in_ids: # 贷方行
-            if line_in.cost:
-                account_id = line_in.goods_id.category_id.account_id.id
-                line_in_data.append({'credit': line_in.cost,
-                                    'goods_id':line_in.goods_id.id,
+        for line_out in disassembly.line_out_ids: # 贷方行
+            if line_out.cost:
+                account_id = line_out.goods_id.category_id.account_id.id
+                line_out_data.append({'credit': line_out.cost,
+                                    'goods_id':line_out.goods_id.id,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
                                     'name': u'%s拆卸单 成品' % disassembly.move_id.name})
@@ -1054,11 +1042,6 @@ class wh_disassembly(models.Model):
         :return:
         """
         voucher_line_data = []
-        # 贷方行
-        if disassembly.fee:
-            account_row = disassembly.create_uid.company_id.operating_cost_account_id
-            voucher_line_data.append({'name': u'拆卸费用', 'account_id': account_row.id,
-                                      'credit': disassembly.fee, 'voucher_id': voucher_row.id})
         voucher_line_data += self.create_vourcher_line_data(disassembly, voucher_row)
         self.create_voucher_line(voucher_line_data)
 
