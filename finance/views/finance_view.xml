@@ -50,7 +50,9 @@
                         <field name="line_ids" context="{'line_ids':line_ids}">
                             <tree editable='bottom'>
                                 <field name='name'/>
-                                <field name='account_id'  options="{'no_create': True}"/>
+                                <field name='account_id'  options="{'no_create': True}"
+                                       context="{'show_balance':True}"
+                                />
                                 <field name='partner_id' options="{'no_open': True, 'no_create': True}"
                                        domain="[('name','=',False)]"/>
                                 <field name='goods_id' groups='finance.group_account_goods'

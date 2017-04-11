@@ -267,14 +267,14 @@ class test_finance_account(TransactionCase):
 
     def test_name_get(self):
         name = self.cash.name_get()
-        real_name = '%s %s %s' % (self.cash.code, self.cash.name, self.cash.balance)
+        real_name = '%s %s' % (self.cash.code, self.cash.name)
         self.assertTrue(name[0][1] == real_name)
 
     def test_name_search(self):
         '''会计科目按名字和编号搜索'''
         result = self.env['finance.account'].name_search('库存现金')
         real_result = [(self.cash.id,
-                        self.cash.code + ' ' + self.cash.name + ' ' + str(self.cash.balance))]
+                        self.cash.code + ' ' + self.cash.name)]
 
         self.assertEqual(result, real_result)
 
