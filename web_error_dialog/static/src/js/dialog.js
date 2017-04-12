@@ -22,7 +22,7 @@ odoo.define('web.gooderp_dialog', function(require) {
             }
             new Dialog(this, {
                 size: 'medium',
-                title: "Odoo " + (_.str.capitalize(error.type) || core._t("Warning")),
+                title: "Gooderp " + (_.str.capitalize(error.type) || core._t("Warning")),
                 subtitle: error.data.title,
                 $content: $('<div>').html(core.qweb.render('CrashManager.warning', {error: error})),
                 buttons: warning_buttons || default_buttons
@@ -33,7 +33,7 @@ odoo.define('web.gooderp_dialog', function(require) {
                 return;
             }
             new Dialog(this, {
-                title: "Odoo " + _.str.capitalize(error.type),
+                title: "Gooderp " + _.str.capitalize(error.type),
                 $content: core.qweb.render('CrashManager.error', {error: error}),
                 buttons: error.buttons || error_buttons || default_buttons,
             }).open();
