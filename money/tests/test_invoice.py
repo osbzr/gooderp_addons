@@ -125,3 +125,21 @@ class test_invoice(TransactionCase):
         inv_name_bill = inv.name_get()
         real_name_bill = '%s' % (inv.bill_number)
         self.assertTrue(inv_name_bill[0][1] == real_name_bill)
+
+    def test_money_invoice_compute_overdue(self):
+        """
+        计算逾期天数、计算逾期金额
+        """
+        invoice = self.env['money.invoice'].create({
+            'name': 'invoice', 'date': "2016-02-20",
+            'partner_id': self.env.ref('core.jd').id,
+            'category_id': self.env.ref('money.core_category_sale').id,
+            'amount': 117,
+            'tax_amount': 17,
+            'reconciled': 100,
+            'to_reconcile': 17,
+            'date_due': '2016-04-10',
+        })
+        invoice.compute_overdue()
+        self.assertEqual(invoice.overdue_amount, 17)
+
