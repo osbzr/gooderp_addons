@@ -11,5 +11,8 @@
     开阖引领中国会计软件进入开源时代
     ''',
     'depends': ['money','asset','goods'],
+    'data':[
+        'data/home_page.xml',
+    ],
     'application': True,
 }

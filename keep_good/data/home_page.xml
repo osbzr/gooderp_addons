@@ -1,0 +1,23 @@
+<openerp>
+	<data noupdate='1'>
+        
+        <record id="home_page_money_invoice_income_action" model="home.page">
+		    <field name="sequence">7</field>
+			<field name="action" ref="money.money_invoice_income_action"/>
+			<field name="view_id" ref="money.money_invoice_form"/>
+			<field name="menu_type">all_business</field>
+            <field name="context">{'type':'income', 'default_is_init':'1', 'default_name':'.'}</field>
+			<field name="note_one" >销售发票</field>
+        </record>
+
+        <record id="home_page_money_invoice_expense_action" model="home.page">
+		    <field name="sequence">8</field>
+			<field name="action" ref="money.money_invoice_expense_action"/>
+			<field name="view_id" ref="money.money_invoice_form"/>
+			<field name="menu_type">all_business</field>
+            <field name="context">{'type':'expense', 'default_is_init':'1', 'default_name':'.'}</field>
+			<field name="note_one" >采购发票</field>
+        </record>
+
+    </data>
+</openerp>
