@@ -3,7 +3,7 @@
 	<data>
 
 		<!--根菜单-->
-		<menuitem id='setting_menu' name='配置' groups="core.master_groups" web_icon="core,static/description/icon.png"/>
+		<menuitem id='setting_menu' name='配置' groups="core.master_groups" web_icon="core,static/description/icon.png" sequence='9999'/>
 		<menuitem id='config_data_menu' name='基本配置' parent='setting_menu' sequence='20'/>
 		<menuitem id='system_menu' name='高级配置' parent='setting_menu' sequence='30'/>
 
