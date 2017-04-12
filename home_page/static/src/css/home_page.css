@@ -45,3 +45,9 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, menu,
 .gooderp-title {
   color: #337ab7;
 }
+
+
+.oe_quick_link{
+    overflow:hidden;
+    white-space:nowrap;
+}
