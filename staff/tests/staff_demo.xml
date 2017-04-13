@@ -39,6 +39,12 @@
             <field name='health'>100</field>
             <field name='unemployment'>100</field>
             <field name='housing_fund'>100</field>
+            <field name='endowment_co'>100</field>
+            <field name='health_co'>100</field>
+            <field name='unemployment_co'>100</field>
+            <field name='housing_fund_co'>100</field>
+            <field name='injury'>100</field>
+            <field name='maternity'>100</field>
             <field name='over_date'>2020-01-01</field>
             <field name='job_id' ref='staff.staff_job_1'/>
         </record>

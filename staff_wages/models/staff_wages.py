@@ -42,6 +42,14 @@ class staff_wages(models.Model):
     totoal_housing_fund = fields.Float(u'应扣住房合计')
     totoal_personal_tax = fields.Float(u'应扣个税合计')
     totoal_amount = fields.Float(u'实发工资合计')
+    totoal_endowment_co = fields.Float(u'应扣公司养老合计')
+    totoal_health_co = fields.Float(u'应扣公司医疗合计')
+    totoal_unemployment_co = fields.Float(u'应扣公司失业合计')
+    totoal_housing_fund_co = fields.Float(u'应扣公司住房合计')
+    totoal_injury = fields.Float(u'应扣公司工伤保险合计',
+                          help=u'公司承担的工伤保险合计')
+    totoal_maternity = fields.Float(u'应扣公司生育保险合计',
+                             help=u'公司承担的生育保险合计')
 
     @api.onchange('line_ids')
     def _total_amount_wage(self):
@@ -54,6 +62,12 @@ class staff_wages(models.Model):
         self.totoal_unemployment = sum(line.unemployment for line in self.line_ids)
         self.totoal_housing_fund = sum(line.housing_fund for line in self.line_ids)
         self.totoal_personal_tax = sum(line.personal_tax for line in self.line_ids)
+        self.totoal_endowment_co = sum(line.endowment_co for line in self.line_ids)
+        self.totoal_health_co = sum(line.health_co for line in self.line_ids)
+        self.totoal_unemployment_co = sum(line.unemployment_co for line in self.line_ids)
+        self.totoal_housing_fund_co = sum(line.housing_fund_co for line in self.line_ids)
+        self.totoal_injury = sum(line.injury for line in self.line_ids)
+        self.totoal_maternity = sum(line.maternity for line in self.line_ids)
 
     @api.one
     def staff_wages_confirm(self):
@@ -111,6 +125,10 @@ class staff_wages(models.Model):
         """
         before_voucher = self.voucher_id
         date = fields.Date.context_today(self)
+        if self.change_voucher_id:
+            # 如果修正计提凭证存在，则删除后重新生成修正计提凭证
+            change_voucher, self.change_voucher_id = self.change_voucher_id, False
+            self.voucher_unlink(change_voucher)
         change_voucher = self.create_voucher(date)
         for change_line in change_voucher.line_ids:
             for before_line in before_voucher.line_ids:
@@ -129,6 +147,24 @@ class staff_wages(models.Model):
             change_voucher.voucher_done()
             self.write({'change_voucher_id': change_voucher.id})
 
+    def create_credit_line(self, voucher, name, account, credit):
+        """
+        生成贷方行
+        :param voucher: 凭证
+        :param name: 摘要
+        :param account: 借方科目
+        :param credit: 贷方金额
+        :return:
+        """
+        vals = {
+            'voucher_id': voucher.id,
+            'name': name,
+            'account_id': account.id,
+            'credit': credit,
+        }
+        voucher_line = self.env['voucher.line'].create(vals)
+        return voucher_line
+
     @api.multi
     def create_voucher(self, date):
         """
@@ -142,22 +178,92 @@ class staff_wages(models.Model):
         res = {}
         for line in self.line_ids:
             staff = self.env['staff.contract'].search([('staff_id', '=', line.name.id)])
-            debite_account = staff.job_id and staff.job_id.account_id.id or self.env.ref('finance.small_business_chart5602001').id
-            if debite_account not in res:
-                res[debite_account] = {'debit': 0}
-            val = res[debite_account]
+            debit_account = staff.job_id and staff.job_id.account_id or self.env.ref('finance.small_business_chart5602001')
+            if debit_account not in res:
+                res[debit_account] = {'debit': 0}
+            val = res[debit_account]
             val.update({'debit': val.get('debit') + line.all_wage,
                         'voucher_id': vouch_obj.id,
-                        'account_id': debite_account,
+                        'account_id': debit_account.id,
                         'name': u'提本月工资'})
+            account_housing = self.env.ref('finance.management_housing_fund')
+            if account_housing not in res:
+                res[account_housing] = {'debit': 0}
+            val = res[account_housing]
+            val.update({
+                'debit': val.get('debit') + line.housing_fund_co,
+                'voucher_id': vouch_obj.id,
+                'account_id': account_housing.id,
+                'name': u'提本月公积金',
+            })
+            account_endowment = self.env.ref('finance.management_endowment')
+            if account_endowment not in res:
+                res[account_endowment] = {'debit': 0}
+            val = res[account_endowment]
+            val.update({
+                'debit': val.get('debit') + line.endowment_co,
+                'voucher_id': vouch_obj.id,
+                'account_id': account_endowment.id,
+                'name': u'提本月养老保险',
+            })
+            account_health = self.env.ref('finance.management_health')
+            if account_health not in res:
+                res[account_health] = {'debit': 0}
+            val = res[account_health]
+            val.update({
+                'debit': val.get('debit') + line.health_co,
+                'voucher_id': vouch_obj.id,
+                'account_id': account_health.id,
+                'name': u'提本月医疗保险',
+            })
+            account_unemployment = self.env.ref('finance.management_unemployment')
+            if account_unemployment not in res:
+                res[account_unemployment] = {'debit': 0}
+            val = res[account_unemployment]
+            val.update({
+                'debit': val.get('debit') + line.unemployment_co,
+                'voucher_id': vouch_obj.id,
+                'account_id': account_unemployment.id,
+                'name': u'提本月失业保险',
+            })
+            account_injury = self.env.ref('finance.management_injury')
+            if account_injury not in res:
+                res[account_injury] = {'debit': 0}
+            val = res[account_injury]
+            val.update({
+                'debit': val.get('debit') + line.injury,
+                'voucher_id': vouch_obj.id,
+                'account_id': account_injury.id,
+                'name': u'提本月工伤保险',
+            })
+            account_maternity = self.env.ref('finance.management_maternity')
+            if account_maternity not in res:
+                res[account_maternity] = {'debit': 0}
+            val = res[account_maternity]
+            val.update({
+                'debit': val.get('debit') + line.maternity,
+                'voucher_id': vouch_obj.id,
+                'account_id': account_maternity.id,
+                'name': u'提本月生育保险',
+            })
+
         #生成借方凭证行
         for account_id,val in res.iteritems():
-            self.env['voucher.line'].create(dict(val, account_id=account_id))
+            self.env['voucher.line'].create(dict(val, account_id=account_id.id))
         #生成贷方凭证行
-        self.env['voucher.line'].create({'credit': self.totoal_wage,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': credit_account.account_id.id,
-                                         'name': u'提本月工资'})
+        pay_housing = self.env.ref('finance.small_business_chart2211009')
+        pay_endowment = self.env.ref('finance.small_business_chart2211003')
+        pay_health = self.env.ref('finance.small_business_chart2211005')
+        pay_unemploy = self.env.ref('finance.small_business_chart2211006')
+        pay_injury = self.env.ref('finance.small_business_chart2211008')
+        pay_maternity = self.env.ref('finance.small_business_chart2211007')
+        self.create_credit_line(vouch_obj, u'提本月工资', credit_account.account_id, self.totoal_wage)
+        self.create_credit_line(vouch_obj, u'提本月公积金', pay_housing, self.totoal_housing_fund_co)
+        self.create_credit_line(vouch_obj, u'提本月养老保险', pay_endowment, self.totoal_endowment_co)
+        self.create_credit_line(vouch_obj, u'提本月医疗保险', pay_health, self.totoal_health_co)
+        self.create_credit_line(vouch_obj, u'提本月失业保险', pay_unemploy, self.totoal_unemployment_co)
+        self.create_credit_line(vouch_obj, u'提本月工伤保险', pay_injury, self.totoal_injury)
+        self.create_credit_line(vouch_obj, u'提本月生育保险', pay_maternity, self.totoal_maternity)
         return vouch_obj
 
     @api.one
@@ -257,6 +363,18 @@ class wages_line(models.Model):
     health = fields.Float(u'个人医疗保险')
     unemployment = fields.Float(u'个人失业保险')
     housing_fund = fields.Float(u'个人住房公积金')
+    endowment_co = fields.Float(u'公司养老保险',
+                                help=u'公司承担的养老保险')
+    health_co = fields.Float(u'公司医疗保险',
+                             help=u'公司承担的医疗保险')
+    unemployment_co = fields.Float(u'公司失业保险',
+                                   help=u'公司承担的失业保险')
+    injury = fields.Float(u'公司工伤保险',
+                          help=u'公司承担的工伤保险')
+    maternity = fields.Float(u'公司生育保险',
+                             help=u'公司承担的生育保险')
+    housing_fund_co = fields.Float(u'公司住房公积金',
+                                   help=u'公司承担的住房公积金')
     personal_tax = fields.Float(u'个人所得税', store=True, compute='_personal_tax_value')
     amount_wage = fields.Float(u'实发工资', store=True, compute='_amount_wage_value')
     order_id = fields.Many2one('staff.wages', u'工资表', index=True,
@@ -280,12 +398,22 @@ class wages_line(models.Model):
 
     @api.onchange('name')
     def change_social_security(self):
+        """
+        选择员工后，自动带出五险一金
+        :return:
+        """
         social_security = self.env['staff.contract'].search([('staff_id', '=', self.name.id)])
         self.basic_wage = social_security.basic_wage
         self.endowment = social_security.endowment
         self.health = social_security.health
         self.unemployment = social_security.unemployment
         self.housing_fund = social_security.housing_fund
+        self.endowment_co = social_security.endowment_co
+        self.health_co = social_security.health_co
+        self.unemployment_co = social_security.unemployment_co
+        self.housing_fund_co = social_security.housing_fund_co
+        self.injury = social_security.injury
+        self.maternity = social_security.maternity
 
     @api.one
     @api.depends('date_number','basic_date','add_wage','other_wage','basic_wage')

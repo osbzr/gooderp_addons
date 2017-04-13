@@ -70,10 +70,24 @@
                                 <field name='contract_ids'>
                                 	<tree editable='bottom'>
                                 		<field name="basic_wage"/>
-                                        <field name="endowment" groups='staff.hr_senior_groups'/>
-                                        <field name="health" groups='staff.hr_senior_groups'/>
-                                        <field name="unemployment" groups='staff.hr_senior_groups'/>
-                                        <field name="housing_fund" groups='staff.hr_senior_groups'/>
+                                        <field name="endowment" groups='staff.hr_senior_groups'
+                                               base_string='养老保险' merge="False" child_name='个人' colspan='2'/>
+                                        <field name="endowment_co" groups='staff.hr_senior_groups'
+                                               merge="True" child_name='公司'/>
+                                        <field name="health" groups='staff.hr_senior_groups'
+                                               base_string='医疗保险' merge="False" child_name='个人' colspan='2'/>
+                                        <field name="health_co" groups='staff.hr_senior_groups'
+                                               merge="True" child_name='公司'/>
+                                        <field name="unemployment" groups='staff.hr_senior_groups'
+                                               base_string='失业保险' merge="False" child_name='个人' colspan='2'/>
+                                        <field name="unemployment_co" groups='staff.hr_senior_groups'
+                                               merge="True" child_name='公司'/>
+                                        <field name="housing_fund" groups='staff.hr_senior_groups'
+                                               base_string='住房公积金' merge="False" child_name='个人' colspan='2'/>
+                                        <field name="housing_fund_co" groups='staff.hr_senior_groups'
+                                               merge="True" child_name='公司'/>
+                                        <field name="injury" groups='staff.hr_senior_groups'/>
+                                        <field name="maternity" groups='staff.hr_senior_groups'/>
                                 		<field name="over_date"/>
                                 		<field name="job_id"/>
                                 	</tree>
