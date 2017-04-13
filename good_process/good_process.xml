@@ -13,6 +13,7 @@
 				<form string='审批'>
                     <group>
                         <field name='model_id'/>
+						<field name='type'/>
                         <field name='is_department_approve'/>
                     </group>
                     <field name='line_ids'>
@@ -31,6 +32,7 @@
 			<field name='arch' type='xml'>
 				<tree string='审批'>
 					<field name='model_id'/>
+					<field name='type'/>
 					<field name='is_department_approve'/>
 				</tree>
 			</field>
@@ -65,5 +67,8 @@
             <field name='res_model'>good_process.approver</field>
             <field name='view_mode'>tree</field>
         </record>
+
+		<menuitem id='menu_to_approve_process' name='待审批单据' action='good_process_approver_action' sequence='0'/>
+
     </data>
 </openerp>

@@ -2,10 +2,11 @@
 {
     "name": "good_process",
     "version": '11.11',
-    "author": '',
+    "author": '上海开阖软件有限公司',
     "website": "http://www.osbzr.com",
-    "category": "Generic Modules",
+    "category": "gooderp",
     "description": """
+    可配置的审批流程
     """,
     "data": [
         'good_process.xml',
@@ -15,6 +16,6 @@
         'core',
     ],
     'qweb': [
-        'static/src/xml/*.xml',
+        'static/src/xml/approver.xml',
     ],
 }
