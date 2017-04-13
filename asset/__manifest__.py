@@ -15,6 +15,7 @@
         'views/asset_action.xml',
         'views/asset_menu.xml',
         'data/asset_data.xml',
+        'data/home_page.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [

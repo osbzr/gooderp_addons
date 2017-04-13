@@ -1,0 +1,11 @@
+<openerp>
+	<data noupdate='1'>
+        <record id="home_page_asset_action" model="home.page">
+        	<field name="sequence">13</field>
+		    <field name="action" ref="asset.asset_action"/>
+		    <field name="menu_type">amount_summary</field>
+			<field name="compute_field_one" ref="asset.field_asset_surplus_value"/>
+		    <field name="note_one" >固定资产</field>
+		</record>
+    </data>
+</openerp>
