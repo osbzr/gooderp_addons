@@ -44,6 +44,12 @@
 								<field name="totoal_housing_fund" invisible="1"/>
 								<field name="totoal_personal_tax" invisible="1"/>
 								<field name="totoal_amount" invisible="1"/>
+								<field name="totoal_endowment_co" invisible="1"/>
+								<field name="totoal_health_co" invisible="1"/>
+								<field name="totoal_unemployment_co" invisible="1"/>
+								<field name="totoal_housing_fund_co" invisible="1"/>
+								<field name="totoal_injury" invisible="1"/>
+								<field name="totoal_maternity" invisible="1"/>
 							</group>
 						</group>
 						<field name="line_ids">
