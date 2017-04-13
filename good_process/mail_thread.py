@@ -6,9 +6,10 @@ class mail_thread(models.AbstractModel):
     _inherit = 'mail.thread'
     _to_approver_ids = fields.One2many('good_process.approver',  'res_id',
         domain=lambda self: [('model', '=', self._name)], auto_join=True, string='待审批人')
+    _approver_num = fields.Integer(string='总审批人数')
 
     def get_groups(self, model_name):
-        process_rows = self.env['good_process.process'].search([('model_id.model', '=', model_name)])
+        process_rows = self.env['good_process.process'].search([('model_id.model', '=', self._name),('type', '=', getattr(self,'type',False))])
         groups = []
         if process_rows:
             [groups.append((line.group_id, line.sequence)) for line in self.env['good_process.process_line'].search(
@@ -25,7 +26,7 @@ class mail_thread(models.AbstractModel):
         return users, sequence_dict
 
     def _add_approver(self, thread_row, model_name):
-
+        #TODO 加上当前用户的部门经理
         groups = self.get_groups(model_name)
         users, user_sequence_dict= self.get_users(groups)
         approver_rows = []
@@ -36,13 +37,6 @@ class mail_thread(models.AbstractModel):
              'model': thread_row._name})) for user in users]
         return [{'id': row.id, 'display_name': row.user_id.name} for row in approver_rows]
 
-    # def constract_message(self, name, group):
-    #     message = ""
-    #     user_row = self.env['res.users'].browse(self.env.uid)
-    #     for group in user_row.group_ids:
-    #         if group.category_id.name == 'Gooderp':
-    #             message = "%s %s %s" % (name, group.name, user_row.name)
-    #     return message
 
     def good_approver_send_message(self, active_id, active_model, group, message):
         mode_row = self.env[active_model].browse(active_id)
@@ -57,7 +51,7 @@ class mail_thread(models.AbstractModel):
         if return_vals:
             self.good_approver_send_message(active_id, active_model, group, u'同意')
         else:
-            return_vals = u'这个单子您还没必要审批！'
+            return_vals = u'您不是这张单据的下一个审批者'
         return return_vals
 
     @api.model
@@ -70,19 +64,29 @@ class mail_thread(models.AbstractModel):
             approver_rows.unlink()
             self.good_approver_send_message(active_id, active_model, group, u'拒绝')
             retturn_vals = self._add_approver(mode_row, active_model)
+            self._approver_num = len(retturn_vals)
         else:
-            retturn_vals = u'已经通过能拒绝！'
+            retturn_vals = u'已经通过不能拒绝！'
         return retturn_vals
 
 
     @api.model
     def create(self, vals):
         thread_row = super(mail_thread, self).create(vals)
-        self._add_approver(thread_row, self._name)
+        approvers = self._add_approver(thread_row, self._name)
+        vals.update({'_approver_num':len(approvers)})
+        return thread_row
+    
+    @api.multi
+    def write(self, vals):
+        for th in self:
+            if len(th._to_approver_ids) < th._approver_num:
+                raise ValidationError(u"审批中不可修改")
+        thread_row = super(mail_thread, self).write(vals)
         return thread_row
 
     def get_user_group(self, active_model):
-        process_rows = self.env['good_process.process'].search([('model_id.model', '=', active_model)])
+        process_rows = self.env['good_process.process'].search([('model_id.model', '=', active_model), ('type', '=', getattr(self,'type',False))])
         group_dict = {}
         [group_dict.update({line.group_id.id: (line.is_all_approve, line.sequence)})
          for line in self.env['good_process.process_line'].search(
@@ -122,12 +126,11 @@ class approver(models.Model):
     _name = 'good_process.approver'
     _rec_name = 'user_id'
     _order = 'sequence'
-    model = fields.Char('Related Document Model', index=True)
-    res_id = fields.Many2one('Related Document ID', index=True)
+    model = fields.Char('模型', index=True)
+    res_id = fields.Integer('ID', index=True)
     group_id = fields.Many2one('res.groups', string='用户组')
     user_id = fields.Many2one('res.users', string='用户')
     sequence = fields.Integer(string='顺序')
-    _approver_num = fields.Integer(string='总审批人数')
 
     @api.model_cr
     def init(self):
@@ -139,12 +142,13 @@ class process(models.Model):
     _name = 'good_process.process'
     _rec_name = 'model_id'
     model_id = fields.Many2one('ir.model')
+    type = fields.Char(u'类型', help=u'有些单据根据type字段区分具体流程')
     is_department_approve = fields.Boolean(string='部门经理审批')
     line_ids = fields.One2many('good_process.process_line', 'process_id', string='审批组')
 
 class process_line(models.Model):
     _name = 'good_process.process_line'
     sequence = fields.Integer(string='序号')
-    group_id = fields.Many2one('res.groups', string='序号')
-    is_all_approve = fields.Boolean(string='是否全部审批')
+    group_id = fields.Many2one('res.groups', string='审批组')
+    is_all_approve = fields.Boolean(string='是否需要本组用户全部审批')
     process_id = fields.Many2one('process')

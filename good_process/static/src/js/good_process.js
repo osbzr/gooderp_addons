@@ -38,7 +38,7 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
            if(result && typeof(result)== 'object'){
                self.render_tag(result);
            }else{
-               self.do_notify(_t("审核问题"), _t(result));
+               self.do_notify(_t("拒绝失败"), _t(result));
            }
         })
     },
@@ -54,7 +54,7 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
                    $(remove_button).addClass('o_hidden');
                });
            }else{
-               self.do_notify(_t("审核问题"), _t(result));
+               self.do_notify(_t("审批失败"), _t(result));
            }
        })
     },
