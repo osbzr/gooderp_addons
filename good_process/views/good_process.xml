@@ -19,7 +19,7 @@
                     <field name='line_ids'>
 						<tree editable='TOP' string='审批'>
 							<field name='sequence'/>
-							<field name='group_id'/>
+							<field name='group_id' domain="[('category_id','=', %(good_process.gooderp_approver_groups)d)]"/>
 							<field name='is_all_approve' />
 						</tree>
 					</field>
