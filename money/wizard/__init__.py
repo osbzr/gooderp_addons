@@ -2,3 +2,4 @@
 import partner_statements_wizard
 import bank_statements_wizard
 import other_money_statements_wizard
+import money_get_pay_wizard
