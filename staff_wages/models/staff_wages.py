@@ -147,6 +147,24 @@ class staff_wages(models.Model):
             change_voucher.voucher_done()
             self.write({'change_voucher_id': change_voucher.id})
 
+    def create_credit_line(self, voucher, name, account, credit):
+        """
+        生成贷方行
+        :param voucher: 凭证
+        :param name: 摘要
+        :param account: 借方科目
+        :param credit: 贷方金额
+        :return:
+        """
+        vals = {
+            'voucher_id': voucher.id,
+            'name': name,
+            'account_id': account.id,
+            'credit': credit,
+        }
+        voucher_line = self.env['voucher.line'].create(vals)
+        return voucher_line
+
     @api.multi
     def create_voucher(self, date):
         """
@@ -233,40 +251,19 @@ class staff_wages(models.Model):
         for account_id,val in res.iteritems():
             self.env['voucher.line'].create(dict(val, account_id=account_id.id))
         #生成贷方凭证行
-        account_pay_housing = self.env.ref('finance.small_business_chart2211009')
-        account_pay_endowment = self.env.ref('finance.small_business_chart2211003')
-        account_pay_health = self.env.ref('finance.small_business_chart2211005')
-        account_pay_unemploy = self.env.ref('finance.small_business_chart2211006')
-        account_pay_injury = self.env.ref('finance.small_business_chart2211008')
-        account_pay_maternity = self.env.ref('finance.small_business_chart2211007')
-        self.env['voucher.line'].create({'credit': self.totoal_wage,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': credit_account.account_id.id,
-                                         'name': u'提本月工资'})
-        self.env['voucher.line'].create({'credit': self.totoal_housing_fund_co,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': account_pay_housing.id,
-                                         'name': u'提本月公积金'})
-        self.env['voucher.line'].create({'credit': self.totoal_endowment_co,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': account_pay_endowment.id,
-                                         'name': u'提本月养老保险'})
-        self.env['voucher.line'].create({'credit': self.totoal_health_co,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': account_pay_health.id,
-                                         'name': u'提本月医疗保险'})
-        self.env['voucher.line'].create({'credit': self.totoal_unemployment_co,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': account_pay_unemploy.id,
-                                         'name': u'提本月失业保险'})
-        self.env['voucher.line'].create({'credit': self.totoal_injury,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': account_pay_injury.id,
-                                         'name': u'提本月工伤保险'})
-        self.env['voucher.line'].create({'credit': self.totoal_maternity,
-                                         'voucher_id': vouch_obj.id,
-                                         'account_id': account_pay_maternity.id,
-                                         'name': u'提本月生育保险'})
+        pay_housing = self.env.ref('finance.small_business_chart2211009')
+        pay_endowment = self.env.ref('finance.small_business_chart2211003')
+        pay_health = self.env.ref('finance.small_business_chart2211005')
+        pay_unemploy = self.env.ref('finance.small_business_chart2211006')
+        pay_injury = self.env.ref('finance.small_business_chart2211008')
+        pay_maternity = self.env.ref('finance.small_business_chart2211007')
+        self.create_credit_line(vouch_obj, u'提本月工资', credit_account.account_id, self.totoal_wage)
+        self.create_credit_line(vouch_obj, u'提本月公积金', pay_housing, self.totoal_housing_fund_co)
+        self.create_credit_line(vouch_obj, u'提本月养老保险', pay_endowment, self.totoal_endowment_co)
+        self.create_credit_line(vouch_obj, u'提本月医疗保险', pay_health, self.totoal_health_co)
+        self.create_credit_line(vouch_obj, u'提本月失业保险', pay_unemploy, self.totoal_unemployment_co)
+        self.create_credit_line(vouch_obj, u'提本月工伤保险', pay_injury, self.totoal_injury)
+        self.create_credit_line(vouch_obj, u'提本月生育保险', pay_maternity, self.totoal_maternity)
         return vouch_obj
 
     @api.one
