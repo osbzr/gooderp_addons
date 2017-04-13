@@ -174,10 +174,10 @@
           <field name="account_id" ref="finance.account_ap"/>
         </record>
         <record id="core.cat_freight" model="core.category">
-           <field name="account_id" ref="finance.bs_8"/>
+           <field name="account_id" ref="finance.small_business_chart1132"/>
         </record>
         <record id="core.cat_consult" model="core.category">
-           <field name="account_id" ref="finance.bs_9"/>
+           <field name="account_id" ref="finance.small_business_chart1221"/>
         </record>
         <record id="core.alipay" model="bank.account">
              <field name="account_id" ref="finance.account_bank"/>

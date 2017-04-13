@@ -15,7 +15,7 @@
                     <field name='period_id'/>
                     <separator/>
                     <filter string="本期"
-                            domain="[('vdate','&gt;=',(context_today()).strftime('%%Y-%%m-01')),
+                            domain="[('date','&gt;=',(context_today()).strftime('%%Y-%%m-01')),
                             ('date','&lt;=',(context_today()).strftime('%%Y-%%m-%%d'))]"/>
                     <group expand="0" string="分组">
                         <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>

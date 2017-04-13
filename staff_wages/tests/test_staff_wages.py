@@ -10,6 +10,9 @@ class test_staff_wages(TransactionCase):
     def setUp(self):
         super(test_staff_wages, self).setUp()
         self.staff_wages = self.env.ref('staff_wages.staff_wages_lili')
+        # 调用下员工onchange自动带出五险一金
+        for line in self.staff_wages.line_ids:
+            line.change_social_security()
 
     def test_normal_case(self):
         '''测试正常业务流程'''
@@ -63,7 +66,7 @@ class test_staff_wages(TransactionCase):
         self.staff_wages.line_ids[0].date_number = 22
         for line in amount_lines:
             # 基本工资大于每档1元
-            self.staff_wages.line_ids[0].basic_wage = line + 3500 + 1
+            self.staff_wages.line_ids[0].basic_wage = line + 3500 + 400 + 1
             self.assertTrue(self.staff_wages.line_ids[0].personal_tax)
 
     def test_unlink(self):

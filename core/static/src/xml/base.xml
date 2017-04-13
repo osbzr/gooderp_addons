@@ -62,7 +62,7 @@
                             <t t-esc="column.string"/>
                         </th>
                     </t>
-					<th t-if="options.deletable" class='oe_list_record_copy' width="13px"/>
+					<th t-if="options.deletable" class='oe_list_record_copy' width="13px" rowspan="2" />
                     <th t-if="options.selectable" class="o_list_record_selector" rowspan="2" colspan="1">
                         <div class="o_checkbox" >
                             <input type="checkbox"/><span/>

@@ -37,5 +37,42 @@
             <field name='type'>other_pay</field>
             <field name='note'>由系统创建</field>
         </record>
+
+        <record id="categ_endowment_co" model='core.category'>
+            <field name='name'>公司缴纳养老保险</field>
+            <field name='account_id' ref='finance.small_business_chart2211003'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="categ_health_co" model='core.category'>
+            <field name='name'>公司缴纳医疗保险</field>
+            <field name='account_id' ref='finance.small_business_chart2211005'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="categ_unemployment_co" model='core.category'>
+            <field name='name'>公司缴纳失业保险</field>
+            <field name='account_id' ref='finance.small_business_chart2211006'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="categ_maternity" model='core.category'>
+            <field name='name'>公司缴纳生育保险</field>
+            <field name='account_id' ref='finance.small_business_chart2211007'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="categ_injury" model='core.category'>
+            <field name='name'>公司缴纳工伤保险</field>
+            <field name='account_id' ref='finance.small_business_chart2211008'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
+        <record id="categ_housing_fund_co" model='core.category'>
+            <field name='name'>公司缴纳住房公积金</field>
+            <field name='account_id' ref='finance.small_business_chart2211009'/>
+            <field name='type'>other_pay</field>
+            <field name='note'>由系统创建</field>
+        </record>
     </data>
 </openerp>
