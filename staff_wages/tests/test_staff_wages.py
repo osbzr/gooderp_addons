@@ -67,7 +67,6 @@ class test_staff_wages(TransactionCase):
         for line in amount_lines:
             # 基本工资大于每档1元
             self.staff_wages.line_ids[0].basic_wage = line + 3500 + 400 + 1
-            print 'aaaaaaaaaaa',self.staff_wages.line_ids[0].personal_tax
             self.assertTrue(self.staff_wages.line_ids[0].personal_tax)
 
     def test_unlink(self):
