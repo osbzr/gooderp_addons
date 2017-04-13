@@ -12,11 +12,11 @@
                 </t>
                 <t t-if="button_invisible" >
                     <div class="good_approve_div">
-                         <button type="button" class="btn btn-sm btn-primary good_approve" title="同意">
+                         <button type="button" class="btn btn-sm btn-primary good_approve">
                              同意
                          </button>
                         <button class="btn btn-sm btn-link good_refused" type="button" >
-                           不同意
+                             拒绝
                         </button>
                     </div>
                 </t>
