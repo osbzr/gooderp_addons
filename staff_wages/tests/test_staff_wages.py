@@ -10,6 +10,9 @@ class test_staff_wages(TransactionCase):
     def setUp(self):
         super(test_staff_wages, self).setUp()
         self.staff_wages = self.env.ref('staff_wages.staff_wages_lili')
+        # 调用下员工onchange自动带出五险一金
+        for line in self.staff_wages.line_ids:
+            line.change_social_security()
 
     def test_normal_case(self):
         '''测试正常业务流程'''
