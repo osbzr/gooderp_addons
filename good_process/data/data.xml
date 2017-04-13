@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="0">
+		<record model="ir.module.category" id="gooderp_approver_groups">
+			<field name="name">流程审批</field>
+			<field name="sequence">10</field>
+		</record>
+	</data>
+</openerp>
