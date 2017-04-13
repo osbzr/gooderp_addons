@@ -52,7 +52,7 @@
 			<field name='name'>good_process.approver</field>
 			<field name='model'>good_process.approver</field>
 			<field name='arch' type='xml'>
-				<tree string='审批人' editable="bottom">
+				<tree string='待审批单据' create="0" delete="0">
 					<field name='model'/>
 					<field name='res_id'/>
 					<field name='group_id'/>
@@ -63,12 +63,12 @@
 		</record>
 
         <record id='good_process_approver_action' model='ir.actions.act_window'>
-            <field name='name'>审批人</field>
+            <field name='name'>待审批单据</field>
             <field name='res_model'>good_process.approver</field>
             <field name='view_mode'>tree</field>
         </record>
 
-		<menuitem id='menu_to_approve_process' name='待审批单据' action='good_process_approver_action' sequence='0'/>
+		<menuitem id='menu_to_approve_process' name='待审批' action='good_process_approver_action'  web_icon="good_process,static/description/icon.png" sequence='998'/>
 
     </data>
 </openerp>
