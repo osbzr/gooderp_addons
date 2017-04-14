@@ -284,6 +284,11 @@ class test_sell_delivery(TransactionCase):
         self.env.ref('goods.cable').tax_rate = 12
         delivery.onchange_partner_id()
 
+    def test_sell_delivery_done_currency(self):
+        """发货单上是外币时进行审核"""
+        self.delivery.currency_id = self.env.ref('base.USD')
+        self.delivery.sell_delivery_done()
+
 
 class test_wh_move_line(TransactionCase):
 
