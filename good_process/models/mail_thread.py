@@ -9,7 +9,7 @@ class mail_thread(models.AbstractModel):
                  _approver_num 整个流程涉及的审批者数量（用来判断审批是否开始）
     '''
     _inherit = 'mail.thread'
-    _to_approver_ids = fields.One2many('good_process.approver',  'res_id',
+    _to_approver_ids = fields.One2many('good_process.approver',  'res_id', readonly='1',
         domain=lambda self: [('model', '=', self._name)], auto_join=True, string='待审批人')
     _approver_num = fields.Integer(string='总审批人数')
 
@@ -27,10 +27,12 @@ class mail_thread(models.AbstractModel):
              for user in group.users]
         return users
 
-    def get_user_manager(self, thread_row, process_rows):
-        '''
+
+    def __get_user_manager__(self, thread_row, process_rows):
+     '''
         如此流程需要记录创建者的部门经理审批，取得部门经理用户
         '''
+
         return_vals = False
         if process_rows.is_department_approve:
             staff_row = self.env['staff'].search([('user_id', '=', thread_row.create_uid.id)])
@@ -45,7 +47,7 @@ class mail_thread(models.AbstractModel):
         process_rows = self.env['good_process.process'].search(
             [('model_id.model', '=', model_name), ('type', '=', getattr(thread_row, 'type', False))])
         groups = self.__get_groups__(process_rows)
-        department_manager = self.get_user_manager(thread_row, process_rows)
+        department_manager = self.__get_user_manager__(thread_row, process_rows)
         if department_manager:
             users.append((department_manager, 0, False))
         users.extend(self.__get_users__(groups))
@@ -80,7 +82,7 @@ class mail_thread(models.AbstractModel):
         return department_row
 
     @api.model
-    def approve(self, active_id, active_model):
+    def good_process_approve(self, active_id, active_model):
         return_vals = []
         manger_row = self.__has_manager__(active_id, active_model)
         model_row = self.env[active_model].browse(active_id)
@@ -100,7 +102,7 @@ class mail_thread(models.AbstractModel):
         return return_vals
 
     @api.model
-    def refused(self, active_id, active_model):
+    def good_process_refused(self, active_id, active_model):
         mode_row = self.env[active_model].browse(active_id)
         users, groups = self.__get_user_group__(active_id, active_model, [], mode_row)
         approver_rows = self.env['good_process.approver'].search([('model', '=', active_model),

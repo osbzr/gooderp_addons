@@ -20,7 +20,6 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
     },
 
     render_tag: function(data) {
-        console.log(data, this);
         var self = this;
         var user_ids =  _.filter(data,function (value)
                             { if(value.display_name==self.session.name){
@@ -36,7 +35,7 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
 
     good_refused:function () {
         var self = this;
-        new Model('mail.thread').call('refused',[self.view.datarecord.id, self.view.model]).then(function (result) {
+        new Model('mail.thread').call('good_process_refused',[self.view.datarecord.id, self.view.model]).then(function (result) {
            if(result && typeof(result)== 'object'){
                self.render_tag(result);
            }else{
@@ -47,7 +46,7 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
 
     good_approve:function () {
        var self = this;
-       new Model('mail.thread').call('approve',[self.view.datarecord.id, self.view.model]).then(function (result) {
+       new Model('mail.thread').call('good_process_approve',[self.view.datarecord.id, self.view.model]).then(function (result) {
 
            if(result && typeof(result)== 'object'){
                _.each(result,function (id) {
