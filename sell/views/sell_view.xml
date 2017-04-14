@@ -45,7 +45,8 @@
             					<field name='contact'/>
             				    <field name='address'/>
             				    <field name='mobile'/>
-            					<field name='user_id'/>
+            					<field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
             					<field name='date'/>
             					<field name='warehouse_id'/>
             				</group>
@@ -194,7 +195,8 @@
             				    <field name='contact'/>
             				    <field name="address"/>
             				    <field name="mobile"/>
-            					<field name='user_id'/>
+            					<field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="warehouse_id"/>
 								<field name="warehouse_dest_id" invisible="1"/>
@@ -393,7 +395,8 @@
             					<field name='contact'/>
             				    <field name="address"/>
             				    <field name="mobile"/>
-            					<field name='user_id'/>
+            					<field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
             					<field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name="warehouse_dest_id"/>
 								<field name="warehouse_id" invisible="1"/>
@@ -558,6 +561,8 @@
                             <field name="order_id" required="1"
                             	domain="[('state', '=', 'done'), ('type', '=', 'sell')]"
                             	options="{'no_create': True}"/>
+							<field name='user_id'
+								   options="{'no_open': True, 'no_create': True}"/>
                         </group>
                         <group>
                         	<field name="date" required="1"/>

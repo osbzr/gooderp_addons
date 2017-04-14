@@ -43,6 +43,14 @@ class buy_adjust(models.Model):
                              help=u'变更单审核状态')
     note = fields.Text(u'备注',
                        help=u'单据备注')
+    user_id = fields.Many2one(
+        'res.users',
+        u'经办人',
+        ondelete='restrict',
+        states=READONLY_STATES,
+        default=lambda self: self.env.user,
+        help=u'单据经办人',
+    )
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
