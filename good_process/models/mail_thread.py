@@ -29,10 +29,9 @@ class mail_thread(models.AbstractModel):
 
 
     def __get_user_manager__(self, thread_row, process_rows):
-     '''
+        '''
         如此流程需要记录创建者的部门经理审批，取得部门经理用户
         '''
-
         return_vals = False
         if process_rows.is_department_approve:
             staff_row = self.env['staff'].search([('user_id', '=', thread_row.create_uid.id)])
