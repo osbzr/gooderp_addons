@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--资金收支报表向导 form-->
+    	<record id="money_get_pay_wizard_form" model="ir.ui.view">
+            <field name="name">money.get.pay.wizard.form</field>
+            <field name="model">money.get.pay.wizard</field>
+            <field name="arch" type="xml">
+                <form string="资金收支报表向导">
+                    <group>
+                        <group>
+                        	<field name="type"/>
+                        </group>
+                        <group>
+                        	<field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name='button_confirm' string='确定' type='object' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                	</footer>
+                </form>
+            </field>
+        </record>
+
+		<!-- 资金收支报表向导 action -->
+		<record id='money_get_pay_wizard_action' model='ir.actions.act_window'>
+            <field name='name'>资金收支报表向导</field>
+            <field name='res_model'>money.get.pay.wizard</field>
+            <field name='view_mode'>form</field>
+            <field name='target'>new</field>
+        </record>
+
+		<!-- 资金收支报表向导 menu -->
+        <menuitem id="menu_money_get_pay" name="资金收支报表"
+                  action="money_get_pay_wizard_action" parent="menu_money_report" sequence="5"/>
+	</data>
+</openerp>
+	

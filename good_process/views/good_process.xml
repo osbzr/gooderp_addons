@@ -48,24 +48,50 @@
 
 
 
-		<record id='good_process_approver_tree' model='ir.ui.view'>
+		<record id='good_process_approver_kanban' model='ir.ui.view'>
 			<field name='name'>good_process.approver</field>
 			<field name='model'>good_process.approver</field>
 			<field name='arch' type='xml'>
+			<!--
 				<tree string='待审批单据' create="0" delete="0">
-					<field name='model'/>
-					<field name='res_id'/>
+				    <field name='creator'/>
+					<field name='model_type'/>
+					<field name='record_name'/>
+					<button name='goto' type='object' string="查看并处理" class="oe_highlight"/>
 					<field name='group_id'/>
-					<field name='user_id'/>
 					<field name='sequence'/>
 				</tree>
+			-->
+			<kanban>
+                  <field name='creator'/>
+				  <field name='model_type'/>
+				  <field name='record_name'/>
+				  <button name='goto' type='object' string="查看并处理" class="oe_highlight"/>
+				  <field name='group_id'/>
+                  <templates>
+                    <t t-name="kanban-box">
+                      <div>
+                          <div class="oe_module_desc">
+							  <span><field name='creator'/> 申请 </span>
+							  <span><field name='group_id'/> 审批 </span>
+				              <span><field name='model_type'/> </span>
+				              <span><field name='record_name'/></span>
+                          </div>
+						  <div>
+						      <button type="object" class="btn btn-primary pull-right btn-sm" name="goto">查看并处理</button>
+						  </div>
+                      </div>
+                    </t>
+                  </templates>
+                </kanban>
 			</field>
 		</record>
 
         <record id='good_process_approver_action' model='ir.actions.act_window'>
             <field name='name'>待审批单据</field>
             <field name='res_model'>good_process.approver</field>
-            <field name='view_mode'>tree</field>
+            <field name='view_mode'>kanban</field>
+			<field name='domain'>[('user_id','=',uid)]</field>
         </record>
 
 		<menuitem id='menu_to_approve_process' name='待审批' action='good_process_approver_action'  web_icon="good_process,static/description/icon.png" sequence='998'/>

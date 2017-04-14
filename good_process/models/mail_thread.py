@@ -3,6 +3,11 @@ from odoo import models, fields, api
 from odoo.exceptions import  ValidationError
 
 class mail_thread(models.AbstractModel):
+    '''
+    针对系统内的单据增加审批流程控制
+    增加两个字段：_to_approver_ids 记录还有谁需要审批（用来判断审批是否结束）
+                 _approver_num 整个流程涉及的审批者数量（用来判断审批是否开始）
+    '''
     _inherit = 'mail.thread'
     _to_approver_ids = fields.One2many('good_process.approver',  'res_id', readonly='1',
         domain=lambda self: [('model', '=', self._name)], auto_join=True, string='待审批人')
@@ -22,7 +27,12 @@ class mail_thread(models.AbstractModel):
              for user in group.users]
         return users
 
+
     def __get_user_manager__(self, thread_row, process_rows):
+     '''
+        如此流程需要记录创建者的部门经理审批，取得部门经理用户
+        '''
+
         return_vals = False
         if process_rows.is_department_approve:
             staff_row = self.env['staff'].search([('user_id', '=', thread_row.create_uid.id)])
@@ -44,6 +54,9 @@ class mail_thread(models.AbstractModel):
         [approver_rows.append(self.env['good_process.approver'].create(
             {'user_id': user.id,
              'res_id': thread_row.id,
+             'model_type':thread_row._description,
+             'record_name':getattr(thread_row, 'name',''),
+             'creator':thread_row.create_uid.id,
              'sequence': sequence,
              'group_id': groud_id,
              'model': thread_row._name})) for user, sequence, groud_id in users]
@@ -115,8 +128,16 @@ class mail_thread(models.AbstractModel):
     
     @api.multi
     def write(self, vals):
+        '''
+        如果单据的审批流程已经开始 —— 至少一个审批人已经审批通过，不允许对此单据进行修改。
+        '''
         for th in self:
-            if th._approver_num != len(th._to_approver_ids) and not vals.get('_approver_num'):
+            ignore_fields = ['_approver_num','message_ids','message_follower_ids','message_partner_ids','message_channel_ids']
+            if any([vals.has_key(x) for x in ignore_fields]):
+                continue
+            if len(th._to_approver_ids) and vals.get('state',False) == 'done':
+                raise ValidationError(u"审批后才能审核")
+            if th._approver_num != len(th._to_approver_ids):
                 raise ValidationError(u"审批中不可修改")
         thread_row = super(mail_thread, self).write(vals)
         return thread_row
@@ -179,13 +200,33 @@ class mail_thread(models.AbstractModel):
         return return_vals
 
 class approver(models.Model):
+    '''
+    单据的待审批者
+    '''
     _name = 'good_process.approver'
     _rec_name = 'user_id'
+    _order = 'model, res_id, sequence'
+
+    model_type = fields.Char(u'单据类型')
+    record_name = fields.Char(u'编号')
+    creator = fields.Many2one('res.users', u'申请人')
     model = fields.Char('模型', index=True)
     res_id = fields.Integer('ID', index=True)
-    group_id = fields.Many2one('res.groups', string='用户组')
-    user_id = fields.Many2one('res.users', string='用户')
-    sequence = fields.Integer(string='顺序')
+    group_id = fields.Many2one('res.groups', string=u'审批组')
+    user_id = fields.Many2one('res.users', string=u'用户')
+    sequence = fields.Integer(string=u'顺序')
+
+    @api.multi
+    def goto(self):
+        self.ensure_one()
+        return {
+                            'name': u'审批',
+                            'view_type': 'form',
+                            'view_mode': 'form',
+                            'res_model': self.model,
+                            'type': 'ir.actions.act_window',
+                            'res_id': self.res_id,
+                        }
 
     @api.model_cr
     def init(self):
@@ -194,16 +235,26 @@ class approver(models.Model):
             self._cr.execute("""CREATE INDEX good_process_approver_model_res_id_idx ON good_process_approver (model, res_id)""")
 
 class process(models.Model):
+    '''
+    可供用户自定义的审批流程，可控制是否需部门经理审批。注意此规则只对修改之后新建（或被拒绝）的单据有效
+    '''
     _name = 'good_process.process'
+    _description = u'审批规则'
     _rec_name = 'model_id'
-    model_id = fields.Many2one('ir.model')
+    model_id = fields.Many2one('ir.model', u'单据')
     type = fields.Char(u'类型', help=u'有些单据根据type字段区分具体流程')
-    is_department_approve = fields.Boolean(string='部门经理审批')
-    line_ids = fields.One2many('good_process.process_line', 'process_id', string='审批组')
+    is_department_approve = fields.Boolean(string=u'部门经理审批')
+    line_ids = fields.One2many('good_process.process_line', 'process_id', string=u'审批组')
 
 class process_line(models.Model):
+    '''
+    可控制由哪些审批组审批，各自的审批顺序是什么，组内用户都需要审还是一位代表审批即可
+    '''
     _name = 'good_process.process_line'
+    _description = u'审批规则行'
+    _order = 'sequence'
+
     sequence = fields.Integer(string='序号')
-    group_id = fields.Many2one('res.groups', string='审批组')
-    is_all_approve = fields.Boolean(string='是否需要本组用户全部审批')
-    process_id = fields.Many2one('good_process.process')
+    group_id = fields.Many2one('res.groups', string=u'审批组')
+    is_all_approve = fields.Boolean(string=u'是否需要本组用户全部审批')
+    process_id = fields.Many2one('good_process.process', u'审批规则')

@@ -74,3 +74,22 @@ class test_report(TransactionCase):
         self.partner_id = self.env.ref('core.jd').id
         self.env['partner.statements.report.wizard'].with_context({'default_customer': True}).onchange_from_date()
         self.assertEqual(self.partner_id, self.env.ref('core.jd').id)
+
+    def test_money_get_pay_wizard(self):
+        """资金收支报表"""
+        # 创建向导
+        wizard = self.env['money.get.pay.wizard'].create({})
+        # 判断date_start的值是否是公司启用日期
+        self.assertEqual(wizard.date_start, self.env.user.company_id.start_date)
+        # 结束日期不能小于开始日期
+        wizard_error = self.env['money.get.pay.wizard'].create({
+            'date_start': '2017-04-14',
+            'date_end': '2017-04-12',
+        })
+        with self.assertRaises(UserError):
+            wizard_error.button_confirm()
+        # 按全部筛选
+        wizard.button_confirm()
+        # 按其他收入筛选
+        wizard.type = 'other_get'
+        wizard.button_confirm()

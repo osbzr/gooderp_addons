@@ -26,6 +26,8 @@ from odoo.tools import float_compare
 class other_money_order(models.Model):
     _name = 'other.money.order'
     _description = u'其他收入/其他支出'
+    _inherit = ['mail.thread']
+
 
     TYPE_SELECTION = [
         ('other_pay', u'其他支出'),

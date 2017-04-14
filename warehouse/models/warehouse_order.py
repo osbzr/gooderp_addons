@@ -7,6 +7,7 @@ from odoo import models, fields, api
 class wh_out(models.Model):
     _name = 'wh.out'
     _description = u'其他出库单'
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -124,6 +125,7 @@ class wh_out(models.Model):
 class wh_in(models.Model):
     _name = 'wh.in'
     _description = u'其他入库单'
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -259,6 +261,7 @@ class wh_in(models.Model):
 class wh_internal(models.Model):
     _name = 'wh.internal'
     _description = u'内部调拨单'
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {

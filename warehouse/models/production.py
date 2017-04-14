@@ -11,6 +11,7 @@ from odoo.exceptions import UserError
 class wh_assembly(models.Model):
     _name = 'wh.assembly'
     _description = u'组装单'
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -452,6 +453,7 @@ class wh_assembly(models.Model):
 class outsource(models.Model):
     _name = 'outsource'
     _description = u'委外加工单'
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -879,6 +881,7 @@ class outsource(models.Model):
 class wh_disassembly(models.Model):
     _name = 'wh.disassembly'
     _description = u'拆卸单'
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {
