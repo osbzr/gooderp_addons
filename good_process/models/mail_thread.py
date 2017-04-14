@@ -4,7 +4,7 @@ from odoo.exceptions import  ValidationError
 
 class mail_thread(models.AbstractModel):
     _inherit = 'mail.thread'
-    _to_approver_ids = fields.One2many('good_process.approver',  'res_id',
+    _to_approver_ids = fields.One2many('good_process.approver',  'res_id', readonly='1',
         domain=lambda self: [('model', '=', self._name)], auto_join=True, string='待审批人')
     _approver_num = fields.Integer(string='总审批人数')
 
