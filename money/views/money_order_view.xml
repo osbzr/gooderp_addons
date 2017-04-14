@@ -29,6 +29,7 @@
                     <field name="partner_id"/>
                     <field name="amount"/>
                     <field name="state"/>
+                    <field name="to_reconcile" sum="未核销总额"/>
                 </tree>
             </field>
         </record>

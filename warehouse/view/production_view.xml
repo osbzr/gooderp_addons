@@ -141,6 +141,8 @@
                                 <field name='bom_id' options="{'no_create': 1}"/>
                                 <field name='goods_id' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
                                 <field name='goods_qty' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
+                                <field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
                             </group>
                             <group>
                                 <field name='fee'/>
@@ -327,6 +329,8 @@
                                 <field name='bom_id' options="{'no_create': 1}"/>
                                 <field name='goods_id' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}"/>
                                 <field name='goods_qty' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}"/>
+                                <field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
                             </group>
                             <group>
                                 <field name='outsource_fee'/>
@@ -512,6 +516,8 @@
                                 <field name='bom_id' options="{'no_create': 1}" />
                                 <field name='goods_id' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
                                 <field name='goods_qty' options="{'no_create': 1}" attrs="{'invisible': [('is_many_to_many_combinations', '=', True)]}" />
+                                <field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
                             </group>
                             <group>
                                 <field name='fee' />

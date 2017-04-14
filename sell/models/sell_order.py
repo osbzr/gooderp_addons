@@ -87,7 +87,7 @@ class sell_order(models.Model):
         ondelete='restrict',
         states=READONLY_STATES,
         default=lambda self: self.env.user,
-        help=u'单据负责人',
+        help=u'单据经办人',
     )
     date = fields.Date(u'单据日期',
                        required=True,
