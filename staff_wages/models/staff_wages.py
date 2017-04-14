@@ -101,6 +101,9 @@ class staff_wages(models.Model):
         如不同，生成并审核修正凭证。
         :return:
         """
+        if not self.line_ids:
+            raise UserError(u'明细行不能为空')
+
         if not self.voucher_id:
             # 生成并审核计提凭证
             voucher = self.create_voucher(self.date)

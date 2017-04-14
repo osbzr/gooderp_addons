@@ -325,7 +325,6 @@ class test_buy_receipt(TransactionCase):
     def test_buy_receipt_done_currency(self):
         """入库单选择外币时审核"""
         self.receipt.currency_id = self.env.ref('base.USD')
-        print 'bbbbbbbbbbbb',self.receipt.currency_id.name
         self.receipt.buy_receipt_done()
 
 
