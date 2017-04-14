@@ -312,7 +312,8 @@ class sell_delivery(models.Model):
         :return:
         """
         rate_silent = currency_amount = 0
-        if self.currency_id:
+        currency = self.currency_id != self.env.user.company_id.currency_id and self.currency_id.id or False
+        if self.currency_id and self.currency_id != self.env.user.company_id.currency_id:
             rate_silent = self.env['res.currency'].get_rate_silent(self.date, self.currency_id.id)
             currency_amount = debit or credit
             debit = debit * (rate_silent or 1)
@@ -324,7 +325,7 @@ class sell_delivery(models.Model):
             'credit': credit,
             'voucher_id': voucher and voucher.id,
             'goods_id': goods_id and goods_id.id,
-            'currency_id': self.currency_id.id,
+            'currency_id': currency,
             'currency_amount': currency_amount,
             'rate_silent': rate_silent,
         })
