@@ -12,8 +12,25 @@
                     <field name="type"/>
                     <field name="partner_id"/>
                     <field name="category_id"/>
-                    <field name="amount"/>
+                    <field name="get" sum="收入合计"/>
+                    <field name="pay" sum="支出合计"/>
+                    <field name="amount" sum="金额合计"/>
                 </tree>
+            </field>
+        </record>
+        <record id="money_get_pay_report_search" model="ir.ui.view">
+            <field name="name">money.get.pay.report.search</field>
+            <field name="model">money.get.pay.report</field>
+            <field name="arch" type="xml">
+                <search string="资金收支报表">
+                    <field name="name"/>
+                    <filter name="get" string="收入" domain="[('type','in',['get','other_get'])]"/>
+                    <filter name="pay" string="支出" domain="[('type','in',['pay','other_pay'])]"/>
+                    <separator/>
+                    <filter name="group_date" string="日期" domain="[]" context="{'group_by':'date'}"/>
+                    <filter name="group_partner" string="往来单位" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter name="group_category_id" string="收支类别" domain="[]" context="{'group_by':'category_id'}"/>
+                </search>
             </field>
         </record>
 	</data>
