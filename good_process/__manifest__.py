@@ -9,8 +9,9 @@
     可配置的审批流程
     """,
     "data": [
-        'good_process.xml',
-        'security/ir.model.access.csv'
+        'data/data.xml',
+        'views/good_process.xml',
+        'security/ir.model.access.csv',
     ],
     "depends":[
         'core',

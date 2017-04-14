@@ -25,11 +25,13 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
         var user_ids =  _.filter(data,function (value)
                             { if(value.display_name==self.session.name){
                                 return value.id}})
-        this.$('.process').remove();
-        this.$el.prepend(QWeb.render(this.tag_template, {elements: data,
-            button_invisible: user_ids.length,
-            filed_display_name: self.string,
-            readonly: this.get('effective_readonly')}));
+        if(self.view.datarecord.id!=undefined){
+            this.$('.process').remove();
+            this.$('.o_form_input_dropdown').remove();
+            this.$el.prepend(QWeb.render(this.tag_template, {elements: data,
+                button_invisible: user_ids.length,
+                filed_display_name: self.string,
+                readonly: this.get('effective_readonly')}));}
     },
 
     good_refused:function () {
@@ -46,6 +48,7 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
     good_approve:function () {
        var self = this;
        new Model('mail.thread').call('approve',[self.view.datarecord.id, self.view.model]).then(function (result) {
+
            if(result && typeof(result)== 'object'){
                _.each(result,function (id) {
                    var remove_tags = self.$el.find('span[data-id="' + id + '"]');
