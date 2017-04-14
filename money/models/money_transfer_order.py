@@ -27,6 +27,7 @@ from odoo.tools import float_compare
 class money_transfer_order(models.Model):
     _name = 'money.transfer.order'
     _description = u'资金转账单'
+    _inherit = ['mail.thread']
 
 
     @api.multi

@@ -13,6 +13,7 @@ from odoo import api
 class wh_inventory(models.Model):
     _name = 'wh.inventory'
     _description = u'盘点单'
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     INVENTORY_STATE = [
