@@ -20,7 +20,6 @@ var FieldGoodProcess = form_relational.FieldMany2ManyTags.extend({
     },
 
     render_tag: function(data) {
-        console.log(data, this);
         var self = this;
         var user_ids =  _.filter(data,function (value)
                             { if(value.display_name==self.session.name){
