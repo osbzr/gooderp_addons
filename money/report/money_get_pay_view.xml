@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--资金收支报表 tree-->
+    	<record id="money_get_pay_report_tree" model="ir.ui.view">
+            <field name="name">money.get.pay.report.tree</field>
+            <field name="model">money.get.pay.report</field>
+            <field name="arch" type="xml">
+                <tree string="资金收支报表">
+                	<field name="date"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="partner_id"/>
+                    <field name="category_id"/>
+                    <field name="amount"/>
+                </tree>
+            </field>
+        </record>
+	</data>
+</openerp>
+	

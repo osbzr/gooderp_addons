@@ -35,6 +35,8 @@
         'wizard/bank_statements_wizard_view.xml',
         'report/other_money_statements_view.xml',
         'wizard/other_money_statements_wizard_view.xml',
+        'wizard/money_get_pay_wizard_view.xml',
+        'report/money_get_pay_view.xml',
         'security/ir.model.access.csv',
         'views/partner_view.xml',
         'views/generate_accounting.xml',
