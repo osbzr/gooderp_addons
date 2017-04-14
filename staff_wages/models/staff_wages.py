@@ -13,6 +13,7 @@ change = [('time', u'计时'),
 class staff_wages(models.Model):
     _name = 'staff.wages'
     _description = u'员工工资'
+    _inherit = ['mail.thread']
     _order = "name"
 
     @api.one

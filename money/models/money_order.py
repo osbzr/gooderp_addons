@@ -29,6 +29,7 @@ from datetime import datetime
 class money_order(models.Model):
     _name = 'money.order'
     _description = u"收付款单"
+    _inherit = ['mail.thread']
 
     TYPE_SELECTION = [
         ('pay', u'付款'),
@@ -640,6 +641,7 @@ class source_order_line(models.Model):
 class reconcile_order(models.Model):
     _name = 'reconcile.order'
     _description = u'核销单'
+    _inherit = ['mail.thread']
 
     TYPE_SELECTION = [
         ('adv_pay_to_get', u'预收冲应收'),
