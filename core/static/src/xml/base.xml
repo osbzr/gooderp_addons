@@ -114,4 +114,12 @@
             <input type="file" class="o_form_input_file" name="ufile" accept="application/pdf" />
         </t>
     </t>
+	<t t-extend="FieldMany2ManyTag">
+		<t t-jquery="span:first" t-operation="replace">
+			<span t-attf-class="badge dropdown o_tag_color_#{el.color || 6}" t-att-data-color="el.color || 10" t-att-data-index="el_index" t-att-data-id="el.id">
+				<span class="o_badge_text" t-attf-title="#{el['display_name']}"><t t-raw="el['display_name']"/></span>
+				<span t-if="!readonly" class="fa fa-times o_delete"/>
+			</span>
+		</t>
+	</t>
  </template>
