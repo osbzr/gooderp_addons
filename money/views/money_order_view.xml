@@ -28,6 +28,7 @@
                     <field name="date"/>
                     <field name="partner_id"/>
                     <field name="amount"/>
+                    <field name="to_reconcile"/>
                     <field name="state"/>
                 </tree>
             </field>
