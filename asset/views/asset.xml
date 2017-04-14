@@ -175,7 +175,7 @@
 			<field name='name'>asset.line.tree</field>
 			<field name='model'>asset.line</field>
 			<field name='arch' type='xml'>
-				<tree string='固定资产折旧明细' create='0'>
+				<tree string='固定资产折旧明细' create='0' delete='0'>
                     <field name='code'/>
 					<field name='name'/>
 					<field name='period_id'/>
