@@ -262,7 +262,6 @@ class staff_wages(models.Model):
         maternity = self.env.ref('staff_wages.categ_maternity')  # 公司缴纳生育类别
         injury = self.env.ref('staff_wages.categ_injury')  # 公司缴纳工伤类别
         housing_co = self.env.ref('staff_wages.categ_housing_fund_co')  # 公司缴纳住房公积金类别
-        print '0000000',self.totoal_wage,self.totoal_endowment_co
         self.create_credit_line(vouch_obj, u'提本月工资', credit_account.account_id, self.totoal_wage)
         self.create_credit_line(vouch_obj, u'提本月养老保险', endowment_co.account_id, self.totoal_endowment_co)
         self.create_credit_line(vouch_obj, u'提本月医疗保险', health_co.account_id, self.totoal_health_co)
