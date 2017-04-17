@@ -159,7 +159,7 @@ class money_order(models.Model):
                                    store=True, readonly=True,
                                    help=u'根据收付款单行金额总和，原始单据行金额总和及折扣额计算得来的预收/预付款，'
                                         u'值>=0')
-    to_reconcile = fields.Float(string=u'未核销预收款',
+    to_reconcile = fields.Float(string=u'未核销预收/付款',
                                 digits=dp.get_precision('Amount'),
                             help=u'未核销的预收/预付款金额')
     reconciled = fields.Float(string=u'已核销预收款',
