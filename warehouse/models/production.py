@@ -323,9 +323,13 @@ class wh_assembly(models.Model):
             order.move_id.state = 'draft'
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(wh_assembly, self).unlink()
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
 
     @api.model
     @create_name
@@ -663,9 +667,13 @@ class outsource(models.Model):
         return True
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(outsource, self).unlink()
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
 
     @api.model
     @create_name
@@ -1131,9 +1139,13 @@ class wh_disassembly(models.Model):
             order.move_id.state = 'draft'
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(wh_disassembly, self).unlink()
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
 
     @api.model
     @create_name
