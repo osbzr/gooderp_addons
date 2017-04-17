@@ -339,14 +339,14 @@ class buy_receipt(models.Model):
                 if line.amount:
                     # 借方明细
                     self._create_voucher_line(line.goods_id.category_id.account_id,
-                                              line.amount, 0, vouch_id, line.goods_id)
+                                              line.amount, 0, vouch_id, line.goods_id, line.goods_qty)
                 sum_amount += line.amount
 
             if sum_amount:
                 category_expense = self.env.ref('money.core_category_purchase')
                 # 贷方明细
                 self._create_voucher_line(category_expense.account_id,
-                                          0, sum_amount, vouch_id, False)
+                                          0, sum_amount, vouch_id, False, 0)
         if self.is_return:
             for line in self.line_out_ids:
                 if line.amount:
