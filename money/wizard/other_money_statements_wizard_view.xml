@@ -26,7 +26,7 @@
 
 		<!-- 其他收支明细表向导 action -->
 		<record id='other_money_statements_report_wizard_action' model='ir.actions.act_window'>
-            <field name='name'>其他收支明细表向导</field>
+            <field name='name'>其他收支明细表</field>
             <field name='res_model'>other.money.statements.report.wizard</field>
             <field name='view_type'>form</field>
             <field name='view_mode'>form</field>

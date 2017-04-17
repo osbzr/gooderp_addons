@@ -27,7 +27,7 @@
 
 		<!-- 现金银行报表向导 action -->
 		<record id='bank_statements_report_wizard_action' model='ir.actions.act_window'>
-            <field name='name'>现金银行报表向导</field>
+            <field name='name'>现金银行报表</field>
             <field name='res_model'>bank.statements.report.wizard</field>
             <field name='view_type'>form</field>
             <field name='view_mode'>form</field>
