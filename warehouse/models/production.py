@@ -259,17 +259,24 @@ class wh_assembly(models.Model):
 
     def wh_assembly_create_voucher(self):
         """
-        生成入库和出库凭证并审核
+        生成入库凭证并审核
         :return:
         """
         for assembly in self:
             voucher_row = self.env['voucher'].create({'date': assembly.date})
-            out_voucher = self.env['voucher'].create({'date': assembly.date})
             self.wh_assembly_create_voucher_line(assembly, voucher_row) # 入库凭证
-            self.create_out_voucher_line(assembly, out_voucher) # 出库凭证
             assembly.voucher_id = voucher_row.id
-            assembly.out_voucher_id = out_voucher.id
             voucher_row.voucher_done()
+
+    def create_out_voucher(self):
+        """
+        生成出库凭证并审核
+        :return:
+        """
+        for assembly in self:
+            out_voucher = self.env['voucher'].create({'date': assembly.date})
+            self.create_out_voucher_line(assembly, out_voucher) # 出库凭证
+            assembly.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     @api.multi
@@ -282,6 +289,7 @@ class wh_assembly(models.Model):
                 if line_out.state != 'done':
                     line_out.action_done()
 
+            order.create_out_voucher()  # 生成出库凭证并审核
             order.state = 'feeding'
             return
 
@@ -294,8 +302,8 @@ class wh_assembly(models.Model):
             order.move_id.check_qc_result() # 检验质检报告是否上传
             order.line_in_ids.action_done() # 完成成品入库
 
-            self.update_parent_cost()
-            self.wh_assembly_create_voucher() # 生成出入库凭证并审核
+            order.update_parent_cost()
+            order.wh_assembly_create_voucher() # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -816,18 +824,26 @@ class outsource(models.Model):
 
     def outsource_create_voucher(self):
         """
-        生成入库和出库凭证并审核
+        生成入库凭证并审核
         :return:
         """
         for outsource in self:
             voucher_row = self.env['voucher'].create({'date': outsource.date})
-            out_voucher = self.env['voucher'].create({'date': outsource.date})
             self.outsource_create_voucher_line(outsource, voucher_row)  # 入库凭证
-            self.create_out_voucher_line(outsource, out_voucher)  # 出库凭证
 
             outsource.voucher_id = voucher_row.id
-            outsource.out_voucher_id = out_voucher.id
             voucher_row.voucher_done()
+
+    def create_out_voucher(self):
+        """
+        生成出库凭证并审核
+        :return:
+        """
+        for outsource in self:
+            out_voucher = self.env['voucher'].create({'date': outsource.date})
+            self.create_out_voucher_line(outsource, out_voucher)  # 出库凭证
+
+            outsource.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     @api.multi
@@ -840,6 +856,7 @@ class outsource(models.Model):
                 if line_out.state != 'done':
                     line_out.action_done()
 
+            order.create_out_voucher()  # 生成出库凭证并审核
             order.state = 'feeding'
             return
 
@@ -856,8 +873,8 @@ class outsource(models.Model):
             if order.outsource_fee:
                 order._create_money_invoice()
 
-            self.update_parent_cost()
-            self.outsource_create_voucher() # 生成出入库凭证并审核
+            order.update_parent_cost()
+            order.outsource_create_voucher() # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -1080,17 +1097,24 @@ class wh_disassembly(models.Model):
 
     def wh_disassembly_create_voucher(self):
         """
-        生成入库和出库凭证并审核
+        生成入库凭证并审核
         :return:
         """
         for disassembly in self:
             voucher_row = self.env['voucher'].create({'date': disassembly.date})
-            out_voucher = self.env['voucher'].create({'date': disassembly.date})
             self.wh_disassembly_create_voucher_line(disassembly, voucher_row)   # 入库凭证
-            self.create_out_voucher_line(disassembly, out_voucher)  # 出库凭证
             disassembly.voucher_id = voucher_row.id
-            disassembly.out_voucher_id = out_voucher.id
             voucher_row.voucher_done()
+
+    def create_out_voucher(self):
+        """
+        生成出库凭证并审核
+        :return:
+        """
+        for disassembly in self:
+            out_voucher = self.env['voucher'].create({'date': disassembly.date})
+            self.create_out_voucher_line(disassembly, out_voucher)  # 出库凭证
+            disassembly.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     def approve_feeding(self):
@@ -1102,6 +1126,7 @@ class wh_disassembly(models.Model):
                 if line_out.state != 'done':
                     line_out.action_done()
 
+            order.create_out_voucher()   # 生成出库凭证并审核
             order.state = 'feeding'
             return
 
@@ -1114,8 +1139,8 @@ class wh_disassembly(models.Model):
             order.move_id.check_qc_result() # 检验质检报告是否上传
             order.line_in_ids.action_done() # 完成成品入库
 
-            self.update_child_cost()
-            self.wh_disassembly_create_voucher() # 生成出入库凭证并审核
+            order.update_child_cost()
+            order.wh_disassembly_create_voucher() # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
