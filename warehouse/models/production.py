@@ -118,6 +118,7 @@ class wh_assembly(models.Model):
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
             line_in_ids = [{'goods_id': line.goods_id.id,
+                            'attribute_id': line.attribute_id.id,
                                'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
                                    'production').id,
                                'warehouse_dest_id': warehouse_id.id,
@@ -135,6 +136,7 @@ class wh_assembly(models.Model):
                 local_goods_qty = line.goods_qty / parent_line_goods_qty * self.goods_qty
                 line_out_ids.append({
                     'goods_id': line.goods_id.id,
+                    'attribute_id': line.attribute_id.id,
                     'warehouse_id': warehouse_id.id,
                     'warehouse_dest_id': self.env[
                         'warehouse'].get_warehouse_by_type('production'),
@@ -541,6 +543,7 @@ class outsource(models.Model):
         warehouse_id = self.env['warehouse'].search([('type', '=', 'stock')], limit=1)
         if self.bom_id: # 存在 物料清单
             line_in_ids = [{'goods_id': line.goods_id.id,
+                            'attribute_id': line.attribute_id.id,
                             'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
                             'warehouse_dest_id': warehouse_id.id,
                             'uom_id': line.goods_id.uom_id.id,
@@ -560,6 +563,7 @@ class outsource(models.Model):
 
                 line_out_ids.append({
                                      'goods_id': line.goods_id.id,
+                                     'attribute_id': line.attribute_id.id,
                                      'warehouse_id': warehouse_id.id,
                                      'warehouse_dest_id': self.env['warehouse'].get_warehouse_by_type('production'),
                                      'uom_id': line.goods_id.uom_id.id,
@@ -1230,6 +1234,7 @@ class wh_disassembly(models.Model):
 
             line_out_ids.append({
                  'goods_id': parent_line.goods_id.id,
+                 'attribute_id': parent_line.attribute_id.id,
                  'warehouse_id': self.env[
                      'warehouse'].get_warehouse_by_type('production').id,
                  'warehouse_dest_id': warehouse_id.id,
@@ -1244,6 +1249,7 @@ class wh_disassembly(models.Model):
 
             line_in_ids = [{
                             'goods_id': line.goods_id.id,
+                            'attribute_id': line.attribute_id.id,
                             'warehouse_id': warehouse_id.id,
                             'warehouse_dest_id': self.env[
                                 'warehouse'].get_warehouse_by_type('production').id,
