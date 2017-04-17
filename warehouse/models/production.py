@@ -188,10 +188,11 @@ class wh_assembly(models.Model):
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
-                                    'goods_id':line_in.goods_id.id,
-                                    'voucher_id': voucher_row.id,
-                                    'account_id': account_id,
-                                    'name': u'%s组合单 成品' % assembly.move_id.name})
+                                     'goods_id':line_in.goods_id.id,
+                                     'goods_qty': line_in.goods_qty,
+                                     'voucher_id': voucher_row.id,
+                                     'account_id': account_id,
+                                     'name': u'%s组合单 成品' % assembly.move_id.name})
         return line_out_data + line_in_data
 
     def wh_assembly_create_voucher_line(self, assembly, voucher_row):
@@ -232,16 +233,17 @@ class wh_assembly(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
-                                  'name': u'%s组合单 原料' % assembly.move_id.name
+                                  'name': u'%s组合单 成品' % assembly.move_id.name
                                   })
         for line_out in assembly.line_out_ids: # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost,
                                     'goods_id':line_out.goods_id.id,
+                                    'goods_qty': line_out.goods_qty,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
-                                    'name': u'%s组合单 成品' % assembly.move_id.name})
+                                    'name': u'%s组合单 原料' % assembly.move_id.name})
         return line_out_data + line_in_data
 
     def create_out_voucher_line(self, assembly, voucher):
@@ -742,7 +744,8 @@ class outsource(models.Model):
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
-                                     'goods_id':line_in.goods_id.id,
+                                     'goods_id': line_in.goods_id.id,
+                                     'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
                                      'name': u'%s委外加工单 成品' % outsource.move_id.name
@@ -770,16 +773,17 @@ class outsource(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
-                                  'name': u'%s委外加工单 原料' % outsource.move_id.name
+                                  'name': u'%s委外加工单 成品' % outsource.move_id.name
                                   })
         for line_out in outsource.line_out_ids: # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost,
-                                    'goods_id': line_out.goods_id.id,
-                                    'voucher_id': voucher.id,
-                                    'account_id': account_id,
-                                    'name': u'%s委外加工单 成品' % outsource.move_id.name})
+                                      'goods_id': line_out.goods_id.id,
+                                      'goods_qty': line_out.goods_qty,
+                                      'voucher_id': voucher.id,
+                                      'account_id': account_id,
+                                      'name': u'%s委外加工单 原料' % outsource.move_id.name})
         return line_out_data + line_in_data
 
     def outsource_create_voucher_line(self, outsource, voucher_row):
@@ -1005,7 +1009,8 @@ class wh_disassembly(models.Model):
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
-                                     'goods_id':line_in.goods_id.id,
+                                     'goods_id': line_in.goods_id.id,
+                                     'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
                                      'name': u'%s拆卸单 成品' % disassembly.move_id.name
@@ -1032,16 +1037,17 @@ class wh_disassembly(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
-                                  'name': u'%s拆卸单 原料' % disassembly.move_id.name
+                                  'name': u'%s拆卸单 成品' % disassembly.move_id.name
                                   })
         for line_out in disassembly.line_out_ids: # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost + disassembly.fee,
-                                    'goods_id':line_out.goods_id.id,
+                                    'goods_id': line_out.goods_id.id,
+                                    'goods_qty': line_out.goods_qty,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
-                                    'name': u'%s拆卸单 成品' % disassembly.move_id.name})
+                                    'name': u'%s拆卸单 原料' % disassembly.move_id.name})
         return line_out_data + line_in_data
 
     def wh_disassembly_create_voucher_line(self, disassembly, voucher_row):
