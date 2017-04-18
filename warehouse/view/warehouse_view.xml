@@ -252,6 +252,8 @@
                                 	domain="[('c_category_id', '!=', False)]"
                                 	options="{'no_open': True, 'no_create': True}"/>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
                             </group>
                             <group>
                                 <field name='type' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
@@ -371,6 +373,8 @@
                                 	domain="[('s_category_id', '!=', False)]"
                                 	options="{'no_open': True, 'no_create': True}"/>
                                 <field name='date' required='1' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
                                 <field name='is_init' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             </group>
                             <group>

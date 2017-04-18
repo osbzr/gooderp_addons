@@ -98,14 +98,11 @@ class test_staff_wages(TransactionCase):
         with self.assertRaises(UserError):
             self.staff_wages.staff_wages_confirm()
 
-
-
-
-
-
-
-
-
-
+    def test_no_line(self):
+        '''明细行为空'''
+        # 计提lili的工资
+        self.staff_wages.line_ids.unlink()
+        with self.assertRaises(UserError):
+            self.staff_wages.staff_wages_accrued()
 
 

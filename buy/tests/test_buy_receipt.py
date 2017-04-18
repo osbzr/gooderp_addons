@@ -322,6 +322,12 @@ class test_buy_receipt(TransactionCase):
         self.env.ref('goods.keyboard').tax_rate = 12
         self.receipt.onchange_partner_id()
 
+    def test_buy_receipt_done_currency(self):
+        """入库单选择外币时审核"""
+        self.receipt.currency_id = self.env.ref('base.USD')
+        self.receipt.buy_receipt_done()
+
+
 class test_wh_move_line(TransactionCase):
 
     def setUp(self):

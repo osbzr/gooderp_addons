@@ -93,6 +93,7 @@ class wh_out(models.Model):
                     'credit': line.cost,
                     'voucher_id': voucher.id,
                     'goods_id': line.goods_id.id,
+                    'goods_qty': line.goods_qty,
                 })
             credit_sum += line.cost
         account = self.type == 'inventory' \
@@ -214,6 +215,7 @@ class wh_in(models.Model):
                     'debit': line.cost,
                     'voucher_id': vouch_id.id,
                     'goods_id': line.goods_id.id,
+                    'goods_qty': line.goods_qty,
                     'init_obj': init_obj,
                 })
             debit_sum += line.cost

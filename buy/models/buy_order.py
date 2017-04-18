@@ -215,6 +215,14 @@ class buy_order(models.Model):
                                   compute='_compute_currency_id',
                                   store=True,
                                   help=u'外币币别')
+    user_id = fields.Many2one(
+        'res.users',
+        u'经办人',
+        ondelete='restrict',
+        states=READONLY_STATES,
+        default=lambda self: self.env.user,
+        help=u'单据经办人',
+    )
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

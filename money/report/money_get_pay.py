@@ -27,6 +27,10 @@ class money_get_pay_report(models.Model):
     category_id = fields.Many2one('core.category',
                                   u'收支类别',
                                   help=u'类型：运费、咨询费等')
+    get = fields.Float(string=u'收入',
+                       digits=dp.get_precision('Amount'))
+    pay = fields.Float(string=u'支出',
+                       digits=dp.get_precision('Amount'))
     amount = fields.Float(string=u'金额',
                           digits=dp.get_precision('Amount'))
 
@@ -42,6 +46,8 @@ class money_get_pay_report(models.Model):
                     type,
                     partner_id,
                     category_id,
+                    get,
+                    pay,
                     amount
             FROM
                 (
@@ -50,7 +56,9 @@ class money_get_pay_report(models.Model):
                         mo.type,
                         mo.partner_id,
                         NULL AS category_id,
-                        mo.amount
+                        (CASE WHEN mo.type = 'get' THEN mo.amount ELSE 0 END) AS get,
+                        (CASE WHEN mo.type = 'pay' THEN mo.amount ELSE 0 END) AS pay,
+                        (CASE WHEN mo.type = 'get' THEN mo.amount ELSE -mo.amount END) AS amount
                 FROM money_order AS mo
                 WHERE mo.state = 'done'
                 UNION ALL
@@ -59,7 +67,9 @@ class money_get_pay_report(models.Model):
                         omo.type,
                         omo.partner_id,
                         omol.category_id,
-                        omol.amount
+                        (CASE WHEN omo.type = 'other_get' THEN omol.amount ELSE 0 END) AS get,
+                        (CASE WHEN omo.type = 'other_pay' THEN omol.amount ELSE 0 END) AS pay,
+                        (CASE WHEN omo.type = 'other_get' THEN omol.amount ELSE -omol.amount END) AS amount
                 FROM other_money_order AS omo
                 LEFT JOIN other_money_order_line AS omol ON omo.id = omol.other_money_id
                 WHERE omo.state = 'done'

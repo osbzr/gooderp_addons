@@ -47,6 +47,8 @@
                             	attrs="{'readonly': [('state','!=','draft')]}"
                             	domain="[('s_category_id', '!=', False)]"
                             	context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                            <field name='user_id'
+                                   options="{'no_open': True, 'no_create': True}"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                             <field name="warehouse_dest_id"/>
@@ -233,6 +235,8 @@
                             	attrs="{'readonly': [('state','!=','draft')]}"
                             	domain="[('s_category_id', '!=', False)]"
                             	context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                            <field name='user_id'
+                                   options="{'no_open': True, 'no_create': True}"/>
                             <field name="date" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="is_return" readonly="1" invisible="1"/>
                             <field name="warehouse_id"/>

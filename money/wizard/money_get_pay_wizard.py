@@ -60,4 +60,7 @@ class money_get_pay_wizard(models.Model):
             'limit': 65535,
             'type': 'ir.actions.act_window',
             'domain': domain,
+            'context': {'search_default_group_date': 1,
+                        'search_default_group_partner': 1,
+                        'search_default_group_category_id': 1}
         }
