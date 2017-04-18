@@ -439,7 +439,8 @@ class wages_line(models.Model):
     wage = fields.Float(u'出勤工资', compute='_all_wage_value', store=True)
     add_hour = fields.Float(u'加班小时')
     add_wage = fields.Float(u'加班工资')
-    other_wage = fields.Float(u'其它')
+    other_wage = fields.Float(u'补助')
+    deduction = fields.Float(u'扣款')
     all_wage = fields.Float(u'应发工资', store=True, compute='_all_wage_value')
     endowment = fields.Float(u'个人养老保险')
     health = fields.Float(u'个人医疗保险')
@@ -498,14 +499,14 @@ class wages_line(models.Model):
         self.maternity = social_security.maternity
 
     @api.one
-    @api.depends('date_number','basic_date','add_wage','other_wage','basic_wage')
+    @api.depends('date_number','basic_date','add_wage','other_wage','basic_wage', 'deduction')
     def _all_wage_value(self):
         if self.date_number >= self.basic_date:
             self.wage = self.basic_wage
         else:
             self.wage = round((self.date_number / self.basic_date or 1) * self.basic_wage, 2)
 
-        self.all_wage = self.wage + self.add_wage + self.other_wage
+        self.all_wage = self.wage + self.add_wage + self.other_wage - self.deduction
 
     @api.one
     @api.depends('all_wage','endowment','health','unemployment','housing_fund')
