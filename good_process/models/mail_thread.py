@@ -66,7 +66,7 @@ class mail_thread(models.AbstractModel):
         mode_row = self.env[active_model].browse(active_id)
         user_row = self.env['res.users'].browse(self.env.uid)
         message_text = u"%s %s %s %s" % (user_row.name, message, mode_row._name, mode_row.name)
-        mode_row.message_post(message_text, subtype='mail.mt_comment')
+        return message_text
 
     def __is_departement_manager__(self, department_row):
         return_vals = department_row.id
@@ -93,12 +93,12 @@ class mail_thread(models.AbstractModel):
             users, can_clean_groups = (self.__get_user_group__(active_id, active_model, manger_user, model_row))
             return_vals.extend(self.__remove_approver__(active_id, active_model, users, can_clean_groups))
             if return_vals:
-                self.__good_approver_send_message__(active_id, active_model, u'同意')
+                message = self.__good_approver_send_message__(active_id, active_model, u'同意')
             else:
                 return_vals = u'您不是这张单据的下一个审批者'
         else:
             return_vals = u'您不是这张单据的下一个审批者'
-        return return_vals
+        return return_vals, message or ''
 
     @api.model
     def good_process_refused(self, active_id, active_model):
@@ -110,13 +110,12 @@ class mail_thread(models.AbstractModel):
             retturn_vals = u'您是第一批需要审批的人，无需拒绝！'
         elif approver_rows and users:
             approver_rows.unlink()
-            self.__good_approver_send_message__(active_id, active_model, u'拒绝')
+            message = self.__good_approver_send_message__(active_id, active_model, u'拒绝')
             retturn_vals = self.__add_approver__(mode_row, active_model)
 
         else:
             retturn_vals = u'已经通过不能拒绝！'
-        return retturn_vals
-
+        return retturn_vals, message or ''
 
     @api.model
     def create(self, vals):

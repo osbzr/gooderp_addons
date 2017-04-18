@@ -2,7 +2,7 @@
 <templates>
     <t t-name="FieldGoodProcess">
         <div class="process">
-           <span><t t-esc="filed_display_name"></t></span>
+           <span style="font-size:15px;"><t t-esc="filed_display_name"></t></span>
 
             <t t-foreach="elements" t-as="el">
                 <span t-attf-class="badge dropdown o_tag_color_#{el.color || 6}" t-att-data-color="el.color || 10" t-att-data-index="el_index" t-att-data-id="el.id">
