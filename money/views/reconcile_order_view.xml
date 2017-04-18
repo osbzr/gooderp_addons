@@ -11,6 +11,7 @@
                     <field name="date"/>
                     <field name="partner_id"/>
                     <field name="state"/>
+                    <field name="note"/>
                 </tree>
             </field>
         </record>
