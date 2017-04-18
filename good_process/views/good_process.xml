@@ -62,7 +62,7 @@
 					<field name='sequence'/>
 				</tree>
 			-->
-			<kanban>
+			<kanban create="0">
                   <field name='creator'/>
 				  <field name='model_type'/>
 				  <field name='record_name'/>
