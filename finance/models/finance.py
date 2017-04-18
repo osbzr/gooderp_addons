@@ -196,6 +196,8 @@ class voucher_line(models.Model):
     currency_id = fields.Many2one('res.currency', u'外币币别', ondelete='restrict')
     rate_silent = fields.Float(u'汇率')
     period_id = fields.Many2one(related='voucher_id.period_id', relation='finance.period', string=u'凭证期间', store=True)
+    goods_qty = fields.Float(u'数量',
+                             digits=dp.get_precision('Quantity'))
     goods_id = fields.Many2one('goods', u'商品', ondelete='restrict')
     auxiliary_id = fields.Many2one(
         'auxiliary.financing', u'辅助核算', help=u'辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\

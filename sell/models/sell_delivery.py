@@ -301,7 +301,7 @@ class sell_delivery(models.Model):
         })
         return money_order
 
-    def _create_voucher_line(self, account_id, debit, credit, voucher, goods_id):
+    def _create_voucher_line(self, account_id, debit, credit, voucher, goods_id, goods_qty):
         """
         创建凭证明细行
         :param account_id: 科目
@@ -324,6 +324,7 @@ class sell_delivery(models.Model):
             'debit': debit,
             'credit': credit,
             'voucher_id': voucher and voucher.id,
+            'goods_qty': goods_qty,
             'goods_id': goods_id and goods_id.id,
             'currency_id': currency,
             'currency_amount': currency_amount,
@@ -355,10 +356,10 @@ class sell_delivery(models.Model):
             sum_amount += cost
             if line.amount:  # 贷方明细
                 self._create_voucher_line(line.goods_id.category_id.account_id,
-                                          0, cost, voucher, line.goods_id)
+                                          0, cost, voucher, line.goods_id, line.goods_qty)
         if sum_amount:  # 借方明细
             self._create_voucher_line(self.sell_move_id.finance_category_id.account_id,
-                                      sum_amount, 0, voucher, False)
+                                      sum_amount, 0, voucher, False, 0)
 
         self.voucher_id = voucher
         if len(self.voucher_id.line_ids) > 0:

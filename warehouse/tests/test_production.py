@@ -59,13 +59,20 @@ class TestProduction(TransactionCase):
 
     def test_unlink(self):
         self.assembly.approve_feeding()
-        self.assembly.approve_order()
+        # 没法删除已经发料的单据
+        with self.assertRaises(UserError):
+            self.assembly.unlink()
 
-        # 没法删除已经审核果的单据
+        self.assembly.approve_order()
+        # 没法删除已经审核的单据
         with self.assertRaises(UserError):
             self.assembly.unlink()
 
         self.disassembly.approve_feeding()
+        # 没法删除已经发料的单据
+        with self.assertRaises(UserError):
+            self.disassembly.unlink()
+
         self.disassembly.approve_order()
         # 组装的产品已经被拆卸过了，此时会报异常
         with self.assertRaises(UserError):
@@ -81,6 +88,13 @@ class TestProduction(TransactionCase):
 #         # 删除后的单据应该不存在
 #         self.assertTrue(not self.disassembly.exists())
 #         self.assertTrue(not self.assembly.exists())
+
+    def test_unlink_outsource_raise(self):
+        """删除发料的委外加工单"""
+        self.outsource_out1.approve_feeding()
+        # 没法删除已经发料的单据
+        with self.assertRaises(UserError):
+            self.outsource_out1.unlink()
 
     def test_create(self):
         temp_assembly = self.env['wh.assembly'].create({'name': '/'})
