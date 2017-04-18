@@ -35,9 +35,9 @@ class money_order(models.Model):
         res = super(money_order, self).money_order_done()
         for money in self:
             if money.type == 'get':
-                voucher = money.create_money_order_get_voucher(money.line_ids, money.source_ids, money.partner_id, money.name)
+                voucher = money.create_money_order_get_voucher(money.line_ids, money.source_ids, money.partner_id, money.name, money.note)
             else:
-                voucher = money.create_money_order_pay_voucher(money.line_ids, money.source_ids, money.partner_id, money.name)
+                voucher = money.create_money_order_pay_voucher(money.line_ids, money.source_ids, money.partner_id, money.name, money.note)
             voucher.voucher_done()
         return res
 
@@ -80,7 +80,7 @@ class money_order(models.Model):
         return voucher_line
 
     @api.multi
-    def create_money_order_get_voucher(self, line_ids, source_ids, partner, name):
+    def create_money_order_get_voucher(self, line_ids, source_ids, partner, name, note):
         """
         为收款单创建凭证
         :param line_ids: 收款单明细
@@ -98,7 +98,7 @@ class money_order(models.Model):
             # 生成借方明细行
             # param: line, name, account_id, debit, credit, voucher_id, partner_id
             self._create_voucher_line(line,
-                                     u"收款单%s" % (name),
+                                     u"%s %s" % (name, note),
                                      line.bank_id.account_id.id,
                                      line.amount,
                                      0,
@@ -112,7 +112,7 @@ class money_order(models.Model):
             # 生成借方明细行
             # param: False, name, account_id, debit, credit, voucher_id, partner_id
             self._create_voucher_line(False,
-                                     u"%s%s收款单%s 现金折扣" % (self.date, partner.name, name),
+                                     u"%s 现金折扣 %s" % (name, note),
                                      self.discount_account_id.id,
                                      self.discount_amount,
                                      0,
@@ -127,7 +127,7 @@ class money_order(models.Model):
         # 生成贷方明细行
         # param: source, name, account_id, debit, credit, voucher_id, partner_id
         self._create_voucher_line('',
-                                  u"%s收款单%s " % (partner.name, name),
+                                  u"%s %s" % (name, note),
                                   partner_account_id,
                                   0,
                                   amount_all + self.discount_amount,
@@ -138,7 +138,7 @@ class money_order(models.Model):
         return vouch_obj
 
     @api.multi
-    def create_money_order_pay_voucher(self, line_ids, source_ids, partner, name):
+    def create_money_order_pay_voucher(self, line_ids, source_ids, partner, name, note):
         """
         为付款单创建凭证
         :param line_ids: 付款单明细
@@ -157,7 +157,7 @@ class money_order(models.Model):
             # 生成贷方明细行 credit
             # param: line, name, account_id, debit, credit, voucher_id, partner_id
             self._create_voucher_line(line,
-                                      u"付款单%s" % (name),
+                                      u"%s %s" % (name, note),
                                       line.bank_id.account_id.id,
                                       0,
                                       line.amount,
@@ -171,7 +171,7 @@ class money_order(models.Model):
         # 生成借方明细行 debit
         # param: source, name, account_id, debit, credit, voucher_id, partner_id
         self._create_voucher_line('',
-                                  u"%s%s付款单%s" % (self.date,partner.name, name),
+                                  u"%s %s" % (name, note),
                                   partner_account_id,
                                   amount_all - self.discount_amount,
                                   0,
@@ -184,7 +184,7 @@ class money_order(models.Model):
             # 生成借方明细行 debit
             # param: False, name, account_id, debit, credit, voucher_id, partner_id
             self._create_voucher_line(line,
-                                      u"%s%s付款单%s 手续费" % (self.date, partner.name, name),
+                                      u"%s 手续费 %s" % (name, note),
                                       self.discount_account_id.id,
                                       self.discount_amount,
                                       0,
@@ -250,14 +250,14 @@ class money_invoice(models.Model):
             if not partner_account_id:
                 raise UserError(u'请配置%s的会计科目' % (partner_cat.name))
             if invoice.category_id.type == 'income':
-                vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': invoice.partner_id.id, 'name': invoice.name, 'string': u'%s发票%s结算单' % (invoice.date_due,invoice.bill_number or ''),
+                vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': invoice.partner_id.id, 'name': invoice.name, 'string': invoice.note or '',
                              'amount': invoice.amount, 'credit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
                              'debit_account_id': partner_account_id, 'sell_tax_amount': invoice.tax_amount or 0,
                              'credit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '',
                              'rate_silent':self.env['res.currency'].get_rate_silent(self.date, invoice.currency_id.id) or 0,
                              })
             else:
-                vals.update({'vouch_obj_id': vouch_obj.id, 'name': invoice.name, 'string': u'%s发票%s结算单' % (invoice.date_due,invoice.bill_number or ''),
+                vals.update({'vouch_obj_id': vouch_obj.id, 'name': invoice.name, 'string': invoice.note or '',
                              'amount': invoice.amount, 'credit_account_id': partner_account_id,
                              'debit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
                              'partner_credit':invoice.partner_id.id, 'buy_tax_amount': invoice.tax_amount or 0,
@@ -329,7 +329,7 @@ TODO：这段代码未经严格测试验证，暂时注释掉 -- jeff 2017-3-4
         currency_id = vals.get('currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id:  # 结算单上是外币
             self.env['voucher.line'].create({
-                'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': vals.get('debit_account_id'),
                 'debit': debit,
                 'voucher_id': vals.get('vouch_obj_id'),
@@ -342,7 +342,7 @@ TODO：这段代码未经严格测试验证，暂时注释掉 -- jeff 2017-3-4
             })
         else:   # 结算单上是本位币
             self.env['voucher.line'].create({
-                'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': vals.get('debit_account_id'),
                 'debit': debit,
                 'voucher_id': vals.get('vouch_obj_id'),
@@ -355,14 +355,14 @@ TODO：这段代码未经严格测试验证，暂时注释掉 -- jeff 2017-3-4
             if not self.env.user.company_id.import_tax_account:
                 raise UserError(u'请通过"配置-->高级配置-->公司"菜单来设置进项税科目')
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': self.env.user.company_id.import_tax_account.id, 'debit': vals.get('buy_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
             })
         # 贷方行
         currency_id = vals.get('currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id:
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
                 'partner_id': vals.get('partner_credit', ''),
                 'account_id': vals.get('credit_account_id'),
                 'credit': credit,
@@ -374,7 +374,7 @@ TODO：这段代码未经严格测试验证，暂时注释掉 -- jeff 2017-3-4
             })
         else:
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
                 'partner_id': vals.get('partner_credit', ''),
                 'account_id': vals.get('credit_account_id'),
                 'credit': credit,
@@ -387,7 +387,7 @@ TODO：这段代码未经严格测试验证，暂时注释掉 -- jeff 2017-3-4
             if not self.env.user.company_id.output_tax_account:            
                 raise UserError(u'您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': self.env.user.company_id.output_tax_account.id, 'credit': sell_tax_amount, 'voucher_id': vals.get('vouch_obj_id'),
         })
 
@@ -454,7 +454,7 @@ class other_money_order(models.Model):
                     if not line.category_id.account_id:
                         raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
 
-                    vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'string': u'其他收入单',
+                    vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'note': line.note or '',
                                  'credit_auxiliary_id':line.auxiliary_id.id,
                                  'amount': abs(line.amount + line.tax_amount), 'credit_account_id': line.category_id.account_id.id,
                                  'debit_account_id': money_order.bank_id.account_id.id, 'partner_credit': money_order.partner_id.id, 'partner_debit': '',
@@ -462,7 +462,7 @@ class other_money_order(models.Model):
                                  })
                     # 贷方行
                     self.env['voucher.line'].create({
-                        'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                        'name': u"%s %s" % (vals.get('name'), vals.get('note')),
                         'partner_id': vals.get('partner_credit', ''),
                         'account_id': vals.get('credit_account_id'),
                         'credit': line.amount,
@@ -475,12 +475,12 @@ class other_money_order(models.Model):
                         if not self.env.user.company_id.output_tax_account:
                             raise UserError(u'您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
                         self.env['voucher.line'].create({
-                            'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                            'name': u"%s %s" % (vals.get('name'), vals.get('note')),
                             'account_id': self.env.user.company_id.output_tax_account.id, 'credit': line.tax_amount or 0, 'voucher_id': vals.get('vouch_obj_id'),
                     })
                 # 借方行
                 self.env['voucher.line'].create({
-                    'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                    'name': u"%s" % (vals.get('name')),
                     'account_id': vals.get('debit_account_id'),
                     'debit': money_order.total_amount,  # 借方和
                     'voucher_id': vals.get('vouch_obj_id'),
@@ -493,7 +493,7 @@ class other_money_order(models.Model):
                     if not line.category_id.account_id:
                         raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
 
-                    vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'string': u'其他支出单',
+                    vals.update({'vouch_obj_id': vouch_obj.id, 'name': money_order.name, 'note': line.note or '',
                                  'debit_auxiliary_id':line.auxiliary_id.id,
                                  'amount': abs(line.amount + line.tax_amount), 'credit_account_id': money_order.bank_id.account_id.id,
                                  'debit_account_id': line.category_id.account_id.id, 'partner_credit': '', 'partner_debit': money_order.partner_id.id,
@@ -501,7 +501,7 @@ class other_money_order(models.Model):
                                  })
                     # 借方行
                     self.env['voucher.line'].create({
-                        'name': u"%s %s " % (vals.get('string'), vals.get('name')),
+                        'name': u"%s %s " % (vals.get('name'), vals.get('note')),
                         'account_id': vals.get('debit_account_id'),
                         'debit': line.amount,
                         'voucher_id': vals.get('vouch_obj_id'),
@@ -514,12 +514,12 @@ class other_money_order(models.Model):
                         if not self.env.user.company_id.import_tax_account:
                             raise UserError(u'请通过"配置-->高级配置-->公司"菜单来设置进项税科目')
                         self.env['voucher.line'].create({
-                            'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                            'name': u"%s %s" % (vals.get('name'), vals.get('note')),
                             'account_id': self.env.user.company_id.import_tax_account.id, 'debit': line.tax_amount or 0, 'voucher_id': vals.get('vouch_obj_id'),
                         })
                 # 贷方行
                 self.env['voucher.line'].create({
-                    'name': u"%s %s" % (vals.get('string'), vals.get('name')),
+                    'name': u"%s" % (vals.get('name')),
                     'partner_id': vals.get('partner_credit', ''),
                     'account_id': vals.get('credit_account_id'),
                     'credit': money_order.total_amount, # 贷方和
@@ -566,13 +566,13 @@ class money_transfer_order(models.Model):
                 '''结汇'''
                 '''借方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s结汇至%s" % (line.out_bank_id.name, line.in_bank_id.name),
+                    'name': u"%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.in_bank_id.account_id.id, 'debit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': '',
                 })
                 '''贷方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s结汇至%s" % (line.out_bank_id.name, line.in_bank_id.name),
+                    'name': u"%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.out_bank_id.account_id.id, 'credit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': out_currency_id,
                     'currency_amount': line.currency_amount, 'rate_silent': line.amount / line.currency_amount
@@ -581,20 +581,20 @@ class money_transfer_order(models.Model):
                 '''买汇'''
                 '''借方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s买汇至%s" % (line.out_bank_id.name, line.in_bank_id.name),
+                    'name': u"%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.in_bank_id.account_id.id, 'debit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': in_currency_id,
                     'currency_amount': line.currency_amount, 'rate_silent': line.amount / line.currency_amount
                 })
                 '''贷方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s买汇至%s" % (line.out_bank_id.name, line.in_bank_id.name),
+                    'name': u"%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.out_bank_id.account_id.id, 'credit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': '',
                 })
             else:
                 '''人民币间'''
-                vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'资金转账单',
+                vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': self.note or '',
                          'amount': abs(line.amount), 'credit_account_id': line.out_bank_id.account_id.id,
                          'debit_account_id': line.in_bank_id.account_id.id,
                          })

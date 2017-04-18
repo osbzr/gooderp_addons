@@ -237,6 +237,7 @@ class buy_receipt(models.Model):
             'date_due': self.date_due,
             'state': 'draft',
             'currency_id': self.currency_id.id,
+            'note': self.note,
         }
 
     def _receipt_make_invoice(self):
@@ -295,7 +296,9 @@ class buy_receipt(models.Model):
             'reconciled': this_reconcile,
             'to_reconcile': amount,
             'state': 'draft',
-            'origin_name': self.name})
+            'origin_name': self.name,
+            'note': self.note,
+        })
         return money_order
 
     def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id, goods_qty):
@@ -308,7 +311,7 @@ class buy_receipt(models.Model):
             debit = debit * (rate_silent or 1)
             credit = credit * (rate_silent or 1)
         voucher = self.env['voucher.line'].create({
-            'name': self.name,
+            'name': u'%s %s' % (self.name, self.note or ''),
             'account_id': account_id and account_id.id,
             'debit': debit,
             'credit': credit,

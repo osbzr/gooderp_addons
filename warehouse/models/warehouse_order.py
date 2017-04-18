@@ -88,7 +88,7 @@ class wh_out(models.Model):
         for line in self.line_out_ids:
             if line.cost:   # 贷方行（多行）
                 self.env['voucher.line'].create({
-                    'name': self.name,
+                    'name': u'%s %s' % (self.name, self.note or ''),
                     'account_id': line.goods_id.category_id.account_id.id,
                     'credit': line.cost,
                     'voucher_id': voucher.id,
@@ -101,7 +101,7 @@ class wh_out(models.Model):
                   or self.finance_category_id.account_id
         if credit_sum:  # 借方行（汇总一行）
             self.env['voucher.line'].create({
-                'name': self.name,
+                'name': u'%s %s' % (self.name, self.note or ''),
                 'account_id': account.id,
                 'debit': credit_sum,
                 'voucher_id': voucher.id,
@@ -210,7 +210,7 @@ class wh_in(models.Model):
             init_obj = self.is_init and 'init_warehouse - %s' % (self.id) or ''
             if line.cost:
                 self.env['voucher.line'].create({
-                    'name': self.name,
+                    'name': u'%s %s' % (self.name, self.note or ''),
                     'account_id': line.goods_id.category_id.account_id.id,
                     'debit': line.cost,
                     'voucher_id': vouch_id.id,
@@ -228,7 +228,7 @@ class wh_in(models.Model):
         if not self.is_init:
             if debit_sum:
                 self.env['voucher.line'].create({
-                    'name': self.name,
+                    'name': u'%s %s' % (self.name, self.note or ''),
                     'account_id': account.id,
                     'credit': debit_sum,
                     'voucher_id': vouch_id.id,
