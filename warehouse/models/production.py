@@ -118,6 +118,7 @@ class wh_assembly(models.Model):
             [('type', '=', 'stock')], limit=1)
         if self.bom_id:
             line_in_ids = [{'goods_id': line.goods_id.id,
+                            'attribute_id': line.attribute_id.id,
                                'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
                                    'production').id,
                                'warehouse_dest_id': warehouse_id.id,
@@ -135,6 +136,7 @@ class wh_assembly(models.Model):
                 local_goods_qty = line.goods_qty / parent_line_goods_qty * self.goods_qty
                 line_out_ids.append({
                     'goods_id': line.goods_id.id,
+                    'attribute_id': line.attribute_id.id,
                     'warehouse_id': warehouse_id.id,
                     'warehouse_dest_id': self.env[
                         'warehouse'].get_warehouse_by_type('production'),
@@ -188,10 +190,11 @@ class wh_assembly(models.Model):
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
-                                    'goods_id':line_in.goods_id.id,
-                                    'voucher_id': voucher_row.id,
-                                    'account_id': account_id,
-                                    'name': u'%s组合单 成品' % assembly.move_id.name})
+                                     'goods_id':line_in.goods_id.id,
+                                     'goods_qty': line_in.goods_qty,
+                                     'voucher_id': voucher_row.id,
+                                     'account_id': account_id,
+                                     'name': u'%s组合单 成品' % assembly.move_id.name})
         return line_out_data + line_in_data
 
     def wh_assembly_create_voucher_line(self, assembly, voucher_row):
@@ -232,16 +235,17 @@ class wh_assembly(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
-                                  'name': u'%s组合单 原料' % assembly.move_id.name
+                                  'name': u'%s组合单 成品' % assembly.move_id.name
                                   })
         for line_out in assembly.line_out_ids: # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost,
                                     'goods_id':line_out.goods_id.id,
+                                    'goods_qty': line_out.goods_qty,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
-                                    'name': u'%s组合单 成品' % assembly.move_id.name})
+                                    'name': u'%s组合单 原料' % assembly.move_id.name})
         return line_out_data + line_in_data
 
     def create_out_voucher_line(self, assembly, voucher):
@@ -257,17 +261,24 @@ class wh_assembly(models.Model):
 
     def wh_assembly_create_voucher(self):
         """
-        生成入库和出库凭证并审核
+        生成入库凭证并审核
         :return:
         """
         for assembly in self:
             voucher_row = self.env['voucher'].create({'date': assembly.date})
-            out_voucher = self.env['voucher'].create({'date': assembly.date})
             self.wh_assembly_create_voucher_line(assembly, voucher_row) # 入库凭证
-            self.create_out_voucher_line(assembly, out_voucher) # 出库凭证
             assembly.voucher_id = voucher_row.id
-            assembly.out_voucher_id = out_voucher.id
             voucher_row.voucher_done()
+
+    def create_out_voucher(self):
+        """
+        生成出库凭证并审核
+        :return:
+        """
+        for assembly in self:
+            out_voucher = self.env['voucher'].create({'date': assembly.date})
+            self.create_out_voucher_line(assembly, out_voucher) # 出库凭证
+            assembly.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     @api.multi
@@ -280,6 +291,7 @@ class wh_assembly(models.Model):
                 if line_out.state != 'done':
                     line_out.action_done()
 
+            order.create_out_voucher()  # 生成出库凭证并审核
             order.state = 'feeding'
             return
 
@@ -292,8 +304,8 @@ class wh_assembly(models.Model):
             order.move_id.check_qc_result() # 检验质检报告是否上传
             order.line_in_ids.action_done() # 完成成品入库
 
-            self.update_parent_cost()
-            self.wh_assembly_create_voucher() # 生成出入库凭证并审核
+            order.update_parent_cost()
+            order.wh_assembly_create_voucher() # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -323,9 +335,13 @@ class wh_assembly(models.Model):
             order.move_id.state = 'draft'
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(wh_assembly, self).unlink()
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
 
     @api.model
     @create_name
@@ -527,6 +543,7 @@ class outsource(models.Model):
         warehouse_id = self.env['warehouse'].search([('type', '=', 'stock')], limit=1)
         if self.bom_id: # 存在 物料清单
             line_in_ids = [{'goods_id': line.goods_id.id,
+                            'attribute_id': line.attribute_id.id,
                             'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
                             'warehouse_dest_id': warehouse_id.id,
                             'uom_id': line.goods_id.uom_id.id,
@@ -546,6 +563,7 @@ class outsource(models.Model):
 
                 line_out_ids.append({
                                      'goods_id': line.goods_id.id,
+                                     'attribute_id': line.attribute_id.id,
                                      'warehouse_id': warehouse_id.id,
                                      'warehouse_dest_id': self.env['warehouse'].get_warehouse_by_type('production'),
                                      'uom_id': line.goods_id.uom_id.id,
@@ -663,9 +681,13 @@ class outsource(models.Model):
         return True
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(outsource, self).unlink()
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
 
     @api.model
     @create_name
@@ -734,7 +756,8 @@ class outsource(models.Model):
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
-                                     'goods_id':line_in.goods_id.id,
+                                     'goods_id': line_in.goods_id.id,
+                                     'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
                                      'name': u'%s委外加工单 成品' % outsource.move_id.name
@@ -762,16 +785,17 @@ class outsource(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
-                                  'name': u'%s委外加工单 原料' % outsource.move_id.name
+                                  'name': u'%s委外加工单 成品' % outsource.move_id.name
                                   })
         for line_out in outsource.line_out_ids: # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost,
-                                    'goods_id': line_out.goods_id.id,
-                                    'voucher_id': voucher.id,
-                                    'account_id': account_id,
-                                    'name': u'%s委外加工单 成品' % outsource.move_id.name})
+                                      'goods_id': line_out.goods_id.id,
+                                      'goods_qty': line_out.goods_qty,
+                                      'voucher_id': voucher.id,
+                                      'account_id': account_id,
+                                      'name': u'%s委外加工单 原料' % outsource.move_id.name})
         return line_out_data + line_in_data
 
     def outsource_create_voucher_line(self, outsource, voucher_row):
@@ -804,18 +828,26 @@ class outsource(models.Model):
 
     def outsource_create_voucher(self):
         """
-        生成入库和出库凭证并审核
+        生成入库凭证并审核
         :return:
         """
         for outsource in self:
             voucher_row = self.env['voucher'].create({'date': outsource.date})
-            out_voucher = self.env['voucher'].create({'date': outsource.date})
             self.outsource_create_voucher_line(outsource, voucher_row)  # 入库凭证
-            self.create_out_voucher_line(outsource, out_voucher)  # 出库凭证
 
             outsource.voucher_id = voucher_row.id
-            outsource.out_voucher_id = out_voucher.id
             voucher_row.voucher_done()
+
+    def create_out_voucher(self):
+        """
+        生成出库凭证并审核
+        :return:
+        """
+        for outsource in self:
+            out_voucher = self.env['voucher'].create({'date': outsource.date})
+            self.create_out_voucher_line(outsource, out_voucher)  # 出库凭证
+
+            outsource.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     @api.multi
@@ -828,6 +860,7 @@ class outsource(models.Model):
                 if line_out.state != 'done':
                     line_out.action_done()
 
+            order.create_out_voucher()  # 生成出库凭证并审核
             order.state = 'feeding'
             return
 
@@ -844,8 +877,8 @@ class outsource(models.Model):
             if order.outsource_fee:
                 order._create_money_invoice()
 
-            self.update_parent_cost()
-            self.outsource_create_voucher() # 生成出入库凭证并审核
+            order.update_parent_cost()
+            order.outsource_create_voucher() # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -997,7 +1030,8 @@ class wh_disassembly(models.Model):
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
-                                     'goods_id':line_in.goods_id.id,
+                                     'goods_id': line_in.goods_id.id,
+                                     'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
                                      'name': u'%s拆卸单 成品' % disassembly.move_id.name
@@ -1024,16 +1058,17 @@ class wh_disassembly(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher.id,
                                   'account_id': account_id,
-                                  'name': u'%s拆卸单 原料' % disassembly.move_id.name
+                                  'name': u'%s拆卸单 成品' % disassembly.move_id.name
                                   })
         for line_out in disassembly.line_out_ids: # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost + disassembly.fee,
-                                    'goods_id':line_out.goods_id.id,
+                                    'goods_id': line_out.goods_id.id,
+                                    'goods_qty': line_out.goods_qty,
                                     'voucher_id': voucher.id,
                                     'account_id': account_id,
-                                    'name': u'%s拆卸单 成品' % disassembly.move_id.name})
+                                    'name': u'%s拆卸单 原料' % disassembly.move_id.name})
         return line_out_data + line_in_data
 
     def wh_disassembly_create_voucher_line(self, disassembly, voucher_row):
@@ -1066,17 +1101,24 @@ class wh_disassembly(models.Model):
 
     def wh_disassembly_create_voucher(self):
         """
-        生成入库和出库凭证并审核
+        生成入库凭证并审核
         :return:
         """
         for disassembly in self:
             voucher_row = self.env['voucher'].create({'date': disassembly.date})
-            out_voucher = self.env['voucher'].create({'date': disassembly.date})
             self.wh_disassembly_create_voucher_line(disassembly, voucher_row)   # 入库凭证
-            self.create_out_voucher_line(disassembly, out_voucher)  # 出库凭证
             disassembly.voucher_id = voucher_row.id
-            disassembly.out_voucher_id = out_voucher.id
             voucher_row.voucher_done()
+
+    def create_out_voucher(self):
+        """
+        生成出库凭证并审核
+        :return:
+        """
+        for disassembly in self:
+            out_voucher = self.env['voucher'].create({'date': disassembly.date})
+            self.create_out_voucher_line(disassembly, out_voucher)  # 出库凭证
+            disassembly.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     def approve_feeding(self):
@@ -1088,6 +1130,7 @@ class wh_disassembly(models.Model):
                 if line_out.state != 'done':
                     line_out.action_done()
 
+            order.create_out_voucher()   # 生成出库凭证并审核
             order.state = 'feeding'
             return
 
@@ -1100,8 +1143,8 @@ class wh_disassembly(models.Model):
             order.move_id.check_qc_result() # 检验质检报告是否上传
             order.line_in_ids.action_done() # 完成成品入库
 
-            self.update_child_cost()
-            self.wh_disassembly_create_voucher() # 生成出入库凭证并审核
+            order.update_child_cost()
+            order.wh_disassembly_create_voucher() # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -1131,9 +1174,13 @@ class wh_disassembly(models.Model):
             order.move_id.state = 'draft'
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(wh_disassembly, self).unlink()
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
 
     @api.model
     @create_name
@@ -1187,6 +1234,7 @@ class wh_disassembly(models.Model):
 
             line_out_ids.append({
                  'goods_id': parent_line.goods_id.id,
+                 'attribute_id': parent_line.attribute_id.id,
                  'warehouse_id': self.env[
                      'warehouse'].get_warehouse_by_type('production').id,
                  'warehouse_dest_id': warehouse_id.id,
@@ -1201,6 +1249,7 @@ class wh_disassembly(models.Model):
 
             line_in_ids = [{
                             'goods_id': line.goods_id.id,
+                            'attribute_id': line.attribute_id.id,
                             'warehouse_id': warehouse_id.id,
                             'warehouse_dest_id': self.env[
                                 'warehouse'].get_warehouse_by_type('production').id,
