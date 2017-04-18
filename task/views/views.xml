@@ -319,6 +319,7 @@
 					<field name="sequence" widget="handle"/>
 					<field name="name"/>
 					<field name="state"/>
+					<field name="_approve_state"/>
 				</tree>
 			</field>
 		</record>
