@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_wages">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="report.external_layout">
+                    <div class="page">
+                        <h2>
+                        工资条
+                        </h2>
+                        <table class="table table-condensed">
+                            <t t-foreach="o.line_ids" t-as="line">
+                                <thead>
+                                    <tr>
+                                        <th><strong>日期</strong></th>
+                                        <th><strong>姓名</strong></th>
+                                        <th><strong>在职天数</strong></th>
+                                        <th><strong>基本工资</strong></th>
+                                        <th><strong>奖金</strong></th>
+                                        <th><strong>养老</strong></th>
+                                        <th><strong>医保</strong></th>
+                                        <th><strong>失业</strong></th>
+                                        <th><strong>公积金</strong></th>
+                                        <th><strong>扣款</strong></th>
+                                        <th><strong>补助</strong></th>
+                                        <th><strong>实发工资</strong></th>
+                                        <th><strong>领款人签字</strong></th>
+                                        <th><strong>备注</strong></th>
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td><span t-field="o.date"/></td>
+                                    <td><span t-field="line.name"/></td>
+                                    <td><span t-field="line.date_number"/></td>
+                                    <td><span t-field="line.basic_wage"/></td>
+                                    <td><span t-field="line.add_wage"/></td>
+                                    <td><span t-field="line.endowment"/></td>
+                                    <td><span t-field="line.health"/></td>
+                                    <td><span t-field="line.unemployment"/></td>
+                                    <td><span t-field="line.housing_fund"/></td>
+                                    <td><span t-field="line.deduction"/></td>
+                                    <td><span t-field="line.other_wage"/></td>
+                                    <td><span t-field="line.amount_wage"/></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </t>
+             </t>
+         </t>
+    </template>
+</odoo>

@@ -16,6 +16,8 @@
         'views/wages_menu.xml',
         'data/wages_data.xml',
         'security/ir.model.access.csv',
+        'report/wages_report.xml',
+        'report/wages_templates.xml',
     ],
     'demo': [
         'demo/staff_wages_demo.xml',
