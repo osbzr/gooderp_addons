@@ -141,6 +141,17 @@ class mail_thread(models.AbstractModel):
         thread_row = super(mail_thread, self).write(vals)
         return thread_row
 
+    @api.multi
+    def unlink(self):
+        for th in self:
+            if th._approver_num != len(th._to_approver_ids):
+                raise ValidationError(u"审批中不可删除")
+            if getattr(th, 'state', False) == 'done':
+                raise ValidationError(u"已审核的单据不可删除")
+            for approver in th._to_approver_ids:
+                approver.unlink()
+        return super(mail_thread, self).unlink()
+
     def __get_user_group__(self, active_id,  active_model, users, mode_row):
         all_groups = []
         process_rows = self.env['good_process.process'].search([('model_id.model', '=', active_model),
