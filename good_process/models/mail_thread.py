@@ -152,7 +152,7 @@ class mail_thread(models.AbstractModel):
                 continue
             if len(th._to_approver_ids) and vals.get('state',False) == 'done':
                 raise ValidationError(u"审批后才能审核")
-            if len(th._to_approver_ids):
+            if len(th._to_approver_ids) < th._approver_num:
                 raise ValidationError(u"审批中不可修改")
         thread_row = super(mail_thread, self).write(vals)
         return thread_row
@@ -160,7 +160,7 @@ class mail_thread(models.AbstractModel):
     @api.multi
     def unlink(self):
         for th in self:
-            if len(th._to_approver_ids):
+            if len(th._to_approver_ids) < th._approver_num:
                 raise ValidationError(u"审批中不可删除")
             if getattr(th, 'state', False) == 'done':
                 raise ValidationError(u"已审核的单据不可删除")
