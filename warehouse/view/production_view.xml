@@ -89,6 +89,7 @@
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本' />
                     <field name='warehouse_id' />
                     <field name='state' />
+                    <field name="_approve_state"/>
                 </tree>
             </field>
         </record>
@@ -305,6 +306,7 @@
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本'/>
                     <field name='warehouse_id'/>
                     <field name='state'/>
+                    <field name="_approve_state"/>
                 </tree>
             </field>
         </record>
@@ -492,6 +494,7 @@
                     <field name='line_in_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本' />
                     <field name='warehouse_id' />
                     <field name='state' />
+                    <field name="_approve_state"/>
                 </tree>
             </field>
         </record>

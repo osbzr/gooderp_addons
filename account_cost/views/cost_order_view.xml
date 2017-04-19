@@ -15,6 +15,7 @@
 					<field name="create_uid" string="制单人"/>
 					<field name="approve_uid"/>
 					<field name="state"/>
+					<field name="_approve_state"/>
 				</tree>
 			</field>
 		</record>

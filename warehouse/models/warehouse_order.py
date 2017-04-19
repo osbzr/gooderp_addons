@@ -43,9 +43,9 @@ class wh_out(models.Model):
         return True
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(wh_out, self).unlink()
+        return self.move_id.unlink()
 
     @api.one
     @api.depends('line_out_ids.cost')
@@ -164,9 +164,9 @@ class wh_in(models.Model):
         return True
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(wh_in, self).unlink()
+        return self.move_id.unlink()
 
     @api.one
     @api.depends('line_in_ids.cost')
@@ -301,9 +301,9 @@ class wh_internal(models.Model):
         return True
 
     @api.multi
-    @inherits_after()
+    @inherits()
     def unlink(self):
-        return super(wh_internal, self).unlink()
+        return self.move_id.unlink()
 
     @api.one
     @api.depends('line_out_ids.cost')

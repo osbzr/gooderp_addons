@@ -85,7 +85,9 @@
 						<group>
 							<group>
 								<field name="name"/>
-								<field name="customer_id"/>
+								<field name="customer_id"
+									   domain="[('c_category_id', '!=', False)]"
+									   options="{'no_create': True, 'no_open': True}"/>
 								<field name="address" widget='url'/>
 							</group>
 							<group>

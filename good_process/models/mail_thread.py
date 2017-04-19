@@ -9,9 +9,25 @@ class mail_thread(models.AbstractModel):
                  _approver_num 整个流程涉及的审批者数量（用来判断审批是否开始）
     '''
     _inherit = 'mail.thread'
+
+    @api.one
+    @api.depends('_to_approver_ids', '_approver_num')
+    def _get_approve_state(self):
+        """计算审批状态"""
+        to_approver = len(self._to_approver_ids)
+        if not to_approver:
+            self._approve_state = u'已审批'
+        elif to_approver == self._approver_num:
+            self._approve_state = u'已提交'
+        else:
+            self._approve_state = u'审批中'
+
+
     _to_approver_ids = fields.One2many('good_process.approver',  'res_id', readonly='1',
         domain=lambda self: [('model', '=', self._name)], auto_join=True, string='待审批人')
     _approver_num = fields.Integer(string='总审批人数')
+    _approve_state = fields.Char(u'审批状态',
+                                 compute='_get_approve_state')
 
     def __get_groups__(self, process_rows):
         groups = []
@@ -136,7 +152,7 @@ class mail_thread(models.AbstractModel):
                 continue
             if len(th._to_approver_ids) and vals.get('state',False) == 'done':
                 raise ValidationError(u"审批后才能审核")
-            if th._approver_num != len(th._to_approver_ids):
+            if len(th._to_approver_ids):
                 raise ValidationError(u"审批中不可修改")
         thread_row = super(mail_thread, self).write(vals)
         return thread_row
@@ -144,7 +160,7 @@ class mail_thread(models.AbstractModel):
     @api.multi
     def unlink(self):
         for th in self:
-            if th._approver_num != len(th._to_approver_ids):
+            if len(th._to_approver_ids):
                 raise ValidationError(u"审批中不可删除")
             if getattr(th, 'state', False) == 'done':
                 raise ValidationError(u"已审核的单据不可删除")
@@ -244,6 +260,7 @@ class approver(models.Model):
         if not self._cr.fetchone():
             self._cr.execute("""CREATE INDEX good_process_approver_model_res_id_idx ON good_process_approver (model, res_id)""")
 
+
 class process(models.Model):
     '''
     可供用户自定义的审批流程，可控制是否需部门经理审批。注意此规则只对修改之后新建（或被拒绝）的单据有效
@@ -251,10 +268,20 @@ class process(models.Model):
     _name = 'good_process.process'
     _description = u'审批规则'
     _rec_name = 'model_id'
-    model_id = fields.Many2one('ir.model', u'单据')
+    model_id = fields.Many2one('ir.model', u'单据', required=True)
     type = fields.Char(u'类型', help=u'有些单据根据type字段区分具体流程')
     is_department_approve = fields.Boolean(string=u'部门经理审批')
     line_ids = fields.One2many('good_process.process_line', 'process_id', string=u'审批组')
+
+    #TODO: model_id 的 type 唯一
+    @api.model
+    def create(self, vals):
+        process_id = super(process, self).create(vals)
+        model = self.env[process_id.model_id.model]
+        if hasattr(model, 'type') and not process_id.type:
+            raise ValidationError(u'请输入类型')
+        return process_id
+
 
 class process_line(models.Model):
     '''
@@ -265,6 +292,6 @@ class process_line(models.Model):
     _order = 'sequence'
 
     sequence = fields.Integer(string='序号')
-    group_id = fields.Many2one('res.groups', string=u'审批组')
+    group_id = fields.Many2one('res.groups', string=u'审批组', required=True)
     is_all_approve = fields.Boolean(string=u'是否需要本组用户全部审批')
     process_id = fields.Many2one('good_process.process', u'审批规则')
