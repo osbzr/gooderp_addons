@@ -148,6 +148,7 @@ class mail_thread(models.AbstractModel):
         '''
         for th in self:
             ignore_fields = ['_approver_num',
+                             '_to_approver_ids',
                              'message_ids',
                              'message_follower_ids',
                              'message_partner_ids',
@@ -166,8 +167,10 @@ class mail_thread(models.AbstractModel):
                 if not change_state:
                     raise ValidationError(u'已审批不可修改')
                 if change_state == 'draft':
-                    th.__add_approver__(th, th._name)
-                    print 'ddddddddd',th._to_approver_ids
+                    self.__add_approver__(th, th._name)
+                    vals.update({
+                        '_approver_num': len(th._to_approver_ids),
+                    })
             # 审批中，审核时报错，修改其他字段报错
             elif len(th._to_approver_ids) < th._approver_num:
                 if change_state:
@@ -180,13 +183,10 @@ class mail_thread(models.AbstractModel):
     @api.multi
     def unlink(self):
         for th in self:
-            print 'llll',len(th._to_approver_ids) , th._approver_num
             if not len(th._to_approver_ids) and th._approver_num:
                 raise ValidationError(u"已审批不可删除")
             if len(th._to_approver_ids) < th._approver_num:
                 raise ValidationError(u"审批中不可删除")
-            if getattr(th, 'state', False) == 'done':
-                raise ValidationError(u"已审核的单据不可删除")
             for approver in th._to_approver_ids:
                 approver.unlink()
         return super(mail_thread, self).unlink()
