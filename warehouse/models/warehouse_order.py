@@ -7,7 +7,7 @@ from odoo import models, fields, api
 class wh_out(models.Model):
     _name = 'wh.out'
     _description = u'其他出库单'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'scan.barcode']
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -29,7 +29,6 @@ class wh_out(models.Model):
     voucher_id = fields.Many2one('voucher', u'出库凭证',
                                  readonly=True,
                                  help=u'该出库单的审核后生成的出库凭证')
-
     @api.multi
     @inherits_after()
     def approve_order(self):
