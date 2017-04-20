@@ -146,19 +146,42 @@ class mail_thread(models.AbstractModel):
         如果单据的审批流程已经开始 —— 至少一个审批人已经审批通过，不允许对此单据进行修改。
         '''
         for th in self:
-            ignore_fields = ['_approver_num','message_ids','message_follower_ids','message_partner_ids','message_channel_ids']
-            if any([vals.has_key(x) for x in ignore_fields]):
+            ignore_fields = ['_approver_num',
+                             'message_ids',
+                             'message_follower_ids',
+                             'message_partner_ids',
+                             'message_channel_ids',
+                             'approve_uid',
+                             'approve_date']
+            if any([vals.has_key(x) for x in ignore_fields]) or not th._approver_num:
                 continue
-            if len(th._to_approver_ids) and vals.get('state',False) == 'done':
+            change_state = vals.get('state', False)
+
+            # 已提交，审核时报错
+            if len(th._to_approver_ids) == th._approver_num and change_state:
                 raise ValidationError(u"审批后才能审核")
-            if len(th._to_approver_ids) < th._approver_num:
+            # 已审批
+            if not len(th._to_approver_ids):
+                if not change_state:
+                    raise ValidationError(u'已审批不可修改')
+                if change_state == 'draft':
+                    th.__add_approver__(th, th._name)
+                    print 'ddddddddd',th._to_approver_ids
+            # 审批中，审核时报错，修改其他字段报错
+            elif len(th._to_approver_ids) < th._approver_num:
+                if change_state:
+                    raise ValidationError(u"审批后才能审核")
                 raise ValidationError(u"审批中不可修改")
+
         thread_row = super(mail_thread, self).write(vals)
         return thread_row
 
     @api.multi
     def unlink(self):
         for th in self:
+            print 'llll',len(th._to_approver_ids) , th._approver_num
+            if not len(th._to_approver_ids):
+                raise ValidationError(u"已审批不可删除")
             if len(th._to_approver_ids) < th._approver_num:
                 raise ValidationError(u"审批中不可删除")
             if getattr(th, 'state', False) == 'done':
@@ -275,6 +298,9 @@ class process(models.Model):
     #TODO: model_id 的 type 唯一
     @api.model
     def create(self, vals):
+        """
+        新建审批配置规则，如果配置的模型有type字段而规则未输入type，保存时给出提示
+        """
         process_id = super(process, self).create(vals)
         model = self.env[process_id.model_id.model]
         if hasattr(model, 'type') and not process_id.type:
