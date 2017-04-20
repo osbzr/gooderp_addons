@@ -180,7 +180,7 @@ class mail_thread(models.AbstractModel):
     def unlink(self):
         for th in self:
             print 'llll',len(th._to_approver_ids) , th._approver_num
-            if not len(th._to_approver_ids):
+            if not len(th._to_approver_ids) and th._approver_num:
                 raise ValidationError(u"已审批不可删除")
             if len(th._to_approver_ids) < th._approver_num:
                 raise ValidationError(u"审批中不可删除")
