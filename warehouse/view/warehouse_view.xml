@@ -363,6 +363,7 @@
                     <field name='approve_uid' />
                     <field name='note' />
                     <field name='state' />
+                    <field name="_approve_state"/>
                 </tree>
             </field>
         </record>
@@ -483,6 +484,7 @@
                     <field name='approve_uid' />
                     <field name='note' />
                     <field name='state' />
+                    <field name="_approve_state"/>
                 </tree>
             </field>
         </record>
@@ -598,6 +600,7 @@
                     <field name='approve_uid' />
                     <field name='note' />
                     <field name='state' />
+                    <field name="_approve_state"/>
                 </tree>
             </field>
         </record>

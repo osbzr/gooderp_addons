@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_wages">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="report.external_layout">
+                    <div class="page">
+                        <h2>
+                        工资条
+                        </h2>
+                        <table class="table">
+                            <t t-foreach="o.line_ids" t-as="line">
+                                <tr>
+                                    <th style='border:1px solid #000;'><strong>日期</strong></th>
+                                    <th style='border:1px solid #000;'><strong>姓名</strong></th>
+                                    <th style='border:1px solid #000;'><strong>在职天数</strong></th>
+                                    <th style='border:1px solid #000;'><strong>基本工资</strong></th>
+                                    <th style='border:1px solid #000;'><strong>加班工资</strong></th>
+                                    <th style='border:1px solid #000;'><strong>养老</strong></th>
+                                    <th style='border:1px solid #000;'><strong>医保</strong></th>
+                                    <th style='border:1px solid #000;'><strong>失业</strong></th>
+                                    <th style='border:1px solid #000;'><strong>公积金</strong></th>
+                                    <th style='border:1px solid #000;'><strong>扣款</strong></th>
+                                    <th style='border:1px solid #000;'><strong>补助</strong></th>
+                                    <th style='border:1px solid #000;'><strong>实发工资</strong></th>
+                                    <th style='border:1px solid #000;'><strong>领款人签字</strong></th>
+                                    <th style='border:1px solid #000;'><strong>备注</strong></th>
+                                </tr>
+                                <tr>
+                                    <td style='border:1px solid #000;'><span t-field="o.date"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.name"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.date_number"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.basic_wage"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.add_wage"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.endowment"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.health"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.unemployment"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.housing_fund"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.deduction"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.other_wage"/></td>
+                                    <td style='border:1px solid #000;'><span t-field="line.amount_wage"/></td>
+                                    <td style='border:1px solid #000;'></td>
+                                    <td style='border:1px solid #000;'></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </t>
+             </t>
+         </t>
+    </template>
+</odoo>

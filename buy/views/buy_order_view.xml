@@ -19,6 +19,7 @@
 					<field name='currency_id'
 						 groups='finance.group_multi_currency'/>
 					<field name="state"/>
+					<field name="_approve_state"/>
 					<field name="goods_state"/>
 					<field name="money_state"/>
 				</tree>

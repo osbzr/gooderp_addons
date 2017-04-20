@@ -181,9 +181,8 @@ class sell_delivery(models.Model):
         for delivery in self:
             if delivery.state == 'done':
                 raise UserError(u'不能删除已审核的销售发货单')
-            delivery.sell_move_id.unlink()
 
-        return super(sell_delivery, self).unlink()
+        return delivery.sell_move_id.unlink()
 
     def goods_inventory(self, vals):
         """
@@ -240,7 +239,8 @@ class sell_delivery(models.Model):
             'tax_amount': tax_amount,
             'date_due': self.date_due,
             'state': 'draft',
-            'currency_id': self.currency_id.id
+            'currency_id': self.currency_id.id,
+            'note': self.note,
         }
 
     def _delivery_make_invoice(self):
@@ -298,6 +298,7 @@ class sell_delivery(models.Model):
             'to_reconcile': amount,
             'state': 'draft',
             'origin_name': self.name,
+            'note': self.note,
         })
         return money_order
 
@@ -319,7 +320,7 @@ class sell_delivery(models.Model):
             debit = debit * (rate_silent or 1)
             credit = credit * (rate_silent or 1)
         voucher_line = self.env['voucher.line'].create({
-            'name': self.name,
+            'name': u'%s %s' % (self.name, self.note or ''),
             'account_id': account_id and account_id.id,
             'debit': debit,
             'credit': credit,

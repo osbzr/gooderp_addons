@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="action_report_wages"
+            string="工资条"
+            model="staff.wages"
+            report_type="qweb-pdf"
+            file="staff_wages.report_wages"
+            name="staff_wages.report_wages"
+        />
+    </data>
+</odoo>
