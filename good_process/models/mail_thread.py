@@ -99,6 +99,7 @@ class mail_thread(models.AbstractModel):
     @api.model
     def good_process_approve(self, active_id, active_model):
         return_vals = []
+        message = ''
         manger_row = self.__has_manager__(active_id, active_model)
         model_row = self.env[active_model].browse(active_id)
         if (manger_row and manger_row.user_id.id == self.env.uid) or not manger_row:
