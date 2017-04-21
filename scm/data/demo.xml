@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
+        <record id='user_alice' model='res.users'>
+            <field name='name'>Alice</field>
+            <field name='login'>alice</field>
+        </record>
         <!--购货审批组-->
         <record id='group_process_buy_order' model='res.groups'>
             <field name='category_id' ref='good_process.gooderp_approver_groups'/>
@@ -27,7 +31,7 @@
         </record>
         <record id='process_line_buy_order_2' model='good_process.process_line'>
             <field name='process_id' ref='scm.process_buy_order'/>
-            <field name='sequence'>0</field>
+            <field name='sequence'>1</field>
             <field name='group_id' ref='scm.group_process_buy_order_2'/>
             <field name='is_all_approve'></field>
         </record>
