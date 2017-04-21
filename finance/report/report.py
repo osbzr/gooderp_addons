@@ -24,7 +24,7 @@ class action_report_picking_wrapped(report_sxw.rml_parse):
         """
                         将数值按位数分开
         """
-        if value < 0.01:
+        if abs(value) < 0.01:
             # 值为0的不输出，即返回12个空格
             return ['' for i in range(12)]
         # 先将数字转为字符，去掉小数点，然后和12个空格拼成列表，取最后12个元素返回
