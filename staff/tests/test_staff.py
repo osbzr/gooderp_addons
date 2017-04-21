@@ -7,12 +7,17 @@ class test_staff(TransactionCase):
 
     def test_get_image(self):
         '''拿到用户头像,职位的onchange'''
+        user_lucy = self.env['res.users'].create({
+            'name': 'Lucy',
+            'login': 'lucy@osbzr.com',
+        })
         staff_pro = self.env['staff'].create({
-                                              'identification_id':111111,
-                                              'work_phone':12345678901,
-                                              'name': 'DemoUser',
-                                              'user_id': 1,
-                                              'job_id': self.env.ref('staff.staff_job_1').id})
+            'identification_id':111111,
+            'work_phone':12345678901,
+            'work_email': 'lucy@osbzr.com',
+            'name': 'Lucy',
+            'user_id': user_lucy.id,
+            'job_id': self.env.ref('staff.staff_job_1').id})
         staff_pro.onchange_job_id()
 
     def test_staff_contract_over_date(self):
@@ -32,7 +37,6 @@ class test_staff(TransactionCase):
                                         'basic_wage': 123456,
                                         'over_date': datetime.now().strftime("%Y-%m-%d"),
                                         'job_id': self.env.ref('staff.staff_job_1').id})
-
         # has staff.contract_ids and apartment manager
         self.env.ref('staff.staff_1').work_email = 'admin@sina.com.cn'
         staff_lily.parent_id = self.env.ref('staff.staff_1').id

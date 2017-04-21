@@ -254,7 +254,6 @@ class buy_order(models.Model):
     @api.multi
     def unlink(self):
         for order in self:
-            print 'oooooooooo'
             if order.state == 'done':
                 raise UserError(u'不能删除已审核的单据(%s)'%order.name)
 
