@@ -13,7 +13,6 @@
 		<template id="report_voucher_view">
 			<t t-foreach="docs" t-as="o">
 			<t t-call="report.html_container">
-            <t t-call="report.internal_layout">
                 <div class="page">
                 	<div class="oe_structure">
                 		<div class="row">
@@ -68,7 +67,6 @@
                 	</div>
                 </div>
 			</t>	
-			</t>	
 			</t>
 		</template>
 		<template id='report_voucher_view'>
@@ -78,8 +76,7 @@
             <t t-set="data_report_dpi" t-value="110"/>
             <t t-set="data-report_format" t-value='A5' />
             <t t-foreach='docs' t-as='o' >
-                <t t-call="report.internal_layout">
-                    <div class='page'>
+                    <div class='page' style="font-size:24;">
                         <div class='row' >
                             <div class='oe_structure' />
                             <div class='row'>
@@ -90,7 +87,7 @@
                             </div>
                         </div>
 
-                        <div class='row' >
+                        <div class='row'>
                             <div class='col-xs-6 pull-left'>
                                 <span>公司名称</span>
                                 <span t-field='user.company_id.name' />
@@ -111,7 +108,7 @@
                                 <tr>
                                     <td rowspan='2' height='80px' class='col-xs-2 text-center' style="vertical-align:middle;">摘要</td>
                                     <td rowspan='2' class='col-xs-2 text-center' style="vertical-align:middle;">会计科目</td>
-                                    <td colspan='12' class='col-xs-4 text-center'>借方</td>
+                                    <td colspan='12' height='40px' class='col-xs-4 text-center'>借方</td>
                                     <td colspan='12' class='col-xs-4 text-center'>贷方</td>
                                 </tr>
                                 <tr>
@@ -234,80 +231,80 @@
                                     </tr>
                                 </t>
                                 <tr>
-                                    <td class='col-xs-4' colspan = '2'>
+                                    <td class='col-xs-4' height='80px' colspan = '2' style="vertical-align:middle;">
                                         <span>合计:</span>
                                         <span t-esc='rmb_upper(o.amount_text)' />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[0]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[1]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[2]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[3]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[4]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[5]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[6]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[7]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[8]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[9]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[10]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[11]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[0]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[1]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[2]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[3]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[4]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[5]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[6]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[7]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[8]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[9]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:middle;">
                                         <span t-esc="rmb_format(o.amount_text)[10]" />
                                     </td>
-                                    <td>
+                                    <td style="vertical-align:middle;">
                                         <span t-esc="rmb_format(o.amount_text)[11]" />
                                     </td>
                                 </tr>
@@ -333,7 +330,6 @@
                             </div>
                         </div>
                     </div>
-                </t>
             </t>
         </t>
     </template>
