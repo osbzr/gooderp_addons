@@ -86,7 +86,6 @@ odoo.define('core.core', function (require) {
                     this.$('.oe_view_nocontent').remove();
                     var recored = this.make_empty_record_copy(self.copy_recored.attributes);
                     this.records.add(recored, { at: (this.prepends_on_create()) ? 0 : null });
-                    console.log(recored);
                     this.start_edition(recored, undefined);
                 } else {
                     this._super.apply(this, arguments);
