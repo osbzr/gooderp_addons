@@ -119,20 +119,21 @@ class mail_thread(models.AbstractModel):
 
     @api.model
     def good_process_refused(self, active_id, active_model):
+        message = ''
         mode_row = self.env[active_model].browse(active_id)
         users, groups = self.__get_user_group__(active_id, active_model, [], mode_row)
         approver_rows = self.env['good_process.approver'].search([('model', '=', active_model),
                                                                   ('res_id', '=', active_id)])
         if mode_row._approver_num==len(mode_row._to_approver_ids):
-            retturn_vals = u'您是第一批需要审批的人，无需拒绝！'
+            return_vals = u'您是第一批需要审批的人，无需拒绝！'
         elif approver_rows and users:
             approver_rows.unlink()
             message = self.__good_approver_send_message__(active_id, active_model, u'拒绝')
-            retturn_vals = self.__add_approver__(mode_row, active_model)
+            return_vals = self.__add_approver__(mode_row, active_model)
 
         else:
-            retturn_vals = u'已经通过不能拒绝！'
-        return retturn_vals, message or ''
+            return_vals = u'已经通过不能拒绝！'
+        return return_vals, message or ''
 
     @api.model
     def create(self, vals):
