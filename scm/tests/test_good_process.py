@@ -44,7 +44,7 @@ class test_mail_thread(TransactionCase):
         """审批顺序"""
         # 自己审批
         result = self.order.good_process_approve(self.order.id, self.order._name)
-        self.assertTrue(result == u'您不是这张单据的下一个审批者')
+        self.assertTrue(result[0] == u'您不是这张单据的下一个审批者')
 
     def test_unlink(self):
         """级联删除"""
