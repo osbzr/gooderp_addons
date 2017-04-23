@@ -23,6 +23,10 @@ MONTH_SELECTION = [
     ('11', u'11'),
     ('12', u'12')]
 
+# 字段只读状态
+READONLY_STATES = {
+        'done': [('readonly', True)],
+    }
 
 class voucher(models.Model):
     '''新建凭证'''
@@ -54,14 +58,15 @@ class voucher(models.Model):
         'document.word', u'凭证字', ondelete='restrict', required=True,
         default=lambda self: self.env.ref('finance.document_word_1'))
     date = fields.Date(u'凭证日期', required=True, default=_default_voucher_date,
+                       states=READONLY_STATES,
                        track_visibility='always', help=u'本张凭证创建的时间', copy=False)
     name = fields.Char(u'凭证号', track_visibility='always', copy=False)
-    att_count = fields.Integer(u'附单据', default=1, help=u'原始凭证的张数')
+    att_count = fields.Integer(u'附单据', default=1, help=u'原始凭证的张数', states=READONLY_STATES)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True, help=u'本张凭证发生日期对应的，会计期间')
-    line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细', copy=True)
+    line_ids = fields.One2many('voucher.line', 'voucher_id', u'凭证明细', copy=True, states=READONLY_STATES,)
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
                                track_visibility='always',help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
