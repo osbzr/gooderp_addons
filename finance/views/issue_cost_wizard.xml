@@ -42,6 +42,6 @@
             <field name="view_mode">tree</field>
             <field name="target"></field>
         </record>
-        <menuitem id='month_product_cost_menu' action='month_product_cost_action' parent='voucher_books_menu' sequence='40'/>
+        <menuitem id='month_product_cost_menu' action='month_product_cost_action' parent='voucher_books_menu' sequence='80'/>
     </data>
 </openerp>

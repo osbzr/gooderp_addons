@@ -8,10 +8,10 @@
         <menuitem id='finance_setting_menu' name='设置' parent='finance_menu' sequence='20'/>
 
         <menuitem id="menu_finance_setting_default" name="默认设置" parent="finance_setting_menu"
-                  action="view_finance_config_setting_action" sequence="0"/>
+                  action="view_finance_config_setting_action" sequence="100"/>
 
         <menuitem action="base.action_currency_form" id="menu_action_currency_form" parent="finance_setting_menu" name='币别'
-                  sequence="13" groups="finance.group_multi_currency"/>
+                  sequence="60" groups="finance.group_multi_currency"/>
 
         <!--会计科目-->
         <record id="finance_account_tree" model="ir.ui.view">
@@ -52,7 +52,7 @@
             <field name="view_mode">tree</field>
         </record>
 
-        <menuitem id='finance_account_menu' action='finance_account_action' parent='finance_setting_menu' sequence='15'/>
+        <menuitem id='finance_account_menu' action='finance_account_action' parent='finance_setting_menu' sequence='20'/>
 
         <!--辅助核算-->
         <record id="auxiliary_financing_tree" model="ir.ui.view">
@@ -88,7 +88,7 @@
             <field name="view_mode">tree</field>
         </record>
 
-        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='25'/>       
+        <menuitem id='auxiliary_financing_menu' action='auxiliary_financing_action' parent='finance_setting_menu' sequence='30'/>       
 
         <!--会计期间-->
         <record id="period_tree" model="ir.ui.view">
