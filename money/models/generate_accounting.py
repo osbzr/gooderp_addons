@@ -35,9 +35,9 @@ class money_order(models.Model):
         res = super(money_order, self).money_order_done()
         for money in self:
             if money.type == 'get':
-                voucher = money.create_money_order_get_voucher(money.line_ids, money.source_ids, money.partner_id, money.name, money.note)
+                voucher = money.create_money_order_get_voucher(money.line_ids, money.source_ids, money.partner_id, money.name, money.note or '')
             else:
-                voucher = money.create_money_order_pay_voucher(money.line_ids, money.source_ids, money.partner_id, money.name, money.note)
+                voucher = money.create_money_order_pay_voucher(money.line_ids, money.source_ids, money.partner_id, money.name, money.note or '')
             voucher.voucher_done()
         return res
 
