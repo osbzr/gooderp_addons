@@ -563,6 +563,9 @@ class money_invoice(models.Model):
         if self.env.ref('asset.model_asset'):
             res_models += ['asset']
             views += ['asset.asset_form']
+        if self.env.ref('account_cost.model_cost_order'):
+            res_models += ['cost.order']
+            views += ['account_cost.cost_order_form']
         if u'固定资产变更' in self.name:
             code = self.name.replace(u'固定资产变更', '')
         elif u'固定资产' in self.name:

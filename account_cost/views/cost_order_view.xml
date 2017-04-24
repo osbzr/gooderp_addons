@@ -48,6 +48,8 @@
 								<field name="note"/>
 							</tree>
 						</field>
+						<label string="结算单"/>
+						<field name="invoice_ids"/>
 						<field name="note" placeholder="暂无备注信息"/>
 						<group>
 							<field name="prepayment"/>

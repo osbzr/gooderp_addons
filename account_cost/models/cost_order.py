@@ -148,7 +148,7 @@ class cost_order(models.Model):
         if not float_is_zero(self.amount,2):
             for line in self.line_ids:
                 invoice_id = self.env['money.invoice'].create({
-                    'name': u'服务采购单',
+                    'name': self.name,
                     'partner_id': self.partner_id.id,
                     'category_id': line.category_id.id,
                     'date': self.date,
@@ -157,6 +157,7 @@ class cost_order(models.Model):
                     'to_reconcile': line.subtotal,
                     'tax_amount': line.tax_amount,
                     'date_due': self.date,
+                    'note': line.note,
                     'state': 'draft',
                 })
                 self.invoice_ids = [(4, invoice_id.id)]
