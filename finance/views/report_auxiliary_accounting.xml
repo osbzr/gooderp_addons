@@ -47,6 +47,6 @@
             <field name='view_mode'>pivot,tree</field>
             <field name='view_id' ref='report_auxiliary_accounting_graph' />
         </record>
-         <menuitem id='report_auxiliary_accounting_menu' name='辅助核算余额表' action="report_auxiliary_accounting_action" parent='voucher_books_menu' sequence='100'/>
+         <menuitem id='report_auxiliary_accounting_menu' name='辅助核算余额表' action="report_auxiliary_accounting_action" parent='voucher_books_menu' sequence='70'/>
     </data>
 </openerp>

@@ -34,7 +34,7 @@
             <field name="view_id" ref="profit_statement_tree_template"/>
         </record> 
 
-         <menuitem id='profit_statement_menu' action='profit_statement_action_template' parent='finance_setting_menu' sequence='40'/>
+         <menuitem id='profit_statement_menu' action='profit_statement_action_template' groups="base.group_no_one" parent='finance_setting_menu' sequence='80'/>
 
 
         <record id="balance_sheet_tree" model="ir.ui.view">
@@ -114,7 +114,7 @@
             context="{'profit_statement':True}"
             />
          <menuitem id='profit_statement_tree_wizard_action_menu' action='profit_statement_tree_wizard_action' parent='voucher_books_menu' sequence='30'/>
-        <menuitem id='create_balance_sheet_wizard_menu' action='create_balance_sheet_wizard_action' parent='voucher_books_menu' sequence='25'/>
-         <menuitem id='balance_sheet_menu' action='balance_sheet_action' parent='finance_setting_menu' sequence='30'/>
+         <menuitem id='create_balance_sheet_wizard_menu' action='create_balance_sheet_wizard_action' parent='voucher_books_menu' sequence='25'/>
+         <menuitem id='balance_sheet_menu' action='balance_sheet_action' parent='finance_setting_menu' groups="base.group_no_one" sequence='70'/>
     </data>
 </openerp>

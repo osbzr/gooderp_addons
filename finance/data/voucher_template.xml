@@ -84,6 +84,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-        <menuitem id='voucher_template_menu' action='voucher_template_action' parent='finance_setting_menu' sequence='20'/>
+        <menuitem id='voucher_template_menu' action='voucher_template_action' parent='finance_setting_menu' sequence='90'/>
     </data>
 </openerp>
