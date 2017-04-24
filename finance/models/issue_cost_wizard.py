@@ -141,14 +141,15 @@ class MonthProductCost(models.Model):
             current_period_out_cost = self.compute_balance_price(create_vals)   # 当期加权平均成本
             real_out_cost = self.compute_real_out_cost(create_vals, period_id)  # 当期实际成本
             diff_cost = current_period_out_cost - real_out_cost # 两者之差
-            if self.compute_balance_price(create_vals)!=0:  # 贷方
+            if diff_cost:  # 贷方
                 voucher_line_data = {'name': u'发出成本', 'credit': diff_cost,
                                      'account_id': goods_row.category_id.account_id.id,
-                                     'goods_id': create_vals.get('goods_id')}
+                                     'goods_id': create_vals.get('goods_id'),
+                                     'goods_qty': create_vals.get('current_period_out_qty')}
                 voucher_line_data_list.append([0, 0, voucher_line_data.copy()])
-            create_vals.update({'current_period_out_cost': diff_cost})
+                create_vals.update({'current_period_out_cost': diff_cost})
+                self.create(create_vals)
             all_balance_price += diff_cost
-            self.create(create_vals)
         if all_balance_price != 0: # 借方
             voucher_line_data_list.append(
                 [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
