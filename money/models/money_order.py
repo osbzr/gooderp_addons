@@ -309,9 +309,6 @@ class money_order(models.Model):
         :return: 
         """
         for order in self:
-            order.to_reconcile = 0
-            order.reconciled = 0
-
             total = 0
             for line in order.line_ids:
                 if order.type == 'pay':  # 反审核：付款账号余额增加
@@ -332,8 +329,11 @@ class money_order(models.Model):
                 source.name.to_reconcile += source.this_reconcile
                 source.name.reconciled -= source.this_reconcile
 
-            order.state = 'draft'
-        return True
+        return order.write({
+            'to_reconcile': 0,
+            'reconciled': 0,
+            'state': 'draft',
+        })
 
 
 class money_order_line(models.Model):
