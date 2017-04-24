@@ -10,9 +10,27 @@ class TrialBalance(models.Model):
     _order = 'subject_code'
     _description = u'科目余额表'
 
+    @api.one
+    @api.depends('cumulative_occurrence_debit', 'cumulative_occurrence_credit', 
+                 'ending_balance_debit', 'ending_balance_credit', 'subject_name_id')
+    def _get_year_init(self):
+        if self.subject_name_id.costs_types in ('in','out','cost'):
+            self.year_init_debit = self.year_init_credit = 0
+            return True
+        if self.subject_name_id.balance_directions == 'in':
+            #年初借 = 期末借 - 本年借 + 本年贷
+            self.year_init_debit = self.ending_balance_debit - self.cumulative_occurrence_debit + self.cumulative_occurrence_credit
+            self.year_init_credit = 0
+        else:
+            #年初贷 = 期末贷 - 本年贷 + 本年借
+            self.year_init_credit = self.ending_balance_credit - self.cumulative_occurrence_credit + self.cumulative_occurrence_debit
+            self.year_init_debit = 0
+    
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
     subject_name_id = fields.Many2one('finance.account', string=u'科目名称')
+    year_init_debit = fields.Float(u'年初余额(借方)', default=0, compute=_get_year_init)
+    year_init_credit = fields.Float(u'年初余额(贷方)', default=0, compute=_get_year_init)
     initial_balance_debit = fields.Float(u'期初余额(借方)', default=0)
     initial_balance_credit = fields.Float(u'期初余额(贷方)', default=0)
     current_occurrence_debit = fields.Float(u'本期发生额(借方)', default=0)
@@ -130,6 +148,9 @@ class CreateTrialBalanceWizard(models.TransientModel):
             trial_balance_ids = [self.env['trial.balance'].create(vals).id for (key, vals) in
                              trial_balance_dict.items()]
         view_id = self.env.ref('finance.trial_balance_tree').id
+        if self.period_id == self.period_id.get_init_period():
+            view_id = self.env.ref('finance.init_balance_tree').id
+        
         return {
             'type': 'ir.actions.act_window',
             'name': u'科目余额表:' + self.period_id.name,

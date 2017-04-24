@@ -325,6 +325,16 @@ class finance_period(models.Model):
         if not period_id:
             return self.create({'year': current_date[0:4],
                                 'month': str(int(current_date[5:7])), })
+    @api.model
+    def get_init_period(self):
+       '''系统启用的期间'''
+       start_date = self.env.ref('base.main_company').start_date
+       period_id = self.search([
+            ('year', '=', start_date[0:4]),
+            ('month', '=', int(start_date[5:7]))
+        ])
+       return period_id
+
     @api.multi
     def get_date_now_period_id(self):
         """
