@@ -100,13 +100,12 @@ class create_balance_sheet_wizard(models.TransientModel):
         balance_wizard.create_trial_balance()
         view_id = self.env.ref('finance.balance_sheet_tree_wizard').id
         balance_sheet_objs = self.env['balance.sheet'].search([])
-        period = self.env['finance.period'].search([('year', '=', self.period_id.year), ('month', '=', '1')])
-        year_begain_field = ['initial_balance_debit', 'initial_balance_credit']
+        year_begain_field = ['year_init_debit', 'year_init_credit']
         current_period_field = ['ending_balance_debit', 'ending_balance_credit']
         for balance_sheet_obj in balance_sheet_objs:
-            balance_sheet_obj.write({'beginning_balance': fabs(self.compute_balance(balance_sheet_obj.balance_formula, period, year_begain_field)),
+            balance_sheet_obj.write({'beginning_balance': fabs(self.compute_balance(balance_sheet_obj.balance_formula, self.period_id, year_begain_field)),
                                      'ending_balance': fabs(self.compute_balance(balance_sheet_obj.balance_formula, self.period_id, current_period_field)),
-                                     'beginning_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, period, year_begain_field),
+                                     'beginning_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, self.period_id, year_begain_field),
                                      'ending_balance_two': self.compute_balance(balance_sheet_obj.balance_two_formula, self.period_id, current_period_field)})
         force_company = self._context.get('force_company')
         if not force_company:

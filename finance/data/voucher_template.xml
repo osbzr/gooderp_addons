@@ -41,7 +41,7 @@
                     <button name='%(voucher_template_wizard_action)d' string="另存为模板" type="action" class="oe_highlight"/>
                 </button>
                 <field name="name" position="after">
-                    <field name="template_id" option="{'no_create':True}"/>
+                    <field name="template_id" option="{'no_create':True}" class="oe_edit_only" states="draft"/>
                 </field>
             </field>
         </record>
