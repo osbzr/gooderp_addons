@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    <data >
+    <data noupdate="1">
         <record id="small_business_chart160101" model='finance.account'>
             <field name='code'>1601</field>
             <field name='name'>固定资产</field>

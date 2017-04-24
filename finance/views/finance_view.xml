@@ -206,6 +206,6 @@
         </record>
 
         <menuitem id='chang_voucher_name_menu_finance' name="月末凭证变更记录"
-                  action='chang_voucher_name_action' parent='finance.checkout_menu' sequence='11'/>
+                  action='chang_voucher_name_action' parent='finance.checkout_menu' sequence='90'/>
     </data>
 </openerp>
