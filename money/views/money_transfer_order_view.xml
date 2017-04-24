@@ -11,7 +11,6 @@
                     <field name="date"/>
                     <field name="state"/>
                     <field name="_approve_state"/>
-                    <field name="note"/>
                 </tree>
             </field>
         </record>

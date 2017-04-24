@@ -31,7 +31,6 @@
                     <field name="state"/>
                     <field name="_approve_state"/>
                     <field name="to_reconcile" sum="未核销总额"/>
-                    <field name="note"/>
                 </tree>
             </field>
         </record>
