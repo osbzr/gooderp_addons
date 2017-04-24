@@ -155,7 +155,8 @@ class mail_thread(models.AbstractModel):
                              'message_partner_ids',
                              'message_channel_ids',
                              'approve_uid',
-                             'approve_date']
+                             'approve_date',
+                             'voucher_id']
             if any([vals.has_key(x) for x in ignore_fields]) or not th._approver_num:
                 continue
             change_state = vals.get('state', False)

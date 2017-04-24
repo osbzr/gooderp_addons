@@ -268,9 +268,6 @@ class money_order(models.Model):
             if order.advance_payment < 0:
                 raise UserError(u'本次核销金额不能大于付款金额。\n差额: %s'%(order.advance_payment))
 
-            order.to_reconcile = order.advance_payment
-            order.reconciled = order.amount - order.advance_payment
-
             total = 0
             for line in order.line_ids:
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
@@ -299,8 +296,11 @@ class money_order(models.Model):
                 source.name.to_reconcile -= source.this_reconcile
                 source.name.reconciled += source.this_reconcile
 
-            order.state = 'done'
-        return True
+        return order.write({
+            'to_reconcile': order.advance_payment,
+            'reconciled': order.amount - order.advance_payment,
+            'state': 'done',
+        })
 
     @api.multi
     def money_order_draft(self):
