@@ -323,11 +323,6 @@ class wh_assembly(models.Model):
             if voucher.state == 'done':
                 voucher.voucher_draft()
             voucher.unlink()
-            # 删除出库凭证
-            voucher, order.out_voucher_id = order.out_voucher_id, False
-            if voucher.state == 'done':
-                voucher.voucher_draft()
-            voucher.unlink()
 
             order.approve_uid = False
             order.approve_date = False
@@ -896,11 +891,6 @@ class outsource(models.Model):
             if voucher.state == 'done':
                 voucher.voucher_draft()
             voucher.unlink()
-            # 删除出库凭证
-            voucher, order.out_voucher_id = order.out_voucher_id, False
-            if voucher.state == 'done':
-                voucher.voucher_draft()
-            voucher.unlink()
 
             if order.invoice_id:
                 order.invoice_id.money_invoice_draft()
@@ -1160,11 +1150,6 @@ class wh_disassembly(models.Model):
 
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
-            if voucher.state == 'done':
-                voucher.voucher_draft()
-            voucher.unlink()
-            # 删除出库凭证
-            voucher, order.out_voucher_id = order.out_voucher_id, False
             if voucher.state == 'done':
                 voucher.voucher_draft()
             voucher.unlink()
