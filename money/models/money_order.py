@@ -405,13 +405,14 @@ class money_invoice(models.Model):
     @api.depends('date_due', 'to_reconcile')
     def compute_overdue(self):
         """
-        计算逾期天数： 当前日期 - 到期日
+        计算逾期天数： 当前日期 - 到期日，< 0则显示为0
         计算逾期金额： 逾期时等于未核销金额，否则为0
         :return: 逾期天数
         """
         d1 = datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
         d2 = self.date_due and datetime.strptime(self.date_due, '%Y-%m-%d') or d1
-        self.overdue_days = (d1 - d2).days
+        day = (d1 - d2).days
+        self.overdue_days = day > 0 and day or 0.0
         self.overdue_amount = self.overdue_days > 0 and self.to_reconcile or 0.0
 
     state = fields.Selection([
