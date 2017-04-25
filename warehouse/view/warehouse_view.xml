@@ -272,45 +272,43 @@
                                 'type': 'out',
                                 'default_warehouse_id': warehouse_id,
                             }" attrs="{'readonly': [('state', '!=', 'draft')]}" >
-                                <tree string='销售发货单行' editable='bottom'>
-		         						<field name='goods_id'
-										    domain="[('not_saleable','=',False)]"
-		         							context="{'default_partner':parent.partner_id,
-		         									  'default_is_return':parent.is_return,
-		         									  }"/>
-		         						<field name='attribute_id'
-		         							domain="[('goods_id', '=', goods_id)]"
-		         							groups='goods.multi_attrs_groups'
-		         							attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>
-	                    				<field name='lot_id' attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
-	                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
-	                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
-	                    					groups='goods.batch_groups'/>
-		         						<field name='goods_uos_qty' sum='辅助数量合计'
-		         							groups='goods.auxiliary_unit_groups'/>
-				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
-				 						<field name='goods_qty' sum='数量合计'/>
-		         						<field name='uom_id'/>
-		         						<field name='price'/>
-				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
-										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
-										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
-				 						<field name='amount' string='销售金额' sum='金额合计'/>
-				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
-		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
-				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
-										<field name='expiration_date'
+                                <tree string='库存调拨' editable='bottom'>
+                                    <field name='goods_id' required='1' />
+                                    <field name='attribute_id'
+                                        domain="[('goods_id', '=', goods_id)]"
+                                        attrs="{'required': [('using_attribute', '=', True)], 'readonly': [('using_attribute', '=', False)]}"
+                                        groups='goods.multi_attrs_groups'/>
+                                    <field name='lot_id'
+                                        groups='goods.batch_groups'
+                                        attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"
+                                        domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
+                                        context="{'lot': True}"
+                                        options="{'no_open': True, 'no_create': True}" />
+                                    <field name='goods_uos_qty' sum='1'
+                                        widget='float_limit'
+                                        options="{'field': 'lot_uos_qty'}"
+                                        groups='goods.auxiliary_unit_groups'/>
+                                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
+                                    <field name='goods_qty' sum='1'
+                                        widget='float_limit'
+                                        options="{'field': 'lot_qty'}"
+                                        attrs="{'readonly': [('force_batch_one', '=', True)]}" />
+                                    <field name='uom_id' required='1' />
+                                    <field name='cost_unit' string='出库单位成本' readonly='1' />
+                                    <field name='cost' string='出库成本' readonly='1' sum='1' />
+                                    <field name='expiration_date'
                                            readonly='1'
                                            groups='warehouse.group_expiration_date' />
-				 						<field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
-				 						<field name='note'/>
-				 						<field name="type" invisible="1"/>
-				 						<field name='using_attribute' invisible='1'/>
-				 						<field name='using_batch' invisible='1'/>
-			                            <field name='lot_qty' invisible='1'/>
-			                            <field name='lot' invisible='1'/>
-				 					</tree>
-
+                                    <field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
+                                    <field name='note' string='备注' />
+                                    <field name='using_attribute' invisible='1' />
+                                    <field name='using_batch' invisible='1' />
+                                    <field name='force_batch_one' invisible='1' />
+                                    <field name='lot_qty' invisible='1' />
+                                    <field name='lot_uos_qty' invisible='1' />
+                                    <field name='lot' invisible='1'/>
+                                    <field name='type' invisible='1'/>
+                                </tree>
                             </field>
                         </group>
 

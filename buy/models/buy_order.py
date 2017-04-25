@@ -210,6 +210,11 @@ class buy_order(models.Model):
     receipt_count = fields.Integer(compute='_compute_receipt', string='Receptions Count', default=0)
     invoice_ids = fields.One2many('money.invoice', compute='_compute_invoice', string='Invoices')
     invoice_count = fields.Integer(compute='_compute_invoice', string='Invoices Count', default=0)
+    request_id = fields.Many2one('stock.request',
+                                  u'补货申请单',
+                                  copy=False,
+                                  ondelete='restrict',
+                                  help=u'该单据关联的补货申请单')
     currency_id = fields.Many2one('res.currency',
                                   u'外币币别',
                                   compute='_compute_currency_id',

@@ -42,6 +42,12 @@ class stock_request(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    buy_order_ids = fields.One2many('buy.order',
+                                    'request_id',
+                                    u'购货订单')
+    assembly_ids = fields.One2many('wh.assembly',
+                                   'request_id',
+                                   u'组装单')
 
     @api.one
     def stock_query(self):
@@ -189,7 +195,7 @@ class stock_request(models.Model):
                 'note': u'补货申请单号：%s' % line.request_id.name
                 }
 
-    @api.one  
+    @api.one
     def stock_request_done(self):
         todo_buy_lines = []  # 待生成购货订单
         todo_produce_lines = []  # 待生成组装单
@@ -218,8 +224,10 @@ class stock_request(models.Model):
                 if bom_line:
                     assembly = self.env['wh.assembly'].create({
                                                                'bom_id': bom_line.bom_id.id,
-                                                               'goods_qty': line.request_qty
+                                                               'goods_qty': 0,
                                                                })
+                    assembly.onchange_bom()
+                    assembly.goods_qty = line.request_qty
                     assembly.onchange_goods_qty()
 
                     # 如果待处理行中有属性，则把它传至组装单的组合件行中
@@ -250,6 +258,7 @@ class stock_request(models.Model):
                             todo_buy_lines.append(request_line_ids)
                         else:
                             todo_produce_lines.append(request_line_ids)
+                    assembly.request_id = line.request_id.id
 
         # 处理待生成购货订单行
         for line in todo_buy_lines:
@@ -281,10 +290,13 @@ class stock_request(models.Model):
             if buy_order_line:
                 # 增加原订单行的产品数量
                 buy_order_line.quantity += line.request_qty
+                buy_order_line.note = buy_order_line.note or ''
+                buy_order_line.note += u' %s' % (line.request_id.name)
             else:
                 # 创建购货订单行
                 vals = self._get_buy_order_line_data(line, buy_order)
                 self.env['buy.order.line'].create(vals)
+            buy_order.request_id = line.request_id.id
 
         self.state = 'done'
 
