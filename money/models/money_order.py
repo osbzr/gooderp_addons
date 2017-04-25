@@ -545,25 +545,25 @@ class money_invoice(models.Model):
             'money.reconcile_order_form',
         ]
         # 判断当前数据库中否存在该 model
-        if self.env.get('sell.delivery'):
+        if self.env.get('sell.delivery') != None:
             res_models += ['sell.delivery']
             views += ['sell.sell_delivery_form']
-        if self.env.get('outsource'):
+        if self.env.get('outsource') != None:
             res_models += ['outsource']
             views += ['warehouse.outsource_form']
-        if self.env.get('buy.order'):
+        if self.env.get('buy.order') != None:
             res_models += ['buy.order']
             views += ['buy.buy_order_form']
-        if self.env.get('buy.receipt'):
+        if self.env.get('buy.receipt') != None:
             res_models += ['buy.receipt']
             views += ['buy.buy_receipt_form']
-        if self.env.get('project'):
+        if self.env.get('project') != None:
             res_models += ['project']
             views += ['task.project_form']
-        if self.env.get('asset'):
+        if self.env.get('asset') != None:
             res_models += ['asset']
             views += ['asset.asset_form']
-        if self.env.get('cost.order'):
+        if self.env.get('cost.order') != None:
             res_models += ['cost.order']
             views += ['account_cost.cost_order_form']
         if u'固定资产变更' in self.name:
