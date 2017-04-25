@@ -290,6 +290,7 @@ class stock_request(models.Model):
             if buy_order_line:
                 # 增加原订单行的产品数量
                 buy_order_line.quantity += line.request_qty
+                buy_order_line.note = buy_order_line.note or ''
                 buy_order_line.note += u' %s' % (line.request_id.name)
             else:
                 # 创建购货订单行
