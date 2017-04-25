@@ -141,7 +141,7 @@ class mail_thread(models.AbstractModel):
         approvers = self.__add_approver__(thread_row, self._name)
         thread_row._approver_num = len(approvers)
         return thread_row
-    
+
     @api.multi
     def write(self, vals):
         '''
@@ -155,7 +155,11 @@ class mail_thread(models.AbstractModel):
                              'message_partner_ids',
                              'message_channel_ids',
                              'approve_uid',
-                             'approve_date']
+                             'approve_date',
+                             'voucher_id',
+                             'invoice_id',
+                             'modifying',
+                             ]
             if any([vals.has_key(x) for x in ignore_fields]) or not th._approver_num:
                 continue
             change_state = vals.get('state', False)

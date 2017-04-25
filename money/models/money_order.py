@@ -268,9 +268,6 @@ class money_order(models.Model):
             if order.advance_payment < 0:
                 raise UserError(u'本次核销金额不能大于付款金额。\n差额: %s'%(order.advance_payment))
 
-            order.to_reconcile = order.advance_payment
-            order.reconciled = order.amount - order.advance_payment
-
             total = 0
             for line in order.line_ids:
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
@@ -299,8 +296,11 @@ class money_order(models.Model):
                 source.name.to_reconcile -= source.this_reconcile
                 source.name.reconciled += source.this_reconcile
 
-            order.state = 'done'
-        return True
+        return order.write({
+            'to_reconcile': order.advance_payment,
+            'reconciled': order.amount - order.advance_payment,
+            'state': 'done',
+        })
 
     @api.multi
     def money_order_draft(self):
@@ -309,9 +309,6 @@ class money_order(models.Model):
         :return: 
         """
         for order in self:
-            order.to_reconcile = 0
-            order.reconciled = 0
-
             total = 0
             for line in order.line_ids:
                 if order.type == 'pay':  # 反审核：付款账号余额增加
@@ -332,8 +329,11 @@ class money_order(models.Model):
                 source.name.to_reconcile += source.this_reconcile
                 source.name.reconciled -= source.this_reconcile
 
-            order.state = 'draft'
-        return True
+        return order.write({
+            'to_reconcile': 0,
+            'reconciled': 0,
+            'state': 'draft',
+        })
 
 
 class money_order_line(models.Model):
@@ -545,24 +545,27 @@ class money_invoice(models.Model):
             'money.reconcile_order_form',
         ]
         # 判断当前数据库中否存在该 model
-        if self.env.ref('sell.model_sell_delivery'):
+        if self.env.get('sell.delivery') != None:
             res_models += ['sell.delivery']
             views += ['sell.sell_delivery_form']
-        if self.env.ref('warehouse.model_outsource'):
+        if self.env.get('outsource') != None:
             res_models += ['outsource']
             views += ['warehouse.outsource_form']
-        if self.env.ref('buy.model_buy_order'):
+        if self.env.get('buy.order') != None:
             res_models += ['buy.order']
             views += ['buy.buy_order_form']
-        if self.env.ref('buy.model_buy_receipt'):
+        if self.env.get('buy.receipt') != None:
             res_models += ['buy.receipt']
             views += ['buy.buy_receipt_form']
-        if self.env.ref('task.model_project'):
+        if self.env.get('project') != None:
             res_models += ['project']
             views += ['task.project_form']
-        if self.env.ref('asset.model_asset'):
+        if self.env.get('asset') != None:
             res_models += ['asset']
             views += ['asset.asset_form']
+        if self.env.get('cost.order') != None:
+            res_models += ['cost.order']
+            views += ['account_cost.cost_order_form']
         if u'固定资产变更' in self.name:
             code = self.name.replace(u'固定资产变更', '')
         elif u'固定资产' in self.name:
