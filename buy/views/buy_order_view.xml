@@ -18,6 +18,7 @@
 					<field name="approve_uid"/>
 					<field name='currency_id'
 						 groups='finance.group_multi_currency'/>
+					<field name="request_id"/>
 					<field name="state"/>
 					<field name="_approve_state"/>
 					<field name="goods_state"/>
@@ -70,6 +71,7 @@
 								<field name="money_state" readonly="1"/>
 								<field name='currency_id' readonly='1'
 									   groups='finance.group_multi_currency'/>
+								<field name="request_id" readonly="1"/>
 							</group>
 						</group>
 						<field name="line_ids">
