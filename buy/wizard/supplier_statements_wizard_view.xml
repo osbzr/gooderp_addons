@@ -21,10 +21,11 @@
             <field name='view_mode'>form</field>
             <field name='context'>{'default_supplier': True}</field>
             <field name='target'>new</field>
+            <field name='view_id' ref='money.partner_statements_report_wizard_form'/>
         </record>
 
         <!-- 供应商对账单向导 menu-->
-        <menuitem id="report_supplier_statements_action" name="供应商对账单" action="supplier_statements_report_wizard_action" parent="money.menu_money_report" sequence="2"/>
+        <menuitem id="money.report_supplier_statements_action" name="供应商对账单" action="supplier_statements_report_wizard_action" parent="money.menu_money_report" sequence="2"/>
 	</data>
 </openerp>
 	
