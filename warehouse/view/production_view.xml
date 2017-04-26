@@ -88,7 +88,6 @@
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost_unit'}" string='子件单位成本' />
                     <field name='line_out_ids' widget='relation_sublist' options="{'field': 'cost'}" string='子件成本' />
                     <field name='warehouse_id' />
-                    <field name="request_id" />
                     <field name='state' />
                     <field name="_approve_state"/>
                 </tree>
@@ -153,7 +152,6 @@
                                 <field name='finance_category_id'/>
                                 <field name='voucher_id' readonly='1'/>
                                 <field name='out_voucher_id' readonly='1'/>
-                                <field name="request_id" readonly="1"/>
                             </group>
                         </group>
 
