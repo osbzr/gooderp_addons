@@ -7,45 +7,13 @@ from odoo.exceptions import UserError
 
 
 class supplier_statements_report(models.Model):
-    _name = "supplier.statements.report"
-    _description = u"供应商对账单"
+    _inherit = "supplier.statements.report"
     _auto = False
-    _order = 'id, date'
 
-    @api.one
-    @api.depends('amount', 'pay_amount', 'partner_id')
-    def _compute_balance_amount(self):
-        pre_record = self.search([
-            ('id', '=', self.id - 1),
-            ('partner_id', '=', self.partner_id.id)
-        ])
-        # 相邻的两条记录，partner不同，应付款余额要清零并重新计算
-        if pre_record:
-            before_balance = pre_record.balance_amount
-        else:
-            before_balance = 0
-        self.balance_amount += before_balance + self.amount - self.pay_amount + self.discount_money
-
-    partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
-    name = fields.Char(string=u'单据编号', readonly=True)
-    date = fields.Date(string=u'单据日期', readonly=True)
-    done_date = fields.Datetime(string=u'完成日期', readonly=True)
     purchase_amount = fields.Float(string=u'采购金额', readonly=True,
                                    digits=dp.get_precision('Amount'))
     benefit_amount = fields.Float(string=u'优惠金额', readonly=True,
                                   digits=dp.get_precision('Amount'))
-    amount = fields.Float(string=u'应付金额', readonly=True,
-                          digits=dp.get_precision('Amount'))
-    pay_amount = fields.Float(string=u'实际付款金额', readonly=True,
-                              digits=dp.get_precision('Amount'))
-    discount_money = fields.Float(string=u'付款折扣', readonly=True,
-                                  digits=dp.get_precision('Amount'))
-    balance_amount = fields.Float(
-        string=u'应付款余额',
-        compute='_compute_balance_amount',
-        readonly=True,
-        digits=dp.get_precision('Amount'))
-    note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
     def init(self):

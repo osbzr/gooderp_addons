@@ -21,10 +21,11 @@
             <field name='view_mode'>form</field>
             <field name='context'>{'default_customer': True}</field>
             <field name='target'>new</field>
+            <field name='view_id' ref='money.partner_statements_report_wizard_form'/>
         </record>
 
 		<!-- 客户对账单向导 menu-->
-        <menuitem id="report_customer_statements_action" name="客户对账单" action="customer_statements_report_wizard_action" parent="money.menu_money_report" sequence="1"/>
+        <menuitem id="money.report_customer_statements_action" name="客户对账单" action="customer_statements_report_wizard_action" parent="money.menu_money_report" sequence="1"/>
 	</data>
 </openerp>
 	

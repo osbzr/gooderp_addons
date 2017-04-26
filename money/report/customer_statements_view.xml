@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--客户对账单tree-->
+		<record id="customer_statements_report_simple_tree" model="ir.ui.view">
+            <field name="name">customer.statements.report.simple.tree</field>
+            <field name="model">customer.statements.report</field>
+            <field name="arch" type="xml">
+                <tree string="客户对账单" create="false">
+                	<field name="date"/>
+                    <field name="name"/>
+                    <field name="note"/>
+                    <field name="amount"/>
+                    <field name="pay_amount"/>
+                    <field name="discount_money"/>
+                    <field name="balance_amount"/>
+                </tree>
+            </field>
+        </record>
+	</data>
+</openerp>
+	
