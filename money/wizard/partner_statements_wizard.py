@@ -38,11 +38,15 @@ class partner_statements_report_wizard(models.TransientModel):
                 raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' % (s.from_date, s.to_date))
 
             if self.env.context.get('default_customer'):  # 客户
-                view = self.env.ref('sell.customer_statements_report_tree')
+                view = self.env.get('sell.order') != None \
+                       and self.env.ref('sell.customer_statements_report_tree') \
+                       or self.env.ref('money.customer_statements_report_simple_tree')
                 name = u'客户对账单:' + s.partner_id.name
                 res_model = 'customer.statements.report'
             else:  # 供应商
-                view = self.env.ref('buy.supplier_statements_report_tree')
+                view = self.env.get('buy.order') != None \
+                       and self.env.ref('buy.supplier_statements_report_tree') \
+                       or self.env.ref('money.supplier_statements_report_simple_tree')
                 name = u'供应商对账单:' + s.partner_id.name
                 res_model = 'supplier.statements.report'
 
