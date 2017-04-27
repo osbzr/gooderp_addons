@@ -116,25 +116,10 @@ class TestInventory(TransactionCase):
         mouse.inventory_qty = mouse.real_qty + 2
         self.assertEqual(mouse.onchange_qty(), warning)
 
-        # 盘盈盘亏数量和辅助单位数量的盈亏方向应该一致
-        warning = {'warning': {
-            'title': u'错误',
-            'message': u'盘盈盘亏数量应该与辅助单位的盘盈盘亏数量盈亏方向一致',
-        }}
-        mouse.inventory_qty = mouse.real_qty - 1
-        mouse.inventory_uos_qty = mouse.real_uos_qty + 1
-        self.assertEqual(mouse.onchange_qty(), warning)
-
         # 实际辅助数量改变的时候，实际数量应该跟着改变
         mouse.inventory_uos_qty = mouse.real_uos_qty + 1
         mouse.onchange_uos_qty()
         self.assertEqual(mouse.goods_id.conversion_unit(mouse.inventory_uos_qty), mouse.inventory_qty)
-
-        # 盘盈盘亏数量与辅助单位的盘盈盘亏数量盈亏方向不一致的时候，此时没法生成盘盈盘亏单据
-        mouse.difference_qty = -1
-        mouse.difference_uos_qty = 1
-        with self.assertRaises(UserError):
-            self.inventory.generate_inventory()
 
         mouse.line_role_back()
         mouse.inventory_qty = mouse.real_qty + 1
