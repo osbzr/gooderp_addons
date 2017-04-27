@@ -78,10 +78,13 @@ class staff_wages(models.Model):
         """
         if not self.voucher_id:
             raise UserError(u'工资单还未计提，请先计提')
-        self._other_pay()   # 支付工资的其他支出单
+        other_money_order = self._other_pay()   # 支付工资的其他支出单
         self.create_other_pay_housing_fund()  # 住房公积金的其他支出单
         self.create_other_pay_social_security()   # 社保的其他支出单
-        self.state = 'done'
+        self.write({
+            'other_money_order': other_money_order.id,
+            'state': 'done',
+        })
 
     def voucher_unlink(self, voucher):
         """
@@ -272,9 +275,10 @@ class staff_wages(models.Model):
         self.create_credit_line(vouch_obj, u'提本月公积金', housing_co.account_id, self.totoal_housing_fund_co)
         return vouch_obj
 
-    @api.one
+    @api.multi
     def _other_pay(self):
         '''选择结算账户，生成其他支出单 '''
+        self.ensure_one()
         staff_wages = self.env.ref('staff_wages.staff_wages')
         endowment = self.env.ref('staff_wages.endowment')
         unemployment = self.env.ref('staff_wages.unemployment')
@@ -287,7 +291,6 @@ class staff_wages(models.Model):
             'date': fields.Date.context_today(self),
             'bank_id': self.payment.id,
         })
-        self.write({'other_money_order': other_money_order.id})
         self.env['other.money.order.line'].create({
             'other_money_id': other_money_order.id,
             'amount': self.totoal_wage,
