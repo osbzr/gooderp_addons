@@ -103,6 +103,7 @@
                     	<group>
 		                	<field name="discount_amount" groups="money.reconcile_groups"/>
                             <field name="discount_account_id" attrs="{'required': [('discount_amount', '!=', 0)]}"
+                                   options="{'no_open': True, 'no_create': True}"
                                    groups="money.reconcile_groups"/>
 		                </group>
 		                <group>	
