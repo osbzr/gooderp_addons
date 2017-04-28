@@ -85,7 +85,7 @@ class test_track_wizard(TransactionCase):
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
-        order_2 = self.order.copy()
+        order_2 = self.env.ref('buy.buy_order_1_same')
         for line in order_2.line_ids:
             line.goods_id = self.env.ref('goods.mouse').id
         order_2.bank_account_id = False

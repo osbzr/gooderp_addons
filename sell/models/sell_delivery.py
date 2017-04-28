@@ -352,7 +352,7 @@ class sell_delivery(models.Model):
             cost = self.is_return and -line.cost or line.cost
             if not cost:
                 # 缺货审核发货单时不产生出库凭证
-                return True
+                return
             sum_amount += cost
             if line.amount:  # 贷方明细
                 self._create_voucher_line(line.goods_id.category_id.account_id,
@@ -363,9 +363,9 @@ class sell_delivery(models.Model):
 
         if len(voucher.line_ids) > 0:
             voucher.voucher_done()
+            return voucher
         else:
             voucher.unlink()
-        return voucher
 
     @api.multi
     def sell_delivery_done(self):
@@ -387,8 +387,8 @@ class sell_delivery(models.Model):
             # 发货单/退货单 生成结算单
             invoice_id = record._delivery_make_invoice()
             self.write({
-                'voucher_id': voucher.id,
-                'invoice_id': invoice_id.id,
+                'voucher_id': voucher and voucher.id,
+                'invoice_id': invoice_id and invoice_id.id,
                 'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
             })
             # 销售费用产生结算单

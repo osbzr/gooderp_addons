@@ -365,9 +365,9 @@ class buy_receipt(models.Model):
 
         if len(vouch_id.line_ids) > 0:
             vouch_id.voucher_done()
+            return vouch_id
         else:
             vouch_id.unlink()
-        return vouch_id
 
     @api.one
     def buy_receipt_done(self):
@@ -386,8 +386,8 @@ class buy_receipt(models.Model):
         # 入库单/退货单 生成结算单
         invoice_id = self._receipt_make_invoice()
         self.write({
-            'voucher_id': voucher.id,
-            'invoice_id': invoice_id.id,
+            'voucher_id': voucher and voucher.id,
+            'invoice_id': invoice_id and invoice_id.id,
             'state': 'done',    # 为保证审批流程顺畅，否则，未审批就可审核
         })
         # 采购费用产生结算单
