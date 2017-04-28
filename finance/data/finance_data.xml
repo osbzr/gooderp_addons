@@ -899,42 +899,6 @@
             <field name='costs_types'>out</field>
             <field name='balance_directions'>in</field>
         </record>
-        <record id='management_endowment' model='finance.account'>
-            <field name='code'>5602023</field>
-            <field name='name'>管理费用-养老保险</field>
-            <field name='costs_types'>out</field>
-            <field name='balance_directions'>in</field>
-        </record>
-        <record id='management_health' model='finance.account'>
-            <field name='code'>5602024</field>
-            <field name='name'>管理费用-医疗保险</field>
-            <field name='costs_types'>out</field>
-            <field name='balance_directions'>in</field>
-        </record>
-        <record id='management_unemployment' model='finance.account'>
-            <field name='code'>5602025</field>
-            <field name='name'>管理费用-失业保险</field>
-            <field name='costs_types'>out</field>
-            <field name='balance_directions'>in</field>
-        </record>
-        <record id='management_injury' model='finance.account'>
-            <field name='code'>5602026</field>
-            <field name='name'>管理费用-工伤保险</field>
-            <field name='costs_types'>out</field>
-            <field name='balance_directions'>in</field>
-        </record>
-        <record id='management_maternity' model='finance.account'>
-            <field name='code'>5602027</field>
-            <field name='name'>管理费用-生育保险</field>
-            <field name='costs_types'>out</field>
-            <field name='balance_directions'>in</field>
-        </record>
-        <record id='management_housing_fund' model='finance.account'>
-            <field name='code'>5602028</field>
-            <field name='name'>管理费用-住房公积金</field>
-            <field name='costs_types'>out</field>
-            <field name='balance_directions'>in</field>
-        </record>
 
         <record id='small_business_chart5603001' model='finance.account'>
             <field name='code'>5603001</field>
