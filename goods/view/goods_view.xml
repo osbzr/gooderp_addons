@@ -39,7 +39,7 @@
 							<group>
 	            				<div>
 	            					<field name='image' widget='image'
-	            						options='{"preview_image": "image", "size": [300, 300]}'/>
+	            						options='{"preview_image": "image", "width": "100%"}'/>
 	            				</div>
 							</group>
                 		</group>
