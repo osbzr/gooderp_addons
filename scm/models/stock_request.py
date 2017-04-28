@@ -42,12 +42,6 @@ class stock_request(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    buy_order_ids = fields.One2many('buy.order',
-                                    'request_id',
-                                    u'购货订单')
-    assembly_ids = fields.One2many('wh.assembly',
-                                   'request_id',
-                                   u'组装单')
 
     @api.one
     def stock_query(self):
@@ -229,6 +223,8 @@ class stock_request(models.Model):
                     assembly.onchange_bom()
                     assembly.goods_qty = line.request_qty
                     assembly.onchange_goods_qty()
+                    assembly.note = assembly.note or ''
+                    assembly.note += u' 补货申请单号：%s' % line.request_id.name
 
                     # 如果待处理行中有属性，则把它传至组装单的组合件行中
                     if line.attribute_id:
@@ -258,7 +254,6 @@ class stock_request(models.Model):
                             todo_buy_lines.append(request_line_ids)
                         else:
                             todo_produce_lines.append(request_line_ids)
-                    assembly.request_id = line.request_id.id
 
         # 处理待生成购货订单行
         for line in todo_buy_lines:
@@ -296,7 +291,6 @@ class stock_request(models.Model):
                 # 创建购货订单行
                 vals = self._get_buy_order_line_data(line, buy_order)
                 self.env['buy.order.line'].create(vals)
-            buy_order.request_id = line.request_id.id
 
         self.state = 'done'
 

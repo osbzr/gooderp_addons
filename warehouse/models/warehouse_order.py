@@ -314,11 +314,3 @@ class wh_internal(models.Model):
     @create_origin
     def create(self, vals):
         return super(wh_internal, self).create(vals)
-
-# 补货申请模型定义在这里避免升级出错
-class stock_request(models.Model):
-    _name = 'stock.request'
-    _inherit = ['mail.thread']
-    _description = u'补货申请'
-
-    name = fields.Char(u'编号')

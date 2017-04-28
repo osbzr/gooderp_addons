@@ -49,11 +49,6 @@ class wh_assembly(models.Model):
                              help=u"(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
     out_voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
-    request_id = fields.Many2one('stock.request',
-                                 u'补货申请单',
-                                 copy=False,
-                                 ondelete='restrict',
-                                 help=u'该单据关联的补货申请单')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -101,7 +96,6 @@ class wh_assembly(models.Model):
     @api.onchange('goods_id')
     def onchange_goods_id(self):
         if self.goods_id:
-            print '00000'
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                              'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id,
                              'type': 'in'}]
