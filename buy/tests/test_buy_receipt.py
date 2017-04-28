@@ -123,13 +123,10 @@ class test_buy_receipt(TransactionCase):
             self.receipt.unlink()
 
         # 反审核购货订单，测试删除buy_receipt时是否可以删除关联的wh.move.line记录
-        order = self.order.copy()
-        order.buy_order_done()
+        self.receipt.buy_receipt_draft()
 
-        receipt = self.env['buy.receipt'].search(
-                       [('order_id', '=', order.id)])
-        move_id = receipt.buy_move_id.id
-        order.buy_order_draft()
+        move_id = self.receipt.buy_move_id.id
+        self.order.buy_order_draft()
         move = self.env['wh.move'].search(
                [('id', '=', move_id)])
         self.assertTrue(not move)
@@ -324,7 +321,13 @@ class test_buy_receipt(TransactionCase):
 
     def test_buy_receipt_done_currency(self):
         """入库单选择外币时审核"""
-        self.receipt.currency_id = self.env.ref('base.USD')
+        self.order.buy_order_draft()
+        self.order.currency_id = self.env.ref('base.USD')
+        for line in self.order.line_ids:
+            line.tax_rate = 0
+        self.order.buy_order_done()
+        self.receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id)])
         self.receipt.buy_receipt_done()
 
 

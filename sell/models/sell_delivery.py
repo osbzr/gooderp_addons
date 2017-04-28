@@ -257,7 +257,6 @@ class sell_delivery(models.Model):
             invoice_id = self.env['money.invoice'].create(
                 self._get_invoice_vals(self.partner_id, category, self.date, amount, tax_amount)
             )
-            self.invoice_id = invoice_id.id
         return invoice_id
 
     def _sell_amount_to_invoice(self):
@@ -353,7 +352,7 @@ class sell_delivery(models.Model):
             cost = self.is_return and -line.cost or line.cost
             if not cost:
                 # 缺货审核发货单时不产生出库凭证
-                return True
+                return
             sum_amount += cost
             if line.amount:  # 贷方明细
                 self._create_voucher_line(line.goods_id.category_id.account_id,
@@ -362,12 +361,11 @@ class sell_delivery(models.Model):
             self._create_voucher_line(self.sell_move_id.finance_category_id.account_id,
                                       sum_amount, 0, voucher, False, 0)
 
-        self.voucher_id = voucher
-        if len(self.voucher_id.line_ids) > 0:
-            self.voucher_id.voucher_done()
+        if len(voucher.line_ids) > 0:
+            voucher.voucher_done()
+            return voucher
         else:
-            self.voucher_id.unlink()
-        return voucher
+            voucher.unlink()
 
     @api.multi
     def sell_delivery_done(self):
@@ -385,9 +383,14 @@ class sell_delivery(models.Model):
             if record.order_id:
                 record._line_qty_write()
             # 创建出库的会计凭证，生成盘盈的入库单的不产生出库凭证
-            record.create_voucher()
+            voucher = record.create_voucher()
             # 发货单/退货单 生成结算单
             invoice_id = record._delivery_make_invoice()
+            self.write({
+                'voucher_id': voucher and voucher.id,
+                'invoice_id': invoice_id and invoice_id.id,
+                'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
+            })
             # 销售费用产生结算单
             record._sell_amount_to_invoice()
             # 生成收款单，并审核
@@ -415,15 +418,20 @@ class sell_delivery(models.Model):
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
                 [('name', '=', self.invoice_id.name)])
-        for invoice in invoice_ids:
-            invoice.money_invoice_draft()
-            invoice.unlink()
+        invoice_ids.money_invoice_draft()
+        invoice_ids.unlink()
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单
-        self.modifying = False
+        self.write({
+            'modifying': False,
+            'state': 'draft',
+        })
         delivery_ids = self.search(
             [('order_id', '=', self.order_id.id)])
         if len(delivery_ids) > 1:
-            self.modifying = True
+            self.write({
+                'modifying': True,
+                'state': 'draft',
+            })
         # 将原始订单中已执行数量清零
         if self.order_id:
             line_ids = not self.is_return and self.line_in_ids or self.line_out_ids

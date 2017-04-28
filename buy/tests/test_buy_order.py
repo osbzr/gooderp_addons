@@ -38,16 +38,18 @@ class test_buy_order(TransactionCase):
         receipt.buy_receipt_done()
         self.order._get_buy_goods_state()
         self.assertTrue(self.order.goods_state == u'全部入库')
+
+    def test_get_buy_goods_state_part_in(self):
+        '''返回收货状态：部分入库'''
         # 采购订单行的已入库数量小于产品数量时，将产品状态写为部分入库
-        order_copy_1 = self.order.copy()
-        order_copy_1.buy_order_done()
+        self.order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
-                  [('order_id', '=', order_copy_1.id)])
+                  [('order_id', '=', self.order.id)])
         for line in receipt.line_in_ids:
             line.goods_qty = 5
         receipt.buy_receipt_done()
-        order_copy_1._get_buy_goods_state()
-        self.assertTrue(order_copy_1.goods_state == u'部分入库')
+        self.order._get_buy_goods_state()
+        self.assertTrue(self.order.goods_state == u'部分入库')
 
     def test_default_warehouse_dest(self):
         '''新建购货订单时默认调入仓库'''
@@ -104,7 +106,6 @@ class test_buy_order(TransactionCase):
         with self.assertRaises(UserError):
             self.order.unlink()
         # 删除草稿状态的采购订单
-        self.order.copy()
         self.order.buy_order_draft()
         self.order.unlink()
 
@@ -185,7 +186,6 @@ class test_buy_order(TransactionCase):
         receipt = self.env['buy.receipt'].search(
                   [('order_id', '=', self.order.id)])
         receipt.buy_receipt_done()
-        self.order.buy_generate_receipt()
         self.assertTrue(self.order.goods_state == u'全部入库')
         # 批次管理拆分订单行
         new_order = self.order.copy()

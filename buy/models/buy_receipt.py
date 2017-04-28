@@ -255,7 +255,6 @@ class buy_receipt(models.Model):
             invoice_id = self.env['money.invoice'].create(
                 self._get_invoice_vals(self.partner_id, categ, self.date, amount, tax_amount)
             )
-            self.invoice_id = invoice_id.id
         return invoice_id
 
     @api.one
@@ -323,7 +322,7 @@ class buy_receipt(models.Model):
         })
         return voucher
 
-    @api.one
+    @api.multi
     def create_voucher(self):
         '''
         借： 商品分类对应的会计科目 一般是库存商品
@@ -333,6 +332,7 @@ class buy_receipt(models.Model):
 
         采购退货单生成的金额为负
         '''
+        self.ensure_one()
         vouch_id = self.env['voucher'].create({'date': self.date})
 
         sum_amount = 0
@@ -363,12 +363,11 @@ class buy_receipt(models.Model):
                 self._create_voucher_line(category_expense.account_id,
                                           0, -sum_amount, vouch_id, False, 0)
 
-        self.voucher_id = vouch_id
-        if len(self.voucher_id.line_ids) > 0:
-            self.voucher_id.voucher_done()
+        if len(vouch_id.line_ids) > 0:
+            vouch_id.voucher_done()
+            return vouch_id
         else:
-            self.voucher_id.unlink()
-        return vouch_id
+            vouch_id.unlink()
 
     @api.one
     def buy_receipt_done(self):
@@ -382,10 +381,15 @@ class buy_receipt(models.Model):
         self._line_qty_write()
 
         # 创建入库的会计凭证
-        self.create_voucher()
+        voucher = self.create_voucher()
 
         # 入库单/退货单 生成结算单
         invoice_id = self._receipt_make_invoice()
+        self.write({
+            'voucher_id': voucher and voucher.id,
+            'invoice_id': invoice_id and invoice_id.id,
+            'state': 'done',    # 为保证审批流程顺畅，否则，未审批就可审核
+        })
         # 采购费用产生结算单
         self._buy_amount_to_invoice()
         # 生成付款单
@@ -413,11 +417,17 @@ class buy_receipt(models.Model):
         invoice_ids.money_invoice_draft()
         invoice_ids.unlink()
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单
-        self.modifying = False
+        self.write({
+            'modifying': False,
+            'state': 'draft',
+        })
         receipt_ids = self.search(
             [('order_id', '=', self.order_id.id)])
         if len(receipt_ids) > 1:
-            self.modifying = True
+            self.write({
+                'modifying': True,
+                'state': 'draft',
+            })
         # 修改订单行中已执行数量
         if self.order_id:
             line_ids = not self.is_return and self.line_in_ids or self.line_out_ids
@@ -427,10 +437,10 @@ class buy_receipt(models.Model):
         self.buy_move_id.cancel_approved_order()
 
         # 反审核采购入库单时删除对应的入库凭证
-        if self.voucher_id:
-            if self.voucher_id.state == 'done':
-                self.voucher_id.voucher_draft()
-            self.voucher_id.unlink()
+        voucher, self.voucher_id = self.voucher_id, False
+        if voucher.state == 'done':
+            voucher.voucher_draft()
+        voucher.unlink()
 
     @api.one
     def buy_share_cost(self):

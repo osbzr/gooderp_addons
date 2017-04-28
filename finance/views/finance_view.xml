@@ -17,6 +17,8 @@
                     <filter string="本期"
                             domain="[('date','&gt;=',(context_today()).strftime('%%Y-%%m-01')),
                             ('date','&lt;=',(context_today()).strftime('%%Y-%%m-%%d'))]"/>
+                    <separator/>
+                    <filter string="草稿" domain="[('state','=', 'draft')]"/>
                     <group expand="0" string="分组">
                         <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
                     </group>
@@ -55,9 +57,9 @@
                                 />
                                 <field name='partner_id' options="{'no_open': True, 'no_create': True}"
                                        domain="[('name','=',False)]"/>
-                                <field name='goods_qty' groups='finance.group_account_goods'
-                                        domain="[('name','=',False)]"/>
-                                <field name='goods_id' groups='finance.group_account_goods'/>
+                                <field name='goods_id' groups='finance.group_account_goods'
+                                       domain="[('name','=',False)]"/>
+                                <field name='goods_qty' groups='finance.group_account_goods'/>
                                 <field name='auxiliary_id' domain="[('name','=',False)]"/>
                                 <field name='currency_id'  options="{'no_create': True}"
                                 	 groups='finance.group_multi_currency'/>

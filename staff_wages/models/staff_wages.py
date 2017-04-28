@@ -78,10 +78,13 @@ class staff_wages(models.Model):
         """
         if not self.voucher_id:
             raise UserError(u'工资单还未计提，请先计提')
-        self._other_pay()   # 支付工资的其他支出单
+        other_money_order = self._other_pay()   # 支付工资的其他支出单
         self.create_other_pay_housing_fund()  # 住房公积金的其他支出单
         self.create_other_pay_social_security()   # 社保的其他支出单
-        self.state = 'done'
+        self.write({
+            'other_money_order': other_money_order.id,
+            'state': 'done',
+        })
 
     def voucher_unlink(self, voucher):
         """
@@ -184,74 +187,18 @@ class staff_wages(models.Model):
         res = {}
         for line in self.line_ids:
             staff = self.env['staff.contract'].search([('staff_id', '=', line.name.id)])
-            debit_account = staff.job_id and staff.job_id.account_id or self.env.ref('finance.small_business_chart5602001')
+            debit_account = staff.job_id and staff.job_id.account_id \
+                            or self.env.ref('finance.small_business_chart5602001')
             if debit_account not in res:
                 res[debit_account] = {'debit': 0}
             val = res[debit_account]
-            val.update({'debit': val.get('debit') + line.all_wage,
-                        'voucher_id': vouch_obj.id,
-                        'account_id': debit_account.id,
-                        'name': u'提本月工资'})
-            account_housing = self.env.ref('finance.management_housing_fund')
-            if account_housing not in res:
-                res[account_housing] = {'debit': 0}
-            val = res[account_housing]
             val.update({
-                'debit': val.get('debit') + line.housing_fund_co,
+                'debit': val.get('debit') + line.all_wage + line.housing_fund_co \
+                         + line.endowment_co + line.health_co + line.unemployment_co \
+                         + line.injury + line.maternity,
                 'voucher_id': vouch_obj.id,
-                'account_id': account_housing.id,
-                'name': u'提本月公积金',
-            })
-            account_endowment = self.env.ref('finance.management_endowment')
-            if account_endowment not in res:
-                res[account_endowment] = {'debit': 0}
-            val = res[account_endowment]
-            val.update({
-                'debit': val.get('debit') + line.endowment_co,
-                'voucher_id': vouch_obj.id,
-                'account_id': account_endowment.id,
-                'name': u'提本月养老保险',
-            })
-            account_health = self.env.ref('finance.management_health')
-            if account_health not in res:
-                res[account_health] = {'debit': 0}
-            val = res[account_health]
-            val.update({
-                'debit': val.get('debit') + line.health_co,
-                'voucher_id': vouch_obj.id,
-                'account_id': account_health.id,
-                'name': u'提本月医疗保险',
-            })
-            account_unemployment = self.env.ref('finance.management_unemployment')
-            if account_unemployment not in res:
-                res[account_unemployment] = {'debit': 0}
-            val = res[account_unemployment]
-            val.update({
-                'debit': val.get('debit') + line.unemployment_co,
-                'voucher_id': vouch_obj.id,
-                'account_id': account_unemployment.id,
-                'name': u'提本月失业保险',
-            })
-            account_injury = self.env.ref('finance.management_injury')
-            if account_injury not in res:
-                res[account_injury] = {'debit': 0}
-            val = res[account_injury]
-            val.update({
-                'debit': val.get('debit') + line.injury,
-                'voucher_id': vouch_obj.id,
-                'account_id': account_injury.id,
-                'name': u'提本月工伤保险',
-            })
-            account_maternity = self.env.ref('finance.management_maternity')
-            if account_maternity not in res:
-                res[account_maternity] = {'debit': 0}
-            val = res[account_maternity]
-            val.update({
-                'debit': val.get('debit') + line.maternity,
-                'voucher_id': vouch_obj.id,
-                'account_id': account_maternity.id,
-                'name': u'提本月生育保险',
-            })
+                'account_id': debit_account.id,
+                'name': u'提本月工资'})
 
         #生成借方凭证行
         for account_id,val in res.iteritems():
@@ -272,9 +219,10 @@ class staff_wages(models.Model):
         self.create_credit_line(vouch_obj, u'提本月公积金', housing_co.account_id, self.totoal_housing_fund_co)
         return vouch_obj
 
-    @api.one
+    @api.multi
     def _other_pay(self):
         '''选择结算账户，生成其他支出单 '''
+        self.ensure_one()
         staff_wages = self.env.ref('staff_wages.staff_wages')
         endowment = self.env.ref('staff_wages.endowment')
         unemployment = self.env.ref('staff_wages.unemployment')
@@ -287,7 +235,6 @@ class staff_wages(models.Model):
             'date': fields.Date.context_today(self),
             'bank_id': self.payment.id,
         })
-        self.write({'other_money_order': other_money_order.id})
         self.env['other.money.order.line'].create({
             'other_money_id': other_money_order.id,
             'amount': self.totoal_wage,
@@ -405,11 +352,14 @@ class staff_wages(models.Model):
     @api.one
     def staff_wages_draft(self):
         if self.other_money_order:
-            other_money_order, self.other_money_order = self.other_money_order, False
+            other_money_order = self.other_money_order
+            self.write({
+                'other_money_order': False,
+                'state': 'draft',
+            })
             if other_money_order.state == 'done':
                 other_money_order.other_money_draft()
             other_money_order.unlink()
-        self.state = 'draft'
 
     @api.multi
     def unlink(self):
