@@ -94,7 +94,8 @@
 			<field name='domain'>[('user_id','=',uid)]</field>
         </record>
 
-		<menuitem id='menu_to_approve_process' name='待审批' action='good_process_approver_action'  web_icon="good_process,static/description/icon.png" sequence='998'/>
+		<menuitem id='menu_to_approve_process' name='待审批' action='good_process_approver_action'
+		   groups="home_page.group_mail" web_icon="good_process,static/description/icon.png" sequence='998'/>
 
     </data>
 </openerp>
