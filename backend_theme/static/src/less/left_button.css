@@ -1,32 +1,89 @@
+
 @media screen and (max-width: 800px) {
-	.small_show {
-		display:block;
-	}
+    .small_show {
+        display:block;
+    }
 
-	.big_show {
-		display:none;
-	}
+    .big_show{
+        display:none;
+    }
 }
 
-@media screen and (min-width:800px){
-	.small_show {
-		display:none;
-	}
-	
-	.big_show {
-		display:block;
-		overflow:auto;
-		width:60px;
-		height:100%;
-		border:1px solid #cccccc;
-		text-align: center;
-		overFlow-x:hidden;
-	}
+@media screen and (min-width:800px) {
+    .small_show {
+        display:none;
+    }
+    
+    .big_show {
+        display:block;
+        background: #777;
+        padding-top: 30px;
+        width:100px;
+        height:100%;
+        border:1px solid #cccccc;
+        text-align: center;
+		display: block;
+        overflow: auto;
+
+
+    }
 }
 
+
+
+
+@media screen and (max-width: 800px) {
+    .o_sub_menu_logo {
+        display:none;
+    }
+
+    .container-fluid > .navbar-collapse {
+
+        line-height: 30px;
+    }
+
+   
+}
+
+
+
+@media screen and (min-width:800px) {
+    .o_sub_menu_logo {
+        max-height:50px;
+        height: 46px;
+        float: left;
+        display:table-cell;
+        text-align:center;
+        vertical-align: middle;
+    }
+
+    .o_sub_menu_logo img {
+        height: 36px;
+        padding: 6px 20px 4px 10px;
+        vertical-align: middle;
+    }
+    .container > .navbar-header, .container-fluid > .navbar-header, .container > .navbar-collapse, .container-fluid > .navbar-collapse {
+        
+        display: block;
+    }
+    
+    .o_web_client .navbar {
+
+        padding-top: 6px;
+    }
+
+}
+
+
+a {
+    color: #000000;
+}
+a:hover {
+    color: #000000;
+}
 /* 设置滚动条的样式 */
 ::-webkit-scrollbar {
-	width: 8px;
+	width: 2px;
 }/* 滚动槽 */
 ::-webkit-scrollbar-track {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
