@@ -8,13 +8,12 @@
 			<field name='arch' type='xml'>
 				<tree string='固定资产'>
                     <field name='code'/>
-                    <field name='date'/>
 					<field name='name'/>
+                    <field name='category_id'/>
 					<field name='cost'/>
-					<field name='tax'/>
 					<field name='no_depreciation'/>
-					<field name='depreciation_number'/>
-					<field name='category_id'/>
+                    <field name='surplus_value'/>
+                    <field name="cost_depreciation"/>					
                     <field name='state'/>
 				</tree>
 			</field>
@@ -112,36 +111,40 @@
                         <group>
                             <group>
                                 <field name='code'/>
-                                <field name="date"/>
                                 <field name="name"/>
-                                <field name="period_id"/>
-                            </group>
-                            <group>
-                                <field name="partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
-                                <field name="bank_account"/>
-                                <field name="no_depreciation"/>
-                                <field name="is_init" groups='core.master_groups'/>
                                 <field name="category_id"/>
+                                <field name="cost"/>
                             </group>
                             <group>
-                                <field name="cost"/>
-                                <field name="tax"/>
-                                <field name="amount"/>
-                                <field name="depreciation_previous"/>
                                 <field name="surplus_value"/>
+                                <field name="no_depreciation"/>
                                 <field name="depreciation_number"/>
                                 <field name="depreciation_value"/>
-                            </group>
-                            <group>
-                                <field name="account_asset"/>
-                                <field name="account_credit"/>
-                                <field name="account_depreciation"/>
-                                <field name="account_accumulated_depreciation"/>
                                 <field name="cost_depreciation"/>
                             </group>
                         </group>
                         <notebook>
-                            <page string="折旧明细行">
+                            <page string="入账">
+                              <group>
+                              <group>
+                                <field name="period_id"/>
+                                <field name="date"/>
+                                <field name="tax"/>
+                                <field name="amount"/>
+                                <field name="partner_id" domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                                <field name="bank_account"/>
+                                <field name="is_init" groups='core.master_groups'/>
+                                <field name="depreciation_previous" attrs="{'invisible': [('is_init', '=', False)]}" />
+                              </group>
+                              <group>
+                                <field name="account_credit"/>
+                                <field name="account_asset"/>
+                                <field name="account_depreciation"/>
+                                <field name="account_accumulated_depreciation"/>
+                              </group>
+                              </group>
+                            </page>
+                            <page string="折旧">
                                 <field name="line_ids">
                                      <tree string="折旧行" editable="bottom" create='0'>
                                          <field name="date"/>
@@ -150,7 +153,7 @@
                                      </tree>
                                 </field>
                             </page>
-                            <page string="变更明细">
+                            <page string="变更">
                                  <field name="chang_ids">
                                       <tree string="变更明细" editable="bottom" create='0'>
                                           <field name="date"/>

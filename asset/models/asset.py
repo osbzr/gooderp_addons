@@ -63,10 +63,9 @@ class asset(models.Model):
     def _get_cost_depreciation(self):
         self.cost_depreciation = (self.surplus_value - self.depreciation_value) / (self.depreciation_number or 1)
 
-    code = fields.Char(u'编码', required="1", states=READONLY_STATES)
+    code = fields.Char(u'编号', required="1", states=READONLY_STATES)
     date = fields.Date(u'记帐日期', required=True, states=READONLY_STATES)
     name = fields.Char(u'名称', required=True, states=READONLY_STATES)
-    att_count = fields.Integer(u'附单据', default=1, states=READONLY_STATES)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',
@@ -77,17 +76,20 @@ class asset(models.Model):
     cost = fields.Float(u'金额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
     tax = fields.Float(u'税额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
     amount = fields.Float(u'价税合计', digits=dp.get_precision('Amount'), store=True, compute='_get_amount')
-    bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict', states=READONLY_STATES)
-    partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', states=READONLY_STATES)
-    is_init = fields.Boolean(u'初始化固定资产', states=READONLY_STATES)
+    bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict', states=READONLY_STATES,
+                                   help=u'用于记录现金采购固定资产时的付款，据此生成其他支出单')
+    partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', states=READONLY_STATES,
+                                 help=u'用于记录采购固定资产时的应付账款，据此生成结算单')
+    is_init = fields.Boolean(u'初始化资产', states=READONLY_STATES)
     no_depreciation = fields.Boolean(u'不折旧')
     category_id = fields.Many2one('asset.category', u'固定资产分类', ondelete='restrict', required=True, states=READONLY_STATES)
     depreciation_previous = fields.Float(u'以前折旧', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
-    depreciation_number = fields.Float(u'折旧期间数', required=True, states=READONLY_STATES)
-    surplus_value = fields.Float(u'残值', digits=dp.get_precision('Amount'), store=True, compute='_get_surplus_value')
+    depreciation_number = fields.Integer(u'折旧期间数', required=True, states=READONLY_STATES)
+    surplus_value = fields.Float(u'净值', digits=dp.get_precision('Amount'), store=True, compute='_get_surplus_value')
     depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
     account_credit = fields.Many2one(
-        'finance.account', u'固定资产贷方科目', required=True, states=READONLY_STATES)
+        'finance.account', u'资产贷方科目', required=True, states=READONLY_STATES,
+        help=u'固定资产入账时：\n 如赊购，此处为应付科目；\n 如现购，此处为资金科目；\n 如自建，此处为在建工程')
     account_depreciation = fields.Many2one(
         'finance.account', u'折旧费用科目', required=True, states=READONLY_STATES)
     account_accumulated_depreciation = fields.Many2one(
@@ -446,9 +448,9 @@ class asset_line(models.Model):
     def _compute_period_id(self):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
-    order_id = fields.Many2one('asset', u'订单编号', index=True,
+    order_id = fields.Many2one('asset', u'资产', index=True,
                                required=True, ondelete='cascade')
-    cost_depreciation = fields.Float(u'每月折旧额', required=True, digits=dp.get_precision('Amount'))
+    cost_depreciation = fields.Float(u'折旧额', required=True, digits=dp.get_precision('Amount'))
     no_depreciation = fields.Float(u'未提折旧额')
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
