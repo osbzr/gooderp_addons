@@ -24,6 +24,7 @@ from odoo.exceptions import UserError
 class money_order(models.Model):
     _inherit = 'money.order'
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 copy=False,
                                  help=u'收付款单审核时生成的对应凭证')
 
     @api.multi
@@ -198,6 +199,7 @@ class money_order(models.Model):
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 copy=False,
                                  help=u'结算单审核时生成的对应凭证')
 
     @api.multi
@@ -397,6 +399,7 @@ TODO：这段代码未经严格测试验证，暂时注释掉 -- jeff 2017-3-4
 class other_money_order(models.Model):
     _inherit = 'other.money.order'
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 copy=False,
                                  help=u'其他收支单审核时生成的对应凭证')
 
     @api.multi
@@ -542,6 +545,7 @@ class other_money_order(models.Model):
 class money_transfer_order(models.Model):
     _inherit = 'money.transfer.order'
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+                                 copy=False,
                                  help=u'资金转账单审核时生成的对应凭证', copy=False)
 
     '''外币转外币暂时不做，只处理外币转本位币'''
