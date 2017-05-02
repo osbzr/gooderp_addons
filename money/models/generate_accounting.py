@@ -545,7 +545,6 @@ class other_money_order(models.Model):
 class money_transfer_order(models.Model):
     _inherit = 'money.transfer.order'
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
-                                 copy=False,
                                  help=u'资金转账单审核时生成的对应凭证', copy=False)
 
     '''外币转外币暂时不做，只处理外币转本位币'''
