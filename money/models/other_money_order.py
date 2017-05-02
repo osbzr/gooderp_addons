@@ -75,6 +75,7 @@ class other_money_order(models.Model):
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
+                       copy=False,
                        help=u'单据创建日期')
     name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/',
                        help=u'单据编号，创建时会根据类型自动生成')
@@ -88,6 +89,7 @@ class other_money_order(models.Model):
                               help=u'本次其他收支的结算账户')
     line_ids = fields.One2many('other.money.order.line', 'other_money_id',
                                string=u'收支单行', readonly=True,
+                               copy=True,
                                states={'draft': [('readonly', False)]},
                             help = u'其他收支单明细行')
     type = fields.Selection(TYPE_SELECTION, string=u'类型', readonly=True,
