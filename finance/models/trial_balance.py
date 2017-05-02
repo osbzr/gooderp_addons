@@ -18,11 +18,11 @@ class TrialBalance(models.Model):
             self.year_init_debit = self.year_init_credit = 0
             return True
         if self.subject_name_id.balance_directions == 'in':
-            #年初借 = 期末借 - 本年借 + 本年贷
+            #年初借 = 期末借 - 期末贷 - 本年借 + 本年贷
             self.year_init_debit = self.ending_balance_debit - self.ending_balance_credit -  self.cumulative_occurrence_debit + self.cumulative_occurrence_credit
             self.year_init_credit = 0
         else:
-            #年初贷 = 期末贷 - 本年贷 + 本年借
+            #年初贷 = 期末贷 - 期末借 - 本年贷 + 本年借
             self.year_init_credit = self.ending_balance_credit - self.ending_balance_debit - self.cumulative_occurrence_credit + self.cumulative_occurrence_debit
             self.year_init_debit = 0
     
