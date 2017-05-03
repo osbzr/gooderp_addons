@@ -23,8 +23,12 @@ class CreateExchangeWizard(models.TransientModel):
     @api.depends('date')
     def _compute_period_id(self):
         self.period_id = self.env['finance.period'].get_period(self.date)
+    
+    @api.model
+    def _get_last_date(self):
+        return self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[1]
 
-    date = fields.Date(u'记帐日期', required=True)
+    date = fields.Date(u'记帐日期', required=True, default=_get_last_date)
     period_id = fields.Many2one(
         'finance.period',
         u'会计期间',

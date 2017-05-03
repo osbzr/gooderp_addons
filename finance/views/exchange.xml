@@ -32,6 +32,7 @@
             />
 
         <menuitem id='create_exchange_menu_finance' name="期末调汇"
+                  groups="finance.group_multi_currency"
                   action='create_exchange_action' parent='finance.checkout_menu' sequence='20'/>
 
 	</data>
