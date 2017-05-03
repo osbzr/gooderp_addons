@@ -28,7 +28,7 @@ class TrialBalance(models.Model):
     
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
-    subject_name_id = fields.Many2one('finance.account', string=u'科目名称')
+    subject_name_id = fields.Many2one('finance.account', string=u'科目')
     year_init_debit = fields.Float(u'年初余额(借方)', default=0, compute=_get_year_init)
     year_init_credit = fields.Float(u'年初余额(贷方)', default=0, compute=_get_year_init)
     initial_balance_debit = fields.Float(u'期初余额(借方)', default=0)
@@ -153,7 +153,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         
         return {
             'type': 'ir.actions.act_window',
-            'name': u'科目余额表:' + self.period_id.name,
+            'name': u'科目余额表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'trial.balance',
@@ -250,12 +250,12 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     period_begin_id = fields.Many2one('finance.period', string=u'开始期间', default=_default_begin_period_id,
                                       help=u'默认是本年第一个期间')
     period_end_id = fields.Many2one('finance.period', string=u'结束期间', default=_default_end_period_id, help=u'默认是当前期间')
-    subject_name_id = fields.Many2one('finance.account', string=u'科目名称 从', default=_default_subject_name_id,
+    subject_name_id = fields.Many2one('finance.account', string=u'会计科目 从', default=_default_subject_name_id,
                                       help=u'默认是所有科目的最小code')
     subject_name_end_id = fields.Many2one('finance.account', string=u'到', default=_default_subject_name_end_id,
                                           help=u'默认是所有科目的最大code')
-    no_occurred = fields.Boolean(u'无发生额不显示', default=True, help=u'无发生额的科目不显示明细账，默认为不显示')
-    no_balance = fields.Boolean(u'无余额不显示', default=True, help=u'无余额的科目不显示明细账，默认为不显示')
+    no_occurred = fields.Boolean(u'有发生额', default=True, help=u'无发生额的科目不显示明细账，默认为不显示')
+    no_balance = fields.Boolean(u'有余额', default=True, help=u'无余额的科目不显示明细账，默认为不显示')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -482,9 +482,20 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                 for vals in create_vals:  # create_vals 值顺序为：期初余额  本期明细  本期本年累计
                     vouchers_summary_ids.append((self.env['vouchers.summary'].create(vals)).id)
         view_id = self.env.ref('finance.vouchers_summary_tree').id
+        
+        title = self.period_begin_id.name
+        if self.period_end_id != self.period_begin_id:
+            title += '-'
+            title += self.period_end_id.name
+        title += '_'
+        title += self.subject_name_id.name
+        if self.subject_name_end_id != self.subject_name_id:
+             title += '-'
+             title += self.subject_name_end_id.name
+        
         return {
             'type': 'ir.actions.act_window',
-            'name': u'明细账 : %s' % self.subject_name_id.name + u'~' + self.subject_name_end_id.name,
+            'name': u'明细账 : %s' % title,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'vouchers.summary',
@@ -534,9 +545,20 @@ class CreateVouchersSummaryWizard(models.TransientModel):
                     vouchers_summary_ids.append((self.env['general.ledger.account'].create(vals)).id)
 
         view_id = self.env.ref('finance.general_ledger_account_tree').id
+        
+        title = self.period_begin_id.name
+        if self.period_end_id != self.period_begin_id:
+            title += '-'
+            title += self.period_end_id.name
+        title += '_'
+        title += self.subject_name_id.name
+        if self.subject_name_end_id != self.subject_name_id:
+             title += '-'
+             title += self.subject_name_end_id.name
+        
         return {
             'type': 'ir.actions.act_window',
-            'name': u'总账 %s' % self.subject_name_id.name + u'~' + self.subject_name_end_id.name,
+            'name': u'总账 %s' % title,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'general.ledger.account',

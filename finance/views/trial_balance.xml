@@ -8,7 +8,6 @@
             <field name="arch" type="xml">
                 <tree string="科目余额表" create="false" edit='false'>
                 	<field name="period_id" readonly='1'/>
-                    <field name="subject_code" readonly='1'/>
                     <field name="subject_name_id" readonly='1'/>
                     <field name="initial_balance_debit" sum="合计" base_string='期初余额' merge="False" child_name='借方' colspan='2' readonly='1'/>
                     <field name="initial_balance_credit" sum="合计"  merge="True" child_name='贷方' readonly='1'/>
@@ -68,7 +67,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_trial_balance" string="查看科目余额表" type="object" class="oe_highlight"/>
+                        <button name="create_trial_balance" string="科目余额表" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
                     </footer>
@@ -105,8 +104,8 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="查看科目明细帐表" type="object" class="oe_highlight"/>
-                         <button name="create_general_ledger_account" invisible="context.get('create_vouchers_summary')" string="查看科目总账" type="object" class="oe_highlight"/>
+                        <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="科目明细帐表" type="object" class="oe_highlight"/>
+                         <button name="create_general_ledger_account" invisible="context.get('create_vouchers_summary')" string="科目总账" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
                     </footer>

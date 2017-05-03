@@ -50,7 +50,7 @@
                                 </group>
                                 <field name="notes" placeholder="其他信息 ..." colspan="4"/>
                             </page>
-                            <page string="个人信息">
+                            <page string="个人信息" groups='staff.hr_senior_groups'>
                                 <group>
                                     <group string="国籍和其他">
                                         <field name="birthday"/>
@@ -66,7 +66,7 @@
                                     </group>
                                 </group>
                             </page>
-                            <page string='合同'>
+                            <page string='合同' groups='staff.hr_senior_groups'>
                                 <field name='contract_ids'>
                                 	<tree editable='bottom'>
                                 		<field name="basic_wage"/>
@@ -93,7 +93,7 @@
                                 	</tree>
                                 </field>
                             </page>
-                            <page string="人力资源设置">
+                            <page string="人力资源设置" groups='staff.hr_senior_groups'>
                                 <group>
                                     <group string="生效" name="active_group">
                                         <field name="active"/>
