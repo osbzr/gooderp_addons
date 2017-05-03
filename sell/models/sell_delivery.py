@@ -354,7 +354,7 @@ class sell_delivery(models.Model):
                 # 缺货审核发货单时不产生出库凭证
                 return
             sum_amount += cost
-            if line.amount:  # 贷方明细
+            if line.cost:  # 贷方明细
                 self._create_voucher_line(line.goods_id.category_id.account_id,
                                           0, cost, voucher, line.goods_id, line.goods_qty)
         if sum_amount:  # 借方明细
