@@ -8,7 +8,6 @@
             <field name="arch" type="xml">
                 <tree string="科目余额表" create="false" edit='false'>
                 	<field name="period_id" readonly='1'/>
-                    <field name="subject_code" readonly='1'/>
                     <field name="subject_name_id" readonly='1'/>
                     <field name="initial_balance_debit" sum="合计" base_string='期初余额' merge="False" child_name='借方' colspan='2' readonly='1'/>
                     <field name="initial_balance_credit" sum="合计"  merge="True" child_name='贷方' readonly='1'/>
