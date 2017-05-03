@@ -65,24 +65,24 @@
 								<field name="other_wage" sum="补助金额"/>
 								<field name="deduction" sum="扣款金额"/>
 								<field name="all_wage" sum="应发工资金额"/>
-								<field name="endowment" groups='staff.hr_senior_groups'
+								<field name="endowment"
 									   sum="个人合计" base_string='养老' merge="False" child_name='个人' colspan='2'/>
-								<field name="endowment_co" groups='staff.hr_senior_groups'
+								<field name="endowment_co"
 									   sum="公司合计" merge="True" child_name='公司'/>
-								<field name="health" groups='staff.hr_senior_groups'
+								<field name="health"
 									   sum="个人合计" base_string='医保' merge="False" child_name='个人' colspan='2'/>
-								<field name="health_co" groups='staff.hr_senior_groups'
+								<field name="health_co"
 									   sum="公司合计" merge="True" child_name='公司'/>
-								<field name="unemployment" groups='staff.hr_senior_groups'
+								<field name="unemployment"
 									   sum="个人合计" base_string='失业' merge="False" child_name='个人' colspan='2'/>
-								<field name="unemployment_co" groups='staff.hr_senior_groups'
+								<field name="unemployment_co"
 									   sum="公司合计" merge="True" child_name='公司'/>
-								<field name="housing_fund" groups='staff.hr_senior_groups'
+								<field name="housing_fund"
 									   sum="个人合计" base_string='住房公积金' merge="False" child_name='个人' colspan='2'/>
-								<field name="housing_fund_co" groups='staff.hr_senior_groups'
+								<field name="housing_fund_co"
 									   sum="公司合计" merge="True" child_name='公司'/>
-								<field name="injury" groups='staff.hr_senior_groups'/>
-								<field name="maternity" groups='staff.hr_senior_groups'/>
+								<field name="injury"/>
+								<field name="maternity"/>
 								<field name="personal_tax" sum="个人所得税金额"/>
 								<field name="amount_wage" sum="实发工资金额"/>
 							</tree>
