@@ -431,11 +431,8 @@
 		<record model="ir.actions.act_window" id="action_timeline">
 			<field name="name">工作日志</field>
 			<field name="res_model">timeline</field>
-			<field name="view_mode">tree</field>
+			<field name="view_mode">tree,pivot</field>
 			<field name="context">{'search_default_today_timeline': 1}</field>
-			<field name="help" type="html">
-				<p class="oe_view_nocontent_create">点击创建一个工作日志</p>
-			</field>
 		</record>
 		<record model="ir.actions.act_window" id="action_timesheet_today">
 			<field name="name">今日工作日志</field>
