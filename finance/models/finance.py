@@ -355,7 +355,7 @@ class finance_period(models.Model):
         :return: 返回一个月的第一天和最后一天 （'2016-01-01','2016-01-31'）
         """
         month_day_range = calendar.monthrange(int(period_id.year), int(period_id.month))
-        return ("%s-%s-01" % (period_id.year, period_id.month), "%s-%s-%s" % (period_id.year, period_id.month, str(month_day_range[1])))
+        return ("%s-%s-01" % (period_id.year, period_id.month.zfill(2)), "%s-%s-%s" % (period_id.year, period_id.month.zfill(2), str(month_day_range[1])))
 
     @api.multi
     def get_year_fist_period_id(self):

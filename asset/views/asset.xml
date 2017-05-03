@@ -230,7 +230,7 @@
 			<field name='name'>asset.category.tree</field>
 			<field name='model'>asset.category</field>
 			<field name='arch' type='xml'>
-				<tree string='固定资产分类'>
+				<tree editable="top" string='固定资产分类'>
 					<field name='name'/>
 					<field name='account_accumulated_depreciation'/>
 					<field name='account_asset'/>
