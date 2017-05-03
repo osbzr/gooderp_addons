@@ -5,17 +5,17 @@
             <field name="name">month.product.cost.tree</field>
             <field name="model">month.product.cost</field>
             <field name="arch" type="xml">
-                <tree string="产品"  edit="false">
+                <tree string="成本账"   create="false" edit='false'>
                     <field name="goods_id"/>
                     <field name="period_id"/>
-                    <field name="period_begin_qty" sum="1"/>
-                    <field name="period_begin_cost" sum="1"/>
-                    <field name="current_period_out_qty" sum="1"/>
-                    <field name="current_period_out_cost" sum="1"/>
-                    <field name="current_period_in_qty" sum="1"/>
-                    <field name="current_period_in_cost" sum="1"/>
-                    <field name="current_period_remaining_qty" sum="1"/>
-                    <field name = "current_period_remaining_cost" sum="1"/>
+                    <field name="period_begin_qty" sum="1" base_string='期初余额' merge="False" child_name='数量' colspan='2' />
+                    <field name="period_begin_cost" sum="1" merge="True" child_name='成本'/> 
+                    <field name="current_period_in_qty" sum="1" base_string='本期入库' merge="False" child_name='数量' colspan='2' />
+                    <field name="current_period_in_cost" sum="1" merge="True" child_name='成本'/>
+                    <field name="current_period_out_qty" sum="1" base_string='本期出库' merge="False" child_name='数量' colspan='2' />
+                    <field name="current_period_out_cost" sum="1" merge="True" child_name='成本'/>
+                    <field name="current_period_remaining_qty" sum="1" base_string='期末余额' merge="False" child_name='数量' colspan='2' />
+                    <field name="current_period_remaining_cost" sum="1" merge="True" child_name='成本'/>
                 </tree>
             </field>
         </record>
@@ -30,7 +30,7 @@
                     <separator/>
                     <group expand="0" string="分组">
                         <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
-                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                        <filter string="商品" domain="[]" context="{'group_by':'goods_id'}"/>
                     </group>
                 </search>
             </field>
