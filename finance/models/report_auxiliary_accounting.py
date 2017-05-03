@@ -16,11 +16,6 @@ class report_auxiliary_accounting(models.Model):
     debit = fields.Float(u'借方金额', digits=dp.get_precision('Amount'))
     credit = fields.Float(u'贷方金额', digits=dp.get_precision('Amount'))
     balance = fields.Float(u'余额', digits=dp.get_precision('Amount'))
-    company_id = fields.Many2one(
-        'res.company',
-        string=u'公司',
-        change_default=True,
-        default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
     def view_voucher_line_detail(self):
