@@ -28,7 +28,7 @@ class TrialBalance(models.Model):
     
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
-    subject_name_id = fields.Many2one('finance.account', string=u'科目名称')
+    subject_name_id = fields.Many2one('finance.account', string=u'科目')
     year_init_debit = fields.Float(u'年初余额(借方)', default=0, compute=_get_year_init)
     year_init_credit = fields.Float(u'年初余额(贷方)', default=0, compute=_get_year_init)
     initial_balance_debit = fields.Float(u'期初余额(借方)', default=0)
