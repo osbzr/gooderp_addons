@@ -157,17 +157,18 @@
                     <field name='date'/>
                     <field name='name'/>
                     <field name='account_id'/>
+                    <field name='debit' sum='借方合计'/>
+                    <field name='credit' sum='贷方合计'/>
                     <field name='partner_id'/>
-                    <field name='goods_id'/>
+                    <field name='auxiliary_id'/>
+                    <field name='goods_id' groups='finance.group_account_goods'/>
+                    <field name='goods_qty' groups='finance.group_account_goods' sum='数量合计'/>
                     <field name='currency_id'
                     	 groups='finance.group_multi_currency'/>
                     <field name='currency_amount'  sum='外币合计'
                     	 groups='finance.group_multi_currency'/>
                     <field name='rate_silent'
                     	 groups='finance.group_multi_currency'/>
-                    <field name='auxiliary_id'/>
-                    <field name='debit' sum='借方合计'/>
-                    <field name='credit' sum='贷方合计'/>
                     <field name='state'/>
                     <field name='init_obj' invisible="1"/>
                 </tree>
