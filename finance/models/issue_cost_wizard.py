@@ -8,7 +8,7 @@ class MonthProductCost(models.Model):
     _description = u'每月发出成本'
 
     period_id = fields.Many2one('finance.period', string='会计期间')
-    goods_id = fields.Many2one('goods', string="产品")
+    goods_id = fields.Many2one('goods', string="商品")
     period_begin_qty = fields.Float(string='期初数量')
     period_begin_cost = fields.Float(string='期初成本')
     current_period_out_qty = fields.Float(string='本期出库量')

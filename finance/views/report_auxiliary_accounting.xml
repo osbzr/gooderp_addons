@@ -5,7 +5,7 @@
             <field name='name'>report.auxiliary.accounting.tree</field>
             <field name='model'>report.auxiliary.accounting</field>
             <field name='arch' type='xml'>
-                <tree string='辅助核算余额表'>
+                <tree string='辅助核算余额表' create="false" edit='false'>
                     <field name='account_id'/>
                     <field name='auxiliary_id'/>
                     <field name='debit'  sum="合计"/>

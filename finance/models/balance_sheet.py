@@ -116,7 +116,7 @@ class create_balance_sheet_wizard(models.TransientModel):
                                  + u'年' + self.period_id.month + u'月' + str(days) + u'日' + u',,,' + u'单位：元'
         return {     # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'资产负债表',
+            'name': u'资产负债表：'+ self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'balance.sheet',
@@ -149,7 +149,7 @@ class create_balance_sheet_wizard(models.TransientModel):
                                  + u'年' + self.period_id.month + u'月' + str(days) + u'日' + u',' + u'单位：元'
         return {      # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'利润表',
+            'name': u'利润表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'profit.statement',
