@@ -10,6 +10,13 @@ class cost_line(models.Model):
                               ondelete='cascade',
                               help=u'与销售费用相关联的出库单号')
 
+class money_order(models.Model):
+    _inherit = 'money.order'
+
+    sell_id = fields.Many2one('sell.order', u'销售订单',
+                              ondelete='restrict',
+                              help=u'与付款相关的销售订单号')
+
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'

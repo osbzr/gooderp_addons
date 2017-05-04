@@ -167,5 +167,17 @@
 				</search>
 			</field>
 		</record>
+		<record id="money_order_form_add_buy_order" model="ir.ui.view">
+            <field name="name">money.order.form</field>
+            <field name="model">money.order</field>
+            <field name='inherit_id' ref='money.money_order_form'/>
+            <field name="arch" type="xml">
+                <field name="voucher_id" position="after">
+                	<field name="buy_id"
+				            	invisible="context.get('default_get', 0)" 
+								groups="buy.buy_groups"/>
+                </field>
+            </field>
+        </record>
 	</data>
 </openerp>

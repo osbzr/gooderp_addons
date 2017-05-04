@@ -69,7 +69,7 @@
                             	 groups='finance.group_multi_currency'/>
                         </group>
                        <group>
-                            <field name="line_ids" nolabel="1">
+                            <field name="line_ids" nolabel="1" colspan='2'>
                                 <tree string="Money Order Lines" editable="bottom">
                                     <field name="bank_id"/>
                                     <field name="amount" sum="合计"/>
