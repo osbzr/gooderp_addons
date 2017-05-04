@@ -74,14 +74,6 @@
 		                </group>
 		            </group>
                     <field name="note" placeholder="备注"/>
-		            <group>
-						<group>
-		                	<field name="create_date" string="录单时间" readonly="1"/>
-		                </group>
-		                <group>	
-		                	<field name="write_date" string="最后修改时间"  readonly="1"/>
-		                </group>
-		            </group>
                 </sheet>
                 <div class="oe_chatter">
 	                    <field name="message_follower_ids" widget="mail_followers"/>
