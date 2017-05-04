@@ -74,7 +74,7 @@ class customer_statements_report(models.Model):
                         0 AS pay_amount,
                         0 as discount_money,
                         0 AS balance_amount,
-                        Null AS note
+                        mi.note AS note
                 FROM money_invoice AS mi
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
                 WHERE c.type = 'income' AND mi.state = 'done'
@@ -87,7 +87,7 @@ class customer_statements_report(models.Model):
                         sol.this_reconcile AS pay_amount,
                         0 AS discount_money,
                         0 AS balance_amount,
-                        Null AS note
+                        ro.note AS note
                 FROM reconcile_order AS ro
                 LEFT JOIN money_invoice AS mi ON mi.name = ro.name
                 LEFT JOIN source_order_line AS sol ON sol.receivable_reconcile_id = ro.id
