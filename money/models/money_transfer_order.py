@@ -55,13 +55,6 @@ class money_transfer_order(models.Model):
                                string=u'资金转账单行', readonly=True,
                                states={'draft': [('readonly', False)]},
                                help=u'资金转账单明细行')
-    discount_amount = fields.Float(string=u'折扣', readonly=True,
-                                   states={'draft': [('readonly', False)]},
-                                   digits=dp.get_precision('Amount'),
-                                   help=u'资金转换时，待抹去的零头数据')
-    discount_account_id = fields.Many2one('finance.account', u'折扣科目', ondelete='restrict',
-                                          readonly=True, states={'draft': [('readonly', False)]},
-                                          help=u'资金转换单审核生成凭证时，折扣额对应的科目')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
