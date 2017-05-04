@@ -603,15 +603,6 @@ class money_transfer_order(models.Model):
                          })
                 self.env['money.invoice'].create_voucher_line(vals)
 
-        # if self.discount_amount > 0:
-        #     self.env['voucher.line'].create({
-        #         'name': u"其他转账单%s" % (self.name),
-        #         'account_id': self.discount_account_id.id,
-        #         'credit': self.discount_amount,
-        #         'voucher_id': vouch_obj.id,
-        #         'partner_id': '',
-        #     })
-
         vouch_obj.voucher_done()
         return res
 

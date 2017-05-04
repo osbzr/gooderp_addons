@@ -761,6 +761,19 @@
 			<field name="domain">[('not_saleable','=',False)]</field>
 		</record>
 
+		<record id="money_order_form_add_sell_order" model="ir.ui.view">
+            <field name="name">money.order.form</field>
+            <field name="model">money.order</field>
+            <field name='inherit_id' ref='money.money_order_form'/>
+            <field name="arch" type="xml">
+                <field name="voucher_id" position="after">
+                	<field name="sell_id"
+				            	invisible="context.get('default_pay', 0)" 
+								groups="sell.sell_groups"/>
+                </field>
+            </field>
+        </record>
+
     	<!--根菜单-->
         <menuitem id='sell_menu' name='销货' groups='group_sell' web_icon="sell,static/description/icon.png"/>
     	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>

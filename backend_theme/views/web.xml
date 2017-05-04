@@ -61,7 +61,7 @@
                      >
                     <div class="container-fluid">
                         <div class="o_sub_menu_logo">
-                            <img src="/web/binary/company_logo"  />
+                            <img src="/web/static/src/img/logo.png"/>
                         </div>
                         <div class="navbar-header">
                             <!--

@@ -9,6 +9,13 @@ class cost_line(models.Model):
     buy_id = fields.Many2one('buy.receipt', u'入库单号', ondelete='cascade',
                              help=u'与采购费用关联的入库单号')
 
+class money_order(models.Model):
+    _inherit = 'money.order'
+
+    buy_id = fields.Many2one('buy.order', u'采购订单',
+                              ondelete='restrict',
+                              help=u'与付款相关的采购订单号')
+
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'

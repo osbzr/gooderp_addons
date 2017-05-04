@@ -27,7 +27,7 @@
                     <field name="name" string="单据编号"/>
                     <field name="date"/>
                     <field name="partner_id"/>
-                    <field name="amount"/>
+                    <field name="amount" sum="合计"/>
                     <field name="state"/>
                     <field name="_approve_state"/>
                     <field name="to_reconcile" sum="未核销总额"/>
@@ -46,7 +46,6 @@
                 		type="object" class="oe_highlight" groups='money.group_money_manager'/>
 					<button name="money_order_draft" states="done" string="反审核" 
 						type="object" groups='money.group_money_manager'/>
-                    <button name="write_off_reset" states="draft" string="核销行金额清零" type="object"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -57,35 +56,33 @@
                     </div>
                     <group>
                         <group>
+                            <field name="date"/>
 				            <field name="partner_id"
 				            	options="{'no_open': True, 'no_create': True}"/>
-                            <field name="voucher_id"/>
 				            <field name="bank_name"
 				            	invisible="context.get('default_get', 0)"
 				            	required="context.get('default_pay', 0)"/>
 				            <field name="bank_num"
 				            	invisible="context.get('default_get', 0)"
 				            	required="context.get('default_pay', 0)"/>
-                        </group>
-                        <group>
-                            <field name="date"/>
                             <field name="currency_id"
                             	 groups='finance.group_multi_currency'/>
+                        </group>
+                       <group>
+                            <field name="line_ids" nolabel="1" colspan='2'>
+                                <tree string="Money Order Lines" editable="bottom">
+                                    <field name="bank_id"/>
+                                    <field name="amount" sum="合计"/>
+                                    <field name="currency_id"
+                                        groups='finance.group_multi_currency'/>
+                                    <field name="mode_id" groups='core.settle_mode_groups'/>
+                                    <field name="number" groups='core.settle_mode_groups'/>
+                                    <field name="note"/>
+                            </tree>
+                            </field>
                         </group>
                     </group>
-                    <label string="收/付款行"/>
-                    <field name="line_ids">
-                    	<tree string="Money Order Lines" editable="bottom">
-                    		<field name="bank_id"/>
-                            <field name="amount" sum="合计"/>
-                            <field name="currency_id"
-                            	 groups='finance.group_multi_currency'/>
-                            <field name="mode_id" groups='core.settle_mode_groups'/>
-                            <field name="number" groups='core.settle_mode_groups'/>
-                            <field name="note"/>
-                       </tree>
-                    </field>
-                    <label string="核销行" groups='money.reconcile_groups'/>
+                    <button name="write_off_reset" states="draft" string="核销行金额清零" type="object" class="oe_right"/>
                     <field name="source_ids" groups='money.reconcile_groups'>
 						<tree string="Source Order Lines" create="false" editable="bottom">
                     		<field name="name" readonly='1'/>
@@ -108,16 +105,9 @@
 		                </group>
 		                <group>	
 		                	<field name="advance_payment" groups="money.reconcile_groups"/>
+                            <field name="voucher_id"/>
 		                </group>
 		             </group>
-	                 <group>
-                    	<group>
-		                	<field name="create_date" string="录单时间" readonly="1"/>
-		                </group>
-		                <group>	
-		                	<field name="write_date" string="最后修改时间"  readonly="1"/>
-		                </group>
-		            </group>
                 </sheet>
                     <div class="oe_chatter">
 	                    <field name="message_follower_ids" widget="mail_followers"/>
@@ -186,14 +176,13 @@
             <field name="arch" type="xml">
                 <tree string="结算单" editable='top' create="false">
                     <field name="state" invisible="1"/>
+                    <field name="date" readonly="1"/>
                     <field name="name" readonly="1"/>
                     <button name="find_source_order" type="object" string="查看原始单据" icon="fa-search" 
                         class="oe_highlight" attrs="{'invisible': ['|', ('is_init', '=', True), ('name', '=', '.')]}"/>
                     <field name="partner_id" readonly="1" />
             		<field name="category_id" readonly="1"/>
                     <field name="voucher_id" readonly="1"/>
-            		<field name="auxiliary_id"/>
-                    <field name="date" readonly="1"/>
                     <field name="currency_id"
                     	 groups='finance.group_multi_currency' readonly="1"/>
                     <field name="amount" sum="金额" readonly="1" />
@@ -201,11 +190,12 @@
                     <field name="to_reconcile" sum="未核销金额" readonly="1"/>
                     <field name="tax_amount" readonly="1"/>
                     <button name="money_invoice_done" states="draft" string="审核" type="object"/>
+                    <field name="auxiliary_id"/>
                     <field name="bill_number"/>
                     <field name="date_due"/>
+                    <field name="note"/>
                     <field name="overdue_days" readonly="1" />
                     <field name="overdue_amount" sum="逾期金额" readonly="1"/>
-                    <field name="note"/>
                     <field name="is_init" invisible="1"/>
                 </tree>
             </field>
