@@ -273,11 +273,22 @@ class approver(models.Model):
     @api.multi
     def goto(self):
         self.ensure_one()
+        views = self.env['ir.ui.view'].search([('model','=',self.model),('type','=','form')])       
+        if getattr(self.env[self.model].browse(self.res_id), 'is_return', False):
+            for v in views:
+                if '_return_' in v.xml_id :
+                    vid = v.id
+                    break
+        else:
+            vid = views[0].id
+
         return {
                             'name': u'审批',
                             'view_type': 'form',
                             'view_mode': 'form',
                             'res_model': self.model,
+                            'view_id': False,
+                            'views': [(vid, 'form')],
                             'type': 'ir.actions.act_window',
                             'res_id': self.res_id,
                         }
