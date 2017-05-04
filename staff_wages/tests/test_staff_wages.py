@@ -33,9 +33,9 @@ class test_staff_wages(TransactionCase):
         self.staff_wages.staff_wages_accrued()
         self.assertTrue(self.staff_wages.change_voucher_id)
 
-        # 在工资表上增加人员并重新计提
+        # 在工资表上增加人员 Admin 并重新计提
         l_change_voucher = self.staff_wages.change_voucher_id
-        l_line = self.env['wages.line'].create({'name': self.env.ref('staff.lili').id,
+        l_line = self.env['wages.line'].create({'name': self.env.ref('staff.staff_1').id,
                                        'basic_wage': 5000,
                                        'basic_date': 22,
                                        'date_number': 23,
