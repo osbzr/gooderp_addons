@@ -116,7 +116,7 @@ class money_order(models.Model):
                           ], string=u'状态', readonly=True,
                              default='draft', copy=False,
                         help=u'收付款单状态标识，新建时状态为未审核;审核后状态为已审核')
-    partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True,
+    partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
                                 help=u'该单据对应的业务伙伴，单据审核时会影响他的应收应付余额')
@@ -130,7 +130,7 @@ class money_order(models.Model):
     currency_id = fields.Many2one('res.currency', u'币别',
                                   compute='_compute_currency_id', store=True, readonly=True,
                                   help=u'业务伙伴的类别科目上对应的外币币别')
-    discount_amount = fields.Float(string=u'手续费/折扣', readonly=True,
+    discount_amount = fields.Float(string=u'我方承担费用', readonly=True,
                                    states={'draft': [('readonly', False)]},
                                    digits=dp.get_precision('Amount'),
                                    help=u'收付款时发生的银行手续费或给业务伙伴的现金折扣。')
@@ -153,16 +153,16 @@ class money_order(models.Model):
                           digits=dp.get_precision('Amount'),
                           store=True, readonly=True,
                           help=u'收付款单行金额总和')
-    advance_payment = fields.Float(string=u'本次预收/付款',
+    advance_payment = fields.Float(string=u'本次预付',
                                    compute='_compute_advance_payment',
                                    digits=dp.get_precision('Amount'),
                                    store=True, readonly=True,
                                    help=u'根据收付款单行金额总和，原始单据行金额总和及折扣额计算得来的预收/预付款，'
                                         u'值>=0')
-    to_reconcile = fields.Float(string=u'未核销预收/付款',
+    to_reconcile = fields.Float(string=u'未核销金额',
                                 digits=dp.get_precision('Amount'),
                             help=u'未核销的预收/预付款金额')
-    reconciled = fields.Float(string=u'已核销预收款',
+    reconciled = fields.Float(string=u'已核销金额',
                               digits=dp.get_precision('Amount'),
                             help=u'已核销的预收/预付款金额')
     origin_name = fields.Char(u'原始单据编号',
