@@ -42,6 +42,16 @@
             <field name="context" >{}</field>
         </record>
 
+		<record id="home_page_amount_summary_customer_over" model="home.page">
+        	<field name="sequence">1</field>
+            <field name="action" ref="money.money_invoice_action"/>
+            <field name="menu_type">amount_summary</field>
+            <field name="note_one">逾期应收</field>
+            <field name="compute_field_one" ref="money.field_money_invoice_overdue_amount"/>
+            <field name="domain" >[('partner_id.c_category_id','!=',False)]</field>
+            <field name="context" >{}</field>
+        </record>
+
         <record id="home_page_amount_summary_vendor_action" model="home.page">
         	<field name="sequence">1</field>
             <field name="action" ref="core.vendor_action"/>
@@ -49,6 +59,16 @@
             <field name="note_one">应付余额</field>
             <field name="compute_field_one" ref="core.field_partner_payable"/>
             <field name="domain" >[('s_category_id','!=',False)]</field>
+            <field name="context" >{}</field>
+        </record>
+
+        <record id="home_page_amount_summary_vendor_over" model="home.page">
+        	<field name="sequence">1</field>
+            <field name="action" ref="money.money_invoice_action"/>
+            <field name="menu_type">amount_summary</field>
+            <field name="note_one">逾期应付</field>
+            <field name="compute_field_one" ref="money.field_money_invoice_overdue_amount"/>
+            <field name="domain" >[('partner_id.s_category_id','!=',False)]</field>
             <field name="context" >{}</field>
         </record>
 
