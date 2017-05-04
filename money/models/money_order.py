@@ -421,21 +421,21 @@ class money_invoice(models.Model):
                           ], string=u'状态', 
                           default='draft', copy=False,
                         help=u'结算单状态标识，新建时状态为草稿;审核后状态为完成')
-    partner_id = fields.Many2one('partner', string=u'业务伙伴',
+    partner_id = fields.Many2one('partner', string=u'往来单位',
                                  required=True,
                                  ondelete='restrict',
                                  help=u'该单据对应的业务伙伴')
-    name = fields.Char(string=u'业务单据编号', copy=False,
+    name = fields.Char(string=u'前置单据编号', copy=False,
                        readonly=True, required=True,
                        help=u'该结算单编号，取自生成结算单的采购入库单和销售入库单')
     category_id = fields.Many2one('core.category', string=u'类别',
                                   ondelete='restrict',
                                   default=_get_category_id,
                                   help=u'结算单类别：采购 或者 销售等')
-    date = fields.Date(string=u'单据日期',required=True,
+    date = fields.Date(string=u'日期',required=True,
                        default=lambda self: fields.Date.context_today(self),
                        help=u'单据创建日期')
-    amount = fields.Float(string=u'单据金额',
+    amount = fields.Float(string=u'金额（含税）',
                           digits=dp.get_precision('Amount'),
                           help=u'原始单据对应金额')
     reconciled = fields.Float(string=u'已核销金额', readonly=True,
@@ -454,7 +454,7 @@ class money_invoice(models.Model):
                            help=u'结算单的到期日')
     currency_id = fields.Many2one('res.currency', u'外币币别',
                                   help=u'原始单据对应的外币币别')
-    bill_number = fields.Char(u'发票号',
+    bill_number = fields.Char(u'纸质发票号',
                               help=u'纸质发票号')
     is_init = fields.Boolean(u'是否初始化单')
     company_id = fields.Many2one(

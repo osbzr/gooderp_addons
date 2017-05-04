@@ -175,14 +175,13 @@
             <field name="arch" type="xml">
                 <tree string="结算单" editable='top' create="false">
                     <field name="state" invisible="1"/>
+                    <field name="date" readonly="1"/>
                     <field name="name" readonly="1"/>
                     <button name="find_source_order" type="object" string="查看原始单据" icon="fa-search" 
                         class="oe_highlight" attrs="{'invisible': ['|', ('is_init', '=', True), ('name', '=', '.')]}"/>
                     <field name="partner_id" readonly="1" />
             		<field name="category_id" readonly="1"/>
                     <field name="voucher_id" readonly="1"/>
-            		<field name="auxiliary_id"/>
-                    <field name="date" readonly="1"/>
                     <field name="currency_id"
                     	 groups='finance.group_multi_currency' readonly="1"/>
                     <field name="amount" sum="金额" readonly="1" />
@@ -190,11 +189,12 @@
                     <field name="to_reconcile" sum="未核销金额" readonly="1"/>
                     <field name="tax_amount" readonly="1"/>
                     <button name="money_invoice_done" states="draft" string="审核" type="object"/>
+                    <field name="auxiliary_id"/>
                     <field name="bill_number"/>
                     <field name="date_due"/>
+                    <field name="note"/>
                     <field name="overdue_days" readonly="1" />
                     <field name="overdue_amount" sum="逾期金额" readonly="1"/>
-                    <field name="note"/>
                     <field name="is_init" invisible="1"/>
                 </tree>
             </field>
