@@ -673,7 +673,7 @@ class reconcile_order(models.Model):
                           ], string=u'状态', readonly=True,
                           default='draft', copy=False,
                         help=u'核销单状态标识，新建时状态为未审核;审核后状态为已审核')
-    partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True,
+    partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
                                  help=u'该单据对应的业务伙伴，与业务类型一起带出待核销的明细行')
@@ -702,7 +702,7 @@ class reconcile_order(models.Model):
                                      states={'draft': [('readonly', False)]},
                                      help=u'类型：预收冲应收,预付冲应付,应收冲应付,应收转应收,应付转应付'
                                      )
-    name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/',
+    name = fields.Char(string=u'单据编号', copy=False, readonly=True,
                        help=u'单据编号，创建时会自动生成')
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
