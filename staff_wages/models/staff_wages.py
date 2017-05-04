@@ -418,6 +418,10 @@ class wages_line(models.Model):
     order_id = fields.Many2one('staff.wages', u'工资表', index=True,
                                required=True, ondelete='cascade')
 
+    _sql_constraints = [
+        ('staff_uniq', 'unique(order_id, name)', '同一个工资单不能出现重名员工工资行')
+    ]
+
     @api.onchange('date_number','basic_wage','basic_date')
     def change_wage_addhour(self):
         if self.date_number > 31 or self.basic_date > 31:
