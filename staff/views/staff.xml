@@ -116,6 +116,7 @@
                     <field name="department_id"/>
                     <field name="job_id"/>
                     <field name="parent_id"/>
+                    <field name='active'/>
                 </tree>
             </field>
         </record>
@@ -201,6 +202,7 @@
                     <field name="name"/>
                     <field name="manager_id"/>
                     <field name="parent_id"/>
+                    <field name='active'/>
                 </tree>
             </field>
         </record>
@@ -238,6 +240,7 @@
                 <tree string="职位">
                     <field name="name"/>
                     <field name="department_id"/>
+                    <field name='active'/>
                 </tree>
             </field>
         </record>

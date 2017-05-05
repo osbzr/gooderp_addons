@@ -449,6 +449,7 @@ class finance_account(models.Model):
     ], u'类型', required="1")
     currency_id = fields.Many2one('res.currency', u'外币币别')
     exchange = fields.Boolean(u'是否期末调汇')
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -523,6 +524,7 @@ class auxiliary_financing(models.Model):
         ('project', u'项目'),
         ('department', u'部门'),
     ], u'分类', default=lambda self: self.env.context.get('type'))
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

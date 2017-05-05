@@ -63,6 +63,7 @@ class project(models.Model):
                          compute=_compute_hours)
     address = fields.Char(u'地址')
     note = fields.Text(u'备注')
+    active = fields.Boolean(u'启用', default=True)
 
 
 class project_invoice(models.Model):

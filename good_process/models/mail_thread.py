@@ -311,6 +311,7 @@ class process(models.Model):
     type = fields.Char(u'类型', help=u'有些单据根据type字段区分具体流程')
     is_department_approve = fields.Boolean(string=u'部门经理审批')
     line_ids = fields.One2many('good_process.process_line', 'process_id', string=u'审批组')
+    active = fields.Boolean(u'启用', default=True)
 
     #TODO: model_id 的 type 唯一
     @api.model

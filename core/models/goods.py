@@ -75,6 +75,7 @@ class goods(models.Model):
     not_saleable = fields.Boolean(u'不可销售',
                                   default=_get_default_not_saleable,
                                   help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

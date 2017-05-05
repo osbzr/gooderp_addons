@@ -13,6 +13,7 @@
                     <field name='line_parent_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='组合件数量' />
                     <field name='line_child_ids' widget='relation_sublist' options="{'field': 'goods_id'}" string='子件' />
                     <field name='line_child_ids' widget='relation_sublist' options="{'field': 'goods_qty'}" string='子件数量' />
+                    <field name='active'/>
                 </tree>
             </field>
         </record>

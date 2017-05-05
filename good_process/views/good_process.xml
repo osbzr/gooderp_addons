@@ -34,6 +34,7 @@
 					<field name='model_id'/>
 					<field name='type'/>
 					<field name='is_department_approve'/>
+					<field name='active'/>
 				</tree>
 			</field>
 		</record>

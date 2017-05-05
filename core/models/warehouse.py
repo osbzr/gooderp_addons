@@ -20,7 +20,7 @@ class warehouse(models.Model):
     name = fields.Char(u'名称', required=True)
     code = fields.Char(u'编号')
     type = fields.Selection(WAREHOUSE_TYPE, u'类型', default='stock')
-    active = fields.Boolean(u'有效', default=True)
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
