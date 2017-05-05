@@ -141,7 +141,8 @@ class staff_wages(models.Model):
         change_voucher = self.create_voucher(date)
         for change_line in change_voucher.line_ids:
             for before_line in before_voucher.line_ids:
-                if change_line.account_id.id == before_line.account_id.id:
+                if change_line.account_id == before_line.account_id \
+                        and change_line.auxiliary_id == before_line.auxiliary_id:
                     change_line.credit -= before_line.credit
                     change_line.debit -= before_line.debit
                     continue
@@ -156,7 +157,7 @@ class staff_wages(models.Model):
             change_voucher.voucher_done()
             self.write({'change_voucher_id': change_voucher.id})
 
-    def create_credit_line(self, voucher, name, account, credit):
+    def create_credit_line(self, voucher, name, account, credit, auxiliary_id):
         """
         生成贷方行
         :param voucher: 凭证
@@ -170,6 +171,7 @@ class staff_wages(models.Model):
             'name': name,
             'account_id': account.id,
             'credit': credit,
+            'auxiliary_id': auxiliary_id and auxiliary_id.id,
         }
         voucher_line = self.env['voucher.line'].create(vals)
         return voucher_line
@@ -210,13 +212,14 @@ class staff_wages(models.Model):
         maternity = self.env.ref('staff_wages.categ_maternity')  # 公司缴纳生育类别
         injury = self.env.ref('staff_wages.categ_injury')  # 公司缴纳工伤类别
         housing_co = self.env.ref('staff_wages.categ_housing_fund_co')  # 公司缴纳住房公积金类别
-        self.create_credit_line(vouch_obj, u'提本月工资', credit_account.account_id, self.totoal_wage)
-        self.create_credit_line(vouch_obj, u'提本月养老保险', endowment_co.account_id, self.totoal_endowment_co)
-        self.create_credit_line(vouch_obj, u'提本月医疗保险', health_co.account_id, self.totoal_health_co)
-        self.create_credit_line(vouch_obj, u'提本月失业保险', unemployment_co.account_id, self.totoal_unemployment_co)
-        self.create_credit_line(vouch_obj, u'提本月生育保险', maternity.account_id, self.totoal_maternity)
-        self.create_credit_line(vouch_obj, u'提本月工伤保险', injury.account_id, self.totoal_injury)
-        self.create_credit_line(vouch_obj, u'提本月公积金', housing_co.account_id, self.totoal_housing_fund_co)
+        for line in self.line_ids:
+            self.create_credit_line(vouch_obj, u'提本月工资', credit_account.account_id, line.all_wage, line.name.auxiliary_id)
+        self.create_credit_line(vouch_obj, u'提本月养老保险', endowment_co.account_id, self.totoal_endowment_co, False)
+        self.create_credit_line(vouch_obj, u'提本月医疗保险', health_co.account_id, self.totoal_health_co, False)
+        self.create_credit_line(vouch_obj, u'提本月失业保险', unemployment_co.account_id, self.totoal_unemployment_co, False)
+        self.create_credit_line(vouch_obj, u'提本月生育保险', maternity.account_id, self.totoal_maternity, False)
+        self.create_credit_line(vouch_obj, u'提本月工伤保险', injury.account_id, self.totoal_injury, False)
+        self.create_credit_line(vouch_obj, u'提本月公积金', housing_co.account_id, self.totoal_housing_fund_co, False)
         return vouch_obj
 
     @api.multi
@@ -235,11 +238,13 @@ class staff_wages(models.Model):
             'date': fields.Date.context_today(self),
             'bank_id': self.payment.id,
         })
-        self.env['other.money.order.line'].create({
-            'other_money_id': other_money_order.id,
-            'amount': self.totoal_wage,
-            'category_id': staff_wages and staff_wages.id
-        })
+        for line in self.line_ids:
+            self.env['other.money.order.line'].create({
+                'other_money_id': other_money_order.id,
+                'amount': line.all_wage,
+                'category_id': staff_wages and staff_wages.id,
+                'auxiliary_id': line.name.auxiliary_id.id,
+            })
         if self.totoal_endowment:
             self.env['other.money.order.line'].create({
             'other_money_id': other_money_order.id,
@@ -412,6 +417,10 @@ class wages_line(models.Model):
     amount_wage = fields.Float(u'实发工资', store=True, compute='_amount_wage_value')
     order_id = fields.Many2one('staff.wages', u'工资表', index=True,
                                required=True, ondelete='cascade')
+
+    _sql_constraints = [
+        ('staff_uniq', 'unique(order_id, name)', '同一个工资单不能出现重名员工工资行')
+    ]
 
     @api.onchange('date_number','basic_wage','basic_date')
     def change_wage_addhour(self):
