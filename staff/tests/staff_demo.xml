@@ -6,7 +6,8 @@
         	<field name="name">丽丽</field>
             <field name='identification_id'>87654321</field>
             <field name='work_phone'>18823456789</field>
-             <field name='user_id' ref='base.user_demo'/>
+            <field name='user_id' ref='base.user_demo'/>
+            <field name='active'>True</field>
         </record>
         <record id='staff_1' model='staff'>
             <field name='name'>Admin</field>
@@ -14,6 +15,7 @@
             <field name='work_phone'>12345678901</field>
             <field name='user_id' ref='base.user_root'/>
             <field name='parent_id' ref='staff.lili'/>
+            <field name='active'>True</field>
         </record>
         <!--部门-->
         <record id='department_1' model='staff.department'>
