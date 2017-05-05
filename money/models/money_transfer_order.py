@@ -60,6 +60,12 @@ class money_transfer_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    voucher_id = fields.Many2one('voucher',
+                                 u'对应凭证',
+                                 readonly=True,
+                                 ondelete='restrict',
+                                 help=u'资金转账单审核时生成的对应凭证',
+                                 copy=False)
 
     @api.multi
     def money_transfer_done(self):
@@ -96,8 +102,12 @@ class money_transfer_order(models.Model):
                 else:   # 如果转入账户是外币
                     raise UserError('系统不支持外币转外币')
 
-        self.state = 'done'
-        return True
+        # 创建凭证并审核
+        voucher = self.create_voucher()
+        return self.write({
+            'voucher_id': voucher.id,
+            'state': 'done',
+        })
 
     @api.multi
     def money_transfer_draft(self):
@@ -127,8 +137,69 @@ class money_transfer_order(models.Model):
                 else:
                     line.in_bank_id.balance -= line.amount
                     line.out_bank_id.balance += line.amount
-        self.state = 'draft'
+
+        voucher = self.voucher_id
+        self.write({
+            'voucher_id': False,
+            'state': 'draft',
+        })
+        # 反审核凭证并删除
+        if voucher.state == 'done':
+            voucher.voucher_draft()
         return True
+
+    @api.multi
+    def create_voucher(self):
+        """创建凭证并审核"""
+        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vals = {}
+        for line in self.line_ids:
+            out_currency_id = line.out_bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
+            in_currency_id = line.in_bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
+            company_currency_id = self.env.user.company_id.currency_id.id
+            if (
+                    out_currency_id != company_currency_id or in_currency_id != company_currency_id) and not line.currency_amount:
+                raise UserError(u'错误' u'请请输入外币金额。')
+            if line.currency_amount and out_currency_id != company_currency_id:
+                '''结汇'''
+                '''借方行'''
+                self.env['voucher.line'].create({
+                    'name': u"%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'account_id': line.in_bank_id.account_id.id, 'debit': line.amount,
+                    'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': '',
+                })
+                '''贷方行'''
+                self.env['voucher.line'].create({
+                    'name': u"%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'account_id': line.out_bank_id.account_id.id, 'credit': line.amount,
+                    'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': out_currency_id,
+                    'currency_amount': line.currency_amount, 'rate_silent': line.amount / line.currency_amount
+                })
+            elif line.currency_amount and in_currency_id != company_currency_id:
+                '''买汇'''
+                '''借方行'''
+                self.env['voucher.line'].create({
+                    'name': u"%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'account_id': line.in_bank_id.account_id.id, 'debit': line.amount,
+                    'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': in_currency_id,
+                    'currency_amount': line.currency_amount, 'rate_silent': line.amount / line.currency_amount
+                })
+                '''贷方行'''
+                self.env['voucher.line'].create({
+                    'name': u"%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'account_id': line.out_bank_id.account_id.id, 'credit': line.amount,
+                    'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': '',
+                })
+            else:
+                '''人民币间'''
+                vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': self.note or '',
+                             'amount': abs(line.amount), 'credit_account_id': line.out_bank_id.account_id.id,
+                             'debit_account_id': line.in_bank_id.account_id.id,
+                             })
+                self.env['money.invoice'].create_voucher_line(vals)
+
+        vouch_obj.voucher_done()
+        return vouch_obj
 
 
 class money_transfer_order_line(models.Model):
