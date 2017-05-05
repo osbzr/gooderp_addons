@@ -29,6 +29,7 @@ class asset_category(models.Model):
         'finance.account', u'固定资产清理收入科目', required=True)
     clean_costs = fields.Many2one(
         'finance.account', u'固定资产清理成本科目', required=True)
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

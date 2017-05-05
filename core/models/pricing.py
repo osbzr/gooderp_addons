@@ -193,6 +193,7 @@ class pricing(models.Model):
     active_date = fields.Date(u'开始日期', required=True)
     deactive_date = fields.Date(u'终止日期', required=True)
     discount_rate = fields.Float(u'折扣率%', help=u'商品的价格 × 折扣率 = 商品的实际价格 !')
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

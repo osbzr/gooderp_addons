@@ -26,6 +26,7 @@
                     <field name="costs_types"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
+                    <field name='active'/>
                 </tree>
             </field>
         </record>
@@ -63,6 +64,7 @@
                     <field name="code"/>
                     <field name="name"/>
                     <field name="type"/>
+                    <field name='active'/>
                 </tree>
             </field>
         </record>
