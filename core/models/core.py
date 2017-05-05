@@ -7,7 +7,6 @@ from odoo.exceptions import UserError
 # 单据自动编号，避免在所有单据对象上重载
 
 create_original = models.BaseModel.create
-unlink_original = models.BaseModel.unlink
 
 @api.model
 @api.returns('self', lambda value: value.id)
@@ -19,17 +18,8 @@ def create(self, vals):
     record_id = create_original(self, vals)
     return record_id
 
-# @api.multi
-# def unlink(self):
-#     for model_row in self:
-#         if getattr(model_row, 'state',False) == 'done':
-#             raise UserError(u"已完成状态的记录不能删除")
-#     return_vals = unlink_original(self)
-#     return return_vals
-
-# 还需测试暂时注释代码
 models.BaseModel.create = create
-#models.BaseModel.unlink = unlink
+
 # 分类的类别
 
 CORE_CATEGORY_TYPE = [('customer', u'客户'),
@@ -53,6 +43,7 @@ class core_value(models.Model):
     type = fields.Char(u'类型', required=True,
                        default=lambda self: self._context.get('type'))
     note = fields.Text(u'备注', help=u'此字段用于详细描述该可选值的意义，或者使用一些特殊字符作为程序控制的标识')
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -73,6 +64,7 @@ class core_category(models.Model):
                             required=True,
                             default=lambda self: self._context.get('type'))
     note = fields.Text(u'备注')
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -89,6 +81,7 @@ class uom(models.Model):
     _description = u'计量单位'
 
     name = fields.Char(u'名称', required=True)
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -105,6 +98,7 @@ class settle_mode(models.Model):
     _description = u'结算方式'
 
     name = fields.Char(u'名称', required=True)
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -144,6 +138,7 @@ class bank_account(models.Model):
     name = fields.Char(u'名称', required=True)
     balance = fields.Float(u'余额', readonly=True,
                            digits=dp.get_precision('Amount'))
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -171,6 +166,7 @@ class service(models.Model):
                                    domain="[('type', '=', 'other_pay')]",
                                    context={'type': 'other_pay'})
     price = fields.Float(u'价格', required=True)
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

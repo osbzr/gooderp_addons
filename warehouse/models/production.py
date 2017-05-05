@@ -1383,6 +1383,7 @@ class wh_bom(osv.osv):
         'wh.bom.line', 'bom_id', u'子件', domain=[('type', '=', 'child')],
         context={'type': 'child'}, copy=True,
         help=u'物料清单对应的子件行')
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

@@ -20,6 +20,7 @@ class staff_department(models.Model):
     child_ids = fields.One2many('staff.department', 'parent_id', u'下级部门')
     jobs_ids = fields.One2many('staff.job', 'department_id', u'职位')
     note = fields.Text(u'备注')
+    active = fields.Boolean(u'启用', default=True)
 
     @api.one
     @api.constrains('parent_id')
@@ -40,6 +41,7 @@ class staff_job(models.Model):
     note = fields.Text(u'描述')
     account_id = fields.Many2one('finance.account', u'计提工资科目')
     department_id = fields.Many2one('staff.department', u'部门')
+    active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -117,7 +119,7 @@ class staff(models.Model):
                                 ('divorced', u'离异')
                                 ], u'婚姻状况')
     contract_ids = fields.One2many('staff.contract', 'staff_id', u'合同')
-    active = fields.Boolean(u'生效', default='1')
+    active = fields.Boolean(u'启用', default=True)
     # 公开信息
     work_mobile = fields.Char(u'办公手机')
     department_id = fields.Many2one('staff.department', u'部门')
