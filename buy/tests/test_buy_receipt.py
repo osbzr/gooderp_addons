@@ -352,10 +352,6 @@ class test_wh_move_line(TransactionCase):
 
         # 采购退货单行
         for line in self.return_receipt.line_out_ids:
-            line.goods_id.cost = 0.0
-            with self.assertRaises(UserError):
-                line.with_context({'default_is_return': True,
-                    'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
             line.goods_id.cost = 1.0
             line.with_context({'default_is_return': True,
                 'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
