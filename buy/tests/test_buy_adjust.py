@@ -245,10 +245,6 @@ class test_buy_adjust_line(TransactionCase):
 
             # 测试价格是否是商品的成本
             self.assertTrue(line.price_taxed == self.cable.cost)
-            # 测试不设置商品的成本时是否弹出警告
-            self.cable.cost = 0.0
-            with self.assertRaises(UserError):
-                line.onchange_goods_id()
 
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''

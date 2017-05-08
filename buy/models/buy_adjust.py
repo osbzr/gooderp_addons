@@ -239,8 +239,6 @@ class buy_adjust_line(models.Model):
         '''当订单行的产品变化时，带出产品上的单位、默认仓库、成本价'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            if not self.goods_id.cost:
-                raise UserError(u'请先设置商品(%s)的成本！'%self.goods_id.name)
             self.price_taxed = self.goods_id.cost
 
             if self.goods_id.tax_rate and self.order_id.order_id.partner_id.tax_rate:
