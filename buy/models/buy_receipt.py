@@ -549,9 +549,6 @@ class wh_move_line(models.Model):
         '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税'''
         self.ensure_one()
         if self.goods_id:
-            if not self.goods_id.cost:
-                raise UserError(u'请先设置商品的成本！')
-
             is_return = self.env.context.get('default_is_return')
             # 如果是采购入库单行 或 采购退货单行
             if (self.type == 'in' and not is_return) or (self.type == 'out' and is_return):
