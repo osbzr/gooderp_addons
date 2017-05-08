@@ -126,7 +126,7 @@
 						<field name="fax" string="手机"/>
 						<field name='email' string='公司邮箱'/>
 						<field name="zip"/>
-						<field name="start_date" readonly="1" />
+						<field name="start_date" groups="base.group_no_one" />
 						<field name="currency_id"/>
 						<field name="cost_method"/>
 						<field name="draft_invoice"/>
