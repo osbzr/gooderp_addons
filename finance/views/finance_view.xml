@@ -211,5 +211,29 @@
         <menuitem id='chang_voucher_name_menu_finance' name="月末凭证变更记录"
                   groups='base.group_no_one'
                   action='chang_voucher_name_action' parent='finance.checkout_menu' sequence='90'/>
+
+
+        <record id='dupont_graph' model='ir.ui.view'>
+            <field name='name'>dupont.graph</field>
+            <field name='model'>dupont</field>
+            <field name='arch' type='xml'>
+                <graph string='杜邦分析'>
+                    <field name='period_id' type='row'/>
+                    <field name='kpi' type='col'/>
+                    <field name='val' type='measure'/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="dupont_action" model="ir.actions.act_window">
+            <field name="name">杜邦分析</field>
+            <field name="res_model">dupont</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">pivot,graph</field>
+        </record>
+
+        <menuitem id='dupont_menu_finance' name="杜邦分析"
+                  action='dupont_action' parent='finance.checkout_menu' sequence='100'/>
     </data>
 </openerp>

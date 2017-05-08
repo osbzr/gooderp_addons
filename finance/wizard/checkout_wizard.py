@@ -158,6 +158,11 @@ class checkout_wizard(models.TransientModel):
                     self.recreate_voucher_name(balance.period_id)
                     # 关闭会计期间
                     balance.period_id.is_closed = True
+                    self.env['dupont'].fill(balance.period_id)
+                    pre_period = last_period
+                    while pre_period:
+                        self.env['dupont'].fill(pre_period)
+                        pre_period = self.env['create.trial.balance.wizard'].compute_last_period_id(pre_period)
                     # 如果下一个会计期间没有，则创建。
                     next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(balance.period_id)
                     if not next_period:
@@ -206,6 +211,9 @@ class checkout_wizard(models.TransientModel):
                         voucher_id.unlink()
                     trial_balance_objs = self.env['trial.balance'].search([('period_id', '=', balance.period_id.id)])
                     trial_balance_objs.unlink()
+                old = self.env['dupont'].search([('period_id','=', balance.period_id.id)])
+                for o in old:
+                    o.unlink()
 
     # 按用户设置重排结账会计期间凭证号（会计要求凭证号必须连续）
     @api.multi
