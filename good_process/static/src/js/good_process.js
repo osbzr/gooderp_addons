@@ -43,7 +43,6 @@ odoo.define('good.process', function (require) {
             var self = this;
             new Model('mail.thread').call('good_process_refused', [self.view.datarecord.id, self.view.model]).then(
                 function (result) {
-                    console.log()
                     if (result[0] && typeof(result[0]) == 'object') {
                         self.render_tag(result[0]);
                         if (result[1]) {

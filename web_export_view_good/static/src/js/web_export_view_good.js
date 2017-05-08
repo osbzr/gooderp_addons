@@ -76,7 +76,7 @@ function compute_footer_data(amount,export_columns_keys) {
     $.each(amount, function () {
         var $row = $(this);
         var export_row =  new Array(export_columns_keys.length);;
-        var index = 0;
+        var index = 1;
         $.each(export_columns_keys, function () {
             var cell = $row.find('td').get(index);
             index = index + 1;
