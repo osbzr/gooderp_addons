@@ -286,10 +286,6 @@ class test_buy_order_line(TransactionCase):
 
             # 测试价格是否是商品的成本
             self.assertTrue(line.price_taxed == self.cable.cost)
-            # 测试不设置商品的成本时是否弹出警告
-            self.cable.cost = 0.0
-            with self.assertRaises(UserError):
-                line.onchange_goods_id()
 
     def test_onchange_goods_id_tax_rate(self):
         ''' 测试 修改产品时，购货单行税率变化 '''

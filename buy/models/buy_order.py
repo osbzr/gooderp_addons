@@ -629,8 +629,6 @@ class buy_order_line(models.Model):
             raise UserError(u'请先选择一个供应商！')
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            if not self.goods_id.cost:
-                raise UserError(u'请先设置商品的成本！')
             self.price_taxed = self.goods_id.cost
             for line in self.goods_id.vendor_ids:
                 if line.vendor_id == self.order_id.partner_id \

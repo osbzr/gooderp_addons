@@ -347,21 +347,11 @@ class test_wh_move_line(TransactionCase):
 
     def test_onchange_goods_id(self):
         '''测试采购模块中商品的onchange,是否会带出单价'''
-        # 入库单行：修改鼠标成本为0，测试是否报错
         for line in self.receipt.line_in_ids:
             line.onchange_goods_id()
-        self.goods_mouse.cost = 0.0
-        for line in self.receipt.line_in_ids:
-            line.goods_id = self.goods_mouse.id
-            with self.assertRaises(UserError):
-                line.onchange_goods_id()
 
         # 采购退货单行
         for line in self.return_receipt.line_out_ids:
-            line.goods_id.cost = 0.0
-            with self.assertRaises(UserError):
-                line.with_context({'default_is_return': True,
-                    'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
             line.goods_id.cost = 1.0
             line.with_context({'default_is_return': True,
                 'default_partner': self.return_receipt.partner_id.id}).onchange_goods_id()
