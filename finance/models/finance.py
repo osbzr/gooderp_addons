@@ -586,6 +586,7 @@ class dupont(models.Model):
     _name = 'dupont'
     _description = u'企业财务指标'
     _rec_name = 'period_id'
+    _order = 'period_id'
 
     period_id = fields.Many2one('finance.period', u'期间', index=True)
     kpi = fields.Char(u'指标')
