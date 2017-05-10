@@ -3,7 +3,8 @@
 
   /*form 中的sheet 的最小的宽度进行调整 降低为手机的屏幕大小就可以了*/
 
-  /*form  中设置field的最小的宽度 保证屏幕在缩小的时候不会导致看不清楚想要的结果*/
+  /*** form  中设置field的最小的宽度 保证屏幕在缩小的时候不会导致看不清楚想要的结果
+  　 这种写法并不全面，影响到了在ｆｏｒｍ　中ｇｒｏｕｐ　内的ｔｒｅｅ列表视图*/
 
 }
 .o_form_view.o_form_nosheet {
@@ -20,8 +21,8 @@
 .o_form_view .o_form_sheet_bg .o_form_sheet {
   min-width: 340px;
 }
-.o_form_view .o_group .o_form_field {
-  min-width: 120px;
+.o_form_view .o_group > .o_group_col_6 > tbody > tr > td > .o_form_field {
+  min-width: 150px;
 }
 .o_form_view .o_group.o_inner_group {
   display: inline-table;
@@ -35,4 +36,7 @@
   position: relative;
   min-width: 300px;
   margin: 10px;
+}
+.o_list_view .o_list_text {
+  white-space: nowrap;
 }
