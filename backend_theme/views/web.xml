@@ -7,7 +7,7 @@
 
 <odoo>
     <template id="left_menu">
-        <t t-set="debug_param" t-value="'?&amp;debug=' if debug else ''"/>
+        <t t-set="debug_param" t-value="'?debug=%s'%debug if debug else ''"/>
         <t t-if="len(menu_data['children'])>1">
             <div id="left_menu"  class="big_show">
                 <div t-foreach="menu_data['children']" t-as="menu"  >
