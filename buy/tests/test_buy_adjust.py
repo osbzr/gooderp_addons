@@ -233,6 +233,7 @@ class test_buy_adjust_line(TransactionCase):
         '''当订单行的不含税单价改变时，改变含税单价'''
         for line in self.adjust.line_ids:
             line.price = 10
+            line.price_taxed = 0
             line.onchange_price()
             self.assertAlmostEqual(line.price_taxed, 11.7)
 
