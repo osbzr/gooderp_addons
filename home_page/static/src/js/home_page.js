@@ -16,7 +16,19 @@ odoo.define('home_page', function (require) {
             'click .oe_quick_link': 'on_click_quick',
             'click .oe_main_link': 'on_click_main',
         },
-
+        commafy: function (num) {
+            if(parseFloat(num)!=0) {
+                var commafy_num = 0;
+                if (num.indexOf('.') < 0) {
+                    commafy_num = parseInt(num);
+                } else {
+                    commafy_num = parseInt(num.split('.')[0]);
+                }
+                return (commafy_num + '').replace(/(?=(?!\b)(\d{3})+$)/g, ',') + "." + num.split('.')[1];
+            }else{
+                return '0.0';
+            }
+        },
         /**
          *把后端传进来的action的数据进行还原 并且
          * 替换掉tree为list 因为在js里面 tree表示为list
@@ -143,7 +155,7 @@ odoo.define('home_page', function (require) {
                           <button class='btn btn-primary button-circle oe_top_link_" + i +
                         "' oe_top_link='" + i + "' id='" + i + "' style='width: 160px;height: 160px'>\
                           <h4>" + top_data[0] + "</h4>\
-                          <h3>" + top_data[1] + "</h3>\
+                          <h3>" +  self.commafy(top_data[1]) + "</h3>\
                           </button><p class='m-t-sm'></p></div>");
                     self.$el.find('.top_div').append(left_html_str);
                 }
