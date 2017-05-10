@@ -589,9 +589,7 @@ class VouchersSummary(models.TransientModel):
     @api.multi
     def view_detail_voucher(self):
         '''查看凭证明细按钮'''
-        voucher = self.env['voucher'].search([('name', '=', self.voucher_id.name)])
-        if voucher:
-            view = self.env.ref('finance.voucher_form')
+        view = self.env.ref('finance.voucher_form')
         return {
             'name': u'会计凭证明细',
             'view_type': 'form',
@@ -600,7 +598,7 @@ class VouchersSummary(models.TransientModel):
             'views': [(view.id, 'form')],
             'res_model': 'voucher',
             'type': 'ir.actions.act_window',
-            'res_id': voucher.id,
+            'res_id': self.voucher_id.id,
         }
 
 
