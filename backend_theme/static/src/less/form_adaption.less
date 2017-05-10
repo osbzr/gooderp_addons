@@ -22,24 +22,22 @@
     }
     /*** form  中设置field的最小的宽度 保证屏幕在缩小的时候不会导致看不清楚想要的结果
   　 这种写法并不全面，影响到了在ｆｏｒｍ　中ｇｒｏｕｐ　内的ｔｒｅｅ列表视图*/
-    .o_group {
-      .o_group_col_6{
-         .o_form_field {
-            min-width:115px;
-         }
-      }
 
+    .o_group > .o_group_col_6 > tbody > tr > td > .o_form_field {
+          min-width: 150px;
+      }
+    .o_group{
       &.o_inner_group {
         display: inline-table;
         > tbody > tr > td {
           &.o_td_label {
-              width: 0%;
-              padding: 0 15px 0 0;
-              min-width: 100px;
+            width: 0%;
+            padding: 0 15px 0 0;
+            min-width: 100px;
           }
         }
       }
-    }
+  }
 }
 // Shell div to position the modal with bottom padding
 .modal-dialog {
