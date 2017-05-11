@@ -14,7 +14,7 @@ class TrialBalance(models.Model):
     @api.depends('cumulative_occurrence_debit', 'cumulative_occurrence_credit', 
                  'ending_balance_debit', 'ending_balance_credit', 'subject_name_id')
     def _get_year_init(self):
-        if self.subject_name_id.costs_types in ('in','out','cost'):
+        if self.subject_name_id.costs_types in ('in','out'):
             self.year_init_debit = self.year_init_credit = 0
             return True
         if self.subject_name_id.balance_directions == 'in':

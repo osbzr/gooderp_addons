@@ -84,7 +84,7 @@ class create_balance_sheet_wizard(models.TransientModel):
             for trial_balance in trial_balances:
                 # 根据参数code 对应的科目的 方向 进行不同的操作
                 #  trial_balance.subject_name_id.costs_types == 'assets'解决：累计折旧 余额记贷方
-                if trial_balance.subject_name_id.costs_types == 'assets':
+                if trial_balance.subject_name_id.costs_types == 'assets' or trial_balance.subject_name_id.costs_types == 'cost':
                     subject_vals.append(trial_balance[compute_field_list[0]] - trial_balance[compute_field_list[1]])
                 elif trial_balance.subject_name_id.costs_types == 'debt' or trial_balance.subject_name_id.costs_types == 'equity':
                     subject_vals.append(trial_balance[compute_field_list[1]] - trial_balance[compute_field_list[0]])
