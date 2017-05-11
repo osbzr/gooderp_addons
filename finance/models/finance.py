@@ -49,6 +49,27 @@ class voucher(models.Model):
             create_date = now_date
         return create_date
 
+    @api.model
+    def create(self, vals):
+        context = dict(self.env.context or {})
+        context['voucher'] = "checkout_wizard"
+        auto_reset = self.env['ir.values'].get_default('finance.config.settings', 'default_auto_reset')
+        # 重置凭证间隔:年  月
+        reset_period = self.env['ir.values'].get_default('finance.config.settings', 'default_reset_period')
+        # 重置后起始数字
+        reset_init_number = self.env['ir.values'].get_default('finance.config.settings', 'default_reset_init_number')
+        if not vals.get('name') and auto_reset:
+            seq_ids = self.env['ir.sequence'].search([('code', '=', 'voucher')])
+            day_now = time.localtime()
+            if reset_period=='month':
+                period_date = '%d-%02d-01 00:00:00' % (day_now.tm_year, day_now.tm_mon)
+            else:
+                period_date = '%d-01-01 00:00:00' % (day_now.tm_year)
+            first_period_record = self.search([('create_date', '>=', period_date)])
+            if not first_period_record and seq_ids:
+                vals.update({'name':'%%0%sd' % seq_ids[0].padding % 1})
+        return super(voucher, self).create(vals)
+
     @api.one
     @api.depends('date')
     def _compute_period_id(self):
@@ -152,7 +173,7 @@ class voucher(models.Model):
             if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
                 return super(voucher, self).write(vals)
             else:
-                if order.state == 'done':
+                if order.state == 'done' and vals.get('state', False):
                     raise UserError(u'凭证%s已审核！修改请先反审核！'%order.name)
             return super(voucher, self).write(vals)
 
