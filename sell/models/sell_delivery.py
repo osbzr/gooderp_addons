@@ -182,7 +182,7 @@ class sell_delivery(models.Model):
             if delivery.state == 'done':
                 raise UserError(u'不能删除已审核的销售发货单')
 
-        return delivery.sell_move_id.unlink()
+            delivery.sell_move_id.unlink()
 
     def goods_inventory(self, vals):
         """

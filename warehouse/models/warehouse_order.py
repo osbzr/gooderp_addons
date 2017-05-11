@@ -44,7 +44,8 @@ class wh_out(models.Model):
     @api.multi
     @inherits()
     def unlink(self):
-        return self.move_id.unlink()
+        for order in self:
+            return order.move_id.unlink()
 
     @api.one
     @api.depends('line_out_ids.cost')
@@ -165,7 +166,8 @@ class wh_in(models.Model):
     @api.multi
     @inherits()
     def unlink(self):
-        return self.move_id.unlink()
+        for order in self:
+            return order.move_id.unlink()
 
     @api.one
     @api.depends('line_in_ids.cost')
@@ -302,7 +304,8 @@ class wh_internal(models.Model):
     @api.multi
     @inherits()
     def unlink(self):
-        return self.move_id.unlink()
+        for order in self:
+            return order.move_id.unlink()
 
     @api.one
     @api.depends('line_out_ids.cost')
