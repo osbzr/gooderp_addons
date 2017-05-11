@@ -74,7 +74,7 @@ odoo.define('good.process', function (require) {
             new Model('mail.thread').call('good_process_approve', [self.view.datarecord.id, self.view.model]).then(
                 function (result) {
                     if (result[0] && typeof(result[0]) == 'object') {
-                        _.each(result, function (id) {
+                        _.each(result[0], function (id) {
                             var remove_tags = self.$el.find('span[data-id="' + id + '"]');
                             var remove_button = self.$el.find('.good_approve_div');
                             $(remove_tags).addClass('o_hidden');
