@@ -153,7 +153,7 @@ class voucher(models.Model):
                 return super(voucher, self).write(vals)
             else:
                 order = self.browse(order.id)
-                if order.state == 'done' and vals.get('state', False):
+                if order.state == 'done':
                     raise UserError(u'凭证%s已审核！修改请先反审核！'%order.name)
             return super(voucher, self).write(vals)
 
