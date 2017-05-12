@@ -1,0 +1,94 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#	* ir_sequence_autoreset
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 7.0-20130723-231040\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-08-20 07:29+0000\n"
+"PO-Revision-Date: 2013-08-20 07:29+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: ir_sequence_autoreset
+#: selection:ir.sequence,reset_period:0
+msgid "Every Hour"
+msgstr "每小时"
+
+#. module: ir_sequence_autoreset
+#: model:ir.model.fields,field_description:ir_sequence_autoreset.field_ir_sequence_reset_init_number
+#: field:ir.sequence,reset_init_number:0
+msgid "Reset Number"
+msgstr "起始序号"
+
+#. module: ir_sequence_autoreset
+#: model:ir.model.fields,field_description:ir_sequence_autoreset.field_ir_sequence_reset_time
+#: field:ir.sequence,reset_time:0
+msgid "Name"
+msgstr "名称"
+
+#. module: ir_sequence_autoreset
+#: selection:ir.sequence,reset_period:0
+msgid "Every Second"
+msgstr "每秒"
+
+#. module: ir_sequence_autoreset
+#: model:ir.model.fields,field_description:ir_sequence_autoreset.field_ir_sequence_reset_period
+#: field:ir.sequence,reset_period:0
+msgid "Reset Period"
+msgstr "重置周期"
+
+#. module: ir_sequence_autoreset
+#: code:addons/ir_sequence_autoreset/ir_sequence.py:71
+#, python-format
+msgid "Invalid prefix or suffix for sequence '%s'"
+msgstr "无效前缀 '%s'"
+
+#. module: ir_sequence_autoreset
+#: selection:ir.sequence,reset_period:0
+msgid "Every Year"
+msgstr "每年"
+
+#. module: ir_sequence_autoreset
+#: selection:ir.sequence,reset_period:0
+msgid "Every Month"
+msgstr "每月"
+
+#. module: ir_sequence_autoreset
+#: help:ir.sequence,reset_init_number:0
+msgid "Reset number of this sequence"
+msgstr "起始序号"
+
+#. module: ir_sequence_autoreset
+#: selection:ir.sequence,reset_period:0
+msgid "Every Day"
+msgstr "每天"
+
+#. module: ir_sequence_autoreset
+#: code:addons/ir_sequence_autoreset/ir_sequence.py:71
+#, python-format
+msgid "Warning"
+msgstr "警告"
+
+#. module: ir_sequence_autoreset
+#: model:ir.model,name:ir_sequence_autoreset.model_ir_sequence
+msgid "ir.sequence"
+msgstr "ir.sequence"
+
+#. module: ir_sequence_autoreset
+#: model:ir.model.fields,field_description:ir_sequence_autoreset.field_ir_sequence_auto_reset
+#: view:ir.sequence:0
+#: field:ir.sequence,auto_reset:0
+msgid "Auto Reset"
+msgstr "自动重置"
+
+#. module: ir_sequence_autoreset
+#: selection:ir.sequence,reset_period:0
+msgid "Every Minute"
+msgstr "每分钟"
+
