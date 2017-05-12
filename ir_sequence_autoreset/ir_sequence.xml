@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="sequence_autoreset_view">
+            <field name="model">ir.sequence</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.sequence_view" />
+            <field name="arch" type="xml">
+                <field name="number_next_actual" position="after">
+                    <field name="auto_reset"/>
+                    <field name="reset_period"/>
+                    <field name="reset_time"/>
+                    <field name="reset_init_number"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</openerp>
+
