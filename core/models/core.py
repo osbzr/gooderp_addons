@@ -58,6 +58,7 @@ class core_value(models.Model):
 class core_category(models.Model):
     _name = 'core.category'
     _description = u'类别'
+    _order = 'type, name'
 
     name = fields.Char(u'名称', required=True)
     type = fields.Selection(CORE_CATEGORY_TYPE, u'类型',

@@ -10,7 +10,7 @@
         <record id="small_business_chart410101" model='finance.account'>
             <field name='code'>410101</field>
             <field name='name'>制造费用－折旧费</field>
-            <field name='costs_types'>out</field>
+            <field name='costs_types'>cost</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart530101" model='finance.account'>
