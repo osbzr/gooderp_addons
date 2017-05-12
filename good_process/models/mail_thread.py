@@ -75,7 +75,7 @@ class mail_thread(models.AbstractModel):
              'sequence': sequence,
              'group_id': groud_id,
              'model': thread_row._name})) for user, sequence, groud_id in users]
-        thread_row._approver_num = len([{'id': row.id, 'display_name': row.user_id.name} for row in approver_rows])
+        return [{'id': row.id, 'display_name': row.user_id.name} for row in approver_rows]
 
 
     def __good_approver_send_message__(self, active_id, active_model, message):
@@ -138,7 +138,8 @@ class mail_thread(models.AbstractModel):
     @api.model
     def create(self, vals):
         thread_row = super(mail_thread, self).create(vals)
-        self.__add_approver__(thread_row, self._name)
+        approvers = self.__add_approver__(thread_row, self._name)
+        thread_row._approver_num = len(approvers)
         return thread_row
 
     @api.multi
@@ -169,6 +170,9 @@ class mail_thread(models.AbstractModel):
                     raise ValidationError(u'已审批不可修改')
                 if change_state == 'draft':
                     self.__add_approver__(th, th._name)
+                    vals.update({
+                        '_approver_num': len(th._to_approver_ids),
+                    })
             # 审批中，审核时报错，修改其他字段报错
             elif len(th._to_approver_ids) < th._approver_num:
                 if change_state:
