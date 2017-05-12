@@ -152,6 +152,7 @@ class voucher(models.Model):
             if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
                 return super(voucher, self).write(vals)
             else:
+                order = self.browse(order.id)
                 if order.state == 'done' and vals.get('state', False):
                     raise UserError(u'凭证%s已审核！修改请先反审核！'%order.name)
             return super(voucher, self).write(vals)
