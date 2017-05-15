@@ -54,5 +54,12 @@
 		    <field name="context" >{'is_return':False, 'warehouse_dest_type': 'customer'}</field>
 		    <field name="note_one" >销售发货单</field>
 		</record>
+		<record id="customer_statements_report_wizard_action_action_report" model="home.page">
+			<field name="sequence">14</field>
+		    <field name="action" ref="customer_statements_report_wizard_action"/>
+		    <field name="menu_type">report</field>
+			<field name="report_type_id" ref="money.home_report_type_3"/>
+		    <field name="note_one" >客户对账单</field>
+		</record>
 	</data>
 </openerp>

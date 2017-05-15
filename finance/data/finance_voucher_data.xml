@@ -9,6 +9,7 @@
             <field name="code">voucher</field>
             <field name="prefix"></field>
             <field name="padding">5</field>
+            <field name="auto_reset">True</field>
             <field name="implementation">no_gap</field>
         </record>
 
