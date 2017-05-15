@@ -22,6 +22,7 @@ class res_company(models.Model):
     import_tax_rate = fields.Float(string=u"默认进项税税率")
     output_tax_rate = fields.Float(string=u"默认销项税税率")
     bank_account_id = fields.Many2one('bank.account', string=u'开户行')
+    tax_number = fields.Char(u'税号')
 
     def _get_logo(self):
         return self._get_logo_impl()
