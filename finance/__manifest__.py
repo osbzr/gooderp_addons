@@ -23,7 +23,7 @@
                                 科目总账；
                                 辅助核算余额表。
     ''',
-    'depends': ['num_to_china', 'web_sublist', 'good_process'],
+    'depends': ['num_to_china', 'web_sublist', 'good_process', 'ir_sequence_autoreset'],
     'version': '11.11',
     'data': [
         'security/groups.xml',
