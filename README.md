@@ -1,4 +1,4 @@
-[![在线试用(http://www.gooderp.org/logo.png)]](http://demo.gooderp.org:8888/login?db=demo&login=demo&key=demo)
+[![在线试用](http://www.gooderp.org/logo.png)](http://demo.gooderp.org:8888/login?db=demo&login=demo&key=demo)
 
 ----
 [![Join the chat at https://gitter.im/osbzr/gooderp](https://badges.gitter.im/osbzr/gooderp.svg)](https://gitter.im/osbzr/gooderp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
