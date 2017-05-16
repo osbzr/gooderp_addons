@@ -38,7 +38,7 @@ Automatic backup for all such configured databases under this can then be schedu
 2) Schedule new action(create a new record)
 3) Set 'Object' to 'db.backup' and 'Function' to 'schedule_backup' under page 'Technical Data'
 4) Set other values as per your preference""",
-    "depends" : [],
+    "depends" : ['core'],
     "data" : ["views/bkp_conf_view.xml",
               "security/ir.model.access.csv",
               "data/backup_data.xml"],
