@@ -102,7 +102,7 @@ class wh_move(models.Model):
                               help=u'点击上传质检报告')
     finance_category_id = fields.Many2one(
         'core.category',
-        string=u'核算类别',
+        string=u'收发类别',
         ondelete='restrict',
         states={'done': [('readonly', True)]},
         domain=[('type', '=', 'finance')],
