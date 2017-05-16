@@ -23,6 +23,9 @@
             <field name="model">partner</field>
             <field name='inherit_id' ref='core.customer_address_form' />
             <field name="arch" type="xml">
+                <field name="main_contact" position="after">
+                    <field name="address"/>
+                </field>
                 <xpath expr="//group" position="after">
                     <field name="child_ids">
                     	<tree string="联系人地址" editable="bottom">

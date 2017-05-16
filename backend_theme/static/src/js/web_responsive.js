@@ -9,6 +9,14 @@ odoo.define('web_responsive', function(require) {
     var Class = require('web.Class');
     var SearchView = require('web.SearchView');
     var core = require('web.core');
+    var WebClient = require('web.WebClient');
+
+    WebClient.include({
+        update_logo: function(reload) {
+            //安装主题后这个方法没有用武之地,
+            //因为想要用对应的class,导致对应的图片更新给带有这个这个class的的图片都会更新为公司图片
+        }
+    })
 
     Menu.include({
 
