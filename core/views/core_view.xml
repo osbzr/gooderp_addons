@@ -534,5 +534,8 @@
 		<menuitem  id="base.menu_view_base_module_update" groups="-base.group_no_one"  parent="base.menu_management" />
 		<menuitem  groups="base.group_no_one" id="base.menu_view_base_module_upgrade"  parent="base.menu_management" />
 		<menuitem  groups="-base.group_no_one,core.nobody_can_see" id="web_settings_dashboard.web_dashboard_menu" parent="base.menu_administration"  />
+		<menuitem parent="system_menu" id="menu_decimal_precision_form_copy" name="小数精度设置"
+				  action="decimal_precision.action_decimal_precision_form"/>
+
 	</data>
 </openerp>

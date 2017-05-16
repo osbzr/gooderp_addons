@@ -78,5 +78,6 @@
         </record>
 
         <menuitem parent="base.menu_automation" action="action_db_backup_tree" id="menu_db_backup_tree"/>
+        <menuitem parent="core.system_menu" action="action_db_backup_tree" id="menu_db_backup_tree_core" name="自动备份设置"/>
     </data>
 </openerp>
