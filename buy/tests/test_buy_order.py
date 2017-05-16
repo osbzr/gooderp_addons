@@ -226,6 +226,45 @@ class test_buy_order(TransactionCase):
         self.env.ref('goods.keyboard').tax_rate = 12
         self.order.onchange_partner_id()
 
+    def test_compute_receipt_and_invoice(self):
+        '''计算生成入库单和结算单的个数'''
+        self.order.buy_order_done()
+        self.assertTrue(self.order.receipt_count == 1)
+
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.assertTrue(self.order.invoice_count == 1)
+        self.assertTrue(self.order.invoice_ids == self.order.receipt_ids[0].invoice_id)
+
+    def test_action_view_receipt(self):
+        '''查看生成的入库单'''
+        # 生成一张入库单
+        self.order.buy_order_done()
+        self.order.action_view_receipt()
+        # 生成两张入库单
+        self.order.buy_order_draft()
+        self.order.buy_order_done()
+        for line in self.order.receipt_ids[0].line_in_ids:
+            line.goods_qty = 3
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.action_view_receipt()
+
+    def test_action_view_invoice(self):
+        '''查看生成的结算单'''
+        # 生成一张入库单，审核后查看结算单
+        self.order.buy_order_done()
+        self.order.action_view_invoice()
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.action_view_invoice()
+        # 生成两张入库单，都审核后在购货订单上查看结算单
+        self.order.receipt_ids[0].buy_receipt_draft()
+        self.order.buy_order_draft()
+        self.order.buy_order_done()
+        for line in self.order.receipt_ids[0].line_in_ids:
+            line.goods_qty = 3
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.action_view_invoice()
+
 
 class test_buy_order_line(TransactionCase):
 

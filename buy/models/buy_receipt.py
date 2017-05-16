@@ -482,7 +482,7 @@ class buy_receipt(models.Model):
             qty = line.goods_qty
             if return_goods.get(line.attribute_id.id):
                 qty = qty - return_goods[line.attribute_id.id]
-            if qty != 0:
+            if qty > 0:
                 dic = {
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
@@ -498,8 +498,6 @@ class buy_receipt(models.Model):
         if len(receipt_line) == 0:
             raise UserError(u'该订单已全部退货！')
 
-        for line in receipt_line:
-            print line
         vals = {'partner_id': self.partner_id.id,
                 'is_return': True,
                 'origin_id': self.id,
@@ -511,7 +509,6 @@ class buy_receipt(models.Model):
                 'date': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'line_out_ids': [(0, 0, line) for line in receipt_line],
                 }
-        print vals
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('buy.buy_return_form').id
         name = u'采购退货单'

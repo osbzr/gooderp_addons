@@ -330,6 +330,23 @@ class test_buy_receipt(TransactionCase):
             [('order_id', '=', self.order.id)])
         self.receipt.buy_receipt_done()
 
+    def test_buy_to_return(self):
+        '''采购入库单转化为采购退货单'''
+        self.receipt.line_in_ids[0].copy()
+        self.receipt.buy_receipt_done()
+        self.receipt.buy_to_return()
+        with self.assertRaises(UserError):
+            self.receipt.buy_to_return()
+
+        # 该订单已全部退货，再次点击按钮则报错
+        return_order = self.env['buy.receipt'].search([
+            ('is_return', '=', True),
+            ('origin_id', '=', self.receipt.id),
+        ])
+        return_order.buy_receipt_done()
+        with self.assertRaises(UserError):
+            self.receipt.buy_to_return()
+
 
 class test_wh_move_line(TransactionCase):
 
