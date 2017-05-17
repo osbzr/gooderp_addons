@@ -9,7 +9,12 @@ class checkout_wizard(models.TransientModel):
 
     @api.model
     def _get_last_date(self):
-        return self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[1]
+        period_obj = self.env['finance.period']
+        period_now = period_obj.get_date_now_period_id()
+        if period_now:
+            return period_obj.get_period_month_date_range(period_now)[1]
+        else:
+            return fields.Date.context_today(self)
 
     period_id = fields.Many2one('finance.period', u'结账会计期间')
     date = fields.Date(u'生成凭证日期', required=True, default=_get_last_date)
