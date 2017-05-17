@@ -14,6 +14,10 @@ class test_cost_order(TransactionCase):
         self.buy_order_1.buy_order_done()
         self.receipt = self.env['buy.receipt'].search([('order_id', '=', self.buy_order_1.id)])
 
+        self.sell_order_1 = self.env.ref('sell.sell_order_1')
+        self.sell_order_1.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search([('order_id', '=', self.sell_order_1.id)])
+
     def test_cost_order_confim(self):
         ''' 测试 服务订单 审核 '''
         # no name
@@ -55,3 +59,43 @@ class test_cost_order(TransactionCase):
         # 重复反审核
         with self.assertRaises(UserError):
             self.cost_order_1.cost_order_draft()
+
+    def test_unlink(self):
+        '''删除服务订单'''
+        # 不能删除审核过的
+        self.cost_order_1.cost_order_confim()
+        with self.assertRaises(UserError):
+            self.cost_order_1.unlink()
+        # 删除草稿的
+        self.cost_order_1.cost_order_draft()
+        self.cost_order_1.unlink()
+
+    def test_create_mv_cost(self):
+        '''在所关联的入库单/发货单上创建费用行'''
+        # 关联入库单
+        self.cost_order_1.wh_move_ids = [(4, self.receipt.buy_move_id.id)]
+        self.cost_order_1.cost_order_confim()
+
+        # 关联发货单
+        self.cost_order_1.cost_order_draft()
+        self.cost_order_1.wh_move_ids = [(4, self.delivery.sell_move_id.id)]
+        self.cost_order_1.cost_order_confim()
+
+    def test_cost_order_draft_has_prepayment(self):
+        '''反审核服务订单'''
+        self.cost_order_1.prepayment = 20
+        self.cost_order_1.bank_account_id = self.env.ref('core.alipay')
+        self.cost_order_1.cost_order_confim()
+        self.cost_order_1.cost_order_draft()
+
+
+class test_cost_order_line(TransactionCase):
+
+    def setUp(self):
+        super(test_cost_order_line, self).setUp()
+        self.cost_order_1 = self.env.ref('account_cost.cost_order_1')
+
+    def test_compute_all_amount(self):
+        '''计算价税合计'''
+        self.cost_order_1.line_ids[0].amount = 100
+        self.assertAlmostEqual(self.cost_order_1.line_ids[0].subtotal, 110.0)
