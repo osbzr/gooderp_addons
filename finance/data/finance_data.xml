@@ -1344,7 +1344,7 @@
             <field name='note'>由系统创建</field>
 		</record>
 
-        <!--核算类别-->
+        <!--收发类别-->
         <!-- 销售发货 借方科目：主营业务成本-->
         <record id="categ_sell_goods" model="core.category">
             <field name="name">销售发货</field>
