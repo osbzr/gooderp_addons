@@ -103,7 +103,7 @@ class create_balance_sheet_wizard(models.TransientModel):
     def balance_sheet_create(self, balance_sheet_obj, year_begain_field, current_period_field):
         balance_sheet_obj.write(
             {'beginning_balance': fabs(self.deal_with_balance_formula(balance_sheet_obj.balance_formula,
-                                                                      self.period_id, current_period_field)),
+                                                                      self.period_id, year_begain_field)),
              'ending_balance': fabs(self.deal_with_balance_formula(balance_sheet_obj.balance_formula,
                                                                    self.period_id, current_period_field)),
              'beginning_balance_two': self.deal_with_balance_formula(balance_sheet_obj.balance_two_formula,

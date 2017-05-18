@@ -980,7 +980,7 @@
             <field name="line">5</field>
             <field name='balance'>应收账款</field>
             <field name='line_num'>4</field>
-            <field name='balance_formula'>1122~1122999999</field>
+            <field name='balance_formula'>1122~1122999999;1231~1231999999</field>
             <field name='balance_two'>预收账款</field>
             <field name='line_num_two'>34</field>
             <field name='balance_two_formula'>2203~2203999999</field>
@@ -1025,7 +1025,7 @@
             <field name="line">10</field>
             <field name='balance'>存货</field>
             <field name='line_num'>9</field>
-            <field name='balance_formula'>1401~1408999999</field>
+            <field name='balance_formula'>1401~1408999999;4001~4999999999</field>
             <field name='balance_two'>其他应付款</field>
             <field name='line_num_two'>39</field>
             <field name='balance_two_formula'>2241~2241999999</field>
@@ -1042,6 +1042,7 @@
             <field name="line">12</field>
             <field name='balance'>在产品</field>
             <field name='line_num'>11</field>
+            <field name='balance_formula'>4001~4999999999</field>
             <field name='balance_two'>流动负债合计</field>
             <field name='line_num_two'>41</field>
             <field name='balance_two_formula'>2001~2241999999</field>
@@ -1075,7 +1076,7 @@
             <field name="line">16</field>
             <field name='balance'>流动资产合计</field>
             <field name='line_num'>15</field>
-            <field name='balance_formula'>1001~1421999999</field>
+            <field name='balance_formula'>1001~1421999999;4001~4999999999</field>
             <field name='balance_two'>递延收益</field>
             <field name='line_num_two'>44</field>
             <field name='balance_two_formula'>2401~2401999999</field>
@@ -1196,7 +1197,7 @@
             <field name="line">32</field>
             <field name='balance'>资产总计</field>
             <field name='line_num'>30</field>
-            <field name='balance_formula'>1001~1901999999</field>
+            <field name='balance_formula'>1001~1901999999;4001~4999999999</field>
             <field name='balance_two'>负债和所有者权益（或股东权益）总计</field>
             <field name='line_num_two'>53</field>
             <field name='balance_two_formula'>2001~3104999999</field>
