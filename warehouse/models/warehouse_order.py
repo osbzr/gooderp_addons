@@ -194,7 +194,7 @@ class wh_in(models.Model):
         '''
         借：商品分类对应的会计科目 一般是库存商品
         贷：如果入库类型为盘盈，取科目 1901 待处理财产损益（暂时写死）
-        如果入库类型为其他，取核算类别的会计科目
+        如果入库类型为其他，取收发类别的会计科目
         '''
 
         # 初始化单的话，先找是否有初始化凭证，没有则新建一个
@@ -221,7 +221,7 @@ class wh_in(models.Model):
                 })
             debit_sum += line.cost
 
-        # 贷方科目： 如果是盘盈则取主营业务成本，否则取核算类别上的科目
+        # 贷方科目： 如果是盘盈则取主营业务成本，否则取收发类别上的科目
         account = self.type == 'inventory' \
                   and self.env.ref('finance.small_business_chart1901') \
                   or self.finance_category_id.account_id
