@@ -232,6 +232,7 @@ class test_buy_adjust_line(TransactionCase):
     def test_onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价'''
         for line in self.adjust.line_ids:
+            line.price_taxed = 0
             line.price = 10
             line.onchange_price()
             self.assertAlmostEqual(line.price_taxed, 11.7)
@@ -245,10 +246,6 @@ class test_buy_adjust_line(TransactionCase):
 
             # 测试价格是否是商品的成本
             self.assertTrue(line.price_taxed == self.cable.cost)
-            # 测试不设置商品的成本时是否弹出警告
-            self.cable.cost = 0.0
-            with self.assertRaises(UserError):
-                line.onchange_goods_id()
 
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''

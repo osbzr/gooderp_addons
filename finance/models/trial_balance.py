@@ -14,7 +14,7 @@ class TrialBalance(models.Model):
     @api.depends('cumulative_occurrence_debit', 'cumulative_occurrence_credit', 
                  'ending_balance_debit', 'ending_balance_credit', 'subject_name_id')
     def _get_year_init(self):
-        if self.subject_name_id.costs_types in ('in','out','cost'):
+        if self.subject_name_id.costs_types in ('in','out'):
             self.year_init_debit = self.year_init_credit = 0
             return True
         if self.subject_name_id.balance_directions == 'in':
@@ -589,9 +589,7 @@ class VouchersSummary(models.TransientModel):
     @api.multi
     def view_detail_voucher(self):
         '''查看凭证明细按钮'''
-        voucher = self.env['voucher'].search([('name', '=', self.voucher_id.name)])
-        if voucher:
-            view = self.env.ref('finance.voucher_form')
+        view = self.env.ref('finance.voucher_form')
         return {
             'name': u'会计凭证明细',
             'view_type': 'form',
@@ -600,7 +598,7 @@ class VouchersSummary(models.TransientModel):
             'views': [(view.id, 'form')],
             'res_model': 'voucher',
             'type': 'ir.actions.act_window',
-            'res_id': voucher.id,
+            'res_id': self.voucher_id.id,
         }
 
 

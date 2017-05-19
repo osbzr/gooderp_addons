@@ -265,7 +265,7 @@ class wh_move(models.Model):
             if move.state == 'done':
                 raise UserError(u'不可以删除已经完成的单据')
 
-        return super(wh_move, self).unlink()
+            return super(wh_move, self).unlink()
 
     def check_qc_result(self):
         """

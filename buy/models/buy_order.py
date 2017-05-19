@@ -535,12 +535,14 @@ class buy_order_line(models.Model):
     @api.one
     def _inverse_price(self):
         '''由不含税价反算含税价，保存时生效'''
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+        if not self.price_taxed:
+            self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
 
     @api.onchange('price', 'tax_rate')
     def onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价'''
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+        if not self.price_taxed:
+            self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
 
     order_id = fields.Many2one('buy.order',
                                u'订单编号',
@@ -629,8 +631,6 @@ class buy_order_line(models.Model):
             raise UserError(u'请先选择一个供应商！')
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            if not self.goods_id.cost:
-                raise UserError(u'请先设置商品的成本！')
             self.price_taxed = self.goods_id.cost
             for line in self.goods_id.vendor_ids:
                 if line.vendor_id == self.order_id.partner_id \

@@ -246,6 +246,7 @@
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="order_id" readonly="1"/>
+                            <field name='origin_id' readonly='1'/>
                             <field name='invoice_id' readonly='1'/>
                             <field name='voucher_id'/>
                             <field name="return_state" readonly="1"/>

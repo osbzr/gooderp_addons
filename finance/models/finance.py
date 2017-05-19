@@ -581,3 +581,39 @@ class change_voucher_name(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+
+
+class dupont(models.Model):
+    _name = 'dupont'
+    _description = u'企业财务指标'
+    _rec_name = 'period_id'
+    _order = 'period_id'
+
+    period_id = fields.Many2one('finance.period', u'期间', index=True)
+    kpi = fields.Char(u'指标')
+    val = fields.Float(u'值')
+
+    @api.model
+    def fill(self, period_id):
+        
+        if self.search([('period_id','=',period_id.id)]):
+            return True
+
+        ta = te = income = ni = roe = roa = em = 0.0
+
+        for b in self.env['trial.balance'].search([('period_id','=',period_id.id)]):
+            if b.subject_name_id.costs_types == 'assets':
+                ta += b.ending_balance_debit - b.ending_balance_credit
+            if b.subject_name_id.costs_types == 'equity':
+                te += b.ending_balance_credit - b.ending_balance_debit
+            if b.subject_name_id.costs_types == 'in':
+                income += b.current_occurrence_credit
+            if b.subject_name_id == self.env.user.company_id.profit_account:
+                ni = b.current_occurrence_credit
+        
+        roe = te and ni / te * 100
+        roa = ta and ni / ta * 100
+        em  = te and ta / te * 100
+        res = {u'资产':ta, u'权益':te, u'收入':income,u'净利':ni,u'权益净利率':roe, u'资产净利率':roa, u'权益乘数':em}
+        for k in res:
+            self.create({'period_id':period_id.id,'kpi':k, 'val':res[k]})

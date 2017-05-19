@@ -163,7 +163,7 @@ class buy_receipt(models.Model):
             if receipt.state == 'done':
                 raise UserError(u'不能删除已审核的单据')
 
-        return receipt.buy_move_id.unlink()
+            receipt.buy_move_id.unlink()
 
     @api.one
     def _wrong_receipt_done(self):
@@ -482,7 +482,7 @@ class buy_receipt(models.Model):
             qty = line.goods_qty
             if return_goods.get(line.attribute_id.id):
                 qty = qty - return_goods[line.attribute_id.id]
-            if qty != 0:
+            if qty > 0:
                 dic = {
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
@@ -498,8 +498,6 @@ class buy_receipt(models.Model):
         if len(receipt_line) == 0:
             raise UserError(u'该订单已全部退货！')
 
-        for line in receipt_line:
-            print line
         vals = {'partner_id': self.partner_id.id,
                 'is_return': True,
                 'origin_id': self.id,
@@ -511,7 +509,6 @@ class buy_receipt(models.Model):
                 'date': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'line_out_ids': [(0, 0, line) for line in receipt_line],
                 }
-        print vals
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('buy.buy_return_form').id
         name = u'采购退货单'
@@ -549,9 +546,6 @@ class wh_move_line(models.Model):
         '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税'''
         self.ensure_one()
         if self.goods_id:
-            if not self.goods_id.cost:
-                raise UserError(u'请先设置商品的成本！')
-
             is_return = self.env.context.get('default_is_return')
             # 如果是采购入库单行 或 采购退货单行
             if (self.type == 'in' and not is_return) or (self.type == 'out' and is_return):

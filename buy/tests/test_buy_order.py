@@ -226,6 +226,45 @@ class test_buy_order(TransactionCase):
         self.env.ref('goods.keyboard').tax_rate = 12
         self.order.onchange_partner_id()
 
+    def test_compute_receipt_and_invoice(self):
+        '''计算生成入库单和结算单的个数'''
+        self.order.buy_order_done()
+        self.assertTrue(self.order.receipt_count == 1)
+
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.assertTrue(self.order.invoice_count == 1)
+        self.assertTrue(self.order.invoice_ids == self.order.receipt_ids[0].invoice_id)
+
+    def test_action_view_receipt(self):
+        '''查看生成的入库单'''
+        # 生成一张入库单
+        self.order.buy_order_done()
+        self.order.action_view_receipt()
+        # 生成两张入库单
+        self.order.buy_order_draft()
+        self.order.buy_order_done()
+        for line in self.order.receipt_ids[0].line_in_ids:
+            line.goods_qty = 3
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.action_view_receipt()
+
+    def test_action_view_invoice(self):
+        '''查看生成的结算单'''
+        # 生成一张入库单，审核后查看结算单
+        self.order.buy_order_done()
+        self.order.action_view_invoice()
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.action_view_invoice()
+        # 生成两张入库单，都审核后在购货订单上查看结算单
+        self.order.receipt_ids[0].buy_receipt_draft()
+        self.order.buy_order_draft()
+        self.order.buy_order_done()
+        for line in self.order.receipt_ids[0].line_in_ids:
+            line.goods_qty = 3
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.receipt_ids[0].buy_receipt_done()
+        self.order.action_view_invoice()
+
 
 class test_buy_order_line(TransactionCase):
 
@@ -267,12 +306,14 @@ class test_buy_order_line(TransactionCase):
     def test_inverse_price(self):
         '''由不含税价反算含税价，保存时生效'''
         for line in self.order.line_ids:
+            line.price_taxed = 0
             line.price = 10
             self.assertAlmostEqual(line.price_taxed, 11.7)
 
     def test_onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价'''
         for line in self.order.line_ids:
+            line.price_taxed = 0
             line.price = 10
             line.onchange_price()
             self.assertAlmostEqual(line.price_taxed, 11.7)
@@ -286,10 +327,6 @@ class test_buy_order_line(TransactionCase):
 
             # 测试价格是否是商品的成本
             self.assertTrue(line.price_taxed == self.cable.cost)
-            # 测试不设置商品的成本时是否弹出警告
-            self.cable.cost = 0.0
-            with self.assertRaises(UserError):
-                line.onchange_goods_id()
 
     def test_onchange_goods_id_tax_rate(self):
         ''' 测试 修改产品时，购货单行税率变化 '''

@@ -1,12 +1,11 @@
-[【在线试用】](http://demo.gooderp.org:8888)
-或
-[【下载Windows绿色版】](http://com.osbzr.net/osbzr_downloads/static/gooderp.zip)
+[![在线试用](http://www.gooderp.org/logo.png)](http://demo.gooderp.org:8888/login?db=demo&login=demo&key=demo) 在线试用
+
 ----
 [![Join the chat at https://gitter.im/osbzr/gooderp](https://badges.gitter.im/osbzr/gooderp.svg)](https://gitter.im/osbzr/gooderp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![License: AGPL-3](https://img.shields.io/badge/licence-AGPL--3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 [![Build Status](https://travis-ci.org/osbzr/gooderp_addons.svg?branch=master)](https://travis-ci.org/osbzr/gooderp_addons)
 [![Coverage Status](https://coveralls.io/repos/github/osbzr/gooderp_addons/badge.svg?branch=master)](https://coveralls.io/github/osbzr/gooderp_addons?branch=master)
-[![Issue Count](https://codeclimate.com/github/osbzr/gooderp_addons/badges/issue_count.svg)](https://codeclimate.com/github/osbzr/gooderp_addons)
+
 
 开发环境准备
 -------------

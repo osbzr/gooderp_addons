@@ -126,11 +126,11 @@
 						<field name="fax" string="手机"/>
 						<field name='email' string='公司邮箱'/>
 						<field name="zip"/>
-						<field name="start_date" readonly="1" />
+						<field name="start_date" groups="base.group_no_one" />
 						<field name="currency_id"/>
-						<field name="tax_number"/>
 						<field name="cost_method"/>
 						<field name="draft_invoice"/>
+						<field name="tax_number"/>
 						<field name="import_tax_rate"/>
 						<field name="output_tax_rate"/>
 						<field name="bank_account_id"/>

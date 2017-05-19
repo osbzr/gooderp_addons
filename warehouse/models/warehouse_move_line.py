@@ -58,12 +58,14 @@ class wh_move_line(models.Model):
     @api.one
     def _inverse_price(self):
         '''由不含税价反算含税价，保存时生效'''
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+        if not self.price_taxed:
+            self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
 
     @api.onchange('price', 'tax_rate')
     def onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价'''
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+        if not self.price_taxed:
+            self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
 
     @api.one
     @api.depends('goods_id')
