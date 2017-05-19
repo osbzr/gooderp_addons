@@ -201,7 +201,7 @@ class other_money_order(models.Model):
     @api.multi
     def create_voucher(self):
         """创建凭证并审核非初始化凭证"""
-        vals = {}
+        init_obj = ''
         # 初始化单的话，先找是否有初始化凭证，没有则新建一个
         if self.is_init:
             vouch_obj = self.env['voucher'].search([('is_init', '=', True)])
@@ -211,25 +211,19 @@ class other_money_order(models.Model):
         else:
             vouch_obj = self.env['voucher'].create({'date': self.date})
         if self.is_init:
-            vals.update({'init_obj': 'other_money_order-%s' % (self.id)})
+            init_obj = 'other_money_order-%s' % (self.id)
 
         if self.type == 'other_get':  # 其他收入单
-            self.other_get_create_voucher_line(vouch_obj)
+            self.other_get_create_voucher_line(vouch_obj, init_obj)
         else:  # 其他支出单
             self.other_pay_create_voucher_line(vouch_obj)
 
-        # 删除初始非需要的凭证明细行
-        if self.is_init:
-            vouch_line_ids = self.env['voucher.line'].search([
-                ('account_id', '!=', self.bank_id.account_id.id),
-                ('init_obj', '=', 'other_money_order-%s' % (self.id))])
-            for vouch_line_id in vouch_line_ids:
-                vouch_line_id.unlink()
-        else:
+        # 如果非初始化单则审核
+        if not self.is_init:
             vouch_obj.voucher_done()
         return vouch_obj
 
-    def other_get_create_voucher_line(self, vouch_obj):
+    def other_get_create_voucher_line(self, vouch_obj, init_obj):
         """
         其他收入单生成凭证明细行
         :param vouch_obj: 凭证
@@ -247,17 +241,18 @@ class other_money_order(models.Model):
                          'debit_account_id': self.bank_id.account_id.id,
                          'partner_credit': self.partner_id.id, 'partner_debit': '',
                          'sell_tax_amount': line.tax_amount or 0,
+                         'init_obj': init_obj,
                          })
             # 贷方行
-            self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('name'), vals.get('note')),
-                'partner_id': vals.get('partner_credit', ''),
-                'account_id': vals.get('credit_account_id'),
-                'credit': line.amount,
-                'voucher_id': vals.get('vouch_obj_id'),
-                'auxiliary_id': vals.get('credit_auxiliary_id', False),
-                'init_obj': vals.get('init_obj', False),
-            })
+            if not init_obj:
+                self.env['voucher.line'].create({
+                    'name': u"%s %s" % (vals.get('name'), vals.get('note')),
+                    'partner_id': vals.get('partner_credit', ''),
+                    'account_id': vals.get('credit_account_id'),
+                    'credit': line.amount,
+                    'voucher_id': vals.get('vouch_obj_id'),
+                    'auxiliary_id': vals.get('credit_auxiliary_id', False),
+                })
             # 销项税行
             if vals.get('sell_tax_amount'):
                 if not self.env.user.company_id.output_tax_account:
