@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="wave_tree">
+			<field name="name">捡货单</field>
+			<field name="model">wave</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+					<field name="order_type"/>
+					<field name="user_id"/>
+				</tree>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="wave_from">
+			<field name="name">捡货单</field>
+			<field name="model">wave</field>
+			<field name="arch" type="xml">
+				<form string="捡货单">
+                    <group>
+                        <field name="name"/>
+                        <field name="order_type"/>
+                        <field name="user_id"/>
+                        <field name="line_ids">
+							<tree editable='bottom'>
+								<field name="sequence"/>
+								<field name="location_id"/>
+								<field name="goods_id"/>
+								<field name="page_num_list"/>
+								<field name="page_qty_list"/>
+								<field name="picking_num"/>
+								<field name="barcode"/>
+							</tree>
+                        </field>
+                    </group>
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="wave_action">
+			<field name="name">捡货单</field>
+			<field name="res_model">wave</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个任务包</p>
+			</field>
+		</record>
+        <menuitem name="捡货单" id="wave_menu" parent="warehouse.warehouse_order"
+		action="wave_action" sequence='1'/>
+
+
+ 		<record id="create_wave_from" model="ir.ui.view">
+            <field name="name">create.wave.form</field>
+            <field name="model">create.wave</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+						<field name="note" />
+                    </group>
+                    <footer>
+					    <button name="create_package"  string="确认生成" type="object" class="oe_highlight"/>
+                         或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+            	</form>
+            </field>
+        </record>
+
+        <act_window id="create_wave_action"
+            name='生成任务包'
+            res_model="create.wave"
+			src_model="sell.delivery"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new"
+            />
+
+        <record model="ir.ui.view" id="gooderp_location_tree">
+			<field name="name">库位设置</field>
+			<field name="model">location</field>
+			<field name="arch" type="xml">
+				<tree editable='top'>
+					<field name="name"/>
+					<field name="warehouse_id"/>
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="gooderp_location_action">
+			<field name="name">库位设置</field>
+			<field name="res_model">location</field>
+			<field name="view_mode">tree</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个任务包</p>
+			</field>
+		</record>
+       <menuitem name="库位设置" id="location_menu" parent="warehouse.warehouse_setting"
+		action="gooderp_location_action" sequence='1'/>
+
+        <record id="wave_sell_delivery_form" model="ir.ui.view">
+            <field name="name">sell.delivery.form</field>
+            <field name="model">sell.delivery</field>
+            <field name="inherit_id" ref="sell.sell_delivery_form"/>
+            <field name="arch" type="xml">
+                <field name="warehouse_id" position="after">
+                    <field name="wave_id"/>
+					<field name="pakge_sequence"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</openerp>

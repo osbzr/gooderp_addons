@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_location_all_group,access_location_all_group,model_location,,1,1,1,1
+access_wave_all_group,access_wave_all_group,model_wave,,1,1,1,1
+access_wave_line_all_group,access_wave_line_all_group,model_wave_line,,1,1,1,1
+access_create_wave_all_group,access_create_wave_all_group,model_create_wave,,1,1,1,1
