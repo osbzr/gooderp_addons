@@ -165,11 +165,15 @@ class cost_order(models.Model):
 
     @api.one
     def _create_mv_cost(self):
-
+        """
+        在所关联的入库单/发货单上创建费用行
+        :return:
+        """
         all_amount = sum(wh_move_line.amount for wh_move_line in self.env['wh.move.line'].search([('move_id', 'in', self.wh_move_ids.ids)]))
         for mv in self.wh_move_ids:
 
             if mv.origin == 'buy.receipt.buy':
+                buy_id = self.env['buy.receipt'].search([('buy_move_id', '=', mv.id)])
                 mv_amount = sum(mv_line.amount for mv_line in mv.line_in_ids)
                 for cost_line in self.line_ids:
                     cost_mv_in_id = self.env['cost.line'].create({
@@ -177,11 +181,12 @@ class cost_order(models.Model):
                         'category_id':cost_line.category_id.id,
                         'amount':cost_line.amount * (mv_amount / all_amount),
                         'tax':cost_line.tax_amount *(mv_amount / all_amount),
-                        'buy_id': mv.id
+                        'buy_id': buy_id.id
                         })
                     self.wm_ids = [(4, cost_mv_in_id.id)]
 
             if mv.origin == 'sell.delivery.sell':
+                sell_id = self.env['sell.delivery'].search([('sell_move_id', '=', mv.id)])
                 mv_amount = sum(mv_line.amount for mv_line in mv.line_out_ids)
                 for cost_line in self.line_ids:
                     cost_mv_out_id = self.env['cost.line'].create({
@@ -189,7 +194,7 @@ class cost_order(models.Model):
                         'category_id':cost_line.category_id.id,
                         'amount':cost_line.amount * (mv_amount / all_amount),
                         'tax':cost_line.tax_amount *(mv_amount / all_amount),
-                        'sell_id': mv.id
+                        'sell_id': sell_id.id
                         })
                     self.wm_ids = [(4, cost_mv_out_id.id)]
 
@@ -219,18 +224,16 @@ class cost_order(models.Model):
         if self.state == 'draft':
             raise UserError(u'请不要重复反审核！')
 
-        if self.wm_ids:
-            for mv_id in self.wm_ids:
-                cost_line_id = mv_id
-                self.wm_ids = [(3, mv_id.id)]
-                cost_line_id.unlink()
+        for mv_id in self.wm_ids:
+            cost_line_id = mv_id
+            self.wm_ids = [(3, mv_id.id)]
+            cost_line_id.unlink()
 
-        if self.invoice_ids:
-            for invoice in self.invoice_ids:
-                invoice_id = invoice
-                self.invoice_ids = [(3, invoice.id)]
-                invoice_id.money_invoice_draft()
-                invoice_id.unlink()
+        for invoice in self.invoice_ids:
+            invoice_id = invoice
+            self.invoice_ids = [(3, invoice.id)]
+            invoice_id.money_invoice_draft()
+            invoice_id.unlink()
 
         #查找产生的付款单并反审核，删除
         money_order = self.env['money.order'].search(
