@@ -31,7 +31,7 @@
 						<field name="active_model" invisible='True'/>
                     </group>
                     <footer>
-					    <button name="create_package"  string="确认生成" type="object" class="oe_highlight"/>
+					    <button name="create_wave"  string="生成拣货单" type="object" class="oe_highlight"/>
                          或者
                         <button string="取消" class="oe_link" special="cancel"/>
                     </footer>

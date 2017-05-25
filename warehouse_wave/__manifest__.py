@@ -13,6 +13,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/wave.xml',
+        'views/express_menu.xml',
         'data/data.xml',
         'report/report.xml',
         'views/assets_backend.xml'

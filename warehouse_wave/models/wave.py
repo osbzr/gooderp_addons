@@ -55,6 +55,7 @@ class create_wave(models.TransientModel):
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         """
+        根据内容判断 报出错误
         """
         model = self.env.context.get('active_model')
         res = super(create_wave, self).fields_view_get(view_id, view_type,
@@ -70,6 +71,9 @@ class create_wave(models.TransientModel):
 
     @api.multi
     def set_default_note(self):
+        """
+        设置默认值, 用来确认要生成拣货单的 发货单据编码
+        """
         context = self.env.context
         all_delivery_name = [delivery.name for delivery in
                              self.env['sell.delivery'].browse(context.get('active_ids'))]
@@ -78,7 +82,10 @@ class create_wave(models.TransientModel):
     note = fields.Char(u'本次处理发货单', default=set_default_note, readonly=True)
     active_model = fields.Char(u'当前模型', default=lambda self: self.env.context.get('active_model'))
 
-    def contract_wave_line_data(self, product_location_num_dict):
+    def build_wave_line_data(self, product_location_num_dict):
+        """
+        构造捡货单行的 数据
+        """
         return_line_data = []
         sequence = 1
         for key, val  in product_location_num_dict.iteritems():
@@ -97,8 +104,9 @@ class create_wave(models.TransientModel):
         return return_line_data
 
     @api.multi
-    def create_package(self):
+    def create_wave(self):
         """
+        创建拣货单
         """
         context = self.env.context
         product_location_num_dict = {}
@@ -117,7 +125,7 @@ class create_wave(models.TransientModel):
                 else:
                     product_location_num_dict[(line.goods_id.id, location_row.id)] =\
                      [(line.id, line.goods_qty)]
-        wave_row.line_ids = self.contract_wave_line_data(product_location_num_dict)
+        wave_row.line_ids = self.build_wave_line_data(product_location_num_dict)
         return {'type': 'ir.actions.act_window',
                 'res_model': 'wave',
                 'view_mode': 'form',
@@ -135,6 +143,7 @@ class do_pack(models.Model):
     @api.one
     @api.depends('product_line_ids.goods_qty', 'product_line_ids.pack_qty')
     def compute_is_pack_ok(self):
+        """计算字段, 看看是否打包完成"""
         if self.product_line_ids:
             self.is_pack = True
         for line in self.product_line_ids:
@@ -142,6 +151,7 @@ class do_pack(models.Model):
                 self.is_pack = False
 
     def get_line_data(self, code):
+        """构造行的数据"""
         line_data = []
         model_row = self.env['wh.move'].search([('name', '=', code)])
         for line_row in model_row.line_out_ids:
@@ -152,6 +162,7 @@ class do_pack(models.Model):
 
     @api.multi
     def scan_barcode(self, code, pack_id):
+        """扫描多个条码,条码的处理 拆分 """
         if code:
             code_list = code.split(" ")
             for code in code_list:
@@ -159,6 +170,7 @@ class do_pack(models.Model):
         return True
 
     def scan_one_barcode(self, code, pack_id):
+        """对于一个条码的处理"""
         pack_row = self.browse(pack_id)
         if pack_row.is_pack:
             raise UserError(u'已经打包完成!')
@@ -193,5 +205,4 @@ class pack_line(models.Model):
     pack_id = fields.Many2one('do.pack', string='打包')
     goods_id = fields.Many2one('goods', string='产品')
     goods_qty = fields.Float(u'要发货数量')
-    pack_qty =  fields.Float(u'打包数量')
-
+    pack_qty = fields.Float(u'打包数量')
