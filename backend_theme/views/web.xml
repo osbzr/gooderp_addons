@@ -240,7 +240,7 @@
         <xpath expr="//ul[contains(@class, 'oe_application_menu_placeholder')]" position="replace">
 
             <div class="panel-default app-drawer-app-panel" id="appDrawerAppMenu">
-                <div class="panel-heading" id="appDrawerAppPanelHead">
+                <div class="theme-panel-heading" id="appDrawerAppPanelHead">
                     <h4 class="app-drawer-panel-title">
                         <a href="#" class="app-drawer-icon-close drawer-toggle">
                             <i class="fa fa-lg fa-chevron-left" />
