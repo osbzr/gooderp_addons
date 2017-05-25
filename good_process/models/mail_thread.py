@@ -145,7 +145,7 @@ class mail_thread(models.AbstractModel):
     @api.multi
     def write(self, vals):
         '''
-        如果单据的审批流程已经开始 —— 至少一个审批人已经审批通过，不允许对此单据进行修改。
+        如果单据的审批流程已经开始（第一个人同意了才算开始） —— 至少一个审批人已经审批通过，不允许对此单据进行修改。
         '''
         for th in self:
             ignore_fields = ['_approver_num',
