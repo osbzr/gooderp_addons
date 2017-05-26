@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<report
+			 id="report_wave"
+			 model="wave"
+			 string="打印捡货单"
+			 name="warehouse_wave.report_wave_view"
+			 file="warehouse_wave.report_wave" 
+			 report_type="qweb-pdf">	
+		</report>
+
+		<template id="report_wave_view">
+			<t t-foreach="docs" t-as="o">
+			<t t-call="report.html_container">
+                <div class="page">
+                	<div class="oe_structure">
+                		<div class="row">
+                            <div class='text-left'>
+                                <h5 t-field="o.create_date"/>
+                            </div>
+                            <div class='text-right'>
+                                <p class="mt16"><img t-if="o.name" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %('Code128', o.name, 600, 160)" style="width:150px;"/></p>
+                                <p class="mt16"><strong t-field="o.name"/></p>
+                            </div>
+                            
+                			<div class='text-center'>
+                				<h2 class='oe_inline'>捡货单</h2>
+                			</div>
+                			<div style="float:left">
+	                			<p>拣货单号:<span t-field="o.name"/></p>
+                                <p>订单类型:<span t-field="o.order_type"/></p>
+                                <p>承运商:<span t-field="o.express_type"/></p>
+                			</div>
+                			<div style="float:right">
+                				<p>打印时间:<span t-field="o.create_date"/></p>
+                                <p>打印员:<span t-field="o.create_uid.name"/></p>
+                			</div>
+                			<table class="table table-condensed">
+                				<theard>
+                					<tr>
+										<th width='12.5%'>序号</th>
+										<th width='12.5%'>库位号</th>
+										<th width='12.5%'>货品条码</th>
+										<th width='12.5%'>捡货数量</th>
+                                        <th width='12.5%'>格子号</th>
+                                        <th width='12.5%'>对应数量</th>
+                                        <th width='12.5%'>货品代码</th>
+                                        <th width='12.5%'>货品名称</th>
+                					</tr>
+                				</theard>
+                				<tbody class="sale_tbody">
+                					<t t-foreach="o.line_ids" t-as="l"  >
+	                					<tr>
+	                						<td>
+	                							 <span><t t-esc='l_index+1'/></span>
+	                						</td>
+	                						<td>
+	                							<span t-field="l.location_id.name"/>
+	                						</td>
+	                						<td>
+	                							<span t-field="l.goods_id.barcode"/>
+	                						</td>
+	                						<td>
+	                							<span t-field="l.picking_qty"/>件
+	                						</td>
+                                            <td>
+												<t t-foreach="l.move_line_ids" t-as="move_line">
+	                								(<span t-field="move_line.move_id.pakge_sequence"/>)<br/>
+												</t>
+	                						</td>
+	                						<td>
+	                							<t t-foreach="l.move_line_ids" t-as="move_line">
+	                								<span t-field="move_line.goods_qty"/><br/>
+												</t>
+	                						</td>
+	                						<td>
+	                							<span t-field="l.goods_id.code"/>
+	                						</td>
+	                						<td>
+	                							<span t-field="l.goods_id.name"/>
+	                						</td>
+	                					</tr>
+                					</t>
+                				</tbody>
+                			</table>
+                		</div>
+                	</div>
+                </div>
+			</t>	
+			</t>
+		</template>
+	</data>
+</openerp>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="express_menu_config_tree">
+			<field name="name">快递面单设置</field>
+			<field name="model">express.menu.config</field>
+			<field name="arch" type="xml">
+				<tree editable='bottom'>
+					<field name="name"/>
+					<field name="abbreviation"/>
+					<field name='customername' />
+                    <field name='customerpwd' />
+                    <field name='monthcode' />
+                    <field name='sendsite' />
+                    <field name='logisticcode' />
+				</tree>
+			</field>
+		</record>
+	 	<record model="ir.actions.act_window" id="express_menu_config_action">
+			<field name="name">快递面单设置</field>
+			<field name="res_model">express.menu.config</field>
+			<field name="view_mode">tree</field>
+			<field name="target" >current</field>
+		</record>
+       <menuitem name="快递面单设置" id="express_menu_config_menu" parent="warehouse.warehouse_setting"
+		action="express_menu_config_action" sequence='50'/>
+
+
+ 		<record id="wave_warehouse_tree" model="ir.ui.view">
+            <field name="name">warehouse.form</field>
+            <field name="model">warehouse</field>
+            <field name='inherit_id' ref='warehouse.warehouse_tree' />
+            <field name="arch" type="xml">
+            	<field name='name' position='after'>
+					<field name="province_id" required="1"/>
+					<field name="city_id" required="1"/>
+					<field name="county_id"/>
+					<field name="detail_address" required='1'/>
+					<field name="principal_id"/>
+            	</field>
+            </field>
+        </record>
+        <record id="express_menu_print_inherit" model="ir.ui.view">
+            <field name="name">sell_delivery_form</field>
+            <field name="model">sell.delivery</field>
+            <field name='inherit_id' ref='sell.sell_delivery_form' />
+            <field name="arch" type="xml">
+                <button name="sell_delivery_draft" position="after" >
+                    <button name="get_express_menu" string="打印面单" type="object" class="oe_highlight"/>
+                </button>
+				<field name="write_date"  position="after" >
+					<field name="express_menu"/>
+				</field>
+            </field>
+        </record>
+    </data>
+</odoo>

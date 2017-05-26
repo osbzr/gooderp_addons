@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="wave_tree">
+			<field name="name">拣货单</field>
+			<field name="model">wave</field>
+			<field name="arch" type="xml">
+				<tree create='false' edit='false'>
+					<field name="name"/>
+					<field name="order_type"/>
+					<field name='state' />
+				</tree>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="wave_action">
+			<field name="name">拣货单</field>
+			<field name="res_model">wave</field>
+			<field name="view_mode">tree</field>
+		</record>
+        <menuitem name="拣货单" id="wave_menu" parent="warehouse.warehouse_order"
+		action="wave_action" sequence='1'/>
+
+
+ 		<record id="create_wave_from" model="ir.ui.view">
+            <field name="name">create.wave.form</field>
+            <field name="model">create.wave</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+						<field name="note" />
+						<field name="active_model" invisible='True'/>
+                    </group>
+                    <footer>
+					    <button name="create_wave"  string="生成拣货单" type="object" class="oe_highlight"/>
+                         或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+            	</form>
+            </field>
+        </record>
+
+        <act_window id="create_wave_action"
+            name='生成拣货单'
+            res_model="create.wave"
+			src_model="sell.delivery"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new"
+            />
+
+        <record model="ir.ui.view" id="gooderp_location_tree">
+			<field name="name">库位设置</field>
+			<field name="model">location</field>
+			<field name="arch" type="xml">
+				<tree editable='top'>
+					<field name="name"/>
+					<field name="warehouse_id"/>
+					<field name="goods_id"/>
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="gooderp_location_action">
+			<field name="name">库位设置</field>
+			<field name="res_model">location</field>
+			<field name="view_mode">tree</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建一个库位</p>
+			</field>
+		</record>
+       <menuitem name="库位设置" id="location_menu" parent="warehouse.warehouse_setting"
+		action="gooderp_location_action" sequence='1'/>
+
+ 	 	<record model="ir.ui.view" id="do_pack_tree">
+			<field name="name">打包</field>
+			<field name="model">do.pack</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="odd_numbers"/> 
+					<field name="is_pack"/> 
+				</tree>
+			</field>
+		</record>
+        <record model="ir.ui.view" id="do_pack_form">
+			<field name="name">do.pack.form</field>
+			<field name="model">do.pack</field>
+			<field name="arch" type="xml">
+				<form string='打包' edit='false'>
+				  <sheet>
+						<div class="oe_title">
+							<label string="扫描条码 "/>
+							<input type='text' class="do_pack_scan_code" autofocus="true"/>
+						</div>
+						 <group>
+                            <group>
+								<field name="odd_numbers" attrs="{'invisible':[('odd_numbers', '=', False)]}"/>
+								<field name="is_pack" />
+							</group>
+							<group>
+								<field name="create_uid"/>
+								<field name="create_date" />
+							</group>
+						</group>
+							<field name="product_line_ids" >
+								<tree editable='bottom'>
+									<field name="goods_id" />
+									<field name="goods_qty" />
+									<field name="pack_qty" />
+								</tree>
+							</field>
+						
+					</sheet>
+            	</form>
+			</field>
+		</record>
+	 	<record model="ir.actions.act_window" id="do_pack_action">
+			<field name="name">打包</field>
+			<field name="res_model">do.pack</field>
+			<field name="view_mode">tree,form</field>
+			<field name="target" >current</field>
+		</record>
+       <menuitem name="打包" id="do_pack_menu" parent="warehouse.warehouse_order"
+		action="do_pack_action" sequence='50'/>
+    </data>
+</odoo>
