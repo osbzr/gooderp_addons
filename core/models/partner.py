@@ -17,6 +17,7 @@ class partner(models.Model):
     code = fields.Char(u'编号')
     name = fields.Char(u'名称', required=True,)
     main_mobile = fields.Char(u'主要手机号', required=True,)
+    main_address = fields.Char(u'办公地址')
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
