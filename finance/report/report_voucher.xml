@@ -301,10 +301,10 @@
                                     <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[9]" />
                                     </td>
-                                    <td style="vertical-align:middle;">
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[10]" />
                                     </td>
-                                    <td style="vertical-align:middle;">
+                                    <td style="vertical-align:bottom;">
                                         <span t-esc="rmb_format(o.amount_text)[11]" />
                                     </td>
                                 </tr>
