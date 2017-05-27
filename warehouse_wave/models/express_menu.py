@@ -42,8 +42,10 @@ class wh_move(models.Model):
     """
     生成快递电子面单
     """
-    _inherit = 'wh.move'
-    express_menu = fields.Html(u'快递面单')
+    _name = 'wh.move'
+    _inherit = ['wh.move', 'state.city.county']
+    express_menu = fields.Text(u'快递面单', copy=False)
+    express_code = fields.Char(u'快递单号', copy=False)
 
     def get_shipping_type_config(self, menu_type):
         """
@@ -63,21 +65,23 @@ class wh_move(models.Model):
                       Name=ware_hosue_row.principal_id.name or ware_hosue_row.company_id.name or '',
                       Mobile=ware_hosue_row.principal_id.work_phone or
                       ware_hosue_row.company_id.phone,
-                      ProvinceName=ware_hosue_row.province_id.name  or '',
-                      CityName=ware_hosue_row.city_id.city_name or '',
-                      ExpAreaName=ware_hosue_row.county_id.county_name  or '',
-                      Address=ware_hosue_row.detail_address or '')
+                      ProvinceName=ware_hosue_row.province_id.name  or '上海',
+                      CityName=ware_hosue_row.city_id.city_name or '上海',
+                      ExpAreaName=ware_hosue_row.county_id.county_name  or '浦东新区',
+                      Address=ware_hosue_row.detail_address or '金海路2588号B-213')
         return sender
 
     def get_receiver_goods_message(self):
-        receiver = dict(Company='GGG',
+        #TODO: 要发货的详细地址字段 (有疑问)
+        receiver = dict(Company='',
                         Name=self.partner_id.name,
                         Mobile=self.partner_id.main_mobile,
-                        ProvinceName='北京',
-                        CityName='北京',
-                        ExpAreaName='朝阳区',
-                        Address='三里屯街道雅秀大厦')
+                        ProvinceName=self.province_id.name  or '上海',
+                        CityName=self.city_id.city_name or '上海',
+                        ExpAreaName=self.county_id.county_name or '浦东新区',
+                        Address=False or '金海路2588号B-213')
         goods = []
+        qty = 0
         for line in self.line_out_ids:
             goods.append(dict(GoodsName=line.goods_id.name, #产品名称
                               Goodsquantity=int(line.goods_qty), #产品数量
@@ -86,7 +90,8 @@ class wh_move(models.Model):
                               GoodsPrice=0.0, #产品价格
                               # GoodsVol='',  #产品体积
                               ))
-        return receiver, goods
+            qty += 1
+        return receiver, goods, qty
 
     @api.model
     def get_express_menu(self):
@@ -98,12 +103,12 @@ class wh_move(models.Model):
                                                         default=''))
         order_code = self.name
         sender = self.get_sender(self.warehouse_id)
-        remark = '小心轻放'
-        shipping_type = 'YTO'
-        receiver, commodity = self.get_receiver_goods_message()
+        remark = self.note or '小心轻放'
+        shipping_type = self.express_type or 'YTO'
+        receiver, commodity, qty = self.get_receiver_goods_message()
         request_data = dict(OrderCode=order_code, PayType=1, ExpType=1, Cost=1.0, OtherCost=1.0,
                             Sender=sender, Receiver=receiver, Commodity=commodity, Weight=1.0,
-                            Quantity=1, Volume=0.0, Remark=remark, IsReturnPrintTemplate=1)
+                            Quantity=qty, Volume=0.0, Remark=remark, IsReturnPrintTemplate=1)
         request_data.update(self.get_shipping_type_config(shipping_type))
         request_data = json.dumps(request_data)
         data = {'RequestData': request_data,
@@ -114,15 +119,14 @@ class wh_move(models.Model):
         http = httplib2.Http()
         response, content = http.request(path, 'POST', headers=header, body=urllib.urlencode(data))
         content = content.replace('true', 'True').replace('false', 'False')
-        print content
-        #TODO
-        """ file_html = open('express_html.html', 'w')
+        self.express_code = (safe_eval(content).get('Order', {})).get('LogisticCode', "")
+        #TODO: 获取到的快递面单的进一步的处理
+        # file_html = open('express_html.html', 'w')
         # file_html.write(safe_eval(content).get('PrintTemplate'))
         # file_html.close()
         # pdfkit.from_file('express_html.html', 'express_pdf.pdf')
-        # f = open('express_pdf.pdf', 'rb')"""
-        self.express_menu = safe_eval(content).get('PrintTemplate')
-        return True
+        self.express_menu = str(safe_eval(content).get('PrintTemplate'))
+        return str(safe_eval(content).get('PrintTemplate'))
 
     def encrypt_kdn(self, data, appkey):
         """
@@ -131,3 +135,14 @@ class wh_move(models.Model):
         key = base64.b64encode(hashlib.md5("%s%s" % (data, appkey)).hexdigest(), altchars=None)
         return urllib.quote(key, safe='/')
 
+    @api.model
+    def get_moves_html(self, move_ids):
+        move_rows = self.browse(move_ids)
+        return_html_list = []
+        for move_row in move_rows:
+            if move_row.express_menu:
+                return_html_list.append(move_row.express_menu)
+            else:
+                return_html_list.append(move_row.get_express_menu())
+        return return_html_list
+        
