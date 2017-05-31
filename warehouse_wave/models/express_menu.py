@@ -27,17 +27,6 @@ class warehouse(models.Model):
     detail_address = fields.Char(u'详细地址')
     principal_id = fields.Many2one('staff', u'负责人')
 
-
-class sell_delivery(models.Model):
-
-    _inherit = 'sell.delivery'
-
-    @api.multi
-    def get_express_menu(self):
-        """销售发货单 获取 快递面单"""
-        return self.sell_move_id.get_express_menu()
-
-
 class wh_move(models.Model):
     """
     生成快递电子面单

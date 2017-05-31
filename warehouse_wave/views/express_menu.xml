@@ -45,9 +45,6 @@
             <field name="model">sell.delivery</field>
             <field name='inherit_id' ref='sell.sell_delivery_form' />
             <field name="arch" type="xml">
-                <button name="sell_delivery_draft" position="after" >
-                    <button name="get_express_menu" string="打印面单" type="object" class="oe_highlight"/>
-                </button>
 				<field name="address"  position="before" >
 					<label for='province_id' string='地址' />
 					 <div class="address_format">
