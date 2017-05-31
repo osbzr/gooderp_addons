@@ -169,9 +169,8 @@ class mail_thread(models.AbstractModel):
                 if not change_state:
                     raise ValidationError(u'已审批不可修改')
                 if change_state == 'draft':
-                    self.__add_approver__(th, th._name)
                     vals.update({
-                        '_approver_num': len(th._to_approver_ids),
+                        '_approver_num': len(self.__add_approver__(th, th._name)),
                     })
             # 审批中，审核时报错，修改其他字段报错
             elif len(th._to_approver_ids) < th._approver_num:
