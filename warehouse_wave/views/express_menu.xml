@@ -45,11 +45,21 @@
             <field name="model">sell.delivery</field>
             <field name='inherit_id' ref='sell.sell_delivery_form' />
             <field name="arch" type="xml">
-                <button name="sell_delivery_draft" position="after" >
-                    <button name="get_express_menu" string="打印面单" type="object" class="oe_highlight"/>
-                </button>
+				<field name="address"  position="before" >
+					<label for='province_id' string='地址' />
+					 <div class="address_format">
+                        <field name='province_id' style="width: 40%"  placeholder="省"  
+						options="{'no_open': True, 'no_create': True}"   />
+                        <field name='city_id'  placeholder="市" style="width: 30%" 
+						context="{'default_province_name':province_id}" options="{'no_open': True, 'no_create': True}"   />
+                        <field name='county_id' placeholder="县" style="width: 30%" 
+						context="{'default_city_name':city_id}" options="{'no_open': True, 'no_create': True}" />
+                    </div>
+				</field>
+
 				<field name="write_date"  position="after" >
-					<field name="express_menu"/>
+					<field name="express_code"/>
+					<field name="express_menu" invisible='True'/>
 				</field>
             </field>
         </record>
