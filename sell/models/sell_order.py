@@ -163,6 +163,9 @@ class sell_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    received_amount = fields.Float(u'已收金额', readonly=True)
+
+
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
