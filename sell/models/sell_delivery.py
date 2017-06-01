@@ -193,6 +193,7 @@ class sell_delivery(models.Model):
         auto_in = self.env['wh.in'].create(vals)
         line_ids = [line.id for line in auto_in.line_in_ids]
         self.with_context({'wh_in_line_ids':line_ids}).sell_delivery_done()
+        return True
 
     @api.one
     def _wrong_delivery_done(self):
