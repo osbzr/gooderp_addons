@@ -492,6 +492,7 @@ class buy_receipt(models.Model):
                     'goods_qty': qty,
                     'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
+                    'discount_amount': line.discount_amount,
                     'type': 'out'
                 }
                 receipt_line.append(dic)
@@ -508,6 +509,7 @@ class buy_receipt(models.Model):
                 'date_due': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'date': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'line_out_ids': [(0, 0, line) for line in receipt_line],
+                'discount_amount': self.discount_amount,
                 }
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('buy.buy_return_form').id

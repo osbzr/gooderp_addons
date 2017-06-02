@@ -193,6 +193,7 @@ class sell_delivery(models.Model):
         auto_in = self.env['wh.in'].create(vals)
         line_ids = [line.id for line in auto_in.line_in_ids]
         self.with_context({'wh_in_line_ids':line_ids}).sell_delivery_done()
+        return True
 
     @api.one
     def _wrong_delivery_done(self):
@@ -476,7 +477,7 @@ class sell_delivery(models.Model):
             qty = line.goods_qty
             if return_goods.get(line.attribute_id.id):
                 qty = qty - return_goods[line.attribute_id.id]
-            if qty != 0:
+            if qty > 0:
                 dic = {
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
@@ -486,6 +487,7 @@ class sell_delivery(models.Model):
                     'goods_qty': qty,
                     'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
+                    'discount_amount': line.discount_amount,
                 }
                 receipt_line.append(dic)
         if len(receipt_line) == 0:
@@ -500,6 +502,7 @@ class sell_delivery(models.Model):
                 'date_due': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'date': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'line_in_ids': [(0, 0, line) for line in receipt_line],
+                'discount_amount': self.discount_amount,
                 }
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('sell.sell_return_form').id
