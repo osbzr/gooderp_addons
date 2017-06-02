@@ -477,7 +477,7 @@ class sell_delivery(models.Model):
             qty = line.goods_qty
             if return_goods.get(line.attribute_id.id):
                 qty = qty - return_goods[line.attribute_id.id]
-            if qty != 0:
+            if qty > 0:
                 dic = {
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
