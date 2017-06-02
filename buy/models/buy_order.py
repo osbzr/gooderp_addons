@@ -228,6 +228,7 @@ class buy_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    paid_amount = fields.Float(u'已付金额', readonly=True)
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):

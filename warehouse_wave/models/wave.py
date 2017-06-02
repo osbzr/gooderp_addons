@@ -29,12 +29,40 @@ class wave(models.Model):
     line_ids = fields.One2many('wave.line', 'wave_id', string='任务行')
 
 
-class wh_move(models.Model):
-    _inherit = 'wh.move'
+    @api.multi
+    def print_express_menu(self):
+        move_rows = self.env['wh.move'].search([('wave_id', '=', self.id)])
+        return {'type': 'ir.actions.client',
+               'tag': 'warehouse_wave.print_express_menu',
+               'context': {'move_ids':[move.id for move in move_rows]},
+               'target':'new',
+              }
 
+    @api.multi
+    def unlink(self):
+        """
+        1.有部分已经打包,捡货单不能进行删除
+        2.能删除了,要把一些相关联的字段清空 如pakge_sequence
+        """
+        for wave_row in self:
+            wh_move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id),
+                                                       ('pakge_sequence', '=', False)])
+            if wh_move_rows:
+                 raise UserError(u"""发货单%s已经打包发货,捡货单%s不允许删除!
+                                 """%(u'-'.join([move_row.name for move_row in wh_move_rows]),
+                                      wave_row.name))
+            # 清楚发货单上的格子号
+            move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id)])
+            move_rows.write({'pakge_sequence': False})
+        return super(wave, self).unlink()
+
+
+class wh_move(models.Model):
+    _name = 'wh.move'
+    _inherit = ['wh.move', 'state.city.county']
     express_type = fields.Char(string='承运商')
     wave_id = fields.Many2one('wave', string='捡货单')
-    pakge_sequence = fields.Integer(u'格子号')
+    pakge_sequence = fields.Char(u'格子号')
 
 
 class wave_line(models.Model):
@@ -125,11 +153,13 @@ class create_wave(models.TransientModel):
                 else:
                     product_location_num_dict[(line.goods_id.id, location_row.id)] =\
                      [(line.id, line.goods_qty)]
+            index += 1
         wave_row.line_ids = self.build_wave_line_data(product_location_num_dict)
         return {'type': 'ir.actions.act_window',
                 'res_model': 'wave',
+                'name':u'拣货单',
                 'view_mode': 'form',
-                'views': [(False, 'form'), (False, 'tree')],
+                'views': [(False, 'tree')],
                 'res_id': wave_row.id,
                 'target': 'current'}
 
@@ -140,6 +170,14 @@ class do_pack(models.Model):
     product_line_ids = fields.One2many('pack.line', 'pack_id', string='产品行')
     is_pack = fields.Boolean(compute='compute_is_pack_ok', string='打包完成')
 
+    @api.multi
+    def unlink(self):
+        for pack in  self:
+            if pack.is_pack:
+                raise UserError(u'已完成打包记录不能删除!')
+        return super(do_pack, self).unlink()
+
+
     @api.one
     @api.depends('product_line_ids.goods_qty', 'product_line_ids.pack_qty')
     def compute_is_pack_ok(self):
@@ -147,8 +185,12 @@ class do_pack(models.Model):
         if self.product_line_ids:
             self.is_pack = True
         for line in self.product_line_ids:
-            if line.goods_qty == line.pack_qty:
+            if line.goods_qty != line.pack_qty:
                 self.is_pack = False
+        if  self.is_pack:
+            model_row = self.env['wh.move'].search([('name', '=', self.odd_numbers)])
+            model_row.write({'pakge_sequence': False})
+
 
     def get_line_data(self, code):
         """构造行的数据"""
@@ -161,17 +203,22 @@ class do_pack(models.Model):
 
 
     @api.multi
-    def scan_barcode(self, code, pack_id):
+    def scan_barcode(self, code_str, pack_id):
         """扫描多个条码,条码的处理 拆分 """
-        if code:
-            code_list = code.split(" ")
+        if code_str:
+            pack_row = self.browse(pack_id)
+            code_list = code_str.split(" ")
             for code in code_list:
-                self.scan_one_barcode(code, pack_id)
+                if pack_row.odd_numbers:
+                    scan_code = code
+                else:
+                    move_row = self.env['wh.move'].search([('express_code', '=', code)])
+                    scan_code = move_row.name
+                self.scan_one_barcode(scan_code, pack_row)
         return True
 
-    def scan_one_barcode(self, code, pack_id):
+    def scan_one_barcode(self, code, pack_row):
         """对于一个条码的处理"""
-        pack_row = self.browse(pack_id)
         if pack_row.is_pack:
             raise UserError(u'已经打包完成!')
         if not pack_row.odd_numbers:
@@ -183,7 +230,7 @@ class do_pack(models.Model):
         else:
             goods_row = self.env['goods'].search([('barcode', '=', code)])
             line_rows = self.env['pack.line'].search([('goods_id', '=', goods_row.id),
-                                                      ('pack_id', '=', pack_id)])
+                                                      ('pack_id', '=', pack_row.id)])
             if not line_rows:
                 raise UserError(u'产品%s不在当前要打包的发货单%s上!'%(
                     goods_row.name, pack_row.odd_numbers))
@@ -193,6 +240,8 @@ class do_pack(models.Model):
                     continue
                 line_row.pack_qty += 1
                 goods_is_enough = False
+                break
+
             if goods_is_enough:
                 raise UserError(u'发货单%s要发货的产品%s已经充足,请核对后在进行操作!'%(
                     pack_row.odd_numbers, goods_row.name))

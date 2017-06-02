@@ -17,6 +17,30 @@ class money_order(models.Model):
                               ondelete='restrict',
                               help=u'与付款相关的销售订单号')
 
+    @api.multi
+    def money_order_done(self):
+        return_vals = super(money_order, self).money_order_done()
+        for order_row in self:
+            if order_row.type == 'get' and order_row.sell_id:
+                order_row.sell_id.received_amount =\
+                 sum([order.amount for order in self.search([('sell_id', '=',
+                                                              order_row.sell_id.id),
+                                                             ('state', '=', 'done')])])
+        return return_vals
+
+
+    @api.multi
+    def money_order_draft(self):
+        return_vals = super(money_order, self).money_order_draft()
+        for order_row in self:
+            if order_row.type == 'get' and order_row.sell_id:
+                order_row.sell_id.received_amount =\
+                 sum([order.amount for order in self.search([('sell_id', '=',
+                                                              order_row.sell_id.id),
+                                                             ('state', '=', 'done')])])
+        return return_vals
+
+
 
 class money_invoice(models.Model):
     _inherit = 'money.invoice'

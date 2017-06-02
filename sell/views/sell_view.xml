@@ -20,6 +20,7 @@
 					<field name="_approve_state"/>
             		<field name='goods_state'/>
             		<field name="money_state"/>
+					<field name="received_amount"/>
 					<field name='currency_id'
 						   groups='finance.group_multi_currency'/>
             	</tree>
@@ -90,6 +91,7 @@
                         			<group>
 										<field name="discount_amount" groups='sell.sell_discount_groups'/>
                             			<field name="amount"/>
+										<field name="received_amount"/>
                         			</group>
                         			<group>
 										<field name="pre_receipt"/>
