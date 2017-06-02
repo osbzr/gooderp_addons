@@ -10,7 +10,7 @@ python:
   - "2.7"
 
 env:
-  - VERSION="master" ODOO_REPO="osbzr/base" LINT_CHECK="0"
+  - VERSION="10.0" ODOO_REPO="osbzr/base" LINT_CHECK="0"
 
 
 virtualenv:
