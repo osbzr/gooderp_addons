@@ -66,6 +66,12 @@ class money_transfer_order(models.Model):
                                  ondelete='restrict',
                                  help=u'资金转账单审核时生成的对应凭证',
                                  copy=False)
+    transfer_amount = fields.Float(compute='_compute_transfer_amount', string='转账总金额')
+
+    @api.one
+    @api.depends('line_ids', 'line_ids.amount')
+    def _compute_transfer_amount(self):
+        self.transfer_amount = sum([line.amount for line in self.line_ids])
 
     @api.multi
     def money_transfer_done(self):

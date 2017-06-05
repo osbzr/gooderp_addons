@@ -10,6 +10,7 @@
                     <field name="name"/>
                     <field name="date"/>
                     <field name="state"/>
+                    <field name="transfer_amount"/>
                     <field name="_approve_state"/>
                 </tree>
             </field>
