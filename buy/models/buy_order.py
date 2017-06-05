@@ -73,18 +73,13 @@ class buy_order(models.Model):
         return self._default_warehouse_dest_impl()
 
     @api.one
-    @api.depends('type')
-    def _get_money_state(self):
+    def _get_paid_amount(self):
         '''计算购货订单付款/退款状态'''
         receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
-        if all(receipt.invoice_id.reconciled == 0
-               for receipt in receipts):
-            self.money_state = (self.type == 'buy') and u'未付款' or u'未退款'
-        elif all(receipt.invoice_id.reconciled ==
-                 receipt.invoice_id.amount for receipt in receipts):
-            self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
-        else:
-            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
+        money_order_rows = self.env['money.order'].search([('buy_id', '=', self.id),
+       													   ('source_ids', '=', False)])
+        self.paid_amount = sum([receipt.invoice_id.reconciled for receipt in receipts]) +\
+                           sum([order_row.amount for order_row  in money_order_rows])
 
     @api.depends('receipt_ids')
     def _compute_receipt(self):
@@ -201,10 +196,6 @@ class buy_order(models.Model):
                             "buy_id",
                             string=u"付款计划",
                             help=u'分批付款时使用付款计划')
-    money_state = fields.Char(u'付/退款状态',
-                              compute=_get_money_state,
-                              copy=False,
-                              help=u'购货订单生成的采购入库单或退货单的付/退款状态')
     goods_id = fields.Many2one('goods', related='line_ids.goods_id', string=u'商品')
     receipt_ids = fields.One2many('buy.receipt', 'order_id', string='Receptions', copy=False)
     receipt_count = fields.Integer(compute='_compute_receipt', string='Receptions Count', default=0)
@@ -228,7 +219,7 @@ class buy_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    paid_amount = fields.Float(u'已付金额', readonly=True)
+    paid_amount = fields.Float(u'已付金额', compute=_get_paid_amount, readonly=True)
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):

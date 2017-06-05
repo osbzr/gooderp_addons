@@ -15,31 +15,6 @@ class money_order(models.Model):
     buy_id = fields.Many2one('buy.order', u'采购订单', ondelete='restrict',
                              help=u'与付款相关的采购订单号')
 
-    @api.multi
-    def money_order_done(self):
-        """当 付款单审核后重新计算"""
-        return_vals = super(money_order, self).money_order_done()
-        for order_row in self:
-            if order_row.type == 'pay' and order_row.buy_id:
-                order_row.buy_id.paid_amount =\
-                 sum([order.amount for order in self.search([('buy_id', '=',
-                                                              order_row.buy_id.id),
-                                                             ('state', '=', 'done')])])
-        return return_vals
-
-    @api.multi
-    def money_order_draft(self):
-        """当 付款单审核后重新计算"""
-        return_vals = super(money_order, self).money_order_draft()
-        for order_row in self:
-            if order_row.type == 'pay' and order_row.buy_id:
-                order_row.buy_id.paid_amount =\
-                 sum([order.amount for order in self.search([('buy_id', '=',
-                                                              order_row.buy_id.id),
-                                                             ('state', '=', 'done')])])
-        return return_vals
-
-
 class money_invoice(models.Model):
     _inherit = 'money.invoice'
 

@@ -59,19 +59,14 @@ class sell_order(models.Model):
                         self.env.context.get('warehouse_type'))
 
     @api.one
-    @api.depends('type')
-    def _get_money_state(self):
+    def _get_received_amount(self):
         '''计算销货订单收款/退款状态'''
         deliverys = self.env['sell.delivery'].search([('order_id', '=', self.id)])
-        if all(delivery.invoice_id.reconciled == 0
-               for delivery in deliverys):
-            self.money_state = (self.type == 'sell' and u'未收款' or u'未退款')
-        elif all(delivery.invoice_id.reconciled ==
-                 delivery.invoice_id.amount for delivery in deliverys):
-            self.money_state = (self.type == 'sell' and u'全部收款' or u'全部退款')
-        else:
-            self.money_state = (self.type == 'sell' and u'部分收款' or u'部分退款')
-
+        money_order_rows = self.env['money.order'].search([('sell_id', '=', self.id),
+                                                           ('source_ids', '=', False)])
+        self.received_amount = sum([delivery.invoice_id.reconciled for delivery in deliverys]) +\
+                               sum([order_row.amount for order_row  in money_order_rows])
+         
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES,
                                  help=u'签约合同的客户')
@@ -146,10 +141,6 @@ class sell_order(models.Model):
                               default=u'未出库',
                               store=True,
                               help=u"销货订单的发货状态", index=True, copy=False)
-    money_state = fields.Char(u'收/退款状态',
-                              compute=_get_money_state,
-                              copy=False,
-                              help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止',
                                help=u'该单据是否已终止')
     currency_id = fields.Many2one('res.currency',
@@ -163,7 +154,7 @@ class sell_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    received_amount = fields.Float(u'已收金额', readonly=True)
+    received_amount = fields.Float(u'已收金额',  compute=_get_received_amount, readonly=True)
 
 
 
