@@ -130,8 +130,10 @@ class wh_move_line(models.Model):
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
                                    help=u'该单据行对应的产品的属性')
     using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理',
+                                 readonly=True,
                                  help=u'该单据行对应的产品是否使用批号管理')
     force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1',
+                                     readonly=True,
                                      help=u'该单据行对应的产品是否每批号数量为1,是True否则False')
     lot = fields.Char(u'批号',
                       help=u'该单据行对应的产品的批号，一般是入库单行')
