@@ -72,12 +72,12 @@ class wh_move(models.Model):
         goods = []
         qty = 0
         for line in self.line_out_ids:
-            goods.append(dict(GoodsName=line.goods_id.name, #产品名称
-                              Goodsquantity=int(line.goods_qty), #产品数量
-                              GoodsWeight=1.0, #产品重量
-                              GoodsCode=line.goods_id.code or '', # 产品编码
-                              GoodsPrice=0.0, #产品价格
-                              # GoodsVol='',  #产品体积
+            goods.append(dict(GoodsName=line.goods_id.name, #商品名称
+                              Goodsquantity=int(line.goods_qty), #商品数量
+                              GoodsWeight=1.0, #商品重量
+                              GoodsCode=line.goods_id.code or '', # 商品编码
+                              GoodsPrice=0.0, #商品价格
+                              # GoodsVol='',  #商品体积
                               ))
             qty += 1
         return receiver, goods, qty

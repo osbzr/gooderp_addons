@@ -46,7 +46,7 @@ class stock_request(models.Model):
     @api.one
     def stock_query(self):
         ''' 点击 查询库存 按钮 生成补货申请行
-                                    每行一个产品一个属性的 数量，补货数量
+                                    每行一个商品一个属性的 数量，补货数量
          '''
         goods = self.env['goods'].search([('no_stock', '=', False)])
 
@@ -68,52 +68,52 @@ class stock_request(models.Model):
                 # 计算当前数量
                 if wh_move_line.state == 'done':
                     if wh_move_line.warehouse_dest_id.type == 'stock':  # 目的库位为库存库位
-                        if wh_move_line.attribute_id:  # 产品存在属性
+                        if wh_move_line.attribute_id:  # 商品存在属性
                             if wh_move_line.attribute_id not in attribute_dict:
                                 attribute_dict.update({wh_move_line.attribute_id: wh_move_line.qty_remaining})
                             else:
                                 attribute_dict[wh_move_line.attribute_id] += wh_move_line.qty_remaining
-                        else:  # 产品不存在属性
+                        else:  # 商品不存在属性
                             qty += wh_move_line.qty_remaining
                 # 计算未发货和未到货数量
                 else:
                     if wh_move_line.type == 'out':
-                        if wh_move_line.attribute_id:  # 产品存在属性
+                        if wh_move_line.attribute_id:  # 商品存在属性
                             if not to_delivery_dict.has_key(wh_move_line.attribute_id):
                                 to_delivery_dict.update({wh_move_line.attribute_id: wh_move_line.goods_qty})
                             else:
                                 to_delivery_dict[wh_move_line.attribute_id] += wh_move_line.goods_qty
-                        else:  # 产品不存在属性
+                        else:  # 商品不存在属性
                             to_delivery_qty += wh_move_line.goods_qty
                     else:
-                        if wh_move_line.attribute_id:  # 产品存在属性
+                        if wh_move_line.attribute_id:  # 商品存在属性
                             if not to_receipt_dict.has_key(wh_move_line.attribute_id):
                                 to_receipt_dict.update({wh_move_line.attribute_id: wh_move_line.goods_qty})
                             else:
                                 to_receipt_dict[wh_move_line.attribute_id] += wh_move_line.goods_qty
-                        else:  # 产品不存在属性
+                        else:  # 商品不存在属性
                             to_receipt_qty += wh_move_line.goods_qty
             # 计算未销货数量
             sell_order_lines = self.env['sell.order.line'].search([('goods_id', '=', good.id),
                                                                    ('order_id.state', '=', 'draft')])
             for line in sell_order_lines:
-                if line.attribute_id:  # 产品存在属性
+                if line.attribute_id:  # 商品存在属性
                     if not to_sell_dict.has_key(line.attribute_id):
                         to_sell_dict.update({line.attribute_id: line.quantity})
                     else:
                         to_sell_dict[line.attribute_id] += line.quantity
-                else:  # 产品不存在属性
+                else:  # 商品不存在属性
                     to_sell_qty += line.quantity
             # 计算未购货数量
             buy_order_lines = self.env['buy.order.line'].search([('goods_id', '=', good.id),
                                                                    ('order_id.state', '=', 'draft')])
             for line in buy_order_lines:
-                if line.attribute_id:  # 产品存在属性
+                if line.attribute_id:  # 商品存在属性
                     if not to_buy_dict.has_key(line.attribute_id):
                         to_buy_dict.update({line.attribute_id: line.quantity})
                     else:
                         to_buy_dict[line.attribute_id] += line.quantity
-                else:  # 产品不存在属性
+                else:  # 商品不存在属性
                     to_buy_qty += line.quantity
 
             # 如果组装单模板存在，is_buy置为False
@@ -127,7 +127,7 @@ class stock_request(models.Model):
 
             # 生成补货申请行
             qty_available = 0  # 可用库存
-            if good.attribute_ids:  # 产品存在属性
+            if good.attribute_ids:  # 商品存在属性
                 for attribute in good.attribute_ids:
                     qty = attribute in attribute_dict and attribute_dict[attribute] or 0
                     to_sell_qty = attribute in to_sell_dict and to_sell_dict[attribute] or 0
@@ -151,7 +151,7 @@ class stock_request(models.Model):
                            'supplier_id': good.supplier_id and good.supplier_id.id or False,
                            'is_buy': is_buy,
                         })
-            else:  # 产品不存在属性
+            else:  # 商品不存在属性
                 qty_available = qty + to_receipt_qty + to_buy_qty - to_delivery_qty - to_sell_qty
                 if qty_available < good.min_stock_qty:
                     self.env['stock.request.line'].create({
@@ -261,7 +261,7 @@ class stock_request(models.Model):
                 continue
 
             if not line.supplier_id:
-                raise UserError(u'请输入补货申请行产品%s%s 的供应商。' % (line.goods_id.name, line.attribute_id.name or ''))
+                raise UserError(u'请输入补货申请行商品%s%s 的供应商。' % (line.goods_id.name, line.attribute_id.name or ''))
 
             # 找供应商相同的购货订单
             buy_order = self.env['buy.order'].search([('partner_id', '=', line.supplier_id.id),
@@ -279,11 +279,11 @@ class stock_request(models.Model):
                                                       ('goods_id', '=', line.goods_id.id),
                                                       ('attribute_id', '=', line.attribute_id.id)])
             if len(buy_order_line) > 1:
-                raise UserError(u'供应商%s 产品%s%s 存在多条未审核购货订单行。请联系采购人员处理。'
+                raise UserError(u'供应商%s 商品%s%s 存在多条未审核购货订单行。请联系采购人员处理。'
                                 % (line.supplier_id.name, line.goods_id.name, line.attribute_id.name or ''))
 
             if buy_order_line:
-                # 增加原订单行的产品数量
+                # 增加原订单行的商品数量
                 buy_order_line.quantity += line.request_qty
                 buy_order_line.note = buy_order_line.note or ''
                 buy_order_line.note += u' %s' % (line.request_id.name)
@@ -300,7 +300,7 @@ class stock_request_line(models.Model):
     _description = u'补货申请行'
 
     request_id = fields.Many2one('stock.request', u'补货申请')
-    goods_id = fields.Many2one('goods', u'产品')
+    goods_id = fields.Many2one('goods', u'商品')
     attribute_id = fields.Many2one('attribute', u'属性')
     qty = fields.Float(u'当前数量', digits=dp.get_precision('Quantity'))
     to_sell_qty = fields.Float(u'未审核销货数量', digits=dp.get_precision('Quantity'))

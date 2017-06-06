@@ -10,7 +10,7 @@ class report_lot_status(models.Model):
     _description = u'批次余额表'
     _auto = False
 
-    goods = fields.Char(u'产品')
+    goods = fields.Char(u'商品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
     lot = fields.Char(u'批号')

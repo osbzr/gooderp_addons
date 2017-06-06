@@ -738,8 +738,8 @@
                     <group expand="0" string="分组">
                         <filter string="仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
                         <filter string="客户类别" domain="[]" context="{'group_by':'c_category_id'}"/>
-                        <filter string="产品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
-                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                        <filter string="商品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
+                        <filter string="商品" domain="[]" context="{'group_by':'goods_id'}"/>
                     </group>
                 </search>
             </field>

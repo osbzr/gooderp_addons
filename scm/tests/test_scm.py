@@ -59,7 +59,7 @@ class test_scm(TransactionCase):
         ''' 测试 审核 方法'''
         self.wh_move_in_1.approve_order()
 
-        # 请输入补货申请行产品的供应商 存在
+        # 请输入补货申请行商品的供应商 存在
         self.goods_keyboard_mouse.min_stock_qty = 100
         self.env.ref('goods.iphone_black').goods_id = self.goods_keyboard_mouse.id
 
@@ -74,7 +74,7 @@ class test_scm(TransactionCase):
     def test_stock_request_done_request_qty_zero(self):
         ''' 测试 request_qty 为 0 '''
         self.wh_move_in_1.approve_order()
-        # 请输入补货申请行产品的供应商 存在
+        # 请输入补货申请行商品的供应商 存在
         self.goods_keyboard_mouse.min_stock_qty = 100
         self.stock_request.stock_query()
         # 保证不存在多条未审核购货订单行
@@ -98,22 +98,22 @@ class test_scm(TransactionCase):
         self.stock_request.stock_request_done()
 
     def test_stock_request_done_raise_multi_line(self):
-        ''' 测试 raise 供应商%s 产品%s%s 存在多条未审核购货订单行 '''
+        ''' 测试 raise 供应商%s 商品%s%s 存在多条未审核购货订单行 '''
         self.wh_move_in_1.approve_order()
         self.buy_order_keyboard_2 = self.buy_order_keyboard_1.copy()
 
         self.stock_request.stock_query()
-        # raise 供应商%s 产品%s%s 存在多条未审核购货订单行
+        # raise 供应商%s 商品%s%s 存在多条未审核购货订单行
         with self.assertRaises(UserError):
             self.stock_request.stock_request_done()
 
     def test_stock_request_done_raise_no_supplier(self):
-        ''' 测试 raise 请输入补货申请行产品%s%s 的供应商'''
+        ''' 测试 raise 请输入补货申请行商品%s%s 的供应商'''
         self.wh_move_in_1.approve_order()
         self.goods_mouse.supplier_id = False
 
         self.stock_request.stock_query()
-        # raise 请输入补货申请行产品%s%s 的供应商
+        # raise 请输入补货申请行商品%s%s 的供应商
         with self.assertRaises(UserError):
             self.stock_request.stock_request_done()
 

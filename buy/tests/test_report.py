@@ -16,7 +16,7 @@ class test_detail_wizard(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
 
-        # 给buy_order_1中的产品“键盘”的分类设置科目
+        # 给buy_order_1中的商品“键盘”的分类设置科目
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
@@ -52,7 +52,7 @@ class test_detail_wizard(TransactionCase):
             detail.button_ok()
         # 按日期搜索
         self.detail.button_ok()
-        # 按产品、供应商、单据编号、仓库搜索
+        # 按商品、供应商、单据编号、仓库搜索
         self.detail.goods_id = self.env.ref('goods.mouse').id
         self.detail.partner_id = self.env.ref('core.lenovo').id
         self.detail.order_id = self.receipt.id
@@ -78,7 +78,7 @@ class test_track_wizard(TransactionCase):
         # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
-        # 给产品的分类设置科目
+        # 给商品的分类设置科目
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         # 给wh_in_whin0修改时间，使其凭证在demo会计期间内
@@ -127,7 +127,7 @@ class test_track_wizard(TransactionCase):
             track.button_ok()
         # 按日期搜索
         self.track.button_ok()
-        # 按产品、供应商、订单号、仓库搜索
+        # 按商品、供应商、订单号、仓库搜索
         self.track.goods_id = self.env.ref('goods.mouse').id
         self.track.partner_id = self.env.ref('core.lenovo').id
         self.track.order_id = self.order.id
@@ -151,7 +151,7 @@ class test_payment_wizard(TransactionCase):
         # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
-        # 给buy_order_1中的产品“键盘”的分类设置科目
+        # 给buy_order_1中的商品“键盘”的分类设置科目
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')

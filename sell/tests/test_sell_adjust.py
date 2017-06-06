@@ -19,7 +19,7 @@ class test_sell_adjust(TransactionCase):
         self.keyboard_white = self.env.ref('goods.keyboard_white')
         self.mouse = self.env.ref('goods.mouse')
         self.cable = self.env.ref('goods.cable')
-        # 因为下面要用到 产品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
+        # 因为下面要用到 商品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -41,7 +41,7 @@ class test_sell_adjust(TransactionCase):
 
     def test_sell_adjust_done(self):
         '''审核销售变更单:正常情况'''
-        # 正常情况下审核，新增产品鼠标（每批次为1的）、键盘（无批次的）
+        # 正常情况下审核，新增商品鼠标（每批次为1的）、键盘（无批次的）
         adjust = self.env['sell.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
@@ -88,7 +88,7 @@ class test_sell_adjust(TransactionCase):
             adjust.sell_adjust_done()
 
     def test_sell_adjust_done_more_same_line(self):
-        '''审核销售变更单：查找到销货订单中多行同一产品，不能调整'''
+        '''审核销售变更单：查找到销货订单中多行同一商品，不能调整'''
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.cable.id,
@@ -148,7 +148,7 @@ class test_sell_adjust(TransactionCase):
         self.assertTrue(not new_delivery)
 
     def test_sell_adjust_done_goods_done(self):
-        '''审核销售变更单:原始单据中一行产品已全部出库，另一行没有'''
+        '''审核销售变更单:原始单据中一行商品已全部出库，另一行没有'''
         new_order = self.order.copy()
         new_order.line_ids.create({'order_id': new_order.id,
                                    'goods_id': self.keyboard.id,
@@ -194,7 +194,7 @@ class test_sell_adjust_line(TransactionCase):
         })
 
     def test_compute_using_attribute(self):
-        '''返回订单行中产品是否使用属性'''
+        '''返回订单行中商品是否使用属性'''
         for line in self.adjust.line_ids:
             self.assertTrue(not line.using_attribute)
             line.goods_id = self.keyboard
@@ -232,7 +232,7 @@ class test_sell_adjust_line(TransactionCase):
                 line.tax_rate = 102
 
     def test_onchange_goods_id(self):
-        '''当销货订单行的产品变化时，带出产品上的单位、价格'''
+        '''当销货订单行的商品变化时，带出商品上的单位、价格'''
         for line in self.adjust.line_ids:
             line.goods_id = self.keyboard
             line.onchange_goods_id()
@@ -246,26 +246,26 @@ class test_sell_adjust_line(TransactionCase):
             line.onchange_discount_rate()
 
     def test_onchange_goods_id_tax_rate(self):
-        ''' 测试 修改产品时，调整单行税率变化 '''
+        ''' 测试 修改商品时，调整单行税率变化 '''
         self.adjust.partner_id = self.env.ref('core.jd')
         for order_line in self.adjust.line_ids:
-            # partner 无 税率，调整单行产品无税率
+            # partner 无 税率，调整单行商品无税率
             self.env.ref('core.jd').tax_rate = 0
             self.env.ref('goods.cable').tax_rate = 0
             order_line.onchange_goods_id()
-            # partner 有 税率，调整单行产品无税率
+            # partner 有 税率，调整单行商品无税率
             self.env.ref('core.jd').tax_rate = 10
             self.env.ref('goods.cable').tax_rate = 0
             order_line.onchange_goods_id()
-            # partner 无税率，调整单行产品有税率
+            # partner 无税率，调整单行商品有税率
             self.env.ref('core.jd').tax_rate = 0
             self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
-            # partner 税率 > 调整单行产品税率
+            # partner 税率 > 调整单行商品税率
             self.env.ref('core.jd').tax_rate = 11
             self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()
-            # partner 税率 =< 调整单行产品税率
+            # partner 税率 =< 调整单行商品税率
             self.env.ref('core.jd').tax_rate = 9
             self.env.ref('goods.cable').tax_rate = 10
             order_line.onchange_goods_id()

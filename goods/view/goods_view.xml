@@ -5,7 +5,7 @@
 			<field name='name'>goods.tree</field>
 			<field name='model'>goods</field>
 			<field name='arch' type='xml'>
-				<tree string='产品'>
+				<tree string='商品'>
 					<field name='code' />
 					<field name='name' />
 					<field name='category_id' />
@@ -22,7 +22,7 @@
 			<field name='name'>goods.form</field>
 			<field name='model'>goods</field>
 			<field name='arch' type='xml'>
-				<form string='产品'>
+				<form string='商品'>
 					<sheet>
                 		<group>
 							<group>
@@ -70,12 +70,12 @@
 			<field name='name'>goods.search</field>
 			<field name='model'>goods</field>
 			<field name='arch' type='xml'>
-				<search string='产品'>
+				<search string='商品'>
 					<field name='name'/>
 					<field name='code'/>
 					<field name='category_id'/>
 					<group expand="0" string="分组">
-                        <filter string="产品类别" domain="[]" context="{'group_by':'category_id'}"/>
+                        <filter string="商品类别" domain="[]" context="{'group_by':'category_id'}"/>
                     </group>
 				</search>
 			</field>

@@ -29,7 +29,7 @@
             <field name="prefix">SA</field>
             <field name="padding">5</field>
         </record>
-        <!--所有产品的价格策略-->
+        <!--所有商品的价格策略-->
         <record id="pricing_10" model="pricing">
         	<field name="name">适用所有</field>
         	<field name="active_date">2000-01-01</field>

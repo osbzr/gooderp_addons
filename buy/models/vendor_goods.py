@@ -29,15 +29,15 @@ class vendor_goods(models.Model):
                          digits=dp.get_precision('Price'),
                          help=u'供应商提供的价格')
 
-    code = fields.Char(u'供应商产品编号',
-                       help=u'供应商提供的产品编号')
+    code = fields.Char(u'供应商商品编号',
+                       help=u'供应商提供的商品编号')
 
-    name = fields.Char(u'供应商产品名称',
-                       help=u'供应商提供的产品名称')
+    name = fields.Char(u'供应商商品名称',
+                       help=u'供应商提供的商品名称')
 
     min_qty = fields.Float(u'最低订购量',
                            digits=dp.get_precision('Quantity'),
-                           help=u'采购产品时，大于或等于最低订购量时，产品的价格才取该行的供货价')
+                           help=u'采购商品时，大于或等于最低订购量时，商品的价格才取该行的供货价')
 
     company_id = fields.Many2one(
         'res.company',
@@ -50,10 +50,10 @@ class partner(models.Model):
     _inherit = 'partner'
 
     goods_ids = fields.One2many(
-        string=u'供应产品',
+        string=u'供应商品',
         comodel_name='vendor.goods',
         inverse_name='vendor_id',
-        help=u'供应商供应的产品价格列表',
+        help=u'供应商供应的商品价格列表',
     )
 
 

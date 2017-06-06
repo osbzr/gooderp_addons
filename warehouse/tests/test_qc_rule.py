@@ -5,7 +5,7 @@ import time
 
 
 class test_qc_rule(TransactionCase):
-    ''' 测试和仓库相关的产品的有关逻辑 '''
+    ''' 测试和仓库相关的商品的有关逻辑 '''
     def setUp(self):
         super(test_qc_rule, self).setUp()
         # 入库类型单据

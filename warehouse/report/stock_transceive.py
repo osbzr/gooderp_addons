@@ -10,7 +10,7 @@ class report_stock_transceive(models.Model):
     _description = u'商品收发明细表'
     _inherit = 'report.base'
 
-    goods = fields.Char(u'产品')
+    goods = fields.Char(u'商品')
     attribute = fields.Char(u'属性')
     id_lists = fields.Text(u'库存调拨id列表')
     uom = fields.Char(u'单位')

@@ -48,7 +48,7 @@ class TestProduction(TransactionCase):
         self.disassembly.approve_feeding()
         self.disassembly.approve_order()
 
-        # 组装的产品已经被拆卸过了，此时会报异常
+        # 组装的商品已经被拆卸过了，此时会报异常
         with self.assertRaises(UserError):
             self.assembly.cancel_approved_order()
 
@@ -74,7 +74,7 @@ class TestProduction(TransactionCase):
             self.disassembly.unlink()
 
         self.disassembly.approve_order()
-        # 组装的产品已经被拆卸过了，此时会报异常
+        # 组装的商品已经被拆卸过了，此时会报异常
         with self.assertRaises(UserError):
             self.assembly.unlink()
 

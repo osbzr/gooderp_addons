@@ -108,7 +108,7 @@ class sell_order(models.Model):
                                    ondelete='restrict',
                                    states=READONLY_STATES,
                                    default=_default_warehouse,
-                                   help=u'产品将从该仓库调出')
+                                   help=u'商品将从该仓库调出')
     name = fields.Char(u'单据编号', index=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
     line_ids = fields.One2many('sell.order.line', 'order_id', u'销货订单行',
@@ -230,10 +230,10 @@ class sell_order(models.Model):
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         if not self.line_ids:
-            raise UserError(u'请输入产品明细行！')
+            raise UserError(u'请输入商品明细行！')
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
                 raise UserError(u'外贸免税！')
         if not self.bank_account_id and self.pre_receipt:
@@ -376,7 +376,7 @@ class sell_order_line(models.Model):
     @api.one
     @api.depends('goods_id')
     def _compute_using_attribute(self):
-        '''返回订单行中产品是否使用属性'''
+        '''返回订单行中商品是否使用属性'''
         self.using_attribute = self.goods_id.attribute_ids and True or False
 
     @api.one
@@ -496,7 +496,7 @@ class sell_order_line(models.Model):
     @api.multi
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格、税率'''
+        '''当订单行的商品变化时，带出商品上的单位、默认仓库、价格、税率'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.price_taxed = self.goods_id.price

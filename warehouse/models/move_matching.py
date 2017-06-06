@@ -21,11 +21,11 @@ class wh_move_matching(models.Model):
     qty = fields.Float(
         u'数量',
         digits=dp.get_precision('Quantity'), required=True,
-        help=u'出库单行产品的数量')
+        help=u'出库单行商品的数量')
     uos_qty = fields.Float(
         u'辅助数量',
         digits=dp.get_precision('Quantity'), required=True,
-        help=u'出库单行产品的辅助数量')
+        help=u'出库单行商品的辅助数量')
     expiration_date = fields.Date(
         u'过保日',
         help=u'商品保质期截止日期')
@@ -55,12 +55,12 @@ class wh_move_line(models.Model):
         string=u'剩余数量',
         digits=dp.get_precision('Quantity'),
         index=True, store=True, readonly=True,
-        help=u'产品的剩余数量')
+        help=u'商品的剩余数量')
     uos_qty_remaining = fields.Float(
         compute='_get_qty_remaining', string=u'剩余辅助数量',
         digits=dp.get_precision('Quantity'),
         index=True, store=True, readonly=True,
-        help=u'产品的剩余辅助数量')
+        help=u'商品的剩余辅助数量')
 
     matching_in_ids = fields.One2many(
         'wh.move.matching', 'line_in_id', string=u'关联的入库',

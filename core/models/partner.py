@@ -37,7 +37,7 @@ class partner(models.Model):
     bank_num = fields.Char(u'银行账号')
 
     credit_limit = fields.Float(u'信用额度', track_visibility='onchange',
-                                help=u'客户购买产品时，本次发货金额+客户应收余额要小于客户信用额度')
+                                help=u'客户购买商品时，本次发货金额+客户应收余额要小于客户信用额度')
     active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
