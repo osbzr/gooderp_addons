@@ -94,7 +94,7 @@
             <field name="name">交通银行(622262 8888888888888)</field>
         </record>
 
-        <!-- 服务产品 -->
+        <!-- 服务商品 -->
         <record id="service_1" model="service">
         	<field name="name">咨询服务</field>
         	<field name="get_categ_id" ref="cat_consult"/>

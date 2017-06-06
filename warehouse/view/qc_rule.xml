@@ -6,9 +6,9 @@
             <field name="model">qc.rule</field>
             <field name="arch" type="xml">
                 <tree string='质检规则' editable='bottom'>
-                    <field name='move_type'/>
-                    <field name='warehouse_id'/>
-                    <field name='warehouse_dest_id'/>
+                    <field name='move_type' required='1'/>
+                    <field name='warehouse_id' required='1'/>
+                    <field name='warehouse_dest_id' required='1'/>
                 </tree>
             </field>
         </record>

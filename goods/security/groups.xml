@@ -29,7 +29,7 @@
 		</record>
 		<!--添加允许查看成本组-->
         <record id='view_cost_groups' model='res.groups'>
-            <field name='name'>查看产品成本</field>
+            <field name='name'>查看商品成本</field>
             <field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
         </record>

@@ -26,8 +26,8 @@ class report_stock_transceive_wizard(models.TransientModel):
                            help=u'查看本次报表的结束日期')
     warehouse_id = fields.Many2one('warehouse', u'仓库',
                                    help=u'本次报表查看的仓库')
-    goods_id = fields.Many2one('goods', u'产品',
-                               help=u'本次报表查看的产品')
+    goods_id = fields.Many2one('goods', u'商品',
+                               help=u'本次报表查看的商品')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

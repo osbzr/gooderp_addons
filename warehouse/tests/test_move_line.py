@@ -93,14 +93,14 @@ class TestMoveLine(TransactionCase):
         }
         self.assertEqual(results[0], real_results)
 
-        # 当前明细行的产品数量大于批次的数量的时候，会报错
+        # 当前明细行的商品数量大于批次的数量的时候，会报错
         with self.assertRaises(UserError):
             self.mouse_out_line.goods_id.get_matching_records_by_lot(
                 self.mouse_out_line.lot_id,
                 self.mouse_out_line.lot_id.qty_remaining + 10)
 
     def test_attribute(self):
-        '''在出库类型的明细行中，选择产品属性，lot_id的domain需要包含属性相关'''
+        '''在出库类型的明细行中，选择商品属性，lot_id的domain需要包含属性相关'''
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_wh_in_attribute').date = '2016-02-06'
 
@@ -140,7 +140,7 @@ class TestMoveLine(TransactionCase):
         self.assertEqual(out_iphone.cost_unit, black_iphone.cost_unit)
 
     def test_onchange(self):
-        '''在出库类型的明细行中，选择产品，lot_id的domain需要包含仓库相关'''
+        '''在出库类型的明细行中，选择商品，lot_id的domain需要包含仓库相关'''
         results = self.mouse_out_line.with_context({
             'default_warehouse_id': self.mouse_out_line.move_id.warehouse_id.id
         }).onchange_goods_id()
@@ -153,7 +153,7 @@ class TestMoveLine(TransactionCase):
             ('warehouse_dest_id', '=', self.mouse_out_line.warehouse_id.id)
         ]
 
-        # 产品改变的时候，此时仓库存在，lot_id字段的domain值需要包含仓库相关
+        # 商品改变的时候，此时仓库存在，lot_id字段的domain值需要包含仓库相关
         self.assertEqual(results['domain']['lot_id'], real_domain)
         self.assertEqual(self.mouse_out_line.goods_qty, 1)
 
@@ -171,7 +171,7 @@ class TestMoveLine(TransactionCase):
         self.mouse_out_line.onchange_warehouse_id()
         self.assertTrue(not self.mouse_out_line.lot_id)
 
-        # 改变产品的时候，如果批号的产品和它不一致，那么批号也要被删除
+        # 改变商品的时候，如果批号的商品和它不一致，那么批号也要被删除
         self.mouse_out_line.lot_id = self.mouse_in_line
         self.mouse_out_line.warehouse_id = self.hd_warehouse
         self.mouse_out_line.goods_id = self.goods_cable

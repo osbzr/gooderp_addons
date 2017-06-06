@@ -43,23 +43,23 @@ class test_sell_order(TransactionCase):
         '''选择客户带出其默认地址信息'''
         self.order.onchange_partner_id()
 
-        # partner 无 税率，销货单行产品无税率
+        # partner 无 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 0
         self.order.onchange_partner_id()
-        # partner 有 税率，销货单行产品无税率
+        # partner 有 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 10
         self.env.ref('goods.mouse').tax_rate = 0
         self.order.onchange_partner_id()
-        # partner 无税率，销货单行产品无税率
+        # partner 无税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 10
         self.order.onchange_partner_id()
-        # partner 税率 > 销货单行产品税率
+        # partner 税率 > 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 11
         self.env.ref('goods.mouse').tax_rate = 10
         self.order.onchange_partner_id()
-        # partner 税率 =< 销货单行产品税率
+        # partner 税率 =< 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 9
         self.env.ref('goods.mouse').tax_rate = 10
         self.order.onchange_partner_id()
@@ -141,7 +141,7 @@ class test_sell_order_line(TransactionCase):
         self.sell_order_line = self.env.ref('sell.sell_order_line_2_3')
 
     def test_compute_using_attribute(self):
-        '''返回订单行中产品是否使用属性'''
+        '''返回订单行中商品是否使用属性'''
         for line in self.order.line_ids:
             self.assertTrue(not line.using_attribute)
             line.goods_id = self.env.ref('goods.keyboard')
@@ -188,7 +188,7 @@ class test_sell_order_line(TransactionCase):
             self.assertAlmostEqual(line.price_taxed, 11.7)
 
     def test_onchange_goods_id(self):
-        '''当销货订单行的产品变化时，带出产品上的单位、价格'''
+        '''当销货订单行的商品变化时，带出商品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
         c_category_id = self.order.partner_id.c_category_id
 
@@ -200,25 +200,25 @@ class test_sell_order_line(TransactionCase):
             self.assertTrue(line.price_taxed == goods.price)
 
     def test_onchange_goods_id_tax_rate(self):
-        ''' 测试 修改产品时，产品行税率变化 '''
+        ''' 测试 修改商品时，商品行税率变化 '''
         self.order_line = self.env.ref('sell.sell_order_line_1')
-        # partner 无 税率，销货单行产品无税率
+        # partner 无 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 0
         self.order_line.onchange_goods_id()
-        # partner 有 税率，销货单行产品无税率
+        # partner 有 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 10
         self.env.ref('goods.mouse').tax_rate = 0
         self.order_line.onchange_goods_id()
-        # partner 无税率，销货单行产品有税率
+        # partner 无税率，销货单行商品有税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 10
         self.order_line.onchange_goods_id()
-        # partner 税率 > 销货单行产品税率
+        # partner 税率 > 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 11
         self.env.ref('goods.mouse').tax_rate = 10
         self.order_line.onchange_goods_id()
-        # partner 税率 =< 销货单行产品税率
+        # partner 税率 =< 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 9
         self.env.ref('goods.mouse').tax_rate = 10
         self.order_line.onchange_goods_id()

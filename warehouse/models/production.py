@@ -38,9 +38,9 @@ class wh_assembly(models.Model):
         states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
         help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
-                            视图只能选则一个产品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
+                            视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件产品',
+    goods_id = fields.Many2one('goods', string=u'组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
@@ -103,11 +103,11 @@ class wh_assembly(models.Model):
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
         """
-        改变产品数量时(wh_assembly 中的goods_qty) 根据物料清单的 数量的比例及成本价的计算
+        改变商品数量时(wh_assembly 中的goods_qty) 根据物料清单的 数量的比例及成本价的计算
         算出新的组合件或者子件的 数量 (line.goods_qty / parent_line_goods_qty * self.goods_qty
-        line.goods_qty 子件产品数量
-        parent_line_goods_qty 物料清单组合件产品数量
-        self.goods_qty 所要的组合件的产品数量
+        line.goods_qty 子件商品数量
+        parent_line_goods_qty 物料清单组合件商品数量
+        self.goods_qty 所要的组合件的商品数量
         line.goods_qty /parent_line_goods_qty 得出子件和组合件的比例
         line.goods_qty / parent_line_goods_qty * self.goods_qty 得出子件实际的数量的数量
         )
@@ -160,7 +160,7 @@ class wh_assembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise UserError(u'组合件和子件的产品必须存在')
+            raise UserError(u'组合件和子件的商品必须存在')
 
     def create_voucher_line(self, data):
         return [self.env['voucher.line'].create(data_line) for data_line in data]
@@ -401,7 +401,7 @@ class wh_assembly(models.Model):
 
         if len(line_in_ids) == 1:
             """当物料清单中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
-                使试图只能在 many2one中选择一个产品(并且只能选择在物料清单中的产品),并且回写数量"""
+                使试图只能在 many2one中选择一个商品(并且只能选择在物料清单中的商品),并且回写数量"""
             self.is_many_to_many_combinations = False
             self.goods_qty = line_in_ids[0].get("goods_qty")
             self.goods_id = line_in_ids[0].get("goods_id")
@@ -486,9 +486,9 @@ class outsource(models.Model):
                              states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
                              help=u'委外加工单对应的物料清单')
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
-                            视图只能选则一个产品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
+                            视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件产品',
+    goods_id = fields.Many2one('goods', string=u'组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
@@ -525,12 +525,12 @@ class outsource(models.Model):
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
         """
-        改变产品数量时(outsource 中的goods_qty) 根据 物料清单 中的数量的比例
+        改变商品数量时(outsource 中的goods_qty) 根据 物料清单 中的数量的比例
         计算出新的组合件或子件的数量
     (line.goods_qty / parent_line_goods_qty * self.goods_qty
-        line.goods_qty 子件产品数量
-        parent_line_goods_qty 物料清单组合件产品数量
-        self.goods_qty 所要的组合件的产品数量
+        line.goods_qty 子件商品数量
+        parent_line_goods_qty 物料清单组合件商品数量
+        self.goods_qty 所要的组合件的商品数量
         line.goods_qty /parent_line_goods_qty 得出子件和组合件的比例
         line.goods_qty / parent_line_goods_qty * self.goods_qty 得出子件实际的数量的数量
         )
@@ -619,7 +619,7 @@ class outsource(models.Model):
 
         if len(line_in_ids) == 1:
             """当物料清单中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
-                使视图只能在 many2one中选择一个产品(并且只能选择在物料清单中的产品),并且回写数量"""
+                使视图只能在 many2one中选择一个商品(并且只能选择在物料清单中的商品),并且回写数量"""
             self.is_many_to_many_combinations = False
             self.goods_qty = line_in_ids[0].get("goods_qty")
             self.goods_id = line_in_ids[0].get("goods_id")
@@ -934,9 +934,9 @@ class wh_disassembly(models.Model):
         states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
         help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
-                            视图只能选则一个产品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件产品数量\
+                            视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件产品',
+    goods_id = fields.Many2one('goods', string=u'组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},)
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
@@ -991,7 +991,7 @@ class wh_disassembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise UserError(u'组合件和子件的产品必须存在')
+            raise UserError(u'组合件和子件的商品必须存在')
 
     def create_voucher_line(self, data):
         return [self.env['voucher.line'].create(data_line) for data_line in data]
@@ -1201,11 +1201,11 @@ class wh_disassembly(models.Model):
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
         """
-        改变产品数量时(wh_assembly 中的goods_qty) 根据物料清单的 数量的比例及成本价的计算
+        改变商品数量时(wh_assembly 中的goods_qty) 根据物料清单的 数量的比例及成本价的计算
         算出新的组合件或者子件的 数量 (line.goods_qty / parent_line_goods_qty * self.goods_qty
-        line.goods_qty 子件产品数量
-        parent_line_goods_qty 物料清单组合件产品数量
-        self.goods_qty 所要的组合件的产品数量
+        line.goods_qty 子件商品数量
+        parent_line_goods_qty 物料清单组合件商品数量
+        self.goods_qty 所要的组合件的商品数量
         line.goods_qty /parent_line_goods_qty 得出子件和组合件的比例
         line.goods_qty / parent_line_goods_qty * self.goods_qty 得出子件实际的数量的数量
         )
@@ -1300,7 +1300,7 @@ class wh_disassembly(models.Model):
             self.goods_qty = 1
         if len(line_out_ids) == 1 and line_out_ids:
             """当物料清单中只有一个组合件的时候,默认本单据只有一个组合件 设置is_many_to_many_combinations 为False
-             使试图只能在 many2one中选择一个产品(并且只能选择在物料清单中的产品),并且回写数量"""
+             使试图只能在 many2one中选择一个商品(并且只能选择在物料清单中的商品),并且回写数量"""
             self.is_many_to_many_combinations = ''
             self.goods_qty = line_out_ids[0].get("goods_qty")
             self.goods_id = line_out_ids[0].get("goods_id")
@@ -1406,11 +1406,11 @@ class wh_bom_line(osv.osv):
         BOM_LINE_TYPE, u'类型',
         default=lambda self: self.env.context.get('type'),
         help=u'类型: 组合件、子间')
-    goods_id = fields.Many2one('goods', u'产品', default=1, ondelete='restrict',
-                               help=u'子件行/组合件行上的产品')
+    goods_id = fields.Many2one('goods', u'商品', default=1, ondelete='restrict',
+                               help=u'子件行/组合件行上的商品')
     goods_qty = fields.Float(
         u'数量', digits=dp.get_precision('Quantity'),
-        help=u'子件行/组合件行上的产品数量')
+        help=u'子件行/组合件行上的商品数量')
     attribute_id=fields.Many2one('attribute', u'属性', ondelete='restrict')
     company_id = fields.Many2one(
         'res.company',

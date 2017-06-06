@@ -89,7 +89,7 @@
                                         <field name="injury" groups='staff.hr_senior_groups'/>
                                         <field name="maternity" groups='staff.hr_senior_groups'/>
                                 		<field name="over_date"/>
-                                		<field name="job_id"/>
+                                        <field name="job_id" string='职位'/>
                                 	</tree>
                                 </field>
                             </page>

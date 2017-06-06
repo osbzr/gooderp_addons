@@ -167,7 +167,7 @@ class do_pack(models.Model):
     _name = 'do.pack'
     _rec_name = 'odd_numbers'
     odd_numbers = fields.Char(u'单号')
-    product_line_ids = fields.One2many('pack.line', 'pack_id', string='产品行')
+    product_line_ids = fields.One2many('pack.line', 'pack_id', string='商品行')
     is_pack = fields.Boolean(compute='compute_is_pack_ok', string='打包完成')
 
     @api.multi
@@ -232,7 +232,7 @@ class do_pack(models.Model):
             line_rows = self.env['pack.line'].search([('goods_id', '=', goods_row.id),
                                                       ('pack_id', '=', pack_row.id)])
             if not line_rows:
-                raise UserError(u'产品%s不在当前要打包的发货单%s上!'%(
+                raise UserError(u'商品%s不在当前要打包的发货单%s上!'%(
                     goods_row.name, pack_row.odd_numbers))
             goods_is_enough = True
             for line_row in line_rows:
@@ -243,7 +243,7 @@ class do_pack(models.Model):
                 break
 
             if goods_is_enough:
-                raise UserError(u'发货单%s要发货的产品%s已经充足,请核对后在进行操作!'%(
+                raise UserError(u'发货单%s要发货的商品%s已经充足,请核对后在进行操作!'%(
                     pack_row.odd_numbers, goods_row.name))
         return True
 
@@ -252,6 +252,6 @@ class pack_line(models.Model):
     _name = 'pack.line'
 
     pack_id = fields.Many2one('do.pack', string='打包')
-    goods_id = fields.Many2one('goods', string='产品')
+    goods_id = fields.Many2one('goods', string='商品')
     goods_qty = fields.Float(u'要发货数量')
     pack_qty = fields.Float(u'打包数量')

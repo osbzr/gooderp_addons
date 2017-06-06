@@ -16,10 +16,10 @@ class wh_move(models.Model):
     def _compute_total_qty(self):
         goods_total = 0
         if self.line_in_ids:
-            # 入库产品总数
+            # 入库商品总数
             goods_total = sum(line.goods_qty for line in self.line_in_ids)
         elif self.line_out_ids:
-            # 出库产品总数
+            # 出库商品总数
             goods_total = sum(line.goods_qty for line in self.line_out_ids)
         self.total_qty = goods_total
 
@@ -83,8 +83,8 @@ class wh_move(models.Model):
                                   help=u'入库类型的移库单对应的入库明细')
     note = fields.Text(u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
-    total_qty = fields.Integer(u'产品总数', compute=_compute_total_qty, store=True,
-                               help=u'该移库单的入/出库明细行包含的产品总数')
+    total_qty = fields.Integer(u'商品总数', compute=_compute_total_qty, store=True,
+                               help=u'该移库单的入/出库明细行包含的商品总数')
     user_id = fields.Many2one(
         'res.users',
         u'经办人',
@@ -140,7 +140,7 @@ class wh_move(models.Model):
                               else line.goods_id.cost) # 其他出入库单 、内部调拨单
             line.price_taxed = (line.goods_id.price if val['type'] == 'out'
                                 else line.goods_id.cost) # 采购或销售单据
-            # 如果产品属性或产品上存在条码，且明细行上已经存在该产品，则数量累加
+            # 如果商品属性或商品上存在条码，且明细行上已经存在该商品，则数量累加
             if (att and line.attribute_id == att) or (goods and line.goods_id == goods):
                 create_line = self.scan_barcode_move_line_operation(line, conversion)
         return create_line
@@ -149,7 +149,7 @@ class wh_move(models.Model):
         '''盘点单扫码操作'''
         create_line = False
         for line in move.line_ids:
-            # 如果产品属性上存在条码 或 产品上存在条码
+            # 如果商品属性上存在条码 或 商品上存在条码
             if (att and line.attribute_id == att) or (goods and line.goods_id == goods):
                 create_line = self.scan_barcode_inventory_line_operation(line, conversion)
         return create_line
@@ -251,7 +251,7 @@ class wh_move(models.Model):
                       or 'wh.move.line')
 
         if not att and not goods:
-            raise UserError(u'条码为  %s 的产品不存在' % (barcode))
+            raise UserError(u'条码为  %s 的商品不存在' % (barcode))
         else:
             self.check_barcode(model_name, order_id, att, goods)
             conversion = att and att.goods_id.conversion or goods.conversion
@@ -329,7 +329,7 @@ class wh_move(models.Model):
 
     @api.multi
     def check_goods_qty(self, goods, attribute, warehouse):
-        '''SQL来取指定产品，属性，仓库，的当前剩余数量'''
+        '''SQL来取指定商品，属性，仓库，的当前剩余数量'''
 
         if attribute:
             change_conditions = "AND line.attribute_id = %s" % attribute.id
@@ -369,7 +369,7 @@ class wh_move(models.Model):
                 if (line.goods_id.id, line.attribute_id.id) in goods_list:
                     continue
                 goods_list.append((line.goods_id.id, line.attribute_id.id))
-                all_line_message += u'产品 %s ' % line.goods_id.name
+                all_line_message += u'商品 %s ' % line.goods_id.name
                 if line.attribute_id:
                     all_line_message += u' 型号%s' % line.attribute_id.name
                 line_in_ids.append((0, 0, {
@@ -385,7 +385,7 @@ class wh_move(models.Model):
                 all_line_message += u" 当前库存量不足，继续出售请点击确定，并及时盘点库存\n"
 
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0。' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和含税单价不能小于0。' % line.goods_id.name)
         if line_in_ids:
             vals = {
                 'type': 'inventory',

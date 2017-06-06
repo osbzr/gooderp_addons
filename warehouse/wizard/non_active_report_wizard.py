@@ -11,7 +11,7 @@ class non_active_report(models.TransientModel):
     _description = u'呆滞料报表'
 
     warehouse_id = fields.Many2one('warehouse', string=u'仓库')
-    goods_id = fields.Many2one('goods', string=u'产品')
+    goods_id = fields.Many2one('goods', string=u'商品')
     first_stage_day_qty = fields.Float(string=u'第一阶段数量')
     second_stage_day_qty = fields.Float(string=u'第二阶段数量')
     third_stage_day_qty = fields.Float(string=u'第三阶段数量')
@@ -64,7 +64,7 @@ class non_active_report_wizard(models.TransientModel):
     @api.multi
     def get_warehouse_goods_stage_data(self, warehouse_id, first_stage_day, second_stage_day, third_stage_day):
         """
-        用sql 找到 系统 在所输入的时间阶段的对应的产品的 数量
+        用sql 找到 系统 在所输入的时间阶段的对应的商品的 数量
         :param warehouse_id:  仓库id
         :param first_stage_day:  第一阶段天数
         :param second_stage_day:第一阶段天数
