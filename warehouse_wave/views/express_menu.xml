@@ -56,6 +56,10 @@
 						context="{'default_city_name':city_id}" options="{'no_open': True, 'no_create': True}" />
                     </div>
 				</field>
+				
+				<field name="address"  position="after" >
+					<field name="express_type" />
+				</field>
 
 				<field name="write_date"  position="after" >
 					<field name="express_code"/>
