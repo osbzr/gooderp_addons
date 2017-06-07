@@ -81,6 +81,10 @@ class goods(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    brand = fields.Many2one('core.value', u'品牌',
+                              ondelete='restrict',
+                              domain=[('type', '=', 'brand')],
+                              context={'type': 'brand'})
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '商品不能重名'),
