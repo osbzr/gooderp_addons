@@ -5,9 +5,10 @@ access_uom,access_uom,model_uom,,1,1,1,1
 access_settle_mode,access_settle_mode,model_settle_mode,,1,1,1,1
 access_partner,access_partner,model_partner,,1,1,1,1
 access_goods,access_goods,model_goods,,1,1,1,1
-access_warehouse,access_warehouse,model_warehouse,,1,1,1,1
+access_warehouse_user,access_warehouse_user,model_warehouse,base.group_user,1,0,0,0
+access_warehouse_manager,access_warehouse_manager,model_warehouse,base.group_erp_manager,1,1,1,1
 access_staff,access_staff,model_staff,,1,1,1,1
-access_bank_account,access_bank_account,model_bank_account,,1,1,1,1
+access_bank_account,access_bank_account,model_bank_account,base.group_user,1,1,0,0
 access_settle_mode,access_settle_mode,model_settle_mode,,1,1,1,1
 access_pricing,access_pricing,model_pricing,,1,1,1,1
 access_service,access_service,model_service,,1,1,1,1

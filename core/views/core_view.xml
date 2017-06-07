@@ -225,6 +225,7 @@
 							<group>
 								<field name="code"/>
 								<field name="main_mobile"/>
+								<field name="main_address"/>
 								<field name="tax_num"/>
 								<field name="credit_limit"/>
 								<field name="responsible_id"/>
@@ -308,6 +309,9 @@
 				<form string="GOODERP PARTNER FORM">
 					<sheet>
 						<div class="oe_title">
+						    <div class="oe_edit_only">
+                                <label for='name' string='名称'/>
+                            </div>
 							<h1>
 								<field name="name" required="1"/>
 							</h1>
@@ -316,6 +320,7 @@
 							<group>
 								<field name="code"/>
 								<field name="main_mobile"/>
+								<field name="main_address"/>
 								<field name="tax_rate"/>
 							</group>
 							<group>

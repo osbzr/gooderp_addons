@@ -102,7 +102,7 @@
                     <filter name='out' string='出库' domain="[('type', '=', 'out')]"/>
                     <filter name='in' string='入库' domain="[('type', '=', 'in')]"/>
                     <group expand="0" string="分组">
-                    	<filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                    	<filter string="商品" domain="[]" context="{'group_by':'goods_id'}"/>
                         <filter string="调出仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
                         <filter string="调入仓库" domain="[]" context="{'group_by':'warehouse_dest_id'}"/>
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>

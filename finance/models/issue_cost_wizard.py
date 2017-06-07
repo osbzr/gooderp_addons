@@ -23,7 +23,7 @@ class MonthProductCost(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
-    # 使用SQL来取得指定产品情况下的库存数量
+    # 使用SQL来取得指定商品情况下的库存数量
     @api.multi
     def get_stock_qty(self, period_id):
         date_range = self.env['finance.period'].get_period_month_date_range(period_id)
@@ -95,7 +95,7 @@ class MonthProductCost(models.Model):
     @api.multi
     def compute_balance_price(self, data_dcit):
         """
-        本月该产品的结存单价 = （上月该产品的成本余额 + 本月入库成本 ）/ (上月数量余额 + 本月入库数量)
+        本月该商品的结存单价 = （上月该商品的成本余额 + 本月入库成本 ）/ (上月数量余额 + 本月入库数量)
         则本月发出成本 = 结存单价 * 发出数量
         :param data_dcit:
         :return:月发出成本

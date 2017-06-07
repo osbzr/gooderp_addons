@@ -29,7 +29,7 @@ class test_customer_statements(TransactionCase):
         self.env.ref('warehouse.wh_move_line_14').action_done()
         sell_order = self.env.ref('sell.sell_order_2')
         sell_order.sell_order_done()
-        # 因为下面要用到 产品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
+        # 因为下面要用到 商品在系统里面必须是有数量的 所以,找到一个简单的方式直接确认已有的盘点单
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -98,7 +98,7 @@ class test_track_wizard(TransactionCase):
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
-        # 补足产品网线的数量
+        # 补足商品网线的数量
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -133,7 +133,7 @@ class test_track_wizard(TransactionCase):
             track.button_ok()
         # 按日期搜索
         self.track.button_ok()
-        # 按产品、客户、销售员、仓库搜索
+        # 按商品、客户、销售员、仓库搜索
         self.track.goods_id = self.env.ref('goods.mouse').id
         self.track.partner_id = self.env.ref('core.yixun').id
         self.track.user_id = self.env.ref('base.user_demo').id
@@ -161,7 +161,7 @@ class test_detail_wizard(TransactionCase):
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
-        # 补足产品网线的数量
+        # 补足商品网线的数量
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         # 复制一张销货订单并审核
@@ -197,7 +197,7 @@ class test_detail_wizard(TransactionCase):
             detail.button_ok()
         # 按日期搜索
         self.detail.button_ok()
-        # 按产品、客户、销售员、仓库搜索
+        # 按商品、客户、销售员、仓库搜索
         self.detail.goods_id = self.env.ref('goods.mouse').id
         self.detail.partner_id = self.env.ref('core.yixun').id
         self.detail.user_id = self.env.ref('base.user_demo').id

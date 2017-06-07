@@ -18,7 +18,7 @@
 			<field name="category_id" ref="attribute_color" />
 		</record>
 
-		<!-- 管理批号的产品 -->
+		<!-- 管理批号的商品 -->
 		<record id="mouse" model="goods">
 			<field name="code">001</field>
 			<field name="name">鼠标</field>
@@ -31,7 +31,7 @@
 			<field name="force_batch_one">True</field>
 		</record>
 
-		<!-- 双计量单位的产品 -->
+		<!-- 双计量单位的商品 -->
 		<record id="cable" model="goods">
 			<field name="code">002</field>
 			<field name="name">网线</field>
@@ -42,7 +42,7 @@
 			<field name="conversion">12</field>
 		</record>
 
-		<!--多属性的产品-->
+		<!--多属性的商品-->
 		<record id="keyboard" model="goods">
 			<field name="code">003</field>
 			<field name="name">键盘</field>
@@ -53,7 +53,7 @@
 			<field name="cost">800</field>
 		</record>
 
-		<!-- 多属性无批次的产品 -->
+		<!-- 多属性无批次的商品 -->
 		<record id="iphone" model="goods">
 			<field name="code">005</field>
 			<field name="name">iPhone</field>
@@ -81,7 +81,7 @@
 			<field name="category_id" ref="goods.attribute_color"/>
 		</record>
 
-		<!--套装产品-->
+		<!--套装商品-->
 		<record id="keyboard_mouse" model="goods">
 			<field name="code">004</field>
 			<field name="name">键鼠套装</field>

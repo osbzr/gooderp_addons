@@ -122,37 +122,39 @@ class wh_move_line(models.Model):
                             help=u'类型：出库、入库 或者 内部调拨')
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft',
                              help=u'状态标识，新建时状态为草稿;审核后状态为已审核')
-    goods_id = fields.Many2one('goods', string=u'产品', required=True,
+    goods_id = fields.Many2one('goods', string=u'商品', required=True,
                                index=True, ondelete='restrict',
-                               help=u'该单据行对应的产品')
+                               help=u'该单据行对应的商品')
     using_attribute = fields.Boolean(compute='_compute_using_attribute', string=u'使用属性',
-                                     help=u'该单据行对应的产品是否存在属性，存在True否则False')
+                                     help=u'该单据行对应的商品是否存在属性，存在True否则False')
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
-                                   help=u'该单据行对应的产品的属性')
+                                   help=u'该单据行对应的商品的属性')
     using_batch = fields.Boolean(related='goods_id.using_batch', string=u'批号管理',
-                                 help=u'该单据行对应的产品是否使用批号管理')
+                                 readonly=True,
+                                 help=u'该单据行对应的商品是否使用批号管理')
     force_batch_one = fields.Boolean(related='goods_id.force_batch_one', string=u'每批号数量为1',
-                                     help=u'该单据行对应的产品是否每批号数量为1,是True否则False')
+                                     readonly=True,
+                                     help=u'该单据行对应的商品是否每批号数量为1,是True否则False')
     lot = fields.Char(u'批号',
-                      help=u'该单据行对应的产品的批号，一般是入库单行')
+                      help=u'该单据行对应的商品的批号，一般是入库单行')
     lot_id = fields.Many2one('wh.move.line', u'批号',
-                             help=u'该单据行对应的产品的批号，一般是出库单行')
+                             help=u'该单据行对应的商品的批号，一般是出库单行')
     lot_qty = fields.Float(related='lot_id.qty_remaining', string=u'批号数量',
                            digits=dp.get_precision('Quantity'),
-                           help=u'该单据行对应的产品批号的商品剩余数量')
+                           help=u'该单据行对应的商品批号的商品剩余数量')
     lot_uos_qty = fields.Float(u'批号辅助数量',
                            digits=dp.get_precision('Quantity'),
-                               help=u'该单据行对应的产品的批号辅助数量')
+                               help=u'该单据行对应的商品的批号辅助数量')
     production_date = fields.Date(u'生产日期', default=fields.Date.context_today,
-                                  help=u'产品的生产日期')
+                                  help=u'商品的生产日期')
     shelf_life = fields.Integer(u'保质期(天)',
-                                help=u'产品的保质期(天)')
+                                help=u'商品的保质期(天)')
     valid_date = fields.Date(u'有效期至',
-                             help=u'产品的有效期')
+                             help=u'商品的有效期')
     uom_id = fields.Many2one('uom', string=u'单位', ondelete='restrict', compute=_compute_uom_uos,
-                              help=u'产品的计量单位', store=True)
+                              help=u'商品的计量单位', store=True)
     uos_id = fields.Many2one('uom', string=u'辅助单位', ondelete='restrict', compute=_compute_uom_uos,
-                             readonly=True,  help=u'产品的辅助单位', store=True)
+                             readonly=True,  help=u'商品的辅助单位', store=True)
     warehouse_id = fields.Many2one('warehouse', u'调出仓库',
                                    ondelete='restrict',
                                    store=True,
@@ -167,19 +169,19 @@ class wh_move_line(models.Model):
                              digits=dp.get_precision('Quantity'),
                              default=1,
                              required=True,
-                             help=u'产品的数量')
+                             help=u'商品的数量')
     goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),
                                  compute=_get_goods_uos_qty, store=True,
-                                 help=u'产品的辅助数量')
+                                 help=u'商品的辅助数量')
     price = fields.Float(u'单价',
                          compute=_compute_all_amount,
                          inverse=_inverse_price,
                          store=True,
                          digits=dp.get_precision('Price'),
-                         help=u'产品的单价')
+                         help=u'商品的单价')
     price_taxed = fields.Float(u'含税单价',
                                digits=dp.get_precision('Price'),
-                               help=u'产品的含税单价')
+                               help=u'商品的含税单价')
     discount_rate = fields.Float(u'折扣率%',
                                  help=u'单据的折扣率%')
     discount_amount = fields.Float(u'折扣额',

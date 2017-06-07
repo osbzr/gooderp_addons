@@ -182,22 +182,22 @@ class buy_receipt(models.Model):
                         batch_one_list_wh.append((move_line.goods_id.id, move_line.lot))
 
             if (line.goods_id.id, line.lot) in batch_one_list_wh:
-                raise UserError(u'仓库已存在相同序列号的产品！\n产品:%s 序列号:%s' % (line.goods_id.name, line.lot))
+                raise UserError(u'仓库已存在相同序列号的商品！\n商品:%s 序列号:%s' % (line.goods_id.name, line.lot))
 
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.goods_id.force_batch_one:
                 batch_one_list.append((line.goods_id.id, line.lot))
 
         if len(batch_one_list) > len(set(batch_one_list)):
-            raise UserError(u'不能创建相同序列号的产品！\n 序列号list为%s' % str(batch_one_list))
+            raise UserError(u'不能创建相同序列号的商品！\n 序列号list为%s' % str(batch_one_list))
 
         for line in self.line_out_ids:
             if line.amount < 0:
                 raise UserError(u'退货金额不能小于 0！请修改。')
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
 
         if not self.bank_account_id and self.payment:
             raise UserError(u'付款额不为空时，请选择结算账户！')
@@ -328,7 +328,7 @@ class buy_receipt(models.Model):
         借： 商品分类对应的会计科目 一般是库存商品
         贷：类型为支出的类别对应的会计科目 一般是材料采购
 
-        当一张入库单有多个产品的时候，按对应科目汇总生成多个借方凭证行。
+        当一张入库单有多个商品的时候，按对应科目汇总生成多个借方凭证行。
 
         采购退货单生成的金额为负
         '''
@@ -492,6 +492,7 @@ class buy_receipt(models.Model):
                     'goods_qty': qty,
                     'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
+                    'discount_amount': line.discount_amount,
                     'type': 'out'
                 }
                 receipt_line.append(dic)
@@ -508,6 +509,7 @@ class buy_receipt(models.Model):
                 'date_due': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'date': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'line_out_ids': [(0, 0, line) for line in receipt_line],
+                'discount_amount': self.discount_amount,
                 }
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('buy.buy_return_form').id
@@ -543,7 +545,7 @@ class wh_move_line(models.Model):
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的成本价，以及公司的进项税'''
+        '''当订单行的商品变化时，带出商品上的成本价，以及公司的进项税'''
         self.ensure_one()
         if self.goods_id:
             is_return = self.env.context.get('default_is_return')

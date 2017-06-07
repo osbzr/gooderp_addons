@@ -10,8 +10,8 @@ class report_stock_balance(models.Model):
     _description = u'库存余额表'
     _auto = False
 
-    goods = fields.Char(u'产品')
-    goods_id = fields.Many2one('goods', u'产品')
+    goods = fields.Char(u'商品')
+    goods_id = fields.Many2one('goods', u'商品')
     uom = fields.Char(u'单位')
     uos = fields.Char(u'辅助单位')
     lot = fields.Char(u'批号')

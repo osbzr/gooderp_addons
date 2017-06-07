@@ -193,6 +193,7 @@ class sell_delivery(models.Model):
         auto_in = self.env['wh.in'].create(vals)
         line_ids = [line.id for line in auto_in.line_in_ids]
         self.with_context({'wh_in_line_ids':line_ids}).sell_delivery_done()
+        return True
 
     @api.one
     def _wrong_delivery_done(self):
@@ -201,7 +202,7 @@ class sell_delivery(models.Model):
             raise UserError(u'请不要重复审核！')
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和商品含税单价不能小于0！' % line.goods_id.name)
         if not self.bank_account_id and self.receipt:
             raise UserError(u'收款额不为空时，请选择结算账户！')
         decimal_amount = self.env.ref('core.decimal_amount')
@@ -339,7 +340,7 @@ class sell_delivery(models.Model):
         借：主营业务成本（核算分类上会计科目）
         贷：库存商品（商品分类上会计科目）
 
-        当一张发货单有多个产品的时候，按对应科目汇总生成多个贷方凭证行。
+        当一张发货单有多个商品的时候，按对应科目汇总生成多个贷方凭证行。
 
         退货单生成的金额为负
         '''
@@ -476,7 +477,7 @@ class sell_delivery(models.Model):
             qty = line.goods_qty
             if return_goods.get(line.attribute_id.id):
                 qty = qty - return_goods[line.attribute_id.id]
-            if qty != 0:
+            if qty > 0:
                 dic = {
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
@@ -486,6 +487,7 @@ class sell_delivery(models.Model):
                     'goods_qty': qty,
                     'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
+                    'discount_amount': line.discount_amount,
                 }
                 receipt_line.append(dic)
         if len(receipt_line) == 0:
@@ -500,6 +502,7 @@ class sell_delivery(models.Model):
                 'date_due': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'date': (datetime.datetime.now()).strftime(ISODATEFORMAT),
                 'line_in_ids': [(0, 0, line) for line in receipt_line],
+                'discount_amount': self.discount_amount,
                 }
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('sell.sell_return_form').id
@@ -550,7 +553,7 @@ class wh_move_line(models.Model):
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的零售价，以及公司的销项税'''
+        '''当订单行的商品变化时，带出商品上的零售价，以及公司的销项税'''
         self.ensure_one()
         is_return = self.env.context.get('default_is_return')
         if self.goods_id:

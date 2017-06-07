@@ -17,6 +17,7 @@ class partner(models.Model):
     code = fields.Char(u'编号')
     name = fields.Char(u'名称', required=True,)
     main_mobile = fields.Char(u'主要手机号', required=True,)
+    main_address = fields.Char(u'办公地址')
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
@@ -36,7 +37,7 @@ class partner(models.Model):
     bank_num = fields.Char(u'银行账号')
 
     credit_limit = fields.Float(u'信用额度', track_visibility='onchange',
-                                help=u'客户购买产品时，本次发货金额+客户应收余额要小于客户信用额度')
+                                help=u'客户购买商品时，本次发货金额+客户应收余额要小于客户信用额度')
     active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
