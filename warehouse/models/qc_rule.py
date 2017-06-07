@@ -57,10 +57,8 @@ class qc_rule(models.Model):
     warehouse_id = fields.Many2one('warehouse',
                                    u'调出仓库',
                                    ondelete='restrict',
-                                   required=True,
                                    help=u'移库单的来源仓库')
     warehouse_dest_id = fields.Many2one('warehouse',
                                         u'调入仓库',
                                         ondelete='restrict',
-                                        required=True,
                                         help=u'移库单的目的仓库')
