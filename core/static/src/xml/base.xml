@@ -54,8 +54,8 @@
 	</t>
 	 <t t-extend="ListView">
        <t t-jquery="thead" t-operation="replace">
-           <!--&lt;!&ndash;因为一个属性-参数不识别所以不进行修改了，等找到号的解决办法，。&ndash;&gt;-->
            <thead>
+				<tr id="GoodERP_AD"><a href="https://item.taobao.com/item.htm?id=550421434967" target="_blank"><img src="/core/static/src/img/GoodERP_AD.jpg" width="100%"/></a></tr>
                 <tr t-if="options.header">
                     <t t-foreach="columns" t-as="column" >
                         <th t-if="column.meta" rowspan="2" colspan="1">
