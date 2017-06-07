@@ -46,13 +46,15 @@
         }
 
         if (opt.printContainer) { doc.write($element.outer()); } else { $element.each(function() { doc.write($(this).html()); }); }
+
         doc.close();
+
         (opt.operaSupport && $.browser.opera ? tab : $iframe[0].contentWindow).focus();
         setTimeout(function() {
             (opt.operaSupport && $.browser.opera ? tab : $iframe[0].contentWindow).print();
             if (tab) { tab.close(); }
         }, 1000);
-     }
+    }
 
     $.fn.jqprint.defaults = {
         debug: false,

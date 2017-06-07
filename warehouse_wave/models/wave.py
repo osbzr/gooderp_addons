@@ -188,8 +188,21 @@ class do_pack(models.Model):
             if line.goods_qty != line.pack_qty:
                 self.is_pack = False
         if  self.is_pack:
-            model_row = self.env['wh.move'].search([('name', '=', self.odd_numbers)])
-            model_row.write({'pakge_sequence': False})
+            ORIGIN_EXPLAIN = {
+                'wh.internal': 'wh.internal',
+                'wh.out.others': 'wh.out',
+                'buy.receipt.return': 'buy.receipt',
+                'sell.delivery.sell': 'sell.delivery',
+            }
+            function_dict = {'sell.delivery': 'sell_delivery_done',
+                             'wh.out': 'approve_order'}
+            move_row = self.env['wh.move'].search([('name', '=', self.odd_numbers)])
+            move_row.write({'pakge_sequence': False})
+            model_row = self.env[ORIGIN_EXPLAIN.get(move_row.origin)
+                                ].search([('sell_move_id', '=', move_row.id)])
+            func = getattr(model_row, function_dict.get(model_row._name), None)
+            if func and  model_row.state == 'draft':
+                return func()
 
 
     def get_line_data(self, code):
