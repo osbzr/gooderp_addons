@@ -42,7 +42,7 @@ class goods(models.Model):
 
     @api.model
     def create(self, vals):
-        '''导入产品时，如果辅助单位为空，则用计量单位来填充它'''
+        '''导入商品时，如果辅助单位为空，则用计量单位来填充它'''
         if not vals.get('uos_id'):
             vals.update({'uos_id': vals.get('uom_id')})
         return super(goods, self).create(vals)
@@ -57,7 +57,7 @@ class goods(models.Model):
 
     code = fields.Char(u'编号')
     name = fields.Char(u'名称', required=True, copy=False)
-    category_id = fields.Many2one('core.category', u'产品类别',
+    category_id = fields.Many2one('core.category', u'商品类别',
                                   ondelete='restrict',
                                   domain=[('type', '=', 'goods')],
                                   context={'type': 'goods'}, required=True)
@@ -71,7 +71,7 @@ class goods(models.Model):
                         required=True,
                         digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)',
-                            help=u'产品税率')
+                            help=u'商品税率')
     not_saleable = fields.Boolean(u'不可销售',
                                   default=_get_default_not_saleable,
                                   help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
@@ -81,10 +81,14 @@ class goods(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    brand = fields.Many2one('core.value', u'品牌',
+                              ondelete='restrict',
+                              domain=[('type', '=', 'brand')],
+                              context={'type': 'brand'})
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', '产品不能重名'),
-        ('conversion_no_zero', 'check(conversion != 0)', '产品的转化率不能为0')
+        ('name_uniq', 'unique(name)', '商品不能重名'),
+        ('conversion_no_zero', 'check(conversion != 0)', '商品的转化率不能为0')
     ]
 
 

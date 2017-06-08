@@ -26,7 +26,7 @@
                                 </tree>
 	                        </field>
                         </page>
-                        <page string="供货产品">
+                        <page string="供货商品">
                             <field name="goods_ids" colspan="2" nolabel="1" groups='goods.view_cost_groups'>
                                 <tree string="goods" editable="bottom">
                                     <field name="goods_id"/>

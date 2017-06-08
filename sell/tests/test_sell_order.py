@@ -39,61 +39,27 @@ class test_sell_order(TransactionCase):
              }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
 
-    def test_get_money_state(self):
-        '''计算销货订单收款/退款状态'''
-        order2 = self.env.ref('sell.sell_order_2')
-        order2.sell_order_done()
-        delivery = self.env['sell.delivery'].search(
-                  [('order_id', '=', order2.id)])
-        # 发货单产品在仓库中不足，需盘点入库以保证审核通过
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
-        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
-        warehouse_obj.approve_order()
-        # 发货单不付款，销货订单收款状态应该为未收款
-        delivery.sell_delivery_done()
-        order2._get_money_state()
-        self.assertTrue(order2.money_state == u'未收款')
-        # 发货单总金额为 73.3，本次收款 50，销货订单收款状态应该为部分收款
-        delivery.sell_delivery_draft()
-        bank_account = self.env.ref('core.alipay')
-        bank_account.balance = 1000000
-        delivery.receipt = 50
-        delivery.bank_account_id = bank_account.id
-        delivery.sell_delivery_done()
-
-        order2._get_money_state()
-        self.assertTrue(order2.money_state == u'部分收款')
-        # 发货单总金额为 73.3，本次收款 73.3，销货订单收款状态应该为全部收款
-        delivery.sell_delivery_draft()
-        bank_account = self.env.ref('core.alipay')
-        bank_account.balance = 1000000
-        delivery.receipt = 75
-        delivery.bank_account_id = bank_account.id
-        delivery.sell_delivery_done()
-        order2._get_money_state()
-        self.assertTrue(order2.money_state == u'全部收款')
-
     def test_onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
         self.order.onchange_partner_id()
 
-        # partner 无 税率，销货单行产品无税率
+        # partner 无 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 0
         self.order.onchange_partner_id()
-        # partner 有 税率，销货单行产品无税率
+        # partner 有 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 10
         self.env.ref('goods.mouse').tax_rate = 0
         self.order.onchange_partner_id()
-        # partner 无税率，销货单行产品无税率
+        # partner 无税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 10
         self.order.onchange_partner_id()
-        # partner 税率 > 销货单行产品税率
+        # partner 税率 > 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 11
         self.env.ref('goods.mouse').tax_rate = 10
         self.order.onchange_partner_id()
-        # partner 税率 =< 销货单行产品税率
+        # partner 税率 =< 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 9
         self.env.ref('goods.mouse').tax_rate = 10
         self.order.onchange_partner_id()
@@ -175,7 +141,7 @@ class test_sell_order_line(TransactionCase):
         self.sell_order_line = self.env.ref('sell.sell_order_line_2_3')
 
     def test_compute_using_attribute(self):
-        '''返回订单行中产品是否使用属性'''
+        '''返回订单行中商品是否使用属性'''
         for line in self.order.line_ids:
             self.assertTrue(not line.using_attribute)
             line.goods_id = self.env.ref('goods.keyboard')
@@ -222,7 +188,7 @@ class test_sell_order_line(TransactionCase):
             self.assertAlmostEqual(line.price_taxed, 11.7)
 
     def test_onchange_goods_id(self):
-        '''当销货订单行的产品变化时，带出产品上的单位、价格'''
+        '''当销货订单行的商品变化时，带出商品上的单位、价格'''
         goods = self.env.ref('goods.keyboard')
         c_category_id = self.order.partner_id.c_category_id
 
@@ -234,25 +200,25 @@ class test_sell_order_line(TransactionCase):
             self.assertTrue(line.price_taxed == goods.price)
 
     def test_onchange_goods_id_tax_rate(self):
-        ''' 测试 修改产品时，产品行税率变化 '''
+        ''' 测试 修改商品时，商品行税率变化 '''
         self.order_line = self.env.ref('sell.sell_order_line_1')
-        # partner 无 税率，销货单行产品无税率
+        # partner 无 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 0
         self.order_line.onchange_goods_id()
-        # partner 有 税率，销货单行产品无税率
+        # partner 有 税率，销货单行商品无税率
         self.env.ref('core.jd').tax_rate = 10
         self.env.ref('goods.mouse').tax_rate = 0
         self.order_line.onchange_goods_id()
-        # partner 无税率，销货单行产品有税率
+        # partner 无税率，销货单行商品有税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.mouse').tax_rate = 10
         self.order_line.onchange_goods_id()
-        # partner 税率 > 销货单行产品税率
+        # partner 税率 > 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 11
         self.env.ref('goods.mouse').tax_rate = 10
         self.order_line.onchange_goods_id()
-        # partner 税率 =< 销货单行产品税率
+        # partner 税率 =< 销货单行商品税率
         self.env.ref('core.jd').tax_rate = 9
         self.env.ref('goods.mouse').tax_rate = 10
         self.order_line.onchange_goods_id()

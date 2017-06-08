@@ -39,8 +39,8 @@ class wh_inventory(models.Model):
                        help=u'单据编号，创建时会自动生成')
     warehouse_id = fields.Many2one('warehouse', u'仓库', required=True, default=_get_default_warehouse,
                                    help=u'盘点单盘点的仓库')
-    goods = fields.Char(u'产品',
-                        help=u'盘点单盘点的产品')
+    goods = fields.Char(u'商品',
+                        help=u'盘点单盘点的商品')
     out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False,
                              help=u'盘亏生成的其他出库单单据')
     in_id = fields.Many2one('wh.in', u'盘盈单据', copy=False,
@@ -269,51 +269,51 @@ class wh_inventory_line(models.Model):
                                    help=u'盘点单行对应的盘点单')
     warehouse_id = fields.Many2one('warehouse', u'仓库', required=True, ondelete='restrict',
                                    help=u'盘点单行对应的仓库')
-    goods_id = fields.Many2one('goods', u'产品', required=True, ondelete='restrict',
-                               help=u'盘点单行对应的产品')
+    goods_id = fields.Many2one('goods', u'商品', required=True, ondelete='restrict',
+                               help=u'盘点单行对应的商品')
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
-                                   help=u'盘点单行对应的产品的属性')
+                                   help=u'盘点单行对应的商品的属性')
     using_batch = fields.Boolean(
         related='goods_id.using_batch', string=u'批号管理',
-        help=u'盘点单行对应的产品是否使用批号管理，是True否则False')
+        help=u'盘点单行对应的商品是否使用批号管理，是True否则False')
     force_batch_one = fields.Boolean(
         related='goods_id.force_batch_one', string=u'每批号数量为1',
-        help=u'盘点单行对应的产品是否使用每批号数量为1，是True否则False')
+        help=u'盘点单行对应的商品是否使用每批号数量为1，是True否则False')
     lot = fields.Char(u'批号',
-                      help=u'盘点单行对应的产品批号')
+                      help=u'盘点单行对应的商品批号')
     new_lot = fields.Char(u'盘盈批号',
-                          help=u'盘点单行对应的产品盘盈批号')
+                          help=u'盘点单行对应的商品盘盈批号')
     new_lot_id = fields.Many2one('wh.move.line', u'盘亏批号',
                                  ondelete='restrict',
-                                 help=u'盘点单行对应的产品盘亏批号')
+                                 help=u'盘点单行对应的商品盘亏批号')
     lot_type = fields.Selection(LOT_TYPE, u'批号类型', default='nothing',
                                 help=u'批号类型: 出库、入库、不做处理')
     uom_id = fields.Many2one('uom', u'单位', ondelete='restrict',
-                             help=u'盘点单行对应的产品的计量单位')
+                             help=u'盘点单行对应的商品的计量单位')
     uos_id = fields.Many2one('uom', u'辅助单位', ondelete='restrict',
-                             help=u'盘点单行对应的产品的辅助单位')
+                             help=u'盘点单行对应的商品的辅助单位')
     real_qty = fields.Float(
         u'账面数量', digits=dp.get_precision('Quantity'),
-        help=u'盘点单行对应的产品的账面数量')
+        help=u'盘点单行对应的商品的账面数量')
     real_uos_qty = fields.Float(
         u'账面辅助数量', digits=dp.get_precision('Quantity'),
-        help=u'盘点单行对应的产品的账面辅助数量')
+        help=u'盘点单行对应的商品的账面辅助数量')
     inventory_qty = fields.Float(
         u'实际数量', digits=dp.get_precision('Quantity'),
         required=True,
-        help=u'盘点单行对应的产品的实际数量')
+        help=u'盘点单行对应的商品的实际数量')
     inventory_uos_qty = fields.Float(
         u'实际辅助数量', digits=dp.get_precision('Quantity'),
         required=True,
-        help=u'盘点单行对应的产品的实际辅助数量')
+        help=u'盘点单行对应的商品的实际辅助数量')
     difference_qty = fields.Float(
         u'差异数量', digits=dp.get_precision('Quantity'),
         compute='_get_difference_qty',
-        help=u'盘点单行对应的产品的差异数量')
+        help=u'盘点单行对应的商品的差异数量')
     difference_uos_qty = fields.Float(
         u'差异辅助数量', digits=dp.get_precision('Quantity'),
         compute='_get_difference_uos_qty',
-        help=u'盘点单行对应的产品的差异辅助数量')
+        help=u'盘点单行对应的商品的差异辅助数量')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -367,7 +367,7 @@ class wh_inventory_line(models.Model):
                     self.line_role_back()
                     return {'warning': {
                         'title': u'警告',
-                        'message': u'产品上设置了序号为1，此时一次只能盘亏或盘盈一个产品数量',
+                        'message': u'商品上设置了序号为1，此时一次只能盘亏或盘盈一个商品数量',
                     }}
 
             if self.difference_qty > 0:

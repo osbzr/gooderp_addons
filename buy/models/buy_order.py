@@ -73,18 +73,13 @@ class buy_order(models.Model):
         return self._default_warehouse_dest_impl()
 
     @api.one
-    @api.depends('type')
-    def _get_money_state(self):
+    def _get_paid_amount(self):
         '''计算购货订单付款/退款状态'''
         receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
-        if all(receipt.invoice_id.reconciled == 0
-               for receipt in receipts):
-            self.money_state = (self.type == 'buy') and u'未付款' or u'未退款'
-        elif all(receipt.invoice_id.reconciled ==
-                 receipt.invoice_id.amount for receipt in receipts):
-            self.money_state = (self.type == 'buy') and u'全部付款' or u'全部退款'
-        else:
-            self.money_state = (self.type == 'buy') and u'部分付款' or u'部分退款'
+        money_order_rows = self.env['money.order'].search([('buy_id', '=', self.id),
+       													   ('source_ids', '=', False)])
+        self.paid_amount = sum([receipt.invoice_id.reconciled for receipt in receipts]) +\
+                           sum([order_row.amount for order_row  in money_order_rows])
 
     @api.depends('receipt_ids')
     def _compute_receipt(self):
@@ -141,7 +136,7 @@ class buy_order(models.Model):
                                         default=_default_warehouse_dest,
                                         ondelete='restrict',
                                         states=READONLY_STATES,
-                                        help=u'将产品调入到该仓库')
+                                        help=u'将商品调入到该仓库')
     invoice_by_receipt=fields.Boolean(string=u"按收货结算",
                                       default=True,
                                       help=u'如未勾选此项，可在资金行里输入付款金额，订单保存后，采购人员可以单击资金行上的【确认】按钮。')
@@ -201,10 +196,6 @@ class buy_order(models.Model):
                             "buy_id",
                             string=u"付款计划",
                             help=u'分批付款时使用付款计划')
-    money_state = fields.Char(u'付/退款状态',
-                              compute=_get_money_state,
-                              copy=False,
-                              help=u'购货订单生成的采购入库单或退货单的付/退款状态')
     goods_id = fields.Many2one('goods', related='line_ids.goods_id', string=u'商品')
     receipt_ids = fields.One2many('buy.receipt', 'order_id', string='Receptions', copy=False)
     receipt_count = fields.Integer(compute='_compute_receipt', string='Receptions Count', default=0)
@@ -228,7 +219,7 @@ class buy_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    paid_amount = fields.Float(u'已付金额', readonly=True)
+    paid_amount = fields.Float(u'已付金额', compute=_get_paid_amount, readonly=True)
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
@@ -299,10 +290,10 @@ class buy_order(models.Model):
         if self.state == 'done':
             raise UserError(u'请不要重复审核')
         if not self.line_ids:
-            raise UserError(u'请输入产品明细行')
+            raise UserError(u'请输入商品明细行')
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和含税单价不能小于0' % line.goods_id.name)
             if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
                 raise UserError(u'外贸免税')
         if not self.bank_account_id and self.prepayment:
@@ -504,7 +495,7 @@ class buy_order_line(models.Model):
     @api.one
     @api.depends('goods_id')
     def _compute_using_attribute(self):
-        '''返回订单行中产品是否使用属性'''
+        '''返回订单行中商品是否使用属性'''
         self.using_attribute = self.goods_id.attribute_ids and True or False
 
     @api.one
@@ -626,7 +617,7 @@ class buy_order_line(models.Model):
 
     @api.onchange('goods_id', 'quantity')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位、成本价。
+        '''当订单行的商品变化时，带出商品上的单位、成本价。
         在采购订单上选择供应商，自动带出供货价格，没有设置供货价的取成本价格。'''
         if not self.order_id.partner_id:
             raise UserError(u'请先选择一个供应商！')

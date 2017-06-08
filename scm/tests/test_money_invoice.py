@@ -25,7 +25,7 @@ class test_money_invoice(TransactionCase):
                        [('order_id', '=', self.order.id)])
         self.return_receipt = self.env.ref('buy.buy_receipt_return_1')
 
-        # 补足产品，确保审核销售发货单、采购退货单能正常进行
+        # 补足商品，确保审核销售发货单、采购退货单能正常进行
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 

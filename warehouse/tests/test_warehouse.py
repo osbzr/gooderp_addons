@@ -16,7 +16,7 @@ class TestWarehouse(TransactionCase):
         self.internal = self.browse_ref('warehouse.wh_internal_whint0')
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
 
-        # 产品 仓库 数量     成本
+        # 商品 仓库 数量     成本
         # 鼠标 总仓 2.0     80
         # 键盘 总仓 600.0   48000
         # 网线 总仓 11880.0 950400.0
@@ -81,7 +81,7 @@ class TestWarehouse(TransactionCase):
         model_name = 'wh.internal'
         order = self.env.ref('warehouse.wh_internal_whint0')
         warehouse.scan_barcode(model_name,barcode,order.id)
-        # 能找到 barcode 对应的产品
+        # 能找到 barcode 对应的商品
         self.env.ref('warehouse.wh_move_line_17').goods_id = self.env.ref('goods.iphone').id
         warehouse.scan_barcode(model_name,barcode,order.id)
 
@@ -91,12 +91,12 @@ class TestWarehouse(TransactionCase):
         warehouse.scan_barcode(model_name, barcode, order.id)
         warehouse.scan_barcode(model_name, barcode, order.id)
 
-        #产品不存在报错
+        #商品不存在报错
         barcode = '12342312312'
         with self.assertRaises(UserError):
             warehouse.scan_barcode(model_name,barcode,order.id)
 
-        # 产品的条形码扫码出入库
+        # 商品的条形码扫码出入库
         barcode = '123456789'
         #其它入库单扫码
         model_name = 'wh.in'

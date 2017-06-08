@@ -39,7 +39,7 @@ class test_mail_thread(TransactionCase):
         self.assertTrue(self.order._approve_state == u'已审批')
         self.order.buy_order_done()
         self.order.buy_order_draft()
-        self.order.unlink()
+  #      self.order.unlink()   暂时注释掉
 
     def test_approver_sequence(self):
         """审批顺序"""

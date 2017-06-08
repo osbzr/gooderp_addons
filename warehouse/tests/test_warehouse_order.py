@@ -60,7 +60,7 @@ class TestWarehouseOrder(TransactionCase):
         # 此时调拨单上的剩余数量应该位120 - 12
         self.assertEqual(self.internal.line_out_ids.qty_remaining, 120 - 12)
 
-        # 根据FIFO原则，应该先取先入库的产品，所以先取others_in的前24个键盘套装
+        # 根据FIFO原则，应该先取先入库的商品，所以先取others_in的前24个键盘套装
         self.assertEqual(self.others_in_keyboard_mouse.qty_remaining, 24)
         self.assertEqual(self.others_in_2_keyboard_mouse.qty_remaining, 48)
 
@@ -238,7 +238,7 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.cancel_approved_order()
 
     def test_goods_inventory_others_out(self):
-        ''' 其他出库单审核产品不足时调用创建盘盈入库方法 '''
+        ''' 其他出库单审核商品不足时调用创建盘盈入库方法 '''
         for line in self.others_out.line_out_ids:
             vals = {
                     'type':'inventory',
@@ -258,7 +258,7 @@ class TestWarehouseOrder(TransactionCase):
             self.others_out.goods_inventory(vals)
 
     def test_goods_inventory_internal(self):
-        ''' 内部调拨单审核产品不足时调用创建盘盈入库方法 '''
+        ''' 内部调拨单审核商品不足时调用创建盘盈入库方法 '''
         for line in self.internal.line_out_ids:
             vals = {
                     'type':'inventory',

@@ -202,7 +202,7 @@ class sell_delivery(models.Model):
             raise UserError(u'请不要重复审核！')
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和产品含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和商品含税单价不能小于0！' % line.goods_id.name)
         if not self.bank_account_id and self.receipt:
             raise UserError(u'收款额不为空时，请选择结算账户！')
         decimal_amount = self.env.ref('core.decimal_amount')
@@ -340,7 +340,7 @@ class sell_delivery(models.Model):
         借：主营业务成本（核算分类上会计科目）
         贷：库存商品（商品分类上会计科目）
 
-        当一张发货单有多个产品的时候，按对应科目汇总生成多个贷方凭证行。
+        当一张发货单有多个商品的时候，按对应科目汇总生成多个贷方凭证行。
 
         退货单生成的金额为负
         '''
@@ -553,7 +553,7 @@ class wh_move_line(models.Model):
     @api.multi
     @api.onchange('goods_id', 'tax_rate')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的零售价，以及公司的销项税'''
+        '''当订单行的商品变化时，带出商品上的零售价，以及公司的销项税'''
         self.ensure_one()
         is_return = self.env.context.get('default_is_return')
         if self.goods_id:

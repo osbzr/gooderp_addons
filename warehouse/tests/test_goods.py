@@ -5,7 +5,7 @@ import time
 
 
 class TestGoods(TransactionCase):
-    ''' 测试和仓库相关的产品的有关逻辑 '''
+    ''' 测试和仓库相关的商品的有关逻辑 '''
     def setUp(self):
         super(TestGoods, self).setUp()
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
@@ -53,7 +53,7 @@ class TestGoods(TransactionCase):
         # 应该等于最后一次入库的成本
         self.assertEqual(cost, self.others_in_cable.cost_unit)
 
-        # 忽略掉最后一次入库的行为，此时成本应该去产品的默认成本
+        # 忽略掉最后一次入库的行为，此时成本应该去商品的默认成本
         cost = self.goods_cable._get_cost(self.hd_warehouse, ignore=self.others_in_cable.id)
         self.assertEqual(cost, self.goods_cable.cost)
 

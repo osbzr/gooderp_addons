@@ -4,6 +4,7 @@ from odoo import models, fields, api
 import hashlib,base64, httplib2
 import json, urllib
 from odoo.tools.safe_eval import safe_eval
+from odoo.exceptions import UserError
 import pdfkit
 import tempfile, os
 
@@ -41,6 +42,8 @@ class wh_move(models.Model):
         根据传入的快递方式返回相应的参数
         """
         express_menu = self.env['express.menu.config'].search([('abbreviation', '=', menu_type)])
+        if not express_menu:
+            raise UserError("单据%s,承运商暂不支持 或者承运商商户简称输入错误(%s)"%(self.name, menu_type))
         shipping_type_config = dict(ShipperCode=menu_type,
                                     CustomerName=express_menu.customername or '',
                                     CustomerPwd=express_menu.customerpwd or '',
@@ -62,13 +65,25 @@ class wh_move(models.Model):
 
     def get_receiver_goods_message(self):
         #TODO: 要发货的详细地址字段 (有疑问)
-        receiver = dict(Company='',
+        ORIGIN_EXPLAIN = {
+            'wh.internal': 'wh.internal',
+            'wh.out.others': 'wh.out',
+            'buy.receipt.return': 'buy.receipt',
+            'sell.delivery.sell': 'sell.delivery',
+        }
+        address = False
+        if ORIGIN_EXPLAIN.get(self.origin):
+            model_row = self.env[ORIGIN_EXPLAIN.get(self.origin)
+                                ].search([('sell_move_id', '=', self.id)])
+            address = model_row.address
+            mobile = model_row.mobile
+        receiver = dict(Company=' ',
                         Name=self.partner_id.name,
-                        Mobile=self.partner_id.main_mobile,
+                        Mobile=mobile or self.partner_id.main_mobile,
                         ProvinceName=self.province_id.name  or '上海',
                         CityName=self.city_id.city_name or '上海',
                         ExpAreaName=self.county_id.county_name or '浦东新区',
-                        Address=False or '金海路2588号B-213')
+                        Address=address or '金海路2588号B-213')
         goods = []
         qty = 0
         for line in self.line_out_ids:
@@ -77,8 +92,7 @@ class wh_move(models.Model):
                               GoodsWeight=1.0, #产品重量
                               GoodsCode=line.goods_id.code or '', # 产品编码
                               GoodsPrice=0.0, #产品价格
-                              # GoodsVol='',  #产品体积
-                              ))
+                             ))
             qty += 1
         return receiver, goods, qty
 
@@ -109,12 +123,9 @@ class wh_move(models.Model):
         response, content = http.request(path, 'POST', headers=header, body=urllib.urlencode(data))
         content = content.replace('true', 'True').replace('false', 'False')
         self.express_code = (safe_eval(content).get('Order', {})).get('LogisticCode', "")
-        #TODO: 获取到的快递面单的进一步的处理
-        # file_html = open('express_html.html', 'w')
-        # file_html.write(safe_eval(content).get('PrintTemplate'))
-        # file_html.close()
-        # pdfkit.from_file('express_html.html', 'express_pdf.pdf')
         self.express_menu = str(safe_eval(content).get('PrintTemplate'))
+        if not self.express_code:
+            raise UserError("获取快递面单失败!\n原因:%s"%str(content))
         return str(safe_eval(content).get('PrintTemplate'))
 
     def encrypt_kdn(self, data, appkey):
@@ -129,7 +140,7 @@ class wh_move(models.Model):
         move_rows = self.browse(move_ids)
         return_html_list = []
         for move_row in move_rows:
-            if move_row.express_menu:
+            if move_row.express_code:
                 return_html_list.append(move_row.express_menu)
             else:
                 return_html_list.append(move_row.get_express_menu())

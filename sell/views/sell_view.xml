@@ -19,7 +19,6 @@
                     <field name='state'/>
 					<field name="_approve_state"/>
             		<field name='goods_state'/>
-            		<field name="money_state"/>
 					<field name="received_amount"/>
 					<field name='currency_id'
 						   groups='finance.group_multi_currency'/>
@@ -56,7 +55,6 @@
             					<field name='delivery_date'/>
             					<field name='type' widget='radio'/>
             					<field name='goods_state' readonly='1'/>
-            					<field name='money_state' readonly='1'/>
 								<field name='currency_id' readonly='1'
 									 groups='finance.group_multi_currency'/>
 							</group>
@@ -740,8 +738,8 @@
                     <group expand="0" string="分组">
                         <filter string="仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
                         <filter string="客户类别" domain="[]" context="{'group_by':'c_category_id'}"/>
-                        <filter string="产品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
-                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                        <filter string="商品类别" domain="[]" context="{'group_by':'goods_category_id'}"/>
+                        <filter string="商品" domain="[]" context="{'group_by':'goods_id'}"/>
                     </group>
                 </search>
             </field>
@@ -771,7 +769,8 @@
                 <field name="voucher_id" position="after">
                 	<field name="sell_id"
 				            	invisible="context.get('default_pay', 0)" 
-								groups="sell.sell_groups"/>
+								groups="sell.sell_groups" 
+								attrs="{'readonly':[('state', '!=', 'draft')]}"/>
                 </field>
             </field>
         </record>

@@ -59,19 +59,14 @@ class sell_order(models.Model):
                         self.env.context.get('warehouse_type'))
 
     @api.one
-    @api.depends('type')
-    def _get_money_state(self):
+    def _get_received_amount(self):
         '''计算销货订单收款/退款状态'''
         deliverys = self.env['sell.delivery'].search([('order_id', '=', self.id)])
-        if all(delivery.invoice_id.reconciled == 0
-               for delivery in deliverys):
-            self.money_state = (self.type == 'sell' and u'未收款' or u'未退款')
-        elif all(delivery.invoice_id.reconciled ==
-                 delivery.invoice_id.amount for delivery in deliverys):
-            self.money_state = (self.type == 'sell' and u'全部收款' or u'全部退款')
-        else:
-            self.money_state = (self.type == 'sell' and u'部分收款' or u'部分退款')
-
+        money_order_rows = self.env['money.order'].search([('sell_id', '=', self.id),
+                                                           ('source_ids', '=', False)])
+        self.received_amount = sum([delivery.invoice_id.reconciled for delivery in deliverys]) +\
+                               sum([order_row.amount for order_row  in money_order_rows])
+         
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES,
                                  help=u'签约合同的客户')
@@ -113,7 +108,7 @@ class sell_order(models.Model):
                                    ondelete='restrict',
                                    states=READONLY_STATES,
                                    default=_default_warehouse,
-                                   help=u'产品将从该仓库调出')
+                                   help=u'商品将从该仓库调出')
     name = fields.Char(u'单据编号', index=True, copy=False,
                        default='/', help=u"创建时它会自动生成下一个编号")
     line_ids = fields.One2many('sell.order.line', 'order_id', u'销货订单行',
@@ -146,10 +141,6 @@ class sell_order(models.Model):
                               default=u'未出库',
                               store=True,
                               help=u"销货订单的发货状态", index=True, copy=False)
-    money_state = fields.Char(u'收/退款状态',
-                              compute=_get_money_state,
-                              copy=False,
-                              help=u'销货订单生成的发货单或退货单的收/退款状态')
     cancelled = fields.Boolean(u'已终止',
                                help=u'该单据是否已终止')
     currency_id = fields.Many2one('res.currency',
@@ -163,7 +154,7 @@ class sell_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    received_amount = fields.Float(u'已收金额', readonly=True)
+    received_amount = fields.Float(u'已收金额',  compute=_get_received_amount, readonly=True)
 
 
 
@@ -239,10 +230,10 @@ class sell_order(models.Model):
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         if not self.line_ids:
-            raise UserError(u'请输入产品明细行！')
+            raise UserError(u'请输入商品明细行！')
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
-                raise UserError(u'产品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
                 raise UserError(u'外贸免税！')
         if not self.bank_account_id and self.pre_receipt:
@@ -385,7 +376,7 @@ class sell_order_line(models.Model):
     @api.one
     @api.depends('goods_id')
     def _compute_using_attribute(self):
-        '''返回订单行中产品是否使用属性'''
+        '''返回订单行中商品是否使用属性'''
         self.using_attribute = self.goods_id.attribute_ids and True or False
 
     @api.one
@@ -505,7 +496,7 @@ class sell_order_line(models.Model):
     @api.multi
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        '''当订单行的产品变化时，带出产品上的单位、默认仓库、价格、税率'''
+        '''当订单行的商品变化时，带出商品上的单位、默认仓库、价格、税率'''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.price_taxed = self.goods_id.price

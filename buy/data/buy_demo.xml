@@ -17,7 +17,7 @@
             <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
         </record>
-        <!-- 为验证报表可以合并相同产品的数量 -->
+        <!-- 为验证报表可以合并相同商品的数量 -->
         <record id="buy_order_1_same" model="buy.order">
             <field name="planned_date">2016-02-22</field>
             <field name="partner_id" ref="core.lenovo"/>
@@ -68,7 +68,7 @@
             <field name="attribute_id" ref="goods.keyboard_black"/>
             <field eval="10.0" name="quantity"/>
         </record>
-        <!-- 为验证报表可以合并相同产品的数量 -->
+        <!-- 为验证报表可以合并相同商品的数量 -->
         <record id="buy_return_order_1_same" model="buy.order">
             <field name="planned_date">2016-02-22</field>
             <field name="partner_id" ref="core.lenovo"/>
