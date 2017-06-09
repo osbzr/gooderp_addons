@@ -2,11 +2,6 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
-class location(models.Model):
-    _name = 'location'
-    name = fields.Char(u'货位号', required=True)
-    warehouse_id = fields.Many2one('warehouse', string='仓库', required=True)
-    goods_id = fields.Many2one('goods', u'商品')
 
 class goods(models.Model):
     _inherit = 'goods'

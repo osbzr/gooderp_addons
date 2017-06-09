@@ -31,7 +31,7 @@
                                 <group>
                                     <group string="职位">
                                         <field name="job_id"/>
-                                        <field name="department_id" readonly="1"/>
+                                        <field name="department_id"/>
                                         <field name="parent_id"/>
                                     </group>
                                     <group string="联系信息">
