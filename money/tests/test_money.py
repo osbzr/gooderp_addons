@@ -412,8 +412,8 @@ class test_other_money_order(TransactionCase):
         with self.assertRaises(UserError):
             self.env.ref('money.other_pay_1000').other_money_done()
 
-    def test_onchange_receiver_id(self):
-        """更改收款人，自动填入开户行和银行帐号"""
+    def test_onchange_partner_id(self):
+        """更改业务伙伴，自动填入收款人、开户行和银行帐号"""
         order = self.env.ref('money.other_pay_1000')
         partner = self.env.ref('core.lenovo')
         partner.bank_name = u'建设银行'
@@ -421,7 +421,8 @@ class test_other_money_order(TransactionCase):
 
         # 当选择了供应商联想时
         order.partner_id = partner
-        order.onchange_receiver_id()
+        order.onchange_partner_id()
+        self.assertEqual(order.receiver, u'联想')
         self.assertEqual(order.bank_name, u'建设银行')
         self.assertEqual(order.bank_num, u'6000000222222')
 

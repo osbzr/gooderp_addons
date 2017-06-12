@@ -105,11 +105,8 @@ class other_money_order(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    receiver_id = fields.Many2one('res.users',
-                                   u'收款人',
-                                   ondelete='restrict',
-                                   default=lambda self: self.env.user,
-                                   help=u'收款人')
+    receiver = fields.Char(u'收款人',
+                           help=u'收款人')
     bank_name = fields.Char(u'开户行')
     bank_num = fields.Char(u'银行账号')
     voucher_id = fields.Many2one('voucher',
@@ -126,16 +123,13 @@ class other_money_order(models.Model):
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
-    @api.onchange('receiver_id', 'partner_id')
-    def onchange_receiver_id(self):
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
         """
-        更改收款人，自动填入开户行和银行帐号
+        更改业务伙伴，自动填入收款人、开户行和银行帐号
         """
-        if self.receiver_id:
-            self.bank_name = self.receiver_id.employee_ids and self.receiver_id.employee_ids[0].bank_name or ''
-            self.bank_num = self.receiver_id.employee_ids and self.receiver_id.employee_ids[0].bank_num or ''
         if self.partner_id:
-            self.receiver_id = False
+            self.receiver = self.partner_id.name
             self.bank_name = self.partner_id.bank_name
             self.bank_num = self.partner_id.bank_num
 
