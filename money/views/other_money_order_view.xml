@@ -42,8 +42,7 @@
 							<field name='type' invisible='1'/>
 							<field name="partner_id"
 								options="{'no_open': True, 'no_create': True}"/>
-                            <field name="receiver_id"
-                                   options="{'no_open': True, 'no_create': True}"
+                            <field name="receiver"
                                    attrs="{'invisible': [('type', '!=', 'other_pay')]}"
                             />
                             <field name="bank_name" attrs="{'invisible': [('type', '!=', 'other_pay')]}"/>
