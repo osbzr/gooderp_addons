@@ -216,9 +216,7 @@
 				<form string="GOODERP PARTNER FORM">
 					<sheet>
 						<div class="oe_title">
-							<div class="oe_edit_only">
-								<label for='name' string='名称'/>
-							</div>
+							<label for='name' string='名称'/>
 							<h1>
 								<field name="name" required="1"/>
 							</h1>
@@ -311,6 +309,7 @@
 				<form string="GOODERP PARTNER FORM">
 					<sheet>
 						<div class="oe_title">
+						    <label for='name' string='名称'/>
 							<h1>
 								<field name="name" required="1"/>
 							</h1>

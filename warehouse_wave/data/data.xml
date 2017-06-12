@@ -26,6 +26,18 @@
                    "user-agent": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)",
                    "connection": "Keep-Alive"}</field>
 		</record>
+        <record id="yd_ express_menu_config" model="express.menu.config">
+            <field name="name">韵达</field>
+            <field name="abbreviation">YD</field>
+            <field name="customername">testyd</field>
+            <field name="customerpwd">testydpwd</field>
+        </record>
+        <record id="yto_ express_menu_config" model="express.menu.config">
+            <field name="name">圆通</field>
+            <field name="abbreviation">YTO</field>
+            <field name="customername">testyto</field>
+            <field name="monthcode">testytomonthcode</field>
+        </record>
     </data>
 </openerp>
 

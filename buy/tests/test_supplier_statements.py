@@ -24,7 +24,7 @@ class test_supplier_statements(TransactionCase):
         money_get.money_order_done()
         money_order = self.env.ref('money.pay_2000')
         money_order.money_order_done()
-        # 给buy_order_1中的产品“键盘”的分类设置科目
+        # 给buy_order_1中的商品“键盘”的分类设置科目
         self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
         # 创建采购入库单记录
         buy_order = self.env.ref('buy.buy_order_1')

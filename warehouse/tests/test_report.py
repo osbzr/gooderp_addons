@@ -14,7 +14,7 @@ class TestReport(TransactionCase):
         self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
         self.env.ref('warehouse.wh_in_wh_in_attribute').date = '2016-02-06'
 
-        # 产品    仓库  批号         数量   类型
+        # 商品    仓库  批号         数量   类型
         # 键鼠套装 总仓              96    入库
         # 网线    总仓              11928 入库
         # 网线    总仓              120   出库
@@ -23,7 +23,7 @@ class TestReport(TransactionCase):
         # 鼠标    总仓  ms160301    1     入库
         # 鼠标    总仓  ms160302    1     入库
         self.env['wh.in'].search([('name', '!=', 'WH/IN/16040004')]).approve_order()
-        # 先盘点产品，保证网线数量充足
+        # 先盘点商品，保证网线数量充足
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
@@ -66,7 +66,7 @@ class TestReport(TransactionCase):
         context = self.transceive_wizard.open_report().get('context')
 
         real_results = [
-            # 产品 仓库 出库数量 入库数量
+            # 商品 仓库 出库数量 入库数量
             (u'键盘', u'总仓', 0, 600),
             (u'鼠标', u'总仓', 0, 2),
             (u'网线', u'总仓', 120, 12048),

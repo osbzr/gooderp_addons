@@ -17,7 +17,7 @@ class TestInventory(TransactionCase):
         self.goods_mouse = self.browse_ref('goods.mouse')
         self.sh_warehouse = self.browse_ref('warehouse.sh_stock')
 
-        # 创建一个临时的一个库存调拨，将1个产品调拨到上海仓库
+        # 创建一个临时的一个库存调拨，将1个商品调拨到上海仓库
         self.temp_mouse_in = self.env['wh.move.line'].with_context({
             'type': 'in',
         }).create({
@@ -32,7 +32,7 @@ class TestInventory(TransactionCase):
             'lot': 'MOUSE0001',
         })
 
-        # 产品     实际数量 实际辅助数量
+        # 商品     实际数量 实际辅助数量
         # 键鼠套装  96     2
         # 鼠标     1      1
         # 网线     48     1
@@ -62,7 +62,7 @@ class TestInventory(TransactionCase):
         self.inventory.query_inventory()
 
     def test_query_inventory(self):
-        # 盘点单查询的结果必须和每个产品单据查询的结果一致
+        # 盘点单查询的结果必须和每个商品单据查询的结果一致
         for line in self.inventory.line_ids:
             goods_stock = line.goods_id.get_stock_qty()[0]
             self.assertEqual(goods_stock.get('warehouse'), line.warehouse_id.name)
@@ -74,7 +74,7 @@ class TestInventory(TransactionCase):
         for line in self.inventory.line_ids:
             self.assertEqual(line.warehouse_id, self.sh_warehouse)
 
-        # 指定产品的时候，选择的行必须是该产品的
+        # 指定商品的时候，选择的行必须是该商品的
         self.inventory.goods = u'鼠标'
         self.inventory.query_inventory()
         for line in self.inventory.line_ids:
@@ -108,10 +108,10 @@ class TestInventory(TransactionCase):
         self.assertEqual(mouse.difference_qty, 1)
         self.assertEqual(mouse.lot_type, 'in')
 
-        # 对于强制为1的产品，只能添加或减少一个产品
+        # 对于强制为1的商品，只能添加或减少一个商品
         warning = {'warning': {
             'title': u'警告',
-            'message': u'产品上设置了序号为1，此时一次只能盘亏或盘盈一个产品数量',
+            'message': u'商品上设置了序号为1，此时一次只能盘亏或盘盈一个商品数量',
         }}
         mouse.inventory_qty = mouse.real_qty + 2
         self.assertEqual(mouse.onchange_qty(), warning)
@@ -132,7 +132,7 @@ class TestInventory(TransactionCase):
         self.assertTrue(self.inventory.out_id)
         self.assertTrue(self.inventory.in_id)
 
-        # 验证产品
+        # 验证商品
         self.assertEqual(self.inventory.out_id.line_out_ids.goods_id, cable.goods_id)
         self.assertEqual(self.inventory.in_id.line_in_ids.goods_id, mouse.goods_id)
 

@@ -2,11 +2,6 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
-class location(models.Model):
-    _name = 'location'
-    name = fields.Char(u'货位号', required=True)
-    warehouse_id = fields.Many2one('warehouse', string='仓库', required=True)
-    goods_id = fields.Many2one('goods', u'商品')
 
 class goods(models.Model):
     _inherit = 'goods'
@@ -167,7 +162,7 @@ class do_pack(models.Model):
     _name = 'do.pack'
     _rec_name = 'odd_numbers'
     odd_numbers = fields.Char(u'单号')
-    product_line_ids = fields.One2many('pack.line', 'pack_id', string='产品行')
+    product_line_ids = fields.One2many('pack.line', 'pack_id', string='商品行')
     is_pack = fields.Boolean(compute='compute_is_pack_ok', string='打包完成')
 
     @api.multi
@@ -188,8 +183,21 @@ class do_pack(models.Model):
             if line.goods_qty != line.pack_qty:
                 self.is_pack = False
         if  self.is_pack:
-            model_row = self.env['wh.move'].search([('name', '=', self.odd_numbers)])
-            model_row.write({'pakge_sequence': False})
+            ORIGIN_EXPLAIN = {
+                'wh.internal': 'wh.internal',
+                'wh.out.others': 'wh.out',
+                'buy.receipt.return': 'buy.receipt',
+                'sell.delivery.sell': 'sell.delivery',
+            }
+            function_dict = {'sell.delivery': 'sell_delivery_done',
+                             'wh.out': 'approve_order'}
+            move_row = self.env['wh.move'].search([('name', '=', self.odd_numbers)])
+            move_row.write({'pakge_sequence': False})
+            model_row = self.env[ORIGIN_EXPLAIN.get(move_row.origin)
+                                ].search([('sell_move_id', '=', move_row.id)])
+            func = getattr(model_row, function_dict.get(model_row._name), None)
+            if func and  model_row.state == 'draft':
+                return func()
 
 
     def get_line_data(self, code):
@@ -232,7 +240,7 @@ class do_pack(models.Model):
             line_rows = self.env['pack.line'].search([('goods_id', '=', goods_row.id),
                                                       ('pack_id', '=', pack_row.id)])
             if not line_rows:
-                raise UserError(u'产品%s不在当前要打包的发货单%s上!'%(
+                raise UserError(u'商品%s不在当前要打包的发货单%s上!'%(
                     goods_row.name, pack_row.odd_numbers))
             goods_is_enough = True
             for line_row in line_rows:
@@ -243,7 +251,7 @@ class do_pack(models.Model):
                 break
 
             if goods_is_enough:
-                raise UserError(u'发货单%s要发货的产品%s已经充足,请核对后在进行操作!'%(
+                raise UserError(u'发货单%s要发货的商品%s已经充足,请核对后在进行操作!'%(
                     pack_row.odd_numbers, goods_row.name))
         return True
 
@@ -252,6 +260,6 @@ class pack_line(models.Model):
     _name = 'pack.line'
 
     pack_id = fields.Many2one('do.pack', string='打包')
-    goods_id = fields.Many2one('goods', string='产品')
+    goods_id = fields.Many2one('goods', string='商品')
     goods_qty = fields.Float(u'要发货数量')
     pack_qty = fields.Float(u'打包数量')

@@ -174,17 +174,17 @@ class test_sell_delivery(TransactionCase):
         return_delivery.sell_delivery_done()
 
     def test_sell_delivery_done_goods_inventory(self):
-        '''发库单审核时产品不足直接盘盈'''
+        '''发库单审核时商品不足直接盘盈'''
         for line in self.delivery.line_out_ids:
             line.goods_id = self.env.ref('goods.computer')
         self.delivery.sell_delivery_done()
 
     # def test_check_goods_qty(self):
-    #     '''查询指定产品，属性，仓库，的当前剩余数量'''
+    #     '''查询指定商品，属性，仓库，的当前剩余数量'''
     #
 
     def test_goods_inventory(self):
-        '''发库单审核产品不足时调用创建盘盈入库方法'''
+        '''发库单审核商品不足时调用创建盘盈入库方法'''
         for line in self.delivery.line_out_ids:
             vals = {
                     'type':'inventory',
@@ -250,7 +250,7 @@ class test_sell_delivery(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,delivery_order.id)
         warehouse.scan_barcode(model_name,barcode,delivery_order.id)
 
-        # 产品的条形码扫码出入库
+        # 商品的条形码扫码出入库
         barcode = '123456789'
         #销售出库单扫码
         warehouse.scan_barcode(model_name,barcode,delivery_order.id)
@@ -260,26 +260,26 @@ class test_sell_delivery(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
 
     def test_onchange_partner_id_tax_rate(self):
-        ''' 测试 改变 partner, 出库单行产品税率变化 '''
+        ''' 测试 改变 partner, 出库单行商品税率变化 '''
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
-        # partner 无 税率， 出库单行产品无税率
+        # partner 无 税率， 出库单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.cable').tax_rate = 0
         delivery.onchange_partner_id()
-        # partner 有 税率， 出库单行产品无税率
+        # partner 有 税率， 出库单行商品无税率
         self.env.ref('core.jd').tax_rate = 10
         self.env.ref('goods.cable').tax_rate = 0
         delivery.onchange_partner_id()
-        # partner 无税率， 出库单行产品无税率
+        # partner 无税率， 出库单行商品无税率
         self.env.ref('core.jd').tax_rate = 0
         self.env.ref('goods.cable').tax_rate = 10
         delivery.onchange_partner_id()
-        # partner 税率 >  出库单行产品税率
+        # partner 税率 >  出库单行商品税率
         self.env.ref('core.jd').tax_rate = 11
         self.env.ref('goods.cable').tax_rate = 10
         delivery.onchange_partner_id()
-        # partner 税率 =<  出库单行产品税率
+        # partner 税率 =<  出库单行商品税率
         self.env.ref('core.jd').tax_rate = 11
         self.env.ref('goods.cable').tax_rate = 12
         delivery.onchange_partner_id()
@@ -385,25 +385,25 @@ class test_wh_move_line(TransactionCase):
                     'default_partner': self.delivery_return.partner_id.id}).onchange_goods_id()
 
     def test_onchange_goods_id_tax_rate(self):
-        ''' 测试 修改产品时，出库单行税率变化 '''
+        ''' 测试 修改商品时，出库单行税率变化 '''
         for order_line in self.delivery.line_out_ids:
-            # partner 无 税率，出库单行产品无税率
+            # partner 无 税率，出库单行商品无税率
             self.partner.tax_rate = 0
             self.env.ref('goods.mouse').tax_rate = 0
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
-            # partner 有 税率，出库单行产品无税率
+            # partner 有 税率，出库单行商品无税率
             self.partner.tax_rate = 10
             self.env.ref('goods.mouse').tax_rate = 0
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
-            # partner 无税率，出库单行产品有税率
+            # partner 无税率，出库单行商品有税率
             self.partner.tax_rate = 0
             self.env.ref('goods.mouse').tax_rate = 10
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
-            # partner 税率 > 出库单行产品税率
+            # partner 税率 > 出库单行商品税率
             self.partner.tax_rate = 11
             self.env.ref('goods.mouse').tax_rate = 10
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()
-            # partner 税率 =< 出库单行产品税率
+            # partner 税率 =< 出库单行商品税率
             self.partner.tax_rate = 9
             self.env.ref('goods.mouse').tax_rate = 10
             order_line.with_context({'default_partner': self.delivery.partner_id.id}).onchange_goods_id()

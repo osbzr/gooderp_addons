@@ -329,7 +329,7 @@
         </record>
         <record id="small_business_chart2221001008" model='finance.account'>
             <field name='code'>2221001008</field>
-            <field name='name'>应交税费-增值税-出口抵减内销产品应纳税额</field>
+            <field name='name'>应交税费-增值税-出口抵减内销商品应纳税额</field>
             <field name='costs_types'>debt</field>
             <field name='balance_directions'>out</field>
         </record>
@@ -1040,7 +1040,7 @@
         </record>
         <record id='bs_11' model='balance.sheet'>
             <field name="line">12</field>
-            <field name='balance'>在产品</field>
+            <field name='balance'>在商品</field>
             <field name='line_num'>11</field>
             <field name='balance_formula'>4001~4999999999</field>
             <field name='balance_two'>流动负债合计</field>

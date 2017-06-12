@@ -17,7 +17,7 @@ class scan_barcode(models.Model):
         att = self.env['attribute'].search([('ean', '=', code)])
         goods = self.env['goods'].search([('barcode', '=', code)])
         if not att and not goods:
-            return {'warning': {'title': u'警告', 'message': u'不存在条码为 %s 的产品' % code}}
+            return {'warning': {'title': u'警告', 'message': u'不存在条码为 %s 的商品' % code}}
         self.env['wh.move'].check_barcode(self._name, self.id, att, goods)
         conversion = att and att.goods_id.conversion or goods.conversion
         move, create_line, val = self.env['wh.move'].scan_barcode_each_model_operation(self._name, self.id, att,
