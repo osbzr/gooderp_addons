@@ -344,7 +344,7 @@ class wh_move_line(models.Model):
             self.cost_unit = self.goods_id.cost / (1 + tax_rate * 0.01)
 
     @api.multi
-    @api.onchange('goods_id', 'tax_rate')
+    @api.onchange('goods_id')
     def onchange_goods_id(self):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id

@@ -551,7 +551,7 @@ class wh_move_line(models.Model):
         self.price_taxed = self.goods_id.price
 
     @api.multi
-    @api.onchange('goods_id', 'tax_rate')
+    @api.onchange('goods_id')
     def onchange_goods_id(self):
         '''当订单行的商品变化时，带出商品上的零售价，以及公司的销项税'''
         self.ensure_one()
