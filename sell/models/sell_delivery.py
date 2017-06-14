@@ -387,7 +387,7 @@ class sell_delivery(models.Model):
             voucher = record.create_voucher()
             # 发货单/退货单 生成结算单
             invoice_id = record._delivery_make_invoice()
-            self.write({
+            record.write({
                 'voucher_id': voucher and voucher.id,
                 'invoice_id': invoice_id and invoice_id.id,
                 'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
