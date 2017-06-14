@@ -166,13 +166,14 @@ class sell_adjust_line(models.Model):
     @api.one
     def _inverse_price(self):
         '''由不含税价反算含税价，保存时生效'''
-        if not self.price_taxed:
-            self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
+        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
 
     @api.onchange('price', 'tax_rate')
     def onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价'''
-        if not self.price_taxed:
+        price = self.price_taxed / (1 + self.tax_rate * 0.01)  # 不含税单价
+        decimal = self.env.ref('core.decimal_price')
+        if float_compare(price, self.price, precision_digits=decimal.digits) != 0:
             self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
 
     order_id = fields.Many2one('sell.adjust', u'订单编号', index=True,
