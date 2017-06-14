@@ -1161,6 +1161,7 @@
         <record id='bs_26' model='balance.sheet'>
             <field name="line">28</field>
             <field name='balance'>开发支出</field>
+            <field name='balance_formula'>4301~4301999999</field>
             <field name='line_num'>26</field>
             <field name='balance_two'>资本公积</field>
             <field name='line_num_two'>49</field>
