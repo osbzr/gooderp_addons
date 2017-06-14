@@ -53,6 +53,7 @@
             'report/sell_summary_staff_view.xml',
             'report/sell_receipt_view.xml',
             'report/sell_top_ten_view.xml',
+            'report/sell_summary_view.xml',
             'wizard/customer_statements_wizard_view.xml',
             'wizard/sell_order_track_wizard_view.xml',
             'wizard/sell_order_detail_wizard_view.xml',

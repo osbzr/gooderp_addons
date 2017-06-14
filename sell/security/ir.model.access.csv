@@ -6,6 +6,7 @@ access_customer_statements_report,access_customer_statements_report,model_custom
 access_sell_summary_goods,access_sell_summary_goods,model_sell_summary_goods,,1,1,1,1
 access_sell_summary_partner,access_sell_summary_partner,model_sell_summary_partner,,1,1,1,1
 access_sell_summary_staff,access_sell_summary_staff,model_sell_summary_staff,,1,1,1,1
+access_report_sell_summary,access_report_sell_summary,model_report_sell_summary,,1,1,1,1
 access_sell_top_ten,access_sell_top_ten,model_sell_top_ten,,1,1,1,1
 access_sell_order_detail,access_sell_order_detail,model_sell_order_detail,,1,1,1,1
 access_sell_adjust,access_sell_adjust,model_sell_adjust,,1,1,1,1

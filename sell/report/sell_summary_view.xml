@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 销售汇总表 tree 视图 -->
+        <record id="report_sell_summary_tree" model="ir.ui.view">
+            <field name="name">sell.summary.tree</field>
+            <field name="model">report.sell.summary</field>
+            <field name="arch" type="xml">
+                <tree string="销售汇总表" create="false">
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <field name="goods_id"/>
+                    <field name="attribute_id" groups='goods.multi_attrs_groups'/>
+                    <field name="warehouse" groups='warehouse.multi_warehouse_groups'/>
+                    <field name='goods_uos_qty' groups='goods.auxiliary_unit_groups' sum='辅助数量合计' />
+                    <field name='goods_qty' sum='数量合计' />
+                    <field name="uos" groups='goods.auxiliary_unit_groups'/>
+                    <field name="uom"/>
+                    <field name="price"/>
+                    <field name="amount" sum="销售收入合计"/>
+                    <field name="tax_amount" sum="税额合计" groups='sell.out_tax_groups'/>
+                    <field name="subtotal" sum="价税合计的合计" groups='sell.out_tax_groups'/>
+                    <field name="margin" sum="毛利合计"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- 销售汇总表 graph 视图 -->
+        <record id='report_sell_summary_graph' model='ir.ui.view'>
+            <field name='name'>sell summary graph</field>
+            <field name='model'>report.sell.summary</field>
+            <field name='arch' type='xml'>
+                <pivot string="销售汇总表">
+                    <field name='goods' type='row' />
+                    <field name='goods_qty' type='measure' />
+                    <field name='goods_uos_qty' type='measure' groups='goods.auxiliary_unit_groups'/>
+                    <field name="amount" type='measure' sum="销售收入合计"/>
+                    <field name="tax_amount" type='measure' sum="税额合计" groups='sell.out_tax_groups'/>
+                    <field name="subtotal" type='measure' sum="价税合计的合计" groups='sell.out_tax_groups'/>
+                    <field name="margin" type='measure' sum="毛利合计"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- 销售汇总表 search 视图 -->
+        <record id='report_sell_summary_search' model='ir.ui.view'>
+            <field name='name'>report.sell.summary.search</field>
+            <field name='model'>report.sell.summary</field>
+            <field name='arch' type='xml'>
+                <search string='销售汇总表' >
+                    <field name='goods' string='商品' filter_domain="[('goods', 'ilike', self)]"/>
+                    <field name='partner_id' string='客户' filter_domain="[('partner_id', 'ilike', self)]"/>
+                    <field name='user_id' string='销售员' filter_domain="[('user_id', 'ilike', self)]"/>
+                    <field name='department_id' string='部门' filter_domain="[('department_id', 'ilike', self)]"/>
+                    <field name='lot' string='批号' filter_domain="[('lot', 'ilike', self)]" groups='goods.batch_groups' />
+                    <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" groups='warehouse.multi_warehouse_groups' />
+
+                    <group expand="0" string="Group By">
+                        <filter string="商品" context="{'group_by':'goods'}"/>
+                        <filter string="客户" context="{'group_by':'partner_id'}"/>
+                        <filter string="销售员" context="{'group_by':'user_id'}"/>
+                        <filter string="部门" context="{'group_by':'department_id'}"/>
+                        <filter string="批号" context="{'group_by': 'lot'}" groups='goods.batch_groups'/>
+                        <filter string="仓库" context="{'group_by': 'warehouse'}" groups='warehouse.multi_warehouse_groups'/>
+                        <filter string="单位" context="{'group_by': 'uom'}"/>
+                        <filter string="辅助单位" context="{'group_by': 'uos'}" groups='goods.auxiliary_unit_groups'/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- 销售汇总表 action -->
+        <record id='report_sell_summary_action' model='ir.actions.act_window' >
+            <field name='name'>销售汇总表</field>
+            <field name='res_model'>report.sell.summary</field>
+            <field name='view_mode'>pivot,tree</field>
+            <field name='view_id' ref='report_sell_summary_graph' />
+        </record>
+
+        <!-- 销售汇总表 menu -->
+        <menuitem id="menu_sell_summary" name="销售汇总表" action="report_sell_summary_action"
+            parent="menu_sell_report" sequence="0"/>
+    </data>
+</openerp>
