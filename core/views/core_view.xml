@@ -121,6 +121,8 @@
 					<group>
 						<field name="logo" widget="image"  class="oe_avatar oe_left"/>
                         <field name="name" class="oe_inline"/>
+						<field name="rml_header1" string="口号"/>
+						<field name="website"/>
 						<field name="street" required="1"/>
 						<field name="phone" required="1"/>
 						<field name="fax" string="手机"/>
