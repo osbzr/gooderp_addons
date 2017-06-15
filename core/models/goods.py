@@ -68,7 +68,6 @@ class goods(models.Model):
         string=u'转化率', default=1, digits=(16, 3), 
         help=u'1个辅助单位等于多少计量单位的数量，如1箱30个苹果，这里就输入30')
     cost = fields.Float(u'成本',
-                        required=True,
                         digits=dp.get_precision('Amount'))
     tax_rate = fields.Float(u'税率(%)',
                             help=u'商品税率')
