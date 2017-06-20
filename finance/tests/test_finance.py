@@ -239,8 +239,6 @@ class test_period(TransactionCase):
             line.account_id.auxiliary_financing = 'project'
             line.onchange_account_id()
 
-        #这么写覆盖到了，但是这什么逻辑=。=
-        self.env['voucher.line'].onchange_account_id()
     def test_period_compare(self):
         """测试会计期间比较的 代码 有三种情况 大于 小于 等于"""
         period_id = self.env.ref('finance.period_201601')
