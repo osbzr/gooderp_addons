@@ -14,6 +14,8 @@
                 <field name="balance" position="after">
                     <field name="currency_id"
                     	 groups='finance.group_multi_currency'/>
+                    <field name="currency_amount"
+                    	 groups='finance.group_multi_currency'/>
                     <button name="bank_statements" type="object" string="查看现金银行报表" icon="fa-search" class="oe_highlight"/>
 				</field>
             </field>
