@@ -233,6 +233,8 @@ class voucher_line(models.Model):
     @api.multi
     @api.onchange('account_id')
     def onchange_account_id(self):
+        self.currency_id = self.account_id.currency_id
+        self.rate_silent = self.account_id.currency_id.rate
         res = {
             'domain': {
                 'partner_id': [('name', '=', False)],
