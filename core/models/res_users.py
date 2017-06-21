@@ -8,6 +8,13 @@ class res_users(models.Model):
 
     employee_ids = fields.One2many('staff', 'user_id', u'对应员工')
 
+    @api.model
+    def create(self, vals):
+        vals.update({
+            'email': '@'
+        })
+        return super(res_users, self).create(vals)
+
     @api.multi
     def write(self, vals):
         res = super(res_users, self).write(vals)
