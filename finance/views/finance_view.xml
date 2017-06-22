@@ -159,8 +159,8 @@
                     <field name='date'/>
                     <field name='name'/>
                     <field name='account_id'/>
-                    <field name='debit' sum='借方合计'/>
-                    <field name='credit' sum='贷方合计'/>
+                    <field name='debit' sum='借方合计' widget="bgcolor" color="success"/>
+                    <field name='credit' sum='贷方合计' widget="bgcolor" color="primary"/>
                     <field name='partner_id'/>
                     <field name='auxiliary_id'/>
                     <field name='goods_id' groups='finance.group_account_goods'/>

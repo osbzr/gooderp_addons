@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates id="template" xml:space="preserve">
+    <img t-name="ListView.row.image"
+         t-att-height="widget.height || 16"
+         t-att-src="src" />
+
+
+    <span t-name="ListView.row.bgcolor" t-att-class="'label label-'+widget.color" ><t t-esc="value"/></span>
+
+</templates>
