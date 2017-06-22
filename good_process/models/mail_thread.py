@@ -310,7 +310,7 @@ class process(models.Model):
     active = fields.Boolean(u'启用', default=True)
 
     _sql_constraints = [
-        ('model_type_uniq', 'unique(model_id, type)', '同种单据相同类型必须唯一')
+        ('model_type_uniq', 'unique(model_id, type)', '同种单据相同类型的审批规则必须唯一')
     ]
 
     @api.one
@@ -318,7 +318,7 @@ class process(models.Model):
     def check_model_id(self):
         records = self.search([('model_id', '=', self.model_id.id)])
         if self.model_id and not self.type and len(records) > 1:
-            raise ValidationError(u'同种单据必须唯一')
+            raise ValidationError(u'同种单据的审批规则必须唯一')
 
     @api.model
     def create(self, vals):
