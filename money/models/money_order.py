@@ -276,19 +276,31 @@ class money_order(models.Model):
 
             total = 0
             for line in order.line_ids:
+                rate_silent = self.env['res.currency'].get_rate_silent(order.date, line.currency_id.id)
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
                     decimal_amount = self.env.ref('core.decimal_amount')
-                    if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
-                        raise UserError(u'账户余额不足。\n账户余额:%s 付款行金额:%s'%(line.bank_id.balance,line.amount))
-                    line.bank_id.balance -= line.amount
+                    balance = line.currency_id != self.env.user.company_id.currency_id \
+                              and line.bank_id.currency_amount or line.bank_id.balance
+                    if float_compare(balance, line.amount,
+                                     precision_digits=decimal_amount.digits) == -1:
+                        raise UserError(u'账户余额不足。\n账户余额:%s 付款行金额:%s' % (balance, line.amount))
+                    if line.currency_id != self.env.user.company_id.currency_id:  # 外币
+                        line.bank_id.currency_amount -= line.amount
+                        line.bank_id.balance -= line.amount * rate_silent
+                    else:
+                        line.bank_id.balance -= line.amount
                 else:  # 收款账号余额增加, 退款账号余额减少
-                    line.bank_id.balance += line.amount
+                    if line.currency_id != self.env.user.company_id.currency_id:    # 外币
+                        line.bank_id.currency_amount += line.amount
+                        line.bank_id.balance += line.amount * rate_silent
+                    else:
+                        line.bank_id.balance += line.amount
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable -= total - self.discount_amount
+                order.partner_id.payable -= total - order.discount_amount
             else:
-                order.partner_id.receivable -= total + self.discount_amount
+                order.partner_id.receivable -= total + order.discount_amount
 
             # 更新结算单的未核销金额、已核销金额
             for source in order.source_ids:
@@ -325,19 +337,30 @@ class money_order(models.Model):
         for order in self:
             total = 0
             for line in order.line_ids:
+                rate_silent = self.env['res.currency'].get_rate_silent(order.date, line.currency_id.id)
                 if order.type == 'pay':  # 反审核：付款账号余额增加
-                    line.bank_id.balance += line.amount
+                    if line.currency_id != self.env.user.company_id.currency_id:  # 外币
+                        line.bank_id.currency_amount += line.amount
+                        line.bank_id.balance += line.amount * rate_silent
+                    else:
+                        line.bank_id.balance += line.amount
                 else:  # 反审核：收款账号余额减少
+                    balance = line.currency_id != self.env.user.company_id.currency_id \
+                              and line.bank_id.currency_amount or line.bank_id.balance
                     decimal_amount = self.env.ref('core.decimal_amount')
-                    if float_compare(line.bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
-                        raise UserError(u'账户余额不足。\n 账户余额:%s 收款行金额:%s' % (line.bank_id.balance, line.amount))
-                    line.bank_id.balance -= line.amount
+                    if float_compare(balance, line.amount, precision_digits=decimal_amount.digits) == -1:
+                        raise UserError(u'账户余额不足。\n 账户余额:%s 收款行金额:%s' % (balance, line.amount))
+                    if line.currency_id != self.env.user.company_id.currency_id:  # 外币
+                        line.bank_id.currency_amount -= line.amount
+                        line.bank_id.balance -= line.amount * rate_silent
+                    else:
+                        line.bank_id.balance -= line.amount
                 total += line.amount
 
             if order.type == 'pay':
-                order.partner_id.payable += total - self.discount_amount
+                order.partner_id.payable += total - order.discount_amount
             else:
-                order.partner_id.receivable += total + self.discount_amount
+                order.partner_id.receivable += total + order.discount_amount
 
             for source in order.source_ids:
                 source.name.to_reconcile += source.this_reconcile

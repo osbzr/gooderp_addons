@@ -50,6 +50,19 @@ class test_money_order(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.get_40000').money_order_draft()
 
+    def test_money_order_draft_foreign_currency(self):
+        ''' 测试收付款反审核时 单据行与当前用户公司的 currency 不一致的情况 '''
+        # get
+        self.env.ref('money.get_line_1').currency_id = self.env.ref('base.USD').id
+        self.env.user.company_id.currency_id = self.env.ref('base.CNY').id
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.get_40000').money_order_draft()
+        # pay
+        self.env.ref('money.pay_line_1').currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.get_40000').money_order_done()  # 先做收款以便付款足够支付
+        self.env.ref('money.pay_2000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_draft()
+
     def test_money_order_onchange(self):
         '''测试收付款onchange'''
         # onchange_date  'get','pay'
