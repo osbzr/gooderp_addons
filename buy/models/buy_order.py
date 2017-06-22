@@ -679,7 +679,7 @@ class payment(models.Model):
                                 'date_due': fields.Date.context_today(self),
                                 'state': 'draft',
                             })
-            self.env["money.order"].create({
+            self.with_context(type='pay').env["money.order"].create({
                                 'partner_id': self.buy_id.partner_id.id,
                                 'bank_name': self.buy_id.partner_id.bank_name,
                                 'bank_num': self.buy_id.partner_id.bank_num,
