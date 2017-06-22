@@ -309,15 +309,14 @@ class process(models.Model):
     line_ids = fields.One2many('good_process.process_line', 'process_id', string=u'审批组')
     active = fields.Boolean(u'启用', default=True)
 
-    _sql_constraints = [
-        ('model_type_uniq', 'unique(model_id, type)', '同种单据相同类型的审批规则必须唯一')
-    ]
-
     @api.one
-    @api.constrains('model_id')
+    @api.constrains('model_id', 'type')
     def check_model_id(self):
-        records = self.search([('model_id', '=', self.model_id.id)])
-        if self.model_id and not self.type and len(records) > 1:
+        records = self.search([
+            ('model_id', '=', self.model_id.id),
+            ('type', '=', self.type),
+            ('id', '!=', self.id)])
+        if records:
             raise ValidationError(u'同种单据的审批规则必须唯一')
 
     @api.model
