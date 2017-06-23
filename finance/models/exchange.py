@@ -168,11 +168,11 @@ class CreateExchangeWizard(models.TransientModel):
     def create_exchange(self):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         '''只有外币＋期末需要调汇的科目才会能生成调汇凭证的明细行'''
+        vals = {}
         for account_id in self.env['finance.account'].search([
             ('currency_id','!=',self.env.user.company_id.currency_id.id),
             ('currency_id','!=', False),
             ('exchange','=', True)]):
-            vals = {}
             rate_silent = self.env['res.currency'].get_rate_silent(self.date, account_id.currency_id.id) or 0
             vals.update({'account_id': account_id.id,
                          'account':account_id,
@@ -188,7 +188,7 @@ class CreateExchangeWizard(models.TransientModel):
         '''
         self.create_exchang_line(vals)
 
-        if not vouch_obj.line_ids :
+        if not vouch_obj.line_ids:
             vouch_obj.unlink()
 
 class rate_period(models.Model):
