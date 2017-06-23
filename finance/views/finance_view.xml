@@ -94,7 +94,7 @@
                     <field name="name"/>
                     <field name="att_count"/>
                     <field name="period_id"/>
-                    <field name="amount_text"/>
+                    <field name="amount_text" widget="bgcolor" bgcolor="info" bgsize="4"/>
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'name'}"
                            groups = 'finance.view_detail' string='凭证摘要'/>
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'account_id'}"
