@@ -6,6 +6,14 @@
          t-att-src="src" />
 
 
-    <span t-name="ListView.row.bgcolor" t-att-class="'label label-'+widget.color" ><t t-esc="value"/></span>
+    <span t-name="ListView.row.bgcolor" t-att-class="'label label-'+widget.bgcolor" >
+        <t t-esc="value"/>
+    </span>
+
+    <t t-extend="ListView">
+        <t t-jquery=".o_list_record_delete" t-operation="inner">
+            <span name="delete_select" class="fa fa-trash-o"/>
+        </t>
+    </t>
 
 </templates>
