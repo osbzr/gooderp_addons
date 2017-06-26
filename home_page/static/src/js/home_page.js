@@ -155,7 +155,8 @@ odoo.define('home_page', function (require) {
                           <button class='btn btn-primary button-circle oe_top_link_" + i +
                         "' oe_top_link='" + i + "' id='" + i + "' style='width: 160px;height: 160px'>\
                           <h4>" + top_data[0] + "</h4>\
-                          <h3>" +  self.commafy(top_data[1]) + "</h3>\
+                          <h3><span class='counter'>\
+                          " +  self.commafy(top_data[1]) + "</span></h3>\
                           </button><p class='m-t-sm'></p></div>");
                     self.$el.find('.top_div').append(left_html_str);
                 }
@@ -213,6 +214,7 @@ odoo.define('home_page', function (require) {
                     self.third_part()
                 }
             });
+            $('.counter').countUp({delay: 50, time: 2000});
         },
     });
     core.action_registry.add('home_page.homepage', HomePage);

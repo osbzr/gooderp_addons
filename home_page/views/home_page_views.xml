@@ -5,6 +5,8 @@
             <xpath expr="." position="inside">
                 <link rel="stylesheet" href="/home_page/static/src/css/home_page.css"/>
                 <script type="text/javascript" src="/home_page/static/src/js/home_page.js"/>
+                <script type="text/javascript" src="/home_page/static/src/lib/jquery.countup.min.js"/>
+                <script type="text/javascript" src="/home_page/static/src/lib/jquery.waypoints.min.js"/>
             </xpath>
         </template>
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from odoo.tools.safe_eval import safe_eval as eval
-
+from datetime import datetime
 class home_report_type(models.Model):
     _name = "home.report.type"
     _description = u"用来分类报表,让相似的报表显示在一起"
@@ -84,7 +84,10 @@ class home_page(models.Model):
             field_compute = action.compute_field_one.name
             # 本次只计算有变更的记录的值
             compute_value = sum([res_model_obj[field_compute] for res_model_obj in res_model_objs])
-            action_vals[0] = "%s  %s" % (action_vals[0], compute_value+action.last_compute_result)
+            new_compute_value = compute_value + action.last_compute_result
+            action_vals[0] = "%s  %s" % (action_vals[0], )
+            action.last_compute_result = new_compute_value
+            action.last_compute_date = datetime.now()
             action_url_list['top'].append(action_vals)
         else:
             action_vals[0] = "%s   " % action_vals[0]
