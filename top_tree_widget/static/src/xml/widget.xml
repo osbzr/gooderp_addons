@@ -16,4 +16,24 @@
         </t>
     </t>
 
+    <!--<t t-extend="ListView">-->
+        <!--<t t-jquery=".o_list_view" t-operation="before">-->
+            <!--<ul class="nav nav-tabs" role="tablist">-->
+                <!--<li>-->
+                    <!--<a role="presentation" aria-expanded="false" href="#notebook_page_36" data-toggle="tab" disable_anchor="true">-->
+                        <!--全部<span class="badge">42</span>-->
+                    <!--</a>-->
+                <!--</li><li class="active">-->
+                    <!--<a role="presentation" aria-expanded="true" href="#notebook_page_37" data-toggle="tab" disable_anchor="true">-->
+                        <!--待审核<span class="badge">41</span>-->
+                    <!--</a>-->
+                <!--</li><li>-->
+                    <!--<a role="presentation" href="#notebook_page_38" data-toggle="tab" disable_anchor="true">-->
+                        <!--已审核<span class="badge">1</span>-->
+                    <!--</a>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--</t>-->
+    <!--</t>-->
+
 </templates>
