@@ -13,6 +13,7 @@
     'depends': ['sell'],
     'data': [
         'security/gooderp_pos_security.xml',
+        'security/ir.model.access.csv',
         'views/pos_session_view.xml',
         'views/pos_templates.xml',
         'views/gooderp_pos.xml',

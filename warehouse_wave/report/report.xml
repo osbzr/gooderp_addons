@@ -4,10 +4,10 @@
 		<report
 			 id="report_wave"
 			 model="wave"
-			 string="打印捡货单"
+			 string="打印拣货单"
 			 name="warehouse_wave.report_wave_view"
-			 file="warehouse_wave.report_wave" 
-			 report_type="qweb-pdf">	
+			 file="warehouse_wave.report_wave"
+			 report_type="qweb-pdf">
 		</report>
 
 		<template id="report_wave_view">

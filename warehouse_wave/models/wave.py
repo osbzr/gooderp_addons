@@ -34,6 +34,17 @@ class wave(models.Model):
               }
 
     @api.multi
+    def report_wave(self):
+        ''' 打印拣货单 '''
+        assert len(self._ids) == 1
+
+        records = self.env['wave'].browse(self.id)
+        if records[0].state == 'draft':
+            records[0].state = 'printed'
+
+        return self.env['report'].get_action(self, 'warehouse_wave.report_wave_view')
+
+    @api.multi
     def unlink(self):
         """
         1.有部分已经打包,捡货单不能进行删除
@@ -43,7 +54,7 @@ class wave(models.Model):
             wh_move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id),
                                                        ('pakge_sequence', '=', False)])
             if wh_move_rows:
-                 raise UserError(u"""发货单%s已经打包发货,捡货单%s不允许删除!
+                raise UserError(u"""发货单%s已经打包发货,捡货单%s不允许删除!
                                  """%(u'-'.join([move_row.name for move_row in wh_move_rows]),
                                       wave_row.name))
             # 清楚发货单上的格子号
@@ -163,7 +174,7 @@ class do_pack(models.Model):
     _rec_name = 'odd_numbers'
     odd_numbers = fields.Char(u'单号')
     product_line_ids = fields.One2many('pack.line', 'pack_id', string='商品行')
-    is_pack = fields.Boolean(compute='compute_is_pack_ok', string='打包完成')
+    is_pack = fields.Boolean(compute='compute_is_pack_ok', string='打包完成', store=True)
 
     @api.multi
     def unlink(self):
