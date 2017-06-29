@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from odoo.tools.safe_eval import safe_eval as eval
-
+from datetime import datetime
 class home_report_type(models.Model):
     _name = "home.report.type"
     _description = u"用来分类报表,让相似的报表显示在一起"
@@ -30,6 +30,8 @@ class home_page(models.Model):
                                                             仅适合小量数据的计算数字对应的视图或模型中的字段!')
     compute_type = fields.Selection([(u'sum', u'sum'), (u'average', u'average')], default="sum", string=u"计算类型",
                                     help=u'对于所选的计算字段的计算方式!注:目前只支持sum')
+    last_compute_result = fields.Float(u"上次计算的值", default=0)
+    last_compute_date = fields.Datetime(u"上次计算时间")
     context = fields.Char(u'动作的上下文', help=u'对应跳转视图传进去的参数!')
     is_active = fields.Boolean(u'是否可用', default=True, help=u'为了方便调试,首页美观性,或临时性替换首页元素!')
     report_type_id = fields.Many2one('home.report.type', string='报表类别', help=u'类型为 实时报表时 要选择报表类别,\
@@ -75,10 +77,19 @@ class home_page(models.Model):
         elif action.menu_type == 'amount_summary':
             # 性能如果急需提升，就只有sum计算和那个search 是瓶颈了。 这个功能可以尽量少的用，或者用在小数据量的数据字段统计。
             # 如果数据量很大就不要用这种方式。
-            res_model_objs = self.env[action.action.res_model].search(eval(action.domain or '[]'))
+            ## 为了增加计算取数的效率,添加字段记录上次计算值
+            compute_domain = eval(action.domain or '[]')
+            if action.last_compute_date:
+                compute_domain.append(
+                    ('write_date', '>=', action.last_compute_date))
+            res_model_objs = self.env[action.action.res_model].search(compute_domain)
             field_compute = action.compute_field_one.name
-            action_vals[0] = "%s  %s" % (action_vals[0], sum([res_model_obj[field_compute]
-                                                              for res_model_obj in res_model_objs]))
+            # 本次只计算有变更的记录的值
+            compute_value = sum([res_model_obj[field_compute] for res_model_obj in res_model_objs])
+            new_compute_value = compute_value + action.last_compute_result
+            action_vals[0] = "%s  %s" % (action_vals[0], new_compute_value)
+            action.last_compute_result = new_compute_value
+            action.last_compute_date = datetime.now()
             action_url_list['top'].append(action_vals)
         else:
             action_vals[0] = "%s   " % action_vals[0]
