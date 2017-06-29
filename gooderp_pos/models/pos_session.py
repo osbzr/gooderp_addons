@@ -115,5 +115,5 @@ class PaymentLine(models.Model):
     session_id = fields.Many2one('pos.session', string='工作记录')
     amount = fields.Float(u'总金额')
     pay_date = fields.Datetime(u'付款时间')
-    pay_type_id = fields.Many2one(u'settle.mode', u'付款方式')
+    pay_type_id = fields.Many2one(u'bank.account', u'付款方式')
     sell_id = fields.Many2one('sell.order', string='对应订单')
