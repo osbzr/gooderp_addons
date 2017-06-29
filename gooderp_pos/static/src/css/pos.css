@@ -627,7 +627,7 @@ td {
     display: inline-block;
     float: left;
     padding: 0;
-    margin: 16px;
+    margin: 4px;
     margin-top: 8px;
     margin-right: 0;
     text-align: center;
@@ -651,10 +651,6 @@ td {
     color: #555555;
     font-size: 14px;
     border-radius: 0;
-    border: none;
-    border-right: 1px solid;
-    border-bottom: 1px solid;
-    border-color: #bfbfbf;
     transition: all 150ms linear;
 }
 .pos .actionpad .button:hover {

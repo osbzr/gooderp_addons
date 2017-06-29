@@ -171,7 +171,7 @@ odoo.define('gooderp_pos.models', function(require) {
                 self.uom_id = uom[1];
             }
         },{
-            model: 'settle.mode',
+            model: 'bank.account',
             fields: ['name'],
             domain: null,
             loaded: function(self, mode) {
@@ -1067,8 +1067,6 @@ odoo.define('gooderp_pos.models', function(require) {
         // in the orderline. This returns true if it makes sense to merge the two
         can_be_merged_with: function(orderline) {
             if (this.get_product().id !== orderline.get_product().id) { //only orderline of the same product can be merged
-                return false;
-            } else if (true) {
                 return false;
             } else if (this.get_product_type() !== orderline.get_product_type()) {
                 return false;
