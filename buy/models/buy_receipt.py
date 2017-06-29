@@ -296,6 +296,7 @@ class buy_receipt(models.Model):
             'state': 'draft',
             'origin_name': self.name,
             'note': self.note,
+            'buy_id': self.order_id.id,
         })
         return money_order
 

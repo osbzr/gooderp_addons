@@ -299,6 +299,7 @@ class sell_delivery(models.Model):
             'state': 'draft',
             'origin_name': self.name,
             'note': self.note,
+            'sell_id': self.order_id.id,
         })
         return money_order
 
