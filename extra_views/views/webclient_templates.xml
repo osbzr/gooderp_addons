@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<odoo>
+    <template id="assets_backend" name="extra_views" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/extra_views/static/src/lib/echarts.min.js"></script><!-- 第三方js库-->
+            <script type="text/javascript" src="/extra_views/static/src/js/extra_widget.js"></script>
+            <script type="text/javascript" src="/extra_views/static/src/js/extra_views.js"></script>
+            <link rel="stylesheet" type="text/less" href="/extra_views/static/src/less/extra_views.less"/>
+        </xpath>
+    </template>
+</odoo>

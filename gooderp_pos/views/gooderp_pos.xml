@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <template id="assets" name="gooderp_pos assets">
+            <link rel="stylesheet" type="text/less" href="/web/static/src/less/fonts.less" />
+            <link rel="stylesheet" href="/web/static/lib/fontawesome/css/font-awesome.css" />
+            <link rel="stylesheet" href="/gooderp_pos/static/src/css/pos.css" id="pos-stylesheet"/>
+            <link rel="stylesheet" href="/gooderp_pos/static/src/css/keyboard.css" />
+
+            <script type="text/javascript" src="/gooderp_pos/static/lib/fastclick.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/lib/waitfont.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/main.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/db.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/models.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/widget_base.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/keyboard.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/chrome.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/devices.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/gui.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/popups.js"></script>
+            <script type="text/javascript" src="/gooderp_pos/static/src/js/screens.js"></script>
+        </template>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <div t-name="ExtraViews.error" class="oe_view_nocontent" >
+        <p><strong><t t-esc="title"/></strong></p>
+        <p><t t-esc="description"/></p>
+    </div>
+
+    <t t-name="ExtraViews.buttons">
+        <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                Measures <span class="caret"/>
+            </button>
+            <ul class="dropdown-menu o_extra_measures_list">
+                <li t-foreach="measures" t-as="measure" t-att-data-field="measure[0]">
+                    <a href="#"><t t-esc="measure[1].string"/></a>
+                </li>
+                <li class="divider"></li>
+                <li data-field="__count__"><a href="#">Count</a></li>
+            </ul>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-default fa fa-bar-chart-o o_extra_button" title="Bar Chart" data-mode="bar"/>
+            <button class="btn btn-default fa fa-pie-chart o_extra_button" title="Pie Chart" data-mode="pie"/>
+        </div>
+    </t>
+    <div id="main" style="width: 600px;height:400px;">
+    
+    </div>
+</templates>
