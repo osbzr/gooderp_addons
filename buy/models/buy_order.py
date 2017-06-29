@@ -77,7 +77,9 @@ class buy_order(models.Model):
         '''计算购货订单付款/退款状态'''
         receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
         money_order_rows = self.env['money.order'].search([('buy_id', '=', self.id),
-       													   ('source_ids', '=', False)])
+                                                           ('source_ids', '=', False),
+                                                           ('state', '=', 'done')])
+
         self.paid_amount = sum([receipt.invoice_id.reconciled for receipt in receipts]) +\
                            sum([order_row.amount for order_row  in money_order_rows])
 
