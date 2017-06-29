@@ -174,7 +174,7 @@ class do_pack(models.Model):
     _rec_name = 'odd_numbers'
     odd_numbers = fields.Char(u'单号')
     product_line_ids = fields.One2many('pack.line', 'pack_id', string='商品行')
-    is_pack = fields.Boolean(compute='compute_is_pack_ok', string='打包完成')
+    is_pack = fields.Boolean(compute='compute_is_pack_ok', string='打包完成', store=True)
 
     @api.multi
     def unlink(self):
