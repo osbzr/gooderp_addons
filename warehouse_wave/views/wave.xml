@@ -14,7 +14,8 @@
 				<tree create='false' edit='false'>
 					<field name="name"/>
 					<field name="order_type"/>
-					<field name='state' />
+					<field name='state' string='拣货单打印状态'/>
+					<button name="report_wave" type="object" string='打印拣货单'/>
 					<button name="print_express_menu" type="object" string='打印快递面单'/>
 				</tree>
 			</field>
