@@ -63,7 +63,8 @@ class sell_order(models.Model):
         '''计算销货订单收款/退款状态'''
         deliverys = self.env['sell.delivery'].search([('order_id', '=', self.id)])
         money_order_rows = self.env['money.order'].search([('sell_id', '=', self.id),
-                                                           ('source_ids', '=', False)])
+                                                           ('reconciled', '=', 0),
+                                                           ('state', '=', 'done')])
         self.received_amount = sum([delivery.invoice_id.reconciled for delivery in deliverys]) +\
                                sum([order_row.amount for order_row  in money_order_rows])
          
@@ -212,6 +213,7 @@ class sell_order(models.Model):
             'to_reconcile': amount,
             'state': 'draft',
             'origin_name': self.name,
+            'sell_id': self.id,
         }
 
     @api.one
