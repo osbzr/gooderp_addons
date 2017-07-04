@@ -70,6 +70,9 @@
 		                </group>
 		                <group>	
 		                	<field name="total_amount"/>
+                            <field name='currency_amount'
+                                   groups='finance.group_multi_currency'
+                            />
 		                </group>
 		            </group>
                     <field name="note" placeholder="备注"/>
