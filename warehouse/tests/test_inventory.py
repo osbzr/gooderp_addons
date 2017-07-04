@@ -66,7 +66,10 @@ class TestInventory(TransactionCase):
         for line in self.inventory.line_ids:
             goods_stock = line.goods_id.get_stock_qty()[0]
             self.assertEqual(goods_stock.get('warehouse'), line.warehouse_id.name)
-            self.assertEqual(goods_stock.get('qty'), line.real_qty)
+            if line.goods_id.name == u'网线': # 网线在途移库 120个，盘点时应减去
+                self.assertEqual(goods_stock.get('qty') - 120, line.real_qty)
+            else:
+                self.assertEqual(goods_stock.get('qty'), line.real_qty)
 
         # 当指定仓库的时候，选择的行必须是该仓库的
         self.inventory.warehouse_id = self.sh_warehouse
@@ -82,6 +85,17 @@ class TestInventory(TransactionCase):
 
         self.inventory.unlink()
         self.assertTrue(not self.inventory.exists())
+
+    def test_query_inventory_transfer_order(self):
+        '''盘点单查询的盘点数量不应该包含移库在途的,在途移库数量恰好等于仓库中数量'''
+        internal_order = self.env.ref('warehouse.wh_internal_whint0')
+        for line in internal_order.line_out_ids:
+            line.goods_qty = 48
+        inventory = self.env['wh.inventory'].create({
+            'warehouse_id': self.browse_ref('warehouse.hd_stock').id,
+            'goods': u'网线',
+        })
+        inventory.query_inventory()
 
     def test_generate_inventory(self):
         for line in self.inventory.line_ids:
