@@ -189,8 +189,6 @@ class wh_inventory(models.Model):
 
     def get_line_detail(self):
         for inventory in self:
-            remaining_text = 'line.qty_remaining != 0'
-
             sql_text = '''
                 SELECT wh.id as warehouse_id,
                        goods.id as goods_id,
@@ -207,7 +205,7 @@ class wh_inventory(models.Model):
                     LEFT JOIN uom uos ON goods.uos_id = uos.id
                 LEFT JOIN warehouse wh ON line.warehouse_dest_id = wh.id
 
-                WHERE {}
+                WHERE line.qty_remaining != 0
                   AND wh.type = 'stock'
                   AND line.state = 'done'
                   %s
@@ -217,18 +215,29 @@ class wh_inventory(models.Model):
 
                 ORDER BY
                     goods.id, line.lot
-            '''.format(remaining_text)
+            '''
 
-            extra_text = ''
-            if inventory.warehouse_id:
-                extra_text += ' AND wh.id = %s' % inventory.warehouse_id.id
+            extra_text = ' AND wh.id = %s' % inventory.warehouse_id.id
 
             if inventory.goods:
                 extra_text += " AND goods.name ILIKE '%%%s%%' " \
                     % inventory.goods
 
             inventory.env.cr.execute(sql_text % extra_text)
-            return inventory.env.cr.dictfetchall()
+            res = inventory.env.cr.dictfetchall()
+            for line in res:
+                # 盘点单查询的盘点数量不应该包含移库在途的 #1358
+                for int_line in self.env['wh.move.line'].search(
+                        [('goods_id', '=', line['goods_id']),
+                         ('attribute_id', '=', line['attribute_id']),
+                         ('lot_id', '=', line['lot']),
+                         ('warehouse_id', '=', line['warehouse_id']),
+                         ('type', '=', 'internal')]):
+                    line['qty'] -= int_line.goods_qty
+                    line['uos_qty'] -= int_line.goods_uos_qty
+                if not line['qty']:
+                    res.remove(line)
+            return res
 
     @api.multi
     def query_inventory(self):

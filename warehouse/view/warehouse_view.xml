@@ -99,6 +99,7 @@
                     <field name='warehouse_dest_id'/>
                     <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
                     <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
+                    <separator/>
                     <filter name='out' string='出库' domain="[('type', '=', 'out')]"/>
                     <filter name='in' string='入库' domain="[('type', '=', 'in')]"/>
                     <group expand="0" string="分组">
