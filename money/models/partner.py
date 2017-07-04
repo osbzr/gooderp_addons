@@ -124,7 +124,6 @@ class bank_account(models.Model):
                     'tax_amount': 0,
                 })],
                 'state': 'draft',
-                'currency_id': self.currency_id.id,
                 'currency_amount': self.currency_amount,
             })
             # 审核 其他收入单

@@ -115,8 +115,6 @@ class other_money_order(models.Model):
                                  ondelete='restrict',
                                  copy=False,
                                  help=u'其他收支单审核时生成的对应凭证')
-    currency_id = fields.Many2one('res.currency',
-                                  u'外币币别')
     currency_amount = fields.Float(u'外币金额',
                                    digits=dp.get_precision('Amount'))
 
