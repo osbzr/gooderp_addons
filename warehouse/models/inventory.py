@@ -205,7 +205,8 @@ class wh_inventory(models.Model):
                     LEFT JOIN uom uos ON goods.uos_id = uos.id
                 LEFT JOIN warehouse wh ON line.warehouse_dest_id = wh.id
 
-                WHERE wh.type = 'stock'
+                WHERE line.qty_remaining != 0
+                  AND wh.type = 'stock'
                   AND line.state = 'done'
                   %s
 
@@ -216,9 +217,7 @@ class wh_inventory(models.Model):
                     goods.id, line.lot
             '''
 
-            extra_text = ''
-            if inventory.warehouse_id:
-                extra_text += ' AND wh.id = %s' % inventory.warehouse_id.id
+            extra_text = ' AND wh.id = %s' % inventory.warehouse_id.id
 
             if inventory.goods:
                 extra_text += " AND goods.name ILIKE '%%%s%%' " \
