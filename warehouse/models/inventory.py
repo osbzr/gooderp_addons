@@ -189,8 +189,6 @@ class wh_inventory(models.Model):
 
     def get_line_detail(self):
         for inventory in self:
-            remaining_text = 'line.qty_remaining != 0'
-
             sql_text = '''
                 SELECT wh.id as warehouse_id,
                        goods.id as goods_id,
@@ -207,8 +205,7 @@ class wh_inventory(models.Model):
                     LEFT JOIN uom uos ON goods.uos_id = uos.id
                 LEFT JOIN warehouse wh ON line.warehouse_dest_id = wh.id
 
-                WHERE {}
-                  AND wh.type = 'stock'
+                WHERE wh.type = 'stock'
                   AND line.state = 'done'
                   %s
 
@@ -217,7 +214,7 @@ class wh_inventory(models.Model):
 
                 ORDER BY
                     goods.id, line.lot
-            '''.format(remaining_text)
+            '''
 
             extra_text = ''
             if inventory.warehouse_id:
@@ -228,15 +225,8 @@ class wh_inventory(models.Model):
                     % inventory.goods
 
             inventory.env.cr.execute(sql_text % extra_text)
-            return inventory.env.cr.dictfetchall()
-
-    @api.multi
-    def query_inventory(self):
-        line_obj = self.env['wh.inventory.line']
-        for inventory in self:
-            inventory.delete_line()
-            line_ids = inventory.get_line_detail()
-            for line in line_ids:
+            res = inventory.env.cr.dictfetchall()
+            for line in res:
                 # 盘点单查询的盘点数量不应该包含移库在途的 #1358
                 for int_line in self.env['wh.move.line'].search(
                         [('goods_id', '=', line['goods_id']),
@@ -246,6 +236,17 @@ class wh_inventory(models.Model):
                          ('type', '=', 'internal')]):
                     line['qty'] -= int_line.goods_qty
                     line['uos_qty'] -= int_line.goods_uos_qty
+                if not line['qty']:
+                    res.remove(line)
+            return res
+
+    @api.multi
+    def query_inventory(self):
+        line_obj = self.env['wh.inventory.line']
+        for inventory in self:
+            inventory.delete_line()
+            line_ids = inventory.get_line_detail()
+            for line in line_ids:
                 line_obj.create_wh_inventory_line_by_data(inventory.id,line)
             if line_ids:
                 inventory.state = 'query'
