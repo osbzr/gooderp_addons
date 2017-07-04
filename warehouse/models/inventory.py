@@ -237,6 +237,15 @@ class wh_inventory(models.Model):
             inventory.delete_line()
             line_ids = inventory.get_line_detail()
             for line in line_ids:
+                # 盘点单查询的盘点数量不应该包含移库在途的 #1358
+                for int_line in self.env['wh.move.line'].search(
+                        [('goods_id', '=', line['goods_id']),
+                         ('attribute_id', '=', line['attribute_id']),
+                         ('lot_id', '=', line['lot']),
+                         ('warehouse_id', '=', line['warehouse_id']),
+                         ('type', '=', 'internal')]):
+                    line['qty'] -= int_line.goods_qty
+                    line['uos_qty'] -= int_line.goods_uos_qty
                 line_obj.create_wh_inventory_line_by_data(inventory.id,line)
             if line_ids:
                 inventory.state = 'query'
