@@ -20,7 +20,7 @@ READONLY_STATES = {
 class sell_order(models.Model):
     _name = 'sell.order'
     _description = u'销货订单'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'state.city.county']
     _order = 'date desc, id desc'
 
     @api.one
@@ -156,8 +156,6 @@ class sell_order(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     received_amount = fields.Float(u'已收金额',  compute=_get_received_amount, readonly=True)
-
-
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
@@ -321,7 +319,10 @@ class sell_order(models.Model):
             'currency_id': self.currency_id.id,
             'contact': self.contact,
             'address': self.address,
-            'mobile': self.mobile
+            'mobile': self.mobile,
+            'province_id': self.province_id.id,
+            'city_id': self.city_id.id,
+            'county_id': self.county_id.id,
         })
         if self.type == 'sell':
             delivery_id.write({'line_out_ids': [

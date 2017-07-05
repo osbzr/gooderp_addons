@@ -33,7 +33,7 @@ class wh_move(models.Model):
     生成快递电子面单
     """
     _name = 'wh.move'
-    _inherit = ['wh.move', 'state.city.county']
+    _inherit = 'wh.move'
     express_menu = fields.Text(u'快递面单', copy=False)
     express_code = fields.Char(u'快递单号', copy=False)
 

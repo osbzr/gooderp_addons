@@ -4,6 +4,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 class wh_move(models.Model):
     _name = 'wh.move'
+    _inherit = 'state.city.county'
     _description = u'移库单'
 
     MOVE_STATE = [
