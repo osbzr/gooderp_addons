@@ -111,8 +111,8 @@ class sell_delivery(models.Model):
                                help=u"销售退货单的退款状态", index=True, copy=False)
     contact = fields.Char(u'联系人', states=READONLY_STATES,
                           help=u'客户方的联系人')
-    address = fields.Char(u'地址', states=READONLY_STATES,
-                          help=u'联系地址')
+    address = fields.Many2one('partner.address', u'地址', states=READONLY_STATES,
+                              help=u'联系地址')
     mobile = fields.Char(u'手机', states=READONLY_STATES,
                          help=u'联系手机')
     modifying = fields.Boolean(u'差错修改中', default=False,
@@ -121,13 +121,30 @@ class sell_delivery(models.Model):
     voucher_id = fields.Many2one('voucher', u'出库凭证', readonly=True,
                                  help=u'审核时产生的出库凭证')
 
+    @api.onchange('address')
+    def onchange_partner_address(self):
+        ''' 选择地址填充 联系人、电话 '''
+        if self.address:
+            self.contact = self.address.contact
+            self.mobile = self.address.mobile
+
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
         if self.partner_id:
             self.contact = self.partner_id.contact
-            self.address = self.partner_id.address
             self.mobile = self.partner_id.mobile
+
+            if self.partner_id.child_ids:
+                for child in self.partner_id.child_ids:
+                    if child.is_default_add:
+                        self.address = child.id
+            if self.partner_id.child_ids and not any([child.is_default_add for child in self.partner_id.child_ids]):
+                partners_add = self.env['partner.address'].search([('partner_id', '=', self.partner_id.id)], order='id')
+                if not partners_add:
+                    return
+                child = partners_add[0]
+                self.address = child.id
 
             for line in self.line_out_ids:
                 if line.goods_id.tax_rate and self.partner_id.tax_rate:
@@ -141,6 +158,14 @@ class sell_delivery(models.Model):
                     line.tax_rate = self.partner_id.tax_rate
                 else:
                     line.tax_rate = self.env.user.company_id.output_tax_rate
+                    
+            address_list = []
+            for child_list in self.partner_id.child_ids:
+                address_list.append(child_list.id)
+            if address_list:
+                return {'domain': {'address': [('id', 'in', address_list)]}}
+            else:
+                self.address = False
 
     @api.onchange('discount_rate', 'line_in_ids', 'line_out_ids')
     def onchange_discount_rate(self):
@@ -218,6 +243,7 @@ class sell_delivery(models.Model):
                     raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！\n\
                      本次发货金额:%s\n 客户应收余额:%s\n 本次收款金额:%s\n客户信用额度:%s' % (
                     amount, self.receipt, self.partner_id.receivable, self.partner_id.credit_limit))
+        print "2 _wrong_delivery_done"
 
     def _line_qty_write(self):
         line_ids = not self.is_return and self.line_out_ids or self.line_in_ids
@@ -376,6 +402,7 @@ class sell_delivery(models.Model):
             record._wrong_delivery_done()
             # 库存不足 生成零的
             if self.env.user.company_id.is_enable_negative_stock:
+                print "库存不足 生成零的"
                 result_vals = self.env['wh.move'].create_zero_wh_in(record,record._name)
                 if result_vals:
                     return result_vals
@@ -402,10 +429,11 @@ class sell_delivery(models.Model):
                 this_reconcile = flag * record.receipt
                 money_order = record._make_money_order(invoice_id, amount, this_reconcile)
                 money_order.money_order_done()
-
+            print "33333333", record.order_id and not record.modifying, record.order_id
             # 生成分拆单 FIXME:无法跳转到新生成的分单
             if record.order_id and not record.modifying:
                 return record.order_id.sell_generate_delivery()
+            print "4 sell_delivery_done"
 
     @api.one
     def sell_delivery_draft(self):

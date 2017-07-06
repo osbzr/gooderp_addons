@@ -20,7 +20,7 @@ READONLY_STATES = {
 class sell_order(models.Model):
     _name = 'sell.order'
     _description = u'销货订单'
-    _inherit = ['mail.thread', 'state.city.county']
+    _inherit = ['mail.thread']
     _order = 'date desc, id desc'
 
     @api.one
@@ -73,8 +73,8 @@ class sell_order(models.Model):
                                  help=u'签约合同的客户')
     contact = fields.Char(u'联系人', states=READONLY_STATES,
                                  help=u'客户方的联系人')
-    address = fields.Char(u'地址', states=READONLY_STATES,
-                                 help=u'联系地址')
+    address_id = fields.Many2one('partner.address', u'地址', states=READONLY_STATES,
+                              help=u'联系地址')
     mobile = fields.Char(u'手机', states=READONLY_STATES,
                                  help=u'联系手机')
     user_id = fields.Many2one(
@@ -157,13 +157,30 @@ class sell_order(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
     received_amount = fields.Float(u'已收金额',  compute=_get_received_amount, readonly=True)
 
+    @api.onchange('address_id')
+    def onchange_partner_address(self):
+        ''' 选择地址填充 联系人、电话 '''
+        if self.address_id:
+            self.contact = self.address_id.contact
+            self.mobile = self.address_id.mobile
+
     @api.onchange('partner_id')
     def onchange_partner_id(self):
-        '''选择客户带出其默认地址信息'''
+        ''' 选择客户带出其默认地址信息 '''
         if self.partner_id:
             self.contact = self.partner_id.contact
-            self.address = self.partner_id.address
             self.mobile = self.partner_id.mobile
+
+            if self.partner_id.child_ids:
+                for child in self.partner_id.child_ids:
+                    if child.is_default_add:
+                        self.address_id = child.id
+            if self.partner_id.child_ids and not any([child.is_default_add for child in self.partner_id.child_ids]):
+                partners_add = self.env['partner.address'].search([('partner_id', '=', self.partner_id.id)], order='id')
+                if not partners_add:
+                    return
+                child = partners_add[0]
+                self.address_id = child.id
 
             for line in self.line_ids:
                 if line.goods_id.tax_rate and self.partner_id.tax_rate:
@@ -177,6 +194,14 @@ class sell_order(models.Model):
                     line.tax_rate = self.partner_id.tax_rate
                 else:
                     line.tax_rate = self.env.user.company_id.output_tax_rate
+
+            address_list = []
+            for child_list in self.partner_id.child_ids:
+                address_list.append(child_list.id)
+            if address_list:
+                return {'domain': {'address_id': [('id', 'in', address_list)]}}
+            else:
+                self.address_id = False
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
@@ -318,11 +343,8 @@ class sell_order(models.Model):
             'discount_amount': self.discount_amount,
             'currency_id': self.currency_id.id,
             'contact': self.contact,
-            'address': self.address,
+            'address': self.address_id.id,
             'mobile': self.mobile,
-            'province_id': self.province_id.id,
-            'city_id': self.city_id.id,
-            'county_id': self.county_id.id,
         })
         if self.type == 'sell':
             delivery_id.write({'line_out_ids': [

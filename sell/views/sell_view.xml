@@ -44,16 +44,8 @@
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='contact'/>
-            					<label for='province_id' string='送货地址' />
-                                 <div class="address_format">
-                                    <field name='province_id' style="width: 40%"  placeholder="省"  
-                                    options="{'no_open': True, 'no_create': True}"   />
-                                    <field name='city_id'  placeholder="市" style="width: 30%" 
-                                    context="{'default_province_name': province_id}" options="{'no_open': True, 'no_create': True}"   />
-                                    <field name='county_id' placeholder="县" style="width: 30%" 
-                                    context="{'default_city_name': city_id}" options="{'no_open': True, 'no_create': True}" />
-                                </div>
-            				    <field name='address'/>
+            				    <field name='address_id'
+            				        options="{'no_open': True, 'no_create': True}"/>
             				    <field name='mobile'/>
             					<field name='user_id'
                                        options="{'no_open': True, 'no_create': True}"/>
@@ -205,7 +197,7 @@
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             				    <field name='contact'/>
-            				    <field name="address"/>
+            				    <field name="address" options="{'no_open': True, 'no_create': True}"/>
             				    <field name="mobile"/>
             					<field name='user_id'
                                        options="{'no_open': True, 'no_create': True}"/>
@@ -407,7 +399,7 @@
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='contact'/>
-            				    <field name="address"/>
+            				    <field name="address" options="{'no_open': True, 'no_create': True}"/>
             				    <field name="mobile"/>
             					<field name='user_id'
                                        options="{'no_open': True, 'no_create': True}"/>
