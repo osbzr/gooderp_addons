@@ -189,6 +189,7 @@ class test_partner(TransactionCase):
                }
             )]
         })
+        partner._compute_partner_address()
         for child in partner.child_ids:
             child.mobile = '1385559999'
             child.phone = '55558888'

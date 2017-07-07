@@ -197,7 +197,7 @@
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             				    <field name='contact'/>
-            				    <field name="address" options="{'no_open': True, 'no_create': True}"/>
+            				    <field name="address_id" options="{'no_open': True, 'no_create': True}"/>
             				    <field name="mobile"/>
             					<field name='user_id'
                                        options="{'no_open': True, 'no_create': True}"/>
@@ -399,7 +399,7 @@
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='contact'/>
-            				    <field name="address" options="{'no_open': True, 'no_create': True}"/>
+            				    <field name="address_id" options="{'no_open': True, 'no_create': True}"/>
             				    <field name="mobile"/>
             					<field name='user_id'
                                        options="{'no_open': True, 'no_create': True}"/>

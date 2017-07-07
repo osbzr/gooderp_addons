@@ -137,7 +137,6 @@ class partner_address(models.Model):
     _name = 'partner.address'
     _inherit = "state.city.county"
     _description = u'联系人地址'
-    _rec_name = 'town'
 
     partner_id = fields.Many2one('partner', u'业务伙伴')
     contact = fields.Char(u'联系人')
@@ -163,7 +162,7 @@ class partner_address(models.Model):
             res.append((adds.id, add_str))
         return res
 
-# , adds.city_id.id, adds.county_id.id, adds.town, adds.detail_address))
+
 class partner(models.Model):
     _inherit = 'partner'
 

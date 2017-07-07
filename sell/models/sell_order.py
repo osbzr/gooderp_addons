@@ -171,16 +171,14 @@ class sell_order(models.Model):
             self.contact = self.partner_id.contact
             self.mobile = self.partner_id.mobile
 
-            if self.partner_id.child_ids:
-                for child in self.partner_id.child_ids:
-                    if child.is_default_add:
-                        self.address_id = child.id
+            for child in self.partner_id.child_ids:
+                if child.is_default_add:
+                    self.address_id = child.id
             if self.partner_id.child_ids and not any([child.is_default_add for child in self.partner_id.child_ids]):
                 partners_add = self.env['partner.address'].search([('partner_id', '=', self.partner_id.id)], order='id')
                 if not partners_add:
                     return
-                child = partners_add[0]
-                self.address_id = child.id
+                self.address_id = partners_add[0].id
 
             for line in self.line_ids:
                 if line.goods_id.tax_rate and self.partner_id.tax_rate:
@@ -195,9 +193,7 @@ class sell_order(models.Model):
                 else:
                     line.tax_rate = self.env.user.company_id.output_tax_rate
 
-            address_list = []
-            for child_list in self.partner_id.child_ids:
-                address_list.append(child_list.id)
+            address_list = [child_list.id for child_list in self.partner_id.child_ids]
             if address_list:
                 return {'domain': {'address_id': [('id', 'in', address_list)]}}
             else:
@@ -343,7 +339,7 @@ class sell_order(models.Model):
             'discount_amount': self.discount_amount,
             'currency_id': self.currency_id.id,
             'contact': self.contact,
-            'address': self.address_id.id,
+            'address_id': self.address_id.id,
             'mobile': self.mobile,
         })
         if self.type == 'sell':
