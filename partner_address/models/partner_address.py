@@ -191,8 +191,6 @@ class partner(models.Model):
         # 如果没有默认地址取第一个联系人的
         if not any([child.is_default_add for child in self.child_ids]):
             partners_add = self.env['partner.address'].search([('partner_id', '=', self.id)], order='id')
-            if not partners_add:
-                return
             child = partners_add[0]
             self._put_info_to_partner(child)
 

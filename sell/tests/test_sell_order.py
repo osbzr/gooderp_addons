@@ -88,7 +88,16 @@ class test_sell_order(TransactionCase):
             child.is_default_add = True
         self.order.onchange_partner_id()
 
-        self.order.address_id = False
+    def test_onchange_address(self):
+        ''' sell.order onchange address '''
+        address = self.env['partner.address'].create({'contact': u'小东',
+                                        'province_id': self.province_id.id,
+                                        'city_id': self.city_id.id,
+                                        'county_id': self.county_id.id,
+                                        'town': u'曹路镇',
+                                        'detail_address': u'金海路1688号',
+                                        })
+        self.order.address_id = address.id
         self.order.onchange_partner_address()
 
     def test_onchange_discount_rate(self):

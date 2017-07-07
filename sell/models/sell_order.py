@@ -176,8 +176,6 @@ class sell_order(models.Model):
                     self.address_id = child.id
             if self.partner_id.child_ids and not any([child.is_default_add for child in self.partner_id.child_ids]):
                 partners_add = self.env['partner.address'].search([('partner_id', '=', self.partner_id.id)], order='id')
-                if not partners_add:
-                    return
                 self.address_id = partners_add[0].id
 
             for line in self.line_ids:
