@@ -45,7 +45,7 @@
             <field name="model">sell.delivery</field>
             <field name='inherit_id' ref='sell.sell_delivery_form' />
             <field name="arch" type="xml">
-				<field name="address"  position="before" >
+				<field name="address_id"  position="before" >
 					<label for='province_id' string='地址' />
 					 <div class="address_format">
                         <field name='province_id' style="width: 40%"  placeholder="省"  
@@ -57,7 +57,7 @@
                     </div>
 				</field>
 				
-				<field name="address"  position="after" >
+				<field name="address_id"  position="after" >
 					<field name="express_type" />
 				</field>
 

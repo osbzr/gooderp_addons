@@ -79,8 +79,25 @@
 			</field>
 		</record>
 
-       <menuitem name="库位设置" id="location_menu" parent="warehouse.warehouse_setting"
-		action="gooderp_location_action" sequence='1'/>
+		<!-- 商品的库位设置 -->
+        <record id="warehouse_wave_goods_form" model="ir.ui.view">
+            <field name="name">warehouse.goods.form</field>
+            <field name="model">goods</field>
+            <field name="inherit_id" ref="goods.goods_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page" position="after">
+                    <page string="库位设置">
+                        <field name='loc_ids'>
+                            <tree string="计划">
+                                <field name="name"/>
+                                <field name="warehouse_id"/>
+                                <field name="goods_id"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
 
 	<!--打包对应的tree和form  #TODO: 技术点没掌握,在编辑状态下的前后端交互掌握不完全,所以没办法做成wizard 形式
 		以后掌握了要进行修改

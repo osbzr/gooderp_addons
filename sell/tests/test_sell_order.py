@@ -15,6 +15,11 @@ class test_sell_order(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
 
+        self.partner_id = self.env.ref('core.jd')
+        self.province_id = self.env['country.state'].search([('name', '=', u'河北省')])
+        self.city_id = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
+        self.county_id = self.env['all.county'].search([('county_name', '=', u'正定县')])
+
     def test_compute_amount(self):
         ''' 计算字段的测试'''
         self.assertEqual(self.order.amount, 154048.00)
@@ -63,6 +68,37 @@ class test_sell_order(TransactionCase):
         self.env.ref('core.jd').tax_rate = 9
         self.env.ref('goods.mouse').tax_rate = 10
         self.order.onchange_partner_id()
+
+        # partner 不存在默认联系人
+        self.partner_id.write({'child_ids':
+                               [(0, 0, {'contact': u'小东',
+                                        'province_id': self.province_id.id,
+                                        'city_id': self.city_id.id,
+                                        'county_id': self.county_id.id,
+                                        'town': u'曹路镇',
+                                        'detail_address': u'金海路1688号',
+                                        }
+                                )]})
+        self.order.onchange_partner_id()
+        # partner 存在默认联系人
+        for child in self.partner_id.child_ids:
+            child.mobile = '1385559999'
+            child.phone = '55558888'
+            child.qq = '11116666'
+            child.is_default_add = True
+        self.order.onchange_partner_id()
+
+    def test_onchange_address(self):
+        ''' sell.order onchange address '''
+        address = self.env['partner.address'].create({'contact': u'小东',
+                                        'province_id': self.province_id.id,
+                                        'city_id': self.city_id.id,
+                                        'county_id': self.county_id.id,
+                                        'town': u'曹路镇',
+                                        'detail_address': u'金海路1688号',
+                                        })
+        self.order.address_id = address.id
+        self.order.onchange_partner_address()
 
     def test_onchange_discount_rate(self):
         ''' sell.order onchange test '''

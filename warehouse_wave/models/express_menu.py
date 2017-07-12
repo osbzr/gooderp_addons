@@ -83,7 +83,8 @@ class wh_move(models.Model):
                         ProvinceName=self.province_id.name  or '上海',
                         CityName=self.city_id.city_name or '上海',
                         ExpAreaName=self.county_id.county_name or '浦东新区',
-                        Address=address or '金海路2588号B-213')
+                        Address=address.id or '金海路2588号B-213')
+
         goods = []
         qty = 0
         for line in self.line_out_ids:
