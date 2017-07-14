@@ -129,6 +129,13 @@ class sell_delivery(models.Model):
             self.contact = self.address_id.contact
             self.mobile = self.address_id.mobile
 
+            add_str = '%s%s%s%s%s' % (self.address_id.province_id and self.address_id.province_id.name or '',
+                                      self.address_id.city_id and self.address_id.city_id.city_name or '',
+                                      self.address_id.county_id and self.address_id.county_id.county_name or '',
+                                      self.address_id.town or '',
+                                      self.address_id.detail_address or '')
+            self.address = add_str
+
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
