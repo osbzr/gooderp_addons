@@ -123,7 +123,7 @@ class sell_delivery(models.Model):
                                  help=u'审核时产生的出库凭证')
 
     @api.onchange('address_id')
-    def onchange_partner_address(self):
+    def onchange_address_id(self):
         ''' 选择地址填充 联系人、电话 '''
         if self.address_id:
             self.contact = self.address_id.contact
