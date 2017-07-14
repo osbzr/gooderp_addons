@@ -73,7 +73,7 @@ class test_sell_delivery(TransactionCase):
                                         'detail_address': u'金海路1688号',
                                         })
         self.delivery.address_id = address.id
-        self.delivery.onchange_partner_address()
+        self.delivery.onchange_address_id()
 
     def test_onchange_discount_rate(self):
         """ 发货单中折扣率 on_change"""
