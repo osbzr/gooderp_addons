@@ -25,6 +25,7 @@
     'data': [
         'data/money_data.xml',
         'security/groups.xml',
+        'views/cash_flow_view.xml',
         'views/money_order_view.xml',
         'views/other_money_order_view.xml',
         'views/money_transfer_order_view.xml',

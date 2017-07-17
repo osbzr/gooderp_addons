@@ -1232,7 +1232,7 @@
         </record>
         <record id='pl_6' model='profit.statement'>
             <field name='balance'>城市维护建设税</field>
-            <field name='line_num'>5</field>
+            <field name='line_num'>6</field>
             <field name='occurrence_balance_formula'>2221006</field>
         </record>
         <record id='pl_7' model='profit.statement'>
