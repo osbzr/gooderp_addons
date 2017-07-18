@@ -33,3 +33,7 @@ class cash_flow_statement(models.Model):
     name = fields.Char(u'项目')
     line_num = fields.Char(u'行次')
     amount = fields.Float(u'金额',digits=dp.get_precision('Amount'))
+
+class core_category(models.Model):
+    _inherit = 'core.category'
+    cash_flow_template_ids = fields.Many2many('cash.flow.template',string=u'现金流量表行')
