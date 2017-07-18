@@ -17,3 +17,5 @@ access_other_money_statements_report_wizard,access_other_money_statements_report
 access_money_get_pay_report,access_money_get_pay_report,model_money_get_pay_report,,1,1,1,1
 access_money_get_pay_wizard,access_money_get_pay_wizard,model_money_get_pay_wizard,,1,1,1,1
 access_bank_account_cashier,access_bank_account_cashier,model_bank_account,money.group_cashier,1,1,1,1
+access_cash_flow_template,access_cash_flow_template,model_cash_flow_template,,1,1,1,1
+access_cash_flow_statement,access_cash_flow_statement,model_cash_flow_statement,,1,1,1,1

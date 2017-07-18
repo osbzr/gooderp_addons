@@ -24,7 +24,9 @@
     'depends': ['finance', 'report_docx'],
     'data': [
         'data/money_data.xml',
+        'data/cash_flow_data.xml',
         'security/groups.xml',
+        'views/cash_flow_view.xml',
         'views/money_order_view.xml',
         'views/other_money_order_view.xml',
         'views/money_transfer_order_view.xml',
@@ -38,6 +40,7 @@
         'wizard/money_get_pay_wizard_view.xml',
         'report/money_get_pay_view.xml',
         'wizard/partner_statements_wizard_simple_view.xml',
+        'wizard/cash_flow_wizard_view.xml',
         'report/customer_statements_view.xml',
         'report/supplier_statements_view.xml',
         'security/ir.model.access.csv',

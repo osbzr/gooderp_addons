@@ -106,7 +106,7 @@ class goods(models.Model):
             raise UserError(u'批号%s还没有实际入库，请先审核该入库' % lot_id.move_id.name)
 
         if qty > lot_id.qty_remaining and not self.env.context.get('wh_in_line_ids'):
-            raise UserError(u'商品%s的库存数量不够本次出库行为' % (self.name,))
+            raise UserError(u'商品%s的库存数量不够本次出库' % (self.name,))
 
         return [{'line_in_id': lot_id.id, 'qty': qty, 'uos_qty': uos_qty,
                  'expiration_date': lot_id.expiration_date}], \
@@ -156,7 +156,7 @@ class goods(models.Model):
                 uos_qty_to_go -= matching_uos_qty
             else:
                 if not ignore_stock and qty_to_go > 0 and not self.env.context.get('wh_in_line_ids'):
-                    raise UserError(u'商品%s的库存数量不够本次出库行为' % (goods.name,))
+                    raise UserError(u'商品%s的库存数量不够本次出库' % (goods.name,))
                 if self.env.context.get('wh_in_line_ids'):
                     domain = [('id', 'in', self.env.context.get('wh_in_line_ids')),
                               ('state', '=', 'done'),
