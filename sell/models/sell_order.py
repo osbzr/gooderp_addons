@@ -339,6 +339,11 @@ class sell_order(models.Model):
             'contact': self.contact,
             'address_id': self.address_id.id,
             'mobile': self.mobile,
+            'address': '%s%s%s%s%s' % (self.address_id.province_id and self.address_id.province_id.name or '',
+                                       self.address_id.city_id and self.address_id.city_id.city_name or '',
+                                       self.address_id.county_id and self.address_id.county_id.county_name or '',
+                                       self.address_id.town or '',
+                                       self.address_id.detail_address or '')
         })
         if self.type == 'sell':
             delivery_id.write({'line_out_ids': [
