@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        <record id="cash_flow_template_tree" model="ir.ui.view">
+            <record id="cash_flow_template_tree" model="ir.ui.view">
                 <field name="name">cash.flow.template.tree</field>
                 <field name="model">cash.flow.template</field>
                 <field name="arch" type="xml">
