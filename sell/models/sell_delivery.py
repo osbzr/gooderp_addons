@@ -385,15 +385,15 @@ class sell_delivery(models.Model):
             if record.order_id:
                 record._line_qty_write()
             # 创建出库的会计凭证，生成盘盈的入库单的不产生出库凭证
-            voucher = record.create_voucher()
-            # 发货单/退货单 生成结算单
             if not self.env.user.company_id.endmonth_generation_cost:
-                invoice_id = record._delivery_make_invoice()
-                record.write({
-                    'voucher_id': voucher and voucher.id,
-                    'invoice_id': invoice_id and invoice_id.id,
-                    'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
-                })
+                voucher = record.create_voucher()
+            # 发货单/退货单 生成结算单
+            invoice_id = record._delivery_make_invoice()
+            record.write({
+                'voucher_id': voucher and voucher.id,
+                'invoice_id': invoice_id and invoice_id.id,
+                'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
+            })
             # 销售费用产生结算单
             record._sell_amount_to_invoice()
             # 生成收款单，并审核
