@@ -91,10 +91,10 @@ class wh_move_line(models.Model):
         for line in self:
             if line.warehouse_id.type == 'stock' and \
                     line.goods_id.is_using_matching():
-                if line.goods_id.is_using_batch():
+                if line.goods_id.is_using_batch() and line.lot_id:
                     matching_records, cost = \
                         line.goods_id.get_matching_records_by_lot(
-                            self.lot_id, self.goods_qty, self.goods_uos_qty)
+                            line.lot_id, line.goods_qty, line.goods_uos_qty)
                     for matching in matching_records:
                         self.create_matching_obj(line,matching)
                 else:

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="money.cft_01" model="cash.flow.template">
+            <field name="name">一、经营活动产生的现金流量：</field>
+        </record>
+
+        <record id="money.cft_1" model="cash.flow.template">
+            <field name="name">销售产成品、商品、提供劳务收到的现金</field>
+            <field name="line_num" eval="1"/>
+            <field name="line_type">get</field>
+        </record>
+
+        <record id="money.cft_2" model="cash.flow.template">
+            <field name="name">收到其他与经营活动有关的现金</field>
+            <field name="line_num" eval="2"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_3" model="cash.flow.template">
+            <field name="name">购买原材料、商品、接受劳务支付的现金</field>
+            <field name="line_num" eval="3"/>
+            <field name="line_type">pay</field>
+        </record>
+
+        <record id="money.cft_4" model="cash.flow.template">
+            <field name="name">支付的职工薪酬</field>
+            <field name="line_num" eval="4"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_5" model="cash.flow.template">
+            <field name="name">支付的税费</field>
+            <field name="line_num" eval="5"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_6" model="cash.flow.template">
+            <field name="name">支付其他与经营活动有关的现金</field>
+            <field name="line_num" eval="6"/>
+            <field name="line_type">category</field>
+            <field name="category_ids" eval="[(6, 0, [ref('finance.account_exchange')])]"/>
+        </record>
+
+        <record id="money.cft_7" model="cash.flow.template">
+            <field name="name">经营活动产生的现金流量净额</field>
+            <field name="line_num" eval="7"/>
+            <field name="line_type">lines</field>
+            <field name="plus_ids" eval="[(6, 0, [ref('money.cft_1'),ref('money.cft_2')])]"/>
+            <field name="nega_ids" eval="[(6, 0, [ref('money.cft_3'),ref('money.cft_4'),ref('money.cft_5'),ref('money.cft_6')])]"/>
+        </record>
+
+        <record id="money.cft_02" model="cash.flow.template">
+            <field name="name">二、投资活动产生的现金流量：</field>
+        </record>
+
+        <record id="money.cft_8" model="cash.flow.template">
+            <field name="name">收回短期投资、长期债券投资和长期股权投资收到的现金</field>
+            <field name="line_num" eval="8"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_9" model="cash.flow.template">
+            <field name="name">取得投资收益收到的现金</field>
+            <field name="line_num" eval="9"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_10" model="cash.flow.template">
+            <field name="name">处置固定资产、无形资产和其他非流动资产收回的现金净额</field>
+            <field name="line_num" eval="10"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_11" model="cash.flow.template">
+            <field name="name">短期投资、长期债券投资和长期股权投资支付的现金</field>
+            <field name="line_num" eval="11"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_12" model="cash.flow.template">
+            <field name="name">购建固定资产、无形资产和其他非流动资产支付的现金</field>
+            <field name="line_num" eval="12"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_13" model="cash.flow.template">
+            <field name="name">投资活动产生的现金流量净额</field>
+            <field name="line_num" eval="13"/>
+            <field name="line_type">lines</field>
+            <field name="plus_ids" eval="[(6, 0, [ref('money.cft_8'),ref('money.cft_9'),ref('money.cft_10')])]"/>
+            <field name="nega_ids" eval="[(6, 0, [ref('money.cft_11'),ref('money.cft_12')])]"/>
+        </record>
+
+        <record id="money.cft_03" model="cash.flow.template">
+            <field name="name">三、筹资活动产生的现金流量：</field>
+        </record>
+
+        <record id="money.cft_14" model="cash.flow.template">
+            <field name="name">取得借款收到的现金</field>
+            <field name="line_num" eval="14"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_15" model="cash.flow.template">
+            <field name="name">吸收投资者投资收到的现金</field>
+            <field name="line_num" eval="15"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_16" model="cash.flow.template">
+            <field name="name">偿还借款本金支付的现金</field>
+            <field name="line_num" eval="16"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_17" model="cash.flow.template">
+            <field name="name">偿还借款利息支付的现金</field>
+            <field name="line_num" eval="17"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_18" model="cash.flow.template">
+            <field name="name">分配利润支付的现金</field>
+            <field name="line_num" eval="18"/>
+            <field name="line_type">category</field>
+        </record>
+
+        <record id="money.cft_19" model="cash.flow.template">
+            <field name="name">筹资活动产生的现金流量净额</field>
+            <field name="line_num" eval="19"/>
+            <field name="line_type">lines</field>
+            <field name="plus_ids" eval="[(6, 0, [ref('money.cft_14'),ref('money.cft_15')])]"/>
+            <field name="nega_ids" eval="[(6, 0, [ref('money.cft_16'),ref('money.cft_17'),ref('money.cft_18')])]"/>
+        </record>
+
+        <record id="money.cft_20" model="cash.flow.template">
+            <field name="name">四、现金净增加额</field>
+            <field name="line_num" eval="20"/>
+            <field name="line_type">lines</field>
+            <field name="plus_ids" eval="[(6, 0, [ref('money.cft_7'),ref('money.cft_13'),ref('money.cft_19')])]"/>
+        </record>
+
+        <record id="money.cft_21" model="cash.flow.template">
+            <field name="name">加：期初现金余额</field>
+            <field name="line_num" eval="21"/>
+            <field name="line_type">begin</field>
+            <field name="begin_ids" eval="[(6, 0, [ref('finance.account_cash'), ref('finance.account_bank')])]"/>
+            <field name="end_ids" eval="[(6, 0, [ref('finance.account_cash'), ref('finance.account_bank')])]"/>
+        </record>
+
+        <record id="money.cft_22" model="cash.flow.template">
+            <field name="name">五、期末现金余额</field>
+            <field name="line_num" eval="22"/>
+            <field name="line_type">end</field>
+            <field name="begin_ids" eval="[(6, 0, [ref('finance.account_cash'), ref('finance.account_bank')])]"/>
+            <field name="end_ids" eval="[(6, 0, [ref('finance.account_cash'), ref('finance.account_bank')])]"/>
+        </record>
+    </data>
+</openerp>

@@ -123,7 +123,8 @@ class bank_account(models.Model):
                     'tax_rate': 0,
                     'tax_amount': 0,
                 })],
-                'state': 'draft'
+                'state': 'draft',
+                'currency_amount': self.currency_amount,
             })
             # 审核 其他收入单
             other_money_init.other_money_done()

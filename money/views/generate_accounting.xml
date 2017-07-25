@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <field name="name" position="after">
 					<field name="account_id" attrs="{'required': [('type', '!=', 'attribute')]}"/>
+                    <field name="cash_flow_template_ids" widget="many2many_tags"/>
 				</field>
             </field>
         </record>

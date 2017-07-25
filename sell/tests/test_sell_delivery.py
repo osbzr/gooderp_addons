@@ -37,9 +37,43 @@ class test_sell_delivery(TransactionCase):
         self.goods = self.env.ref('goods.cable')
         self.partner = self.env.ref('core.lenovo')
 
+        self.province_id = self.env['country.state'].search([('name', '=', u'河北省')])
+        self.city_id = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
+        self.county_id = self.env['all.county'].search([('county_name', '=', u'正定县')])
+
     def test_onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
+        # partner 不存在默认联系人
+        partner = self.env.ref('core.jd')
+        partner.write({'child_ids':
+                                [(0, 0, {'contact': u'小东',
+                                         'province_id': self.province_id.id,
+                                         'city_id': self.city_id.id,
+                                         'county_id': self.county_id.id,
+                                         'town': u'曹路镇',
+                                         'detail_address': u'金海路1688号',
+                                         }
+                                 )]})
         self.delivery.onchange_partner_id()
+        # partner 存在默认联系人
+        for child in partner.child_ids:
+            child.mobile = '1385559999'
+            child.phone = '55558888'
+            child.qq = '11116666'
+            child.is_default_add = True
+        self.delivery.onchange_partner_id()
+
+    def test_onchange_address(self):
+        ''' sell.delivery onchange address '''
+        address = self.env['partner.address'].create({'contact': u'小东',
+                                        'province_id': self.province_id.id,
+                                        'city_id': self.city_id.id,
+                                        'county_id': self.county_id.id,
+                                        'town': u'曹路镇',
+                                        'detail_address': u'金海路1688号',
+                                        })
+        self.delivery.address_id = address.id
+        self.delivery.onchange_address_id()
 
     def test_onchange_discount_rate(self):
         """ 发货单中折扣率 on_change"""

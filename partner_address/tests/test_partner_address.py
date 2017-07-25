@@ -189,6 +189,7 @@ class test_partner(TransactionCase):
                }
             )]
         })
+        partner._compute_partner_address()
         for child in partner.child_ids:
             child.mobile = '1385559999'
             child.phone = '55558888'
@@ -208,3 +209,19 @@ class test_partner(TransactionCase):
                            child.town,
                            child.detail_address)
         self.assertEqual(partner.address, addr) 
+
+    def test_name_get(self):
+        address = self.env['partner.address'].create({'contact': u'小东',
+                                        'province_id': self.province_id.id,
+                                        'city_id': self.city_id.id,
+                                        'county_id': self.county_id.id,
+                                        'town': u'曹路镇',
+                                        'detail_address': u'金海路1688号',
+                                        })
+        name = address.name_get()
+        real_name = '%s%s%s%s%s' % (address.province_id and address.province_id.name or '',
+                   address.city_id and address.city_id.city_name or '',
+                   address.county_id and address.county_id.county_name or '',
+                   address.town or '',
+                   address.detail_address or '')
+        self.assertTrue(name[0][1] == real_name)

@@ -63,19 +63,25 @@ class bank_statements_report(models.Model):
                 SELECT  omo.bank_id,
                         omo.date,
                         omo.name,
-                        (CASE WHEN omo.type = 'other_get' THEN omo.total_amount ELSE 0 END) AS get,
-                        (CASE WHEN omo.type = 'other_pay' THEN omo.total_amount ELSE 0 END) AS pay,
+                        (CASE WHEN omo.type = 'other_get' THEN
+                         (CASE WHEN ba.currency_id IS NULL THEN omo.total_amount ELSE omo.currency_amount END)
+                         ELSE 0 END) AS get,
+                        (CASE WHEN omo.type = 'other_pay' THEN
+                         (CASE WHEN ba.currency_id IS NULL THEN omo.total_amount ELSE omo.currency_amount END)
+                         ELSE 0 END) AS pay,
                         0 AS balance,
                         omo.partner_id,
                         omo.note AS note
                 FROM other_money_order AS omo
+                LEFT JOIN bank_account AS ba ON ba.id = omo.bank_id
+                LEFT JOIN res_currency AS rc ON rc.id = ba.currency_id
                 WHERE omo.state = 'done'
                 UNION ALL
                 SELECT  mtol.out_bank_id AS bank_id,
                         mto.date,
                         mto.name,
                         0 AS get,
-                        (CASE WHEN ba.currency_id IS NULL OR rc.name='CNY' THEN mtol.amount ELSE mtol.currency_amount END) AS pay,
+                        (CASE WHEN ba.currency_id IS NULL THEN mtol.amount ELSE mtol.currency_amount END) AS pay,
                         0 AS balance,
                         NULL AS partner_id,
                         mto.note

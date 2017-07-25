@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+            <record id="cash_flow_template_tree" model="ir.ui.view">
+                <field name="name">cash.flow.template.tree</field>
+                <field name="model">cash.flow.template</field>
+                <field name="arch" type="xml">
+                    <tree string="现金流量表模板">
+                        <field name="sequence" invisible="1"/>
+                        <field name="name"/>
+                        <field name="line_num"/>
+                        <field name="line_type"/>
+                    </tree>
+                </field>
+            </record>
+
+            <record id="cash_flow_template_form" model="ir.ui.view">
+                <field name="name">cash.flow.template.form</field>
+                <field name="model">cash.flow.template</field>
+                <field name="arch" type="xml">
+                    <form string="现金流量表模板">
+                        <group>
+                          <field name="name"/>
+                          <field name="line_num"/>
+                          <field name="line_type"/>
+                        </group>
+                        <group>
+                        <field name="category_ids" attrs="{'invisible': [('line_type','!=','category')]}" >
+                           <tree string="收支类别" editable="bottom">
+                              <field name="name"/>
+                           </tree>
+                        </field>
+                        <field name="begin_ids" attrs="{'invisible': [('line_type','!=','begin')]}">
+                           <tree string="期初科目" editable="bottom">
+                              <field name="name"/>
+                           </tree>
+                        </field>
+                        <field name="end_ids" attrs="{'invisible': [('line_type','!=','end')]}">
+                           <tree string="期末科目" editable="bottom">
+                              <field name="name"/>
+                           </tree>
+                        </field>
+                        <field name="plus_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
+                           <tree string="+表行" editable="bottom">
+                              <field name="name"/>
+                           </tree>
+                        </field>
+                        <field name="nega_ids" attrs="{'invisible': [('line_type','!=','lines')]}">
+                           <tree string="-表行" editable="bottom">
+                              <field name="name"/>
+                           </tree>
+                        </field>
+                        </group>
+                    </form>
+               </field>
+            </record>
+            <record id="action_cash_flow_template" model="ir.actions.act_window">
+                <field name="name">现金流量表模板</field>
+                <field name="res_model">cash.flow.template</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form</field>
+                <field name="view_id" ref="cash_flow_template_tree"/>
+            </record> 
+            <menuitem id='menu_cash_flow_template' action='action_cash_flow_template' parent='finance.finance_setting_menu' groups="base.group_no_one" sequence='90'/>
+
+            <record id="cash_flow_statement_tree" model="ir.ui.view">
+                <field name="name">cash.flow.statement.tree</field>
+                <field name="model">cash.flow.statement</field>
+                <field name="arch" type="xml">
+                    <tree string="现金流量表">
+                        <field name="name"/>
+                        <field name="line_num"/>
+                        <field name="amount"/>
+                    </tree>
+                </field>
+            </record>
+    </data>
+</openerp>

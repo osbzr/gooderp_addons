@@ -115,6 +115,8 @@ class other_money_order(models.Model):
                                  ondelete='restrict',
                                  copy=False,
                                  help=u'其他收支单审核时生成的对应凭证')
+    currency_amount = fields.Float(u'外币金额',
+                                   digits=dp.get_precision('Amount'))
 
     @api.onchange('date')
     def onchange_date(self):
@@ -228,6 +230,7 @@ class other_money_order(models.Model):
             if not line.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
 
+            rate_silent = self.env['res.currency'].get_rate_silent(self.date, self.bank_id.currency_id.id)
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'credit_auxiliary_id': line.auxiliary_id.id,
                          'amount': abs(line.amount + line.tax_amount),
@@ -236,6 +239,9 @@ class other_money_order(models.Model):
                          'partner_credit': self.partner_id.id, 'partner_debit': '',
                          'sell_tax_amount': line.tax_amount or 0,
                          'init_obj': init_obj,
+                         'currency_id': self.bank_id.currency_id.id,
+                         'currency_amount': self.currency_amount,
+                         'rate_silent': rate_silent,
                          })
             # 贷方行
             if not init_obj:
@@ -266,6 +272,9 @@ class other_money_order(models.Model):
             'partner_id': vals.get('partner_debit', ''),
             'auxiliary_id': vals.get('debit_auxiliary_id', False),
             'init_obj': vals.get('init_obj', False),
+            'currency_id': vals.get('currency_id', False),
+            'currency_amount': vals.get('currency_amount'),
+            'rate_silent': vals.get('rate_silent'),
         })
 
     def other_pay_create_voucher_line(self, vouch_obj):
@@ -279,6 +288,7 @@ class other_money_order(models.Model):
             if not line.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
 
+            rate_silent = self.env['res.currency'].get_rate_silent(self.date, self.bank_id.currency_id.id)
             vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'note': line.note or '',
                          'debit_auxiliary_id': line.auxiliary_id.id,
                          'amount': abs(line.amount + line.tax_amount),
@@ -286,6 +296,9 @@ class other_money_order(models.Model):
                          'debit_account_id': line.category_id.account_id.id, 'partner_credit': '',
                          'partner_debit': self.partner_id.id,
                          'buy_tax_amount': line.tax_amount or 0,
+                         'currency_id': self.bank_id.currency_id.id,
+                         'currency_amount': self.currency_amount,
+                         'rate_silent': rate_silent,
                          })
             # 借方行
             self.env['voucher.line'].create({
@@ -316,6 +329,9 @@ class other_money_order(models.Model):
             'voucher_id': vals.get('vouch_obj_id'),
             'auxiliary_id': vals.get('credit_auxiliary_id', False),
             'init_obj': vals.get('init_obj', False),
+            'currency_id': vals.get('currency_id', False),
+            'currency_amount': vals.get('currency_amount'),
+            'rate_silent': vals.get('rate_silent'),
         })
 
 

@@ -147,10 +147,36 @@ class partner_address(models.Model):
     town = fields.Char(u'乡镇')
     detail_address = fields.Char(u'详细地址')
     is_default_add = fields.Boolean(u'是否默认地址')
+    
+    @api.multi
+    def name_get(self):
+        '''在many2one字段里显示 编号_名称'''
+        res = []
+
+        for adds in self:
+            add_str = '%s%s%s%s%s' % (adds.province_id and adds.province_id.name or '',
+                   adds.city_id and adds.city_id.city_name or '',
+                   adds.county_id and adds.county_id.county_name or '',
+                   adds.town or '',
+                   adds.detail_address or '')
+            res.append((adds.id, add_str))
+        return res
 
 
 class partner(models.Model):
     _inherit = 'partner'
+
+    def _put_info_to_partner(self, child):
+        self.contact = child.contact
+        self.mobile = child.mobile
+        self.phone = child.phone
+        self.qq = child.qq
+        address = '%s%s%s%s%s' % (child.province_id and child.province_id.name or '',
+                   child.city_id and child.city_id.city_name or '',
+                   child.county_id and child.county_id.county_name or '',
+                   child.town or '',
+                   child.detail_address or '')
+        self.address = address
 
     @api.one
     @api.depends('child_ids.is_default_add', 'child_ids.province_id', 'child_ids.city_id', 'child_ids.county_id', 'child_ids.town', 'child_ids.detail_address')
@@ -159,17 +185,16 @@ class partner(models.Model):
         if not self.child_ids:
             return {}
         for child in self.child_ids:
-            if child.is_default_add:
-                self.contact = child.contact
-                self.mobile = child.mobile
-                self.phone = child.phone
-                self.qq = child.qq
-                address = '%s%s%s%s%s' % (child.province_id and child.province_id.name or '',
-                           child.city_id and child.city_id.city_name or '',
-                           child.county_id and child.county_id.county_name or '',
-                           child.town or '',
-                           child.detail_address or '')
-                self.address = address
+            if child.is_default_add: # 如果有默认地址取默认地址
+                self._put_info_to_partner(child)
+
+        # 如果没有默认地址取第一个联系人的
+        if not any([child.is_default_add for child in self.child_ids]):
+            partners_add = self.env['partner.address'].search([('partner_id', '=', self.id)], order='id')
+            child = partners_add and partners_add[0] or False
+            if child:
+                self._put_info_to_partner(child)
+
 
     child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
     contact = fields.Char(u'联系人', compute='_compute_partner_address')
