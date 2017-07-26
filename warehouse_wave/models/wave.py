@@ -193,7 +193,8 @@ class do_pack(models.Model):
         for line in self.product_line_ids:
             if line.goods_qty != line.pack_qty:
                 self.is_pack = False
-        if  self.is_pack:
+
+        if self.is_pack:
             ORIGIN_EXPLAIN = {
                 'wh.internal': 'wh.internal',
                 'wh.out.others': 'wh.out',
@@ -207,9 +208,26 @@ class do_pack(models.Model):
             model_row = self.env[ORIGIN_EXPLAIN.get(move_row.origin)
                                 ].search([('sell_move_id', '=', move_row.id)])
             func = getattr(model_row, function_dict.get(model_row._name), None)
-            if func and  model_row.state == 'draft':
-                return func()
 
+            if func and model_row.state == 'draft':
+                # 执行 销售发货审核，允许库存为零，执行 common.dialog.wizard 里的 do_confirm 方法
+                if function_dict.get(model_row._name) == 'sell_delivery_done':
+                    result_vals = func()
+                    if result_vals and result_vals['res_model'] == 'common.dialog.wizard':
+                        # 通过 context 传值给 common.dialog.wizard
+                        ctx = result_vals['context']
+                        ctx['active_model'] = 'sell.delivery'
+                        ctx['active_ids'] = [model_row.id]
+
+                        # 创建 common.dialog.wizard 对象，模拟打开对象窗口时的操作，传入 active_model， active_ids
+                        dialog = self.env['common.dialog.wizard'].with_context(ctx).create({
+                                'message': result_vals['context']['message']
+                                })
+
+                        dialog.do_confirm()
+                        self.is_pack = True
+                else:
+                    return func()
 
     def get_line_data(self, code):
         """构造行的数据"""
@@ -234,6 +252,7 @@ class do_pack(models.Model):
                     move_row = self.env['wh.move'].search([('express_code', '=', code)])
                     scan_code = move_row.name
                 self.scan_one_barcode(scan_code, pack_row)
+
         return True
 
     def scan_one_barcode(self, code, pack_row):
