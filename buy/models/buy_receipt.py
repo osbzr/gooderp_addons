@@ -153,7 +153,8 @@ class buy_receipt(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code(name) or '/'
 
         vals.update({
-            'origin': self.get_move_origin(vals)
+            'origin': self.get_move_origin(vals),
+            'finance_category_id': self.env.ref('finance.categ_buy_goods').id,
         })
         return super(buy_receipt, self).create(vals)
 
@@ -300,7 +301,7 @@ class buy_receipt(models.Model):
         })
         return money_order
 
-    def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id, goods_qty):
+    def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id, goods_qty, partner_id):
         '''返回voucher line'''
         rate_silent = currency_amount = 0
         currency = self.currency_id != self.env.user.company_id.currency_id and self.currency_id.id or False
@@ -312,6 +313,7 @@ class buy_receipt(models.Model):
         voucher = self.env['voucher.line'].create({
             'name': u'%s %s' % (self.name, self.note or ''),
             'account_id': account_id and account_id.id,
+            'partner_id': partner_id and partner_id.id,
             'debit': debit,
             'credit': credit,
             'voucher_id': voucher_id and voucher_id.id,
@@ -342,27 +344,25 @@ class buy_receipt(models.Model):
                 if line.amount:
                     # 借方明细
                     self._create_voucher_line(line.goods_id.category_id.account_id,
-                                              line.amount, 0, vouch_id, line.goods_id, line.goods_qty)
+                                              line.amount, 0, vouch_id, line.goods_id, line.goods_qty, False)
                 sum_amount += line.amount
 
             if sum_amount:
-                category_expense = self.env.ref('money.core_category_purchase')
                 # 贷方明细
-                self._create_voucher_line(category_expense.account_id,
-                                          0, sum_amount, vouch_id, False, 0)
+                self._create_voucher_line(self.buy_move_id.finance_category_id.account_id,
+                                          0, sum_amount, vouch_id, False, 0, self.partner_id)
         if self.is_return:
             for line in self.line_out_ids:
                 if line.amount:
                     # 借方明细
                     self._create_voucher_line(line.goods_id.category_id.account_id,
-                                              -line.amount, 0, vouch_id, line.goods_id, line.goods_qty)
+                                              -line.amount, 0, vouch_id, line.goods_id, line.goods_qty, False)
                     sum_amount += line.amount
 
             if sum_amount:
-                category_expense = self.env.ref('money.core_category_purchase')
                 # 贷方明细
-                self._create_voucher_line(category_expense.account_id,
-                                          0, -sum_amount, vouch_id, False, 0)
+                self._create_voucher_line(self.buy_move_id.finance_category_id.account_id,
+                                          0, -sum_amount, vouch_id, False, 0, self.partner_id)
 
         if len(vouch_id.line_ids) > 0:
             vouch_id.voucher_done()
