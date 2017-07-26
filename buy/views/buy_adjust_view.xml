@@ -7,7 +7,7 @@
             <field name="name">buy.adjust.tree</field>
             <field name="model">buy.adjust</field>
             <field name="arch" type="xml">
-                <tree string="采购变更单">
+                <tree string="采购变更单" colors='blue:state == "draft"'>
                     <field name="date"/>
                     <field name="name"/>
                     <field name="order_id"/>

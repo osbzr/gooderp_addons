@@ -6,7 +6,7 @@
         	<field name='name'>sell.order.tree</field>
         	<field name='model'>sell.order</field>
         	<field name='arch' type='xml'>
-            	<tree string='销货订单'>
+                <tree string='销货订单' colors='blue:state == "draft"'>
             		<field name='date'/>
             		<field name='name'/>
             		<field name='type'/>
@@ -154,7 +154,7 @@
         	<field name='name'>sell.delivery.tree</field>
         	<field name='model'>sell.delivery</field>
         	<field name='arch' type='xml'>
-            	<tree string='销售发货单'>
+                <tree string='销售发货单' colors='blue:state == "draft"'>
             		<field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -356,7 +356,7 @@
         	<field name='name'>sell.return.tree</field>
         	<field name='model'>sell.delivery</field>
         	<field name='arch' type='xml'>
-            	<tree string='销售退货单'>
+                <tree string='销售退货单' colors='blue:state == "draft"'>
             		<field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -543,7 +543,7 @@
             <field name="name">sell.adjust.tree</field>
             <field name="model">sell.adjust</field>
             <field name="arch" type="xml">
-                <tree string="销售变更单">
+                <tree string="销售变更单" colors='blue:state == "draft"'>
                     <field name="date"/>
                     <field name="name"/>
                     <field name="order_id"/>
