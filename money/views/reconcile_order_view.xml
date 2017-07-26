@@ -6,7 +6,7 @@
             <field name="name">reconcile.order.tree</field>
             <field name="model">reconcile.order</field>
             <field name="arch" type="xml">
-                <tree string="Reconcile Order">
+                <tree string="Reconcile Order" colors='blue:state == "draft"'>
                     <field name="name"/>
                     <field name="date"/>
                     <field name="partner_id"/>
