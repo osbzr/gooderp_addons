@@ -6,7 +6,7 @@
             <field name="name">other.money.order.tree</field>
             <field name="model">other.money.order</field>
             <field name="arch" type="xml">
-                <tree string="其他收支单">
+                <tree string="其他收支单" colors='blue:state == "draft"'>
                     <field name="name"/>
                     <field name="date"/>
                     <field name="partner_id"/>

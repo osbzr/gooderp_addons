@@ -7,7 +7,7 @@
 			<field name="name">buy.order.tree</field>
 			<field name="model">buy.order</field>
 			<field name="arch" type="xml">
-				<tree string="购货订单">
+				<tree string="购货订单" colors='blue:state == "draft"'>
 					<field name="date"/>
 					<field name="name"/>
 					<field name="type"/>

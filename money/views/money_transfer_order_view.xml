@@ -6,7 +6,7 @@
             <field name="name">money.transfer.order.tree</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
-                <tree string="资金转账单">
+                <tree string="资金转账单" colors='blue:state == "draft"'>
                     <field name="name"/>
                     <field name="date"/>
                     <field name="state"/>

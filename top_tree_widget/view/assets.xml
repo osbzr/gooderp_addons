@@ -5,6 +5,7 @@
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/top_tree_widget/static/src/js/web_tree_image.js"></script>
                 <script type="text/javascript" src="/top_tree_widget/static/src/js/web_tree_bgcolor.js"></script>
+                <script type="text/javascript" src="/top_tree_widget/static/src/js/web_tree_tomany_selected.js"></script>
             </xpath>
         </template>
     </data>

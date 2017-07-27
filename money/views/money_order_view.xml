@@ -23,7 +23,7 @@
             <field name="name">money.order.tree</field>
             <field name="model">money.order</field>
             <field name="arch" type="xml">
-                <tree string="收付款单">
+                <tree string="收付款单" colors='blue:state == "draft"'>
                     <field name="name" string="单据编号"/>
                     <field name="date"/>
                     <field name="partner_id"/>
@@ -174,7 +174,7 @@
             <field name="name">money.invoice.tree</field>
             <field name="model">money.invoice</field>
             <field name="arch" type="xml">
-                <tree string="结算单" editable='top' create="false">
+                <tree string="结算单" editable='top' create="false" colors='blue:state == "draft"'>
                     <field name="state" invisible="1"/>
                     <field name="date" readonly="1"/>
                     <field name="name" readonly="1"/>

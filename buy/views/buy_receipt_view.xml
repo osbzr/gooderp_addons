@@ -7,7 +7,7 @@
             <field name="name">buy.receipt.tree</field>
             <field name="model">buy.receipt</field>
             <field name="arch" type="xml">
-                <tree string="采购入库单">
+                <tree string="采购入库单" colors='blue:state == "draft"'>
                     <field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -54,6 +54,7 @@
                             <field name="is_return" readonly="1" invisible="1"/>
                             <field name="warehouse_dest_id"/>
                             <field name="invoice_by_receipt" invisible="1"></field>
+                            <field name="finance_category_id" invisible="1"/>
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -197,7 +198,7 @@
             <field name="name">buy.return.tree</field>
             <field name="model">buy.receipt</field>
             <field name="arch" type="xml">
-                <tree string="采购退货单">
+                <tree string="采购退货单" colors='blue:state == "draft"'>
                     <field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
