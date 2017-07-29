@@ -79,8 +79,8 @@ class staff_wages(models.Model):
         if not self.voucher_id:
             raise UserError(u'工资单还未计提，请先计提')
         other_money_order = self._other_pay()   # 支付工资的其他支出单
-        self.create_other_pay_housing_fund()  # 住房公积金的其他支出单
-        self.create_other_pay_social_security()   # 社保的其他支出单
+        #self.create_other_pay_housing_fund()  # 住房公积金的其他支出单
+        #self.create_other_pay_social_security()   # 社保的其他支出单
         self.write({
             'other_money_order': other_money_order.id,
             'state': 'done',
@@ -205,21 +205,24 @@ class staff_wages(models.Model):
         #生成借方凭证行
         for account_id,val in res.iteritems():
             self.env['voucher.line'].create(dict(val, account_id=account_id.id))
-        #生成贷方凭证行
+        '''生成贷方凭证行
         endowment_co = self.env.ref('staff_wages.categ_endowment_co')  # 公司缴纳养老类别
         health_co = self.env.ref('staff_wages.categ_health_co')  # 公司缴纳医疗类别
         unemployment_co = self.env.ref('staff_wages.categ_unemployment_co')  # 公司缴纳失业类别
         maternity = self.env.ref('staff_wages.categ_maternity')  # 公司缴纳生育类别
         injury = self.env.ref('staff_wages.categ_injury')  # 公司缴纳工伤类别
         housing_co = self.env.ref('staff_wages.categ_housing_fund_co')  # 公司缴纳住房公积金类别
+        '''
         for line in self.line_ids:
             self.create_credit_line(vouch_obj, u'提本月工资', credit_account.account_id, line.all_wage, line.name.auxiliary_id)
+        '''
         self.create_credit_line(vouch_obj, u'提本月养老保险', endowment_co.account_id, self.totoal_endowment_co, False)
         self.create_credit_line(vouch_obj, u'提本月医疗保险', health_co.account_id, self.totoal_health_co, False)
         self.create_credit_line(vouch_obj, u'提本月失业保险', unemployment_co.account_id, self.totoal_unemployment_co, False)
         self.create_credit_line(vouch_obj, u'提本月生育保险', maternity.account_id, self.totoal_maternity, False)
         self.create_credit_line(vouch_obj, u'提本月工伤保险', injury.account_id, self.totoal_injury, False)
         self.create_credit_line(vouch_obj, u'提本月公积金', housing_co.account_id, self.totoal_housing_fund_co, False)
+        '''
         return vouch_obj
 
     @api.multi
@@ -245,37 +248,41 @@ class staff_wages(models.Model):
                 'category_id': staff_wages and staff_wages.id,
                 'auxiliary_id': line.name.auxiliary_id.id,
             })
-        if self.totoal_endowment:
-            self.env['other.money.order.line'].create({
-            'other_money_id': other_money_order.id,
-            'amount': -1 * self.totoal_endowment,
-            'category_id': endowment and endowment.id
-        })
-        if self.totoal_unemployment:
-            self.env['other.money.order.line'].create({
-            'other_money_id': other_money_order.id,
-            'amount': -1 * self.totoal_unemployment,
-            'category_id': unemployment and unemployment.id
-        })
-        if self.totoal_housing_fund:
-            self.env['other.money.order.line'].create({
-            'other_money_id': other_money_order.id,
-            'amount': -1 * self.totoal_housing_fund,
-            'category_id': housing_fund and housing_fund.id
-        })
-        if self.totoal_health:
-            self.env['other.money.order.line'].create({
-            'other_money_id': other_money_order.id,
-            'amount': -1 * self.totoal_health,
-
-            'category_id': health and health.id
-        })
-        if self.totoal_personal_tax:
-            self.env['other.money.order.line'].create({
-            'other_money_id': other_money_order.id,
-            'amount': -1 * self.totoal_personal_tax ,
-            'category_id': personal_tax and personal_tax.id
-        })
+            if line.endowment:
+                self.env['other.money.order.line'].create({
+                'other_money_id': other_money_order.id,
+                'amount': -1 * line.endowment,
+                'category_id': endowment and endowment.id,
+                'auxiliary_id': line.name.auxiliary_id.id,
+            })
+            if line.unemployment:
+                self.env['other.money.order.line'].create({
+                'other_money_id': other_money_order.id,
+                'amount': -1 * line.unemployment,
+                'auxiliary_id': line.name.auxiliary_id.id,
+                'category_id': unemployment and unemployment.id
+            })
+            if line.housing_fund:
+                self.env['other.money.order.line'].create({
+                'other_money_id': other_money_order.id,
+                'amount': -1 * line.housing_fund,
+                'auxiliary_id': line.name.auxiliary_id.id,
+                'category_id': housing_fund and housing_fund.id
+            })
+            if line.health:
+                self.env['other.money.order.line'].create({
+                'other_money_id': other_money_order.id,
+                'amount': -1 * line.health,
+                'auxiliary_id': line.name.auxiliary_id.id,
+                'category_id': health and health.id
+            })
+            if line.personal_tax:
+                self.env['other.money.order.line'].create({
+                'other_money_id': other_money_order.id,
+                'amount': -1 * line.personal_tax,
+                'auxiliary_id': line.name.auxiliary_id.id,
+                'category_id': personal_tax and personal_tax.id
+            })
         return other_money_order
 
     @api.multi
