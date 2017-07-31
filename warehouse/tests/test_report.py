@@ -105,3 +105,22 @@ class TestReport(TransactionCase):
         self.assertEqual(len(results), 1)
         # 查看库存调拨明细
         stock_transceive.with_context(context).find_source_move_line()
+
+    def test_stock_transceive_search_read_domain(self):
+        """
+        商品收发明细表:额外增加domain
+        """
+        self.transceive_wizard.date_start = '2016-02-01'
+        context = self.transceive_wizard.open_report().get('context')
+        stock_transceive = self.env['report.stock.transceive'].create({})
+        # 增加一个domain 条件
+        result1 = stock_transceive.with_context(context).search_read(domain=[('warehouse', '=', u'上海仓')])
+        # 增加一个domain 条件，domain 中用‘|’
+        result2 = stock_transceive.with_context(context).search_read(
+            domain=['|',('warehouse', '=', u'上海仓'),('warehouse', '=', u'总仓')])
+        with self.assertRaises(UserError):  # 暂时无法解析的domain条件
+            stock_transceive.with_context(context).search_read(
+                domain=[('warehouse', '<>', u'上海仓')])
+        with self.assertRaises(UserError):  # 不可识别的domain条件
+            stock_transceive.with_context(context).search_read(
+                domain=[('warehouse', '=', u'上海仓', 'xxx')])
