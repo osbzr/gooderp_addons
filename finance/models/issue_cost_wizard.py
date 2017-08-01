@@ -52,11 +52,45 @@ class MonthProductCost(models.Model):
         :return: 让上一期间的 剩余数量，和剩余数量成本 以字典 形式返回
         """
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(period_id)
-        month_product_cost_row = self.search([('period_id', '=', last_period.id), ('goods_id', '=', goods_id)])
+        last_period_remaining_qty = 0
+        last_period_remaining_cost = 0
+
+        # 存在出库的情况， 会计期间连续
+        month_product_cost_row = self.search([('period_id', '=', last_period.id),
+                                              ('goods_id', '=', goods_id)])
+        if month_product_cost_row:
+            last_period_remaining_qty = month_product_cost_row.current_period_remaining_qty
+            last_period_remaining_cost = month_product_cost_row.current_period_remaining_cost
+
+        if not month_product_cost_row: # 存在无出库的情况，会计期间不连续
+            # 查找 离输入期间最近的 对应产品的发出成本行
+            sql = """select period_id
+                    from month_product_cost mpc
+                    left join finance_period fp
+                    on fp.id = mpc.period_id
+                    where fp.name < %s and mpc.goods_id = %s
+                    order by mpc.period_id desc"""
+
+            self.env.cr.execute(sql, (period_id.name, goods_id))
+            sql_results = self.env.cr.fetchone()
+            if sql_results:
+                month_product_cost_row = self.search([('period_id', '=', sql_results and sql_results[0] or False),
+                                                      ('goods_id', '=', goods_id)])
+                last_period_remaining_qty = month_product_cost_row.current_period_remaining_qty
+                last_period_remaining_cost = month_product_cost_row.current_period_remaining_cost
+        else:
+            # 取期初成本
+            init_period = self.env['finance.period'].search([], order='name')
+            for line in self.env['voucher.line'].search([('period_id', '=', init_period and init_period[0].id or False),
+                                                         ('init_obj', 'ilike', 'init_warehouse%'),
+                                                         ('goods_id', '=', goods_id),
+                                                         ('state', '=', 'done')]):
+                last_period_remaining_qty = line.goods_qty
+                last_period_remaining_cost = line.debit
 
         return {
-            'current_period_remaining_qty': month_product_cost_row.current_period_remaining_qty or 0,
-            'current_period_remaining_cost': month_product_cost_row.current_period_remaining_cost or 0
+            'current_period_remaining_qty': last_period_remaining_qty,
+            'current_period_remaining_cost': last_period_remaining_cost
         }
 
     @api.multi
