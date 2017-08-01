@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class MonthProductCost(models.Model):
     _name = 'month.product.cost'
@@ -247,4 +248,15 @@ class CheckOutWizard(models.TransientModel):
             if self.env['ir.module.module'].sudo().search([('state', '=', 'installed'), ('name', '=', 'warehouse')]):
                 self.env['month.product.cost'].generate_issue_cost(self.period_id, self.date)
         res = super(CheckOutWizard, self).button_checkout()
+        return res
+
+    # 反结账
+    @api.multi
+    def button_counter_checkout(self):
+        ''' 反结账 删除对应出库成本 '''
+        if self.period_id:
+            issue_cost_exists = self.env['month.product.cost'].search([('period_id', '=', self.period_id.id)])
+            issue_cost_exists.unlink()
+
+        res = super(CheckOutWizard, self).button_counter_checkout()
         return res
