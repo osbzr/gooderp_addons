@@ -43,7 +43,7 @@ class wh_move(models.Model):
         """
         express_menu = self.env['express.menu.config'].search([('abbreviation', '=', menu_type)])
         if not express_menu:
-            raise UserError("单据%s,承运商暂不支持 或者承运商商户简称输入错误(%s)"%(self.name, menu_type))
+            raise UserError(u"单据%s,承运商暂不支持 或者承运商商户简称输入错误(%s)"%(self.name, menu_type))
         shipping_type_config = dict(ShipperCode=menu_type,
                                     CustomerName=express_menu.customername or '',
                                     CustomerPwd=express_menu.customerpwd or '',
@@ -126,7 +126,7 @@ class wh_move(models.Model):
         self.express_code = (safe_eval(content).get('Order', {})).get('LogisticCode', "")
         self.express_menu = str(safe_eval(content).get('PrintTemplate'))
         if not self.express_code:
-            raise UserError("获取快递面单失败!\n原因:%s"%str(content))
+            raise UserError(u"获取快递面单失败!\n原因:%s"%str(content))
         return str(safe_eval(content).get('PrintTemplate'))
 
     def encrypt_kdn(self, data, appkey):
