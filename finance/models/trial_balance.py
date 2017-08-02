@@ -3,6 +3,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 from math import fabs
 import copy
+import odoo.addons.decimal_precision as dp
 
 class TrialBalance(models.Model):
     """科目余额表"""
@@ -29,16 +30,16 @@ class TrialBalance(models.Model):
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
     subject_name_id = fields.Many2one('finance.account', string=u'科目')
-    year_init_debit = fields.Float(u'年初余额(借方)', default=0, compute=_get_year_init)
-    year_init_credit = fields.Float(u'年初余额(贷方)', default=0, compute=_get_year_init)
-    initial_balance_debit = fields.Float(u'期初余额(借方)', default=0)
-    initial_balance_credit = fields.Float(u'期初余额(贷方)', default=0)
-    current_occurrence_debit = fields.Float(u'本期发生额(借方)', default=0)
-    current_occurrence_credit = fields.Float(u'本期发生额(贷方)', default=0)
-    ending_balance_debit = fields.Float(u'期末余额(借方)', default=0)
-    ending_balance_credit = fields.Float(u'期末余额(贷方)', default=0)
-    cumulative_occurrence_debit = fields.Float(u'本年累计发生额(借方)', default=0)
-    cumulative_occurrence_credit = fields.Float(u'本年累计发生额(贷方)', default=0)
+    year_init_debit = fields.Float(u'年初余额(借方)', digits=dp.get_precision('Amount'), default=0, compute=_get_year_init)
+    year_init_credit = fields.Float(u'年初余额(贷方)', digits=dp.get_precision('Amount'), default=0, compute=_get_year_init)
+    initial_balance_debit = fields.Float(u'期初余额(借方)', digits=dp.get_precision('Amount'), default=0)
+    initial_balance_credit = fields.Float(u'期初余额(贷方)', digits=dp.get_precision('Amount'), default=0)
+    current_occurrence_debit = fields.Float(u'本期发生额(借方)', digits=dp.get_precision('Amount'), default=0)
+    current_occurrence_credit = fields.Float(u'本期发生额(贷方)', digits=dp.get_precision('Amount'), default=0)
+    ending_balance_debit = fields.Float(u'期末余额(借方)', digits=dp.get_precision('Amount'), default=0)
+    ending_balance_credit = fields.Float(u'期末余额(贷方)', digits=dp.get_precision('Amount'), default=0)
+    cumulative_occurrence_debit = fields.Float(u'本年累计发生额(借方)', digits=dp.get_precision('Amount'), default=0)
+    cumulative_occurrence_credit = fields.Float(u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'), default=0)
 
 
 class CreateTrialBalanceWizard(models.TransientModel):
