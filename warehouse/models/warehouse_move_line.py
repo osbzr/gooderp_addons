@@ -202,7 +202,7 @@ class wh_move_line(models.Model):
                             help=u'价税合计,有不含税金额+税额计算得来')
     note = fields.Text(u'备注',
                        help=u'可以为该单据添加一些需要的标识信息')
-    cost_unit = fields.Float(u'单位成本', digits=dp.get_precision('Amount'),
+    cost_unit = fields.Float(u'单位成本', digits=dp.get_precision('Price'),
                              help=u'入库/出库单位成本')
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
                         digits=dp.get_precision('Amount'), store=True,
