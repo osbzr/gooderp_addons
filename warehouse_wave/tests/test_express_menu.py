@@ -18,8 +18,8 @@ class test_express_menu(TransactionCase):
         move = self.delivery.sell_move_id
 #         self.env['wh.move'].get_moves_html(move.id)
 
-#         with self.assertRaises(UserError):
-#             self.env['wh.move'].get_moves_html(move.id)
+        with self.assertRaises(UserError):
+            self.env['wh.move'].get_moves_html(move.id)
 
         # 承运商暂不支持 或者承运商商户简称输入错误
         with self.assertRaises(UserError):
