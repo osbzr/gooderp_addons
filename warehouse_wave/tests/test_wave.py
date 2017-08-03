@@ -124,7 +124,6 @@ class test_do_pack(TransactionCase):
         # 已打包完成，记录不能删除
         self.env.ref('goods.cable').barcode = '000'
         pack.scan_barcode('000', pack.id)
-        pack.scan_barcode('000', pack.id)
         with self.assertRaises(UserError):
             pack.unlink()
 
@@ -135,7 +134,6 @@ class test_do_pack(TransactionCase):
 
         # 扫描产品在打包行上
         self.env.ref('goods.cable').barcode = '000'
-        pack.scan_barcode('000', pack.id)
         pack.scan_barcode('000', pack.id)
         # 已打包完成
         with self.assertRaises(UserError):
@@ -149,7 +147,7 @@ class test_do_pack(TransactionCase):
         with self.assertRaises(UserError):
             pack.scan_barcode('6666', '')
 
-    def test_scan_barcode_(self):
+    def test_scan_barcode_needs_pack_qty(self):
         ''' 测试 scan_barcode 要求发货数量 < 打包数量 '''
         order_1 = self.env.ref('sell.sell_order_1')
         self.env.ref('sell.sell_order_line_1').quantity = 1
