@@ -7,6 +7,7 @@ class test_month_product_cost(TransactionCase):
     def setUp(self):
         super(test_month_product_cost, self).setUp()
         self.period_id = self.env.ref('finance.period_201601')
+        self.period_id_15 = self.env.ref('finance.period_201512')
 
     def test_generate_issue_cost(self):
         """本月成本结算 相关逻辑的测试"""
@@ -25,3 +26,18 @@ class test_month_product_cost(TransactionCase):
         # [wh_internal_row.approve_order() for wh_internal_row in wh_internal_rows]
         self.env['month.product.cost'].generate_issue_cost(self.period_id, '2016-01-31')
 
+        # 离输入期间最近的 对应产品的发出成本行 存在
+        wh_in_rows = self.env['wh.in'].search([])
+        wh_in_rows.write({'date':'2015-12-31 18:00:00'})
+        [wh_in_row.approve_order() for wh_in_row in wh_in_rows]
+        self.env['month.product.cost'].generate_issue_cost(self.period_id_15, '2015-12-31')
+
+        wh_out_2 = self.env.ref('warehouse.wh_out_whout1')
+        wh_out_2.write({'date':'2016-1-31 18:00:00'})
+        [wh_out_2.approve_order() for wh_out_row in wh_out_rows]
+        self.env['month.product.cost'].generate_issue_cost(self.period_id, '2016-01-31')
+
+        # 计算发出成本 取实际成本
+        company = self.env['res.company'].search([], limit=1)
+        company.cost_method = 'fifo'
+        self.env['month.product.cost'].generate_issue_cost(self.period_id, '2016-01-31')
