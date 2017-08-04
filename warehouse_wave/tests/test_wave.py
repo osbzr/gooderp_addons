@@ -72,7 +72,7 @@ class test_wave(TransactionCase):
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
-        
+
         self.wave_wizard = self.env['create.wave'].with_context({
                                             'active_ids': self.delivery.id}).create({
                                             'active_model': 'sell.delivery',
@@ -93,6 +93,29 @@ class test_wave(TransactionCase):
     def test_unlink(self):
         ''' 测试 unlink'''
         self.wave[0].unlink()
+
+        order_1 = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').quantity = 1
+        self.env.ref('sell.sell_order_line_1').discount_amount = 0
+        order_1.discount_amount = 0
+        order_1.sell_order_done()
+        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        delivery_1.date = '2016-01-02'
+        delivery_1.express_code = '123456'
+        wave_wizard = self.env['create.wave'].with_context({
+                                            'active_ids': delivery_1.id}).create({
+                                            'active_model': 'sell.delivery',
+                                             })
+        wave_wizard.create_wave()
+        wave_2 = self.env['wave'].search([])
+        pack = self.env['do.pack'].create({ })
+        pack.scan_barcode('123456', pack.id)
+
+        # 发货单已经打包发货,捡货单不允许删除
+        self.env.ref('goods.mouse').barcode = '000'
+        pack.scan_barcode('000', pack.id)
+        with self.assertRaises(UserError):
+            wave_2.unlink()
 
 
 class test_do_pack(TransactionCase):
