@@ -106,10 +106,9 @@ class test_money_order(TransactionCase):
         # 收款
         self.env.ref('money.get_40000').money_order_done()
         # 执行money_order_draft 遍历source_ids的操作
-        invoice = self.env['money.invoice'].create({
+        invoice = self.env['money.invoice'].with_context({'type': 'income'}).create({
             'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
             'name': 'invoice/2016001',
-            'category_id': self.env.ref('money.core_category_sale').id,
             'amount': 200.0,
             'reconciled': 0,
             'to_reconcile': 200.0,
@@ -152,6 +151,17 @@ class test_money_order(TransactionCase):
         self.env.ref('core.supplier_category_1').account_id = False
         with self.assertRaises(UserError):
             self.env.ref('money.pay_2000').money_order_done()
+
+    def test_get_category_id(self):
+        ''' 测试  _get_category_id 不存在 context.get('type')'''
+        self.env.user.company_id.draft_invoice = True
+        invoice = self.env['money.invoice'].create({'date': "2016-02-20",
+            'partner_id': self.env.ref('core.jd').id,
+            'name': 'invoice/2016001',
+            'date_due': '2016-09-07'})
+
+        # 测试 invoice name_get has order
+        invoice.with_context({'order': '20170807'}).name_get()
 
     def test_money_order_create_raise_exists_error(self):
         # 同一业务伙伴存在两个未审核的付款单，报错
@@ -237,6 +247,13 @@ class test_money_order(TransactionCase):
         money2.discount_account_id = self.env.ref('finance.small_business_chart5603002').id
         money2.discount_amount = 10
         money2.money_order_done()
+
+        # 重置 结算单行 上的本次核销金额：已审核的单据不能执行这个操作
+        with self.assertRaises(ValueError):
+            money2.write_off_reset()
+        # 重置 结算单行 上的本次核销金额
+        money2.money_order_draft()
+        money2.write_off_reset()
 
     def test_money_order_without_source_no_bank_account(self):
         '''测试 不带结算单明细行的收款单银行账户不存在 account_id 的情况'''
