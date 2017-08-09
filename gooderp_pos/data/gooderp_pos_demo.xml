@@ -23,4 +23,8 @@
           <field name="c_category_id" ref="customer_category_vip"/>
           <field name="main_mobile">00000000000</field>
         </record>
+
+    <record id="pos_config_sell" model="pos.config">
+      <field name="name">零售测试</field>
+    </record>
 </odoo>
