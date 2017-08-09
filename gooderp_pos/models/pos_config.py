@@ -18,6 +18,7 @@ class PosConfig(models.Model):
     uuid = fields.Char(readonly=True, default=lambda self: str(uuid.uuid4()), help='唯一识别码')
     sequence_id = fields.Many2one('ir.sequence', string='Order IDs Sequence', readonly=True, copy=False)
     session_ids = fields.One2many('pos.session', 'config_id', string='Sessions')
+    current_session_id = fields.Many2one('pos.session', compute='_compute_current_session', string="Current Session")
     last_session_closing_date = fields.Date()
 
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
@@ -26,6 +27,13 @@ class PosConfig(models.Model):
     group_pos_user_id = fields.Many2one('res.groups', string='Point of Sale User Group',
         help='可以使用这POS页面的人')
     tip_product_id = fields.Many2one('goods', string='Tip Product' )
+
+    @api.depends('session_ids')
+    def _compute_current_session(self):
+        for pos_config in self:
+            session = pos_config.session_ids.filtered(
+                lambda r: r.user_id.id == self.env.uid and not r.state == 'closed')
+            pos_config.current_session_id = session
 
     @api.multi
     def name_get(self):
