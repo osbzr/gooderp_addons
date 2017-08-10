@@ -78,7 +78,7 @@
     </record>
 
     <record id="action_pos_session" model="ir.actions.act_window">
-        <field name="name">Sessions</field>
+        <field name="name">会话</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">pos.session</field>
         <field name="view_type">form</field>
