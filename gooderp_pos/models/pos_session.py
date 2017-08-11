@@ -14,29 +14,29 @@ class PosSession(models.Model):
         ('closed', '关闭 & 过账'),
     ]
 
-    config_id = fields.Many2one('pos.config', string='POS', required=True, index=True)
-    name = fields.Char(string='工作记录名', required=True, readonly=True, default='/')
+    config_id = fields.Many2one('pos.config', string=u'POS', required=True, index=True)
+    name = fields.Char(string=u'工作记录名', required=True, readonly=True, default='/')
     user_id = fields.Many2one(
-        'res.users', string='负责人',
+        'res.users', string=u'负责人',
         required=True,
         index=True,
         readonly=True,
         states={'opening_control': [('readonly', False)]},
         default=lambda self: self.env.uid)
     #TODO:currency_id = fields.Many2one('res.currency', related='config_id.currency_id', string="Currency")
-    start_at = fields.Datetime(string='打开日期', readonly=True)
-    stop_at = fields.Datetime(string='关闭日期', readonly=True, copy=False)
+    start_at = fields.Datetime(string=u'打开日期', readonly=True)
+    stop_at = fields.Datetime(string=u'关闭日期', readonly=True, copy=False)
 
     state = fields.Selection(
-        POS_SESSION_STATE, string='Status',
+        POS_SESSION_STATE, string=u'状态',
         required=True, readonly=True,
         index=True, copy=False, default='opening_control')
-    sequence_number = fields.Integer(string='Order Sequence Number', default=1)
-    login_number = fields.Integer(string='Login Sequence Number', default=0)
-    cash_control = fields.Boolean( string='Has Cash Control')
-    payment_line_ids = fields.One2many('payment.line', 'session_id', string='支付详情')
+    sequence_number = fields.Integer(string=u'订单序列号', default=1)
+    login_number = fields.Integer(string=u'登录序列号', default=0)
+    cash_control = fields.Boolean( string=u'现金管理')
+    payment_line_ids = fields.One2many('payment.line', 'session_id', string=u'支付详情')
 
-    _sql_constraints = [('uniq_name', 'unique(name)', _("The name of this POS Session must be unique !"))]
+    _sql_constraints = [('uniq_name', 'unique(name)', u"POS会话名称必须唯一")]
 
     @api.multi
     def action_pos_session_open(self):
@@ -58,7 +58,7 @@ class PosSession(models.Model):
                 ('config_id', '=', self.config_id.id),
                 ('name', 'not like', 'RESCUE FOR'),
             ]) > 1:
-            raise ValidationError(_("You cannot create two active sessions related to the same point of sale!"))
+            raise ValidationError(u"对于同一个POS，你不能创建两个活动会话。")
 
     @api.model
     def create(self, values):
@@ -84,25 +84,11 @@ class PosSession(models.Model):
         })
 
     @api.multi
-    def action_pos_session_open(self):
-        # second browse because we need to refetch the data from the DB for cash_register_id
-        # we only open sessions that haven't already been opened
-        for session in self.filtered(lambda session: session.state == 'opening_control'):
-            values = {}
-            if not session.start_at:
-                values['start_at'] = fields.Datetime.now()
-            values['state'] = 'opened'
-            session.write(values)
-            #session.statement_ids.button_open()
-        return True
-
-    @api.multi
     def open_frontend_cb(self):
         if not self.ids:
             return {}
         for session in self.filtered(lambda s: s.user_id.id != self.env.uid):
-            raise UserError(_("You cannot use the session of another users. This session is owned by %s. "
-                              "Please first close this one to use this point of sale.") % session.user_id.name)
+            raise UserError(u"你不能使用其他用户的会话，这个会话属于 %s。请先关闭当前会话然后使用POS。" % session.user_id.name)
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',
@@ -112,8 +98,8 @@ class PosSession(models.Model):
 class PaymentLine(models.Model):
     _name = 'payment.line'
 
-    session_id = fields.Many2one('pos.session', string='工作记录')
+    session_id = fields.Many2one('pos.session', string=u'工作记录')
     amount = fields.Float(u'总金额')
     pay_date = fields.Datetime(u'付款时间')
     pay_type_id = fields.Many2one(u'bank.account', u'付款方式')
-    sell_id = fields.Many2one('sell.order', string='对应订单')
+    sell_id = fields.Many2one('sell.order', string=u'对应订单')
