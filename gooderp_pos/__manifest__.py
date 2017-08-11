@@ -17,6 +17,8 @@
         'views/pos_session_view.xml',
         'views/pos_templates.xml',
         'views/gooderp_pos.xml',
+        'views/pos_config_view.xml',
+        'views/pos_category_view.xml',
         'data/gooderp_pos_data.xml',
         'data/gooderp_pos_demo.xml',
     ],

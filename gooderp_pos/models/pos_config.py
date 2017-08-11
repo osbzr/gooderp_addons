@@ -26,7 +26,11 @@ class PosConfig(models.Model):
         help=u'管理POS这个POS缓存的组')
     group_pos_user_id = fields.Many2one('res.groups', string=u'POS用户组',
         help=u'可以使用这POS页面的人')
-    tip_product_id = fields.Many2one('goods', string=u'提示产品' )
+    tip_product_id = fields.Many2one('goods', string=u'提示产品')
+    # bank_account_ids = fields.Many2many('bank.account', 'pos_config_bank_account_rel',
+    #                                    'pos_config_id', 'bank_account_id',
+    #                                   u'可用的结算账户',
+    #                                     )
 
     @api.depends('session_ids')
     def _compute_current_session(self):

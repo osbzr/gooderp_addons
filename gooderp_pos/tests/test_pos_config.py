@@ -87,3 +87,17 @@ class test_pos_session(TransactionCase):
         with self.assertRaises(UserError):
             self.session.user_id = self.env.ref('core.user_alice').id
             self.session.open_frontend_cb()
+
+
+class test_res_users(TransactionCase):
+
+    def setUp(self):
+        '''准备基本数据'''
+        super(test_res_users, self).setUp()
+        self.user = self.env.ref('core.user_alice')
+
+    def test_check_pin(self):
+        """限制安全pin为数字"""
+        self.user.pos_security_pin = '1234'
+        with self.assertRaises(ValidationError):
+            self.user.pos_security_pin = u'abcd'

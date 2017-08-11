@@ -685,7 +685,7 @@ odoo.define('gooderp_pos.models', function(require) {
 
             // we try to send the order. shadow prevents a spinner if it takes too long. (unless we are sending an invoice,
             // then we want to notify the user that we are waiting on something )
-            var posOrderModel = new Model('sell.order');
+            var posOrderModel = new Model('sell.delivery');
             return posOrderModel.call('create_from_ui', [_.map(orders, function(order) {
                     order.to_invoice = options.to_invoice || false;
                     return order;
