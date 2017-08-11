@@ -95,6 +95,8 @@
         web_icon="gooderp_pos,static/description/icon.png"
         sequence="20"/>
     <menuitem id="menu_gooderp_pos" name="POS订单" parent="menu_point_root" sequence="10"/>
+    <menuitem id="menu_config" name="配置" parent="menu_point_root"
+         sequence="100" groups="group_pos_manager"/>
 
 
     <menuitem
