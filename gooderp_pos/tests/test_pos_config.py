@@ -85,5 +85,5 @@ class test_pos_session(TransactionCase):
         self.session.open_frontend_cb()
 
         with self.assertRaises(UserError):
-            self.session.user_id = self.env.ref('scm.user_alice').id
+            self.session.user_id = self.env.ref('core.user_alice').id
             self.session.open_frontend_cb()
