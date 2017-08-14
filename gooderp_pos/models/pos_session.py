@@ -35,6 +35,12 @@ class PosSession(models.Model):
     login_number = fields.Integer(string=u'登录序列号', default=0)
     cash_control = fields.Boolean( string=u'现金管理')
     payment_line_ids = fields.One2many('payment.line', 'session_id', string=u'支付详情')
+    bank_account_ids = fields.Many2many(
+        'bank.account',
+        related='config_id.bank_account_ids',
+        readonly=True,
+        string=u'可用的结算账户',
+    )
 
     _sql_constraints = [('uniq_name', 'unique(name)', u"POS会话名称必须唯一")]
 
@@ -102,4 +108,4 @@ class PaymentLine(models.Model):
     amount = fields.Float(u'总金额')
     pay_date = fields.Datetime(u'付款时间')
     pay_type_id = fields.Many2one(u'bank.account', u'付款方式')
-    sell_id = fields.Many2one('sell.order', string=u'对应订单')
+    sell_id = fields.Many2one('sell.delivery', string=u'对应订单')

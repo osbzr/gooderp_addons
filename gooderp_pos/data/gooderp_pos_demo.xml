@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="fruits_vegetables" model="pos.category">
+        <record id="fruits_vegetables" model="goods.class">
           <field name="name">水果蔬菜</field>
         </record>
 
-        <record id="partner_services" model="pos.category">
+        <record id="partner_services" model="goods.class">
           <field name="name">原材料</field>
         </record>
 

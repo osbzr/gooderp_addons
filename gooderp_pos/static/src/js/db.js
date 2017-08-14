@@ -123,7 +123,7 @@ var PosDB = core.Class.extend({
     category_contains: function(categ_id, product_id) {
         var product = this.product_by_id[product_id];
         if (product) {
-            var cid = product.pos_categ_id[0];
+            var cid = product.goods_class_id[0];
             while (cid && cid !== categ_id){
                 cid = this.category_parent[cid];
             }
@@ -176,7 +176,7 @@ var PosDB = core.Class.extend({
         for(var i = 0, len = products.length; i < len; i++){
             var product = products[i];
             var search_string = this._product_search_string(product);
-            var categ_id = product.pos_categ_id ? product.pos_categ_id[0] : this.root_category_id;
+            var categ_id = product.goods_class_id ? product.goods_class_id[0] : this.root_category_id;
             //product.product_tmpl_id = product.product_tmpl_id[0];
             if(!stored_categories[categ_id]){
                 stored_categories[categ_id] = [];
@@ -384,7 +384,7 @@ var PosDB = core.Class.extend({
         if (!(category_ids instanceof Array)) {
             category_ids = [category_ids];
         }
-        var cat = this.get_product_by_id(product_id).pos_categ_id[0];
+        var cat = this.get_product_by_id(product_id).goods_class_id[0];
         while (cat) {
             for (var i = 0; i < category_ids.length; i++) {
                 if (cat == category_ids[i]) {   // The == is important, ids may be strings

@@ -12,6 +12,14 @@
                         <field name="sequence_id" readonly="1" groups="base.group_no_one"/>
                         <field name="active"/>
                     </group>
+                    <separator string="可用的结算账户" colspan="4"/>
+                    <field name="bank_account_ids" colspan="4" nolabel="1" >
+                        <tree string="结算账户">
+                            <field name="name" />
+                            <field name="account_id" />
+                            <field name="balance" />
+                        </tree>
+                    </field>
                     <group name="features" string="功能" >
                         <group>
                             <field name="tip_product_id" />

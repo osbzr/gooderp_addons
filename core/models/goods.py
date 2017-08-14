@@ -57,10 +57,12 @@ class goods(models.Model):
 
     code = fields.Char(u'编号')
     name = fields.Char(u'名称', required=True, copy=False)
-    category_id = fields.Many2one('core.category', u'商品类别',
+    category_id = fields.Many2one('core.category', u'核算类别',
                                   ondelete='restrict',
                                   domain=[('type', '=', 'goods')],
-                                  context={'type': 'goods'}, required=True)
+                                  context={'type': 'goods'}, required=True,
+                                  help=u'从会计科目角度划分的类别',
+                                  )
     uom_id = fields.Many2one('uom', ondelete='restrict',
                              string=u'计量单位', required=True)
     uos_id = fields.Many2one('uom', ondelete='restrict', string=u'辅助单位')
