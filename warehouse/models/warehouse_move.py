@@ -82,6 +82,7 @@ class wh_move(models.Model):
                                   context={'type': 'in'}, copy=True,
                                   help=u'入库类型的移库单对应的入库明细')
     note = fields.Text(u'备注',
+                       copy=False,
                        help=u'可以为该单据添加一些需要的标识信息')
     total_qty = fields.Integer(u'商品总数', compute=_compute_total_qty, store=True,
                                help=u'该移库单的入/出库明细行包含的商品总数')
