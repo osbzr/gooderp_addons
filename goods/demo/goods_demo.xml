@@ -18,6 +18,13 @@
 			<field name="category_id" ref="attribute_color" />
 		</record>
 
+		<record id="fruits_vegetables" model="goods.class">
+          <field name="name">水果蔬菜</field>
+        </record>
+        <record id="partner_services" model="goods.class">
+          <field name="name">原材料</field>
+        </record>
+
 		<!-- 管理批号的商品 -->
 		<record id="mouse" model="goods">
 			<field name="code">001</field>
