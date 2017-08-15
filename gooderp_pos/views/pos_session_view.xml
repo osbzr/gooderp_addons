@@ -38,6 +38,16 @@
                             <field name="stop_at" attrs="{'invisible' : [('state', '!=', 'closed')]}"/>
                         </group>
                     </group>
+                    <separator string="付款方式汇总" attrs="{'invisible' : [('state', '=', 'opening_control')]}"/>
+                    <field name="payment_line_ids" attrs="{'invisible' : [('state', '=', 'opening_control')]}">
+                        <tree string="付款明细">
+                            <field name="session_id" />
+                            <field name="pay_type_id" />
+                            <field name="amount" />
+                            <field name="pay_date" />
+                            <field name="sell_id" />
+                        </tree>
+                    </field>
                 </sheet>
             </form>
         </field>
@@ -103,6 +113,6 @@
         id="menu_pos_session_all"
         parent="menu_gooderp_pos"
         action="action_pos_session"
-        sequence="2"
+        sequence="20"
         groups="group_pos_manager"/>
 </odoo>
