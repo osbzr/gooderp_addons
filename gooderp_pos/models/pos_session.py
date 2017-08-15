@@ -11,6 +11,7 @@ class PosSession(models.Model):
     POS_SESSION_STATE = [
         ('opening_control', '新的工作记录'),  # method action_pos_session_open
         ('opened', '销售过程'),               # method action_pos_session_closing_control
+        ('closing_control', '关闭管理'),  # method action_pos_session_close
         ('closed', '关闭 & 过账'),
     ]
 
@@ -56,6 +57,21 @@ class PosSession(models.Model):
             session.write(values)
             # session.statement_ids.button_open()
         return True
+
+    @api.multi
+    def action_pos_session_close(self):
+        # Close CashBox
+        for session in self:
+            company_id = session.config_id.company_id.id
+            ctx = dict(self.env.context, force_company=company_id, company_id=company_id)
+        # self.with_context(ctx)._confirm_orders()
+        self.write({'state': 'closed'})
+        return {
+            'type': 'ir.actions.client',
+            'name': 'POS菜单',
+            'tag': 'reload',
+            'params': {'menu_id': self.env.ref('gooderp_pos.menu_point_root').id},
+        }
 
     @api.constrains('config_id')
     def _check_pos_config(self):

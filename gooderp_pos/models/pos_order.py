@@ -22,12 +22,8 @@ class SellDelivery(models.Model):
     """
     #TODO:估计还有很多字段上的关联要添加,这个还得进一步的测试.
 
-    def _default_session(self):
-        return self.env['pos.session'].search([('state', '=', 'opened'), ('user_id', '=', self.env.uid)], limit=1)
-
     session_id = fields.Many2one(
         'pos.session', string=u'会话', index=True,
-        domain="[('state', '=', 'opened')]",
         readonly=True)
     config_id = fields.Many2one('pos.config', related='session_id.config_id', string=u"POS")
 
