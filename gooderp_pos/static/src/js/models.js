@@ -281,7 +281,7 @@ odoo.define('gooderp_pos.models', function(require) {
 
             },
         }, {
-            model: 'pos.category',
+            model: 'goods.class',
             fields: ['id', 'name', 'parent_id', 'child_id', 'image'],
             domain: null,
             loaded: function(self, categories) {
@@ -289,7 +289,7 @@ odoo.define('gooderp_pos.models', function(require) {
             },
         }, {
             model: 'goods',
-            fields: ['name', 'price', 'pos_categ_id', 'barcode', 'default_code',
+            fields: ['name', 'price', 'goods_class_id', 'barcode', 'default_code',
                 'to_weight', 'description_sale', 'description','uom_id',
                 'tracking'
             ],

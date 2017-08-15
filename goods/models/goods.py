@@ -21,6 +21,9 @@ class goods(models.Model):
     price = fields.Float(u'零售价')
     barcode = fields.Char(u'条形码')
     note = fields.Text(u'备注')
+    goods_class_id = fields.Many2one(
+        'goods.class', string=u'商品分类',
+        help="Those categories are used to group similar products for point of sale.")
 
     _sql_constraints = [
         ('barcode_uniq', 'unique(barcode)', u'条形码不能重复'),

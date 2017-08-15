@@ -31,6 +31,7 @@
 								<field name='name' required='1'/>
 								<field name='not_saleable'/>
 								<field name='brand'/>
+								<field name='goods_class_id'/>
 								<field name='category_id'/>
 								<field name='uom_id' required='1' />
 								<field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>

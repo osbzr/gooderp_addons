@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="goods_class_form_view" model="ir.ui.view">
+        <field name="name">goods.class.form</field>
+        <field name="model">goods.class</field>
+        <field name="arch" type="xml">
+            <form string="商品分类">
+                <sheet>
+                    <field name="image_medium" widget='image' class="oe_avatar"/>
+                    <div class="oe_left">
+                        <group>
+                            <field name="name"/>
+                            <field name="parent_id"/>
+                            <field name="sequence"/>
+                        </group>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="goods_class_tree_view" model="ir.ui.view">
+        <field name="name">goods.class.tree</field>
+        <field name="model">goods.class</field>
+        <field name="field_parent" eval="False"/>
+        <field name="arch" type="xml">
+            <tree string="商品分类">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

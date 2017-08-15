@@ -2,9 +2,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'POS',
-    'version': '1.0.1',
-    'category': 'pos',
+    'name': 'GOODERP POS',
+    'version': '11.11',
+    'author': "上海开阖软件有限公司",
+    'website': "http://www.osbzr.com",
+    'category': 'gooderp',
     'sequence': 20,
     'summary': 'pos',
     'description': """
@@ -18,7 +20,6 @@
         'views/pos_templates.xml',
         'views/gooderp_pos.xml',
         'views/pos_config_view.xml',
-        'views/pos_category_view.xml',
         'data/gooderp_pos_data.xml',
         'data/gooderp_pos_demo.xml',
     ],
