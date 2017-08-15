@@ -19,6 +19,7 @@
         <record id="goods.goods_menu" model="ir.ui.menu">
 			<field name="create_tag">1</field>
 		</record>
+        <menuitem id="menu_goods_class" name="商品分类" action="goods.goods_class_action" parent="warehouse_master" sequence="20" />
 		<menuitem id='wh_bom_menu' name='物料清单' action='wh_bom_action' parent='warehouse_master' sequence='30' groups='warehouse.assembly_groups' />
 
         <!-- 设置 -->
