@@ -22,6 +22,11 @@ class SellDelivery(models.Model):
     """
     #TODO:估计还有很多字段上的关联要添加,这个还得进一步的测试.
 
+    session_id = fields.Many2one(
+        'pos.session', string=u'会话', index=True,
+        readonly=True)
+    config_id = fields.Many2one('pos.config', related='session_id.config_id', string=u"POS")
+
     def data_handling(self, order_data):
         line_data_list = [[0, 0, {'goods_id': line[2].get('product_id'),
                                   'goods_qty': line[2].get('qty'),
@@ -33,6 +38,7 @@ class SellDelivery(models.Model):
                                   }]
                           for line in order_data.get('lines')]
         sell_order_data = dict(
+            session_id=order_data.get('pos_session_id'),
             partner_id=order_data.get('partner_id') or self.env.ref('gooderp_pos.pos_partner').id,
             user_id=order_data.get('user_id') or 1,
             line_out_ids=line_data_list,
