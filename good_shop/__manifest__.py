@@ -14,6 +14,7 @@ Allows your customers to manage their shopping from a beautiful web interface.
         'sell',
     ],
     'data': [
+             'security/ir.model.access.csv',
              'data/data.xml',
              'views/good_shop_templates.xml',
     ],
