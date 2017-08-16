@@ -4,7 +4,7 @@ import json
 import logging
 from werkzeug.exceptions import Forbidden
 
-from odoo import http, tools, _
+from odoo import http, tools
 from odoo.http import request
 from odoo.addons.base.ir.ir_qweb.fields import nl2br
 from odoo.addons.website.models.website import slug
@@ -16,7 +16,6 @@ _logger = logging.getLogger(__name__)
 
 PPG = 20  # Products Per Page
 PPR = 4   # Products Per Row
-
 
 class TableCompute(object):
 
@@ -122,20 +121,18 @@ class TableCompute(object):
 class WebsiteSale(http.Controller):
 
     def get_attribute_value_ids(self, product):
-        """ list of selectable attributes of a product
+        """ 产品的属性列表
 
-        :return: list of product variant description
-           (variant id, [visible attribute ids], variant price, variant sale price)
+        :return: 产品属性列表
+           [attribute id, [attribute ids], price, sale price]
         """
         # product attributes with at least two choices
         quantity = product._context.get('quantity') or 1
         product = product.with_context(quantity=quantity)
 
-#         visible_attrs_ids = product.attribute_line_ids.filtered(lambda l: len(l.value_ids) > 1).mapped('attribute_id').ids
-#         to_currency = request.website.get_current_pricelist().currency_id
         attribute_ids = []
-        for variant in product.attribute_ids:
-            attribute_ids.append([variant.id, product.attribute_ids, product.price, product.price])
+        for attribute in product.attribute_ids:
+            attribute_ids.append([attribute.id, product.attribute_ids, product.price, product.price])
         return attribute_ids
 
     def _get_search_order(self, post):
@@ -149,11 +146,8 @@ class WebsiteSale(http.Controller):
         if search:
             for srch in search.split(" "):
                 domain += [
-                    '|', '|', '|', ('name', 'ilike', srch), ('description', 'ilike', srch),
-                    ('description_sale', 'ilike', srch), ('product_variant_ids.default_code', 'ilike', srch)]
-
-        if category:
-            domain += [('public_categ_ids', 'child_of', int(category))]
+                    '|', ('name', 'ilike', srch),
+                    ('attribute_ids.default_code', 'ilike', srch)]
 
         if attrib_values:
             attrib = None
@@ -165,11 +159,11 @@ class WebsiteSale(http.Controller):
                 elif value[0] == attrib:
                     ids.append(value[1])
                 else:
-                    domain += [('attribute_line_ids.value_ids', 'in', ids)]
+                    domain += [('attribute_ids.value_ids', 'in', ids)]
                     attrib = value[0]
                     ids = [value[1]]
             if attrib:
-                domain += [('attribute_line_ids.value_ids', 'in', ids)]
+                domain += [('attribute_ids.value_ids', 'in', ids)]
 
         return domain
 
@@ -195,7 +189,7 @@ class WebsiteSale(http.Controller):
         attrib_set = set([v[1] for v in attrib_values])
 
         domain = self._get_search_domain(search, category, attrib_values)
-#         domain += [('not_saleable', '=', False)]
+        domain += [('not_saleable', '=', False)]
 
         keep = QueryURL('/shop', category=category and int(category), search=search, attrib=attrib_list, order=post.get('order'))
 
@@ -229,13 +223,11 @@ class WebsiteSale(http.Controller):
         if products:
             # get all products without limit
             selected_products = Product.search(domain, limit=False)
-#             attributes = ProductAttribute.search([('attribute_line_ids.product_tmpl_id', 'in', selected_products.ids)])
-#         else:
-#             attributes = ProductAttribute.browse(attributes_ids)
+            attributes = ProductAttribute.search([('goods_id', 'in', selected_products.ids)])
+        else:
+            attributes = ProductAttribute.browse(attributes_ids)
 
-#         from_currency = request.env.user.company_id.currency_id
-#         to_currency = pricelist.currency_id
-#         compute_currency = lambda price: from_currency.compute(price, to_currency)
+        # 币别
         for user in request.env['res.users'].browse(request.uid):
             currency = user.company_id.currency_id
 
@@ -245,14 +237,11 @@ class WebsiteSale(http.Controller):
             'attrib_values': attrib_values,
             'attrib_set': attrib_set,
             'pager': pager,
-#             'pricelist': pricelist,
             'products': products,
             'search_count': product_count,  # common for all searchbox
             'bins': TableCompute().process(products, ppg),
             'rows': PPR,
-#             'categories': categs,
-#             'attributes': attributes,
-#             'compute_currency': compute_currency,
+            'attributes': attributes,
             'keep': keep,
             'parent_category_ids': parent_category_ids,
             'currency': currency,
@@ -364,7 +353,7 @@ class WebsiteSale(http.Controller):
         value['cart_quantity'] = order.cart_quantity
         from_currency = order.company_id.currency_id
         to_currency = order.pricelist_id.currency_id
-        value['website_sale.cart_lines'] = request.env['ir.ui.view'].render_template("website_sale.cart_lines", {
+        value['website_sale.cart_lines'] = request.env['ir.ui.view'].render_template("good_shop.cart_lines", {
             'website_sale_order': order,
             'compute_currency': lambda price: from_currency.compute(price, to_currency),
 #             'suggested_products': order._cart_accessories()

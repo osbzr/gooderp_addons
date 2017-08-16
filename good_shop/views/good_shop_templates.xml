@@ -45,7 +45,6 @@
                             <t t-call="good_shop.search">
                                 <t t-set="search_class" t-value="'pagination form-inline o_website_sale_search'"/>
                             </t>
-                            <!-- <t t-call="good_shop.pricelist_list" /> -->
                             <!-- <t t-call="website.pager" /> -->
                         </div>
                     </div>
@@ -89,7 +88,7 @@
             </div>
         </t>
     </template>
-    
+
     <template id="search" name="Search Box">
         <form t-att-action="keep('/shop'+ ('/category/'+slug(category)) if category else None, search=0)" method="get" t-att-class="search_class">
             <t t-if="attrib_values">
@@ -101,7 +100,7 @@
         </form>
     </template>
     
-     <!-- /shop and /shop/cart； 某一个产品页面定义-->
+     <!-- /shop and /shop/cart； 某一个产品页面定义 -->
     <template id="products_item" name="Products item">
         <form action="/shop/cart/update" method="post">
             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
@@ -221,24 +220,13 @@
             </div>
         </t>
     </template>
-    
+
     <template id="goods_price">
       <div itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer" class="product_price mt16">
           <h4 class="oe_price_h4 css_editable_mode_hidden">
-              <!-- <span class="text-danger oe_default_price" style="text-decoration: line-through; white-space: nowrap;"
-                t-esc="product.price" t-options="{'widget': 'monetary'}"></span> -->
-
               <b class="oe_price" style="white-space: nowrap;" t-esc="product.price" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
               <span itemprop="price" style="display:none;" t-esc="product.price"/>
-              <!-- <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/> -->
           </h4>
-          <!-- <h4 class="css_non_editable_mode_hidden decimal_precision" t-att-data-precision="str(product.currency_id.decimal_places)">
-            <span t-field="product.lst_price"
-                t-options='{
-                   "widget": "monetary",
-                   "display_currency": product.currency_id,
-               }'/>
-          </h4> -->
           <h4 class="hidden oe_not_available bg-warning">产品不可销售</h4>
       </div>
     </template>
@@ -256,7 +244,7 @@
         </div>
       </xpath>
     </template>
-    
+
     <template id="product_variants" inherit_id="good_shop.product" active="False" customize_show="True" name="List View of Variants">
       <xpath expr="//t[@t-placeholder='select']" position="replace">
         <input type="hidden" t-if="len(product.attribute_ids) == 1" name="product_id" t-att-value="product.attribute_ids[0].id"/>
@@ -267,91 +255,44 @@
           <label label-default="label-default" class="radio" t-foreach="product.attribute_ids" t-as="variant_id">
             <input type="radio" name="product_id" class="js_product_change" t-att-value="variant_id.id" t-att-data-lst_price="product.price" t-att-data-price="product.price"/>
             <span t-esc="variant_id.value_id.name"/>
-            <!-- <span class="badge" t-if="variant_id.price">
-              <t t-esc="variant_id.price_extra > 0 and '+' or ''"/><span t-field="variant_id.price_extra" style="white-space: nowrap;" t-options='{
-                    "widget": "monetary",
-                    "from_currency": product.currency_id,
-                    "display_currency": website.currency_id
-                  }'/>
-            </span> -->
           </label>
         </t>
       </xpath>
     </template>
     
     <template id="variants">
-        <t t-set="attribute_ids" t-value="get_attribute_value_ids(product)"/>
-        <t t-foreach="product.attribute_ids.sorted(key=lambda x: x.attribute_id.id)" t-as="variant_id">
+        <!-- <t t-set="attribute_ids" t-value="get_attribute_value_ids(product)"/>
+        <t t-foreach="product.attribute_ids.sorted(key=lambda x: x.id)" t-as="variant_id">
             <t t-foreach="variant_id.value_ids" t-as="value_id">
                 <strong t-field="value_id.value_id.name"/>
             </t>
-        </t>
-      <!-- <t t-set="attribute_value_ids" t-value="get_attribute_value_ids(product)"/>
-      <ul t-attf-class="list-unstyled js_add_cart_variants #{ul_class}" t-att-data-attribute_value_ids="attribute_value_ids">
-        <t t-foreach="product.attribute_line_ids.sorted(key=lambda x: x.attribute_id.sequence)" t-as="variant_id">
-          <li t-if="len(variant_id.value_ids) > 1">
+        </t> -->
+      <t t-set="attribute_ids" t-value="get_attribute_value_ids(product)"/>
+      <ul t-attf-class="list-unstyled js_add_cart_variants #{ul_class}" t-att-data-attribute_value_ids="attribute_ids">
+        <t t-foreach="product.attribute_ids" t-as="attribute_id">
+          <li t-if="len(attribute_id.value_ids) >= 1">
+            <strong t-field="attribute_id.name"/>
 
-            <strong t-field="variant_id.attribute_id.name"/>
+            <!-- 属性配置 -->
 
-            <t t-if="variant_id.attribute_id.type in ['select', 'hidden']">
-              <select t-attf-class="form-control #{'js_variant_change' if variant_id.attribute_id.create_variant else ''}" t-att-name="'attribute-%s-%s' % (product.id, variant_id.attribute_id.id)">
-                <t t-foreach="variant_id.value_ids" t-as="value_id">
-                  <option t-att-value="value_id.id">
-                      <span t-field="value_id.name"/>
-                      <span t-if="value_id.price_extra">
-                          <t t-esc="value_id.price_extra > 0 and '+' or ''"/><span t-field="value_id.price_extra" style="white-space: nowrap;" t-options='{
-                                   "widget": "monetary",
-                                    "from_currency": product.currency_id,
-                                   "display_currency": website.currency_id
-                               }'/>
-                      </span>
-                  </option>
-                </t>
-              </select>
-            </t>
-
-            <t t-if="variant_id.attribute_id.type == 'radio'">
-              <ul class="list-unstyled">
-                  <t t-set="inc" t-value="0"/>
-                  <t t-foreach="variant_id.value_ids" t-as="value_id">
-                      <li class="form-group js_attribute_value" style="margin: 0;">
-                          <label class="control-label" style="margin: 0 20px;">
-                              <input type="radio" t-att-checked="'checked' if not inc else None" t-att-name="'attribute-%s-%s' % (product.id, variant_id.attribute_id.id)" t-att-value="value_id.id" style="vertical-align: top; margin-right: 10px;"/>
-                              <span t-field="value_id.value_id.name"/>
-                              <span class="badge" t-if="value_id.price_extra">
-                                  <t t-esc="value_id.price_extra > 0 and '+' or ''"/><span t-field="value_id.price_extra" style="white-space: nowrap;" t-options='{
-                                          "widget": "monetary",
-                                          "from_currency": product.currency_id,
-                                          "display_currency": website.currency_id
-                                       }'/>
-                              </span>
-                          </label>
-                      </li>
-                      <t t-set="inc" t-value="inc+1"/>
-                  </t>
-              </ul>
-            </t>
-
-            <t t-if="variant_id.attribute_id.type == 'color'">
               <ul class="list-inline">
-                  <t t-set="inc" t-value="0"/>
-                  <li t-foreach="variant_id.value_ids" t-as="value_id">
-                      <label t-attf-style="background-color:#{value_id.html_color or value_id.name}"
-                          t-attf-class="css_attribute_color #{'active' if not inc else ''}">
-                        <input type="radio" t-att-class="'js_variant_change' if variant_id.attribute_id.create_variant else None"
+                  <t t-set="inc" t-value="0"></t>
+                  <li t-foreach="attribute_id.value_ids" t-as="value_id">
+                      <!-- <label t-attf-style="background-color:#{value_id.value_id.name}"
+                          t-attf-class="css_attribute_color #{'active' if not inc else ''}"> -->
+                        <!-- <input type="radio" t-att-class="'js_variant_change'"
                           t-att-checked="'checked' if not inc else None"
-                          t-att-name="'attribute-%s-%s' % (product.id, variant_id.attribute_id.id)"
-                          t-att-value="value_id.id"
-                          t-att-title="value_id.name"/>
-                      </label>
-                      <t t-set="inc" t-value="inc+1"/>
+                          t-att-name="'attribute-%s-%s' % (product.id, attribute_id.name)"
+                          t-att-value="value_id.value_id.id"
+                          t-att-title="value_id.value_id.name"/> -->
+                      <!-- </label> -->
+                      <t t-set="inc" t-value="inc+1"></t>
                   </li>
               </ul>
-            </t>
 
           </li>
         </t>
-      </ul> -->
+      </ul>
     </template>
 
     <template id="cart" name="Shopping Cart">
@@ -394,15 +335,15 @@
     
     <template id="cart_lines" name="Shopping Cart Lines">
         <div t-if="not website_sale_order or not website_sale_order.website_order_line" class="js_cart_lines well well-lg">
-          Your cart is empty!
+          购物车是空的。
         </div>
         <table class="table table-striped table-condensed js_cart_lines" id="cart_products" t-if="website_sale_order and website_sale_order.website_order_line">
             <thead>
                 <tr>
-                    <th width="100">Product</th>
+                    <th width="100">产品</th>
                     <th></th>
-                    <th width="130" class="text-center">Quantity</th>
-                    <th width="100" class="text-center">Price</th>
+                    <th width="130" class="text-center">数量</th>
+                    <th width="100" class="text-center">价格</th>
                 </tr>
             </thead>
             <tbody>
@@ -414,7 +355,7 @@
                         </td>
                         <td t-if="line.goods_id">
                             <div>
-                                <a t-attf-href="/shop/product/#{ slug(line.product_id.product_tmpl_id) }">
+                                <a t-attf-href="/shop/product/#{ slug(line.goods_id) }">
                                     <strong t-esc="line.goods_id.name" />
                                     <!-- <strong t-esc="line.goods_id.with_context(display_default_code=False).name" /> -->
                                 </a>
@@ -431,7 +372,7 @@
                                 <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
                                     <i class="fa fa-minus"></i>
                                 </a>
-                                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id" t-att-value="int(line.product_uom_qty)" />
+                                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.goods_id.id" t-att-value="int(line.quantity)" />
                                 <a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json" data-no-instant="">
                                     <i class="fa fa-plus"></i>
                                 </a>
@@ -443,7 +384,7 @@
                             </t> -->
                             <!-- <span t-field="line.price_reduce_taxexcl" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': website_sale_order.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_subtotal" /> -->
                             <!-- <span t-field="line.price_reduce_taxinc" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': website_sale_order.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_total" /> -->
-                            <span t-field="line.price" style="white-space: nowrap;" t-options="{'widget': 'monetary'}"/>
+                            <span t-field="line.price" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'display_currency': line.order_id.currency_id}"/>
                         </td>
                     </tr>
                 </t>
@@ -454,6 +395,29 @@
                 <t t-set='extra_class' t-value='"col-sm-4 col-sm-offset-8 col-xs-12"'/>
             </t>
         </div> -->
+    </template>
+
+    <template id="products_attributes" inherit_id="good_shop.products" active="False" customize_show="True" name="Product Attribute's Filters">
+        <xpath expr="//div[@id='products_grid_before']" position="inside">
+            <form class="js_attributes" method="get">
+                <input type="hidden" name="search" t-att-value="search" />
+                <ul class="nav nav-pills nav-stacked mt16">
+                    <t t-foreach="attributes" t-as="a">
+                        <li t-if="a.value_ids and len(a.value_ids) &gt; 1">
+                            <div>
+                                <strong t-field="a.name" />
+                            </div>
+                        </li>
+                    </t>
+                </ul>
+            </form>
+        </xpath>
+        <xpath expr="//div[@id='products_grid_before']" position="attributes">
+            <attribute name="class">col-md-3 hidden-xs</attribute>
+        </xpath>
+        <xpath expr="//div[@id='products_grid']" position="attributes">
+            <attribute name="class">col-md-9</attribute>
+        </xpath>
     </template>
 
 </odoo>

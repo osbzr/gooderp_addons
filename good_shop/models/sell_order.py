@@ -47,7 +47,8 @@ class sell_order(models.Model):
         product = self.env['goods'].browse(product_id)
 
         # split lines with the same product if it has untracked attributes
-        if product and product.mapped('attribute_ids').filtered(lambda r: not r.attribute_id.create_variant) and not line_id:
+#          and product.mapped('attribute_ids').filtered(lambda r: not r.attribute_id.create_variant) and not line_id
+        if product:
             return self.env['sell.order.line']
 
         domain = [('order_id', '=', self.id), ('goods_id', '=', product_id)]
@@ -66,19 +67,14 @@ class sell_order(models.Model):
             'date': order.date,
         })
         product = self.env['goods'].with_context(product_context).browse(product_id)
-#         pu = product.price
-#         if order.partner_id:
-#             order_line = order._cart_find_product_line(product.id)
-#             if order_line:
-#                 pu = self.env['account.tax']._fix_tax_included_price(pu, product.taxes_id, order_line[0].tax_id)
 
         return {
             'goods_id': product_id,
-            'product_uom_qty': qty,
+            'quantity': qty,
             'order_id': order_id,
             'uom_id': product.uom_id.id,
-#             'attribute_id': 
-#             'price_unit': pu,
+            'price': product.price,
+#             'attribute_id': product.attribute_ids and product.attribute_ids[0].value_ids or False
         }
 
     @api.multi
@@ -110,23 +106,24 @@ class sell_order(models.Model):
 
     @api.multi
     def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attributes=None, **kwargs):
-        """ Add or set product quantity, add_qty can be negative """
+        """ 添加或者设置产品数量 """
         self.ensure_one()
         SaleOrderLineSudo = self.env['sell.order.line'].sudo()
         quantity = 0
         order_line = False
         if self.state != 'draft':
             request.session['sale_order_id'] = None
-            raise UserError(_('It is forbidden to modify a sale order which is not in draft status'))
+            raise UserError(u'请先新建销售订单')
+
         if line_id is not False:
             order_lines = self._cart_find_product_line(product_id, line_id, **kwargs)
             order_line = order_lines and order_lines[0]
 
-        # Create line if no line with product_id can be located
+        # 不存在产品的销售明细行，则新建
         if not order_line:
             values = self._website_product_id_change(self.id, product_id, qty=1)
             values['name'] = self._get_line_description(self.id, product_id, attributes=attributes)
-            print "values", values
+
             order_line = SaleOrderLineSudo.create(values)
 
             if add_qty:
@@ -349,9 +346,12 @@ class Website(models.Model):
         self.ensure_one()
         partner = self.env.user.gooderp_partner_id
         if not partner:
-            print "yyyyyyyy"
-            return
-        print "request.session.get('sale_order_id')", request.session.get('sale_order_id')
+            partner = self.env['partner'].create({
+                                        'name': self.env.user.name,
+                                        'c_category_id': self.env.ref('good_shop.portal_customer_category').id,
+                                        'main_mobile': '123456789',
+                                        })
+            self.env.user.gooderp_partner_id = partner.id
         sale_order_id = request.session.get('sale_order_id')
         if not sale_order_id:
             last_order = partner.last_website_so_id
@@ -363,30 +363,15 @@ class Website(models.Model):
 
         # create so if needed
         if not sale_order and (force_create or code):
-            print "in"
             # TODO cache partner_id session
             so_data = self._prepare_sale_order_values(partner)
             sale_order = self.env['sell.order'].sudo().create(so_data)
-
-#             # set fiscal position
-#             if request.website.partner_id.id != partner.id:
-#                 sale_order.onchange_partner_shipping_id()
-#             else: # For public user, fiscal position based on geolocation
-#                 country_code = request.session['geoip'].get('country_code')
-#                 if country_code:
-#                     country_id = request.env['res.country'].search([('code', '=', country_code)], limit=1).id
-#                     fp_id = request.env['account.fiscal.position'].sudo()._get_fpos_by_region(country_id)
-#                     sale_order.fiscal_position_id = fp_id
-#                 else:
-#                     # if no geolocation, use the public user fp
-#                     sale_order.onchange_partner_shipping_id()
 
             request.session['sale_order_id'] = sale_order.id
 
             if request.website.gooderp_partner_id.id != partner.id:
                 partner.write({'last_website_so_id': sale_order.id})
 
-        print "sale 11", sale_order
         if sale_order:
             # case when user emptied the cart
             if not request.session.get('sale_order_id'):
@@ -404,7 +389,6 @@ class Website(models.Model):
             request.session['sale_order_id'] = None
             return None
 
-        print "sale", sale_order
         return sale_order
 
     def sale_get_transaction(self):
