@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<!-- 继承客户 form -->
+		<record id="portal_customer_address_form_inherit" model="ir.ui.view">
+			<field name="name">portal.customer.address.form.inherit</field>
+			<field name="model">partner</field>
+            <field name='inherit_id' ref='core.customer_address_form'/>
+            <field name="arch" type="xml">
+                <xpath expr='//sheet' position='before'>
+                    <header>
+                        <button name="partner_create_user" string="创建对应用户" type="object" class="oe_highlight"/>
+                    </header>
+                </xpath>
+			</field>
+		</record>
+
+		<!-- 继承供应商 form -->
+        <record id="portal_supplier_address_form_inherit" model="ir.ui.view">
+            <field name="name">portal.supplier.address.form.inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.supplier_address_form'/>
+            <field name="arch" type="xml">
+                <xpath expr='//sheet' position='before'>
+                    <header>
+                        <button name="partner_create_user" string="创建对应用户" type="object" class="oe_highlight"/>
+                    </header>
+                </xpath>
+            </field>
+        </record>
+	</data>
+</openerp>
