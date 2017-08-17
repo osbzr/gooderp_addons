@@ -8,10 +8,11 @@
                 <header>
                      <button name="action_pos_session_open" type="object" string="开启工作记录" states="opening_control"
                        class="oe_highlight"/>
-                    <button name="open_frontend_cb" type="object" string="销售" states="opened"
+                    <button name="open_frontend_cb" type="object" string="销售"
+                            states="opened"
                         class="oe_highlight"/>
                     <button name="action_pos_session_close" type="object" string="确认关闭并过账"
-                            states="closing_control"
+                            states="opened"
                         class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="opening_control,opened,closed" nolabel="1" />
                     
