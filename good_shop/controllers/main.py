@@ -4,7 +4,7 @@ import json
 import logging
 from werkzeug.exceptions import Forbidden
 
-from odoo import http, tools, _
+from odoo import http, tools
 from odoo.http import request
 from odoo.addons.base.ir.ir_qweb.fields import nl2br
 from odoo.addons.website.models.website import slug
@@ -16,7 +16,6 @@ _logger = logging.getLogger(__name__)
 
 PPG = 20  # Products Per Page
 PPR = 4   # Products Per Row
-
 
 class TableCompute(object):
 
@@ -122,20 +121,18 @@ class TableCompute(object):
 class WebsiteSale(http.Controller):
 
     def get_attribute_value_ids(self, product):
-        """ list of selectable attributes of a product
+        """ 产品的属性列表
 
-        :return: list of product variant description
-           (variant id, [visible attribute ids], variant price, variant sale price)
+        :return: 产品属性列表
+           [attribute id, [attribute ids], price, sale price]
         """
         # product attributes with at least two choices
         quantity = product._context.get('quantity') or 1
         product = product.with_context(quantity=quantity)
 
-#         visible_attrs_ids = product.attribute_line_ids.filtered(lambda l: len(l.value_ids) > 1).mapped('attribute_id').ids
-#         to_currency = request.website.get_current_pricelist().currency_id
         attribute_ids = []
-        for variant in product.attribute_ids:
-            attribute_ids.append([variant.id, product.attribute_ids, product.price, product.price])
+        for attribute in product.attribute_ids:
+            attribute_ids.append([attribute.id, product.attribute_ids, product.price, product.price])
         return attribute_ids
 
     def _get_search_order(self, post):
@@ -149,11 +146,8 @@ class WebsiteSale(http.Controller):
         if search:
             for srch in search.split(" "):
                 domain += [
-                    '|', '|', '|', ('name', 'ilike', srch), ('description', 'ilike', srch),
-                    ('description_sale', 'ilike', srch), ('product_variant_ids.default_code', 'ilike', srch)]
-
-        if category:
-            domain += [('public_categ_ids', 'child_of', int(category))]
+                    '|', ('name', 'ilike', srch),
+                    ('attribute_ids.default_code', 'ilike', srch)]
 
         if attrib_values:
             attrib = None
@@ -165,11 +159,11 @@ class WebsiteSale(http.Controller):
                 elif value[0] == attrib:
                     ids.append(value[1])
                 else:
-                    domain += [('attribute_line_ids.value_ids', 'in', ids)]
+                    domain += [('attribute_ids.value_ids', 'in', ids)]
                     attrib = value[0]
                     ids = [value[1]]
             if attrib:
-                domain += [('attribute_line_ids.value_ids', 'in', ids)]
+                domain += [('attribute_ids.value_ids', 'in', ids)]
 
         return domain
 
@@ -195,7 +189,7 @@ class WebsiteSale(http.Controller):
         attrib_set = set([v[1] for v in attrib_values])
 
         domain = self._get_search_domain(search, category, attrib_values)
-#         domain += [('not_saleable', '=', False)]
+        domain += [('not_saleable', '=', False)]
 
         keep = QueryURL('/shop', category=category and int(category), search=search, attrib=attrib_list, order=post.get('order'))
 
@@ -205,7 +199,7 @@ class WebsiteSale(http.Controller):
         if search:
             post["search"] = search
         if category:
-            category = request.env['product.public.category'].browse(int(category))
+            category = request.env['goods.class'].browse(int(category))
             url = "/shop/category/%s" % slug(category)
         if attrib_list:
             post['attrib'] = attrib_list
@@ -229,13 +223,11 @@ class WebsiteSale(http.Controller):
         if products:
             # get all products without limit
             selected_products = Product.search(domain, limit=False)
-#             attributes = ProductAttribute.search([('attribute_line_ids.product_tmpl_id', 'in', selected_products.ids)])
-#         else:
-#             attributes = ProductAttribute.browse(attributes_ids)
+            attributes = ProductAttribute.search([('goods_id', 'in', selected_products.ids)])
+        else:
+            attributes = ProductAttribute.browse(attributes_ids)
 
-#         from_currency = request.env.user.company_id.currency_id
-#         to_currency = pricelist.currency_id
-#         compute_currency = lambda price: from_currency.compute(price, to_currency)
+        # 币别
         for user in request.env['res.users'].browse(request.uid):
             currency = user.company_id.currency_id
 
@@ -245,14 +237,11 @@ class WebsiteSale(http.Controller):
             'attrib_values': attrib_values,
             'attrib_set': attrib_set,
             'pager': pager,
-#             'pricelist': pricelist,
             'products': products,
             'search_count': product_count,  # common for all searchbox
             'bins': TableCompute().process(products, ppg),
             'rows': PPR,
-#             'categories': categs,
-#             'attributes': attributes,
-#             'compute_currency': compute_currency,
+            'attributes': attributes,
             'keep': keep,
             'parent_category_ids': parent_category_ids,
             'currency': currency,
@@ -261,16 +250,17 @@ class WebsiteSale(http.Controller):
             values['main_object'] = category
         return request.render("good_shop.products", values)
 
+    # 点击界面上的某一个产品
     @http.route(['/shop/product/<model("goods"):product>'], type='http', auth="public", website=True)
     def product(self, product, category='', search='', **kwargs):
         product_context = dict(request.env.context,
                                active_id=product.id,
-                               partner=request.env.user.partner_id)
-#         ProductCategory = request.env['product.public.category']
+                               partner=request.env.user.gooderp_partner_id)
+        ProductCategory = request.env['goods.class']
 #         Rating = request.env['rating.rating']
 
-#         if category:
-#             category = ProductCategory.browse(int(category)).exists()
+        if category:
+            category = ProductCategory.browse(int(category)).exists()
 
         attrib_list = request.httprequest.args.getlist('attrib')
         attrib_values = [map(int, v.split("-")) for v in attrib_list if v]
@@ -281,7 +271,8 @@ class WebsiteSale(http.Controller):
         if not product_context.get('pricelist'):
 #             product_context['pricelist'] = pricelist.id
             product = product.with_context(product_context)
-        
+
+        # 货币取当前登录用户公司对应的货币
         for user in request.env['res.users'].browse(request.uid):
             currency = user.company_id.currency_id
 
@@ -298,23 +289,7 @@ class WebsiteSale(http.Controller):
         }
         return request.render("good_shop.product", values)
 
-    @http.route(['/shop/change_pricelist/<model("product.pricelist"):pl_id>'], type='http', auth="public", website=True)
-    def pricelist_change(self, pl_id, **post):
-        if (pl_id.selectable or pl_id == request.env.user.partner_id.property_product_pricelist) \
-                and request.website.is_pricelist_available(pl_id.id):
-            request.session['website_sale_current_pl'] = pl_id.id
-            request.website.sale_get_order(force_pricelist=pl_id.id)
-        return request.redirect(request.httprequest.referrer or '/shop')
-
-    @http.route(['/shop/pricelist'], type='http', auth="public", website=True)
-    def pricelist(self, promo, **post):
-        pricelist = request.env['product.pricelist'].sudo().search([('code', '=', promo)], limit=1)
-        if pricelist and not request.website.is_pricelist_available(pricelist.id):
-            return request.redirect("/shop/cart?code_not_available=1")
-
-        request.website.sale_get_order(code=promo)
-        return request.redirect("/shop/cart")
-
+    # 点击购物车
     @http.route(['/shop/cart'], type='http', auth="public", website=True)
     def cart(self, **post):
         order = request.website.sale_get_order()
@@ -326,13 +301,14 @@ class WebsiteSale(http.Controller):
         }
 
         if post.get('type') == 'popover':
-            return request.render("website_sale.cart_popover", values)
+            return request.render("good_shop.cart_popover", values)
 
         if post.get('code_not_available'):
             values['code_not_available'] = post.get('code_not_available')
 
         return request.render("good_shop.cart", values)
 
+    # 点击 加入购物车
     @http.route(['/shop/cart/update'], type='http', auth="public", methods=['POST'], website=True, csrf=False)
     def cart_update(self, product_id, add_qty=1, set_qty=0, **kw):
         request.website.sale_get_order(force_create=1)._cart_update(
@@ -341,6 +317,8 @@ class WebsiteSale(http.Controller):
             set_qty=float(set_qty),
             attributes=self._filter_attributes(**kw),
         )
+
+        # 进入购物车
         return request.redirect("/shop/cart")
 
     def _filter_attributes(self, **kw):
@@ -362,11 +340,51 @@ class WebsiteSale(http.Controller):
 
         order = request.website.sale_get_order()
         value['cart_quantity'] = order.cart_quantity
-        from_currency = order.company_id.currency_id
-        to_currency = order.pricelist_id.currency_id
-        value['website_sale.cart_lines'] = request.env['ir.ui.view'].render_template("website_sale.cart_lines", {
+#         from_currency = order.company_id.currency_id
+#         to_currency = order.pricelist_id.currency_id
+        value['good_shop.cart_lines'] = request.env['ir.ui.view'].render_template("good_shop.cart_lines", {
             'website_sale_order': order,
-            'compute_currency': lambda price: from_currency.compute(price, to_currency),
+            'compute_currency': lambda price: price,
 #             'suggested_products': order._cart_accessories()
         })
         return value
+
+    @http.route(['/shop/checkout'], type='http', auth="public", website=True)
+    def checkout(self, **post):
+        order = request.website.sale_get_order()
+        # TODO
+        return request.redirect('/shop')
+
+        redirection = self.checkout_redirection(order)
+        if redirection:
+            return redirection
+
+        if order.partner_id.id == request.website.user_id.sudo().partner_id.id:
+            return request.redirect('/shop/address')
+
+        for f in self._get_mandatory_billing_fields():
+            if not order.partner_id[f]:
+                return request.redirect('/shop/address?partner_id=%d' % order.partner_id.id)
+
+        values = self.checkout_values(**post)
+
+        # Avoid useless rendering if called in ajax
+        if post.get('xhr'):
+            return 'ok'
+        return request.render("website_sale.checkout", values)
+    
+    # ------------------------------------------------------
+    # Checkout
+    # ------------------------------------------------------
+
+    def checkout_redirection(self, order):
+        # must have a draft sale order with lines at this point, otherwise reset
+        if not order or order.state != 'draft':
+            request.session['sale_order_id'] = None
+            request.session['sale_transaction_id'] = None
+            return request.redirect('/shop')
+
+        # if transaction pending / done: redirect to confirmation
+        tx = request.env.context.get('website_sale_transaction')
+        if tx and tx.state != 'draft':
+            return request.redirect('/shop/payment/confirmation/%s' % order.id)
