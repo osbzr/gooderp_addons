@@ -136,6 +136,19 @@ class test_buy_order(TransactionCase):
         with self.assertRaises(UserError):
             self.order.buy_order_draft()
 
+    def test_buy_order_draft_with_prepayment(self):
+        '''有预付款的采购订单反审核'''
+        # 输入预付款和结算账户
+        bank_account = self.env.ref('core.alipay')
+        bank_account.balance = 1000000
+        self.order.prepayment = 100
+        self.order.bank_account_id = bank_account
+        self.order.buy_order_done()
+        money_order = self.env['money.order'].search([
+            ('origin_name','=',self.order.name)])
+        money_order.money_order_done()
+        self.order.buy_order_draft()
+
     def test_buy_generate_receipt(self):
         '''测试采购订单生成入库单,批次管理拆分折扣金额'''
         # 采购订单
