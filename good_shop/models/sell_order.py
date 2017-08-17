@@ -10,24 +10,26 @@ from odoo.exceptions import UserError, ValidationError
 _logger = logging.getLogger(__name__)
 
 
-class sell_order(models.Model):
-    _inherit = "sell.order"
+class sell_delivery(models.Model):
+    _inherit = "sell.delivery"
 
-    website_order_line = fields.One2many(
-        'sell.order.line', 'order_id',
-        string='Order Lines displayed on Website', readonly=True,
-        help='Order Lines to be displayed on the website. They should not be used for computation purpose.',
-    )
-    cart_quantity = fields.Integer(compute='_compute_cart_info', string='Cart Quantity')
+    website_order_line = fields.One2many(related='sell_move_id.line_out_ids',
+                                         relation='wh.move.line',
+                                         string=u'显示在网页上的发货订单行',
+                                         readonly=True
+                                         )
+    cart_quantity = fields.Integer(compute='_compute_cart_info',
+                                   string=u'购物车产品数量')
 #     payment_acquirer_id = fields.Many2one('payment.acquirer', string='Payment Acquirer', copy=False)
 #     payment_tx_id = fields.Many2one('payment.transaction', string='Transaction', copy=False)
     only_services = fields.Boolean(compute='_compute_cart_info', string='Only Services')
 
     @api.multi
-    @api.depends('website_order_line.quantity', 'website_order_line.goods_id')
+    @api.depends('website_order_line.goods_qty', 'website_order_line.goods_id')
     def _compute_cart_info(self):
+        ''' 计算购物车产品数量 '''
         for order in self:
-            order.cart_quantity = int(sum(order.mapped('website_order_line.quantity')))
+            order.cart_quantity = int(sum(order.mapped('website_order_line.goods_qty')))
             order.only_services = all(l.goods_id.not_saleable for l in order.website_order_line)
 
     @api.model
@@ -48,32 +50,34 @@ class sell_order(models.Model):
 
         # split lines with the same product if it has untracked attributes
 #          and product.mapped('attribute_ids').filtered(lambda r: not r.attribute_id.create_variant) and not line_id
-        if product:
-            return self.env['sell.order.line']
+#         if product and not line_id:
+#             print "product000", product
+#             return self.env['sell.order.line']
 
-        domain = [('order_id', '=', self.id), ('goods_id', '=', product_id)]
+        domain = [('move_id', '=', self.sell_move_id.id), ('goods_id', '=', product_id)]
         if line_id:
             domain += [('id', '=', line_id)]
-        return self.env['sell.order.line'].sudo().search(domain)
+        return self.env['wh.move.line'].sudo().search(domain)
 
     @api.multi
-    def _website_product_id_change(self, order_id, product_id, qty=0):
-        order = self.sudo().browse(order_id)
+    def _website_product_id_change(self, delivery, product_id, qty=0):
+        order = self.sudo().browse(delivery.id)
         product_context = dict(self.env.context)
 
         product_context.update({
             'partner': order.partner_id.id,
-            'quantity': qty,
+            'goods_qty': qty,
             'date': order.date,
         })
-        product = self.env['goods'].with_context(product_context).browse(product_id)
+        product = self.env['goods'].sudo().with_context(product_context).browse(product_id)
 
         return {
             'goods_id': product_id,
-            'quantity': qty,
-            'order_id': order_id,
+            'goods_qty': qty,
+            'move_id': delivery.sell_move_id.id,
             'uom_id': product.uom_id.id,
-            'price': product.price,
+            'price_taxed': product.price,
+            'type': 'out',
 #             'attribute_id': product.attribute_ids and product.attribute_ids[0].value_ids or False
         }
 
@@ -108,7 +112,7 @@ class sell_order(models.Model):
     def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attributes=None, **kwargs):
         """ 添加或者设置产品数量 """
         self.ensure_one()
-        SaleOrderLineSudo = self.env['sell.order.line'].sudo()
+        SaleOrderLineSudo = self.env['wh.move.line'].sudo()
         quantity = 0
         order_line = False
         if self.state != 'draft':
@@ -121,9 +125,8 @@ class sell_order(models.Model):
 
         # 不存在产品的销售明细行，则新建
         if not order_line:
-            values = self._website_product_id_change(self.id, product_id, qty=1)
-            values['name'] = self._get_line_description(self.id, product_id, attributes=attributes)
-
+            values = self._website_product_id_change(self, product_id, qty=1)
+#             values['note'] = self._get_line_description(self.id, product_id, attributes=attributes)
             order_line = SaleOrderLineSudo.create(values)
 
             if add_qty:
@@ -133,21 +136,21 @@ class sell_order(models.Model):
         if set_qty:
             quantity = set_qty
         elif add_qty is not None:
-            quantity = order_line.quantity + (add_qty or 0)
+            quantity = order_line.goods_qty + (add_qty or 0)
 
         # Remove zero of negative lines
         if quantity <= 0:
             order_line.unlink()
         else:
             # update line
-            values = self._website_product_id_change(self.id, product_id, qty=quantity)
+            values = self._website_product_id_change(self, product_id, qty=quantity)
             if not self.env.context.get('fixed_price'):
                 order = self.sudo().browse(self.id)
                 product_context = dict(self.env.context)
 
                 product_context.update({
                     'partner': order.partner_id.id,
-                    'quantity': quantity,
+                    'goods_qty': quantity,
                     'date': order.date,
                 })
                 product = self.env['goods'].with_context(product_context).browse(product_id)
@@ -159,7 +162,7 @@ class sell_order(models.Model):
 
             order_line.write(values)
 
-        return {'line_id': order_line.id, 'quantity': quantity}
+        return {'line_id': order_line.id, 'goods_qty': quantity}
 
     def _cart_accessories(self):
         """ Suggest accessories based on 'Accessory Products' of products in cart """
@@ -312,6 +315,7 @@ class Website(models.Model):
 
     @api.multi
     def _prepare_sale_order_values(self, partner):
+        ''' 创建销售订单数据 '''
         self.ensure_one()
 #         affiliate_id = request.session.get('affiliate_id')
 #         salesperson_id = affiliate_id if self.env['res.users'].sudo().browse(affiliate_id).exists() else request.website.salesperson_id.id
@@ -319,6 +323,7 @@ class Website(models.Model):
 #         default_user_id = partner.parent_id.user_id.id or partner.user_id.id
         values = {
             'partner_id': partner.id,
+            'currency_id': self.env.user.company_id.currency_id.id,
 #             'payment_term_id': self.sale_get_payment_term(partner),
 #             'team_id': self.salesteam_id.id,
 #             'partner_invoice_id': addr['invoice'],
@@ -344,14 +349,16 @@ class Website(models.Model):
         :returns: browse record for the current sale order
         """
         self.ensure_one()
+        # 客户
         partner = self.env.user.gooderp_partner_id
         if not partner:
-            partner = self.env['partner'].create({
+            partner = self.env['partner'].sudo().create({
                                         'name': self.env.user.name,
                                         'c_category_id': self.env.ref('good_shop.portal_customer_category').id,
                                         'main_mobile': '123456789',
                                         })
             self.env.user.gooderp_partner_id = partner.id
+
         sale_order_id = request.session.get('sale_order_id')
         if not sale_order_id:
             last_order = partner.last_website_so_id
@@ -359,13 +366,13 @@ class Website(models.Model):
             sale_order_id = last_order.state == 'draft' and last_order.id
 
         # Test validity of the sale_order_id
-        sale_order = self.env['sell.order'].sudo().browse(sale_order_id).exists() if sale_order_id else None
+        sale_order = self.env['sell.delivery'].sudo().browse(sale_order_id).exists() if sale_order_id else None
 
-        # create so if needed
+        # 创建销售订单
         if not sale_order and (force_create or code):
             # TODO cache partner_id session
             so_data = self._prepare_sale_order_values(partner)
-            sale_order = self.env['sell.order'].sudo().create(so_data)
+            sale_order = self.env['sell.delivery'].sudo().create(so_data)
 
             request.session['sale_order_id'] = sale_order.id
 
@@ -379,7 +386,7 @@ class Website(models.Model):
 
             # check for change of partner_id ie after signup
             if sale_order.partner_id.id != partner.id and request.website.gooderp_partner_id.id != partner.id:
-                # change the partner, and trigger the onchange
+                # 改变客户，并触发 onchange_partner_id
                 sale_order.write({'partner_id': partner.id})
                 sale_order.onchange_partner_id()
 #                 sale_order.onchange_partner_shipping_id() # fiscal position
@@ -417,17 +424,7 @@ class Website(models.Model):
         })
 
 
-class ResCountry(models.Model):
-    _inherit = 'res.country'
-
-    def get_website_sale_countries(self, mode='billing'):
-        return self.sudo().search([])
-
-    def get_website_sale_states(self, mode='billing'):
-        return self.sudo().state_ids
-
-
 class ResPartner(models.Model):
     _inherit = 'partner'
 
-    last_website_so_id = fields.Many2one('sell.order', string='Last Online Sale Order')
+    last_website_so_id = fields.Many2one('sell.delivery', string=u'客户最近一次的销售发货单')

@@ -20,20 +20,21 @@
         </xpath>
     </template>
 
+    <!-- 查看购物车 -->
     <template id="header" inherit_id="website.layout" name="Header Shop My Cart Link">
         <xpath expr="//header//ul[@id='top_menu']/li" position="before">
-            <!-- <t t-set="website_sale_order" t-value="website.sale_get_order()" /> -->
-            <!-- t-att-class="'' if website_sale_order and website_sale_order.cart_quantity else 'hidden'"/ -->
+            <t t-set="website_sale_order" t-value="website.sale_get_order()" />
+            <t t-att-class="'' if website_sale_order and website_sale_order.cart_quantity else 'hidden'" />
             <li >
                 <a href="/shop/cart">
-                    <i class="fa fa-shopping-cart"></i>我的购物车
+                    <i class="fa fa-shopping-cart"></i>购物车
                     <sup t-attf-class="my_cart_quantity label label-primary" t-esc="website_sale_order and website_sale_order.cart_quantity or ''" />
                 </a>
             </li>
         </xpath>
     </template>
 
-     <!-- /shop 产品列表 -->
+     <!-- /shop 显示产品列表 -->
     <template id="products" name="Products">
         <t t-call="website.layout">
             <t t-set="additional_title">网上商城</t>
@@ -63,6 +64,7 @@
                                                 <td t-att-colspan="td_product['x'] != 1 and td_product['x']" t-att-rowspan="td_product['y'] != 1 and td_product['y']" t-attf-class="oe_product oe_grid oe-height-#{td_product['y']*2} #{ td_product['class'] }">
                                                     <div class="oe_product_cart" t-att-data-publish="product.website_published and 'on' or 'off'">
                                                         <t t-set="product_image_big" t-value="td_product['x']+td_product['y'] &gt; 2" />
+                                                        <!-- 产品列表 -->
                                                         <t t-call="good_shop.products_item" />
                                                     </div>
                                                 </td>
@@ -99,8 +101,45 @@
             <t t-call="website.website_search_box" />
         </form>
     </template>
-    
-     <!-- /shop and /shop/cart； 某一个产品页面定义 -->
+
+    <!-- 继承  good_shop.products，发布产品 -->
+    <template id="products_list_view" inherit_id="good_shop.products" active="False" customize_show="True" name="List View">
+        <xpath expr="//div[@id='products_grid']//table" position="replace">
+            <t t-foreach="products" t-as="product">
+                <div class="oe_product oe_list oe_product_cart" t-att-data-publish="product.website_published and 'on' or 'off'">
+                    <t t-call="good_shop.products_item">
+                        <t t-set="show_publish" t-value="True" />
+                    </t>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- 产品列表上 产品属性 -->
+    <template id="products_attributes" inherit_id="good_shop.products" active="False" customize_show="True" name="Product Attribute's Filters">
+        <xpath expr="//div[@id='products_grid_before']" position="inside">
+            <form class="js_attributes" method="get">
+                <input type="hidden" name="search" t-att-value="search" />
+                <ul class="nav nav-pills nav-stacked mt16">
+                    <t t-foreach="attributes" t-as="a">
+                        <li t-if="a.value_ids and len(a.value_ids) &gt; 1">
+                            <div>
+                                <strong t-field="a.name" />
+                            </div>
+                        </li>
+                    </t>
+                </ul>
+            </form>
+        </xpath>
+        <xpath expr="//div[@id='products_grid_before']" position="attributes">
+            <attribute name="class">col-md-3 hidden-xs</attribute>
+        </xpath>
+        <xpath expr="//div[@id='products_grid']" position="attributes">
+            <attribute name="class">col-md-9</attribute>
+        </xpath>
+    </template>
+
+     <!-- /shop 产品列表 -->
     <template id="products_item" name="Products item">
         <form action="/shop/cart/update" method="post">
             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
@@ -108,11 +147,13 @@
                 <div class="ribbon-wrapper">
                     <div class="ribbon btn btn-danger">销售</div>
                 </div>
+                <!-- 点击进入某一个具体的产品 -->
                 <div class="oe_product_image">
                     <a itemprop="url" t-att-href="keep('/shop/product/%s' % slug(product), page=(pager['page']['num'] if pager['page']['num']&gt;1 else None))">
                         <span itemprop="image" t-field="product.image" t-options="{'widget': 'image', 'resize': None if product_image_big else '300x300', 'zoom': 'image'}" t-att-alt="product.name" />
                     </a>
                 </div>
+                <!-- 显示 发布/未发布 -->
                 <t t-if="show_publish">
                     <div id="website_published_button" class="" groups="sell.group_sell">
                         <t t-call="website.publish_management">
@@ -139,6 +180,7 @@
         </form>
     </template>
 
+    <!-- 进入具体某一个产品页面 -->
     <template id="product" name="Product">
         <t t-call="website.layout">
             <t t-set="additional_title" t-value="product.name" />
@@ -161,6 +203,7 @@
                         <div class="col-sm-3 mb8">
                             <t t-call="good_shop.search" />
                         </div>
+                        <!-- 发布/未发布； 编辑产品 -->
                         <div id="website_published_button" class="col-sm-3">
                             <t t-call="website.publish_management" groups="sell.group_sell">
                                 <t t-set="object" t-value="product" />
@@ -176,7 +219,7 @@
                         <div class="col-sm-5 col-lg-4 col-lg-offset-1" id="product_details">
                             <h1 itemprop="name" t-field="product.name">产品</h1>
                             <span itemprop="url" style="display:none;" t-esc="'/shop/product/%s' % slug(product)" />
-                           
+
                            <form action="/shop/cart/update" class="js_add_cart_variants" t-att-data-attribute_ids="attribute_ids" method="POST">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
                                 <div class="js_product">
@@ -186,6 +229,7 @@
                                             <t t-set="ul_class" t-value="'nav-stacked'" />
                                         </t>
                                     </t>
+                                    <!-- 调用 显示产品价格 -->
                                     <t t-call="good_shop.goods_price" />
                                     <p t-if="len(product.attribute_ids) &gt; 1" class="css_not_available_msg bg-danger" style="padding: 15px;">产品不能销售</p>
                                     <a id="add_to_cart" class="btn btn-primary btn-lg mt8 js_check_product a-submit" href="#">加入购物车</a>
@@ -197,8 +241,7 @@
                                 <p t-field="product.note" class="text-muted" />
                             </div>
                             <hr />
-                            <p class="text-muted">
-                                                                                             现在购买，24小时发货<br />
+                            <p class="text-muted">现在购买，24小时发货<br />
                             </p>
                         </div>
                     </div>
@@ -221,6 +264,7 @@
         </t>
     </template>
 
+    <!-- 显示产品价格 -->
     <template id="goods_price">
       <div itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer" class="product_price mt16">
           <h4 class="oe_price_h4 css_editable_mode_hidden">
@@ -231,6 +275,7 @@
       </div>
     </template>
 
+    <!-- 添加 增加/减少 产品数量 显示 -->
     <template id="product_quantity" inherit_id="good_shop.product" customize_show="True" name="Select Quantity">
       <xpath expr="//a[@id='add_to_cart']" position="before">
         <div class="css_quantity input-group oe_website_spinner" contenteditable="false">
@@ -245,6 +290,7 @@
       </xpath>
     </template>
 
+    <!-- 产品属性 -->
     <template id="product_variants" inherit_id="good_shop.product" active="False" customize_show="True" name="List View of Variants">
       <xpath expr="//t[@t-placeholder='select']" position="replace">
         <input type="hidden" t-if="len(product.attribute_ids) == 1" name="product_id" t-att-value="product.attribute_ids[0].id"/>
@@ -259,7 +305,8 @@
         </t>
       </xpath>
     </template>
-    
+
+    <!-- 具体 属性 -->
     <template id="variants">
         <!-- <t t-set="attribute_ids" t-value="get_attribute_value_ids(product)"/>
         <t t-foreach="product.attribute_ids.sorted(key=lambda x: x.id)" t-as="variant_id">
@@ -289,12 +336,12 @@
                       <t t-set="inc" t-value="inc+1"></t>
                   </li>
               </ul>
-
           </li>
         </t>
       </ul>
     </template>
 
+    <!-- 购物车 -->
     <template id="cart" name="Shopping Cart">
         <t t-call="website.layout">
             <div id="wrap">
@@ -302,16 +349,17 @@
                     <!-- <t t-call="website_sale.wizard_checkout">
                         <t t-set="step" t-value="10" />
                     </t> -->
-                    <h1 class="mb32">Shopping Cart</h1>
+                    <h1 class="mb32">购物车</h1>
                     <div class="row">
                         <div class="col-md-8 col-sm-9 oe_cart">
+                            <!-- 调用 购物车产品列表 -->
                             <t t-call="good_shop.cart_lines" />
                             <div class="clearfix" />
-                            <!-- <a t-if="not optional_products and website_sale_order and website_sale_order.website_order_line" class="btn btn-primary pull-right mb32" href="/shop/checkout">
+                            <a t-if="not optional_products and website_sale_order and website_sale_order.website_order_line" class="btn btn-primary pull-right mb32" href="/shop/checkout">
                                 <span class="hidden-xs">Process Checkout</span>
                                 <span class="visible-xs-inline">Checkout</span>
                                 <span class="fa fa-long-arrow-right" />
-                            </a> -->
+                            </a>
                             <div class="oe_structure" />
                         </div>
                         <div class="col-lg-3 col-lg-offset-1 col-sm-3 col-md-3 text-muted" id="right_column">
@@ -332,7 +380,8 @@
             </div>
         </t>
     </template>
-    
+
+    <!-- 购物车产品列表 -->
     <template id="cart_lines" name="Shopping Cart Lines">
         <div t-if="not website_sale_order or not website_sale_order.website_order_line" class="js_cart_lines well well-lg">
           购物车是空的。
@@ -372,7 +421,7 @@
                                 <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
                                     <i class="fa fa-minus"></i>
                                 </a>
-                                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.goods_id.id" t-att-value="int(line.quantity)" />
+                                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.goods_id.id" t-att-value="int(line.goods_qty)" />
                                 <a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json" data-no-instant="">
                                     <i class="fa fa-plus"></i>
                                 </a>
@@ -384,40 +433,65 @@
                             </t> -->
                             <!-- <span t-field="line.price_reduce_taxexcl" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': website_sale_order.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_subtotal" /> -->
                             <!-- <span t-field="line.price_reduce_taxinc" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': website_sale_order.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_total" /> -->
-                            <span t-field="line.price" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'display_currency': line.order_id.currency_id}"/>
+                            <span t-field="line.price_taxed" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/>
                         </td>
                     </tr>
                 </t>
             </tbody>
         </table>
-        <!-- <div class="js_cart_lines row">
-            <t t-call="website_sale.total">
-                <t t-set='extra_class' t-value='"col-sm-4 col-sm-offset-8 col-xs-12"'/>
-            </t>
-        </div> -->
+        <div class="js_cart_lines row">
+            <span class="h5">
+                <t t-call="good_shop.total">
+                    <t t-set='extra_class' t-value='"col-sm-4 col-sm-offset-8 col-xs-12"'/>
+                </t>
+            </span>
+        </div>
     </template>
 
-    <template id="products_attributes" inherit_id="good_shop.products" active="False" customize_show="True" name="Product Attribute's Filters">
-        <xpath expr="//div[@id='products_grid_before']" position="inside">
-            <form class="js_attributes" method="get">
-                <input type="hidden" name="search" t-att-value="search" />
-                <ul class="nav nav-pills nav-stacked mt16">
-                    <t t-foreach="attributes" t-as="a">
-                        <li t-if="a.value_ids and len(a.value_ids) &gt; 1">
-                            <div>
-                                <strong t-field="a.name" />
-                            </div>
-                        </li>
-                    </t>
-                </ul>
-            </form>
-        </xpath>
-        <xpath expr="//div[@id='products_grid_before']" position="attributes">
-            <attribute name="class">col-md-3 hidden-xs</attribute>
-        </xpath>
-        <xpath expr="//div[@id='products_grid']" position="attributes">
-            <attribute name="class">col-md-9</attribute>
-        </xpath>
+    <template id="cart_popover" name="Cart Popover">
+        <div t-if="not website_sale_order or not website_sale_order.website_order_line" class="well well-lg">
+                  购物车是空的！
+        </div>
+        <t t-if="website_sale_order and website_sale_order.website_order_line">
+            <t t-foreach="website_sale_order.website_order_line" t-as="line">
+                <div class="row mb8 cart_line">
+                    <div class="col-xs-3">
+                        <span t-field="line.goods_id.image" t-options="{'widget': 'image', 'class': 'img-rounded'}" />
+                    </div>
+                    <div class="col-xs-9">
+                        <a t-attf-href="/shop/product/#{ slug(line.goods_id) }">
+                            <span t-esc="line.goods_id.name" class="h6" />
+                            <!-- <span t-esc="line.goods_id.with_context(display_default_code=False).name" class="h6" /> -->
+                        </a>
+                        <br />
+                        <small>数量: <t t-esc="int(line.goods_qty)" /></small>
+                    </div>
+                </div>
+            </t>
+            <div class="text-center">
+                <span class="h5">
+                    <!-- 购物车 产品金额 -->
+                    <t t-call="good_shop.total" />
+                </span>
+                <a class="btn btn-primary" href="/shop/cart">查看购物车 
+                    (<t t-esc="website_sale_order.cart_quantity" /> 项)
+                </a>
+            </div>
+        </t>
     </template>
+
+    <!-- 购物车 产品金额 -->
+    <template id="total">
+        <div id="cart_total" t-att-class="extra_class or ''" t-if="website_sale_order">
+            <div class="row" id="order_total_untaxed">
+                <span class="col-xs-6 text-right text-muted">小计:</span>
+                <span class="col-xs-6 text-left text-muted">
+                    <span t-field="website_sale_order.amount" style="white-space: nowrap;" t-options="{'widget': 'monetary','display_currency': website_sale_order.currency_id}" />
+                </span>
+            </div>
+        </div>
+    </template>
+    
+    
 
 </odoo>

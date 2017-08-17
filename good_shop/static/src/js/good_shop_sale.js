@@ -104,7 +104,7 @@ odoo.define('good_shop.website_sale', function (require) {
                 ajax.jsonRpc("/shop/get_unit_price", 'call', {'product_ids': product_ids,'add_qty': parseInt(qty)})
                 .then(function (data) {
                     _.each(product_dom, function (prod) {
-                        var current = $(prod).data("attribute_value_ids");
+                        var current = $(prod).data("attribute_ids");
                         for(var j=0; j < current.length; j++){
                             current[j][2] = data[current[j][0]];
                         }
