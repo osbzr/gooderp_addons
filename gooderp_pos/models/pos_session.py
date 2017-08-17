@@ -10,8 +10,7 @@ class PosSession(models.Model):
 
     POS_SESSION_STATE = [
         ('opening_control', '新的工作记录'),  # method action_pos_session_open
-        ('opened', '销售过程'),               # method action_pos_session_closing_control
-        ('closing_control', '关闭管理'),  # method action_pos_session_close
+        ('opened', '销售过程'),               # method action_pos_session_close
         ('closed', '关闭 & 过账'),
     ]
 
