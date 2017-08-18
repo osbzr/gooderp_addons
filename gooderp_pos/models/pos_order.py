@@ -57,8 +57,56 @@ class SellDelivery(models.Model):
         for order in orders:
             order_data = order.get('data')
             sell_order_data = self.data_handling(order_data)
-            sell_order_row = self.create(sell_order_data)
-            sell_order_row.sell_delivery_done()
-            order_ids.append(sell_order_row.id)
+            sell_delivery = self.create(sell_order_data)
+            sell_delivery.sell_delivery_done()
+            order_ids.append(sell_delivery.id)
+
+            prec_acc = self.env['decimal.precision'].precision_get('Account')
+            for payments in order_data.get('statement_ids'):
+                if not float_is_zero(payments[2].get('amount'), precision_digits=prec_acc):
+                    sell_delivery.add_payment(self._payment_fields(payments[2]))
         return order_ids
 
+    def _payment_fields(self, ui_paymentline):
+        return {
+            'amount':       ui_paymentline['amount'] or 0.0,
+            'payment_date': ui_paymentline['name'],
+            'statement_id': ui_paymentline['statement_id'],
+            'payment_name': ui_paymentline.get('note', False),
+            # 'journal':      ui_paymentline['journal_id'],
+        }
+
+    def add_payment(self, data):
+        """Create a new payment for the order"""
+        args = {
+            'amount': data['amount'],
+            'pay_date': data.get('payment_date', fields.Date.today()),
+            'partner_id': self.partner_id.id or False,
+            # 'name': self.name + ': ' + (data.get('payment_name', '') or ''),
+            # 'partner_id': self.env["res.partner"]._find_accounting_partner(self.partner_id).id or False,
+        }
+
+        # journal_id = data.get('journal', False)
+        statement_id = data.get('statement_id', False)
+        # assert journal_id or statement_id, "No statement_id or journal_id passed to the method!"
+
+        context = dict(self.env.context)
+        context.pop('pos_session_id', False)
+        bank_account_id = False
+        for statement in self.session_id.payment_line_ids:
+            if statement.id:
+                bank_account_id = statement.bank_account_id.id
+                break
+            elif statement.bank_account_id.id:
+                statement_id = statement.id
+                break
+        # if not statement_id:
+        #     raise UserError(_('You have to open at least one cashbox.'))
+
+        args.update({
+            'session_id': self.session_id.id,
+            'sell_id': self.id,
+            'bank_account_id': bank_account_id,
+        })
+        self.env['payment.line'].with_context(context).create(args)
+        return statement_id

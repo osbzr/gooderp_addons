@@ -1254,6 +1254,7 @@ odoo.define('gooderp_pos.models', function(require) {
         },
         init_from_JSON: function(json) {
             this.amount = json.amount;
+            this.cashregister = this.pos.cashregisters_by_id[json.statement_id];
             this.name = this.cashregister.name;
             console.log(this.name)
         },
@@ -1288,7 +1289,7 @@ odoo.define('gooderp_pos.models', function(require) {
         export_as_JSON: function() {
             return {
                 name: time.datetime_to_str(new Date()),
-                //TODO:statement_id: this.cashregister.id,
+                statement_id: this.cashregister.id,
                 //FIXME:account_id: this.cashregister.account_id[0],
                 //FIXME:journal_id: this.cashregister.journal_id[0],
                 amount: this.get_amount()
