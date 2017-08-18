@@ -356,7 +356,7 @@
                             <t t-call="good_shop.cart_lines" />
                             <div class="clearfix" />
                             <a t-if="not optional_products and website_sale_order and website_sale_order.website_order_line" class="btn btn-primary pull-right mb32" href="/shop/checkout">
-                                <span class="hidden-xs">Process Checkout</span>
+                                <span class="hidden-xs">结账</span>
                                 <span class="visible-xs-inline">Checkout</span>
                                 <span class="fa fa-long-arrow-right" />
                             </a>
@@ -421,7 +421,7 @@
                                 <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
                                     <i class="fa fa-minus"></i>
                                 </a>
-                                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.goods_id.id" t-att-value="int(line.goods_qty)" />
+                                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.goods_id.id" t-att-value="int(line.quantity)" />
                                 <a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json" data-no-instant="">
                                     <i class="fa fa-plus"></i>
                                 </a>
@@ -433,7 +433,7 @@
                             </t> -->
                             <!-- <span t-field="line.price_reduce_taxexcl" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': website_sale_order.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_subtotal" /> -->
                             <!-- <span t-field="line.price_reduce_taxinc" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': website_sale_order.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_total" /> -->
-                            <span t-field="line.price_taxed" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/>
+                            <span t-field="line.amount" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/>
                         </td>
                     </tr>
                 </t>
@@ -464,7 +464,7 @@
                             <!-- <span t-esc="line.goods_id.with_context(display_default_code=False).name" class="h6" /> -->
                         </a>
                         <br />
-                        <small>数量: <t t-esc="int(line.goods_qty)" /></small>
+                        <small>数量: <t t-esc="int(line.quantity)" /></small>
                     </div>
                 </div>
             </t>
@@ -491,7 +491,284 @@
             </div>
         </div>
     </template>
-    
-    
+
+    <!-- 地址 -->
+     <template id="address" name="Address Management">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container oe_website_sale">
+                    <t t-call="good_shop.wizard_checkout">
+                        <t t-set="step" t-value="20" />
+                    </t>
+                    <div class="row">
+                        <div class="col-md-9 oe_cart">
+                            <div class="row">
+                                <t t-if="mode == ('new', 'billing')">
+                                    <h3 class="page-header mt16">Your Address
+                                        <small> or </small>
+                                        <t t-set='connect' t-value="request.env['ir.config_parameter'].sudo().get_param('auth_signup.allow_uninvited') == 'True' and ('signup', 'Sign Up') or ('login', 'Log In')"/>
+                                        <a t-attf-href='/web/{{connect[0]}}?redirect=/shop/checkout' class='btn btn-primary' style="margin-top: -11px"><t t-esc='connect[1]'/></a>
+                                    </h3>
+                                </t>
+                                <t t-if="mode == ('edit', 'billing')">
+                                    <h3 class="page-header mt16">Your Address</h3>
+                                </t>
+                                <t t-if="mode[1] == 'shipping'">
+                                    <h3 class="page-header mt16">Shipping Address </h3>
+                                </t>
+                                <t t-if="error" t-foreach="error.get('error_message', [])" t-as="err">
+                                    <h4 class="text-danger" t-esc="err" />
+                                </t>
+                                <form name="/shop/checkout" method="post" class="checkout_autoformat">
+                                    <div t-attf-class="form-group #{error.get('name') and 'has-error' or ''} col-md-12 div_name">
+                                        <label class="control-label" for="name">姓名</label>
+                                        <input type="text" name="name" class="form-control" t-att-value="'name' in checkout and checkout['name']" />
+                                    </div>
+                                    <div class="clearfix" />
+                                    <t t-if="mode[1] == 'billing'">
+                                        <div t-attf-class="form-group #{error.get('email') and 'has-error' or ''} col-md-6" id="div_email">
+                                            <label class="control-label" for="email">Email</label>
+                                            <input type="email" name="email" class="form-control" t-att-value="'email' in checkout and checkout['email']" />
+                                        </div>
+                                    </t>
+                                    <div t-attf-class="form-group #{error.get('mobile') and 'has-error' or ''} col-md-6" id="div_phone">
+                                        <label class="control-label" for="mobile">手机</label>
+                                        <input type="tel" name="mobile" class="form-control" t-att-value="'mobile' in checkout and checkout['mobile']" />
+                                    </div>
+                                    <div class="clearfix" />
+                                    <t t-if="mode == ('new', 'billing')">
+                                        <div t-attf-class="form-group #{error.get('company_name') and 'has-error' or ''} col-md-6">
+                                            <label class="control-label" for="company_name">Company Name</label>
+                                            <input type="text" name="company_name" class="form-control" t-att-value="'company_name' in checkout and checkout['company_name']" />
+                                        </div>
+                                        <!-- <div t-attf-class="form-group #{error.get('vat') and 'has-error' or ''} col-md-6 div_vat">
+                                            <label class="control-label" for="vat">TIN / VAT </label>
+                                            <input type="text" name="vat" class="form-control" t-att-value="'vat' in checkout and checkout['vat']" />
+                                        </div> -->
+                                    </t>
+                                    <div class="clearfix" />
+                                    <div t-attf-class="form-group #{error.get('street') and 'has-error' or ''} col-md-12 div_street">
+                                        <label class="control-label" for="address">地址</label>
+                                        <input type="text" name="address" class="form-control" t-att-value="'address' in checkout and checkout['address']" />
+                                    </div>
+                                    <!--
+                                    <div class="clearfix" />
+                                    <t t-set='zip_city' t-value='country and [x for x in country.get_address_fields() if x in ["zip", "city"]] or ["city", "zip"]'/>
+                                    <t t-if="'zip' in zip_city and zip_city.index('zip') &lt; zip_city.index('city')">
+                                        <div t-attf-class="form-group #{error.get('zip') and 'has-error' or ''} col-sm-4 div_zip">
+                                            <label class="control-label" for="zip">Zip Code</label>
+                                            <input type="text" name="zip" class="form-control" t-att-value="'zip' in checkout and checkout['zip']" />
+                                        </div>
+                                    </t>
+                                    <div t-attf-class="form-group #{error.get('city') and 'has-error' or ''} col-sm-8 div_city">
+                                        <label class="control-label" for="city">City</label>
+                                        <input type="text" name="city" class="form-control" t-att-value="'city' in checkout and checkout['city']" />
+                                    </div>
+                                    <t t-if="'zip' in zip_city and zip_city.index('zip') &gt; zip_city.index('city')">
+                                        <div t-attf-class="form-group #{error.get('zip') and 'has-error' or ''} col-sm-4 div_zip">
+                                            <label class="control-label" for="zip">Zip Code</label>
+                                            <input type="text" name="zip" class="form-control" t-att-value="'zip' in checkout and checkout['zip']" />
+                                        </div>
+                                    </t>
+                                    <div class="clearfix" /> -->
+                                    <!-- <div t-attf-class="form-group #{error.get('country_id') and 'has-error' or ''} col-md-6 div_country">
+                                        <label class="control-label" for="country_id">Country</label>
+                                        <select id="country_id" name="country_id" class="form-control">
+                                            <option value="">Country...</option>
+                                            <t t-foreach="countries" t-as="c">
+                                                <option t-att-value="c.id" t-att-selected="c.id == (country and country.id or -1)">
+                                                    <t t-esc="c.name" />
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div> -->
+                                    <!-- <div t-attf-class="form-group #{error.get('state_id') and 'has-error' or ''} col-md-6 div_state" t-att-style="(not country or not country.state_ids) and 'display: none'">
+                                        <label class="control-label" for="state_id">State / Province</label>
+                                        <select name="state_id" class="form-control" data-init="1">
+                                            <option value="">State / Province...</option>
+                                            <t t-foreach="country and country.state_ids or []" t-as="s">
+                                                <option t-att-value="s.id" t-att-selected="s.id == ('state_id' in checkout and country and checkout['state_id'] != '' and int(checkout['state_id']))">
+                                                    <t t-esc="s.name" />
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div> -->
+
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                    <input type="hidden" name="submitted" value="1" />
+                                    <input type="hidden" name="partner_id" t-att-value="partner_id or '0'" />
+                                    <input type="hidden" name="callback" t-att-value="callback" />
+                                    <!-- Example -->
+                                    <input type="hidden" name="field_required" t-att-value="mode[1] == 'billing' and 'mobile,name' or ''" />
+
+                                    <div class="clearfix"/>
+                                    <div>
+                                        <a t-att-href="mode == ('new', 'billing') and '/shop/cart' or '/shop/checkout'" class="btn btn-default mb32">
+                                            <span class="fa fa-long-arrow-left" /> 返回
+                                        </a>
+                                        <a class="btn btn-default btn-primary pull-right mb32 a-submit a-submit-disable a-submit-loading">
+                                            <span>下一步 </span><span class="fa fa-long-arrow-right" />
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 text-muted">
+                            <h3 class="page-header mt16 text-center">Your Order</h3>
+                            <t t-set="website_sale_order" t-value="website.sale_get_order()" />
+                            <t t-call="good_shop.total" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+     <template id="wizard_checkout" name="Wizard Checkout">
+        <ul class="wizard pull-right">
+            <li t-att-class="step==10 and 'text-primary' or 'text-muted'" id="step10">
+                <t t-if="step&gt;10 and step&lt;50">
+                    <a href="/shop/cart" class="text-success">
+                        Review Order<span class="chevron"></span>
+                    </a>
+                </t>
+                <t t-if="not (step&gt;10 and step&lt;50)">
+                    Review Order<span class="chevron"></span>
+                </t>
+            </li>
+            <li t-att-class="(step==20 and 'text-primary') or 'text-muted'" id="step20">
+                <t t-if="step&gt;20 and step&lt;50">
+                    <a href="/shop/checkout" class="text-success">
+                        <!-- billing if not loggedin - TODO -->
+                        <t t-if="not website_sale_order or not website_sale_order.website_order_line or not website_sale_order.only_services">Shipping &amp;</t>
+                            Billing<span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not (step&gt;20 and step&lt;50)">
+                    <t t-if="not website_sale_order or not website_sale_order.website_order_line or not website_sale_order.only_services">Shipping &amp;</t>
+                        Billing<span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step==40 and 'text-primary') or 'text-muted'" id="step40">
+                Payment<span class="chevron"></span>
+            </li>
+            <li t-att-class="(step==50 and 'text-primary') or 'text-muted'" id="step50">
+                Confirmation<span class="chevron"></span>
+            </li>
+        </ul>
+    </template>
+
+     <template id="checkout">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Shop - Checkout</t>
+            <div id="wrap">
+                <div class="container oe_website_sale">
+                    <t t-call="good_shop.wizard_checkout">
+                        <t t-set="step" t-value="20" />
+                    </t>
+                    <t t-set="same_shipping" t-value="bool(only_services)" />
+                    <div class="row">
+                        <div class="col-md-8 oe_cart">
+                            <div class="row">
+                                <!-- <div class="col-md-12">
+                                    <h3 class="page-header mt16">Billing Address</h3>
+                                </div>
+                                <div class="col-md-6 one_kanban">
+                                    <t t-call="website_sale.address_kanban">
+                                        <t t-set='contact' t-value="order.partner_id"/>
+                                        <t t-set='selected' t-value="1"/>
+                                        <t t-set='readonly' t-value="1"/>
+                                    </t>
+                                </div> -->
+                            </div>
+                            <t t-if="not only_services">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="page-header mt16">发货地址
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="row all_shipping">
+                                    <div class="col-md-12">
+                                        <div class="row mt8">
+                                            <div class="col-sm-12 col-md-12 one_kanban">
+                                                <!-- <form action="/shop/address" method="post" class=''>
+                                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                                    <a class='a-submit btn btn-default mb16 btn-block'>
+                                                        <i class="fa fa-plus-square" aria-hidden="true"></i> 添加地址
+                                                    </a>
+                                                </form> -->
+                                            </div>
+                                            <t t-foreach="shippings" t-as="ship">
+                                                <div class="col-sm-12 col-md-6 one_kanban">
+                                                    <t t-call="good_shop.address_kanban">
+                                                        <t t-set='contact' t-value="ship"/>
+                                                        <t t-set='selected' t-value="order.partner_id==ship"/>
+                                                        <t t-set='readonly' t-value="bool(len(shippings)==1)"/>
+                                                        <t t-set='edit_billing' t-value="bool(ship==order.partner_id)"/>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                            <div class="clearfix" />
+                            <div>
+                                <a href="/shop/cart" class="btn btn-default mb32">
+                                    <span class="fa fa-long-arrow-left" /> 返回购物车</a>
+                                <a class="btn btn-default btn-primary pull-right mb32 " href="/shop/confirm_order">确定 <span class="fa fa-long-arrow-right" /></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-offset-1 col-md-3 text-muted">
+                            <h3 class="page-header mt16">你的订单</h3>
+                            <t t-set="website_sale_order" t-value="website.sale_get_order()" />
+                            <t t-call="good_shop.total" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="success" name="success">
+        <t t-call="website.layout">
+            <div class="container">
+                <span>您的购货订单创建成功！</span>
+            </div>
+        </t>
+    </template>
+
+    <template id="address_kanban" name="Kanban address">
+        <form action="/shop/checkout" method="POST" class='hide'>
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            <input type="hidden" name="partner_id" t-att-value="contact.id" />
+            <t t-if='edit_billing'>
+                <input type="hidden" name="callback" value="/shop/checkout?use_billing" />
+            </t>
+            <input type='submit'/>
+        </form>
+        <a class='btn btn-link pull-right fa fa-edit js_edit_address no-decoration' title="Edit this address"></a>
+        <div t-att-class="'panel panel-default %s' % (selected and 'border_primary' or 'js_change_shipping')">
+            <div class='panel-body' style='min-height: 130px;'>
+                <t t-esc="contact.name"/>
+                <t t-esc="contact.mobile"/>
+                <t t-esc="contact.address"/>
+                 <!-- t-options="dict(widget='contact', fields=['name', 'address'], no_marker=True)" -->
+            </div>
+            <div class='panel-footer' t-if='not readonly'>
+                <span class='btn-ship' t-att-style="'' if selected else 'display:none;'">
+                    <a class="btn btn-block btn-primary">
+                        <i class='fa fa-check'></i> Ship to this address
+                    </a>
+                </span>
+                <span class='btn-ship' t-att-style="'' if not selected else 'display:none;'">
+                    <a class="btn btn-block btn-default">
+                        Select this address
+                    </a>
+                </span>
+            </div>
+        </div>
+    </template>
 
 </odoo>
