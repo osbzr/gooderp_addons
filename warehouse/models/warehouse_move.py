@@ -50,6 +50,7 @@ class wh_move(models.Model):
     name = fields.Char(u'单据编号', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft',
+                             index=True,
                              help=u'移库单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict',
                                  help=u'该单据对应的业务伙伴')

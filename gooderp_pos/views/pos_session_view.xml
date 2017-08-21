@@ -46,8 +46,9 @@
                     <field name="payment_line_ids" attrs="{'invisible' : [('state', '=', 'opening_control')]}">
                         <tree string="付款明细">
                             <field name="session_id" />
-                            <field name="pay_type_id" />
+                            <field name="bank_account_id" />
                             <field name="amount" />
+                            <field name="partner_id" />
                             <field name="pay_date" />
                             <field name="sell_id" />
                         </tree>

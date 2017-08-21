@@ -36,6 +36,7 @@ class stock_request(models.Model):
                                states={'done': [('readonly', True)]})
     state = fields.Selection(STOCK_REQUEST_STATES, u'审核状态', readonly=True,
                              help=u"补货申请的审核状态", copy=False,
+                             index=True,
                              default='unsubmit')
     company_id = fields.Many2one(
         'res.company',

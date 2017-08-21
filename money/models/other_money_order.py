@@ -66,7 +66,7 @@ class other_money_order(models.Model):
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
                            ], string=u'状态', readonly=True,
-                             default='draft', copy=False,
+                             default='draft', copy=False, index=True,
                         help=u'其他收支单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位',
                                  readonly=True, ondelete='restrict',

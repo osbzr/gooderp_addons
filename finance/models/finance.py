@@ -71,6 +71,7 @@ class voucher(models.Model):
                                track_visibility='always',help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核')], u'状态', default='draft',
+                             index=True,
                              track_visibility='always', help=u'凭证所属状态!')
     is_checkout = fields.Boolean(u'结账凭证', help=u'是否是结账凭证')
     is_init = fields.Boolean(u'是否初始化凭证', help=u'是否是初始化凭证')
@@ -210,6 +211,7 @@ class voucher_line(models.Model):
         以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现', ondelete='restrict')
     date = fields.Date(compute='_compute_voucher_date', store=True, string=u'凭证日期')
     state = fields.Selection([('draft', u'草稿'),('done', u'已审核')], compute='_compute_voucher_state',
+                             index=True,
                              store=True, string=u'状态')
     init_obj = fields.Char(u'初始化对象', help=u'描述本条凭证行由哪个单证生成而来')
     company_id = fields.Many2one(
