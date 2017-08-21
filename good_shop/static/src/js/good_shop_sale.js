@@ -168,7 +168,7 @@ odoo.define('good_shop.website_sale', function (require) {
                 $input.val(data.quantity);
                 $('.js_quantity[data-line-id='+line_id+']').val(data.quantity).html(data.quantity);
 
-                $(".js_cart_lines").first().before(data['website_sale.cart_lines']).end().remove();
+                $(".js_cart_lines").first().before(data['good_shop.cart_lines']).end().remove();
 
                 if (data.warning) {
                     var cart_alert = $('.oe_cart').parent().find('#data_warning');
