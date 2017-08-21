@@ -114,7 +114,7 @@ class money_order(models.Model):
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
                           ], string=u'状态', readonly=True,
-                             default='draft', copy=False,
+                             default='draft', copy=False, index=True,
                         help=u'收/付款单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  readonly=True, ondelete='restrict',
@@ -603,7 +603,7 @@ class money_invoice(models.Model):
                           ('draft', u'草稿'),
                           ('done', u'完成')
                           ], string=u'状态', 
-                          default='draft', copy=False,
+                          default='draft', copy=False, index=True,
                         help=u'结算单状态标识，新建时状态为草稿;审核后状态为完成')
     partner_id = fields.Many2one('partner', string=u'往来单位',
                                  required=True,
@@ -855,7 +855,7 @@ class reconcile_order(models.Model):
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
                           ], string=u'状态', readonly=True,
-                          default='draft', copy=False,
+                          default='draft', copy=False, index=True,
                         help=u'核销单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  readonly=True, ondelete='restrict',

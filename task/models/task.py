@@ -260,6 +260,7 @@ class task_status(models.Model):
     name = fields.Char(u'名称')
     state = fields.Selection(TASK_STATES,
                              string=u'任务状态',
+                             index=True,
                              default='doing')
     sequence = fields.Integer(u'顺序')
     company_id = fields.Many2one(
