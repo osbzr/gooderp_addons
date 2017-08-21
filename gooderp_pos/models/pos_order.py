@@ -73,7 +73,6 @@ class SellDelivery(models.Model):
             'payment_date': ui_paymentline['name'],
             'statement_id': ui_paymentline['statement_id'],
             'payment_name': ui_paymentline.get('note', False),
-            # 'journal':      ui_paymentline['journal_id'],
         }
 
     def add_payment(self, data):
@@ -81,32 +80,28 @@ class SellDelivery(models.Model):
         args = {
             'amount': data['amount'],
             'pay_date': data.get('payment_date', fields.Date.today()),
-            'partner_id': self.partner_id.id or False,
+            # 'partner_id': self.partner_id.id or False,
             # 'name': self.name + ': ' + (data.get('payment_name', '') or ''),
             # 'partner_id': self.env["res.partner"]._find_accounting_partner(self.partner_id).id or False,
         }
 
-        # journal_id = data.get('journal', False)
         statement_id = data.get('statement_id', False)
-        # assert journal_id or statement_id, "No statement_id or journal_id passed to the method!"
+        assert statement_id, "No statement_id passed to the method!"
 
         context = dict(self.env.context)
         context.pop('pos_session_id', False)
-        bank_account_id = False
-        for statement in self.session_id.payment_line_ids:
-            if statement.id:
-                bank_account_id = statement.bank_account_id.id
-                break
-            elif statement.bank_account_id.id:
-                statement_id = statement.id
-                break
-        # if not statement_id:
-        #     raise UserError(_('You have to open at least one cashbox.'))
-
+        bank_account = self.env['bank.account'].browse(statement_id)
         args.update({
             'session_id': self.session_id.id,
-            'sell_id': self.id,
-            'bank_account_id': bank_account_id,
+            # 'sell_id': self.id,
+            'bank_account_id': bank_account.id,
         })
-        self.env['payment.line'].with_context(context).create(args)
-        return statement_id
+        for line in self.session_id.payment_line_ids:
+            print '**********',line, statement_id, line.bank_account_id.id
+            if line.bank_account_id.id == statement_id:
+                line.amount += data['amount']
+                break
+            else:
+                self.env['payment.line'].with_context(context).create(args)
+
+        return True
