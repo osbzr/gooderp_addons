@@ -80,9 +80,6 @@ class SellDelivery(models.Model):
         args = {
             'amount': data['amount'],
             'pay_date': data.get('payment_date', fields.Date.today()),
-            # 'partner_id': self.partner_id.id or False,
-            # 'name': self.name + ': ' + (data.get('payment_name', '') or ''),
-            # 'partner_id': self.env["res.partner"]._find_accounting_partner(self.partner_id).id or False,
         }
 
         statement_id = data.get('statement_id', False)
@@ -93,15 +90,15 @@ class SellDelivery(models.Model):
         bank_account = self.env['bank.account'].browse(statement_id)
         args.update({
             'session_id': self.session_id.id,
-            # 'sell_id': self.id,
             'bank_account_id': bank_account.id,
         })
+        need_create = True  # 是否需要创建付款明细行
         for line in self.session_id.payment_line_ids:
-            print '**********',line, statement_id, line.bank_account_id.id
             if line.bank_account_id.id == statement_id:
                 line.amount += data['amount']
+                need_create = False
                 break
-            else:
-                self.env['payment.line'].with_context(context).create(args)
+        if need_create:
+            self.env['payment.line'].with_context(context).create(args)
 
         return True
