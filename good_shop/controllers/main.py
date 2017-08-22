@@ -132,6 +132,7 @@ class WebsiteSale(http.Controller):
         attribute_ids = []
         for attribute in product.attribute_ids:
             attribute_ids.append([attribute.id, product.attribute_ids, product.price, product.price])
+
         return attribute_ids
 
     def _get_search_order(self, post):
@@ -271,6 +272,17 @@ class WebsiteSale(http.Controller):
 #             product_context['pricelist'] = pricelist.id
             product = product.with_context(product_context)
 
+        attribute_dict = {}
+        for attribute in product.attribute_ids:
+            for value in attribute.value_ids:
+                if not attribute_dict.has_key(value.category_id.name):
+                    attribute_dict.update({value.category_id.name: [value.value_id.name]})
+                else:
+                    if value.value_id.name in attribute_dict[value.category_id.name]:
+                        continue
+                    else:
+                        attribute_dict[value.category_id.name].append(value.value_id.name)
+
         # 货币取当前登录用户公司对应的货币
         for user in request.env['res.users'].browse(request.uid):
             currency = user.company_id.currency_id
@@ -285,6 +297,7 @@ class WebsiteSale(http.Controller):
             'product': product,
             'get_attribute_value_ids': self.get_attribute_value_ids,
             'currency': currency,
+            'attribute_dict': attribute_dict,
         }
         return request.render("good_shop.product", values)
 
