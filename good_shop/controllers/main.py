@@ -553,5 +553,10 @@ class WebsiteSale(http.Controller):
 
     @http.route(['/shop/confirm_order'], type='http', auth="public", website=True)
     def confirm_order(self, **post):
+        order = request.website.sale_get_order()
         request.website.sell_order_to_delivery()
-        return request.render("good_shop.success")
+
+        # 订单创建成功，清空购物车
+        redirection = self.checkout_redirection(order)
+        if redirection:
+            return request.render("good_shop.success")

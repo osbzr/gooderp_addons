@@ -725,8 +725,12 @@
 
     <template id="success" name="success">
         <t t-call="website.layout">
-            <div class="container">
-                <span>您的购货订单创建成功！</span>
+            <div id="wrap">
+                <div class="oe_structure oe_empty">
+                    <div class="container">
+                        <span>您的购货订单创建成功！</span>
+                    </div>
+                </div>
             </div>
         </t>
     </template>

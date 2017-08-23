@@ -268,13 +268,13 @@ class Website(models.Model):
         if sell_order:
             sell_order.sell_order_done()
 
-#             delivery_order = self.env['sell.delivery'].sudo().search([('order_id', '=', sell_order_id)])
-#             delivery_order.sell_delivery_done()
+            delivery_order = self.env['sell.delivery'].sudo().search([('order_id', '=', sell_order_id)])
+            delivery_order.sell_delivery_done()
             if not self.env.user.company_id.bank_account_id:
                 company_bank = self.env.ref('good_shop.web_company_bank')
                 company_bank.balance += sell_order.amount
             else:
-                self.env.user.company_id.bank_account_id.balance += sell_order.amount
+                self.env.user.sudo().company_id.bank_account_id.balance += sell_order.amount
 
 
 class ResPartner(models.Model):
