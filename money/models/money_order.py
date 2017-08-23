@@ -442,7 +442,7 @@ class money_order(models.Model):
                                      0,
                                      vouch_obj.id,
                                      self.partner_id.id,
-                                     line.currency_id.id
+                                     self.currency_id.id
                                      )
 
         if partner.c_category_id:
@@ -457,7 +457,7 @@ class money_order(models.Model):
                                   amount_all + self.discount_amount,
                                   vouch_obj.id,
                                   self.partner_id.id,
-                                  line.currency_id.id
+                                  self.currency_id.id
                                   )
         return vouch_obj
 
@@ -475,7 +475,9 @@ class money_order(models.Model):
         # self.write({'voucher_id': vouch_obj.id})
 
         amount_all = 0.0
+        line_data = False
         for line in line_ids:
+            line_data = line
             if not line.bank_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
             # 生成贷方明细行 credit
@@ -501,20 +503,20 @@ class money_order(models.Model):
                                   0,
                                   vouch_obj.id,
                                   self.partner_id.id,
-                                  line.currency_id.id
+                                  self.currency_id.id
                                   )
 
         if self.discount_amount != 0:
             # 生成借方明细行 debit
             # param: False, name, account_id, debit, credit, voucher_id, partner_id
-            self._create_voucher_line(line,
+            self._create_voucher_line(line_data and line_data or False,
                                       u"%s 手续费 %s" % (name, note),
                                       self.discount_account_id.id,
                                       self.discount_amount,
                                       0,
                                       vouch_obj.id,
                                       self.partner_id.id,
-                                      line.currency_id.id
+                                      self.currency_id.id
                                       )
         return vouch_obj
 
