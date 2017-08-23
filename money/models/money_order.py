@@ -416,7 +416,9 @@ class money_order(models.Model):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         # self.write({'voucher_id': vouch_obj.id})
         amount_all = 0.0
+        line_data = False
         for line in line_ids:
+            line_data = line
             if not line.bank_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (line.bank_id.name))
             # 生成借方明细行
@@ -442,7 +444,7 @@ class money_order(models.Model):
                                      0,
                                      vouch_obj.id,
                                      self.partner_id.id,
-                                     self.currency_id.id
+                                     line_data and line.currency_id.id or self.currency_id.id
                                      )
 
         if partner.c_category_id:
@@ -457,7 +459,7 @@ class money_order(models.Model):
                                   amount_all + self.discount_amount,
                                   vouch_obj.id,
                                   self.partner_id.id,
-                                  self.currency_id.id
+                                  line_data and line.currency_id.id or self.currency_id.id
                                   )
         return vouch_obj
 
@@ -503,7 +505,7 @@ class money_order(models.Model):
                                   0,
                                   vouch_obj.id,
                                   self.partner_id.id,
-                                  self.currency_id.id
+                                  line_data and line.currency_id.id or self.currency_id.id
                                   )
 
         if self.discount_amount != 0:
@@ -516,7 +518,7 @@ class money_order(models.Model):
                                       0,
                                       vouch_obj.id,
                                       self.partner_id.id,
-                                      self.currency_id.id
+                                      line_data and line.currency_id.id or self.currency_id.id
                                       )
         return vouch_obj
 
