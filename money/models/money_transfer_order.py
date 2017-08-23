@@ -42,7 +42,7 @@ class money_transfer_order(models.Model):
                           ('draft', u'未审核'),
                           ('done', u'已审核'),
                            ], string=u'状态', readonly=True,
-                             default='draft', copy=False,
+                             default='draft', copy=False, index=True,
                         help=u'资金转账单状态标识，新建时状态为未审核;审核后状态为已审核')
     name = fields.Char(string=u'单据编号', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')

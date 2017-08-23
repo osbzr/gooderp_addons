@@ -644,7 +644,7 @@ odoo.define('gooderp_pos.screens', function(require) {
         },
 
         get_image_url: function(category) {
-            return window.location.origin + '/web/image?model=pos.category&field=image_medium&id=' + category.id;
+            return window.location.origin + '/web/image?model=goods.class&field=image_medium&id=' + category.id;
         },
 
         render_category: function(category, with_image) {

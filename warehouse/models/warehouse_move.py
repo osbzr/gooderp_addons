@@ -50,6 +50,7 @@ class wh_move(models.Model):
     name = fields.Char(u'单据编号', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft',
+                             index=True,
                              help=u'移库单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict',
                                  help=u'该单据对应的业务伙伴')
@@ -82,6 +83,7 @@ class wh_move(models.Model):
                                   context={'type': 'in'}, copy=True,
                                   help=u'入库类型的移库单对应的入库明细')
     note = fields.Text(u'备注',
+                       copy=False,
                        help=u'可以为该单据添加一些需要的标识信息')
     total_qty = fields.Integer(u'商品总数', compute=_compute_total_qty, store=True,
                                help=u'该移库单的入/出库明细行包含的商品总数')

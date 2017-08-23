@@ -22,6 +22,7 @@ class wh_assembly(models.Model):
                               ('feeding', u'已发料'),
                               ('done', u'完成')],
                              u'状态', copy=False, default='draft',
+                             index=True,
                              help=u'组装单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
     move_id = fields.Many2one(
         'wh.move', u'移库单', required=True, index=True, ondelete='cascade',
@@ -477,6 +478,7 @@ class outsource(models.Model):
                               ('feeding', u'已发料'),
                               ('done', u'完成')],
                              u'状态', copy=False, default='draft',
+                             index=True,
                              help=u'委外加工单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
                               help=u'委外加工单对应的移库单')
@@ -918,6 +920,7 @@ class wh_disassembly(models.Model):
                               ('feeding', u'已发料'),
                               ('done', u'完成')],
                              u'状态', copy=False, default='draft',
+                             index=True,
                              help=u'拆卸单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
     move_id = fields.Many2one(
         'wh.move', u'移库单', required=True, index=True, ondelete='cascade',

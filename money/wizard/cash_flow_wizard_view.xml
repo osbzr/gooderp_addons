@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <form string="现金流量表">
                     <group>
-                        <field name='period_id'/>
+                        <field name='period_id' required="True"/>
 	                </group>
                     <footer>
                         <button name="show" type="object" string="生成" class="oe_highlight"/>

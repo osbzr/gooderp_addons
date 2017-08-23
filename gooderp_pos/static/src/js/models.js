@@ -281,7 +281,7 @@ odoo.define('gooderp_pos.models', function(require) {
 
             },
         }, {
-            model: 'pos.category',
+            model: 'goods.class',
             fields: ['id', 'name', 'parent_id', 'child_id', 'image'],
             domain: null,
             loaded: function(self, categories) {
@@ -289,7 +289,7 @@ odoo.define('gooderp_pos.models', function(require) {
             },
         }, {
             model: 'goods',
-            fields: ['name', 'price', 'pos_categ_id', 'barcode', 'default_code',
+            fields: ['name', 'price', 'goods_class_id', 'barcode', 'default_code',
                 'to_weight', 'description_sale', 'description','uom_id',
                 'tracking'
             ],
@@ -685,7 +685,7 @@ odoo.define('gooderp_pos.models', function(require) {
 
             // we try to send the order. shadow prevents a spinner if it takes too long. (unless we are sending an invoice,
             // then we want to notify the user that we are waiting on something )
-            var posOrderModel = new Model('sell.order');
+            var posOrderModel = new Model('sell.delivery');
             return posOrderModel.call('create_from_ui', [_.map(orders, function(order) {
                     order.to_invoice = options.to_invoice || false;
                     return order;
@@ -1254,6 +1254,7 @@ odoo.define('gooderp_pos.models', function(require) {
         },
         init_from_JSON: function(json) {
             this.amount = json.amount;
+            this.cashregister = this.pos.cashregisters_by_id[json.statement_id];
             this.name = this.cashregister.name;
             console.log(this.name)
         },
@@ -1288,7 +1289,7 @@ odoo.define('gooderp_pos.models', function(require) {
         export_as_JSON: function() {
             return {
                 name: time.datetime_to_str(new Date()),
-                //TODO:statement_id: this.cashregister.id,
+                statement_id: this.cashregister.id,
                 //FIXME:account_id: this.cashregister.account_id[0],
                 //FIXME:journal_id: this.cashregister.journal_id[0],
                 amount: this.get_amount()

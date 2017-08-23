@@ -101,5 +101,10 @@
         	<field name="pay_categ_id" ref="cat_freight"/>
         	<field name="price">500</field>
         </record>
+
+        <record id='user_alice' model='res.users'>
+            <field name='name'>Alice</field>
+            <field name='login'>alice</field>
+        </record>
     </data>
 </openerp>

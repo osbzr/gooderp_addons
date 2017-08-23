@@ -9,23 +9,36 @@ class PosConfig(models.Model):
     _name = 'pos.config'
     _description = u'POS设置'
 
-    name = fields.Char(string='Point of Sale Name', index=True, required=True)
-    cash_control = fields.Boolean(string='Cash Control')
-    receipt_footer = fields.Text(string='Receipt Footer', help="A short text that will be inserted as a footer in the printed receipt")
-    proxy_ip = fields.Char(string='IP Address', size=45,
-        help='The hostname or ip address of the hardware proxy, Will be autodetected if left empty')
-    active = fields.Boolean(default=True)
-    uuid = fields.Char(readonly=True, default=lambda self: str(uuid.uuid4()), help='唯一识别码')
-    sequence_id = fields.Many2one('ir.sequence', string='Order IDs Sequence', readonly=True, copy=False)
-    session_ids = fields.One2many('pos.session', 'config_id', string='Sessions')
-    last_session_closing_date = fields.Date()
+    name = fields.Char(string=u'POS名称', index=True, required=True)
+    cash_control = fields.Boolean(string=u'现金管理')
+    receipt_footer = fields.Text(string=u'收据页脚', help=u"在打印出来的收据中插入一段简短文字作为页脚。")
+    proxy_ip = fields.Char(string=u'IP地址', size=45,
+        help=u'硬件代理的主机名或IP地址，如果留空则会被自动检测到。')
+    active = fields.Boolean(u'有效', default=True)
+    uuid = fields.Char(u'唯一识别码', readonly=True, default=lambda self: str(uuid.uuid4()), help=u'唯一识别码')
+    sequence_id = fields.Many2one('ir.sequence', string=u'订单号序列', readonly=True, copy=False)
+    session_ids = fields.One2many('pos.session', 'config_id', string=u'会话')
+    current_session_id = fields.Many2one('pos.session', compute='_compute_current_session', string=u"当前会话")
+    last_session_closing_date = fields.Date(u'最近会话关闭日期')
 
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
-    group_pos_manager_id = fields.Many2one('res.groups', string='Point of Sale Manager Group',
-        help='管理POS这个POS缓存的组')
-    group_pos_user_id = fields.Many2one('res.groups', string='Point of Sale User Group',
-        help='可以使用这POS页面的人')
-    tip_product_id = fields.Many2one('goods', string='Tip Product' )
+    company_id = fields.Many2one('res.company', string=u'公司', required=True, default=lambda self: self.env.user.company_id)
+    group_pos_manager_id = fields.Many2one('res.groups', string=u'POS管理组',
+        help=u'管理POS这个POS缓存的组')
+    group_pos_user_id = fields.Many2one('res.groups', string=u'POS用户组',
+        help=u'可以使用这POS页面的人')
+    tip_product_id = fields.Many2one('goods', string=u'提示产品')
+    bank_account_ids = fields.Many2many(
+        'bank.account', 'pos_config_bank_account_rel',
+        'pos_config_id', 'bank_account_id',
+        u'可用的结算账户',
+    )
+
+    @api.depends('session_ids')
+    def _compute_current_session(self):
+        for pos_config in self:
+            session = pos_config.session_ids.filtered(
+                lambda r: r.user_id.id == self.env.uid and not r.state == 'closed')
+            pos_config.current_session_id = session
 
     @api.multi
     def name_get(self):
@@ -77,6 +90,7 @@ class PosConfig(models.Model):
 
     @api.multi
     def open_session_cb(self):
+        """打开一个新会话"""
         assert len(self.ids) == 1, "只能同时打开一个缓存"
         if not self.current_session_id:
             self.current_session_id = self.env['pos.session'].create({
@@ -90,6 +104,7 @@ class PosConfig(models.Model):
 
     @api.multi
     def open_existing_session_cb(self):
+        """打开一个会话"""
         assert len(self.ids) == 1, "只能同时打开一个缓存"
         return self._open_session(self.current_session_id.id)
 

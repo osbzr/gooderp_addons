@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+import odoo.addons.decimal_precision as dp
 
 class MonthProductCost(models.Model):
     _name = 'month.product.cost'
@@ -9,14 +10,14 @@ class MonthProductCost(models.Model):
 
     period_id = fields.Many2one('finance.period', string='会计期间')
     goods_id = fields.Many2one('goods', string="商品")
-    period_begin_qty = fields.Float(string='期初数量')
-    period_begin_cost = fields.Float(string='期初成本')
-    current_period_out_qty = fields.Float(string='本期出库量')
-    current_period_out_cost = fields.Float(string='本期出库成本')
-    current_period_in_qty = fields.Float(string='本期入库量')
-    current_period_in_cost = fields.Float(string='本期入库成本')
-    current_period_remaining_qty = fields.Float(string='本期剩余数量')
-    current_period_remaining_cost = fields.Float(string='剩余数量成本')
+    period_begin_qty = fields.Float(string='期初数量', digits=dp.get_precision('Quantity'))
+    period_begin_cost = fields.Float(string='期初成本', digits=dp.get_precision('Amount'),)
+    current_period_out_qty = fields.Float(string='本期出库量', digits=dp.get_precision('Quantity'))
+    current_period_out_cost = fields.Float(string='本期出库成本', digits=dp.get_precision('Amount'),)
+    current_period_in_qty = fields.Float(string='本期入库量', digits=dp.get_precision('Quantity'))
+    current_period_in_cost = fields.Float(string='本期入库成本', digits=dp.get_precision('Amount'),)
+    current_period_remaining_qty = fields.Float(string='本期剩余数量', digits=dp.get_precision('Quantity'))
+    current_period_remaining_cost = fields.Float(string='剩余数量成本', digits=dp.get_precision('Amount'),)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

@@ -197,8 +197,8 @@ class partner(models.Model):
 
 
     child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
-    contact = fields.Char(u'联系人', compute='_compute_partner_address')
-    mobile = fields.Char(u'手机', compute='_compute_partner_address')
-    phone = fields.Char(u'座机', compute='_compute_partner_address')
-    qq = fields.Char(u'QQ', compute='_compute_partner_address')
-    address = fields.Char(u'送货地址', compute='_compute_partner_address')
+    contact = fields.Char(u'联系人', compute='_compute_partner_address', store=True)
+    mobile = fields.Char(u'手机', compute='_compute_partner_address', store=True)
+    phone = fields.Char(u'座机', compute='_compute_partner_address', store=True)
+    qq = fields.Char(u'QQ', compute='_compute_partner_address', store=True)
+    address = fields.Char(u'送货地址', compute='_compute_partner_address', store=True)

@@ -1,10 +1,6 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
-        <record id='user_alice' model='res.users'>
-            <field name='name'>Alice</field>
-            <field name='login'>alice</field>
-        </record>
         <!--购货审批组-->
         <record id='group_process_buy_order' model='res.groups'>
             <field name='category_id' ref='good_process.gooderp_approver_groups'/>

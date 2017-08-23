@@ -26,11 +26,12 @@
 				<form string='商品'>
 					<sheet>
                 		<group>
-							<group>
+							<group name="general_info">
 							    <field name='code'/>
 								<field name='name' required='1'/>
 								<field name='not_saleable'/>
 								<field name='brand'/>
+								<field name='goods_class_id'/>
 								<field name='category_id'/>
 								<field name='uom_id' required='1' />
 								<field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
@@ -39,7 +40,7 @@
 								<field name='barcode' />
 								<field name='note'/>
 							</group>
-							<group>
+							<group name="image_info">
 	            				<div>
 	            					<field name='image' widget='image'
 	            						options='{"preview_image": "image", "width": "100%"}'/>
@@ -47,14 +48,14 @@
 							</group>
                 		</group>
 						<notebook>
-							<page string='高级'>
+							<page name="advanced_info" string='高级'>
 								<group>
-									<group>
+									<group name="price_info">
 									    <field name='price'/>
 										<field name='cost' groups='goods.view_cost_groups'/>
 										<field name='supplier_id' context="{'form_view_ref': 'core.supplier_address_form'}" groups='goods.view_cost_groups'/>
 									</group>
-									<group>
+									<group name="warehouse_info">
 									    <field name='no_stock' groups='goods.no_stock_groups'/>
 										<field name='using_batch' groups='goods.batch_groups'/>
 										<field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"

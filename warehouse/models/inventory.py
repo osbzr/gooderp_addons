@@ -47,6 +47,7 @@ class wh_inventory(models.Model):
                             help=u'盘盈生成的其他入库单单据')
     state = fields.Selection(
         INVENTORY_STATE, u'状态', copy=False, default='draft',
+        index=True,
         help=u'盘点单状态，新建时状态为草稿;'
              u'点击查询后为审核后状态为查询中;'
              u'有盘亏盘盈时生成的其他出入库单没有审核时状态为待确认盘盈盘亏;'

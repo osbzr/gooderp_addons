@@ -9,6 +9,10 @@
                      <button name="action_pos_session_open" type="object" string="开启工作记录" states="opening_control"
                        class="oe_highlight"/>
                     <button name="open_frontend_cb" type="object" string="销售"
+                            states="opened"
+                        class="oe_highlight"/>
+                    <button name="action_pos_session_close" type="object" string="确认关闭并过账"
+                            states="opened"
                         class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="opening_control,opened,closed" nolabel="1" />
                     
@@ -38,6 +42,17 @@
                             <field name="stop_at" attrs="{'invisible' : [('state', '!=', 'closed')]}"/>
                         </group>
                     </group>
+                    <separator string="付款方式汇总" attrs="{'invisible' : [('state', '=', 'opening_control')]}"/>
+                    <field name="payment_line_ids" attrs="{'invisible' : [('state', '=', 'opening_control')]}">
+                        <tree string="付款明细">
+                            <field name="session_id" />
+                            <field name="bank_account_id" />
+                            <field name="amount" />
+                            <field name="partner_id" />
+                            <field name="pay_date" />
+                            <field name="sell_id" />
+                        </tree>
+                    </field>
                 </sheet>
             </form>
         </field>
@@ -78,7 +93,7 @@
     </record>
 
     <record id="action_pos_session" model="ir.actions.act_window">
-        <field name="name">Sessions</field>
+        <field name="name">会话</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">pos.session</field>
         <field name="view_type">form</field>
@@ -95,12 +110,14 @@
         web_icon="gooderp_pos,static/description/icon.png"
         sequence="20"/>
     <menuitem id="menu_gooderp_pos" name="POS订单" parent="menu_point_root" sequence="10"/>
+    <menuitem id="menu_config" name="配置" parent="menu_point_root"
+         sequence="100" groups="group_pos_manager"/>
 
 
     <menuitem
         id="menu_pos_session_all"
         parent="menu_gooderp_pos"
         action="action_pos_session"
-        sequence="2"
+        sequence="20"
         groups="group_pos_manager"/>
 </odoo>

@@ -50,7 +50,7 @@ class test_mail_thread(TransactionCase):
 
         # admin的经理改为空，将用户组1中的用户改为Alice,admin去审批
         self.staff_admin.parent_id = False  #TODO:不起作用
-        group_1.write({'users': [(6, 0, [self.env.ref('scm.user_alice').id])]})
+        group_1.write({'users': [(6, 0, [self.env.ref('core.user_alice').id])]})
         res = self.order.good_process_approve(self.order.id, self.order._name)
         self.assertTrue(res[0] == u'您不是这张单据的下一个审批者')
 

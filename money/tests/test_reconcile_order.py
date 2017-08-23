@@ -52,6 +52,11 @@ class test_reconcile_order(TransactionCase):
         reconcile.partner_id = self.env.ref('core.lenovo').id
         reconcile.onchange_partner_id()
         reconcile.advance_payment_ids.this_reconcile = 600.0
+        reconcile.payable_source_ids[0].this_reconcile = 700.0
+        # 核销金额不能大于未核销金额。\n核销金额:700 未核销金额:600
+        with self.assertRaises(UserError):
+            reconcile.reconcile_order_done()
+
         reconcile.payable_source_ids[0].this_reconcile = 600.0
         reconcile.reconcile_order_done()
 

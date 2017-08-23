@@ -321,7 +321,8 @@ class buy_order(models.Model):
         money_order = self.env['money.order'].search(
                           [('origin_name','=',self.name)])
         if money_order:
-            money_order.money_order_draft()
+            if money_order.state == 'done':
+                money_order.money_order_draft()
             money_order.unlink()
         self.state = 'draft'
         self.approve_uid = ''

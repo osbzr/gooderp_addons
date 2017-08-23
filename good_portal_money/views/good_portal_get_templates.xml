@@ -1,0 +1,235 @@
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Website Portal Money">
+      <xpath expr="." position="inside">
+          <link rel='stylesheet' href='/good_portal_money/static/src/less/good_portal_money.less'/>
+      </xpath>
+    </template>
+
+    <template id="portal_my_home_get" name="Portal My Home : Get entries" inherit_id="good_portal.portal_my_home" priority="28">
+        <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
+            <h3 class="page-header">
+                <a href="/my/get/orders">收款单
+                    <small class="ml8">
+                        <t t-if="get_count">
+                            <span class='badge'><t t-esc="get_count"/></span>
+                        </t>
+                        <t t-if="not get_count">没有订单
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <template id="portal_my_get_orders" name="My Get Orders">
+      <t t-call="good_portal.portal_layout">
+        <h3 class="page-header">收款单</h3>
+        <t t-if="not get_orders">
+            <p>没有订单</p>
+        </t>
+        <t t-if="get_orders">
+            <table class="table table-hover o_my_status_table">
+                <thead>
+                  <tr class="active">
+                    <th width="15%">收款单 #</th>
+                    <th width="20%">订单日期</th>
+                    <th width="10%"></th>
+                    <th width="15%">往来单位</th>
+                    <th width="20%">总金额</th>
+                    <th width="20%">未核销金额</th>
+                  </tr>
+                </thead>
+                <t t-foreach="get_orders" t-as="order">
+                    <tr>
+                        <td>
+                            <a t-attf-href="/my/get/orders/{{order.id}}?{{keep_query()}}"><t t-esc="order.name"/></a>
+                        </td>
+                        <td><span t-field="order.date"/></td>
+                        <td>
+                            <t t-if="order.state == 'draft'">
+                                <span class="label label-info"><i class="fa fa-fw fa-clock-o"/> 未审核 </span>
+                            </t>
+                            <t t-if="order.state == 'done'">
+                                <span class="label label-danger"><i class="fa fa-fw fa-warning"/> 已审核 </span>
+                            </t>
+                        </td>
+                        <td><span t-field="order.partner_id.name"/></td>
+                        <td><span t-field="order.amount" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/></td>
+                        <td><span t-field="order.to_reconcile" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/></td>
+                    </tr>
+                </t>
+            </table>
+            <!-- <div t-if="pager" class="o_portal_pager text-center">
+              <t t-call="website.pager"/>
+            </div> -->
+        </t>
+      </t>
+    </template>
+
+    <template id="get_orders_followup" name="Get Order">
+      <t t-call="website.layout">
+        <div id="wrap">
+            <div class="container">
+              <div class="oe_structure">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <ol class="breadcrumb mt8">
+                            <li><a href="/my/home"><i class="fa fa-home"/></a></li>
+                            <li>
+                              <a t-attf-href="/my/get/#{'orders'}?{{ keep_query()}}">收款单</a>
+                            </li>
+                            <li>订单
+                              <t t-esc="get_order.name"/>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+              </div>
+              <div id="optional_placeholder"></div>
+              <div class="container">
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <h4>订单
+                            <span t-esc="get_order.name"/>
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="panel-body">
+                      <div>
+                        <div class='mb8'>
+                            <strong>单据日期：</strong>
+                            <span t-field="get_order.date" t-options='{"widget": "date"}'/>
+                        </div>
+                        <div class='mb8'>
+                            <strong>往来单位：</strong>
+                            <span t-field="get_order.partner_id.name"/>
+                        </div>
+                        <div class='mb8'>
+                            <strong>币别：</strong>
+                            <span t-field="get_order.currency_id.name" />
+                        </div>
+                        <div class='mb8'>
+                            <strong>本次预付：</strong>
+                            <span t-field="get_order.advance_payment" t-options='{"widget": "monetary", "display_currency": get_order.currency_id}'/>
+                        </div>
+                        <div class='mb8'>
+                            <strong>我方承担费用：</strong>
+                            <span t-field="get_order.discount_amount" t-options='{"widget": "monetary", "display_currency": get_order.currency_id}'/>
+                        </div>
+                       </div>
+                      <t t-if="get_order.line_ids">
+                          <hr/>
+                          <h4>资金信息
+                          </h4>
+                          <div class="row">
+                            <div class="col-md-2">
+                              <strong>结算账户</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>金额</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>币别</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>结算方式</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>结算号</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>备注</strong>
+                            </div>
+                          </div>
+                          <t t-foreach="get_order.line_ids" t-as="ol">
+                            <div class="row orders_vertical_align">
+                                <div id='goods_name' class="col-md-2">
+                                  <span t-esc="ol.bank_id.name"/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.amount" t-options='{"widget": "monetary", "display_currency": get_order.currency_id}'/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-esc="ol.currency_id.name"/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.mode_id.name"/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.number"/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.note"/>
+                                </div>
+                            </div>
+                          </t>
+                      </t>
+
+                      <t t-if="get_order.source_ids">
+                          <hr/>
+                          <h4>核销行
+                          </h4>
+                          <div class="row">
+                            <div class="col-md-1">
+                              <strong>结算单</strong>
+                            </div>
+                            <div class="col-md-1 text-right">
+                              <strong>类别</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>单据日期</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>单据金额</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>已核销</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>未核销</strong>
+                            </div>
+                            <div class="col-md-2 text-right">
+                              <strong>本次核销</strong>
+                            </div>
+                          </div>
+                          <t t-foreach="get_order.source_ids" t-as="ol">
+                            <div class="row orders_vertical_align">
+                                <div id='goods_name' class="col-md-1">
+                                  <span t-esc="ol.name.name"/>
+                                </div>
+                                <div class="col-md-1 text-right">
+                                  <span t-field="ol.category_id.name"/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.date" t-options='{"widget": "date"}'/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-esc="ol.amount" t-options='{"widget": "monetary", "display_currency": get_order.currency_id}'/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.reconciled" t-options='{"widget": "monetary", "display_currency": get_order.currency_id}'/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.to_reconcile" t-options='{"widget": "monetary", "display_currency": get_order.currency_id}'/>
+                                </div>
+                                <div class="col-md-2 text-right">
+                                  <span t-field="ol.this_reconcile" t-options='{"widget": "monetary", "display_currency": get_order.currency_id}'/>
+                                </div>
+                            </div>
+                          </t>
+                      </t>
+
+                    </div>
+                  </div>
+              </div>
+              <div class="oe_structure mb32"/>
+          </div>
+        </div>
+      </t>
+    </template>
+
+</odoo>

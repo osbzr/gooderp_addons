@@ -124,3 +124,23 @@ class TestReport(TransactionCase):
         with self.assertRaises(UserError):  # 不可识别的domain条件
             stock_transceive.with_context(context).search_read(
                 domain=[('warehouse', '=', u'上海仓', 'xxx')])
+        with self.assertRaises(UserError):  # 不可识别的domain条件
+            stock_transceive.with_context(context).search_read(
+                domain=['warehouse', '=', u'上海仓'])
+        # 增加一个domain 条件，domain 中用'|','|'
+        stock_transceive.with_context(context).search_read(
+            domain=['|','|',('goods', '=', u'键盘'),('warehouse', '=', u'上海仓'),('warehouse', '=', u'总仓')])
+
+    def test_stock_transceive_read_group(self):
+        """
+        商品收发明细表: 按商品和仓库分组
+        """
+        self.transceive_wizard.date_start = '2016-02-01'
+        context = self.transceive_wizard.open_report().get('context')
+        stock_transceive = self.env['report.stock.transceive'].create({})
+        stock_transceive.with_context(context).read_group(
+            domain=[('warehouse', '=', u'上海仓')],
+            fields=['warehouse'],
+            groupby=['warehouse', 'goods'],
+            orderby='warehouse',
+        )

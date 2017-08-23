@@ -73,7 +73,8 @@ class asset(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已审核'),
-                              ('clean', u'已清理')], u'状态', default='draft')
+                              ('clean', u'已清理')], u'状态', default='draft',
+                             index=True,)
     cost = fields.Float(u'金额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
     tax = fields.Float(u'税额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
     amount = fields.Float(u'价税合计', digits=dp.get_precision('Amount'), store=True, compute='_get_amount')

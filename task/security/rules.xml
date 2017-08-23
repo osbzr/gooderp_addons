@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
-		<record id="group_portal_project_rule"  model="ir.rule">
-			<field name='name'>门户用户只能看自己的项目</field>
-			<field name='model_id' ref="model_project"/>
-			<field name='domain_force'>[('message_partner_ids','in',[user.partner_id.id])]</field>
-			<field name='groups' eval="[(4,ref('base.group_portal'))]"/>
-			<field name='perm_read' eval='True'/>
-			<field name='perm_write' eval='False'/>
-			<field name='perm_create' eval='False'/>
-			<field name='perm_unlink' eval='False'/>
-		</record>
 		<!--base 模块中门户用户对res_partner的访问权规则写在了noupdate='1'中，所以要删掉这个rule-->
 		<delete model='ir.rule' search="[('id', '=', ref('base.res_partner_portal_public_rule'))]"/>
 	</data>

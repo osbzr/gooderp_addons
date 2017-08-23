@@ -126,7 +126,7 @@ class wh_move(models.Model):
         self.express_code = (safe_eval(content).get('Order', {})).get('LogisticCode', "")
         self.express_menu = str(safe_eval(content).get('PrintTemplate'))
         if not self.express_code:
-            raise UserError(u"获取快递面单失败!\n原因:%s"%str(content))
+            raise UserError("获取快递面单失败!\n原因:%s"%str(content))
         return str(safe_eval(content).get('PrintTemplate'))
 
     def encrypt_kdn(self, data, appkey):

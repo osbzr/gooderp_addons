@@ -12,8 +12,7 @@ class report_wave(models.AbstractModel):
     def render_html(self, docids, data=None):
         Report = self.env['report']
         records = self.env['wave'].browse(docids)
-        if records[0].state == 'draft':
-            records[0].state = 'printed'
+
         docargs = {
             'doc_ids': self._ids,
             'doc_model': 'wave',

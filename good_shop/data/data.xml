@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="portal_customer_category" model="core.category">
+            <field name="name">门户用户分类</field>
+            <field name="type">customer</field>
+        </record>
+
+        <record id="menu_shop" model="website.menu">
+            <field name="name">商城</field>
+            <field name="url">/shop</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">20</field>
+        </record>
+        <!-- <record id="action_open_website" model="ir.actions.act_url">
+            <field name="name">Website Shop</field>
+            <field name="target">self</field>
+            <field name="url">/shop</field>
+        </record> -->
+    </data>
+</odoo>

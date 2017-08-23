@@ -123,6 +123,7 @@ class wh_move_line(models.Model):
                             default=lambda self: self.env.context.get('type'),
                             help=u'类型：出库、入库 或者 内部调拨')
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft',
+                             index=True,
                              help=u'状态标识，新建时状态为草稿;审核后状态为已审核')
     goods_id = fields.Many2one('goods', string=u'商品', required=True,
                                index=True, ondelete='restrict',

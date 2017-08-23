@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
+from datetime import datetime
 
 class test_report(TransactionCase):
     def test_bank_report(self):
@@ -93,3 +94,16 @@ class test_report(TransactionCase):
         # 按其他收入筛选
         wizard.type = 'other_get'
         wizard.button_confirm()
+
+    def test_cash_flow_wizard(self):
+        """现金流量表"""
+        # 创建向导
+        wizard = self.env['cash.flow.wizard'].create({})
+        # 判断 period_id 是否是当前月的会计期间
+        datetime_str = datetime.now().strftime("%Y-%m-%d")
+        datetime_str_list = datetime_str.split('-')
+        period_row = self.env['finance.period'].search(
+            [('year', '=', datetime_str_list[0]), ('month', '=', str(int(datetime_str_list[1])))])
+        current_period = period_row and period_row[0]
+        self.assertEqual(wizard.period_id, current_period)
+        wizard.show()

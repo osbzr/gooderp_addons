@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_order_form" model="ir.ui.view">
+        <field name="name">sell.delivery.form</field>
+        <field name="model">sell.delivery</field>
+        <field name="inherit_id" ref="sell.sell_delivery_form"/>
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+                <field name="session_id" />
+            </field>
+        </field>
+    </record>
+    <record id="action_pos_order" model="ir.actions.act_window">
+        <field name="name">POS订单</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sell.delivery</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" eval="False"/>
+        <field name="domain">[('session_id', '!=', False)]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                点击创建一个新的订单。
+            </p>
+        </field>
+    </record>
+    <record id="view_pos_order_tree" model="ir.ui.view">
+        <field name="name">sell.delivery.tree</field>
+        <field name="model">sell.delivery</field>
+        <field name="inherit_id" ref="sell.sell_delivery_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="session_id" />
+            </field>
+        </field>
+    </record>
+
+    <record id="view_pos_order_search" model="ir.ui.view">
+        <field name="name">sell.delivery.search.view</field>
+        <field name="model">sell.delivery</field>
+        <field name="inherit_id" ref="sell.sell_delivery_search"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="config_id"/>
+            </field>
+        </field>
+    </record>
+
+    <menuitem id="menu_pos_order" name="POS订单" parent="menu_gooderp_pos" action="action_pos_order"
+              sequence="10" groups="group_pos_manager,group_pos_user"/>
+
+</odoo>
