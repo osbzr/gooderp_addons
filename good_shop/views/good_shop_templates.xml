@@ -219,7 +219,7 @@
                         <div class="col-sm-5 col-lg-4 col-lg-offset-1" id="product_details">
                             <h1 itemprop="name" t-field="product.name">产品</h1>
                             <span itemprop="url" style="display:none;" t-esc="'/shop/product/%s' % slug(product)" />
-
+                            <t t-set="attribute_ids" t-value="get_attribute_value_ids(product)"/>
                            <form action="/shop/cart/update" class="js_add_cart_variants" t-att-data-attribute_ids="attribute_ids" method="POST">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
                                 <div class="js_product">
@@ -293,15 +293,9 @@
     <!-- 产品属性 -->
     <template id="product_variants" inherit_id="good_shop.product" active="False" customize_show="True" name="List View of Variants">
       <xpath expr="//t[@t-placeholder='select']" position="replace">
-        <input type="hidden" t-if="len(product.attribute_ids) == 1" name="product_id" t-att-value="product.attribute_ids[0].id"/>
+        <input type="hidden" name="product_id" t-att-value="product.id"/>
         <t t-call="good_shop.variants">
           <t t-set="ul_class" t-value="'nav-stacked'"/>
-        </t>
-        <t t-if="len(product.attribute_ids) &gt; 1">
-          <label label-default="label-default" class="radio" t-foreach="product.attribute_ids" t-as="variant_id">
-            <input type="radio" name="product_id" class="js_product_change" t-att-value="variant_id.id" t-att-data-lst_price="product.price" t-att-data-price="product.price"/>
-            <span t-esc="variant_id.value_id.name"/>
-          </label>
         </t>
       </xpath>
     </template>
@@ -315,29 +309,25 @@
             </t>
         </t> -->
       <t t-set="attribute_ids" t-value="get_attribute_value_ids(product)"/>
-      <ul t-attf-class="list-unstyled js_add_cart_variants #{ul_class}" t-att-data-attribute_value_ids="attribute_ids">
-        <t t-foreach="product.attribute_ids" t-as="attribute_id">
-          <li t-if="len(attribute_id.value_ids) >= 1">
-            <strong t-field="attribute_id.name"/>
-
-            <!-- 属性配置 -->
-
-              <ul class="list-inline">
-                  <t t-set="inc" t-value="0"></t>
-                  <li t-foreach="attribute_id.value_ids" t-as="value_id">
-                      <!-- <label t-attf-style="background-color:#{value_id.value_id.name}"
-                          t-attf-class="css_attribute_color #{'active' if not inc else ''}"> -->
-                        <!-- <input type="radio" t-att-class="'js_variant_change'"
-                          t-att-checked="'checked' if not inc else None"
-                          t-att-name="'attribute-%s-%s' % (product.id, attribute_id.name)"
-                          t-att-value="value_id.value_id.id"
-                          t-att-title="value_id.value_id.name"/> -->
-                      <!-- </label> -->
-                      <t t-set="inc" t-value="inc+1"></t>
+      <ul t-attf-class="list-unstyled js_add_cart_variants #{ul_class}" t-att-data-attribute_value_ids="attribute_ids" t-att-data-goods_id="product.id">
+        <ul class="list-unstyled">
+            <t t-foreach="attribute_dict.keys()" t-as="attribute">
+              <strong t-esc="attribute" />
+              <t t-set="inc" t-value="0"/>
+              <t t-foreach="attribute_dict[attribute]" t-as="attribute_value">
+                  <li class="form-group js_attribute_value" style="margin: 0;">
+                      <label class="control-label" style="margin: 0 20px;">
+                          <input type="radio" t-att-class="'js_variant_change'"
+                               t-att-checked="'checked' if not inc else None"
+                               t-att-name="'attribute-%s-%s' % (product.id, attribute)"
+                               t-att-value="attribute_value" style="vertical-align: top; margin-right: 10px;"/>
+                      </label>
+                      <strong t-esc="attribute_value"/>
+                      <t t-set="inc" t-value="inc+1"/>
                   </li>
-              </ul>
-          </li>
-        </t>
+              </t>
+            </t>
+        </ul>
       </ul>
     </template>
 
@@ -391,6 +381,7 @@
                 <tr>
                     <th width="100">产品</th>
                     <th></th>
+                    <th width="100" class="text-center">属性</th>
                     <th width="130" class="text-center">数量</th>
                     <th width="100" class="text-center">价格</th>
                 </tr>
@@ -416,6 +407,7 @@
                             </div>
                             <a href='#' class='js_delete_product no-decoration'> <small><i class='fa fa-trash-o'></i> Remove</small></a>
                         </td>
+                        <td><span t-field="line.attribute_id.name"/></td>
                         <td class="text-center" id="td-qty">
                             <div class="input-group oe_website_spinner">
                                 <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
@@ -733,8 +725,12 @@
 
     <template id="success" name="success">
         <t t-call="website.layout">
-            <div class="container">
-                <span>您的购货订单创建成功！</span>
+            <div id="wrap">
+                <div class="oe_structure oe_empty">
+                    <div class="container">
+                        <span>您的购货订单创建成功！</span>
+                    </div>
+                </div>
             </div>
         </t>
     </template>

@@ -18,5 +18,9 @@
             <field name="target">self</field>
             <field name="url">/shop</field>
         </record> -->
+        
+        <record id="web_company_bank" model="bank.account">
+            <field name="name">公司账户交通银行(16666 8888888888888)</field>
+        </record>
     </data>
 </odoo>

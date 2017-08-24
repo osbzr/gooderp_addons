@@ -265,21 +265,21 @@ odoo.define('good_shop.website_sale', function (require) {
         function update_product_image(event_source, product_id) {
             if ($('#o-carousel-product').length) {
                 var $img = $(event_source).closest('tr.js_product, .oe_website_sale').find('img.js_variant_img');
-                $img.attr("src", "/web/image/product.product/" + product_id + "/image");
-                $img.parent().attr('data-oe-model', 'product.product').attr('data-oe-id', product_id)
-                    .data('oe-model', 'product.product').data('oe-id', product_id);
+                // $img.attr("src", "/web/image/product.product/" + product_id + "/image");
+                $img.parent().attr('data-oe-model', 'goods').attr('data-oe-id', product_id)
+                    .data('oe-model', 'goods').data('oe-id', product_id);
 
                 var $thumbnail = $(event_source).closest('tr.js_product, .oe_website_sale').find('img.js_variant_img_small');
                 if ($thumbnail.length !== 0) { // if only one, thumbnails are not displayed
-                    $thumbnail.attr("src", "/web/image/product.product/" + product_id + "/image/90x90");
+                    // $thumbnail.attr("src", "/web/image/product.product/" + product_id + "/image/90x90");
                     $('.carousel').carousel(0);
                 }
             }
             else {
                 var $img = $(event_source).closest('tr.js_product, .oe_website_sale').find('span[data-oe-model^="product."][data-oe-type="image"] img:first, img.product_detail_img');
-                $img.attr("src", "/web/image/product.product/" + product_id + "/image");
-                $img.parent().attr('data-oe-model', 'product.product').attr('data-oe-id', product_id)
-                    .data('oe-model', 'product.product').data('oe-id', product_id);
+                // $img.attr("src", "/web/image/product.product/" + product_id + "/image");
+                $img.parent().attr('data-oe-model', 'goods').attr('data-oe-id', product_id)
+                    .data('oe-model', 'goods').data('oe-id', product_id);
             }
             // reset zooming constructs
             $img.filter('[data-zoom-image]').attr('data-zoom-image', $img.attr('src'));
@@ -306,6 +306,7 @@ odoo.define('good_shop.website_sale', function (require) {
             var $default_price = $parent.find(".oe_default_price:first .oe_currency_value");
             var $optional_price = $parent.find(".oe_optional:first .oe_currency_value");
             var variant_ids = $ul.data("attribute_value_ids");
+            var goods_id = $ul.data("goods_id");
             var values = [];
             var unchanged_values = $parent.find('div.oe_unchanged_value_ids').data('unchanged_value_ids') || [];
 
@@ -320,8 +321,8 @@ odoo.define('good_shop.website_sale', function (require) {
             for (var k in variant_ids) {
                 if (_.isEmpty(_.difference(variant_ids[k][1], values))) {
                     $.when(base.ready()).then(function() {
-                        $price.html(price_to_str(variant_ids[k][2]));
-                        $default_price.html(price_to_str(variant_ids[k][3]));
+                        // $price.html(price_to_str(variant_ids[k][2]));
+                        // $default_price.html(price_to_str(variant_ids[k][3]));
                     });
                     if (variant_ids[k][3]-variant_ids[k][2]>0.01) {
                         $default_price.closest('.oe_website_sale').addClass("discount");
@@ -331,8 +332,8 @@ odoo.define('good_shop.website_sale', function (require) {
                         $optional_price.closest('.oe_optional').hide();
                         $default_price.parent().addClass('hidden');
                     }
-                    product_id = variant_ids[k][0];
-                    update_product_image(this, product_id);
+                    product_id = goods_id;
+                    update_product_image(this, goods_id);
                     break;
                 }
             }

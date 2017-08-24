@@ -37,23 +37,19 @@ class sell_order(models.Model):
         }
 
     @api.multi
-    def _cart_find_product_line(self, product_id=None, line_id=None, **kwargs):
+    def _cart_find_product_line(self, product_id=None, line_id=None, attributes=None, **kwargs):
         self.ensure_one()
-        product = self.env['goods'].browse(product_id)
+        attribute_id = self._get_line_attribute(line_id, product_id, attributes=attributes)
 
-        # split lines with the same product if it has untracked attributes
-#          and product.mapped('attribute_ids').filtered(lambda r: not r.attribute_id.create_variant) and not line_id
-#         if product and not line_id:
-#             print "product000", product
-#             return self.env['sell.order.line']
-
-        domain = [('order_id', '=', self.id), ('goods_id', '=', product_id)]
+        domain = [('order_id', '=', self.id), ('goods_id', '=', product_id), ('attribute_id', '=', attribute_id)]
         if line_id:
             domain += [('id', '=', line_id)]
+
         return self.env['sell.order.line'].sudo().search(domain)
 
     @api.multi
     def _website_product_id_change(self, order_id, product_id, qty=0):
+        # 获取创建订单行需要的数据
         order = self.sudo().browse(order_id)
         product_context = dict(self.env.context)
 
@@ -70,41 +66,53 @@ class sell_order(models.Model):
             'order_id': order_id,
             'uom_id': product.uom_id.id,
             'price': product.price,
-#             'attribute_id': product.attribute_ids and product.attribute_ids[0].value_ids or False
         }
 
     @api.multi
-    def _get_line_description(self, order_id, product_id, attributes=None):
+    def _get_line_attribute(self, order_id, product_id, attributes=None):
+        # 获取 属性
         if not attributes:
-            attributes = {}
+            return
 
-        order = self.sudo().browse(order_id)
         product_context = dict(self.env.context)
-
         product = self.env['goods'].with_context(product_context).browse(product_id)
 
-        name = product.display_name
+        # 属性：attribute-48-颜色，48是 product_id, 颜色是属性值的 category
+        web_value_lists = []
+        for k, v in attributes.items():
+            if len(k.split('-')) > 2:
+                attribute_category = self.env['core.category'].sudo().search([('name', '=', k.split('-')[2])])
+                attribute_value_value = self.env['attribute.value.value'].sudo().search([('name', '=', v),
+                                                                                         ('category_id', '=', attribute_category.id)])
+                web_value_lists.append(attribute_value_value.id)
 
-        # add untracked attributes in the name
-        untracked_attributes = []
-        for _, v in attributes.items():
-            # attribute should be like 'attribute-48-1' where 48 is the product_id, 1 is the attribute_id and v is the attribute value
-            attribute_value = self.env['attribute.value'].sudo().browse(int(v))
-            if attribute_value:
-                untracked_attributes.append(attribute_value.name)
-        if untracked_attributes:
-            name += '\n%s' % (', '.join(untracked_attributes))
+        attribute_id = False
+        for attribute in product.attribute_ids:
+            goods_value_lists = []
+            for value in attribute.value_ids:
+                goods_value_lists.append(value.value_id.id)
+            if goods_value_lists == web_value_lists: # 找到产品属性里匹配用户 web 界面输入的属性
+                attribute_id = attribute.id
+                break
+
+        return attribute_id
+
+    @api.multi
+    def _get_line_description(self, order_id, product_id):
+        # 获取创建订单行需要的 描述
+        product_context = dict(self.env.context)
+        product = self.env['goods'].with_context(product_context).browse(product_id)
+        name = product.display_name
 
         if product.note:
             name += '\n%s' % (product.note)
-
         return name
 
     @api.multi
     def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attributes=None, **kwargs):
         """ 添加或者设置产品数量 """
         self.ensure_one()
-        SaleOrderLineSudo = self.env['sell.order.line'].sudo()
+        sell_order_line_sudo_obj = self.env['sell.order.line'].sudo()
         quantity = 0
         order_line = False
         if self.state != 'draft':
@@ -112,14 +120,16 @@ class sell_order(models.Model):
             raise UserError(u'请先新建销售订单')
 
         if line_id is not False:
-            order_lines = self._cart_find_product_line(product_id, line_id, **kwargs)
+            order_lines = self._cart_find_product_line(product_id, line_id, attributes=attributes, **kwargs)
             order_line = order_lines and order_lines[0]
 
         # 不存在产品的销售明细行，则新建
         if not order_line:
-            values = self._website_product_id_change(self.id, product_id, qty=1)
-            values['note'] = self._get_line_description(self.id, product_id, attributes=attributes)
-            order_line = SaleOrderLineSudo.create(values)
+            values = self._website_product_id_change(self.id, product_id, qty=1) # 获取创建订单行需要的数据
+            # 获取创建订单行的 属性
+            values['attribute_id'] = self._get_line_attribute(self.id, product_id, attributes=attributes)
+            values['note'] = self._get_line_description(self.id, product_id) # 获取创建订单行的 备注
+            order_line = sell_order_line_sudo_obj.create(values)
 
             if add_qty:
                 add_qty -= 1
@@ -145,12 +155,6 @@ class sell_order(models.Model):
                     'quantity': quantity,
                     'date': order.date,
                 })
-                product = self.env['goods'].with_context(product_context).browse(product_id)
-#                 values['price_unit'] = self.env['account.tax']._fix_tax_included_price(
-#                     order_line._get_display_price(product),
-#                     order_line.product_id.taxes_id,
-#                     order_line.tax_id
-#                 )
 
             order_line.write(values)
 
@@ -263,6 +267,14 @@ class Website(models.Model):
         sell_order = self.env['sell.order'].sudo().search([('id', '=', sell_order_id)])
         if sell_order:
             sell_order.sell_order_done()
+
+            delivery_order = self.env['sell.delivery'].sudo().search([('order_id', '=', sell_order_id)])
+            delivery_order.sell_delivery_done()
+            if not self.env.user.company_id.bank_account_id:
+                company_bank = self.env.ref('good_shop.web_company_bank')
+                company_bank.balance += sell_order.amount
+            else:
+                self.env.user.sudo().company_id.bank_account_id.balance += sell_order.amount
 
 
 class ResPartner(models.Model):
