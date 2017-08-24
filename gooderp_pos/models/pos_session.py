@@ -116,6 +116,7 @@ class PosSession(models.Model):
             'url':   '/pos/web/',
         }
 
+
 class PaymentLine(models.Model):
     _name = 'payment.line'
 
@@ -123,5 +124,3 @@ class PaymentLine(models.Model):
     amount = fields.Float(u'总金额')
     pay_date = fields.Datetime(u'付款时间')
     bank_account_id = fields.Many2one(u'bank.account', u'付款方式')
-    sell_id = fields.Many2one('sell.delivery', string=u'对应订单')
-    partner_id = fields.Many2one('partner', string=u'客户')

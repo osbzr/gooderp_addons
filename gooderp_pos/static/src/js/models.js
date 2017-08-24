@@ -171,9 +171,21 @@ odoo.define('gooderp_pos.models', function(require) {
                 self.uom_id = uom[1];
             }
         },{
+            model: 'payment.line',
+            fields: ['bank_account_id', 'session_id'],
+            domain: null,
+            loaded: function(self, cashregisters, tmp){
+                self.cashregisters = cashregisters;
+
+                tmp.bank_accounts = [];
+                _.each(cashregisters,function(payment){
+                    tmp.bank_accounts.push(payment.bank_account_id[0]);
+                });
+            },
+        },{
             model: 'bank.account',
             fields: ['name'],
-            domain: null,
+            domain: function(self,tmp){ return [['id','in',tmp.bank_accounts]]; },
             loaded: function(self, mode) {
                 self.cashregisters = mode
             }
