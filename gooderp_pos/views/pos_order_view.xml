@@ -1,6 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_pos_order_form" model="ir.ui.view">
+    <record id="pos_order_form" model="ir.ui.view">
+        <field name="name">pos.order.form</field>
+        <field name="model">pos.order</field>
+        <field name="arch" type="xml">
+            <form string="POS 订单" create="0">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,paid,done" />
+                </header>
+                <sheet>
+                    <group col="4" colspan="4" name="order_fields">
+                        <field name="name"/>
+                        <field name="date"/>
+                        <field name="partner_id" domain="[('c_category_id', '!=', False)]"
+                               context="{'form_view_ref': 'core.customer_address_form'}"/>
+                        <field name="session_id" />
+                        <field name="user_id"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="订单明细">
+                            <field name="line_ids" colspan="4">
+                                <tree string="订单明细" create="0" edit="0">
+                                    <field name="goods_id"/>
+                                    <field name="qty"/>
+                                    <field name="price"/>
+                                    <field name="discount_rate"/>
+                                    <field name="discount_amount"/>
+                                    <field name="subtotal"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="付款明细">
+                            <field name="payment_line_ids" colspan="4" nolabel="1">
+                                <tree editable="bottom" string="付款明细">
+                                    <field name="bank_account_id"/>
+                                    <field name="amount" string="金额"/>
+                                    <field name="pay_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group col="4" colspan="4" name="amount_fields">
+                        <field name="amount_total"/>
+                        <field name="amount_paid"/>
+                    </group>
+                    <field name="note"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="pos_order_tree" model="ir.ui.view">
+        <field name="name">pos.order.tree</field>
+        <field name="model">pos.order</field>
+        <field name="arch" type="xml">
+            <tree string="POS 订单" decoration-info="state == 'draft'" decoration-muted="state == 'done'" create="0">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="amount_total" widget="monetary"/>
+                <field name="session_id" />
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_sell_delivery_form" model="ir.ui.view">
         <field name="name">sell.delivery.form</field>
         <field name="model">sell.delivery</field>
         <field name="inherit_id" ref="sell.sell_delivery_form"/>
@@ -10,8 +75,8 @@
             </field>
         </field>
     </record>
-    <record id="action_pos_order" model="ir.actions.act_window">
-        <field name="name">POS订单</field>
+    <record id="action_sell_delivery" model="ir.actions.act_window">
+        <field name="name">发货单</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sell.delivery</field>
         <field name="view_type">form</field>
@@ -24,7 +89,7 @@
             </p>
         </field>
     </record>
-    <record id="view_pos_order_tree" model="ir.ui.view">
+    <record id="view_sell_delivery_tree" model="ir.ui.view">
         <field name="name">sell.delivery.tree</field>
         <field name="model">sell.delivery</field>
         <field name="inherit_id" ref="sell.sell_delivery_tree"/>
@@ -35,7 +100,7 @@
         </field>
     </record>
 
-    <record id="view_pos_order_search" model="ir.ui.view">
+    <record id="view_sell_delivery_search" model="ir.ui.view">
         <field name="name">sell.delivery.search.view</field>
         <field name="model">sell.delivery</field>
         <field name="inherit_id" ref="sell.sell_delivery_search"/>
@@ -46,7 +111,22 @@
         </field>
     </record>
 
+    <record id="action_pos_order" model="ir.actions.act_window">
+        <field name="name">POS订单</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pos.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                点击创建一个新的订单。
+            </p>
+        </field>
+    </record>
+
     <menuitem id="menu_pos_order" name="POS订单" parent="menu_gooderp_pos" action="action_pos_order"
               sequence="10" groups="group_pos_manager,group_pos_user"/>
+    <menuitem id="menu_sell_delivery" name="发货单" parent="menu_gooderp_pos" action="action_sell_delivery"
+              sequence="20" groups="group_pos_manager,group_pos_user"/>
 
 </odoo>

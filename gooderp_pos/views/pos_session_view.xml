@@ -112,10 +112,6 @@
          sequence="100" groups="group_pos_manager"/>
 
 
-    <menuitem
-        id="menu_pos_session_all"
-        parent="menu_gooderp_pos"
-        action="action_pos_session"
-        sequence="20"
-        groups="group_pos_manager"/>
+    <menuitem id="menu_pos_session_all" name="会话" parent="menu_gooderp_pos"
+              action="action_pos_session" sequence="30" groups="group_pos_manager"/>
 </odoo>
