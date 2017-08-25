@@ -47,10 +47,8 @@
                         <tree string="付款明细">
                             <field name="session_id" />
                             <field name="bank_account_id" />
-                            <field name="amount" />
-                            <field name="partner_id" />
+                            <field name="amount" sum="金额汇总" />
                             <field name="pay_date" />
-                            <field name="sell_id" />
                         </tree>
                     </field>
                 </sheet>
@@ -114,10 +112,6 @@
          sequence="100" groups="group_pos_manager"/>
 
 
-    <menuitem
-        id="menu_pos_session_all"
-        parent="menu_gooderp_pos"
-        action="action_pos_session"
-        sequence="20"
-        groups="group_pos_manager"/>
+    <menuitem id="menu_pos_session_all" name="会话" parent="menu_gooderp_pos"
+              action="action_pos_session" sequence="30" groups="group_pos_manager"/>
 </odoo>
