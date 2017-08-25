@@ -216,9 +216,10 @@ class buy_receipt(models.Model):
     @api.one
     def _line_qty_write(self):
         if self.order_id:
-            line_ids = not self.is_return and self.line_in_ids or self.line_out_ids
-            for line in line_ids:
+            for line in self.line_in_ids:
                 line.buy_line_id.quantity_in += line.goods_qty
+            for line in self.line_out_ids:
+                line.buy_line_id.quantity_in -= line.goods_qty
 
         return
 
@@ -493,6 +494,7 @@ class buy_receipt(models.Model):
                     'uom_id': line.uom_id.id,
                     'warehouse_id': line.warehouse_dest_id.id,
                     'warehouse_dest_id': line.warehouse_id.id,
+                    'buy_line_id':line.buy_line_id.id,
                     'goods_qty': qty,
                     'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,

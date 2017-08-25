@@ -247,9 +247,11 @@ class sell_delivery(models.Model):
                     amount, self.receipt, self.partner_id.receivable, self.partner_id.credit_limit))
 
     def _line_qty_write(self):
-        line_ids = not self.is_return and self.line_out_ids or self.line_in_ids
-        for line in line_ids:
-            line.sell_line_id.quantity_out += line.goods_qty
+        if self.order_id:
+            for line in self.line_in_ids:
+                line.sell_line_id.quantity_out -= line.goods_qty
+            for line in self.line_out_ids:
+                line.sell_line_id.quantity_out += line.goods_qty
 
         return
 
