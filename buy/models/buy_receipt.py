@@ -474,15 +474,18 @@ class buy_receipt(models.Model):
         ])
         for order in return_order:
             for return_line in order.line_out_ids:
-                if return_goods.get(return_line.attribute_id.id):
-                    return_goods[return_line.attribute_id.id] += return_line.goods_qty
+                # 用产品、属性、批次做key记录已退货数量
+                t_key = (return_line.goods_id.id,return_line.attribute_id.id,return_line.lot_id.lot)
+                if return_goods.get(t_key):
+                    return_goods[t_key] += return_line.goods_qty
                 else:
-                    return_goods[return_line.attribute_id.id] = return_line.goods_qty
+                    return_goods[t_key] = return_line.goods_qty
         receipt_line = []
         for line in self.line_in_ids:
             qty = line.goods_qty
-            if return_goods.get(line.attribute_id.id):
-                qty = qty - return_goods[line.attribute_id.id]
+            l_key = (line.goods_id.id,line.attribute_id.id,line.lot)
+            if return_goods.get(l_key):
+                qty = qty - return_goods[l_key]
             if qty > 0:
                 dic = {
                     'goods_id': line.goods_id.id,
@@ -496,12 +499,15 @@ class buy_receipt(models.Model):
                     'discount_amount': line.discount_amount,
                     'type': 'out'
                 }
+                if line.goods_id.using_batch:
+                    dic.update({'lot_id':line.id})
                 receipt_line.append(dic)
         if len(receipt_line) == 0:
             raise UserError(u'该订单已全部退货！')
 
         vals = {'partner_id': self.partner_id.id,
                 'is_return': True,
+                'order_id': self.order_id.id,
                 'origin_id': self.id,
                 'origin': 'buy.receipt.return',
                 'warehouse_dest_id': self.warehouse_id.id,
