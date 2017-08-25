@@ -113,5 +113,5 @@
 
 
     <menuitem id="menu_pos_session_all" name="会话" parent="menu_gooderp_pos"
-              action="action_pos_session" sequence="30" groups="group_pos_manager"/>
+              action="action_pos_session" sequence="40" groups="group_pos_manager"/>
 </odoo>
