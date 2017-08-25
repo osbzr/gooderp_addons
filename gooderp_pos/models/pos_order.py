@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 from odoo.tools import float_compare
+import math
 from datetime import timedelta
 from functools import partial
 
@@ -170,7 +171,6 @@ class PosOrder(models.Model):
             order_data = order.get('data')
             pos_order_data = self.data_handling(order_data)
             pos_order = self.create(pos_order_data)
-            # pos_order.sell_delivery_done()
             order_ids.append(pos_order.id)
 
             prec_amt = self.env['decimal.precision'].precision_get('Amount')
@@ -186,9 +186,10 @@ class PosOrder(models.Model):
                 _logger.error(u'不能完整地处理POS 订单: %s', tools.ustr(e))
 
             # 生成sell_delivery，并审核
-            pos_order.create_sell_delivery()
-            # if pos_order.amount_total != 0:
-            #     pos_order.create_money_order()
+            records = pos_order.create_sell_delivery()
+            invoice_ids = [record.invoice_id for record in records]
+            # 生成收款单，并审核
+            pos_order.create_money_order(invoice_ids, pos_order.payment_line_ids)
         return order_ids
 
     def _payment_fields(self, ui_paymentline):
@@ -239,6 +240,7 @@ class PosOrder(models.Model):
     def create_sell_delivery(self):
         """由pos订单生成销售发货单"""
         for order in self:
+            records = []
             delivery_line = []  # 销售发货单行
             return_line = []  # 销售退货单行
             for line in order.line_ids:
@@ -248,8 +250,17 @@ class PosOrder(models.Model):
                     delivery_line.append(order._get_delivery_line(line))
             if delivery_line:
                 sell_delivery = order._generate_delivery(delivery_line, is_return=False)
+                sell_delivery.sell_delivery_done()
+                if sell_delivery.state != 'done':   # fixme:缺货时如何处理
+                    raise UserError(u'发货单不能完成审核')
+                records.append(sell_delivery)
             if return_line:
                 sell_return = order._generate_delivery(return_line, is_return=True)
+                sell_return.sell_delivery_done()
+                if sell_return.state != 'done':
+                    raise UserError(u'退货单不能完成审核')
+                records.append(sell_return)
+            return records
 
     @api.one
     def _get_delivery_line(self, line):
@@ -259,7 +270,7 @@ class PosOrder(models.Model):
             'goods_id': line.goods_id.id,
             'goods_uos_qty': line.goods_id.conversion and line.qty / line.goods_id.conversion or 0,
             'uos_id': line.goods_id.uos_id.id,
-            'goods_qty': line.qty,
+            'goods_qty': math.fabs(line.qty),
             'uom_id': line.goods_id.uom_id.id,
             'cost_unit': line.goods_id.cost,
             'price_taxed': line.price,
@@ -297,6 +308,45 @@ class PosOrder(models.Model):
             delivery_id.write({'line_in_ids': [
                 (0, 0, line[0]) for line in delivery_line]})
         return delivery_id
+
+    def create_money_order(self, invoice_ids, payment_line_ids):
+        '''生成收款单'''
+        categ = self.env.ref('money.core_category_sale')
+        money_lines = []    # 收款明细行
+        source_lines = []   # 待核销行
+        for line in payment_line_ids:
+            money_lines.append({
+                'bank_id': line.bank_account_id.id,
+                'amount': line.amount,
+            })
+        for invoice_id in invoice_ids:
+            if not invoice_id:
+                continue
+            source_lines.append({
+                'name': invoice_id and invoice_id.id,
+                'category_id': categ.id,
+                'date': invoice_id and invoice_id.date,
+                'amount': invoice_id.amount,
+                'reconciled': 0.0,
+                'to_reconcile': invoice_id.amount,
+                'this_reconcile': invoice_id.amount,
+            })
+        rec = self.with_context(type='get')
+        money_order = rec.env['money.order'].create({
+            'partner_id': self.partner_id.id,
+            'date': self.date[:10],
+            'line_ids': [(0, 0, line) for line in money_lines],
+            'source_ids': [(0, 0, line) for line in source_lines],
+            'amount': self.amount_total,
+            'reconciled': self.amount_total,
+            'to_reconcile': self.amount_total,
+            'state': 'draft',
+            'origin_name': self.name,
+            'note': self.note or '',
+        })
+        money_order.money_order_done()
+        return money_order
+
 
 class PosOrderLine(models.Model):
     _name = "pos.order.line"
