@@ -268,6 +268,7 @@ class PosOrderLine(models.Model):
 
 class PosPaymentLine(models.Model):
     _name = 'pos.payment.line'
+    _description = u"POS订单付款明细"
 
     order_id = fields.Many2one('pos.order', string=u'订单号', ondelete='cascade')
     bank_account_id = fields.Many2one('bank.account', u'付款方式')
