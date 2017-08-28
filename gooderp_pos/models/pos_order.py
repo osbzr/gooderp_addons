@@ -128,7 +128,7 @@ class PosOrder(models.Model):
     @api.depends('payment_line_ids', 'line_ids.subtotal')
     def _compute_amount_all(self):
         for order in self:
-            order.amount_paid = order.amount_return = 0.0
+            order.amount_paid = 0.0
             order.amount_paid = sum(payment.amount for payment in order.payment_line_ids)
             order.amount_total = sum(line.subtotal for line in order.line_ids)
 
