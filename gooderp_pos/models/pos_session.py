@@ -35,12 +35,13 @@ class PosSession(models.Model):
     login_number = fields.Integer(string=u'登录序列号', default=0)
     cash_control = fields.Boolean( string=u'现金管理')
     payment_line_ids = fields.One2many('payment.line', 'session_id', string=u'支付详情')
-    bank_account_ids = fields.Many2many(
-        'bank.account',
-        related='config_id.bank_account_ids',
-        readonly=True,
-        string=u'可用的结算账户',
-    )
+    # bank_account_ids = fields.Many2many(
+    #     'bank.account',
+    #     related='config_id.bank_account_ids',
+    #     readonly=True,
+    #     string=u'可用的结算账户',
+    # )
+    order_ids = fields.One2many('pos.order', 'session_id', string=u'POS订单')
 
     _sql_constraints = [('uniq_name', 'unique(name)', u"POS会话名称必须唯一")]
 
@@ -72,6 +73,12 @@ class PosSession(models.Model):
             'params': {'menu_id': self.env.ref('gooderp_pos.menu_point_root').id},
         }
 
+    @api.constrains('user_id', 'state')
+    def _check_unicity(self):
+        if self.search_count(
+                [('state', '!=', 'closed'), ('user_id', '=', self.user_id.id)]) > 1:
+            raise ValidationError(u"同一个负责人不能创建两个活动会话。")
+
     @api.constrains('config_id')
     def _check_pos_config(self):
         if self.search_count([
@@ -83,18 +90,31 @@ class PosSession(models.Model):
 
     @api.model
     def create(self, values):
-        if values.get('session_id'):
-            session = self.env['pos.session'].browse(values['session_id'])
-            values['name'] = session.config_id.sequence_id._next()
-            values.setdefault('pricelist_id', session.config_id.pricelist_id.id)
-        else:
-            # fallback on any pos.order sequence
-            values['name'] = self.env['ir.sequence'].next_by_code('pos.order')
+        """创建会话时，将pos上的付款方式填充到会话上来"""
+        config_id = values.get('config_id')
+        if not config_id:
+            raise UserError(u"你需要为你的销售会话指定一个POS")
+        pos_config = self.env['pos.config'].browse(config_id)
+        payment_lines = []
+        pos_name = self.env['ir.sequence'].next_by_code('pos.session')
+        for bank_account in pos_config.bank_account_ids:
+            bank_values = {
+                'session_id': self.id,
+                'bank_account_id': bank_account.id,
+                'amount': 0,
+            }
+            payment_lines.append(self.env['payment.line'].create(bank_values).id)
+        values.update({
+            'payment_line_ids': [(6, 0, payment_lines)],
+            'name': pos_name,
+        })
         res = super(PosSession, self).create(values)
         return res
 
     @api.multi
     def unlink(self):
+        for session in self.filtered(lambda s: s.payment_line_ids):
+            session.payment_line_ids.unlink()
         return super(PosSession, self).unlink()
 
     @api.multi
