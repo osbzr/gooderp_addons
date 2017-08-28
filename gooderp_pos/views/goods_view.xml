@@ -46,6 +46,6 @@
     </record>
 
     <menuitem id="menu_pos_goods" name="商品" action="goods_action"
-              parent="menu_gooderp_pos" sequence="40"/>
+              parent="menu_gooderp_pos" sequence="50"/>
 
 </odoo>

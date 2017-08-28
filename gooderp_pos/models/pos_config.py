@@ -9,6 +9,16 @@ class PosConfig(models.Model):
     _name = 'pos.config'
     _description = u'POS设置'
 
+    @api.model
+    def _default_warehouse(self):
+        return self._default_warehouse_impl()
+
+    @api.model
+    def _default_warehouse_impl(self):
+        if self.env.context.get('warehouse_type'):
+            return self.env['warehouse'].get_warehouse_by_type(
+                self.env.context.get('warehouse_type'))
+
     name = fields.Char(string=u'POS名称', index=True, required=True)
     cash_control = fields.Boolean(string=u'现金管理')
     receipt_footer = fields.Text(string=u'收据页脚', help=u"在打印出来的收据中插入一段简短文字作为页脚。")
@@ -32,6 +42,12 @@ class PosConfig(models.Model):
         'pos_config_id', 'bank_account_id',
         u'可用的结算账户',
     )
+    warehouse_id = fields.Many2one('warehouse',
+                                   u'调出仓库',
+                                   required=True,
+                                   ondelete='restrict',
+                                   default=_default_warehouse,
+                                   help=u'商品将从该仓库调出')
 
     @api.depends('session_ids')
     def _compute_current_session(self):

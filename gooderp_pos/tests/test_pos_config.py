@@ -12,9 +12,11 @@ class test_pos_config(TransactionCase):
 
     def test_create(self):
         '''创建一个POS设置'''
-        pos_config = self.env['pos.config'].create({
+        pos_config = self.env['pos.config'].with_context({
+            'warehouse_type':'stock'}).create({
             'name': u'零售测试',
         })
+        self.assertTrue(pos_config.warehouse_id.type == 'stock')
         self.assertEqual(pos_config.sequence_id.name, u'POS Order 零售测试')
 
     def test_unlink(self):

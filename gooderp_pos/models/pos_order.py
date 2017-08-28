@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 from odoo.tools import float_compare
+import math
 from datetime import timedelta
 from functools import partial
 
@@ -108,6 +109,12 @@ class PosOrder(models.Model):
         related='session_id.config_id',
         string=u"POS"
     )
+    warehouse_id = fields.Many2one(
+        'warehouse',
+        related='session_id.config_id.warehouse_id',
+        string=u'调出仓库',
+        store=True
+    )
     state = fields.Selection(
         [('draft', u'新建'),
          ('paid', u'已付款'),
@@ -121,11 +128,13 @@ class PosOrder(models.Model):
     @api.depends('payment_line_ids', 'line_ids.subtotal')
     def _compute_amount_all(self):
         for order in self:
-            order.amount_paid = order.amount_return = 0.0
+            order.amount_paid = 0.0
             order.amount_paid = sum(payment.amount for payment in order.payment_line_ids)
             order.amount_total = sum(line.subtotal for line in order.line_ids)
 
     def data_handling(self, order_data):
+        """准备创建 pos order 需要的数据"""
+        payment_line_list = []
         line_data_list = [[0, 0, {'goods_id': line[2].get('product_id'),
                                   'qty': line[2].get('qty'),
                                   'price': line[2].get('price_unit'),
@@ -136,37 +145,37 @@ class PosOrder(models.Model):
                                               line[2].get('discount') * line[2].get('price_unit') * line[2].get('qty')/100
                                   }]
                           for line in order_data.get('lines')]
-        payment_line_list = [[0, 0, {
-            'bank_account_id': line[2].get('statement_id'),
-            'amount': line[2].get('amount'),
-            'pay_date': line[2].get('name'),
-            'session_id': order_data.get('pos_session_id'),
-        }]for line in order_data.get('statement_ids')]
-        sell_order_data = dict(
+        prec_amt = self.env['decimal.precision'].precision_get('Amount')
+        # 付款金额为0时不生成付款明细
+        if line[2].get('amount') and not float_is_zero(line[2].get('amount'), precision_digits=prec_amt):
+            payment_line_list = [[0, 0, {
+                'bank_account_id': line[2].get('statement_id'),
+                'amount': line[2].get('amount'),
+                'pay_date': line[2].get('name'),
+            }]for line in order_data.get('statement_ids')]
+        pos_order_data = dict(
             session_id=order_data.get('pos_session_id'),
             partner_id=order_data.get('partner_id') or self.env.ref('gooderp_pos.pos_partner').id,
             user_id=order_data.get('user_id') or 1,
             line_ids=line_data_list,
             date=order_data.get('creation_date'),
-            warehouse_id=self.env.ref('core.warehouse_general').id,
-            warehouse_dest_id=self.env.ref('warehouse.warehouse_customer').id,
             payment_line_ids=payment_line_list,
         )
-        return sell_order_data
+        return pos_order_data
 
     @api.model
     def create_from_ui(self, orders):
+        """在会话中结账后生成pos order，并由pos order生成相应的发货单/退货单及收款单 """
         order_ids = []
         for order in orders:
             order_data = order.get('data')
-            sell_order_data = self.data_handling(order_data)
-            pos_order = self.create(sell_order_data)
-            # pos_order.sell_delivery_done()
+            pos_order_data = self.data_handling(order_data)
+            pos_order = self.create(pos_order_data)
             order_ids.append(pos_order.id)
 
-            prec_acc = self.env['decimal.precision'].precision_get('Account')
+            prec_amt = self.env['decimal.precision'].precision_get('Amount')
             for payments in order_data.get('statement_ids'):
-                if not float_is_zero(payments[2].get('amount'), precision_digits=prec_acc):
+                if not float_is_zero(payments[2].get('amount'), precision_digits=prec_amt):
                     pos_order.add_payment(self._payment_fields(payments[2]))
             try:
                 pos_order.action_pos_order_paid()
@@ -176,7 +185,11 @@ class PosOrder(models.Model):
             except Exception as e:
                 _logger.error(u'不能完整地处理POS 订单: %s', tools.ustr(e))
 
-            # fixme:生成sell_delivery
+            # 生成sell_delivery，并审核
+            records = pos_order.create_sell_delivery()
+            invoice_ids = [record.invoice_id for record in records]
+            # 生成收款单，并审核
+            pos_order.create_money_order(invoice_ids, pos_order.payment_line_ids)
         return order_ids
 
     def _payment_fields(self, ui_paymentline):
@@ -219,10 +232,120 @@ class PosOrder(models.Model):
     def action_pos_order_paid(self):
         decimal = self.env.ref('core.decimal_amount')
         for order in self:
-            if (not order.line_ids) or (not order.payment_line_ids) or \
-                            float_compare(order.amount_total, order.amount_paid, decimal.digits) == 1:
+            if float_compare(order.amount_total, order.amount_paid, decimal.digits) == 1:
                 raise UserError(u"该单还没付清")
             order.write({'state': 'paid'})
+
+    @api.multi
+    def create_sell_delivery(self):
+        """由pos订单生成销售发货单"""
+        for order in self:
+            records = []
+            delivery_line = []  # 销售发货单行
+            return_line = []  # 销售退货单行
+            for line in order.line_ids:
+                if line.qty < 0:
+                    return_line.append(order._get_delivery_line(line))
+                else:
+                    delivery_line.append(order._get_delivery_line(line))
+            if delivery_line:
+                sell_delivery = order._generate_delivery(delivery_line, is_return=False)
+                sell_delivery.sell_delivery_done()
+                if sell_delivery.state != 'done':   # fixme:缺货时如何处理
+                    raise UserError(u'发货单不能完成审核')
+                records.append(sell_delivery)
+            if return_line:
+                sell_return = order._generate_delivery(return_line, is_return=True)
+                sell_return.sell_delivery_done()
+                if sell_return.state != 'done':
+                    raise UserError(u'退货单不能完成审核')
+                records.append(sell_return)
+            return records
+
+    @api.one
+    def _get_delivery_line(self, line):
+        '''返回销售发货/退货单行'''
+        return {
+            'type': line.qty > 0 and 'out' or 'in',
+            'goods_id': line.goods_id.id,
+            'goods_uos_qty': line.goods_id.conversion and line.qty / line.goods_id.conversion or 0,
+            'uos_id': line.goods_id.uos_id.id,
+            'goods_qty': math.fabs(line.qty),
+            'uom_id': line.goods_id.uom_id.id,
+            'cost_unit': line.goods_id.cost,
+            'price_taxed': line.price,
+            'discount_rate': line.discount_rate,
+            'discount_amount': line.discount_amount,
+        }
+
+    def _generate_delivery(self, delivery_line, is_return):
+        '''根据明细行生成发货单或退货单'''
+        # 如果退货，warehouse_dest_id，warehouse_id要调换
+        warehouse = (not is_return
+                     and self.warehouse_id
+                     or self.env.ref("warehouse.warehouse_customer"))
+        warehouse_dest = (not is_return
+                          and self.env.ref("warehouse.warehouse_customer")
+                          or self.warehouse_id)
+        rec = (not is_return and self.with_context(is_return=False)
+               or self.with_context(is_return=True))
+        delivery_id = rec.env['sell.delivery'].create({
+            'partner_id': self.partner_id.id,
+            'warehouse_id': warehouse.id,
+            'warehouse_dest_id': warehouse_dest.id,
+            'user_id': self.user_id.id,
+            'date': self.date,
+            'date_due': self.date,
+            'session_id': self.session_id.id,
+            'origin': 'sell.delivery',
+            'is_return': is_return,
+            'note': self.note,
+        })
+        if not is_return:
+            delivery_id.write({'line_out_ids': [
+                (0, 0, line[0]) for line in delivery_line]})
+        else:
+            delivery_id.write({'line_in_ids': [
+                (0, 0, line[0]) for line in delivery_line]})
+        return delivery_id
+
+    def create_money_order(self, invoice_ids, payment_line_ids):
+        '''生成收款单'''
+        categ = self.env.ref('money.core_category_sale')
+        money_lines = []    # 收款明细行
+        source_lines = []   # 待核销行
+        for line in payment_line_ids:
+            money_lines.append({
+                'bank_id': line.bank_account_id.id,
+                'amount': line.amount,
+            })
+        for invoice_id in invoice_ids:
+            if not invoice_id:
+                continue
+            source_lines.append({
+                'name': invoice_id and invoice_id.id,
+                'category_id': categ.id,
+                'date': invoice_id and invoice_id.date,
+                'amount': invoice_id.amount,
+                'reconciled': 0.0,
+                'to_reconcile': invoice_id.amount,
+                'this_reconcile': invoice_id.amount,
+            })
+        rec = self.with_context(type='get')
+        money_order = rec.env['money.order'].create({
+            'partner_id': self.partner_id.id,
+            'date': self.date[:10],
+            'line_ids': [(0, 0, line) for line in money_lines],
+            'source_ids': [(0, 0, line) for line in source_lines],
+            'amount': self.amount_total,
+            'reconciled': self.amount_total,
+            'to_reconcile': self.amount_total,
+            'state': 'draft',
+            'origin_name': self.name,
+            'note': self.note or '',
+        })
+        money_order.money_order_done()
+        return money_order
 
 
 class PosOrderLine(models.Model):
@@ -287,27 +410,3 @@ class SellDelivery(models.Model):
         'pos.session', string=u'会话', index=True,
         readonly=True)
     config_id = fields.Many2one('pos.config', related='session_id.config_id', string=u"POS")
-
-    def data_handling(self, order_data):
-        line_data_list = [[0, 0, {'goods_id': line[2].get('product_id'),
-                                  'goods_qty': line[2].get('qty'),
-                                  'price_taxed': line[2].get('price_unit'),
-                                  'discount_amount': line[2].get('discount')*\
-                                                     line[2].get('price_unit') * line[2].get('qty')/100,
-                                  'discount_rate': line[2].get('discount'),
-                                  'type': 'out',
-                                  }]
-                          for line in order_data.get('lines')]
-        sell_order_data = dict(
-            session_id=order_data.get('pos_session_id'),
-            partner_id=order_data.get('partner_id') or self.env.ref('gooderp_pos.pos_partner').id,
-            user_id=order_data.get('user_id') or 1,
-            line_out_ids=line_data_list,
-            date=order_data.get('creation_date'),
-            warehouse_id=self.env.ref('core.warehouse_general').id,
-            warehouse_dest_id=self.env.ref('warehouse.warehouse_customer').id,
-            note=u"POS订单",
-            date_due=order_data.get('creation_date'),
-            bank_account_id=self.env.ref('gooderp_pos.pos_bank_account_cash').id,
-        )
-        return sell_order_data

@@ -23,7 +23,6 @@
         'views/pos_order_view.xml',
         'views/goods_view.xml',
         'data/gooderp_pos_data.xml',
-        'data/gooderp_pos_demo.xml',
     ],
     'demo': [
         'data/gooderp_pos_demo.xml',
