@@ -14,8 +14,8 @@
     ''',
     'data': [
         'data/base_data.xml',
-        'data/all_city_data.xml',
-        'data/all_county_data.xml',
+        'data/all.city.csv',
+        'data/all.county.csv',
         'views/partner_address.xml',
         'security/ir.model.access.csv'
     ],
