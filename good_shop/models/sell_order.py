@@ -231,6 +231,7 @@ class Website(models.Model):
             so_data = self._prepare_sale_order_values(partner)
             sale_order = self.env['sell.order'].sudo().create(so_data)
 
+            sale_order.pre_receipt = sale_order.amount
             request.session['sale_order_id'] = sale_order.id
 
             if request.website.gooderp_partner_id.id != partner.id:
@@ -246,8 +247,8 @@ class Website(models.Model):
                 # 改变客户，并触发 onchange_partner_id
                 sale_order.write({'partner_id': partner.id})
                 sale_order.onchange_partner_id()
-#                 sale_order.onchange_partner_shipping_id() # fiscal position
 
+            sale_order.write({'pre_receipt': sale_order.amount})
         else:
             request.session['sale_order_id'] = None
             return None
@@ -266,15 +267,12 @@ class Website(models.Model):
         sell_order_id = request.session.get('sale_order_id')
         sell_order = self.env['sell.order'].sudo().search([('id', '=', sell_order_id)])
         if sell_order:
+            if sell_order.pre_receipt and not sell_order.bank_account_id:
+                if not self.env.user.company_id.bank_account_id:
+                    sell_order.bank_account_id = self.env.ref('good_shop.web_company_bank').id
+                else:
+                    sell_order.bank_account_id = self.env.user.sudo().company_id.bank_account_id.id
             sell_order.sell_order_done()
-
-            delivery_order = self.env['sell.delivery'].sudo().search([('order_id', '=', sell_order_id)])
-            delivery_order.sell_delivery_done()
-            if not self.env.user.company_id.bank_account_id:
-                company_bank = self.env.ref('good_shop.web_company_bank')
-                company_bank.balance += sell_order.amount
-            else:
-                self.env.user.sudo().company_id.bank_account_id.balance += sell_order.amount
 
 
 class ResPartner(models.Model):

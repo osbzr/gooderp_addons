@@ -476,9 +476,9 @@
     <template id="total">
         <div id="cart_total" t-att-class="extra_class or ''" t-if="website_sale_order">
             <div class="row" id="order_total_untaxed">
-                <span class="col-xs-6 text-right text-muted">小计:</span>
+                <h4 class="col-xs-6 text-right text-muted">小计:</h4>
                 <span class="col-xs-6 text-left text-muted">
-                    <span t-field="website_sale_order.amount" style="white-space: nowrap;" t-options="{'widget': 'monetary','display_currency': website_sale_order.currency_id}" />
+                    <h4 t-field="website_sale_order.amount" style="white-space: nowrap;" t-options="{'widget': 'monetary','display_currency': website_sale_order.currency_id}" />
                 </span>
             </div>
         </div>
@@ -606,7 +606,7 @@
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-3 text-muted">
-                            <h3 class="page-header mt16 text-center">Your Order</h3>
+                            <h3 class="page-header mt16 text-center">你的订单</h3>
                             <t t-set="website_sale_order" t-value="website.sale_get_order()" />
                             <t t-call="good_shop.total" />
                         </div>
@@ -620,19 +620,19 @@
         <ul class="wizard pull-right">
             <li t-att-class="step==10 and 'text-primary' or 'text-muted'" id="step10">
                 <t t-if="step&gt;10 and step&lt;50">
-                    <a href="/shop/cart" class="text-success">
-                        Review Order<span class="chevron"></span>
+                    <a href="/shop/cart" class="text-success">返回订单
+                        <span class="chevron"></span>
                     </a>
                 </t>
-                <t t-if="not (step&gt;10 and step&lt;50)">
-                    Review Order<span class="chevron"></span>
+                <t t-if="not (step&gt;10 and step&lt;50)">返回订单
+                    <span class="chevron"></span>
                 </t>
             </li>
-            <li t-att-class="(step==20 and 'text-primary') or 'text-muted'" id="step20">
+            <!-- <li t-att-class="(step==20 and 'text-primary') or 'text-muted'" id="step20">
                 <t t-if="step&gt;20 and step&lt;50">
-                    <a href="/shop/checkout" class="text-success">
+                    <a href="/shop/checkout" class="text-success">-->
                         <!-- billing if not loggedin - TODO -->
-                        <t t-if="not website_sale_order or not website_sale_order.website_order_line or not website_sale_order.only_services">Shipping &amp;</t>
+                        <!--<t t-if="not website_sale_order or not website_sale_order.website_order_line or not website_sale_order.only_services">Shipping &amp;</t>
                             Billing<span class="chevron"/>
                     </a>
                 </t>
@@ -643,9 +643,9 @@
             </li>
             <li t-att-class="(step==40 and 'text-primary') or 'text-muted'" id="step40">
                 Payment<span class="chevron"></span>
-            </li>
-            <li t-att-class="(step==50 and 'text-primary') or 'text-muted'" id="step50">
-                Confirmation<span class="chevron"></span>
+            </li> -->
+            <li t-att-class="(step==50 and 'text-primary') or 'text-muted'" id="step50">确定
+                <span class="chevron"></span>
             </li>
         </ul>
     </template>
@@ -708,8 +708,10 @@
                             <div class="clearfix" />
                             <div>
                                 <a href="/shop/cart" class="btn btn-default mb32">
-                                    <span class="fa fa-long-arrow-left" /> 返回购物车</a>
-                                <a class="btn btn-default btn-primary pull-right mb32 " href="/shop/confirm_order">确定 <span class="fa fa-long-arrow-right" /></a>
+                                    <span class="fa fa-long-arrow-left"/>返回购物车</a>
+                                <a class="btn btn-default btn-primary pull-right mb32 " href="/shop/confirm_order">确定
+                                    <span class="fa fa-long-arrow-right" />
+                                </a>
                             </div>
                         </div>
                         <div class="col-lg-offset-1 col-md-3 text-muted">
@@ -728,7 +730,7 @@
             <div id="wrap">
                 <div class="oe_structure oe_empty">
                     <div class="container">
-                        <span>您的购货订单创建成功！</span>
+                        <h3>您的购货订单创建成功！</h3>
                     </div>
                 </div>
             </div>
