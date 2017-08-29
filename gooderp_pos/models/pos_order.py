@@ -222,6 +222,7 @@ class PosOrder(models.Model):
         for line in self.session_id.payment_line_ids:
             if line.bank_account_id.id == statement_id:
                 line.amount += data['amount']
+                line.pay_date = args['pay_date']
                 need_create = False
                 break
         if need_create:
