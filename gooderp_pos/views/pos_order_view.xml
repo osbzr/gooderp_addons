@@ -71,7 +71,7 @@
         <field name="inherit_id" ref="sell.sell_delivery_form"/>
         <field name="arch" type="xml">
             <field name="warehouse_id" position="after">
-                <field name="session_id" />
+                <field name="pos_order_id" />
             </field>
         </field>
     </record>
@@ -81,7 +81,7 @@
         <field name="inherit_id" ref="sell.sell_delivery_tree"/>
         <field name="arch" type="xml">
             <field name="name" position="after">
-                <field name="session_id" />
+                <field name="pos_order_id" />
             </field>
         </field>
     </record>
@@ -91,28 +91,28 @@
         <field name="inherit_id" ref="sell.sell_delivery_search"/>
         <field name="arch" type="xml">
             <field name="name" position="after">
-                <field name="config_id"/>
+                <field name="pos_order_id"/>
             </field>
         </field>
     </record>
 
     <record id="view_sell_return_form" model="ir.ui.view">
-        <field name="name">sell.delivery.form</field>
+        <field name="name">sell.return.form</field>
         <field name="model">sell.delivery</field>
         <field name="inherit_id" ref="sell.sell_return_form"/>
         <field name="arch" type="xml">
             <field name="warehouse_id" position="after">
-                <field name="session_id" />
+                <field name="pos_order_id" />
             </field>
         </field>
     </record>
     <record id="view_sell_return_tree" model="ir.ui.view">
-        <field name="name">sell.delivery.tree</field>
+        <field name="name">sell.return.tree</field>
         <field name="model">sell.delivery</field>
         <field name="inherit_id" ref="sell.sell_return_tree"/>
         <field name="arch" type="xml">
             <field name="name" position="after">
-                <field name="session_id" />
+                <field name="pos_order_id" />
             </field>
         </field>
     </record>
@@ -136,8 +136,7 @@
         <field name="res_model">sell.delivery</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <!--<field name='view_id' ref='view_sell_delivery_tree'/>-->
-        <field name="domain">[('session_id', '!=', False),('is_return','=',False)]</field>
+        <field name="domain">[('pos_order_id', '!=', False),('is_return','=',False)]</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 点击创建一个新的订单。
@@ -151,7 +150,7 @@
         <field name="res_model">sell.delivery</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('session_id', '!=', False),('is_return','=',True)]</field>
+        <field name="domain">[('pos_order_id', '!=', False),('is_return','=',True)]</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 点击创建一个新的订单。
