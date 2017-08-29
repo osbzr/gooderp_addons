@@ -3,12 +3,10 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
-class goods(models.Model):
-    _inherit = 'goods'
-    loc_ids = fields.One2many('location', 'goods_id', string='库位')
-
-
 class wh_move_line(models.Model):
+    '''
+    在采购入库单、其他入库单、销售退货单上增加库位字段，记录产品在仓库中存放的具体库位
+    '''
     _inherit = 'wh.move.line'
     location_id = fields.Many2one('location', string='库位')
 
@@ -59,7 +57,7 @@ class wave(models.Model):
                 raise UserError(u"""发货单%s已经打包发货,捡货单%s不允许删除!
                                  """%(u'-'.join([move_row.name for move_row in wh_move_rows]),
                                       wave_row.name))
-            # 清楚发货单上的格子号
+            # 清空发货单上的格子号
             move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id)])
             move_rows.write({'pakge_sequence': False})
         return super(wave, self).unlink()
@@ -151,7 +149,16 @@ class create_wave(models.TransientModel):
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
             active_model.pakge_sequence = index
             active_model.wave_id = wave_row.id
+            short = False    # 本单缺货
             for line in active_model.line_out_ids:
+                if line.goods_id.no_stock:
+                   continue
+                #缺货发货单不分配进拣货单
+                result = self.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_id)
+                result = result[0] or 0
+                if line.goods_qty > result:
+                    short = True
+                    break
                 location_row = self.env['location'].search([
                     ('goods_id', '=', line.goods_id.id),
                     ('warehouse_id', '=', line.warehouse_id.id)])
@@ -161,7 +168,8 @@ class create_wave(models.TransientModel):
                 else:
                     product_location_num_dict[(line.goods_id.id, location_row.id)] =\
                      [(line.id, line.goods_qty)]
-            index += 1
+            if not short:
+                index += 1
         wave_row.line_ids = self.build_wave_line_data(product_location_num_dict)
         return {'type': 'ir.actions.act_window',
                 'res_model': 'wave',
