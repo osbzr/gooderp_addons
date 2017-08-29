@@ -295,6 +295,8 @@ class wh_move_line(models.Model):
                 'date': line.move_id.date,
                 'cost_time': fields.Datetime.now(self),
             })
+            if line.type=='in' and line.location_id:
+                line.location_id.write({'attribute_id':line.attribute_id.id, 'goods_id':line.goods_id.id})
 
     def check_cancel(self):
         pass
