@@ -410,5 +410,6 @@ class SellDelivery(models.Model):
     pos_order_id = fields.Many2one(
         'pos.order',
         string=u'POS订单号',
-        ondelete='restrict'
+        ondelete='restrict',
+        readonly=True,
     )
