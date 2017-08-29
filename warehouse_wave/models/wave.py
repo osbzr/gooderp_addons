@@ -3,14 +3,6 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
-class wh_move_line(models.Model):
-    '''
-    在采购入库单、其他入库单、销售退货单上增加库位字段，记录产品在仓库中存放的具体库位
-    '''
-    _inherit = 'wh.move.line'
-    location_id = fields.Many2one('location', string='库位')
-
-
 class wave(models.Model):
     _name = "wave"
     _description = u"拣货单"
@@ -98,7 +90,7 @@ class create_wave(models.TransientModel):
         express_type = model_rows[0].express_type
         for model_row in model_rows:
             if model_row.wave_id:
-                raise UserError(u'请不要重复生成分拣货单!')
+                raise UserError(u'请不要重复生成拣货单!')
             if express_type and express_type != model_row.express_type:
                 raise UserError(u'发货方式不一样的发货单不能生成同一拣货单!')
         return res
@@ -144,17 +136,16 @@ class create_wave(models.TransientModel):
         """
         context = self.env.context
         product_location_num_dict = {}
-        index = 1
+        index = 0
+        express_type = ''                    #快递方式
         wave_row = self.env['wave'].create({})
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
-            active_model.pakge_sequence = index
-            active_model.wave_id = wave_row.id
             short = False    # 本单缺货
             for line in active_model.line_out_ids:
                 if line.goods_id.no_stock:
                    continue
                 #缺货发货单不分配进拣货单
-                result = self.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_id)
+                result = line.move_id.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_id)
                 result = result[0] or 0
                 if line.goods_qty > result:
                     short = True
@@ -170,6 +161,10 @@ class create_wave(models.TransientModel):
                      [(line.id, line.goods_qty)]
             if not short:
                 index += 1
+                active_model.pakge_sequence = index
+                active_model.wave_id = wave_row.id
+                express_type = active_model.express_type
+        wave_row.express_type = express_type          
         wave_row.line_ids = self.build_wave_line_data(product_location_num_dict)
         return {'type': 'ir.actions.act_window',
                 'res_model': 'wave',

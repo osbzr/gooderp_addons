@@ -148,6 +148,7 @@ class wh_move_line(models.Model):
     lot_uos_qty = fields.Float(u'批号辅助数量',
                            digits=dp.get_precision('Quantity'),
                                help=u'该单据行对应的商品的批号辅助数量')
+    location_id = fields.Many2one('location', string='库位')
     production_date = fields.Date(u'生产日期', default=fields.Date.context_today,
                                   help=u'商品的生产日期')
     shelf_life = fields.Integer(u'保质期(天)',
