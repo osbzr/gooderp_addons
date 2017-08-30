@@ -20,6 +20,7 @@
                 <tree string='仓库' editable='bottom'>
                     <field name='code' required='1' />
                     <field name='name' required='1' />
+                    <field name='user_ids' widget="many2many_tags"/>
                     <field name='active' widget='boolean_clickable' />
                 </tree>
             </field>

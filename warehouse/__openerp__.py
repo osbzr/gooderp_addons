@@ -46,6 +46,7 @@
     "data": [
         'data/warehouse_data.xml',
         'security/groups.xml',
+        'security/rules.xml',
         'wizard/save_bom_view.xml',
         'wizard/stock_transceive_wizard_view.xml',
         'wizard/non_active_report_wizard.xml',
