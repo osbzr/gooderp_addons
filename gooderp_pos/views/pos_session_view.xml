@@ -44,7 +44,7 @@
                     </group>
                     <separator string="付款方式汇总" attrs="{'invisible' : [('state', '=', 'opening_control')]}"/>
                     <field name="payment_line_ids" attrs="{'invisible' : [('state', '=', 'opening_control')]}">
-                        <tree string="付款明细">
+                        <tree string="付款明细" create="0" edit="0" delete="0">
                             <field name="session_id" />
                             <field name="bank_account_id" />
                             <field name="amount" sum="金额汇总" />
