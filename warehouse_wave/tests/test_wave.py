@@ -13,7 +13,7 @@ class test_create_wave(TransactionCase):
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
         # 补足库存数量
-        self.env.ref('warehouse.wh_in_whin3')..approve_order()
+        self.env.ref('warehouse.wh_in_whin3').approve_order()
         
 
     def test_fields_view_get(self):
