@@ -78,10 +78,6 @@
 			</field>
 		</record>
 
-		
-        <menuitem name="库位" id="wh_location_menu" parent="warehouse.warehouse_setting"
-		action="gooderp_location_action" sequence='2'/>
-
         <!-- 库存调拨 -->
         <record id='wh_move_line_tree' model='ir.ui.view'>
             <field name='name'>wh.move.line.tree</field>
