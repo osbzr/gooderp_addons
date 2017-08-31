@@ -35,12 +35,6 @@ class PosSession(models.Model):
     login_number = fields.Integer(string=u'登录序列号', default=0)
     cash_control = fields.Boolean( string=u'现金管理')
     payment_line_ids = fields.One2many('payment.line', 'session_id', string=u'支付详情')
-    # bank_account_ids = fields.Many2many(
-    #     'bank.account',
-    #     related='config_id.bank_account_ids',
-    #     readonly=True,
-    #     string=u'可用的结算账户',
-    # )
     order_ids = fields.One2many('pos.order', 'session_id', string=u'POS订单')
 
     _sql_constraints = [('uniq_name', 'unique(name)', u"POS会话名称必须唯一")]
@@ -65,7 +59,7 @@ class PosSession(models.Model):
             company_id = session.config_id.company_id.id
             ctx = dict(self.env.context, force_company=company_id, company_id=company_id)
         # self.with_context(ctx)._confirm_orders()
-        self.write({'state': 'closed'})
+            session.write({'state': 'closed', 'stop_at': fields.Datetime.now()})
         return {
             'type': 'ir.actions.client',
             'name': 'POS菜单',

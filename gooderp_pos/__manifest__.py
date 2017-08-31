@@ -22,6 +22,7 @@
         'views/pos_config_view.xml',
         'views/pos_order_view.xml',
         'views/goods_view.xml',
+        'views/pos_dashboard.xml',
         'data/gooderp_pos_data.xml',
     ],
     'demo': [
