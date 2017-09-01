@@ -86,8 +86,6 @@ class PosSession(models.Model):
     def create(self, values):
         """创建会话时，将pos上的付款方式填充到会话上来"""
         config_id = values.get('config_id')
-        if not config_id:
-            raise UserError(u"你需要为你的销售会话指定一个POS")
         pos_config = self.env['pos.config'].browse(config_id)
         payment_lines = []
         pos_name = self.env['ir.sequence'].next_by_code('pos.session')
