@@ -2,9 +2,6 @@
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 import datetime
-from odoo import tools
-import logging
-_logger = logging.getLogger(__name__)
 
 
 class test_pos_order(TransactionCase):
