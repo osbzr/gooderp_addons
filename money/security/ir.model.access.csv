@@ -19,3 +19,4 @@ access_money_get_pay_wizard,access_money_get_pay_wizard,model_money_get_pay_wiza
 access_bank_account_cashier,access_bank_account_cashier,model_bank_account,money.group_cashier,1,1,1,1
 access_cash_flow_template,access_cash_flow_template,model_cash_flow_template,,1,1,1,1
 access_cash_flow_statement,access_cash_flow_statement,model_cash_flow_statement,,1,1,1,1
+access_supplier_statements_report,access_supplier_statements_report,model_supplier_statements_report,,1,1,1,1
