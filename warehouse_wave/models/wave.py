@@ -31,7 +31,16 @@ class wave(models.Model):
         move_rows = self.env['wh.move'].search([('wave_id', '=', self.id)])
         return {'type': 'ir.actions.client',
                'tag': 'warehouse_wave.print_express_menu',
-               'context': {'move_ids':[move.id for move in move_rows]},
+               'context': {'move_ids': [move.id for move in move_rows]},
+               'target':'new',
+              }
+
+    @api.multi
+    def print_package_list(self):
+        move_rows = self.env['wh.move'].search([('wave_id', '=', self.id)])
+        return {'type': 'ir.actions.client',
+               'tag': 'warehouse_wave.print_express_package',
+               'context': {'move_ids': [move.id for move in move_rows]},
                'target':'new',
               }
 

@@ -19,4 +19,7 @@
         'views/assets_backend.xml'
     ],
     'depends': ['warehouse', 'sell'],
+    'qweb': [
+        'static/src/xml/*.xml',
+    ],
 }
