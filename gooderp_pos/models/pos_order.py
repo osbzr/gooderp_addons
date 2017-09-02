@@ -147,12 +147,13 @@ class PosOrder(models.Model):
                           for line in order_data.get('lines')]
         prec_amt = self.env['decimal.precision'].precision_get('Amount')
         # 付款金额为0时不生成付款明细
-        if line[2].get('amount') and not float_is_zero(line[2].get('amount'), precision_digits=prec_amt):
-            payment_line_list = [[0, 0, {
-                'bank_account_id': line[2].get('statement_id'),
-                'amount': line[2].get('amount'),
-                'pay_date': line[2].get('name'),
-            }]for line in order_data.get('statement_ids')]
+        for line in order_data.get('statement_ids'):
+            if not float_is_zero(line[2].get('amount'), precision_digits=prec_amt):
+                payment_line_list.append((0, 0, {
+                    'bank_account_id': line[2].get('statement_id'),
+                    'amount': line[2].get('amount'),
+                    'pay_date': line[2].get('name'),
+                }))
         pos_order_data = dict(
             session_id=order_data.get('pos_session_id'),
             partner_id=order_data.get('partner_id') or self.env.ref('gooderp_pos.pos_partner').id,
@@ -221,6 +222,7 @@ class PosOrder(models.Model):
         for line in self.session_id.payment_line_ids:
             if line.bank_account_id.id == statement_id:
                 line.amount += data['amount']
+                line.pay_date = args['pay_date']
                 need_create = False
                 break
         if need_create:
@@ -296,7 +298,7 @@ class PosOrder(models.Model):
             'user_id': self.user_id.id,
             'date': self.date,
             'date_due': self.date,
-            'session_id': self.session_id.id,
+            'pos_order_id': self.id,
             'origin': 'sell.delivery',
             'is_return': is_return,
             'note': self.note,
@@ -406,7 +408,9 @@ class SellDelivery(models.Model):
     """
     #TODO:估计还有很多字段上的关联要添加,这个还得进一步的测试.
 
-    session_id = fields.Many2one(
-        'pos.session', string=u'会话', index=True,
-        readonly=True)
-    config_id = fields.Many2one('pos.config', related='session_id.config_id', string=u"POS")
+    pos_order_id = fields.Many2one(
+        'pos.order',
+        string=u'POS订单号',
+        ondelete='restrict',
+        readonly=True,
+    )
