@@ -59,7 +59,7 @@ class wh_move(models.Model):
                       ProvinceName=ware_hosue_row.province_id.name  or '上海',
                       CityName=ware_hosue_row.city_id.city_name or '上海',
                       ExpAreaName=ware_hosue_row.county_id.county_name  or '浦东新区',
-                      Address=(ware_hosue_row.detail_address or '金海路2588号B-213') + '\r\n格子号：' + pakge_sequence)
+                      Address=(ware_hosue_row.detail_address or '金海路2588号B-213') + '\r\n格子号：' + pakge_sequence if pakge_sequence else '')
         return sender
 
     def get_receiver_goods_message(self):
