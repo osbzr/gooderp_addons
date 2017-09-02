@@ -73,6 +73,15 @@ class test_pos_session(TransactionCase):
                 'config_id': self.pos_config.id,
             })
 
+    def test_check_unicity(self):
+        '''同一个负责人不能创建两个活动会话'''
+        pos_config_2 = self.env['pos.config'].with_context({
+            'warehouse_type': 'stock'}).create({
+            'name': u'浦东店',
+        })
+        with self.assertRaises(ValidationError):
+            pos_config_2.open_session_cb()
+
     def test_unlink(self):
         '''删除会话'''
         self.session.unlink()
@@ -89,6 +98,27 @@ class test_pos_session(TransactionCase):
         with self.assertRaises(UserError):
             self.session.user_id = self.env.ref('core.user_alice').id
             self.session.open_frontend_cb()
+
+    def test_action_pos_session_close(self):
+        """关闭会话"""
+        self.session.action_pos_session_close()
+        self.assertEqual(self.session.state, 'closed')
+
+    def test_create(self):
+        '''创建会话时，将pos上的付款方式填充到会话上来'''
+        self.session.action_pos_session_close()
+        pos_config = self.env['pos.config'].with_context({
+            'warehouse_type': 'stock'}).create({
+            'name': u'浦东店',
+            'bank_account_ids': [(0, 0, {
+                'name': '支付宝',
+                'account_id': self.env.ref('core.alipay').account_id.id,
+                'init_balance': 1000,
+            })]
+        })
+        self.env['pos.session'].create({
+            'config_id': pos_config.id,
+        })
 
 
 class test_res_users(TransactionCase):

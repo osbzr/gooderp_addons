@@ -29,7 +29,8 @@ class PosConfig(models.Model):
     sequence_id = fields.Many2one('ir.sequence', string=u'订单号序列', readonly=True, copy=False)
     session_ids = fields.One2many('pos.session', 'config_id', string=u'会话')
     current_session_id = fields.Many2one('pos.session', compute='_compute_current_session', string=u"当前会话")
-    last_session_closing_date = fields.Date(u'最近会话关闭日期')
+    current_session_state = fields.Char(compute='_compute_current_session')
+    last_session_closing_date = fields.Date(u'最近会话关闭日期', compute='_compute_last_session')
 
     company_id = fields.Many2one('res.company', string=u'公司', required=True, default=lambda self: self.env.user.company_id)
     group_pos_manager_id = fields.Many2one('res.groups', string=u'POS管理组',
@@ -55,6 +56,20 @@ class PosConfig(models.Model):
             session = pos_config.session_ids.filtered(
                 lambda r: r.user_id.id == self.env.uid and not r.state == 'closed')
             pos_config.current_session_id = session
+            pos_config.current_session_state = session.state
+
+    @api.depends('session_ids')
+    def _compute_last_session(self):
+        PosSession = self.env['pos.session']
+        for pos_config in self:
+            session = PosSession.search_read(
+                [('config_id', '=', pos_config.id), ('state', '=', 'closed')],
+                ['stop_at'],
+                order="stop_at desc", limit=1)
+            if session:
+                pos_config.last_session_closing_date = session[0]['stop_at']
+            else:
+                pos_config.last_session_closing_date = False
 
     @api.multi
     def name_get(self):

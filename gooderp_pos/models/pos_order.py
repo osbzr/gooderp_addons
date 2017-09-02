@@ -322,8 +322,6 @@ class PosOrder(models.Model):
                 'amount': line.amount,
             })
         for invoice_id in invoice_ids:
-            if not invoice_id:
-                continue
             source_lines.append({
                 'name': invoice_id and invoice_id.id,
                 'category_id': categ.id,
