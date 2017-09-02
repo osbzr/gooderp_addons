@@ -17,21 +17,21 @@
                    <table>
                         <thead>
                             <tr>
-                                <th width="80" class="text-center">货品代码</th>
-                                <th width="100" class="text-center">货品名称</th>
-                                <th width="40" class="text-center">数量</th>
-                                <th width="50" class="text-center">单价</th>
-                                <th width="50" class="text-center">金额</th>
+                                <th width="80" class="text-left">货品代码</th>
+                                <th width="100" class="text-left">货品名称</th>
+                                <th width="40" class="text-left">数量</th>
+                                <th width="50" class="text-left">单价</th>
+                                <th width="50" class="text-left">金额</th>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-foreach="detail_infos[info]" t-as="show_details">
                                 <tr>
-                                    <td width="80" class="text-center"><t t-esc="show_details[0]"/></td>
-                                    <td width="100" class="text-center"><t t-esc="show_details[1]"/></td>
-                                    <td width="40" class="text-center"><t t-esc="show_details[2]"/></td>
-                                    <td width="50" class="text-center"><t t-esc="show_details[3]"/></td>
-                                    <td width="50" class="text-center"><t t-esc="show_details[4]"/></td>
+                                    <td width="80" class="text-left"><t t-esc="show_details[0]"/></td>
+                                    <td width="100" class="text-left"><t t-esc="show_details[1]"/></td>
+                                    <td width="40" class="text-left"><t t-esc="show_details[2]"/></td>
+                                    <td width="50" class="text-left"><t t-esc="show_details[3]"/></td>
+                                    <td width="50" class="text-left"><t t-esc="show_details[4]"/></td>
                                 </tr>
                             </t>
                             <br/>
@@ -39,6 +39,7 @@
                     </table>
                 </t>
                 <t t-if="info == '8 总件数'">
+                    <br/>
                     <span>总件数：</span>
                     <t t-foreach="detail_infos[info]" t-as="show_details">
                         <t t-esc="show_details"/>
@@ -51,7 +52,7 @@
                     </t>
                 </t>
             </t>
-            <hr/>
+            <br/><hr/>
             <h4>销售凭据，请妥善保管。如果退货，请随货品一同<br/>返还本发货清单。感谢您的合作！</h4>
         </div>
      </t>

@@ -5,9 +5,7 @@ import hashlib,base64, httplib2
 import json, urllib
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
-import pdfkit
-import tempfile, os
-from collections import OrderedDict
+
 
 class express_menu_config(models.Model):
     """
