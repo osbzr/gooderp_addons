@@ -5,8 +5,7 @@ import hashlib,base64, httplib2
 import json, urllib
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
-import pdfkit
-import tempfile, os
+
 
 class express_menu_config(models.Model):
     """
@@ -52,7 +51,7 @@ class wh_move(models.Model):
                                     )
         return shipping_type_config
 
-    def get_sender(self, ware_hosue_row):
+    def get_sender(self, ware_hosue_row, pakge_sequence):
         sender = dict(Company=ware_hosue_row.company_id.name,
                       Name=ware_hosue_row.principal_id.name or ware_hosue_row.company_id.name or '',
                       Mobile=ware_hosue_row.principal_id.work_phone or
@@ -60,7 +59,7 @@ class wh_move(models.Model):
                       ProvinceName=ware_hosue_row.province_id.name  or '上海',
                       CityName=ware_hosue_row.city_id.city_name or '上海',
                       ExpAreaName=ware_hosue_row.county_id.county_name  or '浦东新区',
-                      Address=ware_hosue_row.detail_address or '金海路2588号B-213')
+                      Address=(ware_hosue_row.detail_address or '金海路2588号B-213') + '\r\n格子号：' + pakge_sequence if pakge_sequence else '')
         return sender
 
     def get_receiver_goods_message(self):
@@ -106,7 +105,7 @@ class wh_move(models.Model):
         header = safe_eval(expressconfigparam.get_param('express_menu_request_headers',
                                                         default=''))
         order_code = self.name
-        sender = self.get_sender(self.warehouse_id)
+        sender = self.get_sender(self.warehouse_id, self.pakge_sequence)
         remark = self.note or '小心轻放'
         shipping_type = self.express_type or 'YTO'
         receiver, commodity, qty = self.get_receiver_goods_message()
@@ -137,7 +136,32 @@ class wh_move(models.Model):
         return urllib.quote(key, safe='/')
 
     @api.model
+    def get_package_list_data(self, move_row):
+        # 装箱单明细行数据
+        line_dict = []
+        total_price = 0
+        for line in move_row.line_out_ids:
+            # code, name, goods_qty, price, subtotal
+            line_dict.append([line.goods_id.code,line.goods_id.name,line.goods_qty,line.price,line.subtotal])
+            total_price += line.subtotal
+
+        # 装箱单数据
+        package_list = {'0 任务栏号': [],
+                     '1 内部订单号': [move_row.name],
+                     '2 店铺名称': [],
+                     '3 外部订单号': [move_row.name],
+                     '4 收货人': [move_row.partner_id.name],
+                     '5 订单日期': [move_row.date],
+                     '6 应付款': [move_row.partner_id.receivable],
+                     '7 lines': line_dict,
+                     '8 总件数': [move_row.total_qty],
+                     '9 总价格': [total_price],
+                     }
+        return package_list
+
+    @api.model
     def get_moves_html(self, move_ids):
+        ''' 打印快递面单+装箱单 '''
         move_rows = self.browse(move_ids)
         return_html_list = []
         for move_row in move_rows:
@@ -145,5 +169,19 @@ class wh_move(models.Model):
                 return_html_list.append(move_row.express_menu)
             else:
                 return_html_list.append(move_row.get_express_menu())
+
+            # 添加装箱单数据
+            return_html_list.append(self.get_package_list_data(move_row))
+
+        return return_html_list
+
+    @api.model
+    def get_moves_html_package(self, move_ids):
+        ''' 打印装箱单 '''
+        move_rows = self.browse(move_ids)
+        return_html_list = []
+        for move_row in move_rows:
+            return_html_list.append(self.get_package_list_data(move_row))
+
         return return_html_list
         

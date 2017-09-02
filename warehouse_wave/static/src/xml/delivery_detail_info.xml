@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates id='template' xml:space='preserve'>
+    <t t-name="temp_detail_info">
+        <div class="btn-group btn-group-sm" role="group">
+            <h2 class="text-center">装箱清单</h2>
+            <t t-set='count' t-value='0'/>
+            <t t-foreach="detail_infos" t-as="info">
+                <t t-set='count' t-value='count+1'/>
+                <t t-if="count &lt; 8 ">
+                    <strong t-esc="info.split(' ')[1]"/><span>：</span>
+                    <t t-foreach="detail_infos[info]" t-as="show_details">
+                        <t t-esc="show_details"/>
+                    </t>
+                    <br/>
+                </t>
+                <t t-if="info == '7 lines'">
+                   <table>
+                        <thead>
+                            <tr>
+                                <th width="80" class="text-left">货品代码</th>
+                                <th width="100" class="text-left">货品名称</th>
+                                <th width="40" class="text-left">数量</th>
+                                <th width="50" class="text-left">单价</th>
+                                <th width="50" class="text-left">金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="detail_infos[info]" t-as="show_details">
+                                <tr>
+                                    <td width="80" class="text-left"><t t-esc="show_details[0]"/></td>
+                                    <td width="100" class="text-left"><t t-esc="show_details[1]"/></td>
+                                    <td width="40" class="text-left"><t t-esc="show_details[2]"/></td>
+                                    <td width="50" class="text-left"><t t-esc="show_details[3]"/></td>
+                                    <td width="50" class="text-left"><t t-esc="show_details[4]"/></td>
+                                </tr>
+                            </t>
+                            <br/>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-if="info == '8 总件数'">
+                    <br/>
+                    <span>总件数：</span>
+                    <t t-foreach="detail_infos[info]" t-as="show_details">
+                        <t t-esc="show_details"/>
+                    </t>
+                </t>
+                <t t-if="info == '9 总价格'">
+                    <span>总价格：</span>
+                    <t t-foreach="detail_infos[info]" t-as="show_details">
+                        <t t-esc="show_details"/>
+                    </t>
+                </t>
+            </t>
+            <br/><hr/>
+            <h4>销售凭据，请妥善保管。如果退货，请随货品一同<br/>返还本发货清单。感谢您的合作！</h4>
+        </div>
+     </t>
+</templates>

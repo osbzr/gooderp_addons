@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data noupdate="1">
+    <data noupdate="0">
         <!--  服务单编号 -->
         <record id="seq_wave_order" model="ir.sequence">
             <field name="name">捡货单</field>
@@ -37,6 +37,12 @@
             <field name="abbreviation">YTO</field>
             <field name="customername">testyto</field>
             <field name="monthcode">testytomonthcode</field>
+        </record>
+        <record id="zto_ express_menu_config" model="express.menu.config">
+            <field name="name">中通</field>
+            <field name="abbreviation">ZTO</field>
+            <field name="customername">testzto</field>
+            <field name="customerpwd">testztopwd</field>
         </record>
     </data>
 </openerp>

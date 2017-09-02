@@ -7,6 +7,12 @@
 			<field name='target'>new</field>
         </record>
 
+        <record id="action_warehouse_wave_package" model="ir.actions.client">
+            <field name="name">打印装箱单</field>
+            <field name="tag">warehouse_wave.print_express_package</field>
+            <field name='target'>new</field>
+        </record>
+
         <record model="ir.ui.view" id="wave_tree">
 			<field name="name">拣货单</field>
 			<field name="model">wave</field>
@@ -17,6 +23,7 @@
 					<field name='state' string='拣货单打印状态'/>
 					<button name="report_wave" type="object" string='打印拣货单'/>
 					<button name="print_express_menu" type="object" string='打印快递面单'/>
+					<button name="print_package_list" type="object" string='打印装箱单'/>
 				</tree>
 			</field>
 		</record>
