@@ -218,7 +218,7 @@ class do_pack(models.Model):
                 # 执行 销售发货审核，允许库存为零，执行 common.dialog.wizard 里的 do_confirm 方法
                 if function_dict.get(model_row._name) == 'sell_delivery_done':
                     result_vals = func()
-                    if result_vals and result_vals['res_model'] == 'common.dialog.wizard':
+                    if result_vals and isinstance(result_vals, dict) and result_vals['res_model'] == 'common.dialog.wizard':
                         # 通过 context 传值给 common.dialog.wizard
                         ctx = result_vals['context']
                         ctx['active_model'] = 'sell.delivery'
@@ -281,6 +281,7 @@ class do_pack(models.Model):
             for line_row in line_rows:
                 if line_row.goods_qty <= line_row.pack_qty:
                     continue
+                print '++++++++++++++++++++++++++',line_row
                 line_row.pack_qty += 1
                 goods_is_enough = False
                 break
