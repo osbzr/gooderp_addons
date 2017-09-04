@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+	    <!-- 拣货单显示和打印 -->
         <record id="action_warehouse_wave" model="ir.actions.client">
             <field name="name">打印面单</field>
             <field name="tag">warehouse_wave.print_express_menu</field>
@@ -19,6 +20,7 @@
 			<field name="arch" type="xml">
 				<tree create='false' edit='false'>
 					<field name="name"/>
+					<field name='express_type'/>
 					<field name="order_type"/>
 					<field name='state' string='拣货单打印状态'/>
 					<button name="report_wave" type="object" string='打印拣货单'/>
@@ -36,6 +38,20 @@
 
         <menuitem name="拣货单" id="wave_menu" parent="warehouse.warehouse_order"
 		action="wave_action" sequence='1'/>
+
+        <!-- 在发货单列表上增加拣货单相关字段 -->
+		<record id='sell_delivery_tree_wave' model='ir.ui.view'>
+        	<field name='name'>sell.delivery.tree</field>
+        	<field name='model'>sell.delivery</field>
+			<field name='inherit_id' ref='sell.sell_delivery_tree'/>
+        	<field name='arch' type='xml'>
+			    <field name='order_id' position='after'>
+				    <field name='express_type'/>
+					<field name='wave_id'/>
+					<field name='pakge_sequence'/>
+				</field>
+		    </field>
+		</record>
 
  		<record id="create_wave_from" model="ir.ui.view">
             <field name="name">create.wave.form</field>
@@ -64,47 +80,6 @@
             view_mode="form"
             target="new"
             />
-
-        <record model="ir.ui.view" id="gooderp_location_tree">
-			<field name="name">库位设置</field>
-			<field name="model">location</field>
-			<field name="arch" type="xml">
-				<tree editable='top'>
-					<field name="name"/>
-					<field name="warehouse_id"/>
-					<field name="goods_id"/>
-				</tree>
-			</field>
-		</record>
-
-		<record model="ir.actions.act_window" id="gooderp_location_action">
-			<field name="name">库位设置</field>
-			<field name="res_model">location</field>
-			<field name="view_mode">tree</field>
-			<field name="help" type="html">
-				<p class="oe_view_nocontent_create">点击创建一个库位</p>
-			</field>
-		</record>
-
-		<!-- 商品的库位设置 -->
-        <record id="warehouse_wave_goods_form" model="ir.ui.view">
-            <field name="name">warehouse.goods.form</field>
-            <field name="model">goods</field>
-            <field name="inherit_id" ref="goods.goods_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//page" position="after">
-                    <page string="库位设置">
-                        <field name='loc_ids'>
-                            <tree string="计划">
-                                <field name="name"/>
-                                <field name="warehouse_id"/>
-                                <field name="goods_id"/>
-                            </tree>
-                        </field>
-                    </page>
-                </xpath>
-            </field>
-        </record>
 
 	<!--打包对应的tree和form  #TODO: 技术点没掌握,在编辑状态下的前后端交互掌握不完全,所以没办法做成wizard 形式
 		以后掌握了要进行修改
@@ -178,7 +153,7 @@
 		</record>
 
        <menuitem name="打包" id="do_pack_menu" parent="warehouse.warehouse_order"
-		action="do_pack_action" sequence='50'/>
+		action="do_pack_action" sequence='5'/>
 		
     </data>
 </odoo>

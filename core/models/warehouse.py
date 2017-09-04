@@ -21,6 +21,7 @@ class warehouse(models.Model):
     code = fields.Char(u'编号')
     type = fields.Selection(WAREHOUSE_TYPE, u'类型', default='stock')
     active = fields.Boolean(u'启用', default=True)
+    user_ids = fields.Many2many('res.users',string=u'库管')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
