@@ -152,7 +152,7 @@ class create_wave(models.TransientModel):
             short = False    # 本单缺货
             for line in active_model.line_out_ids:
                 if line.goods_id.no_stock:
-                   continue
+                    continue
                 #缺货发货单不分配进拣货单
                 result = line.move_id.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_id)
                 result = result[0] or 0
@@ -192,7 +192,7 @@ class do_pack(models.Model):
 
     @api.multi
     def unlink(self):
-        for pack in  self:
+        for pack in self:
             if pack.is_pack:
                 raise UserError(u'已完成打包记录不能删除!')
         return super(do_pack, self).unlink()
@@ -237,11 +237,11 @@ class do_pack(models.Model):
                         dialog = self.env['common.dialog.wizard'].with_context(ctx).create({
                                 'message': result_vals['context']['message']
                                 })
-
                         dialog.do_confirm()
                         self.is_pack = True
                 else:
                     return func()
+                self.is_pack = True
 
     def get_line_data(self, code):
         """构造行的数据"""

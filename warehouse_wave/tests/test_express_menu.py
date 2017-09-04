@@ -29,3 +29,8 @@ class test_express_menu(TransactionCase):
 #         self.delivery.express_type = 'YTO'
 #         self.env['wh.move'].get_moves_html(move.id)
 
+    def test_get_moves_html_package(self):
+        ''' 测试 get_moves_html_package '''
+        move = self.delivery.sell_move_id
+        self.env['wh.move'].get_moves_html_package(move.id)
+

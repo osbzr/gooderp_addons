@@ -72,6 +72,7 @@ class test_wave(TransactionCase):
         ''' 准备基本数据 '''
         super(test_wave, self).setUp()
         self.order = self.env.ref('sell.sell_order_2')
+        self.order.warehouse_id = self.env.ref('core.warehouse_general').id
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
@@ -94,13 +95,16 @@ class test_wave(TransactionCase):
         self.wave[0].print_express_menu()
 
     def test_unlink(self):
-        ''' 测试 unlink'''
+        ''' 测试 wave unlink'''
+        wh_in = self.env.ref('warehouse.wh_in_whin0')
+        wh_in.approve_order()
         self.wave[0].unlink()
 
         order_1 = self.env.ref('sell.sell_order_1')
         self.env.ref('sell.sell_order_line_1').quantity = 1
         self.env.ref('sell.sell_order_line_1').discount_amount = 0
         order_1.discount_amount = 0
+        order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
         order_1.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
         delivery_1.date = '2016-01-02'
@@ -143,7 +147,7 @@ class test_do_pack(TransactionCase):
         self.wave = self.env['wave'].search([])
 
     def test_unlink(self):
-        ''' 测试 unlink'''
+        ''' 测试 pack unlink'''
         pack = self.env['do.pack'].create({ })
         pack.scan_barcode('123456', pack.id)
 
