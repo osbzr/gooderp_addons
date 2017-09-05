@@ -114,6 +114,10 @@ class test_wave(TransactionCase):
         ''' 测试 print_express_menu'''
         self.wave[0].print_express_menu()
 
+    def test_print_package_list(self):
+        ''' 测试 print_package_list'''
+        self.wave[0].print_package_list()
+
     def test_unlink(self):
         ''' 测试 wave unlink'''
         self.wave[0].unlink()
@@ -170,8 +174,12 @@ class test_do_pack(TransactionCase):
         ''' 测试 pack unlink'''
         pack = self.env['do.pack'].create({ })
         pack.scan_barcode('123456', pack.id)
+        pack.unlink()
 
         # 已打包完成，记录不能删除
+        pack = self.env['do.pack'].create({ })
+        pack.scan_barcode('123456', pack.id)
+
         self.env.ref('goods.cable').barcode = '000'
         pack.scan_barcode('000', pack.id)
         with self.assertRaises(UserError):

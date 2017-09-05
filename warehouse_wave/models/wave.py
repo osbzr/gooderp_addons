@@ -296,7 +296,7 @@ class do_pack(models.Model):
             for line_row in line_rows:
                 if line_row.goods_qty <= line_row.pack_qty:
                     continue
-                print '++++++++++++++++++++++++++',line_row
+
                 line_row.pack_qty += 1
                 goods_is_enough = False
                 break
