@@ -71,8 +71,9 @@ class test_wave(TransactionCase):
     def setUp(self):
         ''' 准备基本数据 '''
         super(test_wave, self).setUp()
+        # 补足库存数量
+        self.env.ref('warehouse.wh_in_whin0').approve_order()
         self.order = self.env.ref('sell.sell_order_2')
-        self.order.warehouse_id = self.env.ref('core.warehouse_general').id
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
@@ -84,6 +85,25 @@ class test_wave(TransactionCase):
         self.wave_wizard.create_wave()
         self.wave = self.env['wave'].search([])
 
+    def test_create_wave(self):
+        ''' 测试 create_wave 库存不足报错'''
+        self.order.sell_order_draft()
+        # goods_id.no_stock 为 True
+        self.env.ref('sell.sell_order_line_1').order_id = self.order.id
+        self.env.ref('goods.mouse').no_stock = True
+
+        self.order.warehouse_id = self.env.ref('core.warehouse_general').id
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+                       [('order_id', '=', self.order.id)])
+
+        self.wave_wizard = self.env['create.wave'].with_context({
+                                            'active_ids': self.delivery.id}).create({
+                                            'active_model': 'sell.delivery',
+                                             })
+        with self.assertRaises(UserError):
+            self.wave_wizard.create_wave()
+
     def test_report_wave(self):
         ''' 测试 report_wave'''
         report_wave = self.wave[0].report_wave()
@@ -94,10 +114,12 @@ class test_wave(TransactionCase):
         ''' 测试 print_express_menu'''
         self.wave[0].print_express_menu()
 
+    def test_print_package_list(self):
+        ''' 测试 print_package_list'''
+        self.wave[0].print_package_list()
+
     def test_unlink(self):
         ''' 测试 wave unlink'''
-        wh_in = self.env.ref('warehouse.wh_in_whin0')
-        wh_in.approve_order()
         self.wave[0].unlink()
 
         order_1 = self.env.ref('sell.sell_order_1')
@@ -130,6 +152,8 @@ class test_do_pack(TransactionCase):
     def setUp(self):
         ''' 准备基本数据 '''
         super(test_do_pack, self).setUp()
+        # 补足库存数量
+        self.env.ref('warehouse.wh_in_whin0').approve_order()
         self.order = self.env.ref('sell.sell_order_2')
         self.env.ref('sell.sell_order_line_2_3').quantity = 1
         self.env.ref('sell.sell_order_line_2_3').discount_amount = 0
@@ -150,8 +174,12 @@ class test_do_pack(TransactionCase):
         ''' 测试 pack unlink'''
         pack = self.env['do.pack'].create({ })
         pack.scan_barcode('123456', pack.id)
+        pack.unlink()
 
         # 已打包完成，记录不能删除
+        pack = self.env['do.pack'].create({ })
+        pack.scan_barcode('123456', pack.id)
+
         self.env.ref('goods.cable').barcode = '000'
         pack.scan_barcode('000', pack.id)
         with self.assertRaises(UserError):
@@ -180,6 +208,7 @@ class test_do_pack(TransactionCase):
     def test_scan_barcode_needs_pack_qty(self):
         ''' 测试 scan_barcode 要求发货数量 < 打包数量 '''
         order_1 = self.env.ref('sell.sell_order_1')
+        order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.env.ref('sell.sell_order_line_1').quantity = 1
         self.env.ref('sell.sell_order_line_1').discount_amount = 0
         order_1.discount_amount = 0

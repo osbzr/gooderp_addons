@@ -149,30 +149,36 @@ class create_wave(models.TransientModel):
         express_type = ''                    #快递方式
         wave_row = self.env['wave'].create({})
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
-            short = False    # 本单缺货
+            available_line = []
             for line in active_model.line_out_ids:
                 if line.goods_id.no_stock:
                     continue
+                available_line.append(True)
                 #缺货发货单不分配进拣货单
                 result = line.move_id.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_id)
                 result = result[0] or 0
                 if line.goods_qty > result:
-                    short = True
-                    break
-                location_row = self.env['location'].search([
-                    ('goods_id', '=', line.goods_id.id),
-                    ('warehouse_id', '=', line.warehouse_id.id)])
-                if (line.goods_id.id, location_row.id) in product_location_num_dict:
-                    product_location_num_dict[(line.goods_id.id, location_row.id)].append(
-                        (line.id, line.goods_qty))
-                else:
-                    product_location_num_dict[(line.goods_id.id, location_row.id)] =\
-                     [(line.id, line.goods_qty)]
-            if not short:
+                    available_line.append(False)
+
+            if all(available_line):
+                for line in active_model.line_out_ids:
+                    location_row = self.env['location'].search([
+                        ('goods_id', '=', line.goods_id.id),
+                        ('warehouse_id', '=', line.warehouse_id.id)])
+                    if (line.goods_id.id, location_row.id) in product_location_num_dict:
+                        product_location_num_dict[(line.goods_id.id, location_row.id)].append(
+                            (line.id, line.goods_qty))
+                    else:
+                        product_location_num_dict[(line.goods_id.id, location_row.id)] =\
+                         [(line.id, line.goods_qty)]
+
                 index += 1
                 active_model.pakge_sequence = index
                 active_model.wave_id = wave_row.id
                 express_type = active_model.express_type
+        # 所有订单缺货
+        if not product_location_num_dict:
+            raise UserError(u'您勾选的订单缺货，不能生成拣货单')
         wave_row.express_type = express_type          
         wave_row.line_ids = self.build_wave_line_data(product_location_num_dict)
         return {'type': 'ir.actions.act_window',
@@ -224,9 +230,9 @@ class do_pack(models.Model):
             func = getattr(model_row, function_dict.get(model_row._name), None)
 
             if func and model_row.state == 'draft':
-                # 执行 销售发货审核，允许库存为零，执行 common.dialog.wizard 里的 do_confirm 方法
                 if function_dict.get(model_row._name) == 'sell_delivery_done':
                     result_vals = func()
+                    # 执行 销售发货审核，允许库存为零，执行 common.dialog.wizard 里的 do_confirm 方法
                     if result_vals and isinstance(result_vals, dict) and result_vals['res_model'] == 'common.dialog.wizard':
                         # 通过 context 传值给 common.dialog.wizard
                         ctx = result_vals['context']
@@ -238,10 +244,10 @@ class do_pack(models.Model):
                                 'message': result_vals['context']['message']
                                 })
                         dialog.do_confirm()
-                        self.is_pack = True
+                    # 执行完 sell_delivery_done 方法，给 打包完成 字段赋 True 值
+                    self.is_pack = True
                 else:
                     return func()
-                self.is_pack = True
 
     def get_line_data(self, code):
         """构造行的数据"""
@@ -290,7 +296,7 @@ class do_pack(models.Model):
             for line_row in line_rows:
                 if line_row.goods_qty <= line_row.pack_qty:
                     continue
-                print '++++++++++++++++++++++++++',line_row
+
                 line_row.pack_qty += 1
                 goods_is_enough = False
                 break
