@@ -3,16 +3,6 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
-class goods(models.Model):
-    _inherit = 'goods'
-    loc_ids = fields.One2many('location', 'goods_id', string='库位')
-
-
-class wh_move_line(models.Model):
-    _inherit = 'wh.move.line'
-    location_id = fields.Many2one('location', string='库位')
-
-
 class wave(models.Model):
     _name = "wave"
     _description = u"拣货单"
@@ -68,7 +58,7 @@ class wave(models.Model):
                 raise UserError(u"""发货单%s已经打包发货,捡货单%s不允许删除!
                                  """%(u'-'.join([move_row.name for move_row in wh_move_rows]),
                                       wave_row.name))
-            # 清楚发货单上的格子号
+            # 清空发货单上的格子号
             move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id)])
             move_rows.write({'pakge_sequence': False})
         return super(wave, self).unlink()
@@ -109,7 +99,7 @@ class create_wave(models.TransientModel):
         express_type = model_rows[0].express_type
         for model_row in model_rows:
             if model_row.wave_id:
-                raise UserError(u'请不要重复生成分拣货单!')
+                raise UserError(u'请不要重复生成拣货单!')
             if express_type and express_type != model_row.express_type:
                 raise UserError(u'发货方式不一样的发货单不能生成同一拣货单!')
         return res
@@ -155,12 +145,20 @@ class create_wave(models.TransientModel):
         """
         context = self.env.context
         product_location_num_dict = {}
-        index = 1
+        index = 0
+        express_type = ''                    #快递方式
         wave_row = self.env['wave'].create({})
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
-            active_model.pakge_sequence = index
-            active_model.wave_id = wave_row.id
+            short = False    # 本单缺货
             for line in active_model.line_out_ids:
+                if line.goods_id.no_stock:
+                    continue
+                #缺货发货单不分配进拣货单
+                result = line.move_id.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_id)
+                result = result[0] or 0
+                if line.goods_qty > result:
+                    short = True
+                    break
                 location_row = self.env['location'].search([
                     ('goods_id', '=', line.goods_id.id),
                     ('warehouse_id', '=', line.warehouse_id.id)])
@@ -170,7 +168,12 @@ class create_wave(models.TransientModel):
                 else:
                     product_location_num_dict[(line.goods_id.id, location_row.id)] =\
                      [(line.id, line.goods_qty)]
-            index += 1
+            if not short:
+                index += 1
+                active_model.pakge_sequence = index
+                active_model.wave_id = wave_row.id
+                express_type = active_model.express_type
+        wave_row.express_type = express_type          
         wave_row.line_ids = self.build_wave_line_data(product_location_num_dict)
         return {'type': 'ir.actions.act_window',
                 'res_model': 'wave',
@@ -189,7 +192,7 @@ class do_pack(models.Model):
 
     @api.multi
     def unlink(self):
-        for pack in  self:
+        for pack in self:
             if pack.is_pack:
                 raise UserError(u'已完成打包记录不能删除!')
         return super(do_pack, self).unlink()
@@ -224,7 +227,7 @@ class do_pack(models.Model):
                 # 执行 销售发货审核，允许库存为零，执行 common.dialog.wizard 里的 do_confirm 方法
                 if function_dict.get(model_row._name) == 'sell_delivery_done':
                     result_vals = func()
-                    if result_vals and result_vals['res_model'] == 'common.dialog.wizard':
+                    if result_vals and isinstance(result_vals, dict) and result_vals['res_model'] == 'common.dialog.wizard':
                         # 通过 context 传值给 common.dialog.wizard
                         ctx = result_vals['context']
                         ctx['active_model'] = 'sell.delivery'
@@ -234,11 +237,11 @@ class do_pack(models.Model):
                         dialog = self.env['common.dialog.wizard'].with_context(ctx).create({
                                 'message': result_vals['context']['message']
                                 })
-
                         dialog.do_confirm()
                         self.is_pack = True
                 else:
                     return func()
+                self.is_pack = True
 
     def get_line_data(self, code):
         """构造行的数据"""
@@ -287,6 +290,7 @@ class do_pack(models.Model):
             for line_row in line_rows:
                 if line_row.goods_qty <= line_row.pack_qty:
                     continue
+                print '++++++++++++++++++++++++++',line_row
                 line_row.pack_qty += 1
                 goods_is_enough = False
                 break

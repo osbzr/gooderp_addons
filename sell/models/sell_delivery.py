@@ -520,6 +520,7 @@ class sell_delivery(models.Model):
                     'warehouse_id': line.warehouse_dest_id.id,
                     'warehouse_dest_id': line.warehouse_id.id,
                     'goods_qty': qty,
+                    'sell_line_id':line.sell_line_id.id,
                     'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
                     'discount_amount': line.discount_amount,

@@ -213,10 +213,6 @@ class test_sell_delivery(TransactionCase):
             line.goods_id = self.env.ref('goods.computer')
         self.delivery.sell_delivery_done()
 
-    # def test_check_goods_qty(self):
-    #     '''查询指定商品，属性，仓库，的当前剩余数量'''
-    #
-
     def test_goods_inventory(self):
         '''发库单审核商品不足时调用创建盘盈入库方法'''
         for line in self.delivery.line_out_ids:

@@ -12,3 +12,5 @@ class location(models.Model):
                                    required=True)
     goods_id = fields.Many2one('goods',
                                u'商品')
+    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
+                                   help=u'商品的属性')

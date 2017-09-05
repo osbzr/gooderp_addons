@@ -79,10 +79,10 @@ class wh_move(models.Model):
         receiver = dict(Company=' ',
                         Name=self.partner_id.name,
                         Mobile=mobile or self.partner_id.main_mobile,
-                        ProvinceName=self.province_id.name  or '上海',
-                        CityName=self.city_id.city_name or '上海',
-                        ExpAreaName=self.county_id.county_name or '浦东新区',
-                        Address=address or '金海路2588号B-213')
+                        ProvinceName=self.province_id.name  or u'上海',
+                        CityName=self.city_id.city_name or u'上海',
+                        ExpAreaName=self.county_id.county_name or u'浦东新区',
+                        Address=address or u'金海路2588号B-213')
 
         goods = []
         qty = 0
