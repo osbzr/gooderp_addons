@@ -149,18 +149,18 @@ class create_wave(models.TransientModel):
         express_type = ''                    #快递方式
         wave_row = self.env['wave'].create({})
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
-            availale_line = []
+            available_line = []
             for line in active_model.line_out_ids:
                 if line.goods_id.no_stock:
                     continue
-                availale_line.append(True)
+                available_line.append(True)
                 #缺货发货单不分配进拣货单
                 result = line.move_id.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_id)
                 result = result[0] or 0
                 if line.goods_qty > result:
-                    availale_line.append(False)
+                    available_line.append(False)
 
-            if all(availale_line):
+            if all(available_line):
                 for line in active_model.line_out_ids:
                     location_row = self.env['location'].search([
                         ('goods_id', '=', line.goods_id.id),
