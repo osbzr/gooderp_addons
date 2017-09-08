@@ -138,7 +138,7 @@ class goods(models.Model):
                 domain.append(('attribute_id', '=', attribute.id))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
-            lines = self.env['wh.move.line'].search(domain, order='cost_time, id, expiration_date')
+            lines = self.env['wh.move.line'].search(domain, order='location_id, cost_time, id, expiration_date')
 
             qty_to_go, uos_qty_to_go, cost = qty, uos_qty, 0    # 分别为待出库商品的数量、辅助数量和成本
             for line in lines:

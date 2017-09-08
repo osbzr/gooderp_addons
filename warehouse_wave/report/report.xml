@@ -40,8 +40,8 @@
                 				<theard>
                 					<tr>
 										<th width='12.5%'>序号</th>
-										<th width='12.5%'>库位号</th>
 										<th width='12.5%'>货品条码</th>
+										<th width='12.5%'>库位</th>
 										<th width='12.5%'>捡货数量</th>
                                         <th width='12.5%'>格子号</th>
                                         <th width='12.5%'>对应数量</th>
@@ -56,13 +56,17 @@
 	                							 <span><t t-esc='l_index+1'/></span>
 	                						</td>
 	                						<td>
-	                							<span t-field="l.location_id.name"/>
+                                                <span t-field="l.goods_id.barcode"/>
+                                            </td>
+	                						<td>
+                                                <t t-foreach="l.line_location_ids" t-as="loc">
+                                                    <span t-field="loc.location_id.name"/><br/>
+                                                </t>
 	                						</td>
 	                						<td>
-	                							<span t-field="l.goods_id.barcode"/>
-	                						</td>
-	                						<td>
-	                							<span t-field="l.picking_qty"/>件
+                                                <t t-foreach="l.line_location_ids" t-as="loc">
+                                                    <span t-field="loc.picking_qty"/><br/>
+                                                </t>
 	                						</td>
                                             <td>
 												<t t-foreach="l.move_line_ids" t-as="move_line">

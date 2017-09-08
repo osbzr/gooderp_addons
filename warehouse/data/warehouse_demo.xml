@@ -479,5 +479,15 @@
 			<field eval="18.0" name="cost_unit"/>
 			<field model="wh.move" name="move_id" search="[('name', '=', u'WH/OUT/16040002')]"/>
 		</record>
+
+		<record id='a001_location' model='location'>
+		    <field name='name'>a0001</field>
+		    <field name='warehouse_id' ref='warehouse.hd_stock'/>
+        </record>
+        <record id='b001_location' model='location'>
+            <field name='name'>b0001</field>
+            <field name='warehouse_id' ref='warehouse.hd_stock'/>
+        </record>
+
 	</data>
 </openerp>

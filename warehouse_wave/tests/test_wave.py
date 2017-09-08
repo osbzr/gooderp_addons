@@ -12,9 +12,11 @@ class test_create_wave(TransactionCase):
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
+        self.others_wh_in = self.env.ref('warehouse.wh_in_whin0')
+        self.env.ref('warehouse.wh_move_line_14').location_id = self.env.ref('warehouse.a001_location').id
         # 补足库存数量
-        self.env.ref('warehouse.wh_in_whin0').approve_order()
-        
+        self.others_wh_in.approve_order()
+
 
     def test_fields_view_get(self):
         ''' 测试 fields_view_get '''
@@ -31,6 +33,17 @@ class test_create_wave(TransactionCase):
         order_1.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
         delivery_1.express_type = 'SF'
+        with self.assertRaises(UserError):
+            self.env['create.wave'].with_context({
+                                                  'active_model': 'sell.delivery',
+                                                  'active_ids': [self.delivery.id, delivery_1.id],
+                                                  }).fields_view_get(None, 'form', False, False)
+
+    def test_fields_view_get_diff_warehouse(self):
+        ''' 测试 fields_view_get 仓库不一样的发货单不能生成同一拣货单 '''
+        order_1 = self.env.ref('sell.sell_order_1')
+        order_1.sell_order_done()
+        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
         with self.assertRaises(UserError):
             self.env['create.wave'].with_context({
                                                   'active_model': 'sell.delivery',
@@ -63,6 +76,18 @@ class test_create_wave(TransactionCase):
                                             'active_ids': self.delivery.id}).create({
                                             'active_model': 'sell.delivery',
                                              })
+        wave_wizard.create_wave()
+
+    def test_create_wave_add_loc_no_qty(self):
+        ''' 测试 create_wave 给 拣货单行添加 库位，无产品'''
+        self.others_wh_in.cancel_approved_order()
+        self.env.ref('warehouse.wh_move_line_14').location_id = False
+        self.others_wh_in.approve_order()
+
+        wave_wizard = self.env['create.wave'].with_context({
+                                        'active_ids': self.delivery.id}).create({
+                                        'active_model': 'sell.delivery',
+                                         })
         wave_wizard.create_wave()
 
 
