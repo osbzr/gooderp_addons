@@ -145,9 +145,7 @@ class WebsiteSale(http.Controller):
         domain = []
         if search:
             for srch in search.split(" "):
-                domain += [
-                    '|', ('name', 'ilike', srch),
-                    ('attribute_ids.default_code', 'ilike', srch)]
+                domain += [('name', 'ilike', srch)]
 
         if attrib_values:
             attrib = None

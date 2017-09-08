@@ -10,8 +10,10 @@ Allows your customers to manage their shopping from a beautiful web interface.
         """,
     'depends': [
         'website',
+        'good_portal',
         'core',
         'sell',
+        'money',
     ],
     'data': [
              'security/ir.model.access.csv',
