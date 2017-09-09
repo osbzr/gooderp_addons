@@ -68,20 +68,36 @@ class wh_move(models.Model):
     _name = 'wh.move'
     _inherit = ['wh.move', 'state.city.county']
     express_type = fields.Char(string='承运商')
-    wave_id = fields.Many2one('wave', string='捡货单')
+    wave_id = fields.Many2one('wave', string=u'拣货单')
     pakge_sequence = fields.Char(u'格子号')
 
 
 class wave_line(models.Model):
     _name = "wave.line"
     _description = u"拣货单行"
-    _order = 'location_id'
-    wave_id = fields.Many2one('wave', string='捡货单')
-    goods_id = fields.Many2one('goods', string='商品')
-    location_id = fields.Many2one('location', string='库位号')
-    picking_qty = fields.Integer(u'捡货数量')
+    _order = 'location_text'
+
+    wave_id = fields.Many2one('wave', ondelete='cascade', string=u'拣货单')
+    goods_id = fields.Many2one('goods', string=u'商品')
+    attribute_id = fields.Many2one('attribute', string=u'属性')
+    line_location_ids = fields.One2many('wave.line.location',
+                                        'wave_line_id', string=u'库位')
+    picking_qty = fields.Integer(u'拣货数量')
     move_line_ids = fields.Many2many('wh.move.line', 'wave_move_rel', \
-                                     'wave_line_id', 'move_line_id', string='发货单行')
+                                     'wave_line_id', 'move_line_id', string=u'发货单行')
+    location_text = fields.Char(u'库位序列')
+
+
+class wave_line_location(models.Model):
+    _name = "wave.line.location"
+    _description = u"拣货单行上的库位"
+    _order = 'location_id'
+
+    wave_line_id = fields.Many2one('wave.line',
+                                   ondelete='cascade', string=u'拣货单行')
+    location_id = fields.Many2one('location', string=u'库位')
+    picking_qty = fields.Integer(u'拣货数量')
+
 
 class create_wave(models.TransientModel):
 
@@ -97,11 +113,14 @@ class create_wave(models.TransientModel):
                                                        toolbar=toolbar, submenu=False)
         model_rows = self.env[model].browse(self.env.context.get('active_ids'))
         express_type = model_rows[0].express_type
+        wh_id = model_rows[0].warehouse_id.id
         for model_row in model_rows:
             if model_row.wave_id:
                 raise UserError(u'请不要重复生成拣货单!')
             if express_type and express_type != model_row.express_type:
                 raise UserError(u'发货方式不一样的发货单不能生成同一拣货单!')
+            if wh_id and wh_id != model_row.warehouse_id.id:
+                raise UserError(u'不同仓库的发货单不能生成同一拣货单!')
         return res
 
     @api.multi
@@ -124,7 +143,7 @@ class create_wave(models.TransientModel):
         return_line_data = []
         sequence = 1
         for key, val  in product_location_num_dict.iteritems():
-            goods_id, location_id = key
+            goods_id, attribute_id = key
             delivery_lines, picking_qty = [], 0
             for line_id, goods_qty in val:
                 delivery_lines.append((4, line_id))
@@ -132,7 +151,6 @@ class create_wave(models.TransientModel):
             return_line_data.append({
                 'goods_id':goods_id,
                 'picking_qty':picking_qty,
-                'location_id':location_id,
                 'move_line_ids': delivery_lines,
             })
             sequence += 1
@@ -143,6 +161,7 @@ class create_wave(models.TransientModel):
         """
         创建拣货单
         """
+        warehouse_id = False
         context = self.env.context
         product_location_num_dict = {}
         index = 0
@@ -151,6 +170,9 @@ class create_wave(models.TransientModel):
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
             available_line = []
             for line in active_model.line_out_ids:
+                if not warehouse_id:
+                    warehouse_id = line.warehouse_id.id
+
                 if line.goods_id.no_stock:
                     continue
                 available_line.append(True)
@@ -162,14 +184,11 @@ class create_wave(models.TransientModel):
 
             if all(available_line):
                 for line in active_model.line_out_ids:
-                    location_row = self.env['location'].search([
-                        ('goods_id', '=', line.goods_id.id),
-                        ('warehouse_id', '=', line.warehouse_id.id)])
-                    if (line.goods_id.id, location_row.id) in product_location_num_dict:
-                        product_location_num_dict[(line.goods_id.id, location_row.id)].append(
+                    if (line.goods_id.id, line.attribute_id.id) in product_location_num_dict:
+                        product_location_num_dict[(line.goods_id.id, line.attribute_id.id)].append(
                             (line.id, line.goods_qty))
                     else:
-                        product_location_num_dict[(line.goods_id.id, location_row.id)] =\
+                        product_location_num_dict[(line.goods_id.id, line.attribute_id.id)] =\
                          [(line.id, line.goods_qty)]
 
                 index += 1
@@ -181,6 +200,34 @@ class create_wave(models.TransientModel):
             raise UserError(u'您勾选的订单缺货，不能生成拣货单')
         wave_row.express_type = express_type          
         wave_row.line_ids = self.build_wave_line_data(product_location_num_dict)
+
+        # 给拣货单行添加库位
+        for wave_line in wave_row.line_ids:
+            location_text = ''
+            # 找到产品、属性、仓库满足的库位
+            available_locs = self.env['location'].search([('goods_id', '=', wave_line.goods_id.id),
+                                        ('attribute_id', '=', wave_line.attribute_id.id),
+                                        ('warehouse_id', '=', warehouse_id)])
+
+            remaining_picking_qty = wave_line.picking_qty
+            for loc in available_locs:
+                if remaining_picking_qty < 0:
+                    break
+                # 剩余拣货数量 大于 当前遍历库位数量，拣货数量取当前遍历库位数量，否则取剩余拣货数量
+                if remaining_picking_qty > loc.current_qty:
+                    picking_qty = loc.current_qty
+                else:
+                    picking_qty = remaining_picking_qty
+
+                self.env['wave.line.location'].create({
+                                                       'wave_line_id': wave_line.id,
+                                                       'location_id': loc.id,
+                                                       'picking_qty': picking_qty
+                                                       })
+                remaining_picking_qty -= loc.current_qty
+                location_text += loc.name + ','
+            wave_line.location_text = location_text
+
         return {'type': 'ir.actions.act_window',
                 'res_model': 'wave',
                 'name':u'拣货单',
@@ -188,6 +235,7 @@ class create_wave(models.TransientModel):
                 'views': [(False, 'tree')],
                 'res_id': wave_row.id,
                 'target': 'current'}
+
 
 class do_pack(models.Model):
     _name = 'do.pack'

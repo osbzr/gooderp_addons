@@ -5,6 +5,7 @@
         <record id="portal_customer_category" model="core.category">
             <field name="name">门户用户分类</field>
             <field name="type">customer</field>
+            <field name="account_id" ref='finance.account_ar'/>
         </record>
 
         <record id="menu_shop" model="website.menu">
@@ -21,6 +22,7 @@
         
         <record id="web_company_bank" model="bank.account">
             <field name="name">公司账户交通银行(16666 8888888888888)</field>
+            <field name="account_id" ref='finance.account_bank'/>
         </record>
     </data>
 </odoo>

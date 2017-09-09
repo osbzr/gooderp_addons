@@ -66,6 +66,7 @@
 					<field name="warehouse_id"/>
 					<field name="goods_id"/>
                     <field name="attribute_id"/>
+                    <field name="current_qty"/>
 				</tree>
 			</field>
 		</record>
