@@ -67,10 +67,10 @@
 					<field name="goods_id"/>
                     <field name="attribute_id"/>
                     <field name="current_qty"/>
+                    <button name="change_location" type="object" string='转存'/>
 				</tree>
 			</field>
 		</record>
-
 		<record model="ir.actions.act_window" id="gooderp_location_action">
 			<field name="name">库位设置</field>
 			<field name="res_model">location</field>
@@ -79,6 +79,32 @@
 				<p class="oe_view_nocontent_create">点击创建一个库位</p>
 			</field>
 		</record>
+
+		<!-- 转移库位 -->
+        <record model="ir.ui.view" id="change_location_form">
+            <field name="name">转移库位</field>
+            <field name="model">change.location</field>
+            <field name="arch" type="xml">
+                <form editable='top'>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="from_location" readonly='1'/>
+                                <field name="change_qty"/>
+                            </group>
+                            <group>
+                                <field name="end_location"/>
+                            </group>
+                        </group>
+                        <footer>
+                            <button name="confirm_change"  string="确认转移" type="object" class="oe_highlight"/>
+                             或者
+                            <button string="取消" class="oe_link" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
         <!-- 库存调拨 -->
         <record id='wh_move_line_tree' model='ir.ui.view'>
@@ -252,6 +278,7 @@
                     <field name='lot_uos_qty' invisible='1' />
                     <field name='lot' invisible='1' /> <!-- 能否去掉？ 不能, lot的值是 onchange 带过来的-->
                     <field name='type' invisible='1'/>
+                    <field name='location_id'/>
                 </tree>
             </field>
         </record>
