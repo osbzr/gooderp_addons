@@ -55,24 +55,12 @@ class location(models.Model):
                     }
 
 
-class change_location(models.Model):
+class change_location(models.TransientModel):
     _name = 'change.location'
     _description = u'货位转移'
 
-    @api.multi
-    @api.depends('from_location', 'end_location')
-    def name_get(self):
-        """
-        在其他model中用到 change.location 时在页面显示 from_location >> end_location
-        """
-        result = []
-        for change in self:
-            change_name = change.from_location.name + ' ' + change.end_location.name
-            result.append((change.id, change_name))
-        return result
-
     from_location = fields.Many2one('location', string=u'源库位', required=True)
-    end_location = fields.Many2one('location', string=u'目的库位', required=True)
+    to_location = fields.Many2one('location', string=u'目的库位', required=True)
     change_qty = fields.Float(u'转出数量')
 
     @api.model
@@ -84,7 +72,6 @@ class change_location(models.Model):
         res = super(change_location, self).fields_view_get(view_id, view_type,
                                                        toolbar=toolbar, submenu=False)
         model_rows = self.env[model].browse(self.env.context.get('active_ids'))
-
         for model_row in model_rows:
             if model_row.current_qty <= 0:
                 raise UserError(u'转出库位产品数量不能小于等于 0')
@@ -95,28 +82,27 @@ class change_location(models.Model):
         for change in self:
             if change.change_qty < 0:
                 raise UserError(u'转出数量不能小于零')
-            if change.from_location.id == change.end_location.id:
+            if change.from_location.id == change.to_location.id:
                 raise UserError(u'转出库位 %s 与转入库位不能相同' % change.from_location.name)
             if change.from_location.current_qty < change.change_qty:
                 raise UserError(u'转出数量不能大于库位现有数量，库位 %s 现有数量  %s'
                                 % (change.from_location.name, change.from_location.current_qty))
-            # 转出库位与转入库位的 仓库、产品、产品属性要相同
-            if (change.from_location.warehouse_id.id != change.end_location.warehouse_id.id) or \
-            (change.from_location.goods_id.id != change.end_location.goods_id.id) or \
-            (change.from_location.attribute_id.id != change.end_location.attribute_id.id):
-                raise UserError(u'请检查转出库位与转入库位的 仓库、产品、产品属性是否都相同！')
+            # 转出库位与转入库位的 产品、产品属性要相同
+            if (change.from_location.goods_id.id != change.to_location.goods_id.id) or \
+            (change.from_location.attribute_id.id != change.to_location.attribute_id.id):
+                raise UserError(u'请检查转出库位与转入库位的产品、产品属性是否都相同！')
 
             # 创建 内部移库单
             wh_internal = self.env['wh.internal'].with_context({'location': change.from_location.id}).create({
                                 'warehouse_id': change.from_location.warehouse_id.id,
-                                'warehouse_dest_id': change.from_location.warehouse_id.id,
+                                'warehouse_dest_id': change.to_location.warehouse_id.id,
                                 })
             self.env['wh.move.line'].with_context({'type': 'internal'}).create({
                                            'move_id': wh_internal.move_id.id,
                                            'goods_id': change.from_location.goods_id.id,
                                            'attribute_id': change.from_location.attribute_id.id,
                                            'goods_qty': change.change_qty,
-                                           'location_id': change.end_location.id,
+                                           'location_id': change.to_location.id,
                                            })
             # 自动审核 内部移库单
             wh_internal.approve_order()

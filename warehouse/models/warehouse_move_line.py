@@ -280,6 +280,7 @@ class wh_move_line(models.Model):
 
     def check_availability(self):
         if self.warehouse_dest_id == self.warehouse_id:
+            # 如果是 商品库位转移生成的内部移库，则不用约束调入仓和调出仓是否相同；否则需要约束
             if not (self.move_id.origin == 'wh.internal' and not self.location_id == False):
                 raise UserError(u'调出仓库不可以和调入仓库一样')
 

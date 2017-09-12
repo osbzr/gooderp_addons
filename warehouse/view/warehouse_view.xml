@@ -93,7 +93,7 @@
                                 <field name="change_qty"/>
                             </group>
                             <group>
-                                <field name="end_location"/>
+                                <field name="to_location"/>
                             </group>
                         </group>
                         <footer>
