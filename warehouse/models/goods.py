@@ -137,8 +137,13 @@ class goods(models.Model):
             if attribute:
                 domain.append(('attribute_id', '=', attribute.id))
 
+            # 内部移库，从源库位移到目的库位，匹配时从源库位取值; location.py confirm_change 方法
+            if self.env.context.get('location'):
+                domain.append(('location_id', '=', self.env.context.get('location')))
+
             # TODO @zzx需要在大量数据的情况下评估一下速度
-            lines = self.env['wh.move.line'].search(domain, order='location_id, cost_time, id, expiration_date')
+            # 出库顺序按 库位 就近、先到期先出、先进先出
+            lines = self.env['wh.move.line'].search(domain, order='location_id, expiration_date, cost_time, id')
 
             qty_to_go, uos_qty_to_go, cost = qty, uos_qty, 0    # 分别为待出库商品的数量、辅助数量和成本
             for line in lines:
@@ -164,7 +169,7 @@ class goods(models.Model):
                               ('goods_id', '=', goods.id)]
                     if attribute:
                         domain.append(('attribute_id', '=', attribute.id))
-                    line_in_id = self.env['wh.move.line'].search(domain, order='cost_time, id, expiration_date')
+                    line_in_id = self.env['wh.move.line'].search(domain, order='expiration_date, cost_time, id')
                     if line_in_id:
                         matching_records.append({'line_in_id': line_in_id.id, 'expiration_date': line_in_id.expiration_date,
                                                  'qty': qty_to_go, 'uos_qty': uos_qty_to_go})
