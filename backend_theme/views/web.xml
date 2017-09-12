@@ -9,7 +9,7 @@
     <template id="left_menu">
         <t t-set="debug_param" t-value="'?debug=%s'%debug if debug else ''"/>
         <t t-if="len(menu_data['children'])>1">
-            <div id="left_menu"  class="big_show">
+            <div id="left_menu"  class="hidden-print big_show">
                 <div t-foreach="menu_data['children']" t-as="menu"  >
                     <a t-att-href="'/web%s#menu_id=%s&amp;action=%s' % (debug_param, menu['id'], menu['action'] and menu['action'].split(',')[1] or '')"
                         t-att-class="'oe_menu_toggler' if menu.get('children') else 'oe_menu_leaf'"
