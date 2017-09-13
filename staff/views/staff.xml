@@ -4,8 +4,9 @@
     	<!--菜单-->
         <menuitem name="人力资源"
             id="menu_staff_root" groups="staff.hr_groups" web_icon="staff,static/description/icon.png"/>
-        <menuitem id="menu_staff_main" name="员工" parent="staff.menu_staff_root"/>
-        <menuitem id="menu_staff_configuration" name="设置" parent="staff.menu_staff_root"/>
+        <menuitem id="menu_staff_main" name="员工" groups="staff.hr_groups" parent="staff.menu_staff_root"/>
+        <menuitem id="menu_staff_configuration" name="设置" groups="staff.hr_senior_groups"
+                parent="staff.menu_staff_root"/>
         <!--员工界面-->
         <record id="view_staff_employee_form" model="ir.ui.view">
             <field name="name">staff.employee.form</field>
@@ -164,7 +165,8 @@
             </field>
         </record>
         
-        <menuitem action="staff_action" id="menu_staff" sequence="3" parent="menu_staff_main"/>
+        <menuitem action="staff_action" id="menu_staff" groups="staff.hr_senior_groups"
+            sequence="3" parent="menu_staff_main"/>
         
         <!--人力资源设置-->
         <record id="view_staff_department_form" model="ir.ui.view">
@@ -252,7 +254,7 @@
         </record>
         
         <menuitem action="staff_job_action" id="menu_staff_job" sequence="5" parent="menu_staff_configuration"/>
-        
+
 
     </data>
 </openerp>

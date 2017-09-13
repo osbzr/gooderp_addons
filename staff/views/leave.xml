@@ -66,7 +66,8 @@
             <field name="view_mode">calendar,tree,form</field>
              <field name="view_id" ref="staff_leave_calendar"/>
         </record>
-        <menuitem action="staff_leave_action" id="staff_leave_menu" sequence="10" parent="staff.menu_staff_main"/>
+        <menuitem action="staff_leave_action" id="staff_leave_menu" sequence="10"
+            groups="staff.hr_groups" parent="staff.menu_staff_main"/>
 
     </data>
 </openerp>
