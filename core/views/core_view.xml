@@ -476,6 +476,29 @@
 			<field name="search_view_id" ref="service_search"/>
 		</record>
 
+        <!-- 继承 res.users form -->
+        <record id='res_users_form_inherit' model='ir.ui.view'>
+            <field name='name'>res users form inherit</field>
+            <field name='model'>res.users</field>
+             <field name="inherit_id" ref="base.view_users_form"/>
+            <field name='arch' type='xml'>
+                <xpath expr="//label[@for='login']" position='attributes'>
+                    <attribute name='string'>用户</attribute>
+                </xpath>
+            </field>
+        </record>
+        <!-- 继承res.users tree -->
+        <record id='res_users_tree_inherit' model='ir.ui.view'>
+            <field name='name'>res users tree inherit</field>
+            <field name='model'>res.users</field>
+             <field name="inherit_id" ref="base.view_users_tree"/>
+            <field name='arch' type='xml'>
+                <field name='login' position='attributes'>
+                    <attribute name='string'>用户</attribute>
+                </field>
+            </field>
+        </record>
+
 
 
         <!-- 用于清理业务数据 -->
