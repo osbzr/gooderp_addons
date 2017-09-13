@@ -444,7 +444,7 @@ class money_order(models.Model):
                                      0,
                                      vouch_obj.id,
                                      self.partner_id.id,
-                                     line_data and line.currency_id.id or self.currency_id.id
+                                     line_data and line_data.currency_id.id or self.currency_id.id
                                      )
 
         if partner.c_category_id:
