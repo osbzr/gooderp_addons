@@ -29,7 +29,8 @@
         <menuitem name="库位" id="wh_location_menu" parent="warehouse.warehouse_setting"
 		          action="gooderp_location_action" sequence='2'/>
         <menuitem id='uom_menu' name='单位' action='core.uom_action' parent='warehouse_setting' sequence='3'/>
-        <menuitem id='menu_qc_rule' name='质检规则' action='action_qc_rule' parent='warehouse_setting' sequence='4'/>
+        <menuitem id='menu_qc_rule' name='质检规则' action='action_qc_rule' parent='warehouse_setting'
+            groups='warehouse.group_qc' sequence='4'/>
 
         <!-- 报表 -->
         <menuitem id='report_parent' name='报表' parent='warehouse_root' sequence='3' />
