@@ -147,9 +147,9 @@
 	 	<record model="ir.actions.act_window" id="do_pack_action">
 			<field name="name">打包</field>
 			<field name="res_model">do.pack</field>
-			<field name="view_mode">tree,form</field>
+			<field name="view_mode">form</field>
 			<field name="context">{'search_default_is_not_pack':1}</field>
-			<field name="target" >current</field>
+			<field name="target" >inline</field>
 		</record>
 
        <menuitem name="打包" id="do_pack_menu" parent="warehouse.warehouse_order"
