@@ -266,6 +266,7 @@
 				 						<field name='using_batch' invisible='1'/>
 			                            <field name='lot_qty' invisible='1'/>
 			                            <field name='lot' invisible='1'/>
+										<field name='buy_line_id' invisible='1'/>
 				 					</tree>
 				 				</field>
 			 				</page>
