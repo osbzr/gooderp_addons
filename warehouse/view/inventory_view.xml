@@ -9,7 +9,6 @@
                     <field name='name' />
                     <field name='date' />
                     <field name='warehouse_id' groups='warehouse.multi_warehouse_groups' />
-                    <field name='goods' />
                     <field name='state' />
                 </tree>
             </field>
@@ -42,7 +41,7 @@
                         <group >
                             <group>
                                 <field name='warehouse_id' attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                                <field name='goods' help='输入商品的关键字，将只会查询到关键字匹配到的商品' attrs="{'readonly': [('state', '!=', 'draft')]}" />
+                                <field name='goods' widget="many2many_tags" attrs="{'readonly': [('state', '!=', 'draft')]}" />
                                 <field name='out_id' invisible='1' />
                                 <field name='in_id' invisible='1' />
                             </group>
