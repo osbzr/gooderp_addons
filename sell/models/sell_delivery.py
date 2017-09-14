@@ -416,6 +416,7 @@ class sell_delivery(models.Model):
                 record._line_qty_write()
             voucher = False
             # 创建出库的会计凭证，生成盘盈的入库单的不产生出库凭证
+            voucher = False
             if not self.env.user.company_id.endmonth_generation_cost:
                 voucher = record.create_voucher()
             # 发货单/退货单 生成结算单
