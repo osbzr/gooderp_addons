@@ -19,7 +19,7 @@
 
         <template id="web_login"  inherit_id="web.login" name="web_login" >
              <xpath expr="//div[@class='form-group field-login']/label" position="replace">
-                 <label for="login" class="control-label">用户名</label>
+                 <label for="login" class="control-label">用户</label>
              </xpath>
         </template>
          <template id="web_layout"  inherit_id="web.layout" name="web_layout" >
