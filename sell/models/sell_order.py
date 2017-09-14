@@ -103,6 +103,7 @@ class sell_order(models.Model):
     type = fields.Selection([('sell', u'销货'), ('return', u'退货')], u'类型', 
                             default='sell', states=READONLY_STATES,
                             help=u'销货订单的类型，分为销货或退货')
+    ref = fields.Char(u'客户订单号')
     warehouse_id = fields.Many2one('warehouse',
                                    u'调出仓库',
                                    required=True,
