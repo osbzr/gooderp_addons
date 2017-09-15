@@ -28,9 +28,21 @@ odoo.define('warehouse.wave', function(require) {
                             }
                         }).then(function() {
                             new Model("do.pack").call("scan_barcode", [self.model, $this.val(), self.datarecord.id]).then(
-                                function() {
+                                function(result) {
+                                    // TODO 如何让barcode自动获得焦点
+                                    if (result == 'done'){
+                                        self.do_action({
+                                        type: 'ir.actions.act_window',
+                                        res_model: "do.pack",
+                                        view_mode: 'form',
+                                        view_type: 'form',
+                                        views: [[false, 'form']],
+                                        target: 'inline',
+                                        });
+                                    }else{
                                     self.reload();
                                     self.$el.find('input').val('');
+                                    }
                                 }
                             );
                         }).then(function() {

@@ -131,6 +131,7 @@ class buy_order(models.Model):
                             default='buy',
                             states=READONLY_STATES,
                             help=u'购货订单的类型，分为购货或退货')
+    ref = fields.Char(u'供应商订单号')
     warehouse_dest_id = fields.Many2one('warehouse',
                                         u'调入仓库',
                                         required=True,

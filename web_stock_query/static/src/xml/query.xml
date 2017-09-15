@@ -6,7 +6,7 @@
             <t t-esc='goods.name' />
         </li>
 
-        <li class='search-list-more'>打开库存余额表</li>
+        <li class='search-list-more'>查看全部库存余额</li>
 
     </ul>
 </t>

@@ -320,7 +320,8 @@ class do_pack(models.Model):
                     move_row = self.env['wh.move'].search([('express_code', '=', code)])
                     scan_code = move_row.name
                 self.scan_one_barcode(scan_code, pack_row)
-
+                if pack_row.is_pack:
+                    return 'done'
         return True
 
     def scan_one_barcode(self, code, pack_row):
