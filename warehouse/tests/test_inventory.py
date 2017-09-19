@@ -78,7 +78,7 @@ class TestInventory(TransactionCase):
             self.assertEqual(line.warehouse_id, self.sh_warehouse)
 
         # 指定商品的时候，选择的行必须是该商品的
-        self.inventory.goods = u'鼠标'
+        self.inventory.goods = [4,self.goods_mouse.id]    #u'鼠标'
         self.inventory.query_inventory()
         for line in self.inventory.line_ids:
             self.assertEqual(line.goods_id.name, u'鼠标')

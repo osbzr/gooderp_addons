@@ -39,7 +39,7 @@ class wh_inventory(models.Model):
                        help=u'单据编号，创建时会自动生成')
     warehouse_id = fields.Many2one('warehouse', u'仓库', required=True, default=_get_default_warehouse,
                                    help=u'盘点单盘点的仓库')
-    goods = fields.Char(u'商品',
+    goods = fields.Many2many('goods',string=u'商品',
                         help=u'盘点单盘点的商品')
     out_id = fields.Many2one('wh.out', u'盘亏单据', copy=False,
                              help=u'盘亏生成的其他出库单单据')
@@ -221,8 +221,9 @@ class wh_inventory(models.Model):
             extra_text = ' AND wh.id = %s' % inventory.warehouse_id.id
 
             if inventory.goods:
-                extra_text += " AND goods.name ILIKE '%%%s%%' " \
-                    % inventory.goods
+                goods_ids = inventory.goods.ids
+                goods_ids.append(0)
+                extra_text += " AND goods.id IN {ids}".format(ids=tuple(set(goods_ids)))
 
             inventory.env.cr.execute(sql_text % extra_text)
             res = inventory.env.cr.dictfetchall()

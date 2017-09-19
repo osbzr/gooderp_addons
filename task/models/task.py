@@ -98,7 +98,7 @@ class project_invoice(models.Model):
     )
 
     amount = fields.Float(
-        string=u'金额',
+        string=u'含税金额',
         help=u'含税金额',
     )
 

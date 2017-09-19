@@ -342,13 +342,6 @@ class sell_delivery(models.Model):
         :param goods_id: 商品
         :return:
         """
-        rate_silent = currency_amount = 0
-        currency = self.currency_id != self.env.user.company_id.currency_id and self.currency_id.id or False
-        if self.currency_id and self.currency_id != self.env.user.company_id.currency_id:
-            rate_silent = self.env['res.currency'].get_rate_silent(self.date, self.currency_id.id)
-            currency_amount = debit or credit
-            debit = debit * (rate_silent or 1)
-            credit = credit * (rate_silent or 1)
         voucher_line = self.env['voucher.line'].create({
             'name': u'%s %s' % (self.name, self.note or ''),
             'account_id': account_id and account_id.id,
@@ -357,9 +350,6 @@ class sell_delivery(models.Model):
             'voucher_id': voucher and voucher.id,
             'goods_qty': goods_qty,
             'goods_id': goods_id and goods_id.id,
-            'currency_id': currency,
-            'currency_amount': currency_amount,
-            'rate_silent': rate_silent,
         })
         return voucher_line
 
