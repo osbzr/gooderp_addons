@@ -60,6 +60,7 @@ class wh_move(models.Model):
                                    ondelete='restrict',
                                    required=True,
                                    readonly=True,
+                                   domain="['|',('user_ids','=',False),('user_ids','in',uid)]",
                                    states={'draft': [('readonly', False)]},
                                    default=_get_default_warehouse,
                                    help=u'移库单的来源仓库')
@@ -67,6 +68,7 @@ class wh_move(models.Model):
                                         ondelete='restrict',
                                         required=True,
                                         readonly=False,
+                                        domain="['|',('user_ids','=',False),('user_ids','in',uid)]",
                                         states={'done': [('readonly', True)]},
                                         default=_get_default_warehouse_dest,
                                         help=u'移库单的目的仓库')

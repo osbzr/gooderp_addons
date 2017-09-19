@@ -85,9 +85,13 @@ class warehouse(models.Model):
         '''返回指定类型的第一个仓库'''
         if not _type or _type not in map(lambda _type: _type[0], self.WAREHOUSE_TYPE):
             raise UserError(u'仓库类型" % s"不在预先定义的type之中，请联系管理员' % _type)
+        
+        domain =  [('type', '=', _type)]
+        # 仓库管理员带出有权限的仓库作为默认值
+        if _type == 'stock' and self.env.user.has_group('warehouse.group_warehouse'):
+            domain += ['|',('user_ids','=',False),('user_ids','in',self._uid)]
 
-        warehouses = self.search(
-            [('type', '=', _type)], limit=1, order='id asc')
+        warehouses = self.search(domain, limit=1, order='id asc')
         if not warehouses:
             raise UserError(u'不存在类型为%s的仓库，请检查基础数据是否全部导入'%_type)
 
