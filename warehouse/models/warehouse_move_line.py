@@ -111,7 +111,7 @@ class wh_move_line(models.Model):
     def _inverse_goods_qty(self):
         self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
 
-    @api.onchange('goods_uos_qty','goods_id.conversion')
+    @api.onchange('goods_uos_qty','goods_id')
     def onchange_goods_uos_qty(self):
         self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
 
