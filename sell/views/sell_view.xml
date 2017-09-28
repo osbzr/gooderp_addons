@@ -161,6 +161,7 @@
             		<field name='name'/>
             		<field name="order_id"/>
             		<field name='user_id'/>
+                    <field name='warehouse_id'/>
             		<field name='partner_id'/>
 					<field name='total_qty'/>
             		<field name="amount" sum="总金额"/>
@@ -339,6 +340,7 @@
                     <field name="money_state"/>
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
+                    <field name="warehouse_id"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
                     <separator/>
@@ -349,6 +351,7 @@
                         <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                         <filter string="到期日" domain="[]" context="{'group_by':'date_due:day'}"/>
+                        <filter string="调出仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
                     </group>
                 </search>
             </field>
@@ -364,6 +367,7 @@
             		<field name='name'/>
             		<field name="order_id"/>
             		<field name='user_id'/>
+                    <field name='warehouse_dest_id'/>
             		<field name='partner_id'/>
 					<field name='total_qty'/>
             		<field name="amount" sum="总金额"/>
