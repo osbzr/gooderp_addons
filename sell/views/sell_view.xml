@@ -220,6 +220,8 @@
 								<field name="currency_id" readonly="1"
 									 groups='finance.group_multi_currency'/>
 								<field name="modifying" invisible="1"/>
+								<field name="express_type"/>
+								<field name="express_code"/>
             				</group>
             			</group>
             			<notebook>
