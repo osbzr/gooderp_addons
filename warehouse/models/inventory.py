@@ -8,6 +8,7 @@ from odoo.exceptions import UserError
 from odoo import models
 from odoo import fields
 from odoo import api
+from odoo.tools import float_compare, float_is_zero
 
 
 class wh_inventory(models.Model):
@@ -265,10 +266,16 @@ class wh_inventory_line(models.Model):
     ]
 
     @api.multi
-    @api.depends('inventory_qty', 'real_qty')
+    @api.depends('inventory_qty', 'real_qty','inventory_uos_qty', 'real_uos_qty')
     def _get_difference_qty(self):
         for line in self:
             line.difference_qty = line.inventory_qty - line.real_qty
+            line.difference_uos_qty = line.inventory_uos_qty - line.real_uos_qty
+
+            if float_is_zero(line.difference_qty, 2) and not float_is_zero(line.difference_uos_qty,2):
+                line.difference_qty = line.difference_uos_qty * line.goods_id.conversion
+            if not float_is_zero(line.difference_qty, 2) and line.difference_uos_qty == 0:
+                line.difference_uos_qty = line.difference_qty / line.goods_id.conversion
 
     @api.multi
     @api.depends('inventory_uos_qty', 'real_uos_qty')
@@ -410,7 +417,7 @@ class wh_inventory_line(models.Model):
                     lot_id=inventory.new_lot_id,
                     attribute=inventory.attribute_id)
 
-            return {
+            res = {
                 'type': wh_type,
                 'lot': inventory.new_lot,
                 'lot_id': inventory.new_lot_id.id,
@@ -418,11 +425,19 @@ class wh_inventory_line(models.Model):
                 'attribute_id': inventory.attribute_id.id,
                 'uom_id': inventory.uom_id.id,
                 'uos_id': inventory.uos_id.id,
-                'goods_qty': abs(inventory.difference_qty),
-                'goods_uos_qty': abs(inventory.difference_uos_qty),
                 'cost_unit': cost_unit,
                 'cost': cost,
             }
+
+            difference_qty, difference_uos_qty = abs(inventory.difference_qty), abs(inventory.difference_uos_qty)
+
+            # 差异数量为0，且差异辅助数量不为0时，用差异辅助数量。否则用差差异数量
+            if float_is_zero(difference_qty, 2) and not float_is_zero(difference_uos_qty, 2):
+                res.update({'goods_uos_qty': difference_uos_qty})
+            else:
+                res.update ({'goods_qty': difference_qty})
+
+            return res
 
 
 class wh_out(models.Model):
