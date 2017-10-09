@@ -7,3 +7,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/osbzr/gooderp_addons/badge.svg?branch=master)](https://coveralls.io/github/osbzr/gooderp_addons?branch=master)
 
 http://www.gooderp.org
+
+GoodERP基于Python和Postgresql技术，是以AGPL3协议开发的自由软件，实现了中国中小企业关注的财务+进销存的核心功能，并支持二次开发模块化扩展，可能是中国用户数最多的开源ERP

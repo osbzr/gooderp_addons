@@ -16,8 +16,9 @@ class home_report_type(models.Model):
 
 class home_page(models.Model):
     _name = "home.page"
-    _rec_name = "action"
+    _rec_name = "note_one"
     _description = u"本模块就是一些常用操作的集合,也是小量级各方数据显示的平台！"
+    _order = "sequence"
 
     sequence = fields.Integer(u'序列', help=u'用来确定 每条记录在首页中的显示的顺序(而不仅仅是记录的顺序)')
     action = fields.Many2one('ir.actions.act_window', string=u'快捷页面', required='1', help=u'设置首页点击事假,\
