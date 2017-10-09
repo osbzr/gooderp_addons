@@ -97,6 +97,8 @@ class wh_move(models.Model):
         default=lambda self: self.env.user,
         help=u'单据经办人',
     )
+    express_type = fields.Char(string='承运商')
+    express_code = fields.Char(u'快递单号', copy=False)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
