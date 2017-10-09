@@ -1,6 +1,25 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <!--供应商 菜单放在采购模块下-->
+		<record id="supplier_address_form_inherit" model="ir.ui.view">
+			<field name="name">supplier.address.form.inherit</field>
+			<field name="model">partner</field>
+            <field name="inherit_id" ref="core.supplier_address_form"/>
+			<field name="arch" type="xml">
+                <xpath expr='//div' position='before'>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object"
+                                string="购货记录"
+                                name="action_view_buy_history"
+                                class="oe_stat_button"
+                                icon="fa-list-alt">
+                        </button>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
         <!--继承视图-->
         <record id="partner_address_supplier_address_form_inherit" model="ir.ui.view">
             <field name="name">partner.address.supplier.address.form.inherit</field>

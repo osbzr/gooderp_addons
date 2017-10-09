@@ -122,9 +122,6 @@ class buy_adjust(models.Model):
                                      ('state', '=', 'draft')])
                     if move_line:
                         move_line.goods_qty += line.quantity
-                        move_line.goods_uos_qty = (move_line.goods_id.conversion
-                                                   and move_line.goods_qty / move_line.goods_id.conversion
-                                                   or move_line.goods_qty)
                         move_line.note = (move_line.note and
                                           move_line.note or move_line.note + origin_line.note)
                     else:

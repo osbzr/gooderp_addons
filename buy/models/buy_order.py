@@ -345,7 +345,6 @@ class buy_order(models.Model):
             'buy_line_id': line.id,
             'goods_id': line.goods_id.id,
             'attribute_id': line.attribute_id.id,
-            'goods_uos_qty': line.goods_id.conversion and qty / line.goods_id.conversion or qty,
             'uos_id': line.goods_id.uos_id.id,
             'goods_qty': qty,
             'uom_id': line.uom_id.id,
