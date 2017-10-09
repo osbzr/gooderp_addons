@@ -9,10 +9,18 @@
                     <field name="image_medium" widget='image' class="oe_avatar"/>
                     <div class="oe_left">
                         <group>
-                            <field name="name"/>
-                            <field name="parent_id"/>
-                            <field name="sequence"/>
-                        </group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="type"/>
+                            </group>
+                            <group>
+                                <field name="parent_id" domain="[('type','=','view')]"/>
+                                <field name="sequence"/>
+                            </group>
+                            <field name="note"/>
+                        </group>       
                     </div>
                 </sheet>
             </form>
