@@ -23,7 +23,6 @@ class test_common_dialog_wizard(TransactionCase):
                     'line_in_ids':[(0, 0, {
                                 'goods_id':line.goods_id.id,
                                 'attribute_id':line.attribute_id.id,
-                                'goods_uos_qty':line.goods_uos_qty,
                                 'uos_id':line.uos_id.id,
                                 'goods_qty':line.goods_qty,
                                 'uom_id':line.uom_id.id,
