@@ -137,7 +137,7 @@
 			<field name="name">任务列表</field>
 			<field name="model">task</field>
 			<field name="arch" type="xml">
-				<tree editable='top'>
+				<tree>
 					<field name="sequence" widget="handle"/>
 					<field name="name"/>
 					<field name="user_id"/>
