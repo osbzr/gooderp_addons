@@ -136,6 +136,7 @@
                     </group>
                     <group>
                         <group>
+                            <field name='delivery_fee'/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'
                             string="抹零"/>
                             <field name="amount"/>
