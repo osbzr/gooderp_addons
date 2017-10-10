@@ -107,6 +107,14 @@ class wh_move_line(models.Model):
         else:
             self.goods_uos_qty = 0
 
+    @api.one
+    def _inverse_goods_qty(self):
+        self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
+
+    @api.onchange('goods_uos_qty','goods_id')
+    def onchange_goods_uos_qty(self):
+        self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
+
     @api.depends('goods_id', 'goods_qty')
     def compute_line_net_weight(self):
         for move_line in self:
@@ -176,8 +184,9 @@ class wh_move_line(models.Model):
                              required=True,
                              help=u'商品的数量')
     goods_uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'),
-                                 compute=_get_goods_uos_qty, store=True,
+                                 compute=_get_goods_uos_qty,inverse=_inverse_goods_qty, store=True,
                                  help=u'商品的辅助数量')
+
     price = fields.Float(u'单价',
                          compute=_compute_all_amount,
                          inverse=_inverse_price,
@@ -411,11 +420,11 @@ class wh_move_line(models.Model):
     def onchange_goods_qty(self):
         self.compute_suggested_cost()
 
-    # @api.onchange('goods_uos_qty')
-    # def onchange_goods_uos_qty(self):
-    #     if self.goods_id:
-    #         self.goods_qty = self.goods_id.conversion_unit(self.goods_uos_qty)
-    #     self.compute_suggested_cost()
+    @api.onchange('goods_uos_qty')
+    def onchange_goods_uos_qty(self):
+        if self.goods_id:
+            self.goods_qty = self.goods_id.conversion_unit(self.goods_uos_qty)
+        self.compute_suggested_cost()
 
     @api.onchange('lot_id')
     def onchange_lot_id(self):

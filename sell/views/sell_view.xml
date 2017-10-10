@@ -39,6 +39,16 @@
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
             		<sheet>
+						<div class="oe_button_box" name="button_box">
+							<button type="object"
+								name="action_view_delivery"
+								class="oe_stat_button"
+								icon="fa-truck" attrs="{'invisible':['|', ('state', 'in', ('draft')),('delivery_count','=',0)]}">
+								<field name="delivery_count" widget="statinfo" string="发库/退货单" help="Incoming Shipments"/>
+								<field name="delivery_ids" invisible="1"/>
+							</button>
+						</div>
+
             			<group>
             				<group>
             					<field name='partner_id' required='1'
@@ -220,6 +230,8 @@
 								<field name="currency_id" readonly="1"
 									 groups='finance.group_multi_currency'/>
 								<field name="modifying" invisible="1"/>
+								<field name="express_type"/>
+								<field name="express_code"/>
             				</group>
             			</group>
             			<notebook>

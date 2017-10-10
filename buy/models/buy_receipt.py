@@ -22,7 +22,7 @@ class buy_receipt(models.Model):
 
     @api.one
     @api.depends('line_in_ids.subtotal', 'discount_amount',
-                 'payment', 'line_out_ids.subtotal')
+                 'payment', 'line_out_ids.subtotal', 'delivery_fee')
     def _compute_all_amount(self):
         '''当优惠金额改变时，改变优惠后金额和本次欠款'''
         total = 0
@@ -32,7 +32,7 @@ class buy_receipt(models.Model):
         elif self.line_out_ids:
             # 退货时优惠前总金额
             total = sum(line.subtotal for line in self.line_out_ids)
-        self.amount = total - self.discount_amount
+        self.amount = total - self.discount_amount + self.delivery_fee
         self.debt = self.amount - self.payment
 
     @api.one
@@ -110,6 +110,7 @@ class buy_receipt(models.Model):
                                   u'外币币别',
                                   readonly=True,
                                   help=u'外币币别')
+    delivery_fee = fields.Float(u'运费')
 
     def _compute_total(self, line_ids):
         return sum(line.subtotal for line in line_ids)

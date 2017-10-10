@@ -49,7 +49,7 @@ class TestInventory(TransactionCase):
             'uos_id': self.goods_mouse.uos_id.id,
             'warehouse_dest_id': self.sh_warehouse.id,
             'goods_qty': 0,
-            'goods_uos_qty': 1,
+            'goods_uos_qty': 0,
             'cost_unit': 30,
             'lot': 'MOUSE0002',
         })

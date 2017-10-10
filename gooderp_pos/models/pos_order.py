@@ -270,7 +270,6 @@ class PosOrder(models.Model):
         return {
             'type': line.qty > 0 and 'out' or 'in',
             'goods_id': line.goods_id.id,
-            'goods_uos_qty': line.goods_id.conversion and line.qty / line.goods_id.conversion or 0,
             'uos_id': line.goods_id.uos_id.id,
             'goods_qty': math.fabs(line.qty),
             'uom_id': line.goods_id.uom_id.id,

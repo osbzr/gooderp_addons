@@ -67,7 +67,7 @@ class wave(models.Model):
 class wh_move(models.Model):
     _name = 'wh.move'
     _inherit = ['wh.move', 'state.city.county']
-    express_type = fields.Char(string='承运商')
+
     wave_id = fields.Many2one('wave', string=u'拣货单')
     pakge_sequence = fields.Char(u'格子号')
 

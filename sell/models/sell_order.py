@@ -67,7 +67,13 @@ class sell_order(models.Model):
                                                            ('state', '=', 'done')])
         self.received_amount = sum([delivery.invoice_id.reconciled for delivery in deliverys]) +\
                                sum([order_row.amount for order_row  in money_order_rows])
-         
+
+    @api.multi
+    @api.depends ('delivery_ids')
+    def _compute_delivery(self):
+        for order in self:
+            order.delivery_count = len(order.delivery_ids)
+
     partner_id = fields.Many2one('partner', u'客户',
                             ondelete='restrict', states=READONLY_STATES,
                                  help=u'签约合同的客户')
@@ -157,6 +163,9 @@ class sell_order(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     received_amount = fields.Float(u'已收金额',  compute=_get_received_amount, readonly=True)
+    delivery_ids = fields.One2many('sell.delivery', 'order_id', string='Deliverys', copy=False)
+    delivery_count = fields.Integer(compute='_compute_delivery', string='Deliverys Count', default=0)
+
 
     @api.onchange('address_id')
     def onchange_partner_address(self):
@@ -302,7 +311,6 @@ class sell_order(models.Model):
             'sell_line_id': line.id,
             'goods_id': line.goods_id.id,
             'attribute_id': line.attribute_id.id,
-            'goods_uos_qty': line.goods_id.conversion and qty / line.goods_id.conversion or 0,
             'uos_id': line.goods_id.uos_id.id,
             'goods_qty': qty,
             'uom_id': line.uom_id.id,
@@ -392,6 +400,37 @@ class sell_order(models.Model):
             'domain': [('id', '=', delivery_id)],
             'target': 'current',
         }
+
+    @api.multi
+    def action_view_delivery(self):
+        '''
+        This function returns an action that display existing deliverys of given sells order ids.
+        When only one found, show the delivery immediately.
+        '''
+
+        self.ensure_one ()
+        name = (self.type == 'sell' and u'销售发库单' or u'销售退货单')
+        action = {
+            'name': name,
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sell.delivery',
+            'view_id': False,
+            'target': 'current',
+        }
+
+        delivery_ids = self.delivery_ids.ids
+        if len (delivery_ids) > 1:
+            action['domain'] = "[('id','in',[" + ','.join (map (str, delivery_ids)) + "])]"
+            action['view_mode'] = 'tree,form'
+        elif len (delivery_ids) == 1:
+            view_id = (self.type == 'sell'
+                       and self.env.ref ('sell.sell_delivery_form').id
+                       or self.env.ref ('sell.sell_return_form').id)
+            action['views'] = [(view_id, 'form')]
+            action['res_id'] = delivery_ids and delivery_ids[0] or False
+        return action
 
 
 class sell_order_line(models.Model):

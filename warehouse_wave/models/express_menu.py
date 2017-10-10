@@ -34,7 +34,6 @@ class wh_move(models.Model):
     _name = 'wh.move'
     _inherit = ['wh.move', 'state.city.county']
     express_menu = fields.Text(u'快递面单', copy=False)
-    express_code = fields.Char(u'快递单号', copy=False)
 
     def get_shipping_type_config(self, menu_type):
         """

@@ -12,6 +12,7 @@
             		<field name='name'/>
             		<field name="order_id"/>
                     <field name="partner_id"/>
+                    <field name="user_id"/>
                     <field name="amount" sum="总金额"/>
             		<field name='payment'/>
             		<field name='date_due'/>
@@ -135,6 +136,7 @@
                     </group>
                     <group>
                         <group>
+                            <field name='delivery_fee'/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'
                             string="抹零"/>
                             <field name="amount"/>

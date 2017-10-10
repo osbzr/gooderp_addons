@@ -44,7 +44,7 @@
             <field name="origin">buy.receipt.return</field>
         </record>
         <record id="wh_move_line_0" model="wh.move.line">
-            <field eval="1.0" name="goods_uos_qty"/>
+            <!--<field eval="1.0" name="goods_uos_qty"/>-->
             <field name="goods_id" ref="goods.cable"/>
             <field eval="50.0" name="goods_qty"/>
             <field name="type">out</field>
