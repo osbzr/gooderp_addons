@@ -68,7 +68,7 @@
 				<tree editable="TOP" string="可选值">
 					<field name="name"/>
 					<field name="type"/>
-					<field name='active'/>
+					<field name='active'  invisible='1'/>
 				</tree>
 			</field>
 		</record>
@@ -161,7 +161,7 @@
 			<field name="arch" type="xml">
 				<tree editable="TOP" string="单位">
 					<field name="name"/>
-					<field name='active'/>
+					<field name='active'  invisible='1'/>
 				</tree>
 			</field>
 		</record>
@@ -188,7 +188,7 @@
 			<field name="arch" type="xml">
 				<tree editable="TOP" string="结算方式">
 					<field name="name"/>
-					<field name='active'/>
+					<field name='active'  invisible='1'/>
 				</tree>
 			</field>
 		</record>
@@ -258,7 +258,7 @@
 					<field name="c_category_id" required="1"/>
 					<field name="code"/>
 					<field name="main_mobile"/>
-					<field name='active'/>
+					<field name='active'  invisible='1'/>
 					<field name="name"/>
 					<field name="receivable" sum='sum'/>
 				</tree>
@@ -347,7 +347,7 @@
 					<field name="s_category_id" required="1"/>
 					<field name="code"/>
 					<field name="main_mobile"/>
-					<field name='active'/>
+					<field name='active' invisible='1'/>
 					<field name="name"/>
 					<field name="payable" sum='sum'/>
 				</tree>
@@ -400,7 +400,7 @@
 				<tree editable="TOP" string="账户">
 					<field name="name"/>
 					<field name="balance" sum='sum'/>
-				    <field name='active'/>
+				    <field name='active' invisible='1'/>
 				</tree>
 			</field>
 		</record>
@@ -431,7 +431,7 @@
 					<field name="get_categ_id"/>
 					<field name="pay_categ_id"/>
 					<field name="price"/>
-                    <field name='active'/>					
+                    <field name='active' invisible='1'/>					
 				</tree>
 			</field>
 		</record>
