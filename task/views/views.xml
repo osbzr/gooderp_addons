@@ -73,7 +73,7 @@
 					<field name="customer_id"/>
 					<field name="plan_hours" groups='task.group_task_hours'/>
 					<field name="hours" groups='task.group_task_hours'/>
-					<field name='active'/>
+					<field name='active'  invisible='1'/>
 				</tree>
 			</field>
 		</record>
