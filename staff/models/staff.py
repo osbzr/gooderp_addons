@@ -31,6 +31,27 @@ class staff_department(models.Model):
             if self.parent_id in staffs:
                 raise UserError(u'上级部门不能选择他自己或者他的下级部门')
 
+    @api.multi
+    def view_detail(self):
+        for child_department in self:
+            context = {'default_name': child_department.name,
+                       'default_manager_id': child_department.manager_id.id,
+                       'default_parent_id': child_department.parent_id.id}
+            res_id = self.env['staff.department'].search([('id', '=', child_department.id)])
+            view_id = self.env.ref('staff.view_staff_department_form').id
+
+            return {
+                'name': '部门' + child_department.name,
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'staff.department',
+                'res_id': res_id.id,
+                'view_id': False,
+                'views': [(view_id, 'form')],
+                'type': 'ir.actions.act_window',
+                'context': context,
+                'target': 'current',
+            }
 
 
 class staff_job(models.Model):

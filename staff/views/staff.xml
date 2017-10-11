@@ -167,7 +167,7 @@
         
         <menuitem action="staff_action" id="menu_staff" groups="staff.hr_senior_groups"
             sequence="3" parent="menu_staff_main"/>
-        
+
         <!--人力资源设置-->
         <record id="view_staff_department_form" model="ir.ui.view">
             <field name="name">staff.department.form</field>
@@ -194,29 +194,49 @@
                 </form>
             </field>
         </record>
-        
+
+        <!-- 部门 树形显示 -->
         <record id="view_staff_department_tree" model="ir.ui.view">
             <field name="name">staff.department.tree</field>
             <field name="model">staff.department</field>
+            <field name="field_parent">child_ids</field>
             <field name="arch" type="xml">
                 <tree string="部门">
                     <field name="name"/>
                     <field name="manager_id"/>
-                    <field name="parent_id"/>
-                    <field name='active'  invisible='1'/>
+                    <field name="parent_id" invisible='1'/>
+                    <field name='active' invisible='1'/>
                 </tree>
             </field>
         </record>
-        
+
+        <!-- 部门 action -->
         <record id="staff_department_action" model="ir.actions.act_window">
             <field name="name">部门</field>
             <field name="res_model">staff.department</field>
-            <field name="view_type">form</field>
+            <field name="view_type">tree</field>
             <field name="view_mode">tree,form</field>
             <field name="context">{'type':'department'}</field>
+            <field name="domain">[('parent_id','=',False)]</field>
+        </record>
+
+        <!-- 在树形上打开部门 -->
+        <record id="action_staff_department_open" model="ir.actions.server">
+            <field name="name">Open staff department</field>
+            <field name="model_id" ref="model_staff_department"/>
+            <field name="state">code</field>
+            <field name="code">action=records.view_detail()</field>
+        </record>
+        <record model="ir.values" id="ir_action_staff_department_open">
+            <field name="model_id" ref="model_staff_department" />
+            <field name="name">Open staff department</field>
+            <field name="key2">tree_but_open</field>
+            <field eval="'ir.actions.server,%d'%action_staff_department_open" name="value"/>
+            <field name="key">action</field>
+            <field name="model">staff.department</field>
         </record>
         <menuitem action="staff_department_action" id="menu_staff_department" sequence="4" parent="menu_staff_configuration"/>
-        
+
         <record id="view_staff_job_form" model="ir.ui.view">
             <field name="name">staff.job.form</field>
             <field name="model">staff.job</field>
@@ -254,7 +274,6 @@
         </record>
         
         <menuitem action="staff_job_action" id="menu_staff_job" sequence="5" parent="menu_staff_configuration"/>
-
 
     </data>
 </openerp>
