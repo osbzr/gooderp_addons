@@ -190,10 +190,12 @@ class buy_receipt(models.Model):
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.goods_id.force_batch_one:
+                if line.goods_qty > 1:
+                    raise UserError(u'商品 %s 进行了序列号管理，数量必须为1' % line.goods_id.name)
                 batch_one_list.append((line.goods_id.id, line.lot))
 
         if len(batch_one_list) > len(set(batch_one_list)):
-            raise UserError(u'不能创建相同序列号的商品！\n 序列号list为%s' % str(batch_one_list))
+            raise UserError(u'不能创建相同序列号的商品！\n 序列号列表为%s' % [lot[1] for lot in batch_one_list])
 
         for line in self.line_out_ids:
             if line.amount < 0:
