@@ -239,7 +239,7 @@
 					<field name='depreciation_value'/>
 					<field name='clean_income'/>
                     <field name='clean_costs'/>
-                    <field name='active'/>
+                    <field name='active' invisible='1'/>
 				</tree>
 			</field>
 		</record>
