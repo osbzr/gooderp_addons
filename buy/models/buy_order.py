@@ -295,7 +295,7 @@ class buy_order(models.Model):
         for line in self.line_ids:
             if line.quantity <= 0 or line.price_taxed < 0:
                 raise UserError(u'商品 %s 的数量和含税单价不能小于0' % line.goods_id.name)
-            if line.tax_amount > 0 and self.currency_id != self.env.user.company_id.currency_id:
+            if line.tax_amount > 0 and self.currency_id:
                 raise UserError(u'外贸免税')
         if not self.bank_account_id and self.prepayment:
             raise UserError(u'预付款不为空时，请选择结算账户')
