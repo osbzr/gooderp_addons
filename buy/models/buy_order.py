@@ -101,8 +101,6 @@ class buy_order(models.Model):
         :return:
         """
         self.currency_id = self.partner_id.s_category_id.account_id.currency_id.id or self.partner_id.c_category_id.account_id.currency_id.id
-        if not self.currency_id:
-            self.currency_id = self.env.user.company_id.currency_id.id
 
     partner_id = fields.Many2one('partner', u'供应商',
                                  states=READONLY_STATES,
@@ -519,7 +517,7 @@ class buy_order_line(models.Model):
             # 非公司本位币
             rate_silent = (self.env['res.currency'].get_rate_silent(
                 self.order_id.date,
-                self.order_id.currency_id.id) or 0)
+                self.order_id.currency_id.id) or 1)
             currency_amount = self.quantity * self.price_taxed - self.discount_amount
             self.price = self.price_taxed * rate_silent / (1 + self.tax_rate * 0.01)
             self.subtotal = (self.price_taxed * self.quantity - self.discount_amount) * rate_silent  # 价税合计
