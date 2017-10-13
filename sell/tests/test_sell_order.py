@@ -10,6 +10,7 @@ class test_sell_order(TransactionCase):
         super(test_sell_order, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
 
         # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
         self.env.ref('money.get_40000').money_order_done()
@@ -108,6 +109,7 @@ class test_sell_order(TransactionCase):
 
     def test_unlink(self):
         '''测试删除已审核的销货订单'''
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         self.order.sell_order_done()
         with self.assertRaises(UserError):
             self.order.unlink()

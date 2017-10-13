@@ -9,6 +9,8 @@ class test_buy_adjust(TransactionCase):
         '''采购变更单准备基本数据'''
         super(test_buy_adjust, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        for line in self.order.line_ids:
+            line.tax_rate = 0
         self.order.buy_order_done()
         self.keyboard = self.env.ref('goods.keyboard')
         self.keyboard_black = self.env.ref('goods.keyboard_black')
@@ -139,7 +141,8 @@ class test_buy_adjust(TransactionCase):
                                    'goods_id': self.keyboard.id,
                                    'attribute_id': self.keyboard_black.id,
                                    'quantity': 10,
-                                   'price_taxed': 10.0,})
+                                   'price_taxed': 10.0,
+                                   'tax_rate': 0,})
         self.order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
@@ -165,7 +168,8 @@ class test_buy_adjust(TransactionCase):
         self.order.line_ids.create({'order_id': self.order.id,
                                    'goods_id': self.cable.id,
                                    'price_taxed': 10.0,
-                                   'quantity': 10})
+                                   'quantity': 10,
+                                   'tax_rate': 0})
         self.order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])

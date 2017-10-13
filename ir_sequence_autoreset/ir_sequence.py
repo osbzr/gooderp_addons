@@ -63,6 +63,6 @@ class ir_sequence(models.Model):
             number_next_actual = self['reset_init_number'] + self['number_increment']
         return_vals = super(ir_sequence, self).get_next_char(number_next)
         if number_next_actual:
-            self.number_next_actual = number_next_actual
-            self.write({'number_next': number_next_actual})
+            self.sudo().number_next_actual = number_next_actual
+            self.sudo().number_next = number_next_actual
         return return_vals

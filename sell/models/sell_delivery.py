@@ -389,6 +389,57 @@ class sell_delivery(models.Model):
         else:
             voucher.unlink()
 
+    @api.one
+    def auto_reconcile_sell_order(self):
+        ''' 预收款与结算单自动核销 '''
+        all_delivery_amount = 0
+        for delivery in self.order_id.delivery_ids:
+            all_delivery_amount += delivery.amount
+
+        if self.order_id.received_amount and self.order_id.received_amount == all_delivery_amount:
+            adv_pay_result = []
+            receive_source_result = []
+            # 预收款
+            adv_pay_orders = self.env['money.order'].search([('partner_id', '=', self.partner_id.id),
+                                            ('type', '=', 'get'),
+                                            ('state', '=', 'done'),
+                                            ('to_reconcile', '!=', 0),
+                                            ('sell_id', '=', self.order_id.id)])
+            for order in adv_pay_orders:
+                adv_pay_result.append((0, 0, {'name': order.id,
+                                              'amount': order.amount,
+                                              'date': order.date,
+                                              'reconciled': order.reconciled,
+                                              'to_reconcile': order.to_reconcile,
+                                              'this_reconcile': order.to_reconcile,
+                                              }))
+            # 结算单
+            receive_source_name = [delivery.name for delivery in self.order_id.delivery_ids]
+            receive_source_orders = self.env['money.invoice'].search([('category_id.type', '=', 'income'),
+                                            ('partner_id', '=', self.partner_id.id),
+                                            ('to_reconcile', '!=', 0),
+                                            ('name', 'in', receive_source_name)])
+            for invoice in receive_source_orders:
+                receive_source_result.append((0, 0, {
+                                                'name': invoice.id,
+                                                'category_id': invoice.category_id.id,
+                                                'amount': invoice.amount,
+                                                'date': invoice.date,
+                                                'reconciled': invoice.reconciled,
+                                                'to_reconcile': invoice.to_reconcile,
+                                                'date_due': invoice.date_due,
+                                                'this_reconcile': invoice.to_reconcile,
+                                                }))
+            # 创建核销单
+            reconcile_order = self.env['reconcile.order'].create({
+                                                'partner_id': self.partner_id.id,
+                                                'business_type': 'adv_pay_to_get',
+                                                'advance_payment_ids': adv_pay_result,
+                                                'receivable_source_ids': receive_source_result,
+                                                'note': u'自动核销',
+                                                })
+            reconcile_order.reconcile_order_done() # 自动审核
+
     @api.multi
     def sell_delivery_done(self):
         '''审核销售发货单/退货单，更新本单的收款状态/退款状态，并生成结算单和收款单'''
@@ -424,6 +475,10 @@ class sell_delivery(models.Model):
                 this_reconcile = flag * record.receipt
                 money_order = record._make_money_order(invoice_id, amount, this_reconcile)
                 money_order.money_order_done()
+
+            # 先收款后发货订单自动核销
+            self.auto_reconcile_sell_order()
+
             # 生成分拆单 FIXME:无法跳转到新生成的分单
             if record.order_id and not record.modifying:
                 return record.order_id.sell_generate_delivery()
@@ -441,6 +496,10 @@ class sell_delivery(models.Model):
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
                 [('name', '=', self.invoice_id.name)])
+        # 不能反审核已核销的发货单
+        for invoice in invoice_ids:
+            if invoice.to_reconcile == 0 and invoice.reconciled == invoice.amount:
+                raise UserError(u'发货单已核销，不能反审核！')
         invoice_ids.money_invoice_draft()
         invoice_ids.unlink()
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单

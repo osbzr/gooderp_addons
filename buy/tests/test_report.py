@@ -86,6 +86,7 @@ class test_track_wizard(TransactionCase):
         warehouse_obj.approve_order()
         self.order = self.env.ref('buy.buy_order_1')
         order_2 = self.env.ref('buy.buy_order_1_same')
+        order_2.quantity = 1
         for line in order_2.line_ids:
             line.goods_id = self.env.ref('goods.mouse').id
         order_2.bank_account_id = False
@@ -96,7 +97,7 @@ class test_track_wizard(TransactionCase):
         for line in receipt_2.line_in_ids:
             if line.id not in line_lists:
                 line.lot = 'mouse_lot_' + str(line.id)
-                line.goods_qty = 5
+                line.goods_qty = 1
             line_lists.append(line.id)
 
         receipt_2.buy_receipt_done()

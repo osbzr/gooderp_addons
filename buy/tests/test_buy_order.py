@@ -22,8 +22,9 @@ class test_buy_order(TransactionCase):
         discount_amount_before = self.order.discount_amount
         self.order.discount_rate = 10
         self.order.onchange_discount_rate()
-        self.assertTrue(self.order.amount != amount_before)
-        self.assertTrue(self.order.discount_amount != discount_amount_before)
+        if amount_before:
+            self.assertTrue(self.order.amount != amount_before)
+            self.assertTrue(self.order.discount_amount != discount_amount_before)
 
     def test_get_buy_goods_state(self):
         '''返回收货状态'''
@@ -89,6 +90,7 @@ class test_buy_order(TransactionCase):
         self.order.bank_account_id = bank_account
         for line in self.order.line_ids:
             line.quantity = 1
+            line.tax_rate = 0
         self.order.buy_order_done()
 
         # 预付款不为空时，请选择结算账户
