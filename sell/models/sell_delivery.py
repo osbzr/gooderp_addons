@@ -113,7 +113,6 @@ class sell_delivery(models.Model):
                           help=u'客户方的联系人')
     address_id = fields.Many2one('partner.address', u'联系人地址', states=READONLY_STATES,
                                  help=u'联系地址')
-    address = fields.Char(u'地址')
     mobile = fields.Char(u'手机', states=READONLY_STATES,
                          help=u'联系手机')
     modifying = fields.Boolean(u'差错修改中', default=False,
@@ -128,13 +127,6 @@ class sell_delivery(models.Model):
         if self.address_id:
             self.contact = self.address_id.contact
             self.mobile = self.address_id.mobile
-
-            add_str = '%s%s%s%s%s' % (self.address_id.province_id and self.address_id.province_id.name or '',
-                                      self.address_id.city_id and self.address_id.city_id.city_name or '',
-                                      self.address_id.county_id and self.address_id.county_id.county_name or '',
-                                      self.address_id.town or '',
-                                      self.address_id.detail_address or '')
-            self.address = add_str
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):

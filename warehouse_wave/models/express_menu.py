@@ -53,8 +53,7 @@ class wh_move(models.Model):
     def get_sender(self, ware_hosue_row, pakge_sequence):
         sender = dict(Company=ware_hosue_row.company_id.name,
                       Name=ware_hosue_row.principal_id.name or ware_hosue_row.company_id.name or '',
-                      Mobile=ware_hosue_row.principal_id.work_phone or
-                      ware_hosue_row.company_id.phone,
+                      Mobile=ware_hosue_row.principal_id.work_phone or ware_hosue_row.company_id.phone,
                       ProvinceName=ware_hosue_row.province_id.name  or u'上海',
                       CityName=ware_hosue_row.city_id.city_name or u'上海',
                       ExpAreaName=ware_hosue_row.county_id.county_name  or u'浦东新区',
@@ -69,19 +68,16 @@ class wh_move(models.Model):
             'buy.receipt.return': 'buy.receipt',
             'sell.delivery.sell': 'sell.delivery',
         }
-        address = False
         if ORIGIN_EXPLAIN.get(self.origin):
             model_row = self.env[ORIGIN_EXPLAIN.get(self.origin)
                                 ].search([('sell_move_id', '=', self.id)])
-            address = model_row.address
-            mobile = model_row.mobile
         receiver = dict(Company=' ',
-                        Name=self.partner_id.name,
-                        Mobile=mobile or self.partner_id.main_mobile,
-                        ProvinceName=self.province_id.name  or u'上海',
-                        CityName=self.city_id.city_name or u'上海',
-                        ExpAreaName=self.county_id.county_name or u'浦东新区',
-                        Address=address or u'金海路2588号B-213')
+                        Name=model_row.partner_id.name,
+                        Mobile=model_row.address_id.mobile,
+                        ProvinceName=model_row.address_id.province_id.name  or u'上海',
+                        CityName=model_row.address_id.city_id.city_name or u'上海',
+                        ExpAreaName=model_row.address_id.county_id.county_name or u'浦东新区',
+                        Address=model_row.address_id.detail_address or u'金海路2588号B-213')
 
         goods = []
         qty = 0
