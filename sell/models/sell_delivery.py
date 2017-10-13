@@ -392,7 +392,11 @@ class sell_delivery(models.Model):
     @api.one
     def auto_reconcile_sell_order(self):
         ''' 预收款与结算单自动核销 '''
-        if self.order_id.received_amount == sum(delivery.amount for delivery in self.order_id.delivery_ids):
+        all_delivery_amount = 0
+        for delivery in self.order_id.delivery_ids:
+            all_delivery_amount += delivery.amount
+
+        if self.order_id.received_amount and self.order_id.received_amount == all_delivery_amount:
             adv_pay_result = []
             receive_source_result = []
             # 预收款
@@ -471,12 +475,13 @@ class sell_delivery(models.Model):
                 this_reconcile = flag * record.receipt
                 money_order = record._make_money_order(invoice_id, amount, this_reconcile)
                 money_order.money_order_done()
-            # 生成分拆单 FIXME:无法跳转到新生成的分单
-            if record.order_id and not record.modifying:
-                return record.order_id.sell_generate_delivery()
 
             # 先收款后发货订单自动核销
             self.auto_reconcile_sell_order()
+
+            # 生成分拆单 FIXME:无法跳转到新生成的分单
+            if record.order_id and not record.modifying:
+                return record.order_id.sell_generate_delivery()
 
     @api.one
     def sell_delivery_draft(self):

@@ -9,6 +9,8 @@ class test_buy_adjust(TransactionCase):
         '''采购变更单准备基本数据'''
         super(test_buy_adjust, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
+        for line in self.order.line_ids:
+            line.tax_rate = 0
         self.order.buy_order_done()
         self.keyboard = self.env.ref('goods.keyboard')
         self.keyboard_black = self.env.ref('goods.keyboard_black')

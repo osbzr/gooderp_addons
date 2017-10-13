@@ -30,6 +30,7 @@ class test_create_wave(TransactionCase):
         # 发货方式不一样的发货单不能生成同一拣货单
         self.delivery.express_type = 'YTO'
         order_1 = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         order_1.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
         delivery_1.express_type = 'SF'
@@ -42,6 +43,7 @@ class test_create_wave(TransactionCase):
     def test_fields_view_get_diff_warehouse(self):
         ''' 测试 fields_view_get 仓库不一样的发货单不能生成同一拣货单 '''
         order_1 = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         order_1.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
         with self.assertRaises(UserError):
@@ -99,6 +101,7 @@ class test_wave(TransactionCase):
         # 补足库存数量
         self.env.ref('warehouse.wh_in_whin0').approve_order()
         self.order = self.env.ref('sell.sell_order_2')
+        self.env.ref('sell.sell_order_line_2_3').tax_rate = 0
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
@@ -114,6 +117,7 @@ class test_wave(TransactionCase):
         ''' 测试 create_wave 库存不足报错'''
         self.order.sell_order_draft()
         # goods_id.no_stock 为 True
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         self.env.ref('sell.sell_order_line_1').order_id = self.order.id
         self.env.ref('goods.mouse').no_stock = True
 
@@ -148,6 +152,7 @@ class test_wave(TransactionCase):
         self.wave[0].unlink()
 
         order_1 = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         self.env.ref('sell.sell_order_line_1').quantity = 1
         self.env.ref('sell.sell_order_line_1').discount_amount = 0
         order_1.discount_amount = 0
@@ -236,8 +241,10 @@ class test_do_pack(TransactionCase):
         order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
         self.env.ref('sell.sell_order_line_1').quantity = 1
         self.env.ref('sell.sell_order_line_1').discount_amount = 0
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         order_1.discount_amount = 0
         self.env.ref('sell.sell_order_line_2_3').order_id = order_1.id
+        self.env.ref('sell.sell_order_line_2_3').tax_rate = 0
         order_1.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
         delivery_1.express_code = '8888'

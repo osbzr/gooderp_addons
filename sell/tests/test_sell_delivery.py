@@ -18,7 +18,12 @@ class test_sell_delivery(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
 
+        self.bank_account = self.env.ref('core.alipay')
+        self.bank_account.balance = 10000
+
         self.order = self.env.ref('sell.sell_order_2')
+        self.order.bank_account_id = self.bank_account.id
+        self.order.pre_receipt = 1
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
                        [('order_id', '=', self.order.id)])
@@ -28,9 +33,6 @@ class test_sell_delivery(TransactionCase):
                        [('order_id', '=', self.return_order.id)])
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
-
-        self.bank_account = self.env.ref('core.alipay')
-        self.bank_account.balance = 10000
 
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
         self.customer_warehouse_id = self.env.ref('warehouse.warehouse_customer')
@@ -176,7 +178,7 @@ class test_sell_delivery(TransactionCase):
     def test_sell_delivery_done_wrong(self):
         '''审核发货单/退货单报错情况'''
         # 销售发货单重复审核
-        delivery = self.delivery.copy()
+        delivery = self.delivery
         delivery.sell_delivery_done()
         with self.assertRaises(UserError):
             delivery.sell_delivery_done()
@@ -190,6 +192,13 @@ class test_sell_delivery(TransactionCase):
             line.goods_qty = 0
         with self.assertRaises(UserError):
             self.return_delivery.sell_delivery_done()
+
+    def test_auto_reconcile_sell_order(self):
+        ''' 预收款与结算单自动核销 '''
+        delivery = self.delivery
+        delivery.receipt = 74
+        delivery.bank_account_id = self.bank_account
+        delivery.sell_delivery_done()
 
     def test_sell_delivery_done(self):
         """审核退货单正常流程"""
@@ -274,6 +283,7 @@ class test_sell_delivery(TransactionCase):
         warehouse.scan_barcode(model_name,barcode,self.return_delivery.id)
         #销售出库单扫码
         sell_order = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         sell_order.sell_order_done()
         delivery_order = self.env['sell.delivery'].search([('order_id', '=', sell_order.id)])
         warehouse.scan_barcode(model_name,barcode,delivery_order.id)
@@ -331,6 +341,7 @@ class test_wh_move_line(TransactionCase):
                   [('order_id', '=', self.sell_return.id)])
 
         self.sell_order = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         self.sell_order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
                         [('order_id', '=', self.sell_order.id)])

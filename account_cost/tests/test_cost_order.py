@@ -15,6 +15,7 @@ class test_cost_order(TransactionCase):
         self.receipt = self.env['buy.receipt'].search([('order_id', '=', self.buy_order_1.id)])
 
         self.sell_order_1 = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
         self.sell_order_1.sell_order_done()
         self.delivery = self.env['sell.delivery'].search([('order_id', '=', self.sell_order_1.id)])
 
