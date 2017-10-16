@@ -46,7 +46,7 @@ odoo.define('good.process', function(require) {
                     if (result[0] && typeof(result[0]) == 'object') {
                         self.render_tag(result[0]);
                         if (result[1]) {
-                            self.send_message(message)
+                            self.send_message(result[1])
                         }
 
                     } else {
