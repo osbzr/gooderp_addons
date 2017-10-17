@@ -64,8 +64,8 @@
 				<tree editable='top'>
 					<field name="name"/>
 					<field name="warehouse_id"/>
-					<field name="goods_id"/>
-                    <field name="attribute_id"/>
+					<field name="goods_id" readonly='1'/>
+                    <field name="attribute_id" readonly='1'/>
                     <field name="current_qty"/>
                     <button name="change_location" type="object" string='转存'/>
 				</tree>
