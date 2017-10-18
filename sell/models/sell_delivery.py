@@ -639,7 +639,8 @@ class wh_move_line(models.Model):
         is_return = self.env.context.get('default_is_return')
         if self.goods_id:
             # 如果是销售发货单行 或 销售退货单行
-            if (self.type == 'out' and not is_return) or (self.type == 'in' and is_return):
+            if is_return is not None and \
+                    ((self.type == 'out' and not is_return) or (self.type == 'in' and is_return)):
                 self._delivery_get_price_and_tax()
 
         return super(wh_move_line, self).onchange_goods_id()
