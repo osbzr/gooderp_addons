@@ -117,7 +117,7 @@ class money_order(models.Model):
                              default='draft', copy=False, index=True,
                         help=u'收/付款单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
-                                 readonly=True, ondelete='restrict',
+                                 ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
                                 help=u'该单据对应的业务伙伴，单据审核时会影响他的应收应付余额')
     date = fields.Date(string=u'单据日期', readonly=True,
