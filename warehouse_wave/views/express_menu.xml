@@ -40,20 +40,5 @@
             	</field>
             </field>
         </record>
-        <record id="express_menu_print_inherit" model="ir.ui.view">
-            <field name="name">sell_delivery_form</field>
-            <field name="model">sell.delivery</field>
-            <field name='inherit_id' ref='sell.sell_delivery_form' />
-            <field name="arch" type="xml">
-				<field name="address_id"  position="after" >
-					<field name="express_type" />
-				</field>
-
-				<field name="write_date"  position="after" >
-					<field name="express_code"/>
-					<field name="express_menu" invisible='True'/>
-				</field>
-            </field>
-        </record>
     </data>
 </odoo>

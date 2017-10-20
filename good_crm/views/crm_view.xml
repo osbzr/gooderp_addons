@@ -128,13 +128,15 @@
 			<field name="name">opportunity.tree</field>
 			<field name="model">opportunity</field>
 			<field name="arch" type="xml">
-				<tree string="商机">
+				<tree string="商机" create='false' edit='false'>
 					<field name="name"/>
 					<field name="partner_id"/>
 					<field name="user_id"/>
 					<field name="date"/>
 					<field name="planned_revenue"/>
 					<field name="total_amount"/>
+					<button name="assign_to_me" type="object" string="指派给我" class="oe_highlight"
+                        attrs="{'invisible': [('user_id', '!=', False)]}"/>
 				</tree>
 			</field>
 		</record>
@@ -170,10 +172,7 @@
 			<field name="res_model">opportunity</field>
 			<field name="view_mode">tree</field>
 			<field name="domain">[('user_id', '=', False)]</field>
-			<field name="context">{
-                    'search_default_group_status': 1,
-                }
-            </field>
+			<field name="context">{}</field>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">点击创建一个商机</p>
 			</field>

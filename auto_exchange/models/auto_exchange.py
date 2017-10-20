@@ -78,9 +78,7 @@ class Currency(models.Model):
                     }
         try:
             response, content = http.request(url, 'POST', headers=headers, body=urllib.urlencode(body))
-            html = re.sub(r'charset(\w+)', 'charset=UTF-8', content)
-            result=etree.HTML(html).xpath('//table[@cellpadding="0"]/tr[4]/td/text()')
-            result=etree.HTML(content).xpath('//table[@cellpadding="0"]/tr[4]/td/text()')
+            result=etree.HTML(content.decode('utf8')).xpath('//table[@cellpadding="0"]/tr[4]/td/text()')
         except httplib2.HttpLib2Error:
             raise UserError(u'网页设置有误(%s)请联系作者：（qq：2201864）'% url)
         return result[5]

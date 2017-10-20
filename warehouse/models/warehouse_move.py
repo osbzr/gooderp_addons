@@ -332,41 +332,6 @@ class wh_move(models.Model):
                 'state': 'draft',
             })
 
-
-    @api.multi
-    def check_goods_qty(self, goods, attribute, warehouse):
-        '''SQL来取指定商品，属性，仓库，的当前剩余数量'''
-
-        if attribute:
-            change_conditions = "AND line.attribute_id = %s" % attribute.id
-        elif goods:
-            change_conditions = "AND line.goods_id = %s" % goods.id
-        else:
-            change_conditions = "AND 1 = 0"
-        self.env.cr.execute('''
-                       SELECT sum(line.qty_remaining) as qty
-                       FROM wh_move_line line
-
-                       WHERE line.warehouse_dest_id = %s
-                             AND line.state = 'done'
-                             %s
-                   ''' % (warehouse.id, change_conditions,))
-        return self.env.cr.fetchone()
-
-    @api.model
-    def create(self,vals):
-        new_id = super(wh_move, self).create(vals)
-        # 只针对入库单行
-        for line in new_id.line_in_ids:
-            # 有库存的产品
-            if not line.location_id and self.check_goods_qty(line.goods_id, line.attribute_id, line.warehouse_dest_id)[0]:
-                # 建议将产品上架到现有库位上
-                line.location_id = line.env['location'].search([('goods_id','=',line.goods_id.id),
-                                                                 ('attribute_id','=',line.attribute_id.id),
-                                                                 ('warehouse_id','=',line.warehouse_dest_id.id)],
-                                                                limit=1)
-        return new_id
-
     @api.multi
     def create_zero_wh_in(self,wh_in,model_name):
         """

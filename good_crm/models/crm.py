@@ -67,6 +67,11 @@ class opportunity(models.Model):
         help=u'成功原因分析',
     )
 
+    @api.multi
+    def assign_to_me(self):
+        ''' 继承任务 指派给自己，将商机指派给自己，并修改状态 '''
+        self.task_id.assign_to_me()
+
 
 class goods_quotation(models.Model):
     _name = 'goods.quotation'
