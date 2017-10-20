@@ -228,6 +228,41 @@ class wh_move_line(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
+    @api.multi
+    def check_goods_qty(self, goods, attribute, warehouse):
+        '''SQL来取指定商品，属性，仓库，的当前剩余数量'''
+
+        if attribute:
+            change_conditions = "AND line.attribute_id = %s" % attribute.id
+        elif goods:
+            change_conditions = "AND line.goods_id = %s" % goods.id
+        else:
+            change_conditions = "AND 1 = 0"
+        self.env.cr.execute('''
+                       SELECT sum(line.qty_remaining) as qty
+                       FROM wh_move_line line
+
+                       WHERE line.warehouse_dest_id = %s
+                             AND line.state = 'done'
+                             %s
+                   ''' % (warehouse.id, change_conditions,))
+        return self.env.cr.fetchone()
+
+    @api.model
+    def create(self,vals):
+        new_id = super(wh_move_line, self).create(vals)
+        # 只针对入库单行
+        if new_id.type != 'out' and not new_id.location_id:
+            # 有库存的产品
+            qty_now = self.check_goods_qty(new_id.goods_id, new_id.attribute_id, new_id.warehouse_dest_id)[0]
+            if qty_now:
+                # 建议将产品上架到现有库位上
+                new_id.location_id = new_id.env['location'].search([('goods_id','=',new_id.goods_id.id),
+                                                                    ('attribute_id','=',new_id.attribute_id.id),
+                                                                    ('warehouse_id','=',new_id.warehouse_dest_id.id)],
+                                                                    limit=1)
+        return new_id
+
     @api.one
     @api.depends('cost_unit', 'goods_qty')
     def _compute_cost(self):
