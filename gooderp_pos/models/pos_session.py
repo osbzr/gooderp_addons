@@ -3,6 +3,7 @@
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError
 
+
 class PosSession(models.Model):
     _name = 'pos.session'
     _order = 'id desc'
@@ -14,8 +15,10 @@ class PosSession(models.Model):
         ('closed', '关闭 & 过账'),
     ]
 
-    config_id = fields.Many2one('pos.config', string=u'POS', required=True, index=True)
-    name = fields.Char(string=u'工作记录名', required=True, readonly=True, default='/')
+    config_id = fields.Many2one(
+        'pos.config', string=u'POS', required=True, index=True)
+    name = fields.Char(string=u'工作记录名', required=True,
+                       readonly=True, default='/')
     user_id = fields.Many2one(
         'res.users', string=u'负责人',
         required=True,
@@ -23,7 +26,7 @@ class PosSession(models.Model):
         readonly=True,
         states={'opening_control': [('readonly', False)]},
         default=lambda self: self.env.uid)
-    #TODO:currency_id = fields.Many2one('res.currency', related='config_id.currency_id', string="Currency")
+    # TODO:currency_id = fields.Many2one('res.currency', related='config_id.currency_id', string="Currency")
     start_at = fields.Datetime(string=u'打开日期', readonly=True)
     stop_at = fields.Datetime(string=u'关闭日期', readonly=True, copy=False)
 
@@ -33,8 +36,9 @@ class PosSession(models.Model):
         index=True, copy=False, default='opening_control')
     sequence_number = fields.Integer(string=u'订单序列号', default=1)
     login_number = fields.Integer(string=u'登录序列号', default=0)
-    cash_control = fields.Boolean( string=u'现金管理')
-    payment_line_ids = fields.One2many('payment.line', 'session_id', string=u'支付详情')
+    cash_control = fields.Boolean(string=u'现金管理')
+    payment_line_ids = fields.One2many(
+        'payment.line', 'session_id', string=u'支付详情')
     order_ids = fields.One2many('pos.order', 'session_id', string=u'POS订单')
 
     _sql_constraints = [('uniq_name', 'unique(name)', u"POS会话名称必须唯一")]
@@ -57,9 +61,11 @@ class PosSession(models.Model):
         # Close CashBox
         for session in self:
             company_id = session.config_id.company_id.id
-            ctx = dict(self.env.context, force_company=company_id, company_id=company_id)
+            ctx = dict(self.env.context, force_company=company_id,
+                       company_id=company_id)
         # self.with_context(ctx)._confirm_orders()
-            session.write({'state': 'closed', 'stop_at': fields.Datetime.now()})
+            session.write(
+                {'state': 'closed', 'stop_at': fields.Datetime.now()})
         return {
             'type': 'ir.actions.client',
             'name': 'POS菜单',
@@ -76,10 +82,10 @@ class PosSession(models.Model):
     @api.constrains('config_id')
     def _check_pos_config(self):
         if self.search_count([
-                ('state', '!=', 'closed'),
-                ('config_id', '=', self.config_id.id),
-                ('name', 'not like', 'RESCUE FOR'),
-            ]) > 1:
+            ('state', '!=', 'closed'),
+            ('config_id', '=', self.config_id.id),
+            ('name', 'not like', 'RESCUE FOR'),
+        ]) > 1:
             raise ValidationError(u"对于同一个POS，你不能创建两个活动会话。")
 
     @api.model
@@ -95,7 +101,8 @@ class PosSession(models.Model):
                 'bank_account_id': bank_account.id,
                 'amount': 0,
             }
-            payment_lines.append(self.env['payment.line'].create(bank_values).id)
+            payment_lines.append(
+                self.env['payment.line'].create(bank_values).id)
         values.update({
             'payment_line_ids': [(6, 0, payment_lines)],
             'name': pos_name,
@@ -121,7 +128,8 @@ class PosSession(models.Model):
         if not self.ids:
             return {}
         for session in self.filtered(lambda s: s.user_id.id != self.env.uid):
-            raise UserError(u"你不能使用其他用户的会话，这个会话属于 %s。请先关闭当前会话然后使用POS。" % session.user_id.name)
+            raise UserError(
+                u"你不能使用其他用户的会话，这个会话属于 %s。请先关闭当前会话然后使用POS。" % session.user_id.name)
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',

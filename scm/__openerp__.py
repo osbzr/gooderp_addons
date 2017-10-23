@@ -12,13 +12,13 @@
                         根据商品的现有库存及最低库存量，结合购货订单、采购入库单、销货订单、销售出库单、其他出入库单等，自动计算出商品的购货订单或者组装单。
     ''',
     'version': '11.11',
-    'application':True,
-    'depends': ['sell', 'buy','web_stock_query','asset', 'task'],
+    'application': True,
+    'depends': ['sell', 'buy', 'web_stock_query', 'asset', 'task'],
     'data': [
-             'security/ir.model.access.csv',
-             'data/stock_request_data.xml',
-             'views/stock_request_view.xml',
-             ],
+        'security/ir.model.access.csv',
+        'data/stock_request_data.xml',
+        'views/stock_request_view.xml',
+    ],
     'demo': [
         'data/demo.xml',
     ]

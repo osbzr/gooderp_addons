@@ -7,7 +7,8 @@ class TestInventory(TransactionCase):
     def setUp(self):
         super(TestInventory, self).setUp()
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
         self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
 
@@ -57,16 +58,17 @@ class TestInventory(TransactionCase):
         self.temp_mouse_in_zero_qty.action_done()
 
         self.inventory = self.env['wh.inventory'].create({
-                'warehouse_id': self.browse_ref('warehouse.hd_stock').id,
-                })
+            'warehouse_id': self.browse_ref('warehouse.hd_stock').id,
+        })
         self.inventory.query_inventory()
 
     def test_query_inventory(self):
         # 盘点单查询的结果必须和每个商品单据查询的结果一致
         for line in self.inventory.line_ids:
             goods_stock = line.goods_id.get_stock_qty()[0]
-            self.assertEqual(goods_stock.get('warehouse'), line.warehouse_id.name)
-            if line.goods_id.name == u'网线': # 网线在途移库 120个，盘点时应减去
+            self.assertEqual(goods_stock.get('warehouse'),
+                             line.warehouse_id.name)
+            if line.goods_id.name == u'网线':  # 网线在途移库 120个，盘点时应减去
                 self.assertEqual(goods_stock.get('qty') - 120, line.real_qty)
             else:
                 self.assertEqual(goods_stock.get('qty'), line.real_qty)
@@ -78,7 +80,7 @@ class TestInventory(TransactionCase):
             self.assertEqual(line.warehouse_id, self.sh_warehouse)
 
         # 指定商品的时候，选择的行必须是该商品的
-        self.inventory.goods = [4,self.goods_mouse.id]    #u'鼠标'
+        self.inventory.goods = [4, self.goods_mouse.id]  # u'鼠标'
         self.inventory.query_inventory()
         for line in self.inventory.line_ids:
             self.assertEqual(line.goods_id.name, u'鼠标')
@@ -133,7 +135,8 @@ class TestInventory(TransactionCase):
         # 实际辅助数量改变的时候，实际数量应该跟着改变
         mouse.inventory_uos_qty = mouse.real_uos_qty + 1
         mouse.onchange_uos_qty()
-        self.assertEqual(mouse.goods_id.conversion_unit(mouse.inventory_uos_qty), mouse.inventory_qty)
+        self.assertEqual(mouse.goods_id.conversion_unit(
+            mouse.inventory_uos_qty), mouse.inventory_qty)
 
         mouse.line_role_back()
         mouse.inventory_qty = mouse.real_qty + 1
@@ -147,8 +150,10 @@ class TestInventory(TransactionCase):
         self.assertTrue(self.inventory.in_id)
 
         # 验证商品
-        self.assertEqual(self.inventory.out_id.line_out_ids.goods_id, cable.goods_id)
-        self.assertEqual(self.inventory.in_id.line_in_ids.goods_id, mouse.goods_id)
+        self.assertEqual(
+            self.inventory.out_id.line_out_ids.goods_id, cable.goods_id)
+        self.assertEqual(
+            self.inventory.in_id.line_in_ids.goods_id, mouse.goods_id)
 
         # 验证数量
         self.assertEqual(self.inventory.out_id.line_out_ids.goods_qty, 1)
@@ -201,6 +206,6 @@ class TestInventory(TransactionCase):
     def test_inventory_get_default_warehouse(self):
         ''' 测试 获取盘点仓库 '''
         self.env['wh.inventory'].create({
-                                         'date': '2016-12-30',
-                                         'goods': '鼠标',
-                                         })
+            'date': '2016-12-30',
+            'goods': '鼠标',
+        })

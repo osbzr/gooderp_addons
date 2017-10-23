@@ -3,7 +3,8 @@ from odoo import fields, models, api, tools, modules
 from datetime import datetime
 from odoo.exceptions import UserError
 
-class staff_department(models.Model):
+
+class StaffDepartment(models.Model):
     _name = "staff.department"
     _description = u'员工部门'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
@@ -27,7 +28,8 @@ class staff_department(models.Model):
     def _check_parent_id(self):
         '''上级部门不能选择自己和下级的部门'''
         if self.parent_id:
-            staffs = self.env['staff.department'].search([('parent_id','=',self.id)])
+            staffs = self.env['staff.department'].search(
+                [('parent_id', '=', self.id)])
             if self.parent_id in staffs:
                 raise UserError(u'上级部门不能选择他自己或者他的下级部门')
 
@@ -37,7 +39,8 @@ class staff_department(models.Model):
             context = {'default_name': child_department.name,
                        'default_manager_id': child_department.manager_id.id,
                        'default_parent_id': child_department.parent_id.id}
-            res_id = self.env['staff.department'].search([('id', '=', child_department.id)])
+            res_id = self.env['staff.department'].search(
+                [('id', '=', child_department.id)])
             view_id = self.env.ref('staff.view_staff_department_form').id
 
             return {
@@ -54,7 +57,7 @@ class staff_department(models.Model):
             }
 
 
-class staff_job(models.Model):
+class StaffJob(models.Model):
     _name = "staff.job"
     _description = u'员工职位'
 
@@ -70,13 +73,14 @@ class staff_job(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class staff_employee_category(models.Model):
+class StaffEmployeeCategory(models.Model):
     _name = "staff.employee.category"
     _description = u'员工层级'
 
     name = fields.Char(u'名称')
     parent_id = fields.Many2one('staff.employee.category', u'上级标签', index=True)
-    chield_ids = fields.One2many('staff.employee.category', 'parent_id', u'下级标签')
+    chield_ids = fields.One2many(
+        'staff.employee.category', 'parent_id', u'下级标签')
     employee_ids = fields.Many2many('staff',
                                     'employee_category_rel',
                                     'category_id',
@@ -88,7 +92,7 @@ class staff_employee_category(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class staff(models.Model):
+class Staff(models.Model):
     _inherit = 'staff'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
 
@@ -116,29 +120,29 @@ class staff(models.Model):
     # 个人信息
     birthday = fields.Date(u'生日')
     identification_id = fields.Char(u'证照号码')
-    is_arbeitnehmer =  fields.Boolean(u'是否雇员', default='1')
+    is_arbeitnehmer = fields.Boolean(u'是否雇员', default='1')
     is_investoren = fields.Boolean(u'是否投资者')
     is_bsw = fields.Boolean(u'是否残疾烈属孤老')
     type_of_certification = fields.Selection([
-                              ('ID', u'居民身份证'),
-                              ('Military_ID', u'军官证'),
-                              ('Soldiers_Card', u'士兵证'),
-                              ('Police_badge', u'武警警官证'),
-                              ('Passport_card', u'护照'),
-                              ],
-                              u'证照类型',
-                              default='ID',
-                              required=True)
+        ('ID', u'居民身份证'),
+        ('Military_ID', u'军官证'),
+        ('Soldiers_Card', u'士兵证'),
+        ('Police_badge', u'武警警官证'),
+        ('Passport_card', u'护照'),
+    ],
+        u'证照类型',
+        default='ID',
+        required=True)
     gender = fields.Selection([
                               ('male', u'男'),
                               ('female', u'女')
                               ], u'性别')
     marital = fields.Selection([
-                                ('single', u'单身'),
-                                ('married', u'已婚'),
-                                ('widower', u'丧偶'),
-                                ('divorced', u'离异')
-                                ], u'婚姻状况')
+        ('single', u'单身'),
+        ('married', u'已婚'),
+        ('widower', u'丧偶'),
+        ('divorced', u'离异')
+    ], u'婚姻状况')
     contract_ids = fields.One2many('staff.contract', 'staff_id', u'合同')
     active = fields.Boolean(u'启用', default=True)
     # 公开信息
@@ -156,14 +160,16 @@ class staff(models.Model):
     def staff_contract_over_date(self):
         # 员工合同到期，发送邮件给员工 和 部门经理（如果存在）
         now = datetime.now().strftime("%Y-%m-%d")
-        for staff in self.search([]):
-            if not staff.contract_ids:
+        for Staff in self.search([]):
+            if not Staff.contract_ids:
                 continue
 
-            for contract in staff.contract_ids:
+            for contract in Staff.contract_ids:
                 if now == contract.over_date:
-                    self.env.ref('staff.contract_over_due_date_employee').send_mail(self.env.user.id)
-                    if staff.parent_id and staff.parent_id.work_email:
-                        self.env.ref('staff.contract_over_due_date_manager').send_mail(self.env.user.id)
+                    self.env.ref('staff.contract_over_due_date_employee').send_mail(
+                        self.env.user.id)
+                    if Staff.parent_id and Staff.parent_id.work_email:
+                        self.env.ref('staff.contract_over_due_date_manager').send_mail(
+                            self.env.user.id)
 
         return

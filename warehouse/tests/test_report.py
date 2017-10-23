@@ -8,7 +8,8 @@ class TestReport(TransactionCase):
     def setUp(self):
         super(TestReport, self).setUp()
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
         self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
@@ -22,7 +23,8 @@ class TestReport(TransactionCase):
         # 键盘    总仓  kb160000567 600   入库
         # 鼠标    总仓  ms160301    1     入库
         # 鼠标    总仓  ms160302    1     入库
-        self.env['wh.in'].search([('name', '!=', 'WH/IN/16040004')]).approve_order()
+        self.env['wh.in'].search(
+            [('name', '!=', 'WH/IN/16040004')]).approve_order()
         # 先盘点商品，保证网线数量充足
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
@@ -30,8 +32,8 @@ class TestReport(TransactionCase):
         self.env['wh.internal'].search([]).approve_order()
 
         self.transceive_wizard = self.env['report.stock.transceive.wizard'].create({
-                            'date_start': '2016-04-01',
-                            'date_end': '2016-04-03'})
+            'date_start': '2016-04-01',
+            'date_end': '2016-04-03'})
 
     def test_report_base(self):
         report_base = self.env['report.base'].create({})
@@ -56,7 +58,8 @@ class TestReport(TransactionCase):
         }, 'value': {'date_end': self.transceive_wizard.date_start}}
 
         self.assertEqual(results, real_results)
-        self.assertEqual(self.transceive_wizard.open_report().get('res_model'), 'report.stock.transceive')
+        self.assertEqual(self.transceive_wizard.open_report().get(
+            'res_model'), 'report.stock.transceive')
         # 测试wizard默认日期
         self.env['report.stock.transceive.wizard'].create({})
 
@@ -78,8 +81,10 @@ class TestReport(TransactionCase):
         self.assertEqual(len(results), len(real_results))
         self.assertEqual(len(results), length)
 
-        instance = stock_transceive.with_context(context).browse(results[0].get('id'))
-        self.assertEqual(instance.read(['warehouse'])[0].get('warehouse'), results[0].get('warehouse'))
+        instance = stock_transceive.with_context(
+            context).browse(results[0].get('id'))
+        self.assertEqual(instance.read(['warehouse'])[0].get(
+            'warehouse'), results[0].get('warehouse'))
 
         for result in results:
             result = (
@@ -98,7 +103,8 @@ class TestReport(TransactionCase):
         """
         self.transceive_wizard.date_start = '2016-02-01'
         self.transceive_wizard.goods_id = self.env.ref('goods.mouse').id
-        self.transceive_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.transceive_wizard.warehouse_id = self.env.ref(
+            'warehouse.hd_stock').id
         context = self.transceive_wizard.open_report().get('context')
         stock_transceive = self.env['report.stock.transceive'].create({})
         results = stock_transceive.with_context(context).search_read(domain=[])
@@ -114,10 +120,11 @@ class TestReport(TransactionCase):
         context = self.transceive_wizard.open_report().get('context')
         stock_transceive = self.env['report.stock.transceive'].create({})
         # 增加一个domain 条件
-        result1 = stock_transceive.with_context(context).search_read(domain=[('warehouse', '=', u'上海仓')])
+        result1 = stock_transceive.with_context(
+            context).search_read(domain=[('warehouse', '=', u'上海仓')])
         # 增加一个domain 条件，domain 中用‘|’
         result2 = stock_transceive.with_context(context).search_read(
-            domain=['|',('warehouse', '=', u'上海仓'),('warehouse', '=', u'总仓')])
+            domain=['|', ('warehouse', '=', u'上海仓'), ('warehouse', '=', u'总仓')])
         with self.assertRaises(UserError):  # 暂时无法解析的domain条件
             stock_transceive.with_context(context).search_read(
                 domain=[('warehouse', '<>', u'上海仓')])
@@ -129,7 +136,7 @@ class TestReport(TransactionCase):
                 domain=['warehouse', '=', u'上海仓'])
         # 增加一个domain 条件，domain 中用'|','|'
         stock_transceive.with_context(context).search_read(
-            domain=['|','|',('goods', '=', u'键盘'),('warehouse', '=', u'上海仓'),('warehouse', '=', u'总仓')])
+            domain=['|', '|', ('goods', '=', u'键盘'), ('warehouse', '=', u'上海仓'), ('warehouse', '=', u'总仓')])
 
     def test_stock_transceive_read_group(self):
         """

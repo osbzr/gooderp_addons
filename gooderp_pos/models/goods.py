@@ -4,7 +4,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
-class goods(models.Model):
+class Goods(models.Model):
     _inherit = 'goods'
 
     available_in_pos = fields.Boolean(string=u'可用于POS',

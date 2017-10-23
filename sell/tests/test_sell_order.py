@@ -4,10 +4,10 @@ from odoo.exceptions import UserError
 from datetime import datetime
 
 
-class test_sell_order(TransactionCase):
+class TestSellOrder(TransactionCase):
 
     def setUp(self):
-        super(test_sell_order, self).setUp()
+        super(TestSellOrder, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_1')
         self.env.ref('sell.sell_order_line_1').tax_rate = 0
@@ -17,9 +17,12 @@ class test_sell_order(TransactionCase):
         self.env.ref('money.pay_2000').money_order_done()
 
         self.partner_id = self.env.ref('core.jd')
-        self.province_id = self.env['country.state'].search([('name', '=', u'河北省')])
-        self.city_id = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
-        self.county_id = self.env['all.county'].search([('county_name', '=', u'正定县')])
+        self.province_id = self.env['country.state'].search(
+            [('name', '=', u'河北省')])
+        self.city_id = self.env['all.city'].search(
+            [('city_name', '=', u'石家庄市')])
+        self.county_id = self.env['all.county'].search(
+            [('county_name', '=', u'正定县')])
 
     def test_compute_amount(self):
         ''' 计算字段的测试'''
@@ -41,8 +44,8 @@ class test_sell_order(TransactionCase):
     def test_default_warehouse(self):
         '''新建销货订单时调出仓库的默认值'''
         order = self.env['sell.order'].with_context({
-             'warehouse_type': 'stock'
-             }).create({})
+            'warehouse_type': 'stock'
+        }).create({})
         self.assertTrue(order.warehouse_id.type == 'stock')
 
     def test_onchange_partner_id(self):
@@ -79,7 +82,7 @@ class test_sell_order(TransactionCase):
                                         'town': u'曹路镇',
                                         'detail_address': u'金海路1688号',
                                         }
-                                )]})
+                                 )]})
         self.order.onchange_partner_id()
         # partner 存在默认联系人
         for child in self.partner_id.child_ids:
@@ -92,12 +95,12 @@ class test_sell_order(TransactionCase):
     def test_onchange_address(self):
         ''' sell.order onchange address '''
         address = self.env['partner.address'].create({'contact': u'小东',
-                                        'province_id': self.province_id.id,
-                                        'city_id': self.city_id.id,
-                                        'county_id': self.county_id.id,
-                                        'town': u'曹路镇',
-                                        'detail_address': u'金海路1688号',
-                                        })
+                                                      'province_id': self.province_id.id,
+                                                      'city_id': self.city_id.id,
+                                                      'county_id': self.county_id.id,
+                                                      'town': u'曹路镇',
+                                                      'detail_address': u'金海路1688号',
+                                                      })
         self.order.address_id = address.id
         self.order.onchange_partner_address()
 
@@ -171,10 +174,11 @@ class test_sell_order(TransactionCase):
         with self.assertRaises(UserError):
             self.order.sell_order_draft()
 
-class test_sell_order_line(TransactionCase):
+
+class TestSellOrderLine(TransactionCase):
 
     def setUp(self):
-        super(test_sell_order_line, self).setUp()
+        super(TestSellOrderLine, self).setUp()
         self.order = self.env.ref('sell.sell_order_1')
         self.sell_order_line = self.env.ref('sell.sell_order_line_2_3')
 
@@ -187,7 +191,8 @@ class test_sell_order_line(TransactionCase):
 
     def test_compute_all_amount(self):
         ''' 销售订单行计算字段的测试 '''
-        self.assertEqual(self.sell_order_line.amount, 107)  # tax_amount subtotal
+        self.assertEqual(self.sell_order_line.amount,
+                         107)  # tax_amount subtotal
         self.sell_order_line.onchange_goods_id()
         self.assertEqual(self.sell_order_line.tax_rate, 17.0)
         self.sell_order_line.price_taxed = 11.7
@@ -263,9 +268,9 @@ class test_sell_order_line(TransactionCase):
 
     def test_onchange_warehouse_id(self):
         '''仓库和商品带出价格策略的折扣率'''
-        order_line=self.env.ref('sell.sell_order_line_1')
+        order_line = self.env.ref('sell.sell_order_line_1')
         order_line.onchange_warehouse_id()
-        order=self.env.ref('sell.sell_order_1')
+        order = self.env.ref('sell.sell_order_1')
         order.partner_id = self.env.ref('core.yixun').id
         order_line.onchange_warehouse_id()
 

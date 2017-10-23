@@ -4,7 +4,8 @@ from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
 from odoo.tools import float_is_zero
 
-class partner(models.Model):
+
+class Partner(models.Model):
     '''查看业务伙伴对账单'''
     _inherit = 'partner'
 
@@ -12,18 +13,17 @@ class partner(models.Model):
                             amount, reconciled, to_reconcile, date_due, state):
         if not float_is_zero(amount, 2):
             return self.env['money.invoice'].create({
-                                                'name': name,
-                                                'partner_id': partner_id,
-                                                'category_id': category_id,
-                                                'is_init': is_init,
-                                                'date': date,
-                                                'amount': amount,
-                                                'reconciled': reconciled,
-                                                'to_reconcile': to_reconcile,
-                                                'date_due': date_due,
-                                                'state': state,
-                                              })
-
+                'name': name,
+                'partner_id': partner_id,
+                'category_id': category_id,
+                'is_init': is_init,
+                'date': date,
+                'amount': amount,
+                'reconciled': reconciled,
+                'to_reconcile': to_reconcile,
+                'date_due': date_due,
+                'state': state,
+            })
 
     @api.one
     def _set_receivable_init(self):
@@ -38,8 +38,8 @@ class partner(models.Model):
             # 创建结算单
             categ = self.env.ref('money.core_category_sale')
             self._init_source_create("期初应收余额", self.id, categ.id, True,
-                                    self.env.user.company_id.start_date, self.receivable_init, 0,
-                                    self.receivable_init, self.env.user.company_id.start_date, 'draft')
+                                     self.env.user.company_id.start_date, self.receivable_init, 0,
+                                     self.receivable_init, self.env.user.company_id.start_date, 'draft')
 
     @api.one
     def _set_payable_init(self):
@@ -54,18 +54,17 @@ class partner(models.Model):
             # 创建结算单
             categ = self.env.ref('money.core_category_purchase')
             self._init_source_create("期初应付余额", self.id, categ.id, True,
-                                    self.env.user.company_id.start_date, self.payable_init, 0,
-                                    self.payable_init, self.env.user.company_id.start_date, 'draft')
+                                     self.env.user.company_id.start_date, self.payable_init, 0,
+                                     self.payable_init, self.env.user.company_id.start_date, 'draft')
 
-
-    receivable_init = fields.Float(u'应收期初', 
+    receivable_init = fields.Float(u'应收期初',
                                    digits=dp.get_precision('Amount'),
                                    inverse=_set_receivable_init,
                                    help=u'客户的应收期初余额')
-    payable_init = fields.Float(u'应付期初', 
-                           digits=dp.get_precision('Amount'),
-                           inverse=_set_payable_init,
-                        help=u'供应商的应付期初余额')
+    payable_init = fields.Float(u'应付期初',
+                                digits=dp.get_precision('Amount'),
+                                inverse=_set_payable_init,
+                                help=u'供应商的应付期初余额')
 
     @api.multi
     def partner_statements(self):
@@ -94,7 +93,7 @@ class partner(models.Model):
         }
 
 
-class bank_account(models.Model):
+class BankAccount(models.Model):
     '''查看账户对账单'''
     _inherit = 'bank.account'
 

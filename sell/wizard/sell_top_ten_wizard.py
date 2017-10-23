@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class sell_top_ten_wizard(models.TransientModel):
+class SellTopTenWizard(models.TransientModel):
     _name = 'sell.top.ten.wizard'
     _description = u'销量前十商品向导'
 
@@ -35,7 +35,8 @@ class sell_top_ten_wizard(models.TransientModel):
     def button_ok(self):
         self.ensure_one()
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' % (self.date_start, self.date_end))
+            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' %
+                            (self.date_start, self.date_end))
 
         return {
             'name': u'销量前十商品',

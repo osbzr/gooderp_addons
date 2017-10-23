@@ -3,23 +3,24 @@
 from odoo import fields, models, api
 
 
-class cost_line(models.Model):
+class CostLine(models.Model):
     _inherit = 'cost.line'
 
     sell_id = fields.Many2one('sell.delivery', u'出库单号',
                               ondelete='cascade',
                               help=u'与销售费用相关联的出库单号')
 
-class money_order(models.Model):
+
+class MoneyOrder(models.Model):
     _inherit = 'money.order'
 
     sell_id = fields.Many2one('sell.order', u'销售订单',
                               ondelete='restrict',
                               help=u'与付款相关的销售订单号')
 
-class money_invoice(models.Model):
-    _inherit = 'money.invoice'
 
+class MoneyInvoice(models.Model):
+    _inherit = 'money.invoice'
 
     move_id = fields.Many2one('wh.move', string=u'出入库单',
                               readonly=True, ondelete='cascade',

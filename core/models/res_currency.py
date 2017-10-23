@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
 
-class res_currency(models.Model):
+
+class ResCurrency(models.Model):
     _inherit = 'res.currency'
 
     company_id = fields.Many2one(
@@ -27,20 +28,25 @@ class res_currency(models.Model):
         if value < 0:
             xflag = value
             value = abs(value)
-        nums = map(int, list(str('%0.2f' % value).replace('.', '')))  # 先把value 数字进行格式化保留两位小数，转成字符串然后去除小数点
+        # 先把value 数字进行格式化保留两位小数，转成字符串然后去除小数点
+        nums = map(int, list(str('%0.2f' % value).replace('.', '')))
         words = []
         zflag = 0  # 标记连续0次数，以删除万字，或适时插入零字
         start = len(nums) - 3
         for i in range(start, -3, -1):  # 使i对应实际位数，负数为角分
-            if 0 != nums[start - i] or len(words) == 0:  # 大部分情况对应数字不等于零 或者是刚开始循环
+            # 大部分情况对应数字不等于零 或者是刚开始循环
+            if 0 != nums[start - i] or len(words) == 0:
                 if zflag:
                     words.append(rmbmap[0])
                     zflag = 0
                 words.append(rmbmap[nums[start - i]])   # 数字对应的中文字符
                 words.append(unit[i + 2])               # 列表此位置的单位
-            elif 0 == i or (0 == i % 4 and zflag < 3):  # 控制‘万/元’ 万和元比较特殊，如2拾万和2拾1万 无论有没有这个1 万字是必须的
-                words.append(unit[i + 2])               # 上面那种情况定义了 2拾1万 的显示 这个是特殊对待的 2拾万（一类）的显示
-                zflag = 0                               # 元（控制条件为 0 == i ）和万(控制条为(0 == i % 4 and zflag < 3))的情况的处理是一样的
+            # 控制‘万/元’ 万和元比较特殊，如2拾万和2拾1万 无论有没有这个1 万字是必须的
+            elif 0 == i or (0 == i % 4 and zflag < 3):
+                # 上面那种情况定义了 2拾1万 的显示 这个是特殊对待的 2拾万（一类）的显示
+                words.append(unit[i + 2])
+                # 元（控制条件为 0 == i ）和万(控制条为(0 == i % 4 and zflag < 3))的情况的处理是一样的
+                zflag = 0
             else:
                 zflag += 1
         if words[-1] != unit[0]:  # 结尾非‘分’补整字 最小单位 如果最后一个字符不是最小单位(分)则要加一个整字

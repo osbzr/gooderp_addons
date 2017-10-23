@@ -4,11 +4,11 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
-class pricing(models.Model):
+class Pricing(models.Model):
     _name = 'pricing'
     _description = u'定价策略'
 
-    #此逻辑放在这里是为了让采购和销售都有机会使用价格策略，现在只在销售环节读取了这些策略
+    # 此逻辑放在这里是为了让采购和销售都有机会使用价格策略，现在只在销售环节读取了这些策略
 
     def get_condition(self, args):
         """
@@ -28,12 +28,12 @@ class pricing(models.Model):
                                                 goods.name,
                                                 date)
         res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
-                           ('warehouse_id', '=', warehouse.id),
-                           ('goods_id', '=', goods.id),
-                           ('goods_category_id', '=', False),
-                           ('active_date', '<=', date),
-                           ('deactive_date', '>=', date)],
-                'message': message})
+                               ('warehouse_id', '=', warehouse.id),
+                               ('goods_id', '=', goods.id),
+                               ('goods_category_id', '=', False),
+                               ('active_date', '<=', date),
+                               ('deactive_date', '>=', date)],
+                    'message': message})
         # 客户类别、仓库、商品类别满足条件
         message = u'适用于 %s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                                  warehouse.name,
@@ -162,11 +162,11 @@ class pricing(models.Model):
 
         sum = 0
         for value in res:
-            pricing = self.search(value['domain'])
-            sum += len(pricing)
-            if len(pricing) == 1:
-                return pricing
-            if len(pricing) > 1:
+            Pricing = self.search(value['domain'])
+            sum += len(Pricing)
+            if len(Pricing) == 1:
+                return Pricing
+            if len(Pricing) > 1:
                 raise UserError(value['message'])
 
         # 如果日期范围内没有适用的价格策略，则返回空
@@ -176,7 +176,7 @@ class pricing(models.Model):
     name = fields.Char(u'描述', help=u'描述!')
     warehouse_id = fields.Many2one('warehouse',
                                    u'仓库',
-                                   ondelete = 'restrict',
+                                   ondelete='restrict',
                                    )
     c_category_id = fields.Many2one('core.category', u'客户类别',
                                     ondelete='restrict',

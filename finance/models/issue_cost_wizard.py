@@ -4,20 +4,29 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 
+
 class MonthProductCost(models.Model):
     _name = 'month.product.cost'
     _description = u'每月发出成本'
 
     period_id = fields.Many2one('finance.period', string='会计期间')
     goods_id = fields.Many2one('goods', string="商品")
-    period_begin_qty = fields.Float(string='期初数量', digits=dp.get_precision('Quantity'))
-    period_begin_cost = fields.Float(string='期初成本', digits=dp.get_precision('Amount'),)
-    current_period_out_qty = fields.Float(string='本期出库量', digits=dp.get_precision('Quantity'))
-    current_period_out_cost = fields.Float(string='本期出库成本', digits=dp.get_precision('Amount'),)
-    current_period_in_qty = fields.Float(string='本期入库量', digits=dp.get_precision('Quantity'))
-    current_period_in_cost = fields.Float(string='本期入库成本', digits=dp.get_precision('Amount'),)
-    current_period_remaining_qty = fields.Float(string='本期剩余数量', digits=dp.get_precision('Quantity'))
-    current_period_remaining_cost = fields.Float(string='剩余数量成本', digits=dp.get_precision('Amount'),)
+    period_begin_qty = fields.Float(
+        string='期初数量', digits=dp.get_precision('Quantity'))
+    period_begin_cost = fields.Float(
+        string='期初成本', digits=dp.get_precision('Amount'),)
+    current_period_out_qty = fields.Float(
+        string='本期出库量', digits=dp.get_precision('Quantity'))
+    current_period_out_cost = fields.Float(
+        string='本期出库成本', digits=dp.get_precision('Amount'),)
+    current_period_in_qty = fields.Float(
+        string='本期入库量', digits=dp.get_precision('Quantity'))
+    current_period_in_cost = fields.Float(
+        string='本期入库成本', digits=dp.get_precision('Amount'),)
+    current_period_remaining_qty = fields.Float(
+        string='本期剩余数量', digits=dp.get_precision('Quantity'))
+    current_period_remaining_cost = fields.Float(
+        string='剩余数量成本', digits=dp.get_precision('Amount'),)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -26,7 +35,8 @@ class MonthProductCost(models.Model):
 
     @api.multi
     def get_stock_qty(self, period_id):
-        date_range = self.env['finance.period'].get_period_month_date_range(period_id)
+        date_range = self.env['finance.period'].get_period_month_date_range(
+            period_id)
         # 每个产品最多取两行，一个本月出库，一个本月入库
         # 如果一个产品在本月没有出入库记录，则不生成发出成本记录
         self.env.cr.execute('''
@@ -58,7 +68,7 @@ class MonthProductCost(models.Model):
 
         # 查找 离输入期间最近的 对应产品的发出成本行
         last_month_product_cost_row = self.search([('period_id', '<', period_id.id),
-                                              ('goods_id', '=', goods_id)], limit=1, order='id desc')
+                                                   ('goods_id', '=', goods_id)], limit=1, order='id desc')
         if last_month_product_cost_row:
             last_period_remaining_qty = last_month_product_cost_row.current_period_remaining_qty
             last_period_remaining_cost = last_month_product_cost_row.current_period_remaining_cost
@@ -88,11 +98,11 @@ class MonthProductCost(models.Model):
         算出 本月的剩余的数量和成本
         """
         sum_goods_qty = goods_qty_cost.get('period_begin_qty', 0) - \
-                        goods_qty_cost.get('current_period_out_qty', 0) + \
-                        goods_qty_cost.get('current_period_in_qty', 0)
-        sum_goods_cost =goods_qty_cost.get('period_begin_cost', 0) - \
-                       goods_qty_cost.get('current_period_out_cost',0) + \
-                        goods_qty_cost.get('current_period_in_cost',0)
+            goods_qty_cost.get('current_period_out_qty', 0) + \
+            goods_qty_cost.get('current_period_in_qty', 0)
+        sum_goods_cost = goods_qty_cost.get('period_begin_cost', 0) - \
+            goods_qty_cost.get('current_period_out_cost', 0) + \
+            goods_qty_cost.get('current_period_in_cost', 0)
         return {'current_period_remaining_qty': sum_goods_qty,
                 'current_period_remaining_cost': sum_goods_cost
                 }
@@ -106,8 +116,10 @@ class MonthProductCost(models.Model):
             # 本月该商品的结存单价 = （上月该商品的成本余额 + 本月入库成本 ）/ (上月数量余额 + 本月入库数量)
             # 则本月发出成本 = 结存单价 * 发出数量
             balance_price = (data_dcit.get("period_begin_cost", 0) + data_dcit.get("current_period_in_cost", 0)) / \
-                            ((data_dcit.get("period_begin_qty", 0) + data_dcit.get("current_period_in_qty", 0)) or 1)
-            month_cost = balance_price * data_dcit.get("current_period_out_qty", 0)
+                            ((data_dcit.get("period_begin_qty", 0) +
+                              data_dcit.get("current_period_in_qty", 0)) or 1)
+            month_cost = balance_price * \
+                data_dcit.get("current_period_out_qty", 0)
         else:
             # 实际成本
             month_cost = data_dcit.get("current_period_out_cost", 0)
@@ -141,10 +153,12 @@ class MonthProductCost(models.Model):
         all_balance_price = 0
         for create_vals in month_product_cost_dict.values():
             goods_row = self.env['goods'].browse(create_vals.get('goods_id'))
-            current_period_out_cost = self.compute_balance_price(create_vals)   # 当期加权平均成本
-            real_out_cost = self.compute_real_out_cost(create_vals, period_id)  # 发出时已结转的实际成本
+            current_period_out_cost = self.compute_balance_price(
+                create_vals)   # 当期加权平均成本
+            real_out_cost = self.compute_real_out_cost(
+                create_vals, period_id)  # 发出时已结转的实际成本
 
-            diff_cost = current_period_out_cost - real_out_cost # 两者之差
+            diff_cost = current_period_out_cost - real_out_cost  # 两者之差
             if diff_cost:  # 贷方
                 voucher_line_data = {'name': u'发出成本', 'credit': diff_cost,
                                      'account_id': goods_row.category_id.account_id.id,
@@ -153,20 +167,20 @@ class MonthProductCost(models.Model):
                 voucher_line_data_list.append([0, 0, voucher_line_data.copy()])
             # 创建 发出成本
             create_vals.update({'current_period_out_cost': current_period_out_cost,
-                                'current_period_remaining_cost': create_vals.get('period_begin_cost', 0) + \
-                                                                create_vals.get('current_period_in_cost', 0) - \
-                                                                current_period_out_cost
+                                'current_period_remaining_cost': create_vals.get('period_begin_cost', 0) +
+                                create_vals.get('current_period_in_cost', 0) -
+                                current_period_out_cost
                                 })
             self.create(create_vals)
 
             all_balance_price += diff_cost
-        if all_balance_price != 0: # 借方
+        if all_balance_price != 0:  # 借方
             voucher_line_data_list.append(
                 [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
         if voucher_line_data_list:
             voucher_id = self.env['voucher'].create({'date': date, 'period_id': period_id.id,
                                                      'line_ids': voucher_line_data_list,
-                                                     'is_checkout':True})
+                                                     'is_checkout': True})
             voucher_id.voucher_done()
 
     @api.multi
@@ -176,19 +190,22 @@ class MonthProductCost(models.Model):
         """
         month_product_cost_dict = {}
         for dict_goods in list_dict_data:
-            period_begin_qty_cost = self.get_goods_last_period_remaining_qty(period_id, dict_goods.get('goods_id'))
+            period_begin_qty_cost = self.get_goods_last_period_remaining_qty(
+                period_id, dict_goods.get('goods_id'))
             vals = {}
             if dict_goods.get('goods_id') not in month_product_cost_dict:
                 vals = {'goods_id': dict_goods.get('goods_id'), 'period_id': period_id.id,
                         'period_begin_qty': period_begin_qty_cost.get('last_period_remaining_qty', 0),
                         'period_begin_cost': period_begin_qty_cost.get('last_period_remaining_cost', 0)}
                 vals.update(self.fill_in_out(dict_goods))
-                month_product_cost_dict.update({dict_goods.get('goods_id'): vals.copy()})
+                month_product_cost_dict.update(
+                    {dict_goods.get('goods_id'): vals.copy()})
                 month_product_cost_dict.get(dict_goods.get('goods_id')).update(self.month_remaining_qty_cost(
                     month_product_cost_dict.get(dict_goods.get('goods_id'))))
             else:
                 vals.update(self.fill_in_out(dict_goods))
-                month_product_cost_dict.get(dict_goods.get('goods_id')).update(vals.copy())
+                month_product_cost_dict.get(
+                    dict_goods.get('goods_id')).update(vals.copy())
                 month_product_cost_dict.get(dict_goods.get('goods_id')).update(self.month_remaining_qty_cost(
                     month_product_cost_dict.get(dict_goods.get('goods_id'))))
 
@@ -204,7 +221,8 @@ class MonthProductCost(models.Model):
         list_dict_data = self.get_stock_qty(period_id)
         issue_cost_exists = self.search([('period_id', '=', period_id.id)])
         issue_cost_exists.unlink()
-        self.create_month_product_cost_voucher(period_id, date, self.data_structure(list_dict_data, period_id))
+        self.create_month_product_cost_voucher(
+            period_id, date, self.data_structure(list_dict_data, period_id))
 
 
 class CheckOutWizard(models.TransientModel):
@@ -219,7 +237,8 @@ class CheckOutWizard(models.TransientModel):
         """
         if self.period_id:
             if self.env['ir.module.module'].sudo().search([('state', '=', 'installed'), ('name', '=', 'warehouse')]):
-                self.env['month.product.cost'].generate_issue_cost(self.period_id, self.date)
+                self.env['month.product.cost'].generate_issue_cost(
+                    self.period_id, self.date)
         res = super(CheckOutWizard, self).button_checkout()
         return res
 
@@ -228,7 +247,8 @@ class CheckOutWizard(models.TransientModel):
     def button_counter_checkout(self):
         ''' 反结账 删除对应出库成本 '''
         if self.period_id:
-            issue_cost_exists = self.env['month.product.cost'].search([('period_id', '=', self.period_id.id)])
+            issue_cost_exists = self.env['month.product.cost'].search(
+                [('period_id', '=', self.period_id.id)])
             issue_cost_exists.unlink()
 
         res = super(CheckOutWizard, self).button_counter_checkout()

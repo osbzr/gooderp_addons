@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class buy_order_track_wizard(models.TransientModel):
+class BuyOrderTrackWizard(models.TransientModel):
     _name = 'buy.order.track.wizard'
     _description = u'采购订单跟踪表向导'
 
@@ -20,15 +20,15 @@ class buy_order_track_wizard(models.TransientModel):
     date_start = fields.Date(u'开始日期', default=_default_date_start,
                              help=u'报表汇总的开始日期，默认为公司启用日期')
     date_end = fields.Date(u'结束日期', default=_default_date_end,
-                             help=u'报表汇总的结束日期，默认为当前日期')
+                           help=u'报表汇总的结束日期，默认为当前日期')
     partner_id = fields.Many2one('partner', u'供应商',
-                             help=u'按指定供应商进行统计')
+                                 help=u'按指定供应商进行统计')
     goods_id = fields.Many2one('goods', u'商品',
-                             help=u'按指定商品进行统计')
+                               help=u'按指定商品进行统计')
     order_id = fields.Many2one('buy.order', u'订单号',
-                             help=u'按指定订单号进行统计')
+                               help=u'按指定订单号进行统计')
     warehouse_dest_id = fields.Many2one('warehouse', u'仓库',
-                             help=u'按指定仓库进行统计')
+                                        help=u'按指定仓库进行统计')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -48,7 +48,8 @@ class buy_order_track_wizard(models.TransientModel):
         if self.order_id:
             domain.append(('order_id.id', '=', self.order_id.id))
         if self.warehouse_dest_id:
-            domain.append(('order_id.warehouse_dest_id', '=', self.warehouse_dest_id.id))
+            domain.append(('order_id.warehouse_dest_id',
+                           '=', self.warehouse_dest_id.id))
         return domain
 
     def _get_wh_in_date(self, line):
@@ -94,7 +95,7 @@ class buy_order_track_wizard(models.TransientModel):
 
         buy_order_line = self.env['buy.order.line']
         for line in buy_order_line.search(self._get_domain(), order='goods_id'):
-            is_buy = line.order_id.type == 'buy' and 1 or -1 # 是否购货订单
+            is_buy = line.order_id.type == 'buy' and 1 or -1  # 是否购货订单
             # 以下分别为明细行上数量、采购额、未入库数量，退货时均取反
             qty = is_buy * line.quantity
             amount = is_buy * line.subtotal

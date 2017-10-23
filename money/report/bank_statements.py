@@ -4,7 +4,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
 
 
-class bank_statements_report(models.Model):
+class BankStatementsReport(models.Model):
     _name = "bank.statements.report"
     _description = u"现金银行报表"
     _auto = False
@@ -14,7 +14,8 @@ class bank_statements_report(models.Model):
     @api.depends('get', 'pay', 'bank_id')
     def _compute_balance(self):
         # 相邻的两条记录，bank_id不同，重新计算账户余额
-        pre_record = self.search([('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
+        pre_record = self.search(
+            [('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
         before_balance = pre_record and pre_record.balance or 0
         self.balance = before_balance + self.get - self.pay
 
@@ -116,7 +117,7 @@ class bank_statements_report(models.Model):
                                   'view': 'money.other_money_order_form'},
             'money.transfer.order': {'name': u'资金转换单',
                                      'view': 'money.money_transfer_order_form'}}
-        for model,view_dict in model_view.iteritems():
+        for model, view_dict in model_view.iteritems():
             res = self.env[model].search([('name', '=', self.name)])
             name = view_dict['name']
             view = self.env.ref(view_dict['view'])

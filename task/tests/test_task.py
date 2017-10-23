@@ -4,10 +4,10 @@ from odoo.exceptions import UserError
 from datetime import datetime
 
 
-class test_task(TransactionCase):
+class TestTask(TransactionCase):
 
     def setUp(self):
-        super(test_task, self).setUp()
+        super(TestTask, self).setUp()
         self.task = self.env.ref('task.task_sell')
         self.project_id = self.env.ref('task.project_gooderp')
         self.status = self.env.ref('task.task_status_doing')
@@ -31,23 +31,24 @@ class test_task(TransactionCase):
         self.assertTrue(new_task.status == self.status)
 
 
-class test_timesheet(TransactionCase):
+class TestTimesheet(TransactionCase):
 
     def setUp(self):
-        super(test_timesheet, self).setUp()
+        super(TestTimesheet, self).setUp()
         self.timesheet = self.env.ref('task.timesheet_20161110')
 
     def test_name_get(self):
         '''测试今日工作日志的name_get'''
         name = self.timesheet.name_get()
-        real_name = '%s %s' % (self.env.ref('base.user_root').name, '2016-11-10')
+        real_name = '%s %s' % (self.env.ref(
+            'base.user_root').name, '2016-11-10')
         self.assertEqual(name[0][1], real_name)
 
 
-class test_timeline(TransactionCase):
+class TestTimeline(TransactionCase):
 
     def setUp(self):
-        super(test_timeline, self).setUp()
+        super(TestTimeline, self).setUp()
         self.task = self.env.ref('task.task_sell')
         self.status_doing = self.env.ref('task.task_status_doing')
 
@@ -67,10 +68,10 @@ class test_timeline(TransactionCase):
         self.assertEqual(self.task.user_id, timeline.user_id)
 
 
-class test_project_invoice(TransactionCase):
+class TestProjectInvoice(TransactionCase):
 
     def setUp(self):
-        super(test_project_invoice, self).setUp()
+        super(TestProjectInvoice, self).setUp()
         self.project = self.env.ref('task.project_gooderp')
         self.invoice1 = self.env.ref('task.project_invoice_1')
 
@@ -82,7 +83,7 @@ class test_project_invoice(TransactionCase):
         '''输入错误税率，应报错'''
         with self.assertRaises(UserError):
             self.invoice1.tax_rate = -1
-            self.invoice1._compute_tax_amount() # 不调用此方法，测试中UserError报不出来
+            self.invoice1._compute_tax_amount()  # 不调用此方法，测试中UserError报不出来
         with self.assertRaises(UserError):
             self.invoice1.tax_rate = 102
             self.invoice1._compute_tax_amount()
@@ -96,15 +97,16 @@ class test_project_invoice(TransactionCase):
         self.invoice1.project_id.customer_id = self.env.ref('core.jd')
         invoice = self.invoice1.make_invoice()
         self.assertTrue(self.invoice1.invoice_id == invoice)
-        self.assertTrue(self.invoice1.project_id.auxiliary_id == invoice.auxiliary_id)
+        self.assertTrue(self.invoice1.project_id.auxiliary_id ==
+                        invoice.auxiliary_id)
         self.assertTrue(self.invoice1.tax_amount == invoice.tax_amount)
         self.assertTrue(self.invoice1.amount == invoice.amount)
 
 
-class test_project(TransactionCase):
+class TestProject(TransactionCase):
 
     def setUp(self):
-        super(test_project, self).setUp()
+        super(TestProject, self).setUp()
         self.project_id = self.env.ref('task.project_gooderp')
 
     def test_compute_hours(self):

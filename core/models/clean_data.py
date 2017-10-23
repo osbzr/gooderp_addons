@@ -3,7 +3,8 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
-class business_data_table(models.Model):
+
+class BusinessDataTable(models.Model):
     _name = 'business.data.table'
     _description = u'业务数据表'
 
@@ -22,13 +23,14 @@ class business_data_table(models.Model):
         self.name = self.model and self.model.model
 
 
-class clean_business_data(models.Model):
+class CleanBusinessData(models.Model):
     _name = 'clean.business.data'
     _description = u'清理记录'
 
     @api.model
     def _get_business_table_name(self):
         return self._get_business_table_name_impl()
+
     @api.model
     def _get_business_table_name_impl(self):
         '''

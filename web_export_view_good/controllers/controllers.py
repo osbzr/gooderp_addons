@@ -37,7 +37,9 @@ import re
 from xlutils.copy import copy
 from odoo.tools import misc
 from odoo import http
-import odoo,urllib2
+import odoo
+import urllib2
+
 
 class ReportTemplate(models.Model):
     _name = "report.template"
@@ -50,21 +52,25 @@ class ReportTemplate(models.Model):
     @api.model
     def get_time(self, model):
         ISOTIMEFORMAT = "%Y-%m-%d"
-        report_model = self.env['report.template'].search([('model_id.model', '=', model)], limit=1)
+        report_model = self.env['report.template'].search(
+            [('model_id.model', '=', model)], limit=1)
         file_address = report_model and report_model[0].file_address or False
         return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address)
+
 
 def content_disposition(filename):
     filename = odoo.tools.ustr(filename)
     escaped = urllib2.quote(filename.encode('utf8'))
     browser = request.httprequest.user_agent.browser
-    version = int((request.httprequest.user_agent.version or '0').split('.')[0])
+    version = int(
+        (request.httprequest.user_agent.version or '0').split('.')[0])
     if browser == 'msie' and version < 9:
         return "attachment; filename=%s" % escaped
     elif browser == 'safari' and version < 537:
         return u"attachment; filename=%s.xls" % filename.encode('ascii', 'replace')
     else:
         return "attachment; filename*=UTF-8''%s.xls" % escaped
+
 
 class ExcelExportView(ExcelExport, ):
     def __getattribute__(self, name):
@@ -131,9 +137,10 @@ class ExcelExportView(ExcelExport, ):
         return style, colour_style, base_style, float_style, date_style, datetime_style
 
     def from_data_excel(self, fields, rows_file_address):
-        rows,file_address = rows_file_address
+        rows, file_address = rows_file_address
         if file_address:
-            bk = xlrd.open_workbook(misc.file_open(file_address).name, formatting_info=True)
+            bk = xlrd.open_workbook(misc.file_open(
+                file_address).name, formatting_info=True)
             workbook = copy(bk)
             worksheet = workbook.get_sheet(0)
             for i, fieldname in enumerate(fields):
@@ -147,20 +154,23 @@ class ExcelExportView(ExcelExport, ):
             workbook = xlwt.Workbook()
             worksheet = workbook.add_sheet('Sheet 1')
             style, colour_style, base_style, float_style, date_style, datetime_style = self.style_data()
-            worksheet.write_merge(0, 0, 0, len(fields) - 1, fields[0], style=style)
+            worksheet.write_merge(0, 0, 0, len(
+                fields) - 1, fields[0], style=style)
             worksheet.row(0).height = 400
             worksheet.row(2).height = 400
             columnwidth = {}
             for row_index, row in enumerate(rows):
                 for cell_index, cell_value in enumerate(row):
                     if cell_index in columnwidth:
-                        if len("%s"%(cell_value)) > columnwidth.get(cell_index):
-                            columnwidth.update({cell_index: len("%s"%(cell_value))})
+                        if len("%s" % (cell_value)) > columnwidth.get(cell_index):
+                            columnwidth.update(
+                                {cell_index: len("%s" % (cell_value))})
                     else:
-                        columnwidth.update({cell_index: len("%s"%(cell_value))})
+                        columnwidth.update(
+                            {cell_index: len("%s" % (cell_value))})
                     if row_index == 1:
                         cell_style = colour_style
-                    elif row_index != len(rows)-1:
+                    elif row_index != len(rows) - 1:
                         cell_style = base_style
                         if isinstance(cell_value, basestring):
                             cell_value = re.sub("\r", " ", cell_value)
@@ -172,16 +182,20 @@ class ExcelExportView(ExcelExport, ):
                             cell_style = float_style
                     else:
                         cell_style = xlwt.easyxf()
-                    worksheet.write(row_index + 1, cell_index, cell_value, cell_style)
+                    worksheet.write(row_index + 1, cell_index,
+                                    cell_value, cell_style)
             for column, widthvalue in columnwidth.items():
                 """参考 下面链接关于自动列宽（探讨）的代码
                  http://stackoverflow.com/questions/6929115/python-xlwt-accessing-existing-cell-content-auto-adjust-column-width"""
                 if (widthvalue + 3) * 367 >= 65536:
                     widthvalue = 50
-                worksheet.col(column).width = (widthvalue+4) * 367
-        worksheet.set_panes_frozen(True)  # frozen headings instead of split panes
-        worksheet.set_horz_split_pos(3)  # in general, freeze after last heading row
-        worksheet.set_remove_splits(True)  # if user does unfreeze, don't leave a split there
+                worksheet.col(column).width = (widthvalue + 4) * 367
+        # frozen headings instead of split panes
+        worksheet.set_panes_frozen(True)
+        # in general, freeze after last heading row
+        worksheet.set_horz_split_pos(3)
+        # if user does unfreeze, don't leave a split there
+        worksheet.set_remove_splits(True)
         fp_currency = StringIO.StringIO()
         workbook.save(fp_currency)
         fp_currency.seek(0)

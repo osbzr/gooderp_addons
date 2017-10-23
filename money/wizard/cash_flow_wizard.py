@@ -2,7 +2,8 @@
 from odoo.exceptions import UserError
 from odoo import fields, models, api
 
-class cash_flow_wizard(models.TransientModel):
+
+class CashFlowWizard(models.TransientModel):
     _name = "cash.flow.wizard"
 
     def _default_period_id_impl(self):
@@ -11,16 +12,15 @@ class cash_flow_wizard(models.TransientModel):
         :return: 当前会计期间的对象
         """
         return self.env['finance.period'].get_date_now_period_id()
-    
+
     @api.model
     def _default_period_id(self):
 
         return self._default_period_id_impl()
 
-
     period_id = fields.Many2one('finance.period', string=u'会计期间',
                                 default=_default_period_id)
-    
+
     @api.model
     def get_amount(self, tem, report_ids, period_id):
         '''
@@ -31,30 +31,33 @@ class cash_flow_wizard(models.TransientModel):
               ('end',u'科目期末'),
               ('lines',u'表行计算')]
         '''
-        date_start, date_end = self.env['finance.period'].get_period_month_date_range(period_id)
+        date_start, date_end = self.env['finance.period'].get_period_month_date_range(
+            period_id)
         ret = 0
         if tem.line_type == 'get' or tem.line_type == 'pay':
             # 收款单或付款单金额合计
-            ret = sum([order.amount for order in self.env['money.order'].search([('type','=',tem.line_type),
-                                                                                 ('state','=','done'),
-                                                                                 ('date','>=',date_start),
-                                                                                 ('date','<=',date_end)])])
+            ret = sum([order.amount for order in self.env['money.order'].search([('type', '=', tem.line_type),
+                                                                                 ('state',
+                                                                                  '=', 'done'),
+                                                                                 ('date', '>=',
+                                                                                  date_start),
+                                                                                 ('date', '<=', date_end)])])
         if tem.line_type == 'category':
             # 其他收支单金额合计
-            ret = sum([line.amount for line in self.env['other.money.order.line'].search([('category_id','in',[c.id for c in tem.category_ids]),
-                                                                                 ('other_money_id.state','=','done'),
-                                                                                 ('other_money_id.date','>=',date_start),
-                                                                                 ('other_money_id.date','<=',date_end)])])
+            ret = sum([line.amount for line in self.env['other.money.order.line'].search([('category_id', 'in', [c.id for c in tem.category_ids]),
+                                                                                          ('other_money_id.state', '=', 'done'),
+                                                                                          ('other_money_id.date', '>=', date_start),
+                                                                                          ('other_money_id.date', '<=', date_end)])])
         if tem.line_type == 'begin':
             # 科目期初金额合计
-            ret = sum([ acc.initial_balance_debit - acc.initial_balance_credit 
-                        for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                     ('subject_name_id','in',[b.id for b in tem.begin_ids])])])
+            ret = sum([acc.initial_balance_debit - acc.initial_balance_credit
+                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
+                                                                    ('subject_name_id', 'in', [b.id for b in tem.begin_ids])])])
         if tem.line_type == 'end':
             # 科目期末金额合计
-            ret = sum([ acc.ending_balance_debit - acc.ending_balance_credit 
-                        for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                     ('subject_name_id','in',[e.id for e in tem.end_ids])])])
+            ret = sum([acc.ending_balance_debit - acc.ending_balance_credit
+                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
+                                                                    ('subject_name_id', 'in', [e.id for e in tem.end_ids])])])
         if tem.line_type == 'lines':
             # 根据其他报表行计算
             for line in self.env['cash.flow.statement'].browse(report_ids):
@@ -76,31 +79,34 @@ class cash_flow_wizard(models.TransientModel):
               ('end',u'科目期末'),
               ('lines',u'表行计算')]
         '''
-        date_start, date_end = self.env['finance.period'].get_period_month_date_range(period_id)
+        date_start, date_end = self.env['finance.period'].get_period_month_date_range(
+            period_id)
         date_start = date_start[0:5] + '01-01'
         ret = 0
         if tem.line_type == 'get' or tem.line_type == 'pay':
             # 收款单或付款单金额合计
-            ret = sum([order.amount for order in self.env['money.order'].search([('type','=',tem.line_type),
-                                                                                 ('state','=','done'),
-                                                                                 ('date','>=',date_start),
-                                                                                 ('date','<=',date_end)])])
+            ret = sum([order.amount for order in self.env['money.order'].search([('type', '=', tem.line_type),
+                                                                                 ('state',
+                                                                                  '=', 'done'),
+                                                                                 ('date', '>=',
+                                                                                  date_start),
+                                                                                 ('date', '<=', date_end)])])
         if tem.line_type == 'category':
             # 其他收支单金额合计
-            ret = sum([line.amount for line in self.env['other.money.order.line'].search([('category_id','in',[c.id for c in tem.category_ids]),
-                                                                                 ('other_money_id.state','=','done'),
-                                                                                 ('other_money_id.date','>=',date_start),
-                                                                                 ('other_money_id.date','<=',date_end)])])
+            ret = sum([line.amount for line in self.env['other.money.order.line'].search([('category_id', 'in', [c.id for c in tem.category_ids]),
+                                                                                          ('other_money_id.state', '=', 'done'),
+                                                                                          ('other_money_id.date', '>=', date_start),
+                                                                                          ('other_money_id.date', '<=', date_end)])])
         if tem.line_type == 'begin':
             # 科目期初金额合计
-            ret = sum([ acc.year_init_debit - acc.year_init_credit 
-                        for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                     ('subject_name_id','in',[b.id for b in tem.begin_ids])])])
+            ret = sum([acc.year_init_debit - acc.year_init_credit
+                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
+                                                                    ('subject_name_id', 'in', [b.id for b in tem.begin_ids])])])
         if tem.line_type == 'end':
             # 科目期末金额合计
-            ret = sum([ acc.ending_balance_debit - acc.ending_balance_credit 
-                        for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
-                                                                     ('subject_name_id','in',[e.id for e in tem.end_ids])])])
+            ret = sum([acc.ending_balance_debit - acc.ending_balance_credit
+                       for acc in self.env['trial.balance'].search([('period_id', '=', period_id.id),
+                                                                    ('subject_name_id', 'in', [e.id for e in tem.end_ids])])])
         if tem.line_type == 'lines':
             # 根据其他报表行计算
             for line in self.env['cash.flow.statement'].browse(report_ids):
@@ -127,10 +133,10 @@ class cash_flow_wizard(models.TransientModel):
             for tem in templates:
                 new_rep = self.env['cash.flow.statement'].create(
                     {
-                        'name':tem.name,
-                        'line_num':tem.line_num,
-                        'amount':self.get_amount(tem,rep_ids,self.period_id),
-                        'year_amount':self.get_year_amount(tem,rep_ids,self.period_id),
+                        'name': tem.name,
+                        'line_num': tem.line_num,
+                        'amount': self.get_amount(tem, rep_ids, self.period_id),
+                        'year_amount': self.get_year_amount(tem, rep_ids, self.period_id),
                     }
                 )
                 rep_ids.append(new_rep.id)

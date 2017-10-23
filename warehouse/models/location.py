@@ -3,7 +3,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class location(models.Model):
+class Location(models.Model):
     _name = 'location'
     _description = u'货位'
     _order = 'name'
@@ -11,16 +11,19 @@ class location(models.Model):
     @api.multi
     def _get_current_qty(self):
         # 获取当前 库位 的商品数量
-        for location in self:
-            lines = self.env['wh.move.line'].search([('goods_id', '=', location.goods_id.id),
-                                                    ('attribute_id', '=', location.attribute_id.id),
-                                                    ('warehouse_dest_id', '=', location.warehouse_id.id),
-                                                    ('location_id', '=', location.id),
-                                                    ('state', '=', 'done')])
-            location.current_qty = sum([line.qty_remaining for line in lines])
-            if location.current_qty == 0:
-                location.goods_id = False
-                location.attribute_id = False
+        for Location in self:
+            lines = self.env['wh.move.line'].search([('goods_id', '=', Location.goods_id.id),
+                                                     ('attribute_id', '=',
+                                                      Location.attribute_id.id),
+                                                     ('warehouse_dest_id', '=',
+                                                      Location.warehouse_id.id),
+                                                     ('location_id',
+                                                      '=', Location.id),
+                                                     ('state', '=', 'done')])
+            Location.current_qty = sum([line.qty_remaining for line in lines])
+            if Location.current_qty == 0:
+                Location.goods_id = False
+                Location.attribute_id = False
 
     name = fields.Char(u'货位号',
                        required=True)
@@ -40,22 +43,22 @@ class location(models.Model):
 
     @api.multi
     def change_location(self):
-        for location in self:
+        for Location in self:
             view = self.env.ref('warehouse.change_location_form')
             return {
-                    'name': u'库位',
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'change.location',
-                    'view_id': False,
-                    'views': [(view.id, 'form')],
-                    'type': 'ir.actions.act_window',
-                    'target': 'new',
-                    'context': {'default_from_location': location.id},
-                    }
+                'name': u'库位',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'change.location',
+                'view_id': False,
+                'views': [(view.id, 'form')],
+                'type': 'ir.actions.act_window',
+                'target': 'new',
+                'context': {'default_from_location': Location.id},
+            }
 
 
-class change_location(models.TransientModel):
+class ChangeLocation(models.TransientModel):
     _name = 'change.location'
     _description = u'货位转移'
 
@@ -69,8 +72,8 @@ class change_location(models.TransientModel):
         转出库位产品数量大于 0
         """
         model = self.env.context.get('active_model')
-        res = super(change_location, self).fields_view_get(view_id, view_type,
-                                                       toolbar=toolbar, submenu=False)
+        res = super(ChangeLocation, self).fields_view_get(view_id, view_type,
+                                                          toolbar=toolbar, submenu=False)
         model_rows = self.env[model].browse(self.env.context.get('active_ids'))
         for model_row in model_rows:
             if model_row.current_qty <= 0:
@@ -83,32 +86,33 @@ class change_location(models.TransientModel):
             if change.change_qty < 0:
                 raise UserError(u'转出数量不能小于零')
             if change.from_location.id == change.to_location.id:
-                raise UserError(u'转出库位 %s 与转入库位不能相同' % change.from_location.name)
+                raise UserError(u'转出库位 %s 与转入库位不能相同' %
+                                change.from_location.name)
             if change.from_location.current_qty < change.change_qty:
                 raise UserError(u'转出数量不能大于库位现有数量，库位 %s 现有数量  %s'
                                 % (change.from_location.name, change.from_location.current_qty))
             # 转出库位与转入库位的 产品、产品属性要相同
             if (change.from_location.goods_id.id != change.to_location.goods_id.id) or \
-            (change.from_location.attribute_id.id != change.to_location.attribute_id.id):
+                    (change.from_location.attribute_id.id != change.to_location.attribute_id.id):
                 raise UserError(u'请检查转出库位与转入库位的产品、产品属性是否都相同！')
 
             # 创建 内部移库单
             wh_internal = self.env['wh.internal'].with_context({'location': change.from_location.id}).create({
-                                'warehouse_id': change.from_location.warehouse_id.id,
-                                'warehouse_dest_id': change.to_location.warehouse_id.id,
-                                })
+                'warehouse_id': change.from_location.warehouse_id.id,
+                'warehouse_dest_id': change.to_location.warehouse_id.id,
+            })
             self.env['wh.move.line'].with_context({'type': 'internal'}).create({
-                                           'move_id': wh_internal.move_id.id,
-                                           'goods_id': change.from_location.goods_id.id,
-                                           'attribute_id': change.from_location.attribute_id.id,
-                                           'goods_qty': change.change_qty,
-                                           'location_id': change.to_location.id,
-                                           })
+                'move_id': wh_internal.move_id.id,
+                'goods_id': change.from_location.goods_id.id,
+                'attribute_id': change.from_location.attribute_id.id,
+                'goods_qty': change.change_qty,
+                'location_id': change.to_location.id,
+            })
             # 自动审核 内部移库单
             wh_internal.approve_order()
 
             # 返回 更新产品数量后的 库位列表
             return {
-                    'type': 'ir.actions.client',
-                    'tag': 'reload',
-                    }
+                'type': 'ir.actions.client',
+                'tag': 'reload',
+            }

@@ -3,15 +3,15 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
 
-class test_express_menu(TransactionCase):
+class TestExpressMenu(TransactionCase):
 
     def setUp(self):
         ''' 准备基本数据 '''
-        super(test_express_menu, self).setUp()
+        super(TestExpressMenu, self).setUp()
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
 
     def test_get_moves_html(self):
         ''' 测试 get_moves_html '''
@@ -33,4 +33,3 @@ class test_express_menu(TransactionCase):
         ''' 测试 get_moves_html_package '''
         move = self.delivery.sell_move_id
         self.env['wh.move'].get_moves_html_package(move.id)
-

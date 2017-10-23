@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models
 
+
 class GoodsClass(models.Model):
     _name = "goods.class"
     _description = u"商品分类"

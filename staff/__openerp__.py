@@ -11,14 +11,14 @@
     'version': '11.11',
     'depends': ['finance'],
     'demo': [
-             'tests/staff_demo.xml'
-        ],
+        'tests/staff_demo.xml'
+    ],
     'data': [
-             'security/ir.model.access.csv',
-             'security/groups.xml',
-             'security/rules.xml',
-             'views/staff.xml',
-             'views/leave.xml',
-             'data/mail_data.xml',
-        ],
+        'security/ir.model.access.csv',
+        'security/groups.xml',
+        'security/rules.xml',
+        'views/staff.xml',
+        'views/leave.xml',
+        'data/mail_data.xml',
+    ],
 }

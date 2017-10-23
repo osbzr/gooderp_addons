@@ -10,7 +10,7 @@
     "data": [
         'views/web_need.xml',
     ],
-    "depends":[
+    "depends": [
         'core',
     ],
     'auto_install': True,

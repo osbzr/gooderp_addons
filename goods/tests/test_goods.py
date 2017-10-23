@@ -3,10 +3,10 @@
 from odoo.tests.common import TransactionCase
 
 
-class test_goods(TransactionCase):
+class TestGoods(TransactionCase):
 
     def setUp(self):
-        super(test_goods, self).setUp()
+        super(TestGoods, self).setUp()
         self.goods_mouse = self.env.ref('goods.mouse')
 
     def test_conversion_unit(self):
@@ -65,7 +65,7 @@ class test_goods(TransactionCase):
             'uom_id': self.env.ref('core.uom_pc').id,
             'conversion': 1,
             'cost': 1000,
-            })
+        })
         self.assertTrue(goods.uos_id.id == self.env.ref('core.uom_pc').id)
 
     def test_copy(self):
@@ -73,13 +73,13 @@ class test_goods(TransactionCase):
         mouse = self.goods_mouse.copy()
         self.assertEqual(u'鼠标 (copy)', mouse.name)
 
-class test_attributes(TransactionCase):
+
+class TestAttributes(TransactionCase):
 
     def test_ean_search(self):
         '''测试goods的按ean搜索'''
         iphone_value_white = self.env.ref('goods.iphone_value_white')
         result = self.env['attribute'].name_search('12345678987')
         real_result = [(iphone_value_white.id,
-                        iphone_value_white.category_id.name + ':' +iphone_value_white.value_id.name)]
+                        iphone_value_white.category_id.name + ':' + iphone_value_white.value_id.name)]
         self.assertEqual(result, real_result)
-

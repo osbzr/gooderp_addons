@@ -4,7 +4,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
 
 
-class buy_payment(models.TransientModel):
+class BuyPayment(models.TransientModel):
     _name = 'buy.payment'
     _description = u'采购付款一览表'
 
@@ -26,13 +26,14 @@ class buy_payment(models.TransientModel):
     def view_detail(self):
         '''查看明细按钮'''
         self.ensure_one()
-        order = self.env['buy.receipt'].search([('name', '=', self.order_name)])
+        order = self.env['buy.receipt'].search(
+            [('name', '=', self.order_name)])
         if order:
             if not order.is_return:
                 view = self.env.ref('buy.buy_receipt_form')
             else:
                 view = self.env.ref('buy.buy_return_form')
-            
+
             return {
                 'name': u'采购入库单',
                 'view_type': 'form',

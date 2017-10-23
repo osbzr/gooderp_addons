@@ -19,7 +19,7 @@
                                  采购收款一览表。
     ''',
     'version': '11.11',
-    'depends': ['warehouse','partner_address'],
+    'depends': ['warehouse', 'partner_address'],
     'data': [
         'data/buy_data.xml',
         'security/groups.xml',
@@ -44,8 +44,8 @@
         'report/report_data.xml',
         'security/ir.model.access.csv',
         'data/home_page_data.xml'
-        ],
+    ],
     'demo': [
-             'data/buy_demo.xml',
-             ],
+        'data/buy_demo.xml',
+    ],
 }

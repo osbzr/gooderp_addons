@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class buy_summary_goods_wizard(models.TransientModel):
+class BuySummaryGoodsWizard(models.TransientModel):
     _name = 'buy.summary.goods.wizard'
     _description = u'采购汇总表（按商品）向导'
 
@@ -20,15 +20,15 @@ class buy_summary_goods_wizard(models.TransientModel):
     date_start = fields.Date(u'开始日期', default=_default_date_start,
                              help=u'报表汇总的开始日期，默认为公司启用日期')
     date_end = fields.Date(u'结束日期', default=_default_date_end,
-                             help=u'报表汇总的结束日期，默认为当前日期')
+                           help=u'报表汇总的结束日期，默认为当前日期')
     partner_id = fields.Many2one('partner', u'供应商',
-                             help=u'按指定供应商进行统计')
+                                 help=u'按指定供应商进行统计')
     goods_id = fields.Many2one('goods', u'商品',
-                             help=u'按指定商品进行统计')
+                               help=u'按指定商品进行统计')
     goods_categ_id = fields.Many2one('core.category', u'商品类别',
-                             help=u'按指定商品类别进行统计')
+                                     help=u'按指定商品类别进行统计')
     warehouse_dest_id = fields.Many2one('warehouse', u'仓库',
-                             help=u'按指定仓库进行统计')
+                                        help=u'按指定仓库进行统计')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

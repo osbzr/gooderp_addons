@@ -3,7 +3,7 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 
 
-class test_process(TransactionCase):
+class TestProcess(TransactionCase):
 
     def test_create(self):
         """新建审批配置规则，如果配置的模型有type字段而规则未输入type，保存时给出提示"""
@@ -12,12 +12,13 @@ class test_process(TransactionCase):
                 'model_id': self.env.ref('buy.model_buy_order').id,
             })
 
-class test_mail_thread(TransactionCase):
+
+class TestMailThread(TransactionCase):
 
     def setUp(self):
         '''准备基本数据'''
-        super(test_mail_thread, self).setUp()
-        self.approve_rule = self.browse_ref('scm.process_buy_order') # 审批规则
+        super(TestMailThread, self).setUp()
+        self.approve_rule = self.browse_ref('scm.process_buy_order')  # 审批规则
         self.order = self.env.ref('buy.buy_order_1').copy()
         self.staff_admin = self.env.ref('staff.staff_1')
         self.user_demo = self.browse_ref('base.user_demo')
@@ -28,12 +29,14 @@ class test_mail_thread(TransactionCase):
 
         self.assertTrue(self.order._approve_state == u'已提交')
         # 经理审批
-        self.order.with_env(env2).good_process_approve(self.order.id, self.order._name)
+        self.order.with_env(env2).good_process_approve(
+            self.order.id, self.order._name)
         self.assertTrue(self.order._approve_state == u'审批中')
         # 自己先拒绝
         self.order.good_process_refused(self.order.id, self.order._name)
         # 经理重新审批
-        self.order.with_env(env2).good_process_approve(self.order.id, self.order._name)
+        self.order.with_env(env2).good_process_approve(
+            self.order.id, self.order._name)
         # 自己审批
         self.order.good_process_approve(self.order.id, self.order._name)
         self.assertTrue(self.order._approve_state == u'已审批')
@@ -45,12 +48,14 @@ class test_mail_thread(TransactionCase):
         """审批顺序"""
         group_1 = self.env.ref('scm.group_process_buy_order')
         # 自己审批
-        result = self.order.good_process_approve(self.order.id, self.order._name)
+        result = self.order.good_process_approve(
+            self.order.id, self.order._name)
         self.assertTrue(result[0] == u'您不是这张单据的下一个审批者')
 
         # admin的经理改为空，将用户组1中的用户改为Alice,admin去审批
-        self.staff_admin.parent_id = False  #TODO:不起作用
-        group_1.write({'users': [(6, 0, [self.env.ref('core.user_alice').id])]})
+        self.staff_admin.parent_id = False  # TODO:不起作用
+        group_1.write(
+            {'users': [(6, 0, [self.env.ref('core.user_alice').id])]})
         res = self.order.good_process_approve(self.order.id, self.order._name)
         self.assertTrue(res[0] == u'您不是这张单据的下一个审批者')
 
@@ -58,11 +63,13 @@ class test_mail_thread(TransactionCase):
         """拒绝顺序"""
         env2 = self.env(self.env.cr, self.user_demo.id, self.env.context)
         # 自己拒绝
-        result = self.order.good_process_refused(self.order.id, self.order._name)
+        result = self.order.good_process_refused(
+            self.order.id, self.order._name)
         self.assertTrue(result[0] == u'您是第一批需要审批的人，无需拒绝！')
 
         # 经理和自己审批之后
-        self.order.with_env(env2).good_process_approve(self.order.id, self.order._name)
+        self.order.with_env(env2).good_process_approve(
+            self.order.id, self.order._name)
         self.order.good_process_approve(self.order.id, self.order._name)
         res = self.order.good_process_refused(self.order.id, self.order._name)
         self.assertTrue(res[0] == u'已经通过不能拒绝！')
@@ -80,7 +87,8 @@ class test_mail_thread(TransactionCase):
         with self.assertRaises(ValidationError):
             self.order.buy_order_done()
         # 经理审批，审批中审核报错
-        self.order.with_env(env2).good_process_approve(self.order.id, self.order._name)
+        self.order.with_env(env2).good_process_approve(
+            self.order.id, self.order._name)
         self.assertTrue(self.order._approve_state == u'审批中')
         with self.assertRaises(ValidationError):
             self.order.buy_order_done()
@@ -101,12 +109,12 @@ class test_mail_thread(TransactionCase):
             self.order.unlink()
 
 
-class test_approver(TransactionCase):
+class TestApprover(TransactionCase):
 
     def setUp(self):
         '''准备基本数据'''
-        super(test_approver, self).setUp()
-        self.approve_rule = self.browse_ref('scm.process_buy_order') # 审批规则
+        super(TestApprover, self).setUp()
+        self.approve_rule = self.browse_ref('scm.process_buy_order')  # 审批规则
         self.order = self.env.ref('buy.buy_order_1').copy()
         self.user_demo = self.browse_ref('base.user_demo')
 

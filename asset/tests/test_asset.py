@@ -2,11 +2,12 @@
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
-class test_asset(TransactionCase):
+
+class TestAsset(TransactionCase):
 
     def setUp(self):
         '''固定资产准备数据'''
-        super(test_asset, self).setUp()
+        super(TestAsset, self).setUp()
         self.asset = self.env.ref('asset.asset_car')
 
     def test_unlink(self):
@@ -67,7 +68,8 @@ class test_asset(TransactionCase):
 
     def test_asset_done_construction(self):
         '''贷方科目选择在建工程，直接生成凭证'''
-        self.asset.account_credit = self.env.ref('finance.small_business_chart1604')
+        self.asset.account_credit = self.env.ref(
+            'finance.small_business_chart1604')
         self.asset.asset_done()
 
     def test_asset_draft_repeat(self):
@@ -78,7 +80,8 @@ class test_asset(TransactionCase):
     def test_asset_draft_asset_line(self):
         '''反审核报错: 已折旧不能反审核'''
         self.asset.asset_done()
-        wizard = self.env['create.depreciation.wizard'].create({'date': '2016-05-01'})
+        wizard = self.env['create.depreciation.wizard'].create(
+            {'date': '2016-05-01'})
         wizard._compute_period_id()
         wizard.create_depreciation()
         with self.assertRaises(UserError):
@@ -88,11 +91,11 @@ class test_asset(TransactionCase):
         '''反审核报错: 已变更不能反审核'''
         self.asset.asset_done()
         wizard = self.env['create.chang.wizard'].with_context({'active_id': self.asset.id}).create({
-                        'chang_date': '2016-04-02',
-                        'chang_cost': 100,
-                        'chang_depreciation_number': 1,
-                        'chang_tax': 17,
-                        'chang_partner_id': self.env.ref('core.lenovo').id})
+            'chang_date': '2016-04-02',
+            'chang_cost': 100,
+            'chang_depreciation_number': 1,
+            'chang_tax': 17,
+            'chang_partner_id': self.env.ref('core.lenovo').id})
         wizard._compute_period_id()
         wizard.create_chang_account()
         with self.assertRaises(UserError):
@@ -113,7 +116,7 @@ class test_asset(TransactionCase):
     def test_asset_draft_bank_account(self):
         '''正常反审核：选择结算账户，生成其他支出单'''
         self.asset.bank_account = self.env.ref('core.alipay')
-        self.asset.bank_account.balance = 1000000 # 确保审核其他支出单时账户余额充足
+        self.asset.bank_account.balance = 1000000  # 确保审核其他支出单时账户余额充足
         self.asset.onchange_bank_account()
         self.asset.asset_done()
         other = self.env['other.money.order'].search(
@@ -123,16 +126,17 @@ class test_asset(TransactionCase):
 
     def test_asset_draft_construction(self):
         '''正常反审核：贷方科目选择在建工程，直接生成凭证'''
-        self.asset.account_credit = self.env.ref('finance.small_business_chart1604')
+        self.asset.account_credit = self.env.ref(
+            'finance.small_business_chart1604')
         self.asset.asset_done()
         self.asset.asset_draft()
 
 
-class test_CreateCleanWizard(TransactionCase):
+class TestCreateCleanWizard(TransactionCase):
 
     def setUp(self):
         '''固定资产清理准备数据'''
-        super(test_CreateCleanWizard, self).setUp()
+        super(TestCreateCleanWizard, self).setUp()
         self.asset = self.env.ref('asset.asset_car')
 
     def test_compute_period_id(self):
@@ -160,11 +164,11 @@ class test_CreateCleanWizard(TransactionCase):
         wizard.create_clean_account()
 
 
-class test_CreateChangWizard(TransactionCase):
+class TestCreateChangWizard(TransactionCase):
 
     def setUp(self):
         '''固定资产变更准备数据'''
-        super(test_CreateChangWizard, self).setUp()
+        super(TestCreateChangWizard, self).setUp()
         self.asset = self.env.ref('asset.asset_car')
 
     def test_compute_period_id(self):
@@ -192,11 +196,11 @@ class test_CreateChangWizard(TransactionCase):
         wizard.create_chang_account()
 
 
-class test_asset_line(TransactionCase):
+class TestAssetLine(TransactionCase):
 
     def setUp(self):
         '''折旧明细准备数据'''
-        super(test_asset_line, self).setUp()
+        super(TestAssetLine, self).setUp()
         self.asset = self.env.ref('asset.asset_car')
         self.asset_line = self.env['asset.line'].create({
             'order_id': self.asset.id,
@@ -211,11 +215,11 @@ class test_asset_line(TransactionCase):
         self.assertTrue(self.asset_line.period_id == self.period_201604)
 
 
-class test_DepreciationWizard(TransactionCase):
+class TestDepreciationWizard(TransactionCase):
 
     def setUp(self):
         '''折旧向导准备数据'''
-        super(test_DepreciationWizard, self).setUp()
+        super(TestDepreciationWizard, self).setUp()
         self.asset = self.env.ref('asset.asset_car')
         self.wizard = self.env['create.depreciation.wizard'].create(
             {'date': '2016-05-01'})
@@ -247,11 +251,11 @@ class test_DepreciationWizard(TransactionCase):
             wizard.create_depreciation()
 
 
-class test_voucher(TransactionCase):
+class TestVoucher(TransactionCase):
 
     def setUp(self):
         '''折旧明细准备数据'''
-        super(test_voucher, self).setUp()
+        super(TestVoucher, self).setUp()
         self.asset = self.env.ref('asset.asset_car')
         self.asset.is_init = True
         self.voucher = self.env.ref('finance.voucher_4')

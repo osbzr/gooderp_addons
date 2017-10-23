@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from datetime import date,datetime
+from datetime import date, datetime
 from odoo import api, fields, models
 
-class partner(models.Model):
+
+class Partner(models.Model):
     '''
     业务伙伴可能是客户： c_category_id 非空
 
@@ -17,9 +18,10 @@ class partner(models.Model):
         Date range [180 days ago, now]
         '''
 
-        self.ensure_one ()
+        self.ensure_one()
         date_end = datetime.today()
-        date_start = datetime.strptime(self.env.user.company_id.start_date,'%Y-%m-%d')
+        date_start = datetime.strptime(
+            self.env.user.company_id.start_date, '%Y-%m-%d')
 
         if (date_end - date_start).days > 180:
             date_start = date_end - datetime.timedelta(days=180)
