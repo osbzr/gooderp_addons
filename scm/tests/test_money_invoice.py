@@ -3,26 +3,26 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
 
-class test_money_invoice(TransactionCase):
+class TestMoneyInvoice(TransactionCase):
 
     def setUp(self):
         '''准备基本数据'''
-        super(test_money_invoice, self).setUp()
+        super(TestMoneyInvoice, self).setUp()
         # 销售相关
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.return_order = self.env.ref('sell.sell_order_return')
         self.return_order.sell_order_done()
         self.return_delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.return_order.id)])
+            [('order_id', '=', self.return_order.id)])
 
         # 采购相关
         self.order = self.env.ref('buy.buy_order_1')
         self.order.buy_order_done()
         self.receipt = self.env['buy.receipt'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.return_receipt = self.env.ref('buy.buy_receipt_return_1')
 
         # 补足商品，确保审核销售发货单、采购退货单能正常进行
@@ -74,14 +74,15 @@ class test_money_invoice(TransactionCase):
         self.asset.asset_done()
         change_wizard = self.env['create.chang.wizard'].with_context({
             'active_id': self.asset.id}).create({
-            'chang_date': '2016-05-01',
-            'chang_cost': 200.0,
-            'chang_depreciation_number': 1,
-            'chang_tax': 34.0,
-            'chang_partner_id': self.env.ref('core.zt').id,
-        })
+                'chang_date': '2016-05-01',
+                'chang_cost': 200.0,
+                'chang_depreciation_number': 1,
+                'chang_tax': 34.0,
+                'chang_partner_id': self.env.ref('core.zt').id,
+            })
         change_wizard.create_chang_account()
-        invoice = self.env['money.invoice'].search([('name', '=', u'固定资产变更' + self.asset.code)])
+        invoice = self.env['money.invoice'].search(
+            [('name', '=', u'固定资产变更' + self.asset.code)])
         src = invoice.find_source_order()
         self.assertEqual(self.asset.id, src['res_id'])
 

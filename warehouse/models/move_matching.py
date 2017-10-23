@@ -6,7 +6,8 @@ from utils import safe_division
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
-class wh_move_matching(models.Model):
+
+class WhMoveMatching(models.Model):
     _name = 'wh.move.matching'
     _description = u'匹配记录'
 
@@ -47,7 +48,7 @@ class wh_move_matching(models.Model):
         return self.create(res)
 
 
-class wh_move_line(models.Model):
+class WhMoveLine(models.Model):
     _inherit = 'wh.move.line'
 
     qty_remaining = fields.Float(
@@ -96,7 +97,7 @@ class wh_move_line(models.Model):
                         line.goods_id.get_matching_records_by_lot(
                             line.lot_id, line.goods_qty, line.goods_uos_qty)
                     for matching in matching_records:
-                        self.create_matching_obj(line,matching)
+                        self.create_matching_obj(line, matching)
                 else:
                     matching_records, cost = line.goods_id \
                         .get_matching_records(
@@ -104,13 +105,14 @@ class wh_move_line(models.Model):
                             uos_qty=line.goods_uos_qty,
                             attribute=line.attribute_id)
                     for matching in matching_records:
-                        self.create_matching_obj(line , matching)
+                        self.create_matching_obj(line, matching)
                 line.cost_unit = safe_division(cost, line.goods_qty)
                 line.cost = cost
                 # 将过保日填充到出库明细行
-                line.expiration_date = matching_records and matching_records[0].get('expiration_date')
+                line.expiration_date = matching_records and matching_records[0].get(
+                    'expiration_date')
 
-        return super(wh_move_line, self).prev_action_done()
+        return super(WhMoveLine, self).prev_action_done()
 
     def prev_action_cancel(self):
         for line in self:
@@ -121,4 +123,4 @@ class wh_move_line(models.Model):
             line.matching_out_ids.unlink()
             line.expiration_date = False
 
-        return super(wh_move_line, self).prev_action_cancel()
+        return super(WhMoveLine, self).prev_action_cancel()

@@ -6,24 +6,24 @@ from odoo.http import request
 from odoo.addons.good_portal.controllers.main import website_account
 
 
-class website_account(website_account):
+class WebsiteAccount(website_account):
 
     @http.route()
     def account(self, **kw):
         """ Add task documents to main account page """
-        response = super(website_account, self).account(**kw)
+        response = super(WebsiteAccount, self).account(**kw)
         Project = request.env['project']
         Tasks = request.env['task']
 
         task_count = 0
         for project in Project.search([('customer_id', '=', request.env.user.gooderp_partner_id.id)]):
             task_count += Tasks.search_count([
-                                              ('project_id', '=', project.id)
-                                              ])
+                ('project_id', '=', project.id)
+            ])
 
         response.qcontext.update({
-                                  'task_count': task_count,
-                                  })
+            'task_count': task_count,
+        })
         return response
 
     #
@@ -40,12 +40,13 @@ class website_account(website_account):
             project_lists.append(project.id)
 
         domain = [
-                  ('project_id', 'in', project_lists)
-                  ]
+            ('project_id', 'in', project_lists)
+        ]
 
         archive_groups = self._get_archive_groups('task', domain)
         if date_begin and date_end:
-            domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
+            domain += [('create_date', '>', date_begin),
+                       ('create_date', '<=', date_end)]
 
         # count for pager
         task_count = Task_obj.search_count(domain)
@@ -59,7 +60,8 @@ class website_account(website_account):
             step=self._items_per_page
         )
         # content according to pager and archive selected
-        tasks = Task_obj.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        tasks = Task_obj.search(
+            domain, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'date': date_begin,

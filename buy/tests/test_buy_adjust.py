@@ -3,11 +3,11 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
 
-class test_buy_adjust(TransactionCase):
+class TestBuyAdjust(TransactionCase):
 
     def setUp(self):
         '''采购变更单准备基本数据'''
-        super(test_buy_adjust, self).setUp()
+        super(TestBuyAdjust, self).setUp()
         self.order = self.env.ref('buy.buy_order_1')
         for line in self.order.line_ids:
             line.tax_rate = 0
@@ -22,9 +22,9 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                'attribute_id': self.keyboard_black.id,
-                                'quantity': 3.0,
-                                }),
+                                 'attribute_id': self.keyboard_black.id,
+                                 'quantity': 3.0,
+                                 }),
                          ]
         })
         adjust.buy_adjust_done()
@@ -40,15 +40,15 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                'attribute_id': self.keyboard_black.id,
-                                'quantity': 3.0,
-                                }),
-                        (0, 0, {'goods_id': self.mouse.id,
-                               'quantity': 1,
-                               }),
-                        (0, 0, {'goods_id': self.cable.id,
-                               'quantity': 1,
-                               })
+                                 'attribute_id': self.keyboard_black.id,
+                                 'quantity': 3.0,
+                                 }),
+                         (0, 0, {'goods_id': self.mouse.id,
+                                 'quantity': 1,
+                                 }),
+                         (0, 0, {'goods_id': self.cable.id,
+                                 'quantity': 1,
+                                 })
                          ]
         })
         adjust.buy_adjust_done()
@@ -69,17 +69,18 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                'attribute_id': self.keyboard_black.id,
-                                'quantity': 3,
-                                'price_taxed': -1,
-                                })]
+                                 'attribute_id': self.keyboard_black.id,
+                                 'quantity': 3,
+                                 'price_taxed': -1,
+                                 })]
         })
         with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_quantity_lt(self):
         '''审核采购变更单:调整后数量 5 < 原订单已入库数量 6，审核时报错'''
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         for line in buy_receipt.line_in_ids:
@@ -88,16 +89,17 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                'attribute_id': self.keyboard_black.id,
-                                'quantity': -5,
-                                })]
+                                 'attribute_id': self.keyboard_black.id,
+                                 'quantity': -5,
+                                 })]
         })
         with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
     def test_buy_adjust_done_quantity_equal(self):
         '''审核采购变更单:调整后数量6 == 原订单已入库数量 6，审核后将产生的入库单分单删除'''
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         buy_receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         for line in buy_receipt.line_in_ids:
@@ -106,9 +108,9 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                'attribute_id': self.keyboard_black.id,
-                                'quantity': -4,
-                                })]
+                                 'attribute_id': self.keyboard_black.id,
+                                 'quantity': -4,
+                                 })]
         })
         adjust.buy_adjust_done()
         new_receipt = self.env['buy.receipt'].search(
@@ -118,16 +120,17 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_all_in(self):
         '''审核采购变更单：购货订单生成的采购入库单已全部入库，审核时报错'''
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         receipt.buy_receipt_done()
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                'attribute_id': self.keyboard_black.id,
-                                'quantity': 3.0,
-                                }),
+                                 'attribute_id': self.keyboard_black.id,
+                                 'quantity': 3.0,
+                                 }),
                          ]
         })
         with self.assertRaises(UserError):
@@ -135,14 +138,15 @@ class test_buy_adjust(TransactionCase):
 
     def test_buy_adjust_done_more_same_line(self):
         '''审核采购变更单：查找到购货订单中多行同一商品，不能调整'''
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.order.buy_order_draft()
         self.order.line_ids.create({'order_id': self.order.id,
-                                   'goods_id': self.keyboard.id,
-                                   'attribute_id': self.keyboard_black.id,
-                                   'quantity': 10,
-                                   'price_taxed': 10.0,
-                                   'tax_rate': 0,})
+                                    'goods_id': self.keyboard.id,
+                                    'attribute_id': self.keyboard_black.id,
+                                    'quantity': 10,
+                                    'price_taxed': 10.0,
+                                    'tax_rate': 0, })
         self.order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
@@ -152,24 +156,24 @@ class test_buy_adjust(TransactionCase):
         adjust = self.env['buy.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                'attribute_id': self.keyboard_black.id,
-                                'quantity': 3.0,
-                                }),
+                                 'attribute_id': self.keyboard_black.id,
+                                 'quantity': 3.0,
+                                 }),
                          ]
         })
         with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
-
     def test_buy_adjust_done_goods_done(self):
         '''审核采购变更单:原始单据中一行商品已全部入库，另一行没有'''
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.order.buy_order_draft()
         self.order.line_ids.create({'order_id': self.order.id,
-                                   'goods_id': self.cable.id,
-                                   'price_taxed': 10.0,
-                                   'quantity': 10,
-                                   'tax_rate': 0})
+                                    'goods_id': self.cable.id,
+                                    'price_taxed': 10.0,
+                                    'quantity': 10,
+                                    'tax_rate': 0})
         self.order.buy_order_done()
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
@@ -178,20 +182,20 @@ class test_buy_adjust(TransactionCase):
                 line.unlink()
         receipt.buy_receipt_done()
         adjust = self.env['buy.adjust'].create({
-        'order_id': self.order.id,
-        'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                             'quantity': 3.0,
-                            }),
-                     ]
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.cable.id,
+                                 'quantity': 3.0,
+                                 }),
+                         ]
         })
         with self.assertRaises(UserError):
             adjust.buy_adjust_done()
 
 
-class test_buy_adjust_line(TransactionCase):
+class TestBuyAdjustLine(TransactionCase):
 
     def setUp(self):
-        super(test_buy_adjust_line, self).setUp()
+        super(TestBuyAdjustLine, self).setUp()
         # 采购 10个键盘 单价 50
         self.order = self.env.ref('buy.buy_order_1')
         self.order.buy_order_done()
@@ -201,7 +205,7 @@ class test_buy_adjust_line(TransactionCase):
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
                                  'quantity': 10,
-                                })]
+                                 })]
         })
 
     def test_compute_using_attribute(self):

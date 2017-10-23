@@ -8,12 +8,12 @@ from odoo.http import request
 from odoo.addons.good_portal.controllers.main import website_account
 
 
-class website_account(website_account):
+class WebsiteAccount(website_account):
 
     @http.route()
     def account(self, **kw):
         """ Add sales documents to main account page """
-        response = super(website_account, self).account(**kw)
+        response = super(WebsiteAccount, self).account(**kw)
         money_order_obj = request.env['money.order']
         partner = request.env.user.gooderp_partner_id
 
@@ -25,7 +25,7 @@ class website_account(website_account):
         response.qcontext.update({
             'pay_count': pay_count,
         })
-        
+
         # 收款单
         get_count = money_order_obj.search_count([
             ('partner_id', '=', partner.id),
@@ -51,7 +51,8 @@ class website_account(website_account):
         ]
         archive_groups = self._get_archive_groups('money.order', domain)
         if date_begin and date_end:
-            domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
+            domain += [('create_date', '>', date_begin),
+                       ('create_date', '<=', date_end)]
 
         # count for pager
         pay_count = money_order_obj.search_count(domain)
@@ -64,7 +65,8 @@ class website_account(website_account):
             step=self._items_per_page
         )
         # content according to pager and archive selected
-        pay_orders = money_order_obj.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        pay_orders = money_order_obj.search(
+            domain, limit=self._items_per_page, offset=pager['offset'])
 #         print "pay_orders", pay_orders
         values.update({
             'date': date_begin,
@@ -90,7 +92,7 @@ class website_account(website_account):
         return request.render("good_portal_money.pay_orders_followup", {
             'pay_order': pay_order_sudo,
         })
-        
+
     #
     # Get Orders
     #
@@ -106,7 +108,8 @@ class website_account(website_account):
         ]
         archive_groups = self._get_archive_groups('money.order', domain)
         if date_begin and date_end:
-            domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
+            domain += [('create_date', '>', date_begin),
+                       ('create_date', '<=', date_end)]
 
         # count for pager
         get_count = money_order_obj.search_count(domain)
@@ -119,7 +122,8 @@ class website_account(website_account):
             step=self._items_per_page
         )
         # content according to pager and archive selected
-        get_orders = money_order_obj.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        get_orders = money_order_obj.search(
+            domain, limit=self._items_per_page, offset=pager['offset'])
 #         print "pay_orders", pay_orders
         values.update({
             'date': date_begin,

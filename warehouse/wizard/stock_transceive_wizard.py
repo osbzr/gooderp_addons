@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from odoo import models, fields, api
 
 
-class report_stock_transceive_wizard(models.TransientModel):
+class ReportStockTransceiveWizard(models.TransientModel):
     _name = 'report.stock.transceive.wizard'
     _description = u'商品收发明细表向导'
 
@@ -16,7 +16,7 @@ class report_stock_transceive_wizard(models.TransientModel):
     def _default_date_end(self):
         now = date.today()
         next_month = now.month == 12 and now.replace(year=now.year + 1,
-            month=1, day=1) or now.replace(month=now.month + 1, day=1)
+                                                     month=1, day=1) or now.replace(month=now.month + 1, day=1)
 
         return (next_month - timedelta(days=1)).strftime('%Y-%m-%d')
 

@@ -4,7 +4,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
 
 
-class other_money_statements_report(models.Model):
+class OtherMoneyStatementsReport(models.Model):
     _name = "other.money.statements.report"
     _description = u"其他收支明细表"
     _auto = False

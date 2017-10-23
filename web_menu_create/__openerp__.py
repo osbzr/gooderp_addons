@@ -29,7 +29,7 @@
     "website": "http://www.osbzr.com",
     'category': 'Technical Settings',
     'depends': [
-        'web','base',
+        'web', 'base',
     ],
     'description':
     """

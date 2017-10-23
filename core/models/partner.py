@@ -5,7 +5,7 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
-class partner(models.Model):
+class Partner(models.Model):
     '''
     业务伙伴可能是客户： c_category_id 非空
 
@@ -73,7 +73,7 @@ class partner(models.Model):
                 return partners.name_get()
             else:
                 args.remove(('code', 'ilike', name))
-        return super(partner, self).name_search(name=name,
+        return super(Partner, self).name_search(name=name,
                                                 args=args,
                                                 operator=operator,
                                                 limit=limit)

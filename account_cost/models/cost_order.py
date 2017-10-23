@@ -27,25 +27,25 @@ from odoo.tools import float_compare, float_is_zero
 
 # 购货订单审核状态可选值
 COST_ORDER_STATES = [
-        ('draft', u'未审核'),
-        ('done', u'已审核'),
-        ('cancel',u'已中止'),
-    ]
+    ('draft', u'未审核'),
+    ('done', u'已审核'),
+    ('cancel', u'已中止'),
+]
 
 # 字段只读状态
 READONLY_STATES = {
-        'done': [('readonly', True)],
-    }
+    'done': [('readonly', True)],
+}
 
 
-class cost_order(models.Model):
+class CostOrder(models.Model):
     _name = "cost.order"
     _inherit = ['mail.thread']
     _description = u"费用/服务采购单"
     _order = 'date desc, id desc'
 
     @api.one
-    @api.depends('line_ids.amount','line_ids.tax_amount')
+    @api.depends('line_ids.amount', 'line_ids.tax_amount')
     def _compute_amount(self):
         '''当订单行和优惠金额改变时，改变优惠后金额'''
         self.amount = sum(line.amount for line in self.line_ids)
@@ -64,8 +64,8 @@ class cost_order(models.Model):
                                help=u'采购服务的明细行，不能为空')
     note = fields.Text(u'备注', help=u'单据备注')
     prepayment = fields.Float(u'预付款', states=READONLY_STATES,
-                           digits=dp.get_precision('Amount'),
-                           help=u'输入预付款审核购货订单，会产生一张付款单')
+                              digits=dp.get_precision('Amount'),
+                              help=u'输入预付款审核购货订单，会产生一张付款单')
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
                                       ondelete='restrict',
                                       help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
@@ -73,17 +73,17 @@ class cost_order(models.Model):
                                    'cost_invoice',
                                    'cost_ids',
                                    'invoice_ids',
-                                   u'费用凭证',copy=False)
+                                   u'费用凭证', copy=False)
     wm_ids = fields.Many2many('cost.line',
                               'wearhouse_move_cost',
                               'cost_order',
                               'move_cost_line',
-                              u'服务费用与仓库',copy=False)
+                              u'服务费用与仓库', copy=False)
     wh_move_ids = fields.Many2many('wh.move',
                                    'cost_move',
                                    'cost_ids',
                                    'move_ids',
-                                   u'费用分摊出入库明细',copy=False)
+                                   u'费用分摊出入库明细', copy=False)
     approve_uid = fields.Many2one('res.users', u'审核人',
                                   copy=False, ondelete='restrict',
                                   help=u'审核单据的人')
@@ -95,8 +95,8 @@ class cost_order(models.Model):
                           digits=dp.get_precision('Amount'),
                           help=u'总金额减去优惠金额')
     tax_amount = fields.Float(u'合计税额', store=True, readonly=True,
-                          compute='_compute_amount', track_visibility='always',
-                          digits=dp.get_precision('Amount'))
+                              compute='_compute_amount', track_visibility='always',
+                              digits=dp.get_precision('Amount'))
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -104,21 +104,20 @@ class cost_order(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
     #pay_ids=fields.One2many("payment.plan","cost_id",string=u"付款计划", help=u'分批付款时使用付款计划')
 
-
     @api.multi
     def unlink(self):
         for order in self:
             if order.state != 'draft':
-                raise UserError(u'不能删除已审核/取消的单据(%s)'%order.name)
+                raise UserError(u'不能删除已审核/取消的单据(%s)' % order.name)
 
-        return super(cost_order, self).unlink()
+        return super(CostOrder, self).unlink()
 
     def _get_vals(self):
         '''返回创建 money_order 时所需数据'''
         money_lines = [{
-                'bank_id': self.bank_account_id.id,
-                'amount': self.prepayment,
-            }]
+            'bank_id': self.bank_account_id.id,
+            'amount': self.prepayment,
+        }]
         return {
             'partner_id': self.partner_id.id,
             'date': fields.Date.context_today(self),
@@ -145,7 +144,7 @@ class cost_order(models.Model):
     def _amount_to_invoice(self):
         '''服务费用产生结算单'''
         invoice_id = False
-        if not float_is_zero(self.amount,2):
+        if not float_is_zero(self.amount, 2):
             for line in self.line_ids:
                 invoice_id = self.env['money.invoice'].create({
                     'name': self.name,
@@ -169,40 +168,44 @@ class cost_order(models.Model):
         在所关联的入库单/发货单上创建费用行
         :return:
         """
-        all_amount = sum(wh_move_line.amount for wh_move_line in self.env['wh.move.line'].search([('move_id', 'in', self.wh_move_ids.ids)]))
+        all_amount = sum(wh_move_line.amount for wh_move_line in self.env['wh.move.line'].search(
+            [('move_id', 'in', self.wh_move_ids.ids)]))
         for mv in self.wh_move_ids:
 
             if mv.origin == 'buy.receipt.buy':
-                buy_id = self.env['buy.receipt'].search([('buy_move_id', '=', mv.id)])
+                buy_id = self.env['buy.receipt'].search(
+                    [('buy_move_id', '=', mv.id)])
                 mv_amount = sum(mv_line.amount for mv_line in mv.line_in_ids)
                 for cost_line in self.line_ids:
                     cost_mv_in_id = self.env['cost.line'].create({
-                        'partner_id':self.partner_id.id,
-                        'category_id':cost_line.category_id.id,
-                        'amount':cost_line.amount * (mv_amount / all_amount),
-                        'tax':cost_line.tax_amount *(mv_amount / all_amount),
+                        'partner_id': self.partner_id.id,
+                        'category_id': cost_line.category_id.id,
+                        'amount': cost_line.amount * (mv_amount / all_amount),
+                        'tax': cost_line.tax_amount * (mv_amount / all_amount),
                         'buy_id': buy_id.id
-                        })
+                    })
                     self.wm_ids = [(4, cost_mv_in_id.id)]
 
             if mv.origin == 'sell.delivery.sell':
-                sell_id = self.env['sell.delivery'].search([('sell_move_id', '=', mv.id)])
+                sell_id = self.env['sell.delivery'].search(
+                    [('sell_move_id', '=', mv.id)])
                 mv_amount = sum(mv_line.amount for mv_line in mv.line_out_ids)
                 for cost_line in self.line_ids:
                     cost_mv_out_id = self.env['cost.line'].create({
-                        'partner_id':self.partner_id.id,
-                        'category_id':cost_line.category_id.id,
-                        'amount':cost_line.amount * (mv_amount / all_amount),
-                        'tax':cost_line.tax_amount *(mv_amount / all_amount),
+                        'partner_id': self.partner_id.id,
+                        'category_id': cost_line.category_id.id,
+                        'amount': cost_line.amount * (mv_amount / all_amount),
+                        'tax': cost_line.tax_amount * (mv_amount / all_amount),
                         'sell_id': sell_id.id
-                        })
+                    })
                     self.wm_ids = [(4, cost_mv_out_id.id)]
 
     @api.one
     def cost_order_confim(self):
         '''审核服务订单'''
         if not self.name:
-            self.update({'name': self.env['ir.sequence'].next_by_code('cost.order') or '/'})
+            self.update(
+                {'name': self.env['ir.sequence'].next_by_code('cost.order') or '/'})
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         if self.state == 'cancel':
@@ -235,9 +238,9 @@ class cost_order(models.Model):
             invoice_id.money_invoice_draft()
             invoice_id.unlink()
 
-        #查找产生的付款单并反审核，删除
+        # 查找产生的付款单并反审核，删除
         money_order = self.env['money.order'].search(
-                          [('origin_name','=',self.name)])
+            [('origin_name', '=', self.name)])
         if money_order:
             money_order.money_order_draft()
             money_order.unlink()
@@ -245,14 +248,15 @@ class cost_order(models.Model):
         self.state = 'draft'
         self.approve_uid = ''
 
-class cost_order_line(models.Model):
+
+class CostOrderLine(models.Model):
     _name = 'cost.order.line'
     _description = u'费用单明细'
 
     @api.one
     @api.depends('amount', 'tax_amount')
     def _compute_all_amount(self):
-        self.subtotal = self.amount + self.tax_amount # 价税合计
+        self.subtotal = self.amount + self.tax_amount  # 价税合计
 
     order_id = fields.Many2one('cost.order', u'订单编号', index=True,
                                required=True, ondelete='cascade',

@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class sell_order_track_wizard(models.TransientModel):
+class SellOrderTrackWizard(models.TransientModel):
     _name = 'sell.order.track.wizard'
     _description = u'销售订单跟踪表向导'
 
@@ -90,11 +90,12 @@ class sell_order_track_wizard(models.TransientModel):
         self.ensure_one()
         res = []
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！\n所选开始日期:%s 所选结束日期:%s'%(self.date_start, self.date_end))
+            raise UserError(u'开始日期不能大于结束日期！\n所选开始日期:%s 所选结束日期:%s' %
+                            (self.date_start, self.date_end))
 
         sell_order_line = self.env['sell.order.line']
         for line in sell_order_line.search(self._get_domain(), order='goods_id'):
-            is_sell = line.order_id.type == 'sell' and 1 or -1 # 是否销货订单
+            is_sell = line.order_id.type == 'sell' and 1 or -1  # 是否销货订单
             # 以下分别为明细行上数量、销售额、未出库数量，退货时均取反
             qty = is_sell * line.quantity
             amount = is_sell * line.subtotal

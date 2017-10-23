@@ -3,7 +3,8 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
-class warehouse(models.Model):
+
+class Warehouse(models.Model):
     _name = 'warehouse'
     _description = u'仓库'
 
@@ -21,7 +22,7 @@ class warehouse(models.Model):
     code = fields.Char(u'编号')
     type = fields.Selection(WAREHOUSE_TYPE, u'类型', default='stock')
     active = fields.Boolean(u'启用', default=True)
-    user_ids = fields.Many2many('res.users',string=u'库管')
+    user_ids = fields.Many2many('res.users', string=u'库管')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -35,7 +36,7 @@ class warehouse(models.Model):
     @api.multi
     def get_stock_qty(self):
         '''使用SQL来取得指定仓库的库存数量，未考虑属性和批次'''
-        for warehouse in self:
+        for Warehouse in self:
             self.env.cr.execute('''
                 SELECT sum(line.qty_remaining) as qty,
                        sum(line.qty_remaining * (line.cost / line.goods_qty)) as cost,
@@ -50,7 +51,7 @@ class warehouse(models.Model):
                   AND line.warehouse_dest_id = %s
 
                 GROUP BY goods.name
-            ''' % (warehouse.id, ))
+            ''' % (Warehouse.id, ))
 
             return self.env.cr.dictfetchall()
 
@@ -68,16 +69,16 @@ class warehouse(models.Model):
         if not filter(lambda _type: _type[0] == 'type', args):
             args = [['type', '=', 'stock']] + args
 
-        return super(warehouse, self).name_search(name=name, args=args,
+        return super(Warehouse, self).name_search(name=name, args=args,
                                                   operator=operator, limit=limit)
 
     @api.multi
     def name_get(self):
         '''将仓库显示为 [编号]名字 的形式'''
         res = []
-        for warehouse in self:
-            res.append((warehouse.id, u'[%s]%s' %
-                        (warehouse.code, warehouse.name)))
+        for Warehouse in self:
+            res.append((Warehouse.id, u'[%s]%s' %
+                        (Warehouse.code, Warehouse.name)))
 
         return res
 
@@ -85,15 +86,15 @@ class warehouse(models.Model):
         '''返回指定类型的第一个仓库'''
         if not _type or _type not in map(lambda _type: _type[0], self.WAREHOUSE_TYPE):
             raise UserError(u'仓库类型" % s"不在预先定义的type之中，请联系管理员' % _type)
-        
-        domain =  [('type', '=', _type)]
+
+        domain = [('type', '=', _type)]
         # 仓库管理员带出有权限的仓库作为默认值
         if _type == 'stock' and self.env.user.has_group('warehouse.group_warehouse'):
-            domain += ['|',('user_ids','=',False),('user_ids','in',self._uid)]
+            domain += ['|', ('user_ids', '=', False),
+                       ('user_ids', 'in', self._uid)]
 
         warehouses = self.search(domain, limit=1, order='id asc')
         if not warehouses:
-            raise UserError(u'不存在类型为%s的仓库，请检查基础数据是否全部导入'%_type)
+            raise UserError(u'不存在类型为%s的仓库，请检查基础数据是否全部导入' % _type)
 
         return warehouses[0]
-

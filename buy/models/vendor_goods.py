@@ -4,7 +4,7 @@ from odoo import fields, models
 import odoo.addons.decimal_precision as dp
 
 
-class vendor_goods(models.Model):
+class VendorGoods(models.Model):
     _name = 'vendor.goods'
     _description = u'供应商供货价格表'
 
@@ -20,7 +20,7 @@ class vendor_goods(models.Model):
         string=u'供应商',
         required=True,
         comodel_name='partner',
-        domain=[('s_category_id','!=',False)],
+        domain=[('s_category_id', '!=', False)],
         ondelete='cascade',
         help=u'供应商',
     )
@@ -46,7 +46,7 @@ class vendor_goods(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class partner(models.Model):
+class Partner(models.Model):
     _inherit = 'partner'
 
     goods_ids = fields.One2many(
@@ -57,9 +57,9 @@ class partner(models.Model):
     )
 
 
-class goods(models.Model):
+class Goods(models.Model):
 
-    _inherit = 'goods' 
+    _inherit = 'goods'
 
     vendor_ids = fields.One2many(
         string=u'供应价格',

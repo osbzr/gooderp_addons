@@ -8,6 +8,7 @@ from odoo.exceptions import UserError
 
 create_original = models.BaseModel.create
 
+
 @api.model
 @api.returns('self', lambda value: value.id)
 def create(self, vals):
@@ -17,6 +18,7 @@ def create(self, vals):
             vals.update({'name': next_name})
     record_id = create_original(self, vals)
     return record_id
+
 
 models.BaseModel.create = create
 
@@ -35,7 +37,7 @@ CORE_CATEGORY_TYPE = [('customer', u'客户'),
 # 当客户要求下拉字段可编辑，可使用此表存储可选值，按type分类，在字段上用domain和context筛选
 
 
-class core_value(models.Model):
+class CoreValue(models.Model):
     _name = 'core.value'
     _description = u'可选值'
 
@@ -55,7 +57,7 @@ class core_value(models.Model):
     ]
 
 
-class core_category(models.Model):
+class CoreCategory(models.Model):
     _name = 'core.category'
     _description = u'类别'
     _order = 'type, name'
@@ -77,7 +79,7 @@ class core_category(models.Model):
     ]
 
 
-class uom(models.Model):
+class Uom(models.Model):
     _name = 'uom'
     _description = u'计量单位'
 
@@ -94,7 +96,7 @@ class uom(models.Model):
     ]
 
 
-class settle_mode(models.Model):
+class SettleMode(models.Model):
     _name = 'settle.mode'
     _description = u'结算方式'
 
@@ -111,7 +113,7 @@ class settle_mode(models.Model):
     ]
 
 
-class staff(models.Model):
+class Staff(models.Model):
     _name = 'staff'
     _description = u'员工'
 
@@ -127,12 +129,13 @@ class staff(models.Model):
     def _check_user_id(self):
         '''一个员工只能对应一个用户'''
         if self.user_id:
-            staffs = self.env['staff'].search([('user_id', '=', self.user_id.id)])
+            staffs = self.env['staff'].search(
+                [('user_id', '=', self.user_id.id)])
             if len(staffs) > 1:
                 raise UserError(u'用户 %s 已有对应员工' % self.user_id.name)
 
 
-class bank_account(models.Model):
+class BankAccount(models.Model):
     _name = 'bank.account'
     _description = u'账户'
 
@@ -151,8 +154,7 @@ class bank_account(models.Model):
     ]
 
 
-
-class service(models.Model):
+class Service(models.Model):
     ''' 是对其他收支业务的更细分类 '''
     _name = 'service'
     _description = u'收支项'
@@ -173,4 +175,3 @@ class service(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-

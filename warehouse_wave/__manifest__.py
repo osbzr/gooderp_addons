@@ -2,7 +2,7 @@
 {
     'name': '捡货单和打包',
     'version': '11.11',
-    'author':"上海开阖软件有限公司",
+    'author': "上海开阖软件有限公司",
     'summary': ' ',
     'category': 'gooderp',
     'description':

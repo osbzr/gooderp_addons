@@ -8,7 +8,8 @@ from itertools import islice
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
-class wh_assembly(models.Model):
+
+class WhAssembly(models.Model):
     _name = 'wh.assembly'
     _description = u'组装单'
     _inherit = ['mail.thread']
@@ -31,12 +32,14 @@ class wh_assembly(models.Model):
         'wh.bom', u'物料清单', domain=[('type', '=', 'assembly')],
         context={'type': 'assembly'}, ondelete='restrict',
         readonly=True,
-        states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+        states={'draft': [('readonly', False)], 'feeding': [
+            ('readonly', False)]},
         help=u'组装单对应的物料清单')
     fee = fields.Float(
         u'组装费用', digits=dp.get_precision('Amount'),
         readonly=True,
-        states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+        states={'draft': [('readonly', False)], 'feeding': [
+            ('readonly', False)]},
         help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
                             视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
@@ -46,10 +49,13 @@ class wh_assembly(models.Model):
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
-                             states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+                             states={'draft': [('readonly', False)], 'feeding': [
+                                 ('readonly', False)]},
                              help=u"(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
-    voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
-    out_voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
+    voucher_id = fields.Many2one(
+        'voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
+    out_voucher_id = fields.Many2one(
+        'voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -72,18 +78,18 @@ class wh_assembly(models.Model):
                 parent_cost = safe_division(amount, amount_total) * cost
                 collect_parent_cost += parent_cost
                 parent.write({
-                        'cost_unit': safe_division(
-                            parent_cost, parent.goods_qty),
-                        'cost': parent_cost,
-                    })
+                    'cost_unit': safe_division(
+                        parent_cost, parent.goods_qty),
+                    'cost': parent_cost,
+                })
 
             # 最后一行数据使用总金额减去已经消耗的金额来计算
             last_parent_cost = cost - collect_parent_cost
             collects[-1][0].write({
-                    'cost_unit': safe_division(
-                        last_parent_cost, collects[-1][0].goods_qty),
-                    'cost': last_parent_cost,
-                })
+                'cost_unit': safe_division(
+                    last_parent_cost, collects[-1][0].goods_qty),
+                'cost': last_parent_cost,
+            })
 
         return True
 
@@ -98,8 +104,8 @@ class wh_assembly(models.Model):
     def onchange_goods_id(self):
         if self.goods_id:
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
-                             'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id,
-                             'type': 'in'}]
+                                 'uom_id': self.goods_id.uom_id.id, 'uos_id': self.goods_id.uos_id.id,
+                                 'type': 'in'}]
 
     @api.onchange('goods_qty')
     def onchange_goods_qty(self):
@@ -120,20 +126,20 @@ class wh_assembly(models.Model):
         if self.bom_id:
             line_in_ids = [{'goods_id': line.goods_id.id,
                             'attribute_id': line.attribute_id.id,
-                               'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
-                                   'production').id,
-                               'warehouse_dest_id': warehouse_id.id,
-                               'uom_id': line.goods_id.uom_id.id,
-                               'goods_qty': self.goods_qty,
-                               'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
-                               'uos_id': line.goods_id.uos_id.id,
-                               'type': 'in',
-                           } for line in self.bom_id.line_parent_ids]
+                            'warehouse_id': self.env['warehouse'].get_warehouse_by_type(
+                                'production').id,
+                            'warehouse_dest_id': warehouse_id.id,
+                            'uom_id': line.goods_id.uom_id.id,
+                            'goods_qty': self.goods_qty,
+                            'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
+                            'uos_id': line.goods_id.uos_id.id,
+                            'type': 'in',
+                            } for line in self.bom_id.line_parent_ids]
             parent_line_goods_qty = self.bom_id.line_parent_ids[0].goods_qty
             for line in self.bom_id.line_child_ids:
                 cost, cost_unit = line.goods_id. \
                     get_suggested_cost_by_warehouse(
-                    warehouse_id[0], line.goods_qty / parent_line_goods_qty * self.goods_qty)
+                        warehouse_id[0], line.goods_qty / parent_line_goods_qty * self.goods_qty)
                 local_goods_qty = line.goods_qty / parent_line_goods_qty * self.goods_qty
                 line_out_ids.append({
                     'goods_id': line.goods_id.id,
@@ -181,7 +187,7 @@ class wh_assembly(models.Model):
             if line_out.cost:
                 line_out_credit += line_out.cost
 
-        if line_out_credit: # 贷方行
+        if line_out_credit:  # 贷方行
             account_id = self.finance_category_id.account_id.id
             line_out_data.append({'credit': line_out_credit,
                                   'goods_id': False,
@@ -189,11 +195,11 @@ class wh_assembly(models.Model):
                                   'account_id': account_id,
                                   'name': u'%s 原料 %s' % (assembly.move_id.name, assembly.move_id.note or '')
                                   })
-        for line_in in assembly.line_in_ids: # 借方行
+        for line_in in assembly.line_in_ids:  # 借方行
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
-                                     'goods_id':line_in.goods_id.id,
+                                     'goods_id': line_in.goods_id.id,
                                      'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
@@ -213,7 +219,8 @@ class wh_assembly(models.Model):
             account_row = assembly.create_uid.company_id.operating_cost_account_id
             voucher_line_data.append({'name': u'组装费用', 'account_id': account_row.id,
                                       'credit': assembly.fee, 'voucher_id': voucher_row.id})
-        voucher_line_data += self.create_vourcher_line_data(assembly, voucher_row)
+        voucher_line_data += self.create_vourcher_line_data(
+            assembly, voucher_row)
 
         self.create_voucher_line(voucher_line_data)
 
@@ -232,23 +239,23 @@ class wh_assembly(models.Model):
             if line_out.cost:
                 line_out_debit += line_out.cost
 
-        if line_out_debit: # 借方行
+        if line_out_debit:  # 借方行
             account_id = self.finance_category_id.account_id.id
             line_in_data.append({'debit': line_out_debit,
-                                  'goods_id': False,
-                                  'voucher_id': voucher.id,
-                                  'account_id': account_id,
-                                  'name': u'%s 成品 %s' % (assembly.move_id.name, assembly.move_id.note or '')
-                                  })
-        for line_out in assembly.line_out_ids: # 贷方行
+                                 'goods_id': False,
+                                 'voucher_id': voucher.id,
+                                 'account_id': account_id,
+                                 'name': u'%s 成品 %s' % (assembly.move_id.name, assembly.move_id.note or '')
+                                 })
+        for line_out in assembly.line_out_ids:  # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost,
-                                    'goods_id':line_out.goods_id.id,
-                                    'goods_qty': line_out.goods_qty,
-                                    'voucher_id': voucher.id,
-                                    'account_id': account_id,
-                                    'name': u'%s 原料 %s' % (assembly.move_id.name, assembly.move_id.note or '')})
+                                      'goods_id': line_out.goods_id.id,
+                                      'goods_qty': line_out.goods_qty,
+                                      'voucher_id': voucher.id,
+                                      'account_id': account_id,
+                                      'name': u'%s 原料 %s' % (assembly.move_id.name, assembly.move_id.note or '')})
         return line_out_data + line_in_data
 
     def create_out_voucher_line(self, assembly, voucher):
@@ -269,7 +276,7 @@ class wh_assembly(models.Model):
         """
         for assembly in self:
             voucher_row = self.env['voucher'].create({'date': assembly.date})
-            self.wh_assembly_create_voucher_line(assembly, voucher_row) # 入库凭证
+            self.wh_assembly_create_voucher_line(assembly, voucher_row)  # 入库凭证
             assembly.voucher_id = voucher_row.id
             voucher_row.voucher_done()
 
@@ -280,7 +287,7 @@ class wh_assembly(models.Model):
         """
         for assembly in self:
             out_voucher = self.env['voucher'].create({'date': assembly.date})
-            self.create_out_voucher_line(assembly, out_voucher) # 出库凭证
+            self.create_out_voucher_line(assembly, out_voucher)  # 出库凭证
             assembly.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
@@ -304,11 +311,11 @@ class wh_assembly(models.Model):
         for order in self:
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
-            order.move_id.check_qc_result() # 检验质检报告是否上传
-            order.line_in_ids.action_done() # 完成成品入库
+            order.move_id.check_qc_result()  # 检验质检报告是否上传
+            order.line_in_ids.action_done()  # 完成成品入库
 
             order.update_parent_cost()
-            order.wh_assembly_create_voucher() # 生成入库凭证并审核
+            order.wh_assembly_create_voucher()  # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -345,14 +352,15 @@ class wh_assembly(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
-        vals.update({'finance_category_id': self.env.ref('finance.categ_ass_disass').id})
-        self = super(wh_assembly, self).create(vals)
+        vals.update({'finance_category_id': self.env.ref(
+            'finance.categ_ass_disass').id})
+        self = super(WhAssembly, self).create(vals)
         self.update_parent_cost()
         return self
 
     @api.multi
     def write(self, vals):
-        res = super(wh_assembly, self).write(vals)
+        res = super(WhAssembly, self).write(vals)
         self.update_parent_cost()
         return res
 
@@ -382,19 +390,19 @@ class wh_assembly(models.Model):
                     get_suggested_cost_by_warehouse(
                         warehouse_id[0], line.goods_qty)
                 line_out_ids.append({
-                        'type': 'out',
-                        'goods_id': line.goods_id.id,
-                        'warehouse_id': warehouse_id.id,
-                        'warehouse_dest_id': self.env[
+                    'type': 'out',
+                    'goods_id': line.goods_id.id,
+                    'warehouse_id': warehouse_id.id,
+                    'warehouse_dest_id': self.env[
                             'warehouse'].get_warehouse_by_type('production').id,
-                        'uom_id': line.goods_id.uom_id.id,
-                        'goods_qty': line.goods_qty,
-                        'cost_unit': cost_unit,
-                        'cost': cost,
-                        'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
-                        'uos_id': line.goods_id.uos_id.id,
-                        'attribute_id': line.attribute_id,
-                    })
+                    'uom_id': line.goods_id.uom_id.id,
+                    'goods_qty': line.goods_qty,
+                    'cost_unit': cost_unit,
+                    'cost': cost,
+                    'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
+                    'uos_id': line.goods_id.uos_id.id,
+                    'attribute_id': line.attribute_id,
+                })
             self.line_in_ids = False
             self.line_out_ids = False
         else:
@@ -419,7 +427,6 @@ class wh_assembly(models.Model):
         if line_in_ids:
             self.line_in_ids = line_in_ids
         return {'domain': domain}
-
 
     @api.multi
     def update_bom(self):
@@ -455,16 +462,17 @@ class wh_assembly(models.Model):
                     'line_child_ids': line_child_ids})
             else:
                 bom_id = self.env['wh.bom'].create({
-                        'name': name,
-                        'type': 'assembly',
-                        'line_parent_ids': line_parent_ids,
-                        'line_child_ids': line_child_ids,
-                    })
+                    'name': name,
+                    'type': 'assembly',
+                    'line_parent_ids': line_parent_ids,
+                    'line_child_ids': line_child_ids,
+                })
                 assembly.bom_id = bom_id
 
         return True
 
-class outsource(models.Model):
+
+class Outsource(models.Model):
     _name = 'outsource'
     _description = u'委外加工单'
     _inherit = ['mail.thread']
@@ -485,7 +493,8 @@ class outsource(models.Model):
     bom_id = fields.Many2one('wh.bom', u'物料清单', domain=[('type', '=', 'outsource')],
                              context={'type': 'outsource'}, ondelete='restrict',
                              readonly=True,
-                             states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+                             states={'draft': [('readonly', False)], 'feeding': [
+                                 ('readonly', False)]},
                              help=u'委外加工单对应的物料清单')
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
                             视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
@@ -495,14 +504,18 @@ class outsource(models.Model):
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
-                             states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+                             states={'draft': [('readonly', False)], 'feeding': [
+                                 ('readonly', False)]},
                              help=u"(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
-    voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
-    out_voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
+    voucher_id = fields.Many2one(
+        'voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
+    out_voucher_id = fields.Many2one(
+        'voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
 
     outsource_partner_id = fields.Many2one('partner', string=u'委外供应商',
                                            readonly=True,
-                                           states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+                                           states={'draft': [('readonly', False)], 'feeding': [
+                                               ('readonly', False)]},
                                            required=True)
     wh_assembly_id = fields.Many2one('wh.assembly', string=u'关联的组装单',
                                      readonly=True,
@@ -521,7 +534,7 @@ class outsource(models.Model):
         if self.goods_id:
             self.line_in_ids = False
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
-                                 'uom_id': self.goods_id.uom_id.id, 'uos_id':self.goods_id.uos_id.id,
+                                 'uom_id': self.goods_id.uom_id.id, 'uos_id': self.goods_id.uos_id.id,
                                  'type': 'in'}]
 
     @api.onchange('goods_qty')
@@ -539,8 +552,9 @@ class outsource(models.Model):
         :return:line_out_ids ,line_in_ids
         """
         line_out_ids, line_in_ids = [], []
-        warehouse_id = self.env['warehouse'].search([('type', '=', 'stock')], limit=1)
-        if self.bom_id: # 存在 物料清单
+        warehouse_id = self.env['warehouse'].search(
+            [('type', '=', 'stock')], limit=1)
+        if self.bom_id:  # 存在 物料清单
             line_in_ids = [{'goods_id': line.goods_id.id,
                             'attribute_id': line.attribute_id.id,
                             'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
@@ -561,59 +575,61 @@ class outsource(models.Model):
                 local_goods_qty = line.goods_qty / parent_line_goods_qty * self.goods_qty
 
                 line_out_ids.append({
-                                     'goods_id': line.goods_id.id,
-                                     'attribute_id': line.attribute_id.id,
-                                     'warehouse_id': warehouse_id.id,
-                                     'warehouse_dest_id': self.env['warehouse'].get_warehouse_by_type('production'),
-                                     'uom_id': line.goods_id.uom_id.id,
-                                     'goods_qty': local_goods_qty,
-                                     'cost_unit': cost_unit,
-                                     'cost': cost,
-                                     'goods_uos_qty': local_goods_qty / line.goods_id.conversion,
-                                     'uos_id': line.goods_id.uos_id.id,
-                                     'type': 'out',
-                                     })
+                    'goods_id': line.goods_id.id,
+                    'attribute_id': line.attribute_id.id,
+                    'warehouse_id': warehouse_id.id,
+                    'warehouse_dest_id': self.env['warehouse'].get_warehouse_by_type('production'),
+                    'uom_id': line.goods_id.uom_id.id,
+                    'goods_qty': local_goods_qty,
+                    'cost_unit': cost_unit,
+                    'cost': cost,
+                    'goods_uos_qty': local_goods_qty / line.goods_id.conversion,
+                    'uos_id': line.goods_id.uos_id.id,
+                    'type': 'out',
+                })
 
             self.line_in_ids = False
             self.line_out_ids = False
             self.line_out_ids = line_out_ids
             self.line_in_ids = line_in_ids
-        elif self.line_in_ids: # 不存在 物料清单，有组合单行
+        elif self.line_in_ids:  # 不存在 物料清单，有组合单行
             self.line_in_ids[0].goods_qty = self.goods_qty
 
     @api.onchange('bom_id')
     def onchange_bom(self):
         line_out_ids, line_in_ids = [], []
         domain = {}
-        warehouse_id = self.env['warehouse'].search([('type', '=', 'stock')], limit=1)
+        warehouse_id = self.env['warehouse'].search(
+            [('type', '=', 'stock')], limit=1)
         if self.bom_id:
             line_in_ids = [{
-                    'goods_id': line.goods_id.id,
-                    'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
-                    'warehouse_dest_id': warehouse_id.id,
-                    'uom_id': line.goods_id.uom_id.id,
-                    'goods_qty': line.goods_qty,
-                    'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
-                    'uos_id': line.goods_id.uos_id.id,
-                    'type': 'in',
-                } for line in self.bom_id.line_parent_ids]
+                'goods_id': line.goods_id.id,
+                'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
+                'warehouse_dest_id': warehouse_id.id,
+                'uom_id': line.goods_id.uom_id.id,
+                'goods_qty': line.goods_qty,
+                'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
+                'uos_id': line.goods_id.uos_id.id,
+                'type': 'in',
+            } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
                 cost, cost_unit = line.goods_id. \
-                    get_suggested_cost_by_warehouse(warehouse_id[0], line.goods_qty)
+                    get_suggested_cost_by_warehouse(
+                        warehouse_id[0], line.goods_qty)
                 line_out_ids.append({
-                            'goods_id': line.goods_id.id,
-                            'warehouse_id': warehouse_id.id,
-                            'warehouse_dest_id': self.env[
-                                'warehouse'].get_warehouse_by_type('production').id,
-                            'uom_id': line.goods_id.uom_id.id,
-                            'goods_qty': line.goods_qty,
-                            'cost_unit': cost_unit,
-                            'cost': cost,
-                            'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
-                            'uos_id': line.goods_id.uos_id.id,
-                            'type': 'out',
-                        })
+                    'goods_id': line.goods_id.id,
+                    'warehouse_id': warehouse_id.id,
+                    'warehouse_dest_id': self.env[
+                        'warehouse'].get_warehouse_by_type('production').id,
+                    'uom_id': line.goods_id.uom_id.id,
+                    'goods_qty': line.goods_qty,
+                    'cost_unit': cost_unit,
+                    'cost': cost,
+                    'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
+                    'uos_id': line.goods_id.uos_id.id,
+                    'type': 'out',
+                })
             self.line_in_ids = False
             self.line_out_ids = False
         else:
@@ -637,19 +653,19 @@ class outsource(models.Model):
         return {'domain': domain}
 
     def apportion_cost(self, cost):
-        for outsource in self:
-            if not outsource.line_in_ids:
+        for Outsource in self:
+            if not Outsource.line_in_ids:
                 continue
 
             collects = []
-            ignore_move = [line.id for line in outsource.line_in_ids]
-            for parent in outsource.line_in_ids:
+            ignore_move = [line.id for line in Outsource.line_in_ids]
+            for parent in Outsource.line_in_ids:
                 collects.append((parent,
                                  parent.goods_id.get_suggested_cost_by_warehouse(
-                                    parent.warehouse_dest_id, parent.goods_qty,
-                                    lot_id=parent.lot_id,
-                                    attribute=parent.attribute_id,
-                                    ignore_move=ignore_move)[0]
+                                     parent.warehouse_dest_id, parent.goods_qty,
+                                     lot_id=parent.lot_id,
+                                     attribute=parent.attribute_id,
+                                     ignore_move=ignore_move)[0]
                                  ))
 
             amount_total, collect_parent_cost = sum(
@@ -658,25 +674,26 @@ class outsource(models.Model):
                 parent_cost = safe_division(amount, amount_total) * cost
                 collect_parent_cost += parent_cost
                 parent.write({
-                        'cost_unit': safe_division(
-                            parent_cost, parent.goods_qty),
-                        'cost': parent_cost,
-                    })
+                    'cost_unit': safe_division(
+                        parent_cost, parent.goods_qty),
+                    'cost': parent_cost,
+                })
 
             # 最后一行数据使用总金额减去已经消耗的金额来计算
             last_parent_cost = cost - collect_parent_cost
             collects[-1][0].write({
-                    'cost_unit': safe_division(
-                        last_parent_cost, collects[-1][0].goods_qty),
-                    'cost': last_parent_cost,
-                })
+                'cost_unit': safe_division(
+                    last_parent_cost, collects[-1][0].goods_qty),
+                'cost': last_parent_cost,
+            })
 
         return True
 
     def update_parent_cost(self):
-        for outsource in self:
-            cost = sum(child.cost for child in outsource.line_out_ids) + outsource.outsource_fee
-            outsource.apportion_cost(cost)
+        for Outsource in self:
+            cost = sum(child.cost for child in Outsource.line_out_ids) + \
+                outsource.Outsource_fee
+            Outsource.apportion_cost(cost)
         return True
 
     @api.multi
@@ -692,14 +709,15 @@ class outsource(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
-        vals.update({'finance_category_id': self.env.ref('finance.categ_outsource').id})
-        self = super(outsource, self).create(vals)
+        vals.update({'finance_category_id': self.env.ref(
+            'finance.categ_outsource').id})
+        self = super(Outsource, self).create(vals)
         self.update_parent_cost()
         return self
 
     @api.multi
     def write(self, vals):
-        res = super(outsource, self).write(vals)
+        res = super(Outsource, self).write(vals)
         self.update_parent_cost()
         return res
 
@@ -712,16 +730,16 @@ class outsource(models.Model):
     def _create_money_invoice(self):
         categ = self.env.ref('money.core_category_purchase')
         source_id = self.env['money.invoice'].create({
-                                'name': self.name,
-                                'partner_id': self.outsource_partner_id.id,
-                                'category_id': categ.id,
-                                'date': fields.Date.context_today(self),
-                                'amount': self.outsource_fee,
-                                'reconciled': 0,
-                                'to_reconcile': self.outsource_fee,
-                                'date_due': fields.Date.context_today(self),
-                                'note': self.note or '',
-                            })
+            'name': self.name,
+            'partner_id': self.outsource_partner_id.id,
+            'category_id': categ.id,
+            'date': fields.Date.context_today(self),
+            'amount': self.outsource_fee,
+            'reconciled': 0,
+            'to_reconcile': self.outsource_fee,
+            'date_due': fields.Date.context_today(self),
+            'note': self.note or '',
+        })
         if source_id:
             self.invoice_id = source_id.id
         return source_id
@@ -729,7 +747,7 @@ class outsource(models.Model):
     def create_voucher_line(self, data):
         return [self.env['voucher.line'].create(data_line) for data_line in data]
 
-    def create_vourcher_line_data(self, outsource, voucher_row):
+    def create_vourcher_line_data(self, Outsource, voucher_row):
         """
         准备入库凭证行数据
         借：库存商品（商品上）
@@ -740,19 +758,19 @@ class outsource(models.Model):
         """
         line_out_data, line_in_data = [], []
         line_out_credit = 0.0
-        for line_out in outsource.line_out_ids:
+        for line_out in Outsource.line_out_ids:
             if line_out.cost:
                 line_out_credit += line_out.cost
 
-        if line_out_credit: # 贷方行
+        if line_out_credit:  # 贷方行
             account_id = self.finance_category_id.account_id.id
             line_out_data.append({'credit': line_out_credit,
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
                                   'account_id': account_id,
-                                  'name': u'%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')
+                                  'name': u'%s 原料 %s' % (outsource.move_id.name, Outsource.move_id.note or '')
                                   })
-        for line_in in outsource.line_in_ids: # 借方行
+        for line_in in Outsource.line_in_ids:  # 借方行
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
@@ -760,11 +778,11 @@ class outsource(models.Model):
                                      'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
-                                     'name': u'%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
+                                     'name': u'%s 成品 %s' % (outsource.move_id.name, Outsource.move_id.note or '')
                                      })
         return line_out_data + line_in_data
 
-    def pre_out_vourcher_line_data(self, outsource, voucher):
+    def pre_out_vourcher_line_data(self, Outsource, voucher):
         """
         准备出库凭证行数据
         借：委托加工物资（核算分类上）
@@ -775,19 +793,19 @@ class outsource(models.Model):
         """
         line_out_data, line_in_data = [], []
         line_out_debit = 0.0
-        for line_out in outsource.line_out_ids:
+        for line_out in Outsource.line_out_ids:
             if line_out.cost:
                 line_out_debit += line_out.cost
 
-        if line_out_debit: # 借方行
+        if line_out_debit:  # 借方行
             account_id = self.finance_category_id.account_id.id
             line_in_data.append({'debit': line_out_debit,
-                                  'goods_id': False,
-                                  'voucher_id': voucher.id,
-                                  'account_id': account_id,
-                                  'name': u'%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
-                                  })
-        for line_out in outsource.line_out_ids: # 贷方行
+                                 'goods_id': False,
+                                 'voucher_id': voucher.id,
+                                 'account_id': account_id,
+                                 'name': u'%s 成品 %s' % (outsource.move_id.name, Outsource.move_id.note or '')
+                                 })
+        for line_out in Outsource.line_out_ids:  # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost,
@@ -795,10 +813,10 @@ class outsource(models.Model):
                                       'goods_qty': line_out.goods_qty,
                                       'voucher_id': voucher.id,
                                       'account_id': account_id,
-                                      'name': u'%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')})
+                                      'name': u'%s 原料 %s' % (outsource.move_id.name, Outsource.move_id.note or '')})
         return line_out_data + line_in_data
 
-    def outsource_create_voucher_line(self, outsource, voucher_row):
+    def outsource_create_voucher_line(self, Outsource, voucher_row):
         """
         创建入库凭证行
         :param outsource: 委外加工单
@@ -806,23 +824,24 @@ class outsource(models.Model):
         :return:
         """
         voucher_line_data = []
-        if outsource.outsource_fee:
-            account_row = outsource.create_uid.company_id.operating_cost_account_id # 公司上的生产费用科目
+        if Outsource.outsource_fee:
+            account_row = Outsource.create_uid.company_id.operating_cost_account_id  # 公司上的生产费用科目
             # 贷方行
             voucher_line_data.append({'name': u'委外费用', 'account_id': account_row.id,
-                                      'credit': outsource.outsource_fee, 'voucher_id': voucher_row.id})
+                                      'credit': Outsource.outsource_fee, 'voucher_id': voucher_row.id})
 
-        voucher_line_data += self.create_vourcher_line_data(outsource, voucher_row)
+        voucher_line_data += self.create_vourcher_line_data(
+            Outsource, voucher_row)
         self.create_voucher_line(voucher_line_data)
 
-    def create_out_voucher_line(self, outsource, voucher):
+    def create_out_voucher_line(self, Outsource, voucher):
         """
         创建出库凭证行
         :param outsource: 委外加工单
         :param voucher: 出库凭证
         :return:
         """
-        voucher_line_data = self.pre_out_vourcher_line_data(outsource, voucher)
+        voucher_line_data = self.pre_out_vourcher_line_data(Outsource, voucher)
 
         self.create_voucher_line(voucher_line_data)
 
@@ -831,11 +850,11 @@ class outsource(models.Model):
         生成入库凭证并审核
         :return:
         """
-        for outsource in self:
-            voucher_row = self.env['voucher'].create({'date': outsource.date})
-            self.outsource_create_voucher_line(outsource, voucher_row)  # 入库凭证
+        for Outsource in self:
+            voucher_row = self.env['voucher'].create({'date': Outsource.date})
+            self.outsource_create_voucher_line(Outsource, voucher_row)  # 入库凭证
 
-            outsource.voucher_id = voucher_row.id
+            Outsource.voucher_id = voucher_row.id
             voucher_row.voucher_done()
 
     def create_out_voucher(self):
@@ -843,11 +862,11 @@ class outsource(models.Model):
         生成出库凭证并审核
         :return:
         """
-        for outsource in self:
-            out_voucher = self.env['voucher'].create({'date': outsource.date})
-            self.create_out_voucher_line(outsource, out_voucher)  # 出库凭证
+        for Outsource in self:
+            out_voucher = self.env['voucher'].create({'date': Outsource.date})
+            self.create_out_voucher_line(Outsource, out_voucher)  # 出库凭证
 
-            outsource.out_voucher_id = out_voucher.id
+            Outsource.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     @api.multi
@@ -870,15 +889,15 @@ class outsource(models.Model):
         for order in self:
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
-            order.move_id.check_qc_result() # 检验质检报告是否上传
-            order.line_in_ids.action_done() # 完成成品入库
+            order.move_id.check_qc_result()  # 检验质检报告是否上传
+            order.line_in_ids.action_done()  # 完成成品入库
 
             # 如果委外费用存在，生成 结算单
             if order.outsource_fee:
                 order._create_money_invoice()
 
             order.update_parent_cost()
-            order.outsource_create_voucher() # 生成入库凭证并审核
+            order.outsource_create_voucher()  # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -906,7 +925,7 @@ class outsource(models.Model):
             order.move_id.state = 'draft'
 
 
-class wh_disassembly(models.Model):
+class WhDisassembly(models.Model):
     _name = 'wh.disassembly'
     _description = u'拆卸单'
     _inherit = ['mail.thread']
@@ -929,12 +948,14 @@ class wh_disassembly(models.Model):
         'wh.bom', u'物料清单', domain=[('type', '=', 'disassembly')],
         context={'type': 'disassembly'}, ondelete='restrict',
         readonly=True,
-        states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+        states={'draft': [('readonly', False)], 'feeding': [
+            ('readonly', False)]},
         help=u'拆卸单对应的物料清单')
     fee = fields.Float(
         u'拆卸费用', digits=dp.get_precision('Amount'),
         readonly=True,
-        states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+        states={'draft': [('readonly', False)], 'feeding': [
+            ('readonly', False)]},
         help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
     is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
                             视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
@@ -944,10 +965,13 @@ class wh_disassembly(models.Model):
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},)
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
-                             states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},
+                             states={'draft': [('readonly', False)], 'feeding': [
+                                 ('readonly', False)]},
                              help=u"(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
-    voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
-    out_voucher_id = fields.Many2one('voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
+    voucher_id = fields.Many2one(
+        'voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
+    out_voucher_id = fields.Many2one(
+        'voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -969,18 +993,18 @@ class wh_disassembly(models.Model):
                 child_cost = safe_division(amount, amount_total) * cost
                 collect_child_cost += child_cost
                 child.write({
-                        'cost_unit': safe_division(
+                    'cost_unit': safe_division(
                             child_cost, child.goods_qty),
-                        'cost': child_cost,
-                    })
+                    'cost': child_cost,
+                })
 
             # 最后一行数据使用总金额减去已经消耗的金额来计算
             last_child_cost = cost - collect_child_cost
             collects[-1][0].write({
-                    'cost_unit': safe_division(
-                        last_child_cost, collects[-1][0].goods_qty),
-                    'cost': last_child_cost,
-                })
+                'cost_unit': safe_division(
+                    last_child_cost, collects[-1][0].goods_qty),
+                'cost': last_child_cost,
+            })
 
         return True
 
@@ -1014,7 +1038,7 @@ class wh_disassembly(models.Model):
             if line_in.cost:
                 line_in_credit += line_in.cost
 
-        if line_in_credit: # 贷方行
+        if line_in_credit:  # 贷方行
             account_id = self.finance_category_id.account_id.id
             line_out_data.append({'credit': line_in_credit,
                                   'goods_id': False,
@@ -1022,7 +1046,7 @@ class wh_disassembly(models.Model):
                                   'account_id': account_id,
                                   'name': u'%s 原料 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
                                   })
-        for line_in in disassembly.line_in_ids: # 借方行
+        for line_in in disassembly.line_in_ids:  # 借方行
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
@@ -1048,23 +1072,23 @@ class wh_disassembly(models.Model):
         for line_out in disassembly.line_out_ids:
             line_out_debit += line_out.cost
 
-        if line_out_debit: # 借方行
+        if line_out_debit:  # 借方行
             account_id = self.finance_category_id.account_id.id
             line_in_data.append({'debit': line_out_debit,
-                                  'goods_id': False,
-                                  'voucher_id': voucher.id,
-                                  'account_id': account_id,
-                                  'name': u'%s 成品 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
-                                  })
-        for line_out in disassembly.line_out_ids: # 贷方行
+                                 'goods_id': False,
+                                 'voucher_id': voucher.id,
+                                 'account_id': account_id,
+                                 'name': u'%s 成品 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
+                                 })
+        for line_out in disassembly.line_out_ids:  # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost + disassembly.fee,
-                                    'goods_id': line_out.goods_id.id,
-                                    'goods_qty': line_out.goods_qty,
-                                    'voucher_id': voucher.id,
-                                    'account_id': account_id,
-                                    'name': u'%s 原料 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')})
+                                      'goods_id': line_out.goods_id.id,
+                                      'goods_qty': line_out.goods_qty,
+                                      'voucher_id': voucher.id,
+                                      'account_id': account_id,
+                                      'name': u'%s 原料 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')})
         return line_out_data + line_in_data
 
     def wh_disassembly_create_voucher_line(self, disassembly, voucher_row):
@@ -1075,7 +1099,8 @@ class wh_disassembly(models.Model):
         :return:
         """
         voucher_line_data = []
-        voucher_line_data += self.create_vourcher_line_data(disassembly, voucher_row)
+        voucher_line_data += self.create_vourcher_line_data(
+            disassembly, voucher_row)
         self.create_voucher_line(voucher_line_data)
 
     def create_out_voucher_line(self, disassembly, voucher):
@@ -1091,7 +1116,8 @@ class wh_disassembly(models.Model):
             account = disassembly.create_uid.company_id.operating_cost_account_id
             voucher_line_data.append({'name': u'拆卸费用', 'account_id': account.id,
                                       'debit': disassembly.fee, 'voucher_id': voucher.id})
-        voucher_line_data += self.pre_out_vourcher_line_data(disassembly, voucher)
+        voucher_line_data += self.pre_out_vourcher_line_data(
+            disassembly, voucher)
 
         self.create_voucher_line(voucher_line_data)
 
@@ -1101,8 +1127,10 @@ class wh_disassembly(models.Model):
         :return:
         """
         for disassembly in self:
-            voucher_row = self.env['voucher'].create({'date': disassembly.date})
-            self.wh_disassembly_create_voucher_line(disassembly, voucher_row)   # 入库凭证
+            voucher_row = self.env['voucher'].create(
+                {'date': disassembly.date})
+            self.wh_disassembly_create_voucher_line(
+                disassembly, voucher_row)   # 入库凭证
             disassembly.voucher_id = voucher_row.id
             voucher_row.voucher_done()
 
@@ -1112,7 +1140,8 @@ class wh_disassembly(models.Model):
         :return:
         """
         for disassembly in self:
-            out_voucher = self.env['voucher'].create({'date': disassembly.date})
+            out_voucher = self.env['voucher'].create(
+                {'date': disassembly.date})
             self.create_out_voucher_line(disassembly, out_voucher)  # 出库凭证
             disassembly.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
@@ -1136,11 +1165,11 @@ class wh_disassembly(models.Model):
         for order in self:
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
-            order.move_id.check_qc_result() # 检验质检报告是否上传
-            order.line_in_ids.action_done() # 完成成品入库
+            order.move_id.check_qc_result()  # 检验质检报告是否上传
+            order.line_in_ids.action_done()  # 完成成品入库
 
             order.update_child_cost()
-            order.wh_disassembly_create_voucher() # 生成入库凭证并审核
+            order.wh_disassembly_create_voucher()  # 生成入库凭证并审核
 
             order.approve_uid = self.env.uid
             order.approve_date = fields.Datetime.now(self)
@@ -1177,14 +1206,15 @@ class wh_disassembly(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
-        vals.update({'finance_category_id': self.env.ref('finance.categ_ass_disass').id})
-        self = super(wh_disassembly, self).create(vals)
+        vals.update({'finance_category_id': self.env.ref(
+            'finance.categ_ass_disass').id})
+        self = super(WhDisassembly, self).create(vals)
         self.update_child_cost()
         return self
 
     @api.multi
     def write(self, vals):
-        res = super(wh_disassembly, self).write(vals)
+        res = super(WhDisassembly, self).write(vals)
         self.update_child_cost()
         return res
 
@@ -1220,36 +1250,36 @@ class wh_disassembly(models.Model):
         parent_line = self.bom_id.line_parent_ids
         if warehouse_id and self.bom_id and parent_line and self.bom_id.line_child_ids:
             cost, cost_unit = parent_line.goods_id \
-                 .get_suggested_cost_by_warehouse(
-                 warehouse_id, self.goods_qty)
+                .get_suggested_cost_by_warehouse(
+                    warehouse_id, self.goods_qty)
 
             line_out_ids.append({
-                 'goods_id': parent_line.goods_id.id,
-                 'attribute_id': parent_line.attribute_id.id,
-                 'warehouse_id': self.env[
-                     'warehouse'].get_warehouse_by_type('production').id,
-                 'warehouse_dest_id': warehouse_id.id,
-                 'uom_id': parent_line.goods_id.uom_id.id,
-                 'goods_qty': self.goods_qty,
-                 'goods_uos_qty': self.goods_qty / parent_line.goods_id.conversion,
-                 'uos_id':parent_line.goods_id.uos_id.id,
-                 'cost_unit': cost_unit,
-                 'cost': cost,
-                 'type': 'out',
-             })
+                'goods_id': parent_line.goods_id.id,
+                'attribute_id': parent_line.attribute_id.id,
+                'warehouse_id': self.env[
+                    'warehouse'].get_warehouse_by_type('production').id,
+                'warehouse_dest_id': warehouse_id.id,
+                'uom_id': parent_line.goods_id.uom_id.id,
+                'goods_qty': self.goods_qty,
+                'goods_uos_qty': self.goods_qty / parent_line.goods_id.conversion,
+                'uos_id': parent_line.goods_id.uos_id.id,
+                'cost_unit': cost_unit,
+                'cost': cost,
+                'type': 'out',
+            })
 
             line_in_ids = [{
-                            'goods_id': line.goods_id.id,
-                            'attribute_id': line.attribute_id.id,
-                            'warehouse_id': warehouse_id.id,
-                            'warehouse_dest_id': self.env[
-                                'warehouse'].get_warehouse_by_type('production').id,
-                            'uom_id': line.goods_id.uom_id.id,
-                            'goods_qty': line.goods_qty / parent_line.goods_qty * self.goods_qty,
-                            'goods_uos_qty': line.goods_qty / parent_line.goods_qty * self.goods_qty / line.goods_id.conversion,
-                            'uos_id':line.goods_id.uos_id.id,
-                            'type': 'in',
-                        } for line in self.bom_id.line_child_ids]
+                'goods_id': line.goods_id.id,
+                'attribute_id': line.attribute_id.id,
+                'warehouse_id': warehouse_id.id,
+                'warehouse_dest_id': self.env[
+                    'warehouse'].get_warehouse_by_type('production').id,
+                'uom_id': line.goods_id.uom_id.id,
+                'goods_qty': line.goods_qty / parent_line.goods_qty * self.goods_qty,
+                'goods_uos_qty': line.goods_qty / parent_line.goods_qty * self.goods_qty / line.goods_id.conversion,
+                'uos_id':line.goods_id.uos_id.id,
+                'type': 'in',
+            } for line in self.bom_id.line_child_ids]
 
             self.line_in_ids = False
             self.line_out_ids = False
@@ -1272,18 +1302,18 @@ class wh_disassembly(models.Model):
                     .get_suggested_cost_by_warehouse(
                         warehouse_id, line.goods_qty)
                 line_out_ids.append({
-                        'goods_id': line.goods_id,
-                        'warehouse_id': self.env[
-                            'warehouse'].get_warehouse_by_type('production').id,
-                        'warehouse_dest_id': warehouse_id.id,
-                        'uom_id': line.goods_id.uom_id.id,
-                        'goods_qty': line.goods_qty,
-                        'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
-                        'uos_id':line.goods_id.uos_id.id,
-                        'cost_unit': cost_unit,
-                        'cost': cost,
-                        'type': 'out',
-                    })
+                    'goods_id': line.goods_id,
+                    'warehouse_id': self.env[
+                        'warehouse'].get_warehouse_by_type('production').id,
+                    'warehouse_dest_id': warehouse_id.id,
+                    'uom_id': line.goods_id.uom_id.id,
+                    'goods_qty': line.goods_qty,
+                    'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
+                    'uos_id': line.goods_id.uos_id.id,
+                    'cost_unit': cost_unit,
+                    'cost': cost,
+                    'type': 'out',
+                })
 
             line_in_ids = [{
                 'goods_id': line.goods_id.id,
@@ -1316,8 +1346,6 @@ class wh_disassembly(models.Model):
         if line_in_ids:
             self.line_in_ids = line_in_ids
         return {'domain': domain}
-
-
 
     @api.multi
     def update_bom(self):
@@ -1353,17 +1381,17 @@ class wh_disassembly(models.Model):
                     'line_child_ids': line_child_ids})
             else:
                 bom_id = self.env['wh.bom'].create({
-                        'name': name,
-                        'type': 'disassembly',
-                        'line_parent_ids': line_parent_ids,
-                        'line_child_ids': line_child_ids,
-                    })
+                    'name': name,
+                    'type': 'disassembly',
+                    'line_parent_ids': line_parent_ids,
+                    'line_child_ids': line_child_ids,
+                })
                 disassembly.bom_id = bom_id
 
         return True
 
 
-class wh_bom(osv.osv):
+class WhBom(osv.osv):
     _name = 'wh.bom'
     _description = u'物料清单'
 
@@ -1394,7 +1422,7 @@ class wh_bom(osv.osv):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class wh_bom_line(osv.osv):
+class WhBomLine(osv.osv):
     _name = 'wh.bom.line'
     _description = u'物料清单明细'
 
@@ -1414,7 +1442,7 @@ class wh_bom_line(osv.osv):
     goods_qty = fields.Float(
         u'数量', digits=dp.get_precision('Quantity'),
         help=u'子件行/组合件行上的商品数量')
-    attribute_id=fields.Many2one('attribute', u'属性', ondelete='restrict')
+    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

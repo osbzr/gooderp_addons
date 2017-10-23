@@ -8,13 +8,13 @@
     "version": "11.11",
     "category": "Themes/Backend",
     "website": "http://www.openworx.nl",
-	"description": """
+    "description": """
 		Backend theme for Odoo 10.0 community edition.
 		The app dashboard is based on the module web_responsive from LasLabs Inc and the theme on Bootstrap United.
     """,
-	'images':[
-        'images/screen.png'
-	],
+    'images': [
+            'images/screen.png'
+    ],
     "author": "Openworx",
     "license": "LGPL-3",
     "installable": True,
@@ -25,6 +25,5 @@
         'views/assets.xml',
         'views/web.xml',
     ],
-    'auto_install':True,
+    'auto_install': True,
 }
-

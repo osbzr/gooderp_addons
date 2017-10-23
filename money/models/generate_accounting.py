@@ -21,7 +21,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class money_invoice(models.Model):
+class MoneyInvoice(models.Model):
     _inherit = 'money.invoice'
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
                                  copy=False,
@@ -33,14 +33,15 @@ class money_invoice(models.Model):
         反审核结算单时，反审核凭证
         :return: 
         """
-        res = super(money_invoice, self).money_invoice_draft()
+        res = super(MoneyInvoice, self).money_invoice_draft()
         for invoice in self:
             voucher, invoice.voucher_id = invoice.voucher_id, False
             if voucher.state == 'done':
                 voucher.voucher_draft()
             # 始初化单反审核只删除明细行：生成初始化凭证时，不生成往来单位对方的科目，所以要删除相关明细行
             if invoice.is_init:
-                vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
+                vouch_obj = self.env['voucher'].search(
+                    [('id', '=', voucher.id)])
                 vouch_obj_lines = self.env['voucher.line'].search([
                     ('voucher_id', '=', vouch_obj.id),
                     ('partner_id', '=', invoice.partner_id.id),
@@ -57,14 +58,16 @@ class money_invoice(models.Model):
         审核结算单时，创建凭证并审核
         :return: 
         """
-        res = super(money_invoice, self).money_invoice_done()
+        res = super(MoneyInvoice, self).money_invoice_done()
         vals = {}
         # 初始化单的话，先找是否有初始化凭证，没有则新建一个
         for invoice in self:
             if invoice.is_init:
-                vouch_obj = self.env['voucher'].search([('is_init', '=', True)])
+                vouch_obj = self.env['voucher'].search(
+                    [('is_init', '=', True)])
                 if not vouch_obj:
-                    vouch_obj = self.env['voucher'].create({'date': invoice.date})
+                    vouch_obj = self.env['voucher'].create(
+                        {'date': invoice.date})
                 invoice.write({'voucher_id': vouch_obj.id})
                 vouch_obj.is_init = True
             else:
@@ -80,16 +83,16 @@ class money_invoice(models.Model):
                 vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': invoice.partner_id.id, 'name': invoice.name, 'string': invoice.note or '',
                              'amount': invoice.amount, 'credit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
                              'debit_account_id': partner_account_id, 'sell_tax_amount': invoice.tax_amount or 0,
-                             'credit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '',
-                             'rate_silent':self.env['res.currency'].get_rate_silent(self.date, invoice.currency_id.id) or 0,
+                             'credit_auxiliary_id': invoice.auxiliary_id.id, 'currency_id': invoice.currency_id.id or '',
+                             'rate_silent': self.env['res.currency'].get_rate_silent(self.date, invoice.currency_id.id) or 0,
                              })
             else:
                 vals.update({'vouch_obj_id': vouch_obj.id, 'name': invoice.name, 'string': invoice.note or '',
                              'amount': invoice.amount, 'credit_account_id': partner_account_id,
                              'debit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
-                             'partner_credit':invoice.partner_id.id, 'buy_tax_amount': invoice.tax_amount or 0,
-                             'debit_auxiliary_id':invoice.auxiliary_id.id, 'currency_id':invoice.currency_id.id or '',
-                             'rate_silent':self.env['res.currency'].get_rate_silent(self.date, invoice.currency_id.id) or 0,
+                             'partner_credit': invoice.partner_id.id, 'buy_tax_amount': invoice.tax_amount or 0,
+                             'debit_auxiliary_id': invoice.auxiliary_id.id, 'currency_id': invoice.currency_id.id or '',
+                             'rate_silent': self.env['res.currency'].get_rate_silent(self.date, invoice.currency_id.id) or 0,
                              })
             if invoice.is_init:
                 vals.update({'init_obj': 'money_invoice', })
@@ -116,10 +119,11 @@ class money_invoice(models.Model):
         # 把税从金额中减去
         if vals.get('buy_tax_amount'):  # 如果传入了进项税
             debit = vals.get('amount') - vals.get('buy_tax_amount')
-        if vals.get('sell_tax_amount'): # 如果传入了销项税
+        if vals.get('sell_tax_amount'):  # 如果传入了销项税
             credit = vals.get('amount') - sell_tax_amount
         # 借方行
-        currency_id = vals.get('currency_id') or self.env.user.company_id.currency_id.id
+        currency_id = vals.get(
+            'currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id:  # 结算单上是外币
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('name'), vals.get('string')),
@@ -127,11 +131,11 @@ class money_invoice(models.Model):
                 'debit': debit,
                 'voucher_id': vals.get('vouch_obj_id'),
                 'partner_id': vals.get('partner_debit', ''),
-                'auxiliary_id':vals.get('debit_auxiliary_id', False),
-                'currency_id':vals.get('currency_id'),
+                'auxiliary_id': vals.get('debit_auxiliary_id', False),
+                'currency_id': vals.get('currency_id'),
                 'currency_amount': vals.get('amount'),
-                'rate_silent':vals.get('rate_silent'),
-                'init_obj':vals.get('init_obj', False),
+                'rate_silent': vals.get('rate_silent'),
+                'init_obj': vals.get('init_obj', False),
             })
         else:   # 结算单上是本位币
             self.env['voucher.line'].create({
@@ -140,8 +144,8 @@ class money_invoice(models.Model):
                 'debit': debit,
                 'voucher_id': vals.get('vouch_obj_id'),
                 'partner_id': vals.get('partner_debit', ''),
-                'auxiliary_id':vals.get('debit_auxiliary_id', False),
-                'init_obj':vals.get('init_obj', False),
+                'auxiliary_id': vals.get('debit_auxiliary_id', False),
+                'init_obj': vals.get('init_obj', False),
             })
         # 进项税行
         if vals.get('buy_tax_amount'):
@@ -152,7 +156,8 @@ class money_invoice(models.Model):
                 'account_id': self.env.user.company_id.import_tax_account.id, 'debit': vals.get('buy_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
             })
         # 贷方行
-        currency_id = vals.get('currency_id') or self.env.user.company_id.currency_id.id
+        currency_id = vals.get(
+            'currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id:
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('name'), vals.get('string')),
@@ -160,10 +165,10 @@ class money_invoice(models.Model):
                 'account_id': vals.get('credit_account_id'),
                 'credit': credit,
                 'voucher_id': vals.get('vouch_obj_id'),
-                'auxiliary_id':vals.get('credit_auxiliary_id', False),
+                'auxiliary_id': vals.get('credit_auxiliary_id', False),
                 'currency_amount': vals.get('amount'),
-                'rate_silent':vals.get('rate_silent'), 'currency_id':vals.get('currency_id'),
-                'init_obj':vals.get('init_obj', False),
+                'rate_silent': vals.get('rate_silent'), 'currency_id': vals.get('currency_id'),
+                'init_obj': vals.get('init_obj', False),
             })
         else:
             self.env['voucher.line'].create({
@@ -172,16 +177,17 @@ class money_invoice(models.Model):
                 'account_id': vals.get('credit_account_id'),
                 'credit': credit,
                 'voucher_id': vals.get('vouch_obj_id'),
-                'auxiliary_id':vals.get('credit_auxiliary_id', False),
-                'init_obj':vals.get('init_obj', False),
+                'auxiliary_id': vals.get('credit_auxiliary_id', False),
+                'init_obj': vals.get('init_obj', False),
             })
         # 销项税行
         if vals.get('sell_tax_amount'):
-            if not self.env.user.company_id.output_tax_account:            
-                raise UserError(u'您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
+            if not self.env.user.company_id.output_tax_account:
+                raise UserError(
+                    u'您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
             self.env['voucher.line'].create({
                 'name': u"%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': self.env.user.company_id.output_tax_account.id, 'credit': sell_tax_amount, 'voucher_id': vals.get('vouch_obj_id'),
-        })
+            })
 
         return True

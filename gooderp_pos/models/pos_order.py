@@ -129,7 +129,8 @@ class PosOrder(models.Model):
     def _compute_amount_all(self):
         for order in self:
             order.amount_paid = 0.0
-            order.amount_paid = sum(payment.amount for payment in order.payment_line_ids)
+            order.amount_paid = sum(
+                payment.amount for payment in order.payment_line_ids)
             order.amount_total = sum(line.subtotal for line in order.line_ids)
 
     def data_handling(self, order_data):
@@ -138,11 +139,13 @@ class PosOrder(models.Model):
         line_data_list = [[0, 0, {'goods_id': line[2].get('product_id'),
                                   'qty': line[2].get('qty'),
                                   'price': line[2].get('price_unit'),
-                                  'discount_amount': line[2].get('discount')*\
-                                                     line[2].get('price_unit') * line[2].get('qty')/100,
+                                  'discount_amount': line[2].get('discount') *
+                                  line[2].get('price_unit') *
+                                  line[2].get('qty') / 100,
                                   'discount_rate': line[2].get('discount'),
-                                  'subtotal': line[2].get('price_unit') * line[2].get('qty') - \
-                                              line[2].get('discount') * line[2].get('price_unit') * line[2].get('qty')/100
+                                  'subtotal': line[2].get('price_unit') * line[2].get('qty') -
+                                  line[2].get(
+                                      'discount') * line[2].get('price_unit') * line[2].get('qty') / 100
                                   }]
                           for line in order_data.get('lines')]
         prec_amt = self.env['decimal.precision'].precision_get('Amount')
@@ -156,7 +159,8 @@ class PosOrder(models.Model):
                 }))
         pos_order_data = dict(
             session_id=order_data.get('pos_session_id'),
-            partner_id=order_data.get('partner_id') or self.env.ref('gooderp_pos.pos_partner').id,
+            partner_id=order_data.get('partner_id') or self.env.ref(
+                'gooderp_pos.pos_partner').id,
             user_id=order_data.get('user_id') or 1,
             line_ids=line_data_list,
             date=order_data.get('creation_date'),
@@ -190,7 +194,8 @@ class PosOrder(models.Model):
             records = pos_order.create_sell_delivery()
             invoice_ids = [record.invoice_id for record in records]
             # 生成收款单，并审核
-            pos_order.create_money_order(invoice_ids, pos_order.payment_line_ids)
+            pos_order.create_money_order(
+                invoice_ids, pos_order.payment_line_ids)
         return order_ids
 
     def _payment_fields(self, ui_paymentline):
@@ -251,13 +256,15 @@ class PosOrder(models.Model):
                 else:
                     delivery_line.append(order._get_delivery_line(line))
             if delivery_line:
-                sell_delivery = order._generate_delivery(delivery_line, is_return=False)
+                sell_delivery = order._generate_delivery(
+                    delivery_line, is_return=False)
                 sell_delivery.sell_delivery_done()
                 if sell_delivery.state != 'done':   # fixme:缺货时如何处理
                     raise UserError(u'发货单不能完成审核')
                 records.append(sell_delivery)
             if return_line:
-                sell_return = order._generate_delivery(return_line, is_return=True)
+                sell_return = order._generate_delivery(
+                    return_line, is_return=True)
                 sell_return.sell_delivery_done()
                 if sell_return.state != 'done':
                     raise UserError(u'退货单不能完成审核')
@@ -403,7 +410,7 @@ class SellDelivery(models.Model):
     """
     POS 和 gooderp结合 订单部分的主要内容.
     """
-    #TODO:估计还有很多字段上的关联要添加,这个还得进一步的测试.
+    # TODO:估计还有很多字段上的关联要添加,这个还得进一步的测试.
 
     pos_order_id = fields.Many2one(
         'pos.order',

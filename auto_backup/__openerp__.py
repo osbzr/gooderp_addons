@@ -24,11 +24,11 @@
 ##############################################################################
 
 {
-    "name" : "Database Auto-Backup",
-    "version" : "11.11",
-    "author" : "Tiny,MrShelly,JianJian",
-    "website" : "http://www.openerp.com",
-    "category" : "Generic Modules",
+    "name": "Database Auto-Backup",
+    "version": "11.11",
+    "author": "Tiny,MrShelly,JianJian",
+    "website": "http://www.openerp.com",
+    "category": "Generic Modules",
     "description": """The generic Open ERP Database Auto-Backup system enables the user to make configurations for the automatic backup of the database.
 User simply requires to specify host & port under IP Configuration & database(on specified host running at specified port) and backup directory(in which all the backups of the specified database will be stored) under Database Configuration.
 
@@ -38,8 +38,8 @@ Automatic backup for all such configured databases under this can then be schedu
 2) Schedule new action(create a new record)
 3) Set 'Object' to 'db.backup' and 'Function' to 'schedule_backup' under page 'Technical Data'
 4) Set other values as per your preference""",
-    "depends" : ['core'],
-    "data" : ["views/bkp_conf_view.xml",
+    "depends": ['core'],
+    "data": ["views/bkp_conf_view.xml",
               "security/ir.model.access.csv",
               "data/backup_data.xml"],
     'demo': [

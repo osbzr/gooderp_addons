@@ -4,7 +4,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
 
 
-class supplier_statements_report(models.Model):
+class SupplierStatementsReport(models.Model):
     _name = "supplier.statements.report"
     _description = u"供应商对账单"
     _auto = False
@@ -22,7 +22,8 @@ class supplier_statements_report(models.Model):
             before_balance = pre_record.balance_amount
         else:
             before_balance = 0
-        self.balance_amount += before_balance + self.amount - self.pay_amount + self.discount_money
+        self.balance_amount += before_balance + \
+            self.amount - self.pay_amount + self.discount_money
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)

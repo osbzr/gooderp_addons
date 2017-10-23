@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class sell_order_detail_wizard(models.TransientModel):
+class SellOrderDetailWizard(models.TransientModel):
     _name = 'sell.order.detail.wizard'
     _description = u'销售明细表向导'
 
@@ -40,7 +40,8 @@ class sell_order_detail_wizard(models.TransientModel):
         '''向导上的确定按钮'''
         self.ensure_one()
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！\n所选开始日期:%s所选结束日期:%s'%(self.date_start, self.date_end))
+            raise UserError(u'开始日期不能大于结束日期！\n所选开始日期:%s所选结束日期:%s' %
+                            (self.date_start, self.date_end))
 
         domain = [('date', '>=', self.date_start),
                   ('date', '<=', self.date_end),
@@ -62,7 +63,7 @@ class sell_order_detail_wizard(models.TransientModel):
             'view_type': 'form',
             'view_mode': 'tree,pivot',
             'view_id': False,
-            'views': [(view.id, 'tree'),(graph_view.id,'graph')],
+            'views': [(view.id, 'tree'), (graph_view.id, 'graph')],
             'res_model': 'sell.order.detail',
             'type': 'ir.actions.act_window',
             'domain': domain,

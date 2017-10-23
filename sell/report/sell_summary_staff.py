@@ -5,7 +5,7 @@ from odoo import fields, models, api
 import datetime
 
 
-class sell_summary_staff(models.Model):
+class SellSummaryStaff(models.Model):
     _name = 'sell.summary.staff'
     _inherit = 'report.base'
     _description = u'销售汇总表（按销售人员）'
@@ -115,18 +115,18 @@ class sell_summary_staff(models.Model):
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
             'user_id': context.get('user_id') and
-                context.get('user_id')[0] or '',
+            context.get('user_id')[0] or '',
             'goods_id': context.get('goods_id') and
-                context.get('goods_id')[0] or '',
+            context.get('goods_id')[0] or '',
             'goods_categ_id': context.get('goods_categ_id') and
-                context.get('goods_categ_id')[0] or '',
+            context.get('goods_categ_id')[0] or '',
             'warehouse_id': context.get('warehouse_id') and
-                context.get('warehouse_id')[0] or '',
+            context.get('warehouse_id')[0] or '',
         }
 
     def _compute_order(self, result, order):
         order = order or 'user_id ASC'
-        return super(sell_summary_staff, self)._compute_order(result, order)
+        return super(SellSummaryStaff, self)._compute_order(result, order)
 
     def collect_data_by_sql(self, sql_type='out'):
         collection = self.execute_sql(sql_type='out')
@@ -145,7 +145,7 @@ class sell_summary_staff(models.Model):
             if line.get('id') == self.id:
                 line_ids = line.get('id_lists')
                 move_lines = self.env['wh.move.line'].search(
-                        [('id', 'in', line_ids)])
+                    [('id', 'in', line_ids)])
 
         for move_line in move_lines:
             details = self.env['sell.order.detail'].search(

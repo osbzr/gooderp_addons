@@ -9,7 +9,7 @@
                         该模块为工资模块，可计提工资，工资可以二个提取，月末一次计提，次月（发放前）一次补提一次！
     ''',
     'version': '11.11',
-    'depends': ['staff','money'],
+    'depends': ['staff', 'money'],
     'data': [
         'views/wages_view.xml',
         'views/wages_action.xml',

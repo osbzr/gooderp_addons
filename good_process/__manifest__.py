@@ -13,7 +13,7 @@
         'views/good_process.xml',
         'security/ir.model.access.csv',
     ],
-    "depends":[
+    "depends": [
         'core',
     ],
     'qweb': [

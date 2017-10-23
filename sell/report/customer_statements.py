@@ -25,7 +25,7 @@ import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
 
 
-class customer_statements_report(models.Model):
+class CustomerStatementsReport(models.Model):
     _inherit = "customer.statements.report"
     _auto = False
 
@@ -130,10 +130,10 @@ class customer_statements_report(models.Model):
         for model, view_dict in model_view.iteritems():
             res = self.env[model].search([('name', '=', self.name)])
             name = model == 'sell.delivery' and res.is_return and \
-                   view_dict['name_return'] or view_dict['name']
+                view_dict['name_return'] or view_dict['name']
             view = model == 'sell.delivery' and res.is_return and \
-                   self.env.ref(view_dict['view_return']) \
-                   or self.env.ref(view_dict['view'])
+                self.env.ref(view_dict['view_return']) \
+                or self.env.ref(view_dict['view'])
             if res:
                 return {
                     'name': name,
@@ -147,7 +147,7 @@ class customer_statements_report(models.Model):
         raise UserError(u'期初余额无原始单据可查看。')
 
 
-class customer_statements_report_with_goods(models.TransientModel):
+class CustomerStatementsReportWithGoods(models.TransientModel):
     _name = "customer.statements.report.with.goods"
     _description = u"客户对账单带商品明细"
 
@@ -163,16 +163,21 @@ class customer_statements_report_with_goods(models.TransientModel):
     quantity = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     price = fields.Float(u'单价', digits=dp.get_precision('Price'))
     discount_amount = fields.Float(u'折扣额', digits=dp.get_precision('Amount'))
-    without_tax_amount = fields.Float(u'不含税金额', digits=dp.get_precision('Amount'))
+    without_tax_amount = fields.Float(
+        u'不含税金额', digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
-    order_amount = fields.Float(string=u'销售金额', digits=dp.get_precision('Amount'))
-    benefit_amount = fields.Float(string=u'优惠金额', digits=dp.get_precision('Amount'))
+    order_amount = fields.Float(
+        string=u'销售金额', digits=dp.get_precision('Amount'))
+    benefit_amount = fields.Float(
+        string=u'优惠金额', digits=dp.get_precision('Amount'))
     fee = fields.Float(string=u'客户承担费用', digits=dp.get_precision('Amount'))
     amount = fields.Float(string=u'应收金额', digits=dp.get_precision('Amount'))
-    pay_amount = fields.Float(string=u'实际收款金额', digits=dp.get_precision('Amount'))
+    pay_amount = fields.Float(
+        string=u'实际收款金额', digits=dp.get_precision('Amount'))
     discount_money = fields.Float(string=u'收款折扣', readonly=True,
-                              digits=dp.get_precision('Amount'))
-    balance_amount = fields.Float(string=u'应收款余额', digits=dp.get_precision('Amount'))
+                                  digits=dp.get_precision('Amount'))
+    balance_amount = fields.Float(
+        string=u'应收款余额', digits=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)
     move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
 
@@ -192,9 +197,10 @@ class customer_statements_report_with_goods(models.TransientModel):
         }
         for model, view_dict in model_view.iteritems():
             res = self.env[model].search([('name', '=', self.name)])
-            name = model == 'sell.delivery' and res.is_return and view_dict['name_return'] or view_dict['name']
+            name = model == 'sell.delivery' and res.is_return and view_dict[
+                'name_return'] or view_dict['name']
             view = model == 'sell.delivery' and res.is_return and self.env.ref(view_dict['view_return']) \
-                   or self.env.ref(view_dict['view'])
+                or self.env.ref(view_dict['view'])
             if res:
                 return {
                     'name': name,

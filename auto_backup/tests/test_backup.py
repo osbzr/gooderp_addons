@@ -2,10 +2,11 @@
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
-class test_db_backup(TransactionCase):
+
+class TestDbBackup(TransactionCase):
 
     def setUp(self):
-        super(test_db_backup, self).setUp()
+        super(TestDbBackup, self).setUp()
         self.obj = self.env.get('db.backup')
         self.back = self.env.ref('auto_backup.backup_demo')
     '''

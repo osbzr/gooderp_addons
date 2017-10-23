@@ -2,6 +2,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
+
 class ProductStyle(models.Model):
     _name = "product.style"
     _description = u'产品样式'
@@ -11,7 +12,7 @@ class ProductStyle(models.Model):
     html_class = fields.Char(string='HTML Classes')
 
 
-class goods(models.Model):
+class Goods(models.Model):
     _inherit = ['goods', 'website.published.mixin']
 
     website_size_x = fields.Integer('Size X',

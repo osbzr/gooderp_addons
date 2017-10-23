@@ -24,26 +24,25 @@ from odoo import fields, models, api
 from odoo.tools import float_compare
 
 
-class money_transfer_order(models.Model):
+class MoneyTransferOrder(models.Model):
     _name = 'money.transfer.order'
     _description = u'资金转账单'
     _inherit = ['mail.thread']
-
 
     @api.multi
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不可以删除已经审核的单据\n 资金转账单%s已审核'%order.name)
+                raise UserError(u'不可以删除已经审核的单据\n 资金转账单%s已审核' % order.name)
 
-        return super(money_transfer_order, self).unlink()
+        return super(MoneyTransferOrder, self).unlink()
 
     state = fields.Selection([
-                          ('draft', u'未审核'),
-                          ('done', u'已审核'),
-                           ], string=u'状态', readonly=True,
-                             default='draft', copy=False, index=True,
-                        help=u'资金转账单状态标识，新建时状态为未审核;审核后状态为已审核')
+        ('draft', u'未审核'),
+        ('done', u'已审核'),
+    ], string=u'状态', readonly=True,
+        default='draft', copy=False, index=True,
+        help=u'资金转账单状态标识，新建时状态为未审核;审核后状态为已审核')
     name = fields.Char(string=u'单据编号', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')
     date = fields.Date(string=u'单据日期', readonly=True,
@@ -66,7 +65,8 @@ class money_transfer_order(models.Model):
                                  ondelete='restrict',
                                  help=u'资金转账单审核时生成的对应凭证',
                                  copy=False)
-    transfer_amount = fields.Float(compute='_compute_transfer_amount', string='转账总金额')
+    transfer_amount = fields.Float(
+        compute='_compute_transfer_amount', string='转账总金额')
 
     @api.one
     @api.depends('line_ids', 'line_ids.amount')
@@ -91,7 +91,8 @@ class money_transfer_order(models.Model):
                 raise UserError('转账金额必须大于0。\n 转账金额:%s' % line.amount)
             if out_currency_id == company_currency_id:  # 如果转出账户是公司本位币
                 if float_compare(line.out_bank_id.balance, line.amount, decimal_amount.digits) == -1:
-                    raise UserError('转出账户余额不足。\n转出账户余额:%s 本次转出金额:%s'%(line.out_bank_id.balance, line.amount))
+                    raise UserError('转出账户余额不足。\n转出账户余额:%s 本次转出金额:%s' % (
+                        line.out_bank_id.balance, line.amount))
                 else:   # 转出账户余额充足
                     line.out_bank_id.balance -= line.amount
                 if in_currency_id == company_currency_id:   # 如果转入账户是公司本位币
@@ -122,24 +123,24 @@ class money_transfer_order(models.Model):
         decimal_amount = self.env.ref('core.decimal_amount')
         for line in self.line_ids:
             if line.currency_amount > 0:
-                if line.in_bank_id.currency_id: # 如果填充了转入账户的币别，则说明转入账户为外币
+                if line.in_bank_id.currency_id:  # 如果填充了转入账户的币别，则说明转入账户为外币
                     if float_compare(line.in_bank_id.balance, line.currency_amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError('转入账户余额不足。\n转入账户余额:%s 本次转出外币金额:%s'
-                                % (line.in_bank_id.balance, line.currency_amount))
+                                        % (line.in_bank_id.balance, line.currency_amount))
                     else:   # 转入账户余额充足
                         line.in_bank_id.balance -= line.currency_amount
                         line.out_bank_id.balance += line.amount
                 else:   # 转入账户为本位币
                     if float_compare(line.in_bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                         raise UserError('转入账户余额不足。\n转入账户余额:%s 本次转出金额:%s'
-                                % (line.in_bank_id.balance, line.amount))
+                                        % (line.in_bank_id.balance, line.amount))
                     else:
                         line.in_bank_id.balance -= line.amount
                         line.out_bank_id.balance += line.currency_amount
             else:   # 转入/转出账户都为本位币
                 if float_compare(line.in_bank_id.balance, line.amount, precision_digits=decimal_amount.digits) == -1:
                     raise UserError('转入账户余额不足。\n转入账户余额:%s 本次转出金额:%s'
-                                % (line.in_bank_id.balance, line.amount))
+                                    % (line.in_bank_id.balance, line.amount))
                 else:
                     line.in_bank_id.balance -= line.amount
                     line.out_bank_id.balance += line.amount
@@ -208,7 +209,7 @@ class money_transfer_order(models.Model):
         return vouch_obj
 
 
-class money_transfer_order_line(models.Model):
+class MoneyTransferOrderLine(models.Model):
     _name = 'money.transfer.order.line'
     _description = u'资金转账单明细'
 
@@ -222,8 +223,8 @@ class money_transfer_order_line(models.Model):
                                  required=True, ondelete='restrict',
                                  help=u'资金转账单行上的转入账户')
     currency_amount = fields.Float(string=u'外币金额',
-                          digits=dp.get_precision('Amount'),
-                                help=u'转出或转入的外币金额')
+                                   digits=dp.get_precision('Amount'),
+                                   help=u'转出或转入的外币金额')
     amount = fields.Float(string=u'金额',
                           digits=dp.get_precision('Amount'),
                           help=u'转出或转入的金额')
