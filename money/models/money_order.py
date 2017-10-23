@@ -157,7 +157,7 @@ class MoneyOrder(models.Model):
                           digits=dp.get_precision('Amount'),
                           store=True, readonly=True,
                           help=u'收/付款单行金额总和')
-    AdvancePayment = fields.Float(string=u'本次预付',
+    advance_payment = fields.Float(string=u'本次预付',
                                   compute='_compute_advance_payment',
                                   digits=dp.get_precision('Amount'),
                                   store=True, readonly=True,

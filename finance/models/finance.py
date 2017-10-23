@@ -455,7 +455,7 @@ class FinanceAccount(models.Model):
     code = fields.Char(u'编码', required="1")
     balance_directions = fields.Selection(
         BALANCE_DIRECTIONS_TYPE, u'余额方向', required="1", help=u'根据科目的类型，判断余额方向是借方或者贷方！')
-    AuxiliaryFinancing = fields.Selection([('customer', u'客户'),
+    auxiliary_financing = fields.Selection([('customer', u'客户'),
                                            ('supplier', u'供应商'),
                                            ('member', u'个人'),
                                            ('project', u'项目'),
