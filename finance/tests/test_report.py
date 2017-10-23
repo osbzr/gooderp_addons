@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
-from odoo.addons.finance.report.report import action_report_picking_wrapped
+from odoo.addons.finance.report.report import ActionReportPickingWrapped
 
 
 class TestReport(TransactionCase):
@@ -332,7 +332,7 @@ class TestCheckoutWizard(TransactionCase):
 
 class TestActionReportPickingWrapped(TransactionCase):
     def test_action_report(self):
-        arpw = action_report_picking_wrapped(
+        arpw = ActionReportPickingWrapped(
             self.env.cr, self.env.uid, 'context', self.env.context)
         arpw._rmb_upper(1000)
         arpw._rmb_format(1000)

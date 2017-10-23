@@ -6,7 +6,7 @@ from odoo import tools
 from odoo.fields import Date
 
 
-class WebsiteAccount(http.Controller):
+class website_account(http.Controller):
 
     MANDATORY_BILLING_FIELDS = ["main_contact", "main_mobile", 'message']
 
