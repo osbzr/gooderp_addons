@@ -2,16 +2,21 @@
 # © 2016 cole
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from docxtpl import DocxTemplate
-
+from docxtpl import DocxTemplate, InlineImage
+import tempfile
 import docx
-
+import random
+import os
 import jinja2
 
 """
 使用一个独立的文件来封装需要支持图片等功能，避免污染report_docx.py
 """
 
+"""
+需要安装python-docxtpl 0.4.6，使用InlineImage功能。
+已安装旧版本，请使用pip install --upgrade docxtpl升级
+"""
 
 def calc_length(s):
     """
@@ -62,7 +67,7 @@ def calc_alignment(s):
 
 
 @jinja2.contextfilter
-def picture(ctx,data,width=None, height=None,align=None):
+def picture(ctx, data, width='40mm', height='40mm', align='center'):
     """
     把图片的二进制数据（使用了base64编码）转化为一个docx.Document对象
 
@@ -75,31 +80,24 @@ def picture(ctx,data,width=None, height=None,align=None):
     if not data:
         return None
 
-    #转化为file-like对象
-    #在python2.7中，bytes==str，可以直接使用
-    #在python3.5中，bytes和str是不同的类型，需要使用base64这个库
-
-    
-    #data使用了base64编码，所以这里需要解码
-    data = data.decode('base64')
-
-    import io
-    data = io.BytesIO(data)
-
-        
-    tpl = ctx['tpl']
-    doc = tpl.new_subdoc()
-
     if width:
         width=calc_length(width)
     if height:
         height=calc_length(height)
-    
-    p = doc.add_paragraph()
-    p.alignment = calc_alignment(align)
-    p.add_run().add_picture(data,width=width,height=height)
-    return doc
 
+    tempname = tempfile.mkdtemp()
+    temppath = os.path.join(tempname, 'temp_%s_%s_%s_%s.%s' %
+                 (os.getpid(), random.randint(1, 10000), ctx.get('id'), ctx.get('create_uid').id, 'png'))
+    #data使用了base64编码，所以这里需要解码
+    save_file(temppath, data.decode('base64'))
+    return InlineImage(ctx['tpl'], temppath, width=width, height=height)
+
+def save_file(folder_name, file):
+    out_stream = open(folder_name, 'wb')
+    try:
+        out_stream.writelines(file)
+    finally:
+        out_stream.close()
 
 def get_env():
     """
@@ -109,24 +107,3 @@ def get_env():
     jinja_env.filters['picture'] = picture
     return jinja_env
 
-def test():
-    """
-    演示了如何使用，可以直接执行该文件，但是需要使用自己写的docx模版，和图片
-    """
-    tpl = DocxTemplate("tpls/test_tpl.docx")
-    #读取图片的数据且使用base64编码
-    data = open('tpls/python_logo.png','rb').read().encode('base64')
-    obj={'logo':data}
-    # 需要添加模版对象
-    ctx={'obj':obj,'tpl':tpl}
-    jinja_env = get_env()
-    tpl.render(ctx,jinja_env)
-
-    tpl.save('tpls/test.docx')
-
-def main():
-    test()
-
-
-if __name__ == '__main__':
-    main()
