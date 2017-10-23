@@ -193,6 +193,26 @@ class wh_move(models.Model):
             create_line = self.scan_barcode_inventory_operation(move, att, conversion, goods, val)
 
         return move, create_line, val
+    
+    @api.multi
+    def check_goods_qty(self, goods, attribute, warehouse):
+        '''SQL来取指定商品，属性，仓库，的当前剩余数量'''
+
+        if attribute:
+            change_conditions = "AND line.attribute_id = %s" % attribute.id
+        elif goods:
+            change_conditions = "AND line.goods_id = %s" % goods.id
+        else:
+            change_conditions = "AND 1 = 0"
+        self.env.cr.execute('''
+                       SELECT sum(line.qty_remaining) as qty
+                       FROM wh_move_line line
+
+                       WHERE line.warehouse_dest_id = %s
+                             AND line.state = 'done'
+                             %s
+                   ''' % (warehouse.id, change_conditions,))
+        return self.env.cr.fetchone()
 
     def prepare_move_line_data(self, att, val, goods, move):
         """
