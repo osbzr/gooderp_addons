@@ -803,7 +803,7 @@ class Outsource(models.Model):
                                  'goods_id': False,
                                  'voucher_id': voucher.id,
                                  'account_id': account_id,
-                                 'name': u'%s 成品 %s' % (outsource.move_id.name, Outsource.move_id.note or '')
+                                 'name': u'%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
                                  })
         for line_out in Outsource.line_out_ids:  # 贷方行
             if line_out.cost:
@@ -813,7 +813,7 @@ class Outsource(models.Model):
                                       'goods_qty': line_out.goods_qty,
                                       'voucher_id': voucher.id,
                                       'account_id': account_id,
-                                      'name': u'%s 原料 %s' % (outsource.move_id.name, Outsource.move_id.note or '')})
+                                      'name': u'%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')})
         return line_out_data + line_in_data
 
     def outsource_create_voucher_line(self, Outsource, voucher_row):
