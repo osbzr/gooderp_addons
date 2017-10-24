@@ -13,7 +13,7 @@ Allows your customers to manage their account from a beautiful web interface.
         'core',
     ],
     'data': [
-             'views/portal_view.xml',
-             'views/good_portal_templates.xml',
+        'views/portal_view.xml',
+        'views/good_portal_templates.xml',
     ],
 }

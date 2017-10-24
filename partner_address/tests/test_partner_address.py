@@ -4,22 +4,22 @@ from odoo.tests.common import TransactionCase
 from psycopg2 import IntegrityError
 
 
-class test_partner_address(TransactionCase):
+class TestPartnerAddress(TransactionCase):
     '''测试业务伙伴的联系人地址'''
 
     def setUp(self):
         '''准备数据'''
-        super(test_partner_address, self).setUp()
+        super(TestPartnerAddress, self).setUp()
         self.partner_id = self.env.ref('core.jd')
-        self.partner =  self.env['partner'].search(
-                    [('id', '=', self.partner_id.id)])
+        self.partner = self.env['partner'].search(
+            [('id', '=', self.partner_id.id)])
         self.partner.write({'child_ids':
-            [(0, 0,
-              {'contact': u'小东',
-               'mobile': '1385559999',
-               }
-            )]
-        })
+                            [(0, 0,
+                              {'contact': u'小东',
+                               'mobile': '1385559999',
+                               }
+                              )]
+                            })
 
     def test_onchange_province(self):
         '''测试onchange province'''
@@ -71,7 +71,7 @@ class test_partner_address(TransactionCase):
             child.onchange_city()
         # 存在市存在省存在县，但县不属于市
         county = self.env['all.county'].search(
-                [('county_name', '=', u'承德县')])
+            [('county_name', '=', u'承德县')])
         for child in self.partner.child_ids:
             child.province_id = False
             child.county_id = county.id
@@ -158,37 +158,37 @@ class test_partner_address(TransactionCase):
             child.onchange_county()
 
 
-class test_partner(TransactionCase):
+class TestPartner(TransactionCase):
 
     def setUp(self):
         '''准备数据'''
-        super(test_partner, self).setUp()
+        super(TestPartner, self).setUp()
         self.partner_id = self.env.ref('core.jd')
         self.province_id = self.env['country.state'].search(
-                    [('name', '=', u'河北省')])
+            [('name', '=', u'河北省')])
         self.city_id = self.env['all.city'].search(
-                    [('city_name', '=', u'石家庄市')])
+            [('city_name', '=', u'石家庄市')])
         self.county_id = self.env['all.county'].search(
-                    [('county_name', '=', u'正定县')])
+            [('county_name', '=', u'正定县')])
 
     def test_compute_partner_address(self):
         '''测试如果业务伙伴地址中有默认地址，则显示在业务伙伴列表上'''
-        partner =  self.env['partner'].search(
-                    [('id', '=', self.partner_id.id)])
+        partner = self.env['partner'].search(
+            [('id', '=', self.partner_id.id)])
         # 没有联系人地址child_ids时
         partner._compute_partner_address()
         # 有联系人地址child_ids，并为默认地址时
         partner.write({'child_ids':
-            [(0, 0,
-              {'contact': u'小东',
-               'province_id': self.province_id.id,
-               'city_id': self.city_id.id,
-               'county_id': self.county_id.id,
-               'town': u'曹路镇',
-               'detail_address': u'金海路1688号',
-               }
-            )]
-        })
+                       [(0, 0,
+                         {'contact': u'小东',
+                          'province_id': self.province_id.id,
+                          'city_id': self.city_id.id,
+                          'county_id': self.county_id.id,
+                          'town': u'曹路镇',
+                          'detail_address': u'金海路1688号',
+                          }
+                         )]
+                       })
         partner._compute_partner_address()
         for child in partner.child_ids:
             child.mobile = '1385559999'
@@ -204,24 +204,24 @@ class test_partner(TransactionCase):
         addr = ''
         for child in partner.child_ids:
             addr = '%s%s%s%s%s' % (child.province_id.name,
-                           child.city_id.city_name,
-                           child.county_id.county_name,
-                           child.town,
-                           child.detail_address)
-        self.assertEqual(partner.address, addr) 
+                                   child.city_id.city_name,
+                                   child.county_id.county_name,
+                                   child.town,
+                                   child.detail_address)
+        self.assertEqual(partner.address, addr)
 
     def test_name_get(self):
         address = self.env['partner.address'].create({'contact': u'小东',
-                                        'province_id': self.province_id.id,
-                                        'city_id': self.city_id.id,
-                                        'county_id': self.county_id.id,
-                                        'town': u'曹路镇',
-                                        'detail_address': u'金海路1688号',
-                                        })
+                                                      'province_id': self.province_id.id,
+                                                      'city_id': self.city_id.id,
+                                                      'county_id': self.county_id.id,
+                                                      'town': u'曹路镇',
+                                                      'detail_address': u'金海路1688号',
+                                                      })
         name = address.name_get()
         real_name = '%s%s%s%s%s' % (address.province_id and address.province_id.name or '',
-                   address.city_id and address.city_id.city_name or '',
-                   address.county_id and address.county_id.county_name or '',
-                   address.town or '',
-                   address.detail_address or '')
+                                    address.city_id and address.city_id.city_name or '',
+                                    address.county_id and address.county_id.county_name or '',
+                                    address.town or '',
+                                    address.detail_address or '')
         self.assertTrue(name[0][1] == real_name)

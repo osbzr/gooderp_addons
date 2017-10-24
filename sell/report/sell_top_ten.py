@@ -4,7 +4,8 @@ from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
 import datetime
 
-class sell_top_ten(models.Model):
+
+class SellTopTen(models.Model):
     _name = 'sell.top.ten'
     _inherit = 'report.base'
     _description = u'销量前十商品'
@@ -69,7 +70,7 @@ class sell_top_ten(models.Model):
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
             'warehouse_id': context.get('warehouse_id') and
-                context.get('warehouse_id')[0] or '',
+            context.get('warehouse_id')[0] or '',
         }
 
     def collect_data_by_sql(self, sql_type='out'):

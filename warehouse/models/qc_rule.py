@@ -15,7 +15,9 @@ MOVE_TYPE = [
     ('wh.disassembly', u'拆卸单'),
     ('outsource', u'委外加工单'),
 ]
-class qc_rule(models.Model):
+
+
+class QcRule(models.Model):
     _name = 'qc.rule'
     _description = u'质检规则'
 
@@ -35,20 +37,22 @@ class qc_rule(models.Model):
     def _compute_warehouse_dest_impl(self):
         '''根据单据类型自动填充上调入仓库'''
         if self.move_type == 'sell.delivery.sell':
-            self.warehouse_dest_id = self.env.ref('warehouse.warehouse_customer')
+            self.warehouse_dest_id = self.env.ref(
+                'warehouse.warehouse_customer')
         if self.move_type == 'buy.receipt.return':
-            self.warehouse_dest_id = self.env.ref('warehouse.warehouse_supplier')
+            self.warehouse_dest_id = self.env.ref(
+                'warehouse.warehouse_supplier')
         if self.move_type == 'wh.out.others':
             self.warehouse_dest_id = self.env.ref('warehouse.warehouse_others')
         if self.move_type == 'wh.out.inventory':
-            self.warehouse_dest_id = self.env.ref('warehouse.warehouse_inventory')
+            self.warehouse_dest_id = self.env.ref(
+                'warehouse.warehouse_inventory')
 
     @api.onchange('move_type')
     def onchange_move_type(self):
         '''根据单据类型自动填充上调入仓库或调出仓库'''
         self._compute_warehouse_impl()
         self._compute_warehouse_dest_impl()
-
 
     move_type = fields.Selection(MOVE_TYPE,
                                  u'单据类型',

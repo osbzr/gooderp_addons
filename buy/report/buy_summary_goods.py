@@ -5,7 +5,7 @@ from odoo import fields, models, api
 import datetime
 
 
-class buy_summary_goods(models.Model):
+class BuySummaryGoods(models.Model):
     _name = 'buy.summary.goods'
     _inherit = 'report.base'
     _description = u'采购汇总表（按商品）'
@@ -108,18 +108,18 @@ class buy_summary_goods(models.Model):
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
             'partner_id': context.get('partner_id') and
-                context.get('partner_id')[0] or '',
+            context.get('partner_id')[0] or '',
             'goods_id': context.get('goods_id') and
-                context.get('goods_id')[0] or '',
+            context.get('goods_id')[0] or '',
             'goods_categ_id': context.get('goods_categ_id') and
-                context.get('goods_categ_id')[0] or '',
+            context.get('goods_categ_id')[0] or '',
             'warehouse_dest_id': context.get('warehouse_dest_id') and
-                context.get('warehouse_dest_id')[0] or '',
+            context.get('warehouse_dest_id')[0] or '',
         }
 
     def _compute_order(self, result, order):
         order = order or 'goods_code ASC'
-        return super(buy_summary_goods, self)._compute_order(result, order)
+        return super(BuySummaryGoods, self)._compute_order(result, order)
 
     def collect_data_by_sql(self, sql_type='out'):
         collection = self.execute_sql(sql_type='out')
@@ -137,7 +137,7 @@ class buy_summary_goods(models.Model):
             if line.get('id') == self.id:
                 line_ids = line.get('id_lists')
                 move_lines = self.env['wh.move.line'].search(
-                        [('id', 'in', line_ids)])
+                    [('id', 'in', line_ids)])
 
         for move_line in move_lines:
             details = self.env['buy.order.detail'].search(

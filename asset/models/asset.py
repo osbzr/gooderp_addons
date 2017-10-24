@@ -7,11 +7,12 @@ from datetime import datetime
 
 # 字段只读状态
 READONLY_STATES = {
-        'done': [('readonly', True)],
-        'clean': [('readonly', True)],
-    }
+    'done': [('readonly', True)],
+    'clean': [('readonly', True)],
+}
 
-class asset_category(models.Model):
+
+class AssetCategory(models.Model):
     '''固定资产分类'''
     _name = 'asset.category'
     _description = u'固定资产分类'
@@ -37,7 +38,7 @@ class asset_category(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class asset(models.Model):
+class Asset(models.Model):
     '''固定资产'''
     _name = 'asset'
     _description = u'固定资产'
@@ -49,20 +50,21 @@ class asset(models.Model):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
     @api.one
-    @api.depends('cost','tax')
+    @api.depends('cost', 'tax')
     def _get_amount(self):
         self.amount = self.cost + self.tax
 
     @api.one
-    @api.depends('cost','depreciation_previous')
+    @api.depends('cost', 'depreciation_previous')
     def _get_surplus_value(self):
         self.surplus_value = self.cost - self.depreciation_previous
         self.depreciation_value = self.category_id.depreciation_value * self.cost / 100
 
     @api.one
-    @api.depends('surplus_value','depreciation_value','depreciation_number')
+    @api.depends('surplus_value', 'depreciation_value', 'depreciation_number')
     def _get_cost_depreciation(self):
-        self.cost_depreciation = (self.surplus_value - self.depreciation_value) / (self.depreciation_number or 1)
+        self.cost_depreciation = (
+            self.surplus_value - self.depreciation_value) / (self.depreciation_number or 1)
 
     code = fields.Char(u'编号', required="1", states=READONLY_STATES)
     date = fields.Date(u'记帐日期', required=True, states=READONLY_STATES)
@@ -75,20 +77,28 @@ class asset(models.Model):
                               ('done', u'已审核'),
                               ('clean', u'已清理')], u'状态', default='draft',
                              index=True,)
-    cost = fields.Float(u'金额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
-    tax = fields.Float(u'税额', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
-    amount = fields.Float(u'价税合计', digits=dp.get_precision('Amount'), store=True, compute='_get_amount')
+    cost = fields.Float(u'金额', digits=dp.get_precision(
+        'Amount'), required=True, states=READONLY_STATES)
+    tax = fields.Float(u'税额', digits=dp.get_precision(
+        'Amount'), required=True, states=READONLY_STATES)
+    amount = fields.Float(u'价税合计', digits=dp.get_precision(
+        'Amount'), store=True, compute='_get_amount')
     bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict', states=READONLY_STATES,
                                    help=u'用于记录现金采购固定资产时的付款，据此生成其他支出单')
     partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', states=READONLY_STATES,
                                  help=u'用于记录采购固定资产时的应付账款，据此生成结算单')
     is_init = fields.Boolean(u'初始化资产', states=READONLY_STATES)
     no_depreciation = fields.Boolean(u'不折旧')
-    category_id = fields.Many2one('asset.category', u'固定资产分类', ondelete='restrict', required=True, states=READONLY_STATES)
-    depreciation_previous = fields.Float(u'以前折旧', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
-    depreciation_number = fields.Integer(u'折旧期间数', required=True, states=READONLY_STATES)
-    surplus_value = fields.Float(u'净值', digits=dp.get_precision('Amount'), store=True, compute='_get_surplus_value')
-    depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision('Amount'), required=True, states=READONLY_STATES)
+    category_id = fields.Many2one(
+        'asset.category', u'固定资产分类', ondelete='restrict', required=True, states=READONLY_STATES)
+    depreciation_previous = fields.Float(u'以前折旧', digits=dp.get_precision(
+        'Amount'), required=True, states=READONLY_STATES)
+    depreciation_number = fields.Integer(
+        u'折旧期间数', required=True, states=READONLY_STATES)
+    surplus_value = fields.Float(u'净值', digits=dp.get_precision(
+        'Amount'), store=True, compute='_get_surplus_value')
+    depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision(
+        'Amount'), required=True, states=READONLY_STATES)
     account_credit = fields.Many2one(
         'finance.account', u'资产贷方科目', required=True, states=READONLY_STATES,
         help=u'固定资产入账时：\n 如赊购，此处为应付科目；\n 如现购，此处为资金科目；\n 如自建，此处为在建工程')
@@ -98,14 +108,18 @@ class asset(models.Model):
         'finance.account', u'累计折旧科目', required=True, states=READONLY_STATES)
     account_asset = fields.Many2one(
         'finance.account', u'固定资产科目', required=True, states=READONLY_STATES)
-    cost_depreciation = fields.Float(u'每月折旧额', digits=dp.get_precision('Amount'), store=True, compute='_get_cost_depreciation')
+    cost_depreciation = fields.Float(u'每月折旧额', digits=dp.get_precision(
+        'Amount'), store=True, compute='_get_cost_depreciation')
     line_ids = fields.One2many('asset.line', 'order_id', u'折旧明细行',
                                states=READONLY_STATES, copy=False)
     chang_ids = fields.One2many('chang.line', 'order_id', u'变更明细行',
-                               states=READONLY_STATES, copy=False)
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict', copy=False)
-    money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict', copy=False)
-    other_money_order = fields.Many2one('other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
+                                states=READONLY_STATES, copy=False)
+    voucher_id = fields.Many2one(
+        'voucher', u'对应凭证', readonly=True, ondelete='restrict', copy=False)
+    money_invoice = fields.Many2one(
+        'money.invoice', u'对应结算单', readonly=True, ondelete='restrict', copy=False)
+    other_money_order = fields.Many2one(
+        'other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -145,13 +159,14 @@ class asset(models.Model):
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间(%s)已结账！不能审核'%self.period_id.name)
+            raise UserError(u'该会计期间(%s)已结账！不能审核' % self.period_id.name)
         if self.cost <= 0:
-            raise UserError(u'金额必须大于0！\n金额:%s'%self.cost)
+            raise UserError(u'金额必须大于0！\n金额:%s' % self.cost)
         if self.tax < 0:
-            raise UserError(u'税额必须大于0！\n税额:%s'%self.tax)
+            raise UserError(u'税额必须大于0！\n税额:%s' % self.tax)
         if self.depreciation_previous < 0:
-            raise UserError(u'以前折旧必须大于0！\n折旧金额:%s' % self.depreciation_previous)
+            raise UserError(u'以前折旧必须大于0！\n折旧金额:%s' %
+                            self.depreciation_previous)
         return
 
     @api.one
@@ -159,22 +174,23 @@ class asset(models.Model):
         ''' 赊购的方式，选择往来单位时，生成结算单 '''
         categ = self.env.ref('asset.asset_expense')
         money_invoice = self.env['money.invoice'].create({
-                'name': u'固定资产'+self.code,
-                'partner_id': self.partner_id.id,
-                'category_id': categ and categ.id,
-                'date': self.date,
-                'amount': self.amount,
-                'reconciled': 0,
-                'to_reconcile': self.amount,
-                'date_due': fields.Date.context_today(self),
-                'state': 'draft',
-                'tax_amount': self.tax
+            'name': u'固定资产' + self.code,
+            'partner_id': self.partner_id.id,
+            'category_id': categ and categ.id,
+            'date': self.date,
+            'amount': self.amount,
+            'reconciled': 0,
+            'to_reconcile': self.amount,
+            'date_due': fields.Date.context_today(self),
+            'state': 'draft',
+            'tax_amount': self.tax
         })
         self.write({'money_invoice': money_invoice.id})
         '''变化科目'''
         chang_account = self.env['voucher.line'].search(['&',
-            ('voucher_id', '=', money_invoice.voucher_id.id),
-            ('debit', '=', self.cost)])
+                                                         ('voucher_id', '=',
+                                                          money_invoice.voucher_id.id),
+                                                         ('debit', '=', self.cost)])
         chang_account.write({'account_id': self.account_asset.id})
         return money_invoice
 
@@ -190,10 +206,10 @@ class asset(models.Model):
         })
         self.write({'other_money_order': other_money_order.id})
         self.env['other.money.order.line'].create({
-            'other_money_id': other_money_order.id ,
-            'amount': self.cost ,
+            'other_money_id': other_money_order.id,
+            'amount': self.cost,
             'tax_rate': self.cost and self.tax / self.cost * 100 or 0,
-            'tax_amount' : self.tax,
+            'tax_amount': self.tax,
             'category_id': category and category.id
         })
         return other_money_order
@@ -205,10 +221,10 @@ class asset(models.Model):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         self.write({'voucher_id': vouch_obj.id})
         vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'固定资产',
-             'amount': self.amount, 'credit_account_id': self.account_credit.id,
-             'debit_account_id': self.account_asset.id, 'partner_credit': self.partner_id.id, 'partner_debit': '',
-             'buy_tax_amount': self.tax or 0
-             })
+                     'amount': self.amount, 'credit_account_id': self.account_credit.id,
+                     'debit_account_id': self.account_asset.id, 'partner_credit': self.partner_id.id, 'partner_debit': '',
+                     'buy_tax_amount': self.tax or 0
+                     })
         self.env['money.invoice'].create_voucher_line(vals)
         vouch_obj.voucher_done()
         return vouch_obj
@@ -238,14 +254,14 @@ class asset(models.Model):
         if self.chang_ids:
             raise UserError(u'已变更不能反审核！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间(%s)已结账！不能反审核'%self.period_id.name)
+            raise UserError(u'该会计期间(%s)已结账！不能反审核' % self.period_id.name)
         self.state = 'draft'
         '''删掉凭证'''
         if self.voucher_id:
-            voucher, self.voucher_id = self.voucher_id, False
-            if voucher.state == 'done':
-                voucher.voucher_draft()
-            voucher.unlink()
+            Voucher, self.voucher_id = self.voucher_id, False
+            if Voucher.state == 'done':
+                Voucher.voucher_draft()
+            Voucher.unlink()
         '''删掉其他应付款单'''
         if self.other_money_order:
             other_money_order, self.other_money_order = self.other_money_order, False
@@ -265,7 +281,7 @@ class asset(models.Model):
             if record.state != 'draft':
                 raise UserError(u'只能删除草稿状态的固定资产')
 
-        return super(asset, self).unlink()
+        return super(Asset, self).unlink()
 
 
 class CreateCleanWizard(models.TransientModel):
@@ -298,18 +314,18 @@ class CreateCleanWizard(models.TransientModel):
         '''按发票收入生成收入单'''
         get_category = self.env.ref('asset.asset_clean_get')
         other_money_order = self.with_context(type='other_get').env['other.money.order'].create({
-                    'state': 'draft',
-                    'partner_id': None,
-                    'date': self.date,
-                    'bank_id': self.bank_account.id,
-                })
+            'state': 'draft',
+            'partner_id': None,
+            'date': self.date,
+            'bank_id': self.bank_account.id,
+        })
         self.env['other.money.order.line'].create({
-                    'other_money_id': other_money_order.id,
-                    'amount': self.residual_income,
-                    'tax_rate': self.residual_income and self.sell_tax_amount / self.residual_income * 100 or 0,
-                    'tax_amount' : self.sell_tax_amount,
-                    'category_id': get_category and get_category.id
-                })
+            'other_money_id': other_money_order.id,
+            'amount': self.residual_income,
+            'tax_rate': self.residual_income and self.sell_tax_amount / self.residual_income * 100 or 0,
+            'tax_amount': self.sell_tax_amount,
+            'category_id': get_category and get_category.id
+        })
         return other_money_order
 
     @api.one
@@ -317,39 +333,39 @@ class CreateCleanWizard(models.TransientModel):
         '''按费用生成支出单'''
         pay_category = self.env.ref('asset.asset_clean_pay')
         other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
-                'state': 'draft',
-                'partner_id': None,
-                'date': self.date,
-                'bank_id': self.bank_account.id,
-            })
+            'state': 'draft',
+            'partner_id': None,
+            'date': self.date,
+            'bank_id': self.bank_account.id,
+        })
         self.env['other.money.order.line'].create({
-                'other_money_id': other_money_order.id,
-                'amount': clean_cost,
-                'category_id': pay_category and pay_category.id
-            })
+            'other_money_id': other_money_order.id,
+            'amount': clean_cost,
+            'category_id': pay_category and pay_category.id
+        })
 
     @api.one
-    def _generate_voucher(self, asset):
+    def _generate_voucher(self, Asset):
         ''' 生成凭证，并审核 '''
         vouch_obj = self.env['voucher'].create({'date': self.date})
-        depreciation2 = sum(line.cost_depreciation for line in asset.line_ids)
-        depreciation = asset.depreciation_previous + depreciation2
-        income = asset.cost - depreciation
-        asset.write({'voucher_id': vouch_obj.id})
+        depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
+        depreciation = Asset.depreciation_previous + depreciation2
+        income = Asset.cost - depreciation
+        Asset.write({'voucher_id': vouch_obj.id})
         '''借方行'''
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
-                     'debit': income, 'account_id': asset.category_id.clean_costs.id,
-                     'auxiliary_id': False
-                     })
+                                         'debit': income, 'account_id': Asset.category_id.clean_costs.id,
+                                         'auxiliary_id': False
+                                         })
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
-                     'debit': depreciation, 'account_id': asset.account_accumulated_depreciation.id,
-                     'auxiliary_id': False
-                     })
+                                         'debit': depreciation, 'account_id': Asset.account_accumulated_depreciation.id,
+                                         'auxiliary_id': False
+                                         })
         '''贷方行'''
         self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
-                     'credit': asset.cost, 'account_id': asset.account_asset.id,
-                     'auxiliary_id': False
-                     })
+                                         'credit': Asset.cost, 'account_id': Asset.account_asset.id,
+                                         'auxiliary_id': False
+                                         })
         vouch_obj.voucher_done()
         return vouch_obj
 
@@ -358,16 +374,17 @@ class CreateCleanWizard(models.TransientModel):
         ''' 清理固定资产 '''
         if not self.env.context.get('active_id'):
             return
-        asset = self.env['asset'].browse(self.env.context.get('active_id'))
-        asset.no_depreciation = 1
-        asset.state = 'clean'
+        Asset = self.env['asset'].browse(self.env.context.get('active_id'))
+        Asset.no_depreciation = 1
+        Asset.state = 'clean'
         # 按发票收入生成收入单
         self._generate_other_get()
         # 按费用生成支出单
         if self.clean_cost:
             self._clean_cost_generate_other_pay(self.clean_cost)
         # 生成凭证
-        self._generate_voucher(asset)
+        self._generate_voucher(Asset)
+
 
 class CreateChangWizard(models.TransientModel):
     '''固定资产变更'''
@@ -384,10 +401,13 @@ class CreateChangWizard(models.TransientModel):
         'finance.period',
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    chang_cost = fields.Float(u'变更金额', required=True, digits=dp.get_precision('Amount'))
+    chang_cost = fields.Float(u'变更金额', required=True,
+                              digits=dp.get_precision('Amount'))
     chang_depreciation_number = fields.Float(u'变更折旧期间', required=True)
-    chang_tax = fields.Float(u'变更税额', digits=dp.get_precision('Amount'), required=True)
-    chang_partner_id = fields.Many2one('partner', u'往来单位', ondelete='restrict', required=True)
+    chang_tax = fields.Float(
+        u'变更税额', digits=dp.get_precision('Amount'), required=True)
+    chang_partner_id = fields.Many2one(
+        'partner', u'往来单位', ondelete='restrict', required=True)
     change_reason = fields.Text(u'变更原因')
     company_id = fields.Many2one(
         'res.company',
@@ -399,17 +419,17 @@ class CreateChangWizard(models.TransientModel):
     def create_chang_account(self):
         if not self.env.context.get('active_id'):
             return
-        asset = self.env['asset'].browse(self.env.context.get('active_id'))
+        Asset = self.env['asset'].browse(self.env.context.get('active_id'))
         if self.chang_cost > 0:
-            chang_before_cost = asset.cost
-            chang_before_depreciation_number = asset.depreciation_number
-            asset.cost = self.chang_cost + asset.cost
-            asset.surplus_value = asset.cost - asset.depreciation_previous
-            asset.tax = asset.tax + self.chang_tax
+            chang_before_cost = Asset.cost
+            chang_before_depreciation_number = Asset.depreciation_number
+            Asset.cost = self.chang_cost + Asset.cost
+            Asset.surplus_value = Asset.cost - Asset.depreciation_previous
+            Asset.tax = Asset.tax + self.chang_tax
             """生成凭证"""
             categ = self.env.ref('money.core_category_purchase')
             money_invoice = self.env['money.invoice'].create({
-                        'name': u'固定资产变更'+asset.code,
+                'name': u'固定资产变更' + Asset.code,
                         'partner_id': self.chang_partner_id.id,
                         'category_id': categ.id,
                         'date': self.chang_date,
@@ -419,29 +439,31 @@ class CreateChangWizard(models.TransientModel):
                         'date_due': fields.Date.context_today(self),
                         'state': 'draft',
                         'tax_amount': self.chang_tax
-                })
-            chang_account = self.env['voucher.line'].search(['&',('voucher_id', '=',
-                                                                  money_invoice.voucher_id.id),
+            })
+            chang_account = self.env['voucher.line'].search(['&', ('voucher_id', '=',
+                                                                   money_invoice.voucher_id.id),
                                                              ('debit', '=', self.chang_cost)])
-            chang_account.write({'account_id': asset.account_asset.id})
-            self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,
-                                           'chang_before':chang_before_cost,
+            chang_account.write({'account_id': Asset.account_asset.id})
+            self.env['chang.line'].create({'date': self.chang_date, 'period_id': self.period_id.id,
+                                           'chang_before': chang_before_cost,
                                            'change_reason': self.change_reason,
-                                           'chang_after':asset.cost,'chang_name':u'原值变更',
-                                           'order_id':asset.id,'partner_id':self.chang_partner_id.id
-            })
-        asset.depreciation_number = asset.depreciation_number + self.chang_depreciation_number
-        asset.depreciation_value = asset.depreciation_value + asset.category_id.depreciation_value * \
-                                                              self.chang_cost / 100
+                                           'chang_after': Asset.cost, 'chang_name': u'原值变更',
+                                           'order_id': Asset.id, 'partner_id': self.chang_partner_id.id
+                                           })
+        Asset.depreciation_number = Asset.depreciation_number + \
+            self.chang_depreciation_number
+        Asset.depreciation_value = Asset.depreciation_value + Asset.category_id.depreciation_value * \
+            self.chang_cost / 100
         if self.chang_depreciation_number:
-            self.env['chang.line'].create({'date':self.chang_date,'period_id':self.period_id.id,
-                                           'chang_before':chang_before_depreciation_number,
-                                           'change_reason':self.change_reason,
-                                           'chang_after':asset.depreciation_number,'chang_name':u'折旧期间变更',
-                                           'order_id':asset.id,'partner_id':self.chang_partner_id.id
-            })
+            self.env['chang.line'].create({'date': self.chang_date, 'period_id': self.period_id.id,
+                                           'chang_before': chang_before_depreciation_number,
+                                           'change_reason': self.change_reason,
+                                           'chang_after': Asset.depreciation_number, 'chang_name': u'折旧期间变更',
+                                           'order_id': Asset.id, 'partner_id': self.chang_partner_id.id
+                                           })
 
-class asset_line(models.Model):
+
+class AssetLine(models.Model):
     _name = 'asset.line'
     _description = u'资产折旧明细'
 
@@ -452,7 +474,8 @@ class asset_line(models.Model):
 
     order_id = fields.Many2one('asset', u'资产', index=True,
                                required=True, ondelete='cascade')
-    cost_depreciation = fields.Float(u'折旧额', required=True, digits=dp.get_precision('Amount'))
+    cost_depreciation = fields.Float(
+        u'折旧额', required=True, digits=dp.get_precision('Amount'))
     no_depreciation = fields.Float(u'未提折旧额')
     code = fields.Char(u'编码')
     name = fields.Char(u'名称')
@@ -467,6 +490,7 @@ class asset_line(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
+
 class CreateDepreciationWizard(models.TransientModel):
     """生成每月折旧的向导 根据输入的期间"""
     _name = "create.depreciation.wizard"
@@ -476,7 +500,7 @@ class CreateDepreciationWizard(models.TransientModel):
     @api.depends('date')
     def _compute_period_id(self):
         self.period_id = self.env['finance.period'].get_period(self.date)
-    
+
     @api.model
     def _get_last_date(self):
         return self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[1]
@@ -493,43 +517,43 @@ class CreateDepreciationWizard(models.TransientModel):
         default=lambda self: self.env['res.company']._company_default_get())
 
     @api.multi
-    def _get_voucher_line(self, asset, cost_depreciation, vouch_obj):
+    def _get_voucher_line(self, Asset, cost_depreciation, vouch_obj):
         '''借方行'''
         res = {}
-        if asset.account_depreciation.id not in res:
-            res[asset.account_depreciation.id] = {'debit': 0}
-        val = res[asset.account_depreciation.id]
+        if Asset.account_depreciation.id not in res:
+            res[Asset.account_depreciation.id] = {'debit': 0}
+        val = res[Asset.account_depreciation.id]
         val.update({'debit': val.get('debit') + cost_depreciation,
                     'voucher_id': vouch_obj.id,
-                    'account_id': asset.account_depreciation.id,
+                    'account_id': Asset.account_depreciation.id,
                     'name': u'固定资产折旧',
                     })
 
         '''贷方行'''
-        if asset.account_accumulated_depreciation.id not in res:
-            res[asset.account_accumulated_depreciation.id] = {'credit': 0}
+        if Asset.account_accumulated_depreciation.id not in res:
+            res[Asset.account_accumulated_depreciation.id] = {'credit': 0}
 
-        val = res[asset.account_accumulated_depreciation.id]
+        val = res[Asset.account_accumulated_depreciation.id]
         val.update({'credit': val.get('credit') + cost_depreciation,
                     'voucher_id': vouch_obj.id,
-                    'account_id': asset.account_accumulated_depreciation.id,
+                    'account_id': Asset.account_accumulated_depreciation.id,
                     'name': u'固定资产折旧',
                     })
         return res
 
     @api.multi
-    def _generate_asset_line(self, asset, cost_depreciation, total):
+    def _generate_asset_line(self, Asset, cost_depreciation, total):
         '''生成折旧明细行'''
-        asset_line = self.env['asset.line'].create({
-             'date': self.date,
-             'order_id': asset.id,
-             'period_id': self.period_id.id,
-             'cost_depreciation': cost_depreciation,
-             'name': asset.name,
-             'code': asset.code,
-             'no_depreciation': asset.surplus_value - total - cost_depreciation,
-            })
-        return asset_line
+        AssetLine = self.env['asset.line'].create({
+            'date': self.date,
+            'order_id': Asset.id,
+            'period_id': self.period_id.id,
+            'cost_depreciation': cost_depreciation,
+            'name': Asset.name,
+            'code': Asset.code,
+            'no_depreciation': Asset.surplus_value - total - cost_depreciation,
+        })
+        return AssetLine
 
     @api.multi
     def create_depreciation(self):
@@ -538,22 +562,25 @@ class CreateDepreciationWizard(models.TransientModel):
         vouch_obj = self.env['voucher'].create({'date': self.date})
         res = {}
         asset_line_id_list = []
-        for asset in self.env['asset'].search([('no_depreciation', '=', False),
+        for Asset in self.env['asset'].search([('no_depreciation', '=', False),
                                                ('state', '=', 'done'), ('period_id', '!=', self.period_id.id)]):
-            if self.period_id not in [line.period_id for line in asset.line_ids] and \
-                     self.env['finance.period'].period_compare(self.period_id,asset.period_id) > 0:
-                cost_depreciation = asset.cost_depreciation
-                total = sum(line.cost_depreciation for line in asset.line_ids) + asset.depreciation_value
-                if asset.surplus_value <= (total + cost_depreciation):
-                    cost_depreciation = asset.surplus_value - total
-                    asset.no_depreciation = 1
+            if self.period_id not in [line.period_id for line in Asset.line_ids] and \
+                    self.env['finance.period'].period_compare(self.period_id, Asset.period_id) > 0:
+                cost_depreciation = Asset.cost_depreciation
+                total = sum(
+                    line.cost_depreciation for line in Asset.line_ids) + Asset.depreciation_value
+                if Asset.surplus_value <= (total + cost_depreciation):
+                    cost_depreciation = Asset.surplus_value - total
+                    Asset.no_depreciation = 1
                 # 获得凭证明细行
-                res = self._get_voucher_line(asset, cost_depreciation, vouch_obj)
+                res = self._get_voucher_line(
+                    Asset, cost_depreciation, vouch_obj)
                 # 生成折旧明细行
-                asset_line_row = self._generate_asset_line(asset, cost_depreciation, total)
+                asset_line_row = self._generate_asset_line(
+                    Asset, cost_depreciation, total)
                 asset_line_id_list.append(asset_line_row.id)
-        for account_id,val in res.iteritems():
-            self.env['voucher.line'].create(dict(val,account_id = account_id))
+        for account_id, val in res.iteritems():
+            self.env['voucher.line'].create(dict(val, account_id=account_id))
 
         if not vouch_obj.line_ids:
             vouch_obj.unlink()
@@ -569,7 +596,8 @@ class CreateDepreciationWizard(models.TransientModel):
             'domain': [('id', 'in', asset_line_id_list)]
         }
 
-class chang_line(models.Model):
+
+class ChangLine(models.Model):
     _name = 'chang.line'
     _description = u'资产变更明细'
 
@@ -588,7 +616,8 @@ class chang_line(models.Model):
         compute='_compute_period_id', ondelete='restrict', store=True)
     chang_before = fields.Float(u'变更前')
     chang_after = fields.Float(u'变更后')
-    chang_money_invoice = fields.Many2one('money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
+    chang_money_invoice = fields.Many2one(
+        'money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
     partner_id = fields.Many2one('partner', u'变更单位')
     change_reason = fields.Text(u'变更原因')
     company_id = fields.Many2one(
@@ -597,7 +626,8 @@ class chang_line(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
-class voucher(models.Model):
+
+class Voucher(models.Model):
     _inherit = 'voucher'
 
     @api.one
@@ -612,33 +642,35 @@ class voucher(models.Model):
         if self.env['asset'].search([('is_init', '=', True),
                                      ('state', '=', 'draft')]):
             raise UserError(u'有未审核的固定资产初始化单据。')
-        for asset in self.env['asset'].search([('is_init', '=', True),
+        for Asset in self.env['asset'].search([('is_init', '=', True),
                                                ('state', '=', 'done')]):
-            cost = asset.cost
-            depreciation_previous = asset.depreciation_previous
+            cost = Asset.cost
+            depreciation_previous = Asset.depreciation_previous
             '''固定资产'''
-            if asset.account_asset.id not in res:
-                res[asset.account_asset.id] = {'credit':0,'debit': 0} # vorcher_line 没有这个字段 ,'cate':'asset'
+            if Asset.account_asset.id not in res:
+                # vorcher_line 没有这个字段 ,'cate':'asset'
+                res[Asset.account_asset.id] = {'credit': 0, 'debit': 0}
 
-            val = res[asset.account_asset.id]
-            val.update({'debit':val.get('debit') + cost,
-                        'account_id': asset.account_asset.id,
+            val = res[Asset.account_asset.id]
+            val.update({'debit': val.get('debit') + cost,
+                        'account_id': Asset.account_asset.id,
                         'voucher_id': self.id,
                         'init_obj': 'asset',
                         'name': '固定资产 期初'
                         })
             '''累计折旧'''
-            if asset.account_accumulated_depreciation.id not in res:
-                res[asset.account_accumulated_depreciation.id] = {'credit':0,'debit': 0} # vorcher_line 没有这个字段 ,'cate':'asset'
+            if Asset.account_accumulated_depreciation.id not in res:
+                res[Asset.account_accumulated_depreciation.id] = {
+                    'credit': 0, 'debit': 0}  # vorcher_line 没有这个字段 ,'cate':'asset'
 
-            val = res[asset.account_accumulated_depreciation.id]
-            val.update({'credit':val.get('credit') + depreciation_previous,
-                        'account_id': asset.account_accumulated_depreciation.id,
+            val = res[Asset.account_accumulated_depreciation.id]
+            val.update({'credit': val.get('credit') + depreciation_previous,
+                        'account_id': Asset.account_accumulated_depreciation.id,
                         'voucher_id': self.id,
                         'init_obj': 'asset',
                         'name': '固定资产 期初'
                         })
 
-        for account_id,val in res.iteritems():
-            self.env['voucher.line'].create(dict(val,account_id = account_id),
+        for account_id, val in res.iteritems():
+            self.env['voucher.line'].create(dict(val, account_id=account_id),
                                             )

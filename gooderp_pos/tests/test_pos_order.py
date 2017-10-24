@@ -4,11 +4,11 @@ from odoo.exceptions import UserError, ValidationError
 import datetime
 
 
-class test_pos_order(TransactionCase):
+class TestPosOrder(TransactionCase):
 
     def setUp(self):
         '''准备基本数据'''
-        super(test_pos_order, self).setUp()
+        super(TestPosOrder, self).setUp()
         self.pos_config = self.env.ref('gooderp_pos.pos_config_sell')
         self.session = self.env['pos.session'].create({
             'config_id': self.pos_config.id,

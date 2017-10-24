@@ -16,6 +16,7 @@ _logger = logging.getLogger(__name__)
 PPG = 20  # Products Per Page
 PPR = 4   # Products Per Row
 
+
 class TableCompute(object):
 
     def __init__(self):
@@ -88,7 +89,7 @@ class TableCompute(object):
 
 
 # class WebsiteSaleForm(WebsiteForm):
-# 
+#
 #     @http.route('/website_form/shop.sale.order', type='http', auth="public", methods=['POST'], website=True)
 #     def website_form_saleorder(self, **kwargs):
 #         model_record = request.env.ref('sale.model_sale_order')
@@ -96,11 +97,11 @@ class TableCompute(object):
 #             data = self.extract_data(model_record, kwargs)
 #         except ValidationError, e:
 #             return json.dumps({'error_fields': e.args[0]})
-# 
+#
 #         order = request.website.sale_get_order()
 #         if data['record']:
 #             order.write(data['record'])
-# 
+#
 #         if data['custom']:
 #             values = {
 #                 'body': nl2br(data['custom']),
@@ -110,10 +111,10 @@ class TableCompute(object):
 #                 'res_id': order.id,
 #             }
 #             request.env['mail.message'].sudo().create(values)
-# 
+#
 #         if data['attachments']:
 #             self.insert_attachment(model_record, order.id, data['attachments'])
-# 
+#
 #         return json.dumps({'id': order.id})
 
 
@@ -131,7 +132,8 @@ class WebsiteSale(http.Controller):
 
         attribute_ids = []
         for attribute in product.attribute_ids:
-            attribute_ids.append([attribute.id, product.attribute_ids, product.price, product.price])
+            attribute_ids.append(
+                [attribute.id, product.attribute_ids, product.price, product.price])
 
         return attribute_ids
 
@@ -141,7 +143,7 @@ class WebsiteSale(http.Controller):
         return 'website_published desc,%s , id desc' % post.get('order', 'website_sequence desc')
 
     def _get_search_domain(self, search, category, attrib_values):
-#         domain = request.website.sale_product_domain()
+        #         domain = request.website.sale_product_domain()
         domain = []
         if search:
             for srch in search.split(" "):
@@ -189,9 +191,11 @@ class WebsiteSale(http.Controller):
         domain = self._get_search_domain(search, category, attrib_values)
         domain += [('not_saleable', '=', False)]
 
-        keep = QueryURL('/shop', category=category and int(category), search=search, attrib=attrib_list, order=post.get('order'))
+        keep = QueryURL('/shop', category=category and int(category),
+                        search=search, attrib=attrib_list, order=post.get('order'))
 
-        request.context = dict(request.context, partner=request.env.user.gooderp_partner_id)
+        request.context = dict(
+            request.context, partner=request.env.user.gooderp_partner_id)
 
         url = "/shop"
         if search:
@@ -214,14 +218,16 @@ class WebsiteSale(http.Controller):
                 current_category = current_category.parent_id
 
         product_count = Product.search_count(domain)
-        pager = request.website.pager(url=url, total=product_count, page=page, step=ppg, scope=7, url_args=post)
+        pager = request.website.pager(
+            url=url, total=product_count, page=page, step=ppg, scope=7, url_args=post)
         products = Product.search(domain, limit=ppg, offset=pager['offset'])
 
         ProductAttribute = request.env['attribute']
         if products:
             # get all products without limit
             selected_products = Product.search(domain, limit=False)
-            attributes = ProductAttribute.search([('goods_id', 'in', selected_products.ids)])
+            attributes = ProductAttribute.search(
+                [('goods_id', 'in', selected_products.ids)])
         else:
             attributes = ProductAttribute.browse(attributes_ids)
 
@@ -264,22 +270,25 @@ class WebsiteSale(http.Controller):
         attrib_values = [map(int, v.split("-")) for v in attrib_list if v]
         attrib_set = set([v[1] for v in attrib_values])
 
-        keep = QueryURL('/shop', category=category and category.id, search=search, attrib=attrib_list)
+        keep = QueryURL('/shop', category=category and category.id,
+                        search=search, attrib=attrib_list)
 
         if not product_context.get('pricelist'):
-#             product_context['pricelist'] = pricelist.id
+            #             product_context['pricelist'] = pricelist.id
             product = product.with_context(product_context)
 
         attribute_dict = {}
         for attribute in product.attribute_ids:
             for value in attribute.value_ids:
                 if not attribute_dict.has_key(value.category_id.name):
-                    attribute_dict.update({value.category_id.name: [value.value_id.name]})
+                    attribute_dict.update(
+                        {value.category_id.name: [value.value_id.name]})
                 else:
                     if value.value_id.name in attribute_dict[value.category_id.name]:
                         continue
                     else:
-                        attribute_dict[value.category_id.name].append(value.value_id.name)
+                        attribute_dict[value.category_id.name].append(
+                            value.value_id.name)
 
         # 货币取当前登录用户公司对应的货币
         for user in request.env['res.users'].browse(request.uid):
@@ -341,7 +350,8 @@ class WebsiteSale(http.Controller):
             request.website.sale_reset()
             return {}
 
-        value = order._cart_update(product_id=product_id, line_id=line_id, add_qty=add_qty, set_qty=set_qty)
+        value = order._cart_update(
+            product_id=product_id, line_id=line_id, add_qty=add_qty, set_qty=set_qty)
         if not order.cart_quantity:
             request.website.sale_reset()
             return {}
@@ -355,12 +365,12 @@ class WebsiteSale(http.Controller):
         value['good_shop.cart_lines'] = request.env['ir.ui.view'].render_template("good_shop.cart_lines", {
             'website_sale_order': order,
             'compute_currency': lambda price: price,
-#             'suggested_products': order._cart_accessories()
+            #             'suggested_products': order._cart_accessories()
         })
         return value
 
     def _get_mandatory_billing_fields(self):
-        return ["name", "address"] # , "city", "country_id"
+        return ["name", "address"]  # , "city", "country_id"
 
     @http.route(['/shop/checkout'], type='http', auth="public", website=True)
     def checkout(self, **post):
@@ -435,14 +445,15 @@ class WebsiteSale(http.Controller):
         # IF PUBLIC ORDER
         if order.partner_id.id == request.website.user_id.sudo().gooderp_partner_id.id:
             mode = ('new', 'billing')
-            
+
         # IF ORDER LINKED TO A PARTNER
         else:
             if partner_id > 0:
                 if partner_id == order.partner_id.id:
                     mode = ('edit', 'billing')
                 else:
-                    shippings = Partner.search([('id', '=', order.partner_id.id)])
+                    shippings = Partner.search(
+                        [('id', '=', order.partner_id.id)])
                     if partner_id in shippings.mapped('id'):
                         mode = ('edit', 'shipping')
                     else:
@@ -451,14 +462,16 @@ class WebsiteSale(http.Controller):
                     values = Partner.browse(partner_id)
             elif partner_id == -1:
                 mode = ('new', 'shipping')
-            else: # no mode - refresh without post?
+            else:  # no mode - refresh without post?
                 return request.redirect('/shop/checkout')
 
         # IF POSTED
         if 'submitted' in kw:
             pre_values = self.values_preprocess(order, mode, kw)
-            errors, error_msg = self.checkout_form_validate(mode, kw, pre_values)
-            post, errors, error_msg = self.values_postprocess(order, mode, pre_values, errors, error_msg)
+            errors, error_msg = self.checkout_form_validate(
+                mode, kw, pre_values)
+            post, errors, error_msg = self.values_postprocess(
+                order, mode, pre_values, errors, error_msg)
 
             if errors:
                 errors['error_message'] = error_msg
@@ -514,9 +527,11 @@ class WebsiteSale(http.Controller):
         error_message = []
 
         # Required fields from form
-        required_fields = filter(None, (all_form_values.get('field_required') or '').split(','))
+        required_fields = filter(
+            None, (all_form_values.get('field_required') or '').split(','))
         # Required fields from mandatory field function
-        required_fields += mode[1] == 'shipping' and self._get_mandatory_shipping_fields() or self._get_mandatory_billing_fields()
+        required_fields += mode[1] == 'shipping' and self._get_mandatory_shipping_fields(
+        ) or self._get_mandatory_billing_fields()
 
         # error message for empty required fields
         for field_name in required_fields:

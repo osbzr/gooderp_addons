@@ -3,7 +3,7 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
-class partner(models.Model):
+class Partner(models.Model):
     _inherit = 'partner'
 
     user_ids = fields.One2many('res.users',
@@ -24,5 +24,6 @@ class partner(models.Model):
             'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])],
         }
         user = self.env['res.users'].sudo().create(values)
-        self.message_post(body=u'登录用户 %s 创建成功。<br>请点击下面链接修改密码 %s' % (user.name, user.signup_url))
+        self.message_post(body=u'登录用户 %s 创建成功。<br>请点击下面链接修改密码 %s' %
+                          (user.name, user.signup_url))
         return user

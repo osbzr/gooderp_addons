@@ -4,7 +4,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
 
 
-class buy_order_detail(models.Model):
+class BuyOrderDetail(models.Model):
     _name = 'buy.order.detail'
     _description = u'采购明细表'
     _auto = False
@@ -20,7 +20,8 @@ class buy_order_detail(models.Model):
     qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     uom = fields.Char(u'单位')
     price = fields.Float(u'单价', digits=dp.get_precision('Price'))
-    amount = fields.Float(u'采购金额', digits=dp.get_precision('Amount'))  # 商品的购货金额
+    amount = fields.Float(
+        u'采购金额', digits=dp.get_precision('Amount'))  # 商品的购货金额
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
     note = fields.Char(u'备注')
@@ -76,13 +77,14 @@ class buy_order_detail(models.Model):
     def view_detail(self):
         '''查看明细按钮'''
         self.ensure_one()
-        order = self.env['buy.receipt'].search([('name', '=', self.order_name)])
+        order = self.env['buy.receipt'].search(
+            [('name', '=', self.order_name)])
         if order:
             if not order.is_return:
                 view = self.env.ref('buy.buy_receipt_form')
             else:
                 view = self.env.ref('buy.buy_return_form')
-            
+
             return {
                 'name': u'采购入库单',
                 'view_type': 'form',

@@ -3,7 +3,8 @@
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
 
-class sell_order_detail(models.Model):
+
+class SellOrderDetail(models.Model):
     _name = 'sell.order.detail'
     _description = u'销售明细表'
     _auto = False
@@ -80,13 +81,14 @@ class sell_order_detail(models.Model):
     def view_detail(self):
         '''查看明细按钮'''
         self.ensure_one()
-        order = self.env['sell.delivery'].search([('name', '=', self.order_name)])
+        order = self.env['sell.delivery'].search(
+            [('name', '=', self.order_name)])
         if order:
             if not order.is_return:
                 view = self.env.ref('sell.sell_delivery_form')
             else:
                 view = self.env.ref('sell.sell_return_form')
-            
+
             return {
                 'name': u'销售发货单',
                 'view_type': 'form',

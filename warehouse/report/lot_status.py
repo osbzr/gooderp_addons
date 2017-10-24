@@ -5,7 +5,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import models, fields
 
 
-class report_lot_status(models.Model):
+class ReportLotStatus(models.Model):
     _name = 'report.lot.status'
     _description = u'批次余额表'
     _auto = False

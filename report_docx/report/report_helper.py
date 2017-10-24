@@ -51,18 +51,18 @@ def calc_alignment(s):
     把字符串转换为对齐的常量
     """
     A = docx.enum.text.WD_ALIGN_PARAGRAPH
-    if s=='center':
+    if s == 'center':
         return A.CENTER
-    elif s=='left':
+    elif s == 'left':
         return A.LEFT
-    elif s=='right':
+    elif s == 'right':
         return A.RIGHT
     else:
         return A.LEFT
 
 
 @jinja2.contextfilter
-def picture(ctx,data,width=None, height=None,align=None):
+def picture(ctx, data, width=None, height=None, align=None):
     """
     把图片的二进制数据（使用了base64编码）转化为一个docx.Document对象
 
@@ -75,29 +75,27 @@ def picture(ctx,data,width=None, height=None,align=None):
     if not data:
         return None
 
-    #转化为file-like对象
-    #在python2.7中，bytes==str，可以直接使用
-    #在python3.5中，bytes和str是不同的类型，需要使用base64这个库
+    # 转化为file-like对象
+    # 在python2.7中，bytes==str，可以直接使用
+    # 在python3.5中，bytes和str是不同的类型，需要使用base64这个库
 
-    
-    #data使用了base64编码，所以这里需要解码
+    # data使用了base64编码，所以这里需要解码
     data = data.decode('base64')
 
     import io
     data = io.BytesIO(data)
 
-        
     tpl = ctx['tpl']
     doc = tpl.new_subdoc()
 
     if width:
-        width=calc_length(width)
+        width = calc_length(width)
     if height:
-        height=calc_length(height)
-    
+        height = calc_length(height)
+
     p = doc.add_paragraph()
     p.alignment = calc_alignment(align)
-    p.add_run().add_picture(data,width=width,height=height)
+    p.add_run().add_picture(data, width=width, height=height)
     return doc
 
 
@@ -109,20 +107,22 @@ def get_env():
     jinja_env.filters['picture'] = picture
     return jinja_env
 
+
 def test():
     """
     演示了如何使用，可以直接执行该文件，但是需要使用自己写的docx模版，和图片
     """
     tpl = DocxTemplate("tpls/test_tpl.docx")
-    #读取图片的数据且使用base64编码
-    data = open('tpls/python_logo.png','rb').read().encode('base64')
-    obj={'logo':data}
+    # 读取图片的数据且使用base64编码
+    data = open('tpls/python_logo.png', 'rb').read().encode('base64')
+    obj = {'logo': data}
     # 需要添加模版对象
-    ctx={'obj':obj,'tpl':tpl}
+    ctx = {'obj': obj, 'tpl': tpl}
     jinja_env = get_env()
-    tpl.render(ctx,jinja_env)
+    tpl.render(ctx, jinja_env)
 
     tpl.save('tpls/test.docx')
+
 
 def main():
     test()

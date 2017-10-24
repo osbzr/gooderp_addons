@@ -5,7 +5,7 @@ from odoo import models, fields, api
 import datetime
 
 
-class report_stock_transceive(models.Model):
+class ReportStockTransceive(models.Model):
     _name = 'report.stock.transceive'
     _description = u'商品收发明细表'
     _inherit = 'report.base'
@@ -133,25 +133,25 @@ class report_stock_transceive(models.Model):
         tag = sql_type == 'out' and -1 or 1
 
         value.update({
-                'goods_qty_begain': value.get('goods_qty_begain', 0) +
+            'goods_qty_begain': value.get('goods_qty_begain', 0) +
                     (tag * record.get('goods_qty_begain', 0)),
-                'cost_begain': value.get('cost_begain', 0) +
+            'cost_begain': value.get('cost_begain', 0) +
                     (tag * record.get('cost_begain', 0)),
-                'goods_qty_end': value.get('goods_qty_end', 0) +
+            'goods_qty_end': value.get('goods_qty_end', 0) +
                     (tag * record.get('goods_qty_end', 0)),
-                'cost_end': value.get('cost_end', 0) +
+            'cost_end': value.get('cost_end', 0) +
                     (tag * record.get('cost_end', 0)),
 
-                'goods_qty_out': value.get('goods_qty_out', 0) +
+            'goods_qty_out': value.get('goods_qty_out', 0) +
                     (sql_type == 'out' and record.get('goods_qty', 0) or 0),
-                'cost_out': value.get('cost_out', 0) +
+            'cost_out': value.get('cost_out', 0) +
                     (sql_type == 'out' and record.get('cost', 0) or 0),
-                'goods_qty_in': value.get('goods_qty_in', 0) +
+            'goods_qty_in': value.get('goods_qty_in', 0) +
                     (sql_type == 'in' and record.get('goods_qty', 0) or 0),
-                'cost_in': value.get('cost_in', 0) +
+            'cost_in': value.get('cost_in', 0) +
                     (sql_type == 'in' and record.get('cost', 0) or 0),
-                'id_lists': value.get('id_lists', []) + record.get('id_lists', []),
-            })
+            'id_lists': value.get('id_lists', []) + record.get('id_lists', []),
+        })
 
     def compute_history_stock_by_collect(self, res, records, sql_type='out'):
         for record in records:

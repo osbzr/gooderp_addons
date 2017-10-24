@@ -21,7 +21,8 @@ class TestChangeLocation(TransactionCase):
 
         self.location = self.env.ref('warehouse.a001_location')
         self.others_wh_in = self.env.ref('warehouse.wh_in_whin0')
-        self.env.ref('warehouse.wh_move_line_14').location_id = self.location.id
+        self.env.ref(
+            'warehouse.wh_move_line_14').location_id = self.location.id
         # 填充库位数量
         self.others_wh_in.approve_order()
 
@@ -30,10 +31,10 @@ class TestChangeLocation(TransactionCase):
 
         self.location_b001 = self.env.ref('warehouse.b001_location')
         self.change_loc = self.env['change.location'].create({
-                                                              'from_location': self.location.id,
-                                                              'to_location': self.location_b001.id,
-                                                              'change_qty': 1,
-                                                              })
+            'from_location': self.location.id,
+            'to_location': self.location_b001.id,
+            'change_qty': 1,
+        })
 
     def test_confirm_change(self):
         ''' 测试商品库位转移 '''
@@ -72,4 +73,4 @@ class TestChangeLocation(TransactionCase):
         # 报错：转出库位产品数量不能小于等于 0
         with self.assertRaises(UserError):
             self.env['change.location'].with_context({'active_model': 'location',
-                'active_ids': [act_id]}).fields_view_get(None, 'form', False, False)
+                                                      'active_ids': [act_id]}).fields_view_get(None, 'form', False, False)

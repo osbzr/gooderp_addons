@@ -2,10 +2,10 @@
 from odoo.tests.common import TransactionCase
 
 
-class test_scan_barcode(TransactionCase):
+class TestScanBarcode(TransactionCase):
 
     def setUp(self):
-        super(test_scan_barcode, self).setUp()
+        super(TestScanBarcode, self).setUp()
         self.goods = self.env.ref('goods.computer')
         self.wh_out = self.env.ref('warehouse.wh_out_whout0')
 

@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo import tools
 
 
-class report_auxiliary_accounting(models.Model):
+class ReportAuxiliaryAccounting(models.Model):
     _name = 'report.auxiliary.accounting'
     _auto = False
     _description = u'辅助核算余额表'

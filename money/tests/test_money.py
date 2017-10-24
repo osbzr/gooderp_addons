@@ -4,8 +4,9 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 
 
-class test_money_order(TransactionCase):
+class TestMoneyOrder(TransactionCase):
     '''测试收付款'''
+
     def test_money_order_unlink(self):
         '''测试收付款单删除'''
         self.env.ref('money.get_40000').money_order_done()
@@ -53,12 +54,14 @@ class test_money_order(TransactionCase):
     def test_money_order_draft_foreign_currency(self):
         ''' 测试收付款反审核时 单据行与当前用户公司的 currency 不一致的情况 '''
         # get
-        self.env.ref('money.get_line_1').currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.get_line_1').currency_id = self.env.ref(
+            'base.USD').id
         self.env.user.company_id.currency_id = self.env.ref('base.CNY').id
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.get_40000').money_order_draft()
         # pay
-        self.env.ref('money.pay_line_1').currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.pay_line_1').currency_id = self.env.ref(
+            'base.USD').id
         self.env.ref('money.get_40000').money_order_done()  # 先做收款以便付款足够支付
         self.env.ref('money.pay_2000').money_order_done()
         self.env.ref('money.pay_2000').money_order_draft()
@@ -96,7 +99,7 @@ class test_money_order(TransactionCase):
                 'line_ids': [(0, 0, {
                     'bank_id': self.env.ref('core.comm').id,
                     'amount': 200.0})]
-                }).onchange_partner_id()
+            }).onchange_partner_id()
 
     def test_money_order_done(self):
         ''' 测试收付款审核  '''
@@ -156,9 +159,9 @@ class test_money_order(TransactionCase):
         ''' 测试  _get_category_id 不存在 context.get('type')'''
         self.env.user.company_id.draft_invoice = True
         invoice = self.env['money.invoice'].create({'date': "2016-02-20",
-            'partner_id': self.env.ref('core.jd').id,
-            'name': 'invoice/2016001',
-            'date_due': '2016-09-07'})
+                                                    'partner_id': self.env.ref('core.jd').id,
+                                                    'name': 'invoice/2016001',
+                                                    'date_due': '2016-09-07'})
 
         # 测试 invoice name_get has order
         invoice.with_context({'order': '20170807'}).name_get()
@@ -167,24 +170,27 @@ class test_money_order(TransactionCase):
         # 同一业务伙伴存在两个未审核的付款单，报错
         with self.assertRaises(UserError):
             self.env['money.order'].with_context({'type': 'get'}) \
-            .create({
+                .create({
                     'partner_id': self.env.ref('core.jd').id,
                     'name': 'GET/201600111',
                     'date': "2016-02-20",
                     'type': 'get'
-                    })
+                })
 
         with self.assertRaises(UserError):
-            self.env.ref('money.pay_2000').partner_id = self.env.ref('core.jd').id
+            self.env.ref('money.pay_2000').partner_id = self.env.ref(
+                'core.jd').id
 
     def test_money_order_done_get_voucher(self):
         ''' 测试收付款审核时 单据行与当前用户公司的 currency 不一致的情况 '''
         # get
-        self.env.ref('money.get_line_1').currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.get_line_1').currency_id = self.env.ref(
+            'base.USD').id
         self.env.user.company_id.currency_id = self.env.ref('base.CNY').id
         self.env.ref('money.get_40000').money_order_done()
         # pay
-        self.env.ref('money.pay_line_1').currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.pay_line_1').currency_id = self.env.ref(
+            'base.USD').id
         self.env.ref('money.pay_2000').money_order_done()
 
     def test_money_order_voucher(self):
@@ -219,7 +225,8 @@ class test_money_order(TransactionCase):
                     'this_reconcile': 210.0,
                     'date_due': '2016-09-07'})],
                 'type': 'get'})
-        money1.discount_account_id = self.env.ref('finance.small_business_chart5603001').id
+        money1.discount_account_id = self.env.ref(
+            'finance.small_business_chart5603001').id
         money1.discount_amount = 10
         money1.money_order_done()
 
@@ -244,7 +251,8 @@ class test_money_order(TransactionCase):
                     'date_due': '2016-09-07'})],
                 'type': 'pay'})
 
-        money2.discount_account_id = self.env.ref('finance.small_business_chart5603002').id
+        money2.discount_account_id = self.env.ref(
+            'finance.small_business_chart5603002').id
         money2.discount_amount = 10
         money2.money_order_done()
 
@@ -268,8 +276,8 @@ class test_money_order(TransactionCase):
         '''测试 带结算单明细行的收款单银行账户不存在 account_id 的情况'''
         self.env.ref('money.get_40000').money_order_done()
         temp_bank = self.env['bank.account'].create({'name': 'temporary bank',
-                                         'currency_id': self.env.ref('base.CNY').id,
-                                         'account_id': False})
+                                                     'currency_id': self.env.ref('base.CNY').id,
+                                                     'account_id': False})
 
         invoice = self.env['money.invoice'].create({
             'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
@@ -281,16 +289,16 @@ class test_money_order(TransactionCase):
             'date_due': '2016-09-07'})
         get_money = self.env['money.order'].with_context({'type': 'get'}) \
             .create({'partner_id': self.env.ref('core.jd').id,
-                    'name': 'GET/2016001', 'date': "2016-02-20",
-                    'line_ids': [(0, 0, {
-                        'bank_id': temp_bank.id,
-                        'amount': 200.0})],
+                     'name': 'GET/2016001', 'date': "2016-02-20",
+                     'line_ids': [(0, 0, {
+                         'bank_id': temp_bank.id,
+                         'amount': 200.0})],
                      'source_ids': [(0, 0, {'name': invoice.id,
-                        'category_id': self.env.ref('money.core_category_purchase').id,
-                        'date': '2016-02-20', 'amount': 200.0,
-                        'reconciled': 0, 'to_reconcile': 200.0,
-                        'this_reconcile': 200.0, 'date_due': '2016-09-07'})],
-                    'type': 'get'})
+                                            'category_id': self.env.ref('money.core_category_purchase').id,
+                                            'date': '2016-02-20', 'amount': 200.0,
+                                            'reconciled': 0, 'to_reconcile': 200.0,
+                                            'this_reconcile': 200.0, 'date_due': '2016-09-07'})],
+                     'type': 'get'})
 
         # get 银行账户没设置科目 有结算单行
         with self.assertRaises(UserError):
@@ -300,15 +308,15 @@ class test_money_order(TransactionCase):
         invoice.partner_id = self.env.ref('core.lenovo').id
         pay_money = self.env['money.order'].with_context({'type': 'pay'}) \
             .create({'partner_id': self.env.ref('core.lenovo').id,
-                    'name': 'PAY/2016001', 'date': "2016-02-20",
-                    'line_ids': [(0, 0, {
-                        'bank_id': temp_bank.id,
-                        'amount': 200.0, 'note': 'money note'})],
+                     'name': 'PAY/2016001', 'date': "2016-02-20",
+                     'line_ids': [(0, 0, {
+                         'bank_id': temp_bank.id,
+                         'amount': 200.0, 'note': 'money note'})],
                      'source_ids': [(0, 0, {'name': invoice.id,
-                        'category_id': self.env.ref('money.core_category_purchase').id,
-                        'date': '2016-02-20', 'amount': 200.0, 'reconciled': 0,
-                        'to_reconcile': 200.0, 'this_reconcile': 200.0, 'date_due': '2016-09-07'})],
-                    'type': 'pay'})
+                                            'category_id': self.env.ref('money.core_category_purchase').id,
+                                            'date': '2016-02-20', 'amount': 200.0, 'reconciled': 0,
+                                            'to_reconcile': 200.0, 'this_reconcile': 200.0, 'date_due': '2016-09-07'})],
+                     'type': 'pay'})
 
         # pay 银行账户没设置科目 有结算单行
         with self.assertRaises(UserError):
@@ -316,12 +324,14 @@ class test_money_order(TransactionCase):
 
     def test_compute_currency_id(self):
         '''测试 结算帐户与业务伙伴币别不一致 报错'''
-        self.env.ref('money.get_40000').currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.get_40000').currency_id = self.env.ref(
+            'base.USD').id
         with self.assertRaises(ValidationError):
-            self.env.ref('money.get_line_1').bank_id = self.env.ref('core.alipay').id
+            self.env.ref('money.get_line_1').bank_id = self.env.ref(
+                'core.alipay').id
 
 
-class test_other_money_order(TransactionCase):
+class TestOtherMoneyOrder(TransactionCase):
     '''测试其他收支单'''
 
     def test_other_money_order_unlink(self):
@@ -391,7 +401,7 @@ class test_other_money_order(TransactionCase):
         self.env['other.money.order.line'].create({
             'other_money_id': other.id,
             'category_id': self.env.ref('money.core_category_sale').id,
-            'amount':-10.0})
+            'amount': -10.0})
         with self.assertRaises(UserError):
             other.other_money_done()
 
@@ -412,7 +422,7 @@ class test_other_money_order(TransactionCase):
         other.line_ids[0].category_id.account_id = False
         with self.assertRaises(UserError):
             other.other_money_done()
-            
+
     def test_other_money_order_no_bank_account(self):
         ''' 其他收支单审核，bank 的 account 不存在 '''
         other_get = self.env.ref('money.other_get_60')
@@ -457,14 +467,16 @@ class test_other_money_order(TransactionCase):
         self.assertEqual(order.bank_num, u'6000000222222')
 
 
-class test_other_money_order_line(TransactionCase):
+class TestOtherMoneyOrderLine(TransactionCase):
     ''' 测试其他收支单明细 '''
 
     def setUp(self):
         '''准备数据'''
-        super(test_other_money_order_line, self).setUp()
-        self.get_order = self.env.ref('money.other_get_60').with_context({'type': 'other_get'})
-        self.pay_order = self.env.ref('money.other_pay_1000').with_context({'type': 'other_pay'})
+        super(TestOtherMoneyOrderLine, self).setUp()
+        self.get_order = self.env.ref(
+            'money.other_get_60').with_context({'type': 'other_get'})
+        self.pay_order = self.env.ref(
+            'money.other_pay_1000').with_context({'type': 'other_pay'})
 
         self.service_1 = self.env.ref('core.service_1')
 
@@ -474,14 +486,16 @@ class test_other_money_order_line(TransactionCase):
         for line in self.get_order.line_ids:
             line.service = self.service_1  # 咨询服务
             line.with_context({'order_type': 'other_get'}).onchange_service()
-            self.assertTrue(line.category_id.id == self.service_1.get_categ_id.id)
+            self.assertTrue(line.category_id.id ==
+                            self.service_1.get_categ_id.id)
             self.assertTrue(line.amount == 500)
 
         # 其他支出单
         for line in self.pay_order.line_ids:
             line.service = self.service_1  # 咨询服务
             line.with_context({'order_type': 'other_pay'}).onchange_service()
-            self.assertTrue(line.category_id.id == self.service_1.pay_categ_id.id)
+            self.assertTrue(line.category_id.id ==
+                            self.service_1.pay_categ_id.id)
             self.assertTrue(line.amount == 500)
 
     def test_onchange_tax_amount(self):
@@ -504,19 +518,21 @@ class test_other_money_order_line(TransactionCase):
                     'line_ids': [(0, 0, {
                         'category_id': self.env.ref('core.cat_consult').id,
                         'amount': 10.0})]})
-        self.env.ref('core.comm').account_id = self.env.ref('finance.account_bank').id
+        self.env.ref('core.comm').account_id = self.env.ref(
+            'finance.account_bank').id
         other_pay.line_ids[0].category_id.account_id = False
         self.env.ref('money.get_40000').money_order_done()
         with self.assertRaises(UserError):
             other_pay.other_money_done()
 
         # 其他收支单审核，订单的 is_init 为 True
-        other_pay.line_ids[0].category_id.account_id = self.env.ref('finance.bs_9').id
+        other_pay.line_ids[0].category_id.account_id = self.env.ref(
+            'finance.bs_9').id
         other_pay.is_init = True
         other_pay.other_money_done()
 
 
-class test_money_transfer_order(TransactionCase):
+class TestMoneyTransferOrder(TransactionCase):
     '''测试其他资金转账单'''
 
     def test_money_transfer_order_unlink(self):
@@ -543,9 +559,12 @@ class test_money_transfer_order(TransactionCase):
 
     def test_transfer_order_draft_in_bank_currency(self):
         '''测试 资金转账单 反审核 转入账户存在 币别'''
-        self.env.ref('finance.account_bank').currency_id = self.env.user.company_id.currency_id.id
-        self.env.ref('finance.account_cash').currency_id = self.env.ref('base.USD').id
-        self.env.ref('core.alipay').account_id = self.env.ref('finance.account_cash').id
+        self.env.ref(
+            'finance.account_bank').currency_id = self.env.user.company_id.currency_id.id
+        self.env.ref('finance.account_cash').currency_id = self.env.ref(
+            'base.USD').id
+        self.env.ref('core.alipay').account_id = self.env.ref(
+            'finance.account_cash').id
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.transfer_line_1').currency_amount = 100
         self.env.ref('money.transfer_300').money_transfer_done()
@@ -558,7 +577,8 @@ class test_money_transfer_order(TransactionCase):
 
     def test_transfer_order_draft_in_bank_no_currency(self):
         '''测试 资金转账单 反审核 转入账户不存在 币别'''
-        self.env.ref('finance.account_bank').currency_id = self.env.user.company_id.currency_id.id
+        self.env.ref(
+            'finance.account_bank').currency_id = self.env.user.company_id.currency_id.id
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.transfer_line_1').currency_amount = 100
         self.env.ref('money.transfer_300').money_transfer_done()
@@ -610,45 +630,55 @@ class test_money_transfer_order(TransactionCase):
     def test_inCurrency_notEqual_company_curreny(self):
         '''测试 资金转账单 转入账户与公司币别不一致 '''
         self.env.ref('money.get_40000').money_order_done()
-        self.env.ref('money.transfer_line_1').out_bank_id.account_id = self.env.ref('finance.account_cash').id
-        self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.transfer_line_1').out_bank_id.account_id = self.env.ref(
+            'finance.account_cash').id
+        self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref(
+            'base.USD').id
         self.env.ref('money.transfer_line_1').currency_amount = 233.75
         self.env.ref('money.transfer_300').money_transfer_done()
 
     def test_outCurrency_notEqual_company_curreny(self):
         '''测试 资金转账单 转出账户与公司币别不一致 '''
         # 转出账户余额不足
-        self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref(
+            'base.USD').id
         self.env.ref('money.transfer_line_1').currency_amount = 233.75
         with self.assertRaises(UserError):
             self.env.ref('money.transfer_300').money_transfer_done()
 
         # 转入账户与公司币别一致 : in_currency_id == company_currency_id
-        self.env.ref('money.get_40000').partner_id.c_category_id.account_id.currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.get_40000').partner_id.c_category_id.account_id.currency_id = self.env.ref(
+            'base.USD').id
         self.env.ref('money.get_40000').money_order_done()
-        self.env.ref('money.transfer_line_1').in_bank_id.account_id = self.env.ref('finance.account_cash').id
+        self.env.ref('money.transfer_line_1').in_bank_id.account_id = self.env.ref(
+            'finance.account_cash').id
         self.env.ref('money.transfer_300').money_transfer_done()
 
         # 系统不支持外币转外币
         self.env.ref('money.transfer_300').money_transfer_draft()
-        self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref('base.USD').id
-        self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref('base.USD').id
+        self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref(
+            'base.USD').id
+        self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref(
+            'base.USD').id
         with self.assertRaises(UserError):
             self.env.ref('money.transfer_300').money_transfer_done()
 
     def test_outCurrency_inCurrency_notEqual_company_curreny(self):
         '''测试 资金转账单 转出账户或者转入账户与公司币别不一致并且外币金额为0 报错'''
 
-        self.env.ref('money.transfer_line_1').in_bank_id.account_id = self.env.ref('finance.account_cash').id
-        self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref('base.USD').id
-        self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref('base.CNY').id
+        self.env.ref('money.transfer_line_1').in_bank_id.account_id = self.env.ref(
+            'finance.account_cash').id
+        self.env.ref('money.transfer_line_1').out_bank_id.account_id.currency_id = self.env.ref(
+            'base.USD').id
+        self.env.ref('money.transfer_line_1').in_bank_id.account_id.currency_id = self.env.ref(
+            'base.CNY').id
         self.env.user.company_id.currency_id = self.env.ref('base.CNY').id
 
         with self.assertRaises(UserError):
             self.env.ref('money.transfer_300').money_transfer_done()
 
 
-class test_partner(TransactionCase):
+class TestPartner(TransactionCase):
 
     def test_partner(self):
         ''' 客户、供应商对账单 和  银行帐'''

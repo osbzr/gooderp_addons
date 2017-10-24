@@ -6,7 +6,7 @@ from odoo import fields, models, api, tools
 from odoo.exceptions import UserError
 
 
-class supplier_statements_report(models.Model):
+class SupplierStatementsReport(models.Model):
     _inherit = "supplier.statements.report"
     _auto = False
 
@@ -105,10 +105,10 @@ class supplier_statements_report(models.Model):
         for model, view_dict in model_view.iteritems():
             res = self.env[model].search([('name', '=', self.name)])
             name = model == 'buy.receipt' and res.is_return and \
-                   view_dict['name_return'] or view_dict['name']
+                view_dict['name_return'] or view_dict['name']
             view = model == 'buy.receipt' and res.is_return and \
-                   self.env.ref(view_dict['view_return']) \
-                   or self.env.ref(view_dict['view'])
+                self.env.ref(view_dict['view_return']) \
+                or self.env.ref(view_dict['view'])
             if res:
                 return {
                     'name': name,
@@ -122,7 +122,7 @@ class supplier_statements_report(models.Model):
         raise UserError(u'期初余额没有原始单据可供查看。')
 
 
-class supplier_statements_report_with_goods(models.TransientModel):
+class SupplierStatementsReportWithGoods(models.TransientModel):
     _name = "supplier.statements.report.with.goods"
     _description = u"供应商对账单带商品明细"
 
@@ -179,10 +179,10 @@ class supplier_statements_report_with_goods(models.TransientModel):
         for model, view_dict in model_view.iteritems():
             res = self.env[model].search([('name', '=', self.name)])
             name = model == 'buy.receipt' and res.is_return and \
-                   view_dict['name_return'] or view_dict['name']
+                view_dict['name_return'] or view_dict['name']
             view = model == 'buy.receipt' and res.is_return and \
-                   self.env.ref(view_dict['view_return']) \
-                   or self.env.ref(view_dict['view'])
+                self.env.ref(view_dict['view_return']) \
+                or self.env.ref(view_dict['view'])
             if res:
                 return {
                     'name': name,

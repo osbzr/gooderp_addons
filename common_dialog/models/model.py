@@ -19,4 +19,5 @@ def open_dialog(self, func, options=None):
         'context': context
     }
 
+
 models.BaseModel.open_dialog = open_dialog

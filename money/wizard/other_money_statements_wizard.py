@@ -2,13 +2,15 @@
 from odoo.exceptions import UserError
 from odoo import fields, models, api
 
-class other_money_statements_report_wizard(models.Model):
+
+class OtherMoneyStatementsReportWizard(models.Model):
     _name = "other.money.statements.report.wizard"
     _description = u"其他收支明细表向导"
 
     @api.model
     def _get_company_start_date(self):
         return self._get_company_start_date_impl()
+
     @api.model
     def _get_company_start_date_impl(self):
         ''' 获取当前登录用户公司的启用日期 '''
@@ -38,13 +40,13 @@ class other_money_statements_report_wizard(models.Model):
         view = self.env.ref('money.other_money_statements_report_tree')
 
         return {
-                'name': u'其他收支明细表',
-                'view_type': 'form',
-                'view_mode': 'tree',
-                'res_model': 'other.money.statements.report',
-                'view_id': False,
-                'views': [(view.id, 'tree')],
-                'limit': 65535,
-                'type': 'ir.actions.act_window',
-                'domain':[('date', '>=', self.from_date), ('date', '<=', self.to_date)]
-                }
+            'name': u'其他收支明细表',
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'other.money.statements.report',
+            'view_id': False,
+            'views': [(view.id, 'tree')],
+            'limit': 65535,
+            'type': 'ir.actions.act_window',
+            'domain': [('date', '>=', self.from_date), ('date', '<=', self.to_date)]
+        }

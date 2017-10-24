@@ -4,7 +4,7 @@ from odoo import fields, models, api, tools
 import odoo.addons.decimal_precision as dp
 
 
-class customer_statements_report(models.Model):
+class CustomerStatementsReport(models.Model):
     _name = "customer.statements.report"
     _description = u"客户对账单"
     _auto = False
@@ -13,13 +13,15 @@ class customer_statements_report(models.Model):
     @api.one
     @api.depends('amount', 'pay_amount', 'partner_id')
     def _compute_balance_amount(self):
-        pre_record = self.search([('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
+        pre_record = self.search(
+            [('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
         # 相邻的两条记录，partner不同，应收款余额重新计算
         if pre_record:
             before_balance = pre_record.balance_amount
         else:
             before_balance = 0
-        self.balance_amount += before_balance + self.amount - self.pay_amount - self.discount_money
+        self.balance_amount += before_balance + \
+            self.amount - self.pay_amount - self.discount_money
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
@@ -33,7 +35,7 @@ class customer_statements_report(models.Model):
                                   compute='_compute_balance_amount',
                                   digits=dp.get_precision('Amount'))
     discount_money = fields.Float(string=u'收款折扣', readonly=True,
-                              digits=dp.get_precision('Amount'))
+                                  digits=dp.get_precision('Amount'))
     note = fields.Char(string=u'备注', readonly=True)
 
     def init(self):

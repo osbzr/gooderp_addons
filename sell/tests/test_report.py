@@ -3,20 +3,22 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
 
-class test_customer_statements(TransactionCase):
+class TestCustomerStatements(TransactionCase):
     '''测试客户对账单'''
+
     def setUp(self):
         '''客户账单向导及数据'''
-        super(test_customer_statements, self).setUp()
+        super(TestCustomerStatements, self).setUp()
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         # 业务伙伴对账单向导: self._context.get('default_customer')
         self.statement = self.env['partner.statements.report.wizard'].create(
-                    {'partner_id': self.env.ref('core.jd').id,
-                    'from_date': '2016-01-01',
-                    'to_date': '2016-11-01'}).with_context({'default_customer': True})
+            {'partner_id': self.env.ref('core.jd').id,
+             'from_date': '2016-01-01',
+             'to_date': '2016-11-01'}).with_context({'default_customer': True})
 
         # 客户期初余额，查看原始单据应报错
         self.env.ref('core.jd').receivable_init = 1000
@@ -25,7 +27,8 @@ class test_customer_statements(TransactionCase):
         money_get.money_order_done()
         # 创建销售出货单记录
         self.env.ref('warehouse.wh_move_line_14').goods_uos_qty = 200
-        self.env.ref('warehouse.wh_move_line_14').production_date = '2016-02-04'
+        self.env.ref(
+            'warehouse.wh_move_line_14').production_date = '2016-02-04'
         self.env.ref('warehouse.wh_move_line_14').action_done()
         sell_order = self.env.ref('sell.sell_order_2')
         sell_order.sell_order_done()
@@ -33,17 +36,21 @@ class test_customer_statements(TransactionCase):
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
 
-        receipt = self.env['sell.delivery'].search([('order_id','=',sell_order.id)])
+        receipt = self.env['sell.delivery'].search(
+            [('order_id', '=', sell_order.id)])
         receipt.sell_delivery_done()
-        invoice = self.env['money.invoice'].search([('name','=',receipt.name)])
+        invoice = self.env['money.invoice'].search(
+            [('name', '=', receipt.name)])
         invoice.money_invoice_done()
 
         # 创建销售退货单记录
         sell_return = self.env.ref('sell.sell_order_return')
         sell_return.sell_order_done()
-        receipt_return = self.env['sell.delivery'].search([('order_id','=',sell_return.id)])
+        receipt_return = self.env['sell.delivery'].search(
+            [('order_id', '=', sell_return.id)])
         receipt_return.sell_delivery_done()
-        invoice_return = self.env['money.invoice'].search([('name','=',receipt_return.name)])
+        invoice_return = self.env['money.invoice'].search(
+            [('name', '=', receipt_return.name)])
         invoice_return.money_invoice_done()
 
     def test_customer_statements_wizard(self):
@@ -57,7 +64,8 @@ class test_customer_statements(TransactionCase):
         # 测试客户对账单方法中的from_date的默认值是否是公司启用日期
         statement_date = self.env['partner.statements.report.wizard'].create({'partner_id': self.env.ref('sell.sell_order_1').partner_id.id,
                                                                               'to_date': '2016-11-03'})
-        self.assertEqual(statement_date.from_date, self.env.user.company_id.start_date)
+        self.assertEqual(statement_date.from_date,
+                         self.env.user.company_id.start_date)
 
     def test_customer_statements_find_source(self):
         '''查看客户对账单明细'''
@@ -75,9 +83,10 @@ class test_customer_statements(TransactionCase):
 
         # 查看客户对账单带商品明细
         self.statement.partner_statements_with_goods()
-        customer_statement_goods = self.env['customer.statements.report.with.goods'].search([('name', '!=', False)])
+        customer_statement_goods = self.env['customer.statements.report.with.goods'].search([
+                                                                                            ('name', '!=', False)])
         customer_statement_goods_init = self.env['customer.statements.report.with.goods'].search([('move_id', '=', False),
-                                                         ('amount', '!=', 0)])
+                                                                                                  ('amount', '!=', 0)])
 
         # 如果对账单中是期初余额行，点击查看按钮应报错
         with self.assertRaises(UserError):
@@ -88,14 +97,15 @@ class test_customer_statements(TransactionCase):
             report.find_source_order()
 
 
-class test_track_wizard(TransactionCase):
+class TestTrackWizard(TransactionCase):
     '''测试销售订单跟踪表向导'''
 
     def setUp(self):
         ''' 准备报表数据 '''
-        super(test_track_wizard, self).setUp()
+        super(TestTrackWizard, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         # 补足商品网线的数量
@@ -107,12 +117,12 @@ class test_track_wizard(TransactionCase):
         order_2.sell_order_done()
         # 分批出库
         delivery_2 = self.env['sell.delivery'].search(
-                    [('order_id', '=', order_2.id)])
+            [('order_id', '=', order_2.id)])
         for line in delivery_2.line_out_ids:
             line.goods_qty = 5
         delivery_2.sell_delivery_done()
         delivery_3 = self.env['sell.delivery'].search(
-                    [('order_id', '=', order_2.id), ('state', '=', 'draft')])
+            [('order_id', '=', order_2.id), ('state', '=', 'draft')])
         delivery_3.sell_delivery_done()
 
         # 销货订单产生退货单
@@ -126,9 +136,9 @@ class test_track_wizard(TransactionCase):
         '''测试销售订单跟踪表  确认按钮'''
         # 日期报错
         track = self.track_obj.create({
-                             'date_start': '2016-11-01',
-                             'date_end': '2016-1-01',
-                             })
+            'date_start': '2016-11-01',
+            'date_end': '2016-1-01',
+        })
         with self.assertRaises(UserError):
             track.button_ok()
         # 按日期搜索
@@ -143,22 +153,25 @@ class test_track_wizard(TransactionCase):
     def test_view_detail(self):
         '''测试销售订单跟踪表  查看明细按钮'''
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
 
         self.track.button_ok()
         goods_id = self.env.ref('goods.cable').id
-        track_line = self.env['sell.order.track'].search([('goods_id', '=', goods_id)])
+        track_line = self.env['sell.order.track'].search(
+            [('goods_id', '=', goods_id)])
         track_line[0].view_detail()
 
 
-class test_detail_wizard(TransactionCase):
+class TestDetailWizard(TransactionCase):
     '''测试销售订单明细表向导'''
 
     def setUp(self):
         ''' 准备报表数据 '''
-        super(test_detail_wizard, self).setUp()
+        super(TestDetailWizard, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         # 补足商品网线的数量
@@ -171,14 +184,14 @@ class test_detail_wizard(TransactionCase):
 
         # 审核出库单
         delivery_2 = self.env['sell.delivery'].search(
-                    [('order_id', '=', order_2.id)])
+            [('order_id', '=', order_2.id)])
         delivery_2.sell_delivery_done()
 
         # 销货订单产生退货单，并审核退货单
         sell_return = self.env.ref('sell.sell_order_return')
         sell_return.sell_order_done()
         delivery_return = self.env['sell.delivery'].search(
-                    [('order_id', '=', sell_return.id)])
+            [('order_id', '=', sell_return.id)])
         delivery_return.sell_delivery_done()
 
         self.detail_obj = self.env['sell.order.detail.wizard']
@@ -187,12 +200,13 @@ class test_detail_wizard(TransactionCase):
     def test_button_ok(self):
         '''测试销售订单明细表  确认按钮'''
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
 
         detail = self.detail_obj.create({
-                             'date_start': '2016-11-01',
-                             'date_end': '2016-1-01',
-                             })
+            'date_start': '2016-11-01',
+            'date_end': '2016-1-01',
+        })
         with self.assertRaises(UserError):
             detail.button_ok()
         # 按日期搜索
@@ -209,19 +223,20 @@ class test_detail_wizard(TransactionCase):
         self.detail.button_ok()
         goods_id = self.env.ref('goods.cable').id
         detail_line = self.env['sell.order.detail'].search(
-                                [('goods_id', '=', goods_id)])
+            [('goods_id', '=', goods_id)])
         for line in detail_line:
             line.view_detail()
 
 
-class test_goods_wizard(TransactionCase):
+class TestGoodsWizard(TransactionCase):
     '''测试销售汇总表（按商品）向导'''
 
     def setUp(self):
         ''' 准备报表数据 '''
-        super(test_goods_wizard, self).setUp()
+        super(TestGoodsWizard, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -229,7 +244,7 @@ class test_goods_wizard(TransactionCase):
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.delivery.sell_delivery_done()
         self.goods_wizard_obj = self.env['sell.summary.goods.wizard']
         self.goods_wizard = self.goods_wizard_obj.create({})
@@ -238,9 +253,9 @@ class test_goods_wizard(TransactionCase):
         '''销售汇总表（按商品）向导确认按钮'''
         # 日期报错
         goods_wizard = self.goods_wizard_obj.create({
-                             'date_start': '2016-11-01',
-                             'date_end': '2016-1-01',
-                             })
+            'date_start': '2016-11-01',
+            'date_end': '2016-1-01',
+        })
         with self.assertRaises(UserError):
             goods_wizard.button_ok()
         # 按日期搜索
@@ -259,7 +274,7 @@ class test_goods_wizard(TransactionCase):
         new_goods_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         new_context = new_goods_wizard.button_ok().get('context')
         new_results = summary_goods.with_context(new_context).search_read(
-                                                                  domain=[])
+            domain=[])
         self.assertEqual(len(results), 1)
         self.assertEqual(len(new_results), 0)
 
@@ -273,15 +288,16 @@ class test_goods_wizard(TransactionCase):
             summary_line.with_context(context).view_detail()
 
 
-class test_partner_wizard(TransactionCase):
+class TestPartnerWizard(TransactionCase):
     '''测试销售汇总表（按客户）向导'''
 
     def setUp(self):
         ''' 准备报表数据 '''
-        super(test_partner_wizard, self).setUp()
+        super(TestPartnerWizard, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -289,7 +305,7 @@ class test_partner_wizard(TransactionCase):
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.delivery.sell_delivery_done()
         self.partner_wizard_obj = self.env['sell.summary.partner.wizard']
         self.partner_wizard = self.partner_wizard_obj.create({})
@@ -298,9 +314,9 @@ class test_partner_wizard(TransactionCase):
         '''销售汇总表（按客户）向导确认按钮'''
         # 日期报错
         partner_wizard = self.partner_wizard_obj.create({
-                             'date_start': '2016-11-01',
-                             'date_end': '2016-1-01',
-                             })
+            'date_start': '2016-11-01',
+            'date_end': '2016-1-01',
+        })
         with self.assertRaises(UserError):
             partner_wizard.button_ok()
         # 按日期搜索
@@ -319,7 +335,7 @@ class test_partner_wizard(TransactionCase):
         new_partner_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         new_context = new_partner_wizard.button_ok().get('context')
         new_results = summary_partner.with_context(new_context).search_read(
-                                                                  domain=[])
+            domain=[])
 
     def test_view_detail(self):
         '''销售汇总表（按客户）  查看明细按钮'''
@@ -331,21 +347,22 @@ class test_partner_wizard(TransactionCase):
             summary_line.with_context(context).view_detail()
 
 
-class test_staff_wizard(TransactionCase):
+class TestStaffWizard(TransactionCase):
     '''测试销售汇总表（按销售人员）向导'''
 
     def setUp(self):
         ''' 准备报表数据 '''
-        super(test_staff_wizard, self).setUp()
+        super(TestStaffWizard, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
         warehouse_obj.approve_order()
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.delivery.sell_delivery_done()
         self.staff_wizard_obj = self.env['sell.summary.staff.wizard']
         self.staff_wizard = self.staff_wizard_obj.create({})
@@ -354,9 +371,9 @@ class test_staff_wizard(TransactionCase):
         '''销售汇总表（按销售人员）向导确认按钮'''
         # 日期报错
         staff_wizard = self.staff_wizard_obj.create({
-                             'date_start': '2016-11-01',
-                             'date_end': '2016-1-01',
-                             })
+            'date_start': '2016-11-01',
+            'date_end': '2016-1-01',
+        })
         with self.assertRaises(UserError):
             staff_wizard.button_ok()
         # 按日期搜索
@@ -376,7 +393,7 @@ class test_staff_wizard(TransactionCase):
         new_staff_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         new_context = new_staff_wizard.button_ok().get('context')
         new_results = summary_staff.with_context(new_context).search_read(
-                                                                  domain=[])
+            domain=[])
 
     def test_view_detail(self):
         '''销售汇总表（按销售人员）  查看明细按钮'''
@@ -388,14 +405,15 @@ class test_staff_wizard(TransactionCase):
             summary_line.with_context(context).view_detail()
 
 
-class test_receipt_wizard(TransactionCase):
+class TestReceiptWizard(TransactionCase):
     '''测试销售收款一览表向导'''
- 
+
     def setUp(self):
         ''' 准备报表数据 '''
-        super(test_receipt_wizard, self).setUp()
+        super(TestReceiptWizard, self).setUp()
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -405,14 +423,14 @@ class test_receipt_wizard(TransactionCase):
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.delivery.bank_account_id = self.env.ref('core.comm')
         self.env.ref('money.get_40000').money_order_done()
         self.delivery.receipt = 2.0
         self.delivery.sell_delivery_done()
         # 查找产生的收款单，并审核
         source_line = self.env['source.order.line'].search(
-                [('name', '=', self.delivery.invoice_id.id)])
+            [('name', '=', self.delivery.invoice_id.id)])
         for line in source_line:
             line.money_id.money_order_done()
 
@@ -428,7 +446,7 @@ class test_receipt_wizard(TransactionCase):
         self.order_return = self.env.ref('sell.sell_order_return')
         self.order_return.sell_order_done()
         self.delivery_return = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order_return.id)])
+            [('order_id', '=', self.order_return.id)])
         self.delivery_return.sell_delivery_done()
         self.receipt_wizard_obj = self.env['sell.receipt.wizard']
         self.receipt_wizard = self.receipt_wizard_obj.create({})
@@ -436,13 +454,14 @@ class test_receipt_wizard(TransactionCase):
     def test_button_ok(self):
         '''测试销售收款一览表  确认按钮'''
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
 
         # 日期报错
         receipt_wizard = self.receipt_wizard_obj.create({
-                             'date_start': '2016-11-01',
-                             'date_end': '2016-1-01',
-                             })
+            'date_start': '2016-11-01',
+            'date_end': '2016-1-01',
+        })
         with self.assertRaises(UserError):
             receipt_wizard.button_ok()
         # 按日期搜索
@@ -452,16 +471,18 @@ class test_receipt_wizard(TransactionCase):
             self.env.ref('core.customer_category_1').id
         self.receipt_wizard.partner_id = self.env.ref('core.jd').id
         self.receipt_wizard.user_id = self.env.ref('base.user_demo').id
-        self.receipt_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.receipt_wizard.warehouse_id = self.env.ref(
+            'warehouse.hd_stock').id
         self.receipt_wizard.button_ok()
 
     def test_view_detail(self):
         '''测试销售收款一览表  查看明细按钮'''
         self.receipt_wizard.button_ok()
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
 
         receipt_line = self.env['sell.receipt'].search(
-                                [('order_name', '=', self.delivery.name)])
+            [('order_name', '=', self.delivery.name)])
         for line in receipt_line:
             line.view_detail()
         receipt_line2 = self.env['sell.receipt'].search(
@@ -470,14 +491,15 @@ class test_receipt_wizard(TransactionCase):
             line.view_detail()
 
 
-class test_sell_top_ten_wizard(TransactionCase):
+class TestSellTopTenWizard(TransactionCase):
     '''测试销量前十商品向导'''
 
     def setUp(self):
         ''' 准备报表数据 '''
-        super(test_sell_top_ten_wizard, self).setUp()
+        super(TestSellTopTenWizard, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
@@ -485,20 +507,20 @@ class test_sell_top_ten_wizard(TransactionCase):
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.delivery.sell_delivery_done()
         self.wizard_obj = self.env['sell.top.ten.wizard']
         self.wizard = self.wizard_obj.create({
-                             'date_start': '2016-1-01',
-                             'date_end': '2016-12-12',})
+            'date_start': '2016-1-01',
+            'date_end': '2016-12-12', })
 
     def test_button_ok(self):
         '''销量前十商品向导确认按钮'''
         # 日期报错
         wizard = self.wizard.create({
-                             'date_start': '2016-11-01',
-                             'date_end': '2016-1-01',
-                             })
+            'date_start': '2016-11-01',
+            'date_end': '2016-1-01',
+        })
         with self.assertRaises(UserError):
             wizard.button_ok()
         # 日期默认值
@@ -514,22 +536,23 @@ class test_sell_top_ten_wizard(TransactionCase):
         new_wizard.warehouse_id = self.env.ref('warehouse.hd_stock').id
         new_context = new_wizard.button_ok().get('context')
         new_results = summary_top_ten.with_context(new_context).search_read(
-                                                                  domain=[])
+            domain=[])
 
         self.assertEqual(len(results), 1)
         self.assertEqual(len(new_results), 1)
 
 
-class test_popup_wizard(TransactionCase):
+class TestPopupWizard(TransactionCase):
     '''发货单缺货向导'''
 
     def setUp(self):
         ''' 准备数据 '''
-        super(test_popup_wizard, self).setUp()
+        super(TestPopupWizard, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.hd_stock = self.env.ref('warehouse.hd_stock')
-        self.warehouse_inventory = self.env.ref('warehouse.warehouse_inventory')
+        self.warehouse_inventory = self.env.ref(
+            'warehouse.warehouse_inventory')

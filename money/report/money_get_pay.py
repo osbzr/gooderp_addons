@@ -11,7 +11,7 @@ MONEY_TYPE = [
 ]
 
 
-class money_get_pay_report(models.Model):
+class MoneyGetPayReport(models.Model):
     _name = "money.get.pay.report"
     _description = u"资金收支报表"
     _auto = False

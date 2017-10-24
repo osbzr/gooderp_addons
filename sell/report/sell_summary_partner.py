@@ -5,7 +5,7 @@ from odoo import fields, models, api
 import datetime
 
 
-class sell_summary_partner(models.Model):
+class SellSummaryPartner(models.Model):
     _name = 'sell.summary.partner'
     _inherit = 'report.base'
     _description = u'销售汇总表（按客户）'
@@ -115,18 +115,18 @@ class sell_summary_partner(models.Model):
             'date_start': context.get('date_start') or '',
             'date_end': date_end,
             'partner_id': context.get('partner_id') and
-                context.get('partner_id')[0] or '',
+            context.get('partner_id')[0] or '',
             'goods_id': context.get('goods_id') and
-                context.get('goods_id')[0] or '',
+            context.get('goods_id')[0] or '',
             'c_category_id': context.get('c_category_id') and
-                context.get('c_category_id')[0] or '',
+            context.get('c_category_id')[0] or '',
             'warehouse_id': context.get('warehouse_id') and
-                context.get('warehouse_id')[0] or '',
+            context.get('warehouse_id')[0] or '',
         }
 
     def _compute_order(self, result, order):
         order = order or 'partner ASC'
-        return super(sell_summary_partner, self)._compute_order(result, order)
+        return super(SellSummaryPartner, self)._compute_order(result, order)
 
     def collect_data_by_sql(self, sql_type='out'):
         collection = self.execute_sql(sql_type='out')
@@ -145,7 +145,7 @@ class sell_summary_partner(models.Model):
             if line.get('id') == self.id:
                 line_ids = line.get('id_lists')
                 move_lines = self.env['wh.move.line'].search(
-                        [('id', 'in', line_ids)])
+                    [('id', 'in', line_ids)])
 
         for move_line in move_lines:
             details = self.env['sell.order.detail'].search(

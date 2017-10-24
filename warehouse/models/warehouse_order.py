@@ -4,7 +4,8 @@ from utils import inherits, inherits_after, create_name, create_origin
 import odoo.addons.decimal_precision as dp
 from odoo import models, fields, api
 
-class wh_out(models.Model):
+
+class WhOut(models.Model):
     _name = 'wh.out'
     _description = u'其他出库单'
     _inherit = ['mail.thread', 'scan.barcode']
@@ -24,11 +25,13 @@ class wh_out(models.Model):
     type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others',
                             help=u'类别: 盘亏,其他出库')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits=dp.get_precision('Amount'),
+                                store=True, readonly=True, digits=dp.get_precision(
+                                    'Amount'),
                                 help=u'该出库单的出库金额总和')
     voucher_id = fields.Many2one('voucher', u'出库凭证',
                                  readonly=True,
                                  help=u'该出库单的审核后生成的出库凭证')
+
     @api.multi
     @inherits_after()
     def approve_order(self):
@@ -59,12 +62,13 @@ class wh_out(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
-        return super(wh_out, self).create(vals)
+        return super(WhOut, self).create(vals)
 
     @api.multi
     @api.onchange('type')
     def onchange_type(self):
-        self.warehouse_dest_id = self.env['warehouse'].get_warehouse_by_type(self.type)
+        self.warehouse_dest_id = self.env['warehouse'].get_warehouse_by_type(
+            self.type)
 
     def goods_inventory(self, vals):
         """
@@ -84,7 +88,7 @@ class wh_out(models.Model):
         贷：库存商品（商品分类上会计科目）
         '''
         voucher = self.env['voucher'].create({'date': self.date})
-        credit_sum = 0 # 贷方之和
+        credit_sum = 0  # 贷方之和
         for line in self.line_out_ids:
             if line.cost:   # 贷方行（多行）
                 self.env['voucher.line'].create({
@@ -97,8 +101,8 @@ class wh_out(models.Model):
                 })
             credit_sum += line.cost
         account = self.type == 'inventory' \
-                  and self.env.ref('finance.small_business_chart1901') \
-                  or self.finance_category_id.account_id
+            and self.env.ref('finance.small_business_chart1901') \
+            or self.finance_category_id.account_id
         if credit_sum:  # 借方行（汇总一行）
             self.env['voucher.line'].create({
                 'name': u'%s %s' % (self.name, self.note or ''),
@@ -123,7 +127,7 @@ class wh_out(models.Model):
         voucher.unlink()
 
 
-class wh_in(models.Model):
+class WhIn(models.Model):
     _name = 'wh.in'
     _description = u'其他入库单'
     _inherit = ['mail.thread']
@@ -143,13 +147,13 @@ class wh_in(models.Model):
     type = fields.Selection(TYPE_SELECTION, u'业务类别', default='others',
                             help=u'类别: 盘盈,其他入库,初始')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits=dp.get_precision('Amount'),
+                                store=True, readonly=True, digits=dp.get_precision(
+                                    'Amount'),
                                 help=u'该入库单的入库金额总和')
     voucher_id = fields.Many2one('voucher', u'入库凭证',
                                  readonly=True,
                                  help=u'该入库单的审核后生成的入库凭证')
     is_init = fields.Boolean(u'初始化单')
-
 
     @api.multi
     @inherits()
@@ -181,12 +185,13 @@ class wh_in(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
-        return super(wh_in, self).create(vals)
+        return super(WhIn, self).create(vals)
 
     @api.multi
     @api.onchange('type')
     def onchange_type(self):
-        self.warehouse_id = self.env['warehouse'].get_warehouse_by_type(self.type).id
+        self.warehouse_id = self.env['warehouse'].get_warehouse_by_type(
+            self.type).id
 
     @api.one
     def create_voucher(self):
@@ -223,8 +228,8 @@ class wh_in(models.Model):
 
         # 贷方科目： 如果是盘盈则取主营业务成本，否则取收发类别上的科目
         account = self.type == 'inventory' \
-                  and self.env.ref('finance.small_business_chart1901') \
-                  or self.finance_category_id.account_id
+            and self.env.ref('finance.small_business_chart1901') \
+            or self.finance_category_id.account_id
 
         if not self.is_init:
             if debit_sum:
@@ -233,8 +238,8 @@ class wh_in(models.Model):
                     'account_id': account.id,
                     'credit': debit_sum,
                     'voucher_id': vouch_id.id,
-                    })
-        if not self.is_init :
+                })
+        if not self.is_init:
             if len(self.voucher_id.line_ids) > 0:
                 self.voucher_id.voucher_done()
             else:
@@ -248,20 +253,22 @@ class wh_in(models.Model):
             if self.voucher_id.state == 'done':
                 self.voucher_id.voucher_draft()
             voucher, self.voucher_id = self.voucher_id, False
-            #始初化单反审核只删除明细行
+            # 始初化单反审核只删除明细行
             if self.is_init:
-                vouch_obj = self.env['voucher'].search([('id', '=', voucher.id)])
+                vouch_obj = self.env['voucher'].search(
+                    [('id', '=', voucher.id)])
                 vouch_obj_lines = self.env['voucher.line'].search([
                     ('voucher_id', '=', vouch_obj.id),
-                    ('goods_id', 'in', [line.goods_id.id for line in self.line_in_ids]),
-                    ('init_obj', '=', 'init_warehouse - %s' % (self.id)),])
+                    ('goods_id', 'in', [
+                     line.goods_id.id for line in self.line_in_ids]),
+                    ('init_obj', '=', 'init_warehouse - %s' % (self.id)), ])
                 for vouch_obj_line in vouch_obj_lines:
                     vouch_obj_line.unlink()
             else:
                 voucher.unlink()
 
 
-class wh_internal(models.Model):
+class WhInternal(models.Model):
     _name = 'wh.internal'
     _description = u'内部调拨单'
     _inherit = ['mail.thread']
@@ -274,7 +281,8 @@ class wh_internal(models.Model):
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
                               help=u'调拨单对应的移库单')
     amount_total = fields.Float(compute='_get_amount_total', string=u'合计成本金额',
-                                store=True, readonly=True, digits=dp.get_precision('Amount'),
+                                store=True, readonly=True, digits=dp.get_precision(
+                                    'Amount'),
                                 help=u'该调拨单的出库金额总和')
 
     def goods_inventory(self, vals):
@@ -291,7 +299,8 @@ class wh_internal(models.Model):
     @inherits()
     def approve_order(self):
         if self.env.user.company_id.is_enable_negative_stock:
-            result_vals = self.env['wh.move'].create_zero_wh_in(self, self._name)
+            result_vals = self.env['wh.move'].create_zero_wh_in(
+                self, self._name)
             if result_vals:
                 return result_vals
         return True
@@ -316,4 +325,4 @@ class wh_internal(models.Model):
     @create_name
     @create_origin
     def create(self, vals):
-        return super(wh_internal, self).create(vals)
+        return super(WhInternal, self).create(vals)

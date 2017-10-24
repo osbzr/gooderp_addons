@@ -3,13 +3,14 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
 
-class test_sell_adjust(TransactionCase):
+class TestSellAdjust(TransactionCase):
 
     def setUp(self):
         '''销售变更单准备基本数据'''
-        super(test_sell_adjust, self).setUp()
+        super(TestSellAdjust, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         # 销货订单 10个 网线
@@ -29,7 +30,7 @@ class test_sell_adjust(TransactionCase):
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
                                  'quantity': 2,
-                                }),
+                                 }),
                          ]
         })
         adjust.sell_adjust_done()
@@ -46,14 +47,14 @@ class test_sell_adjust(TransactionCase):
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
                                  'quantity': 2,
-                                }),
+                                 }),
                          (0, 0, {'goods_id': self.mouse.id,
                                  'quantity': 1,
-                                }),
+                                 }),
                          (0, 0, {'goods_id': self.keyboard.id,
                                  'attribute_id': self.keyboard_white.id,
                                  'quantity': 1,
-                                })
+                                 })
                          ]
         })
         adjust.sell_adjust_done()
@@ -81,7 +82,7 @@ class test_sell_adjust(TransactionCase):
             'order_id': new_order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
                                  'quantity': 1,
-                                }),
+                                 }),
                          ]
         })
         with self.assertRaises(UserError):
@@ -106,7 +107,7 @@ class test_sell_adjust(TransactionCase):
             'order_id': new_order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
                                  'quantity': 3.0,
-                                }),
+                                 }),
                          ]
         })
         with self.assertRaises(UserError):
@@ -122,8 +123,8 @@ class test_sell_adjust(TransactionCase):
         adjust = self.env['sell.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                                'quantity': -5,
-                                })]
+                                 'quantity': -5,
+                                 })]
         })
         with self.assertRaises(UserError):
             adjust.sell_adjust_done()
@@ -138,8 +139,8 @@ class test_sell_adjust(TransactionCase):
         adjust = self.env['sell.adjust'].create({
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
-                                'quantity': -4,
-                                })]
+                                 'quantity': -4,
+                                 })]
         })
         adjust.sell_adjust_done()
         new_delivery = self.env['sell.delivery'].search(
@@ -165,22 +166,22 @@ class test_sell_adjust(TransactionCase):
         delivery.discount_amount = 0    # 订单行中价格为0，所以整单金额0
         delivery.sell_delivery_done()
         adjust = self.env['sell.adjust'].create({
-        'order_id': new_order.id,
-        'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                             'attribute_id': self.keyboard_white.id,
-                             'quantity': 3.0,
-                            }),
-                     ]
+            'order_id': new_order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                 'attribute_id': self.keyboard_white.id,
+                                 'quantity': 3.0,
+                                 }),
+                         ]
         })
         with self.assertRaises(UserError):
             adjust.sell_adjust_done()
 
 
-class test_sell_adjust_line(TransactionCase):
+class TestSellAdjustLine(TransactionCase):
 
     def setUp(self):
         '''销售变更单明细基本数据'''
-        super(test_sell_adjust_line, self).setUp()
+        super(TestSellAdjustLine, self).setUp()
         # 销货订单 10个 网线
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
@@ -190,7 +191,7 @@ class test_sell_adjust_line(TransactionCase):
             'order_id': self.order.id,
             'line_ids': [(0, 0, {'goods_id': self.cable.id,
                                  'quantity': 1,
-                                })]
+                                 })]
         })
 
     def test_compute_using_attribute(self):

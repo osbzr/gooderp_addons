@@ -26,7 +26,7 @@ from odoo.tools import float_compare, float_is_zero
 from datetime import datetime
 
 
-class money_order(models.Model):
+class MoneyOrder(models.Model):
     _name = 'money.order'
     _description = u"收付款单"
     _inherit = ['mail.thread']
@@ -40,9 +40,11 @@ class money_order(models.Model):
     def create(self, values):
         # 创建单据时，根据订单类型的不同，生成不同的单据编号
         if self.env.context.get('type') == 'pay':
-            values.update({'name': self.env['ir.sequence'].next_by_code('pay.order')})
+            values.update(
+                {'name': self.env['ir.sequence'].next_by_code('pay.order')})
         else:
-            values.update({'name': self.env['ir.sequence'].next_by_code('get.order')})
+            values.update(
+                {'name': self.env['ir.sequence'].next_by_code('get.order')})
 
         # 创建时查找该业务伙伴是否存在 未审核 状态下的收付款单
         orders = self.env['money.order'].search([('partner_id', '=', values.get('partner_id')),
@@ -51,7 +53,7 @@ class money_order(models.Model):
         if orders:
             raise UserError(u'该业务伙伴存在未审核的收/付款单，请先审核')
 
-        return super(money_order, self).create(values)
+        return super(MoneyOrder, self).create(values)
 
     @api.multi
     def write(self, values):
@@ -61,9 +63,10 @@ class money_order(models.Model):
                                                      ('state', '=', 'draft'),
                                                      ('id', '!=', self.id)])
             if orders:
-                raise UserError(u'业务伙伴(%s)存在未审核的收/付款单，请先审核'%orders.partner_id.name)
+                raise UserError(u'业务伙伴(%s)存在未审核的收/付款单，请先审核' %
+                                orders.partner_id.name)
 
-        return super(money_order, self).write(values)
+        return super(MoneyOrder, self).write(values)
 
     @api.multi
     def unlink(self):
@@ -75,7 +78,7 @@ class money_order(models.Model):
             if order.state == 'done':
                 raise UserError(u'不可以删除已经审核的单据')
 
-        return super(money_order, self).unlink()
+        return super(MoneyOrder, self).unlink()
 
     @api.one
     @api.depends('discount_amount',
@@ -111,15 +114,15 @@ class money_order(models.Model):
         self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
 
     state = fields.Selection([
-                          ('draft', u'未审核'),
-                          ('done', u'已审核'),
-                          ], string=u'状态', readonly=True,
-                             default='draft', copy=False, index=True,
-                        help=u'收/付款单状态标识，新建时状态为未审核;审核后状态为已审核')
+        ('draft', u'未审核'),
+        ('done', u'已审核'),
+    ], string=u'状态', readonly=True,
+        default='draft', copy=False, index=True,
+        help=u'收/付款单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
-                                help=u'该单据对应的业务伙伴，单据审核时会影响他的应收应付余额')
+                                 help=u'该单据对应的业务伙伴，单据审核时会影响他的应收应付余额')
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
@@ -136,7 +139,8 @@ class money_order(models.Model):
                                    help=u'收/付款时发生的银行手续费或给业务伙伴的现金折扣。')
     discount_account_id = fields.Many2one('finance.account', u'费用科目',
                                           readonly=True,
-                                          states={'draft': [('readonly', False)]},
+                                          states={
+                                              'draft': [('readonly', False)]},
                                           help=u'收/付款单审核生成凭证时，手续费或折扣对应的科目')
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收/付款单行', readonly=True,
@@ -154,19 +158,19 @@ class money_order(models.Model):
                           store=True, readonly=True,
                           help=u'收/付款单行金额总和')
     advance_payment = fields.Float(string=u'本次预付',
-                                   compute='_compute_advance_payment',
-                                   digits=dp.get_precision('Amount'),
-                                   store=True, readonly=True,
-                                   help=u'根据收/付款单行金额总和，原始单据行金额总和及折扣额计算得来的预收/预付款，'
-                                        u'值>=0')
+                                  compute='_compute_advance_payment',
+                                  digits=dp.get_precision('Amount'),
+                                  store=True, readonly=True,
+                                  help=u'根据收/付款单行金额总和，原始单据行金额总和及折扣额计算得来的预收/预付款，'
+                                  u'值>=0')
     to_reconcile = fields.Float(string=u'未核销金额',
                                 digits=dp.get_precision('Amount'),
-                            help=u'未核销的预收/预付款金额')
+                                help=u'未核销的预收/预付款金额')
     reconciled = fields.Float(string=u'已核销金额',
                               digits=dp.get_precision('Amount'),
-                            help=u'已核销的预收/预付款金额')
+                              help=u'已核销的预收/预付款金额')
     origin_name = fields.Char(u'原始单据编号',
-                            help=u'原始单据编号')
+                              help=u'原始单据编号')
     bank_name = fields.Char(u'开户行',
                             readonly=True,
                             states={'draft': [('readonly', False)]},
@@ -212,7 +216,6 @@ class money_order(models.Model):
         else:
             return {'domain': {'partner_id': [('s_category_id', '!=', False)]}}
 
-
     def _get_source_line(self, invoice):
         """
         根据传入的invoice的对象取出对应的值 构造出 source_line的一个dict 包含source line的主要参数
@@ -221,15 +224,15 @@ class money_order(models.Model):
         """
 
         return {
-                'name': invoice.id,
-                'category_id': invoice.category_id.id,
-                'amount': invoice.amount,
-                'date': invoice.date,
-                'reconciled': invoice.reconciled,
-                'to_reconcile': invoice.to_reconcile,
-                'this_reconcile': invoice.to_reconcile,
-                'date_due': invoice.date_due,
-                }
+            'name': invoice.id,
+            'category_id': invoice.category_id.id,
+            'amount': invoice.amount,
+            'date': invoice.date,
+            'reconciled': invoice.reconciled,
+            'to_reconcile': invoice.to_reconcile,
+            'this_reconcile': invoice.to_reconcile,
+            'date_due': invoice.date_due,
+        }
 
     def _get_invoice_search_list(self):
         """
@@ -240,7 +243,7 @@ class money_order(models.Model):
                                ('to_reconcile', '!=', 0)]
         if self.env.context.get('type') == 'get':
             invoice_search_list.append(('category_id.type', '=', 'income'))
-        else: # type = 'pay':
+        else:  # type = 'pay':
             invoice_search_list.append(('category_id.type', '=', 'expense'))
 
         return invoice_search_list
@@ -268,22 +271,27 @@ class money_order(models.Model):
         '''对收付款单的审核按钮'''
         for order in self:
             if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
-                raise UserError(u'请输入供应商类别(%s)上的科目'%order.partner_id.s_category_id.name)
+                raise UserError(u'请输入供应商类别(%s)上的科目' %
+                                order.partner_id.s_category_id.name)
             if order.type == 'get' and not order.partner_id.c_category_id.account_id:
-                raise UserError(u'请输入客户类别(%s)上的科目'%order.partner_id.c_category_id.name)
+                raise UserError(u'请输入客户类别(%s)上的科目' %
+                                order.partner_id.c_category_id.name)
             if order.advance_payment < 0:
-                raise UserError(u'本次核销金额不能大于付款金额。\n差额: %s'%(order.advance_payment))
+                raise UserError(u'本次核销金额不能大于付款金额。\n差额: %s' %
+                                (order.advance_payment))
 
             total = 0
             for line in order.line_ids:
-                rate_silent = self.env['res.currency'].get_rate_silent(order.date, line.currency_id.id)
+                rate_silent = self.env['res.currency'].get_rate_silent(
+                    order.date, line.currency_id.id)
                 if order.type == 'pay':  # 付款账号余额减少, 退款账号余额增加
                     decimal_amount = self.env.ref('core.decimal_amount')
                     balance = line.currency_id != self.env.user.company_id.currency_id \
-                              and line.bank_id.currency_amount or line.bank_id.balance
+                        and line.bank_id.currency_amount or line.bank_id.balance
                     if float_compare(balance, line.amount,
                                      precision_digits=decimal_amount.digits) == -1:
-                        raise UserError(u'账户余额不足。\n账户余额:%s 付款行金额:%s' % (balance, line.amount))
+                        raise UserError(u'账户余额不足。\n账户余额:%s 付款行金额:%s' %
+                                        (balance, line.amount))
                     if line.currency_id != self.env.user.company_id.currency_id:  # 外币
                         line.bank_id.currency_amount -= line.amount
                         line.bank_id.balance -= line.amount * rate_silent
@@ -309,16 +317,18 @@ class money_order(models.Model):
                 decimal_amount = self.env.ref('core.decimal_amount')
                 if float_compare(source.this_reconcile, abs(source.to_reconcile), precision_digits=decimal_amount.digits) == 1:
                     raise UserError(u'本次核销金额不能大于未核销金额。\n 核销金额:%s 未核销金额:%s'
-                                    %(abs(source.to_reconcile),source.this_reconcile))
+                                    % (abs(source.to_reconcile), source.this_reconcile))
 
                 source.name.to_reconcile -= source.this_reconcile
                 source.name.reconciled += source.this_reconcile
 
             # 生成凭证并审核
             if order.type == 'get':
-                voucher = order.create_money_order_get_voucher(order.line_ids, order.source_ids, order.partner_id, order.name, order.note or '')
+                voucher = order.create_money_order_get_voucher(
+                    order.line_ids, order.source_ids, order.partner_id, order.name, order.note or '')
             else:
-                voucher = order.create_money_order_pay_voucher(order.line_ids, order.source_ids, order.partner_id, order.name, order.note or '')
+                voucher = order.create_money_order_pay_voucher(
+                    order.line_ids, order.source_ids, order.partner_id, order.name, order.note or '')
             voucher.voucher_done()
 
             return order.write({
@@ -337,7 +347,8 @@ class money_order(models.Model):
         for order in self:
             total = 0
             for line in order.line_ids:
-                rate_silent = self.env['res.currency'].get_rate_silent(order.date, line.currency_id.id)
+                rate_silent = self.env['res.currency'].get_rate_silent(
+                    order.date, line.currency_id.id)
                 if order.type == 'pay':  # 反审核：付款账号余额增加
                     if line.currency_id != self.env.user.company_id.currency_id:  # 外币
                         line.bank_id.currency_amount += line.amount
@@ -346,10 +357,11 @@ class money_order(models.Model):
                         line.bank_id.balance += line.amount
                 else:  # 反审核：收款账号余额减少
                     balance = line.currency_id != self.env.user.company_id.currency_id \
-                              and line.bank_id.currency_amount or line.bank_id.balance
+                        and line.bank_id.currency_amount or line.bank_id.balance
                     decimal_amount = self.env.ref('core.decimal_amount')
                     if float_compare(balance, line.amount, precision_digits=decimal_amount.digits) == -1:
-                        raise UserError(u'账户余额不足。\n 账户余额:%s 收款行金额:%s' % (balance, line.amount))
+                        raise UserError(u'账户余额不足。\n 账户余额:%s 收款行金额:%s' %
+                                        (balance, line.amount))
                     if line.currency_id != self.env.user.company_id.currency_id:  # 外币
                         line.bank_id.currency_amount -= line.amount
                         line.bank_id.balance -= line.amount * rate_silent
@@ -382,7 +394,8 @@ class money_order(models.Model):
     def _prepare_vouch_line_data(self, line, name, account_id, debit, credit, voucher_id, partner_id, currency_id):
         rate_silent = currency_amount = 0
         if currency_id:
-            rate_silent = self.env['res.currency'].get_rate_silent(self.date, currency_id)
+            rate_silent = self.env['res.currency'].get_rate_silent(
+                self.date, currency_id)
             currency_amount = debit or credit
             debit = debit * (rate_silent or 1)
             credit = credit * (rate_silent or 1)
@@ -395,11 +408,12 @@ class money_order(models.Model):
             'partner_id': partner_id,
             'currency_id': currency_id,
             'currency_amount': currency_amount,
-            'rate_silent':rate_silent or ''
+            'rate_silent': rate_silent or ''
         }
 
     def _create_voucher_line(self, line, name, account_id, debit, credit, voucher_id, partner_id, currency_id):
-        line_data = self._prepare_vouch_line_data(line, name, account_id, debit, credit, voucher_id, partner_id, currency_id)
+        line_data = self._prepare_vouch_line_data(
+            line, name, account_id, debit, credit, voucher_id, partner_id, currency_id)
         voucher_line = self.env['voucher.line'].create(line_data)
         return voucher_line
 
@@ -424,28 +438,28 @@ class money_order(models.Model):
             # 生成借方明细行
             # param: line, name, account_id, debit, credit, voucher_id, partner_id
             self._create_voucher_line(line,
-                                     u"%s %s" % (name, note),
-                                     line.bank_id.account_id.id,
-                                     line.amount,
-                                     0,
-                                     vouch_obj.id,
-                                     '',
-                                     line.currency_id.id
-                                     )
+                                      u"%s %s" % (name, note),
+                                      line.bank_id.account_id.id,
+                                      line.amount,
+                                      0,
+                                      vouch_obj.id,
+                                      '',
+                                      line.currency_id.id
+                                      )
 
             amount_all += line.amount
         if self.discount_amount != 0:
             # 生成借方明细行
             # param: False, name, account_id, debit, credit, voucher_id, partner_id
             self._create_voucher_line(False,
-                                     u"%s 现金折扣 %s" % (name, note),
-                                     self.discount_account_id.id,
-                                     self.discount_amount,
-                                     0,
-                                     vouch_obj.id,
-                                     self.partner_id.id,
-                                     line_data and line_data.currency_id.id or self.currency_id.id
-                                     )
+                                      u"%s 现金折扣 %s" % (name, note),
+                                      self.discount_account_id.id,
+                                      self.discount_amount,
+                                      0,
+                                      vouch_obj.id,
+                                      self.partner_id.id,
+                                      line_data and line_data.currency_id.id or self.currency_id.id
+                                      )
 
         if partner.c_category_id:
             partner_account_id = partner.c_category_id.account_id.id
@@ -523,7 +537,7 @@ class money_order(models.Model):
         return vouch_obj
 
 
-class money_order_line(models.Model):
+class MoneyOrderLine(models.Model):
     _name = 'money.order.line'
     _description = u'收付款单明细'
 
@@ -537,25 +551,25 @@ class money_order_line(models.Model):
         self.currency_id = self.bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id
         if self.bank_id and self.currency_id != self.money_id.currency_id:
             raise ValidationError(u'结算帐户与业务伙伴币别不一致。\n 结算账户币别:%s 业务伙伴币别:%s'
-                                  %(self.currency_id.name,self.money_id.currency_id.name))
+                                  % (self.currency_id.name, self.money_id.currency_id.name))
 
     money_id = fields.Many2one('money.order', string=u'收付款单',
                                ondelete='cascade',
-                            help=u'订单行对应的收付款单')
+                               help=u'订单行对应的收付款单')
     bank_id = fields.Many2one('bank.account', string=u'结算账户',
                               required=True, ondelete='restrict',
-                            help=u'本次收款/付款所用的计算账户，审核收付款单会修改对应账户的金额')
+                              help=u'本次收款/付款所用的计算账户，审核收付款单会修改对应账户的金额')
     amount = fields.Float(string=u'金额',
                           digits=dp.get_precision('Amount'),
-                            help=u'本次结算金额')
+                          help=u'本次结算金额')
     mode_id = fields.Many2one('settle.mode', string=u'结算方式',
                               ondelete='restrict',
-                            help=u'结算方式：支票、信用卡等')
+                              help=u'结算方式：支票、信用卡等')
     currency_id = fields.Many2one('res.currency', u'币别', compute='_compute_currency_id',
                                   store=True, readonly=True,
                                   help=u'结算账户对应的外币币别')
     number = fields.Char(string=u'结算号',
-                                  help=u'本次结算号')
+                         help=u'本次结算号')
     note = fields.Char(string=u'备注',
                        help=u'可以为本次结算添加一些需要的标识信息')
     company_id = fields.Many2one(
@@ -565,7 +579,7 @@ class money_order_line(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class money_invoice(models.Model):
+class MoneyInvoice(models.Model):
     _name = 'money.invoice'
     _description = u'结算单'
 
@@ -573,7 +587,7 @@ class money_invoice(models.Model):
     def _get_category_id(self):
         cate_type = self.env.context.get('type')
         if cate_type:
-            return self.env['core.category'].search([('type','=',cate_type)])[0]
+            return self.env['core.category'].search([('type', '=', cate_type)])[0]
         return False
 
     @api.multi
@@ -585,7 +599,8 @@ class money_invoice(models.Model):
             if self.env.context.get('order'):
                 res.append((invoice.id, invoice.name))
             else:
-                res.append((invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
+                res.append(
+                    (invoice.id, invoice.bill_number and invoice.bill_number or invoice.name))
         return res
 
     @api.one
@@ -597,18 +612,19 @@ class money_invoice(models.Model):
         :return: 逾期天数
         """
         d1 = datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
-        d2 = self.date_due and datetime.strptime(self.date_due, '%Y-%m-%d') or d1
+        d2 = self.date_due and datetime.strptime(
+            self.date_due, '%Y-%m-%d') or d1
         day = (d1 - d2).days
         self.overdue_days = day > 0 and day or 0.0
         self.overdue_amount = self.overdue_days > 0 and self.to_reconcile or 0.0
         self.overdue_days = self.overdue_amount and self.overdue_days or 0
 
     state = fields.Selection([
-                          ('draft', u'草稿'),
-                          ('done', u'完成')
-                          ], string=u'状态', 
-                          default='draft', copy=False, index=True,
-                        help=u'结算单状态标识，新建时状态为草稿;审核后状态为完成')
+        ('draft', u'草稿'),
+        ('done', u'完成')
+    ], string=u'状态',
+        default='draft', copy=False, index=True,
+        help=u'结算单状态标识，新建时状态为草稿;审核后状态为完成')
     partner_id = fields.Many2one('partner', string=u'往来单位',
                                  required=True,
                                  ondelete='restrict',
@@ -620,7 +636,7 @@ class money_invoice(models.Model):
                                   ondelete='restrict',
                                   default=_get_category_id,
                                   help=u'结算单类别：采购 或者 销售等')
-    date = fields.Date(string=u'日期',required=True,
+    date = fields.Date(string=u'日期', required=True,
                        default=lambda self: fields.Date.context_today(self),
                        help=u'单据创建日期')
     amount = fields.Float(string=u'金额（含税）',
@@ -632,7 +648,7 @@ class money_invoice(models.Model):
     to_reconcile = fields.Float(string=u'未核销金额', readonly=True,
                                 digits=dp.get_precision('Amount'),
                                 help=u'原始单据未核销掉的金额')
-    tax_amount = fields.Float(u'税额', 
+    tax_amount = fields.Float(u'税额',
                               digits=dp.get_precision('Amount'),
                               help=u'对应税额')
 
@@ -699,7 +715,7 @@ class money_invoice(models.Model):
         :param values: 
         :return: 
         """
-        new_id = super(money_invoice, self).create(values)
+        new_id = super(MoneyInvoice, self).create(values)
         if not self.env.user.company_id.draft_invoice:
             new_id.money_invoice_done()
         return new_id
@@ -717,7 +733,7 @@ class money_invoice(models.Model):
             if invoice.state == 'done':
                 raise UserError(u'不可以删除已经审核的单据')
 
-        return super(money_invoice, self).unlink()
+        return super(MoneyInvoice, self).unlink()
 
     @api.multi
     def find_source_order(self):
@@ -764,9 +780,10 @@ class money_invoice(models.Model):
         for i in range(len(res_models)):
             # 若code存在说明 model为asset，view为固定资产form视图。
             res_model = code and 'asset' or res_models[i]
-            view = code and self.env.ref('asset.asset_form') or self.env.ref(views[i])
+            view = code and self.env.ref(
+                'asset.asset_form') or self.env.ref(views[i])
             res = self.env[res_model].search(domain)
-            if res: # 如果找到res_id,则退出for循环。
+            if res:  # 如果找到res_id,则退出for循环。
                 break
 
         if not res:
@@ -787,19 +804,19 @@ class money_invoice(models.Model):
         }
 
 
-class source_order_line(models.Model):
+class SourceOrderLine(models.Model):
     _name = 'source.order.line'
     _description = u'待核销行'
 
     money_id = fields.Many2one('money.order', string=u'收付款单',
                                ondelete='cascade',
-                                help=u'待核销行对应的收付款单')  # 收付款单上的待核销行
+                               help=u'待核销行对应的收付款单')  # 收付款单上的待核销行
     receivable_reconcile_id = fields.Many2one('reconcile.order',
-                            string=u'核销单', ondelete='cascade',
-                            help=u'核销单上的应收结算单明细')  # 核销单上的应收结算单明细
+                                              string=u'核销单', ondelete='cascade',
+                                              help=u'核销单上的应收结算单明细')  # 核销单上的应收结算单明细
     payable_reconcile_id = fields.Many2one('reconcile.order',
-                            string=u'核销单', ondelete='cascade',
-                            help=u'核销单上的应付结算单明细')  # 核销单上的应付结算单明细
+                                           string=u'核销单', ondelete='cascade',
+                                           help=u'核销单上的应付结算单明细')  # 核销单上的应付结算单明细
     name = fields.Many2one('money.invoice', string=u'结算单',
                            copy=False, required=True,
                            ondelete='cascade',
@@ -810,17 +827,17 @@ class source_order_line(models.Model):
     date = fields.Date(string=u'单据日期',
                        help=u'单据创建日期')
     amount = fields.Float(string=u'单据金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'待核销行对应金额')
+                          digits=dp.get_precision('Amount'),
+                          help=u'待核销行对应金额')
     reconciled = fields.Float(string=u'已核销金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'待核销行已核销掉的金额')
+                              digits=dp.get_precision('Amount'),
+                              help=u'待核销行已核销掉的金额')
     to_reconcile = fields.Float(string=u'未核销金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'待核销行未核销掉的金额')
+                                digits=dp.get_precision('Amount'),
+                                help=u'待核销行未核销掉的金额')
     this_reconcile = fields.Float(string=u'本次核销金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'本次要核销掉的金额')
+                                  digits=dp.get_precision('Amount'),
+                                  help=u'本次要核销掉的金额')
     date_due = fields.Date(string=u'到期日',
                            help=u'待核销行的到期日')
     company_id = fields.Many2one(
@@ -830,7 +847,7 @@ class source_order_line(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class reconcile_order(models.Model):
+class ReconcileOrder(models.Model):
     _name = 'reconcile.order'
     _description = u'核销单'
     _inherit = ['mail.thread']
@@ -853,14 +870,14 @@ class reconcile_order(models.Model):
             if order.state == 'done':
                 raise UserError(u'不可以删除已经审核的单据')
 
-        return super(reconcile_order, self).unlink()
+        return super(ReconcileOrder, self).unlink()
 
     state = fields.Selection([
-                          ('draft', u'未审核'),
-                          ('done', u'已审核'),
-                          ], string=u'状态', readonly=True,
-                          default='draft', copy=False, index=True,
-                        help=u'核销单状态标识，新建时状态为未审核;审核后状态为已审核')
+        ('draft', u'未审核'),
+        ('done', u'已审核'),
+    ], string=u'状态', readonly=True,
+        default='draft', copy=False, index=True,
+        help=u'核销单状态标识，新建时状态为未审核;审核后状态为已审核')
     partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
@@ -868,23 +885,23 @@ class reconcile_order(models.Model):
     to_partner_id = fields.Many2one('partner', string=u'转入往来单位',
                                     readonly=True, ondelete='restrict',
                                     states={'draft': [('readonly', False)]},
-                                help=u'应收转应收、应付转应付时对应的转入业务伙伴，'
-                                       u'订单审核时会影响该业务伙伴的应收/应付')
+                                    help=u'应收转应收、应付转应付时对应的转入业务伙伴，'
+                                    u'订单审核时会影响该业务伙伴的应收/应付')
     advance_payment_ids = fields.One2many(
-                            'advance.payment', 'pay_reconcile_id',
-                            string=u'预收/付款单行', readonly=True,
-                            states={'draft': [('readonly', False)]},
-                            help=u'业务伙伴有预收/付款单，自动带出，用来与应收/应付款单核销')
+        'advance.payment', 'pay_reconcile_id',
+        string=u'预收/付款单行', readonly=True,
+        states={'draft': [('readonly', False)]},
+        help=u'业务伙伴有预收/付款单，自动带出，用来与应收/应付款单核销')
     receivable_source_ids = fields.One2many(
-                            'source.order.line', 'receivable_reconcile_id',
-                             string=u'应收结算单行', readonly=True,
-                             states={'draft': [('readonly', False)]},
-                            help=u'业务伙伴有应收结算单，自动带出，待与预收款单核销')
+        'source.order.line', 'receivable_reconcile_id',
+        string=u'应收结算单行', readonly=True,
+        states={'draft': [('readonly', False)]},
+        help=u'业务伙伴有应收结算单，自动带出，待与预收款单核销')
     payable_source_ids = fields.One2many(
-                            'source.order.line', 'payable_reconcile_id',
-                            string=u'应付结算单行', readonly=True,
-                            states={'draft': [('readonly', False)]},
-                            help=u'业务伙伴有应付结算单，自动带出，待与预付款单核销')
+        'source.order.line', 'payable_reconcile_id',
+        string=u'应付结算单行', readonly=True,
+        states={'draft': [('readonly', False)]},
+        help=u'业务伙伴有应付结算单，自动带出，待与预付款单核销')
     business_type = fields.Selection(TYPE_SELECTION, string=u'业务类型',
                                      readonly=True,
                                      states={'draft': [('readonly', False)]},
@@ -912,20 +929,20 @@ class reconcile_order(models.Model):
         :return: list
         """
         money_orders = self.env['money.order'].search(
-                                    [('partner_id', '=', self.partner_id.id),
-                                    ('type', '=', way),
-                                    ('state', '=', 'done'),
-                                    ('to_reconcile', '!=', 0)])
+            [('partner_id', '=', self.partner_id.id),
+             ('type', '=', way),
+             ('state', '=', 'done'),
+             ('to_reconcile', '!=', 0)])
         result = []
         for order in money_orders:
             result.append((0, 0, {
-                   'name': order.id,
-                   'amount': order.amount,
-                   'date': order.date,
-                   'reconciled': order.reconciled,
-                   'to_reconcile': order.to_reconcile,
-                   'this_reconcile': order.to_reconcile,
-                   }))
+                'name': order.id,
+                'amount': order.amount,
+                'date': order.date,
+                'reconciled': order.reconciled,
+                'to_reconcile': order.to_reconcile,
+                'this_reconcile': order.to_reconcile,
+            }))
         return result
 
     @api.multi
@@ -936,22 +953,22 @@ class reconcile_order(models.Model):
         :param way: money.invoice 中的category_id 的type
         :return:
         """
-        money_invoice = self.env['money.invoice'].search([
-                                    ('category_id.type', '=', way),
-                                    ('partner_id', '=', self.partner_id.id),
-                                    ('to_reconcile', '!=', 0)])
+        MoneyInvoice = self.env['money.invoice'].search([
+            ('category_id.type', '=', way),
+            ('partner_id', '=', self.partner_id.id),
+            ('to_reconcile', '!=', 0)])
         result = []
-        for invoice in money_invoice:
+        for invoice in MoneyInvoice:
             result.append((0, 0, {
-                   'name': invoice.id,
-                   'category_id': invoice.category_id.id,
-                   'amount': invoice.amount,
-                   'date': invoice.date,
-                   'reconciled': invoice.reconciled,
-                   'to_reconcile': invoice.to_reconcile,
-                   'date_due': invoice.date_due,
-                   'this_reconcile': invoice.to_reconcile,
-                   }))
+                'name': invoice.id,
+                'category_id': invoice.category_id.id,
+                'amount': invoice.amount,
+                'date': invoice.date,
+                'reconciled': invoice.reconciled,
+                'to_reconcile': invoice.to_reconcile,
+                'date_due': invoice.date_due,
+                'this_reconcile': invoice.to_reconcile,
+            }))
         return result
 
     @api.onchange('partner_id', 'to_partner_id', 'business_type')
@@ -1003,7 +1020,8 @@ class reconcile_order(models.Model):
         """
         decimal_amount = self.env.ref('core.decimal_amount')
         if float_compare(line.this_reconcile, line.to_reconcile, precision_digits=decimal_amount.digits) == 1:
-            raise UserError(u'核销金额不能大于未核销金额。\n核销金额:%s 未核销金额:%s'%(line.this_reconcile, line.to_reconcile))
+            raise UserError(u'核销金额不能大于未核销金额。\n核销金额:%s 未核销金额:%s' %
+                            (line.this_reconcile, line.to_reconcile))
         # 更新每一行的已核销余额、未核销余额
         line.name.to_reconcile -= line.this_reconcile
         line.name.reconciled += line.this_reconcile
@@ -1012,15 +1030,15 @@ class reconcile_order(models.Model):
         if business_type in ['get_to_get', 'pay_to_pay']:
             if not float_is_zero(line.this_reconcile, 2):
                 self.env['money.invoice'].create({
-                       'name': name,
-                       'category_id': line.category_id.id,
-                       'amount': line.this_reconcile,
-                       'date': line.date,
-                       'reconciled': 0,  # 已核销金额
-                       'to_reconcile': line.this_reconcile,  # 未核销金额
-                       'date_due': line.date_due,
-                       'partner_id': to_partner_id.id,
-                       })
+                    'name': name,
+                    'category_id': line.category_id.id,
+                    'amount': line.this_reconcile,
+                    'date': line.date,
+                    'reconciled': 0,  # 已核销金额
+                    'to_reconcile': line.this_reconcile,  # 未核销金额
+                    'date_due': line.date_due,
+                    'partner_id': to_partner_id.id,
+                })
 
             if business_type == 'get_to_get':
                 partner_id.receivable -= line.this_reconcile
@@ -1039,14 +1057,15 @@ class reconcile_order(models.Model):
             order_reconcile, invoice_reconcile = 0, 0
             if self.business_type in ['get_to_get', 'pay_to_pay'] and order.partner_id == order.to_partner_id:
                 raise UserError(u'业务伙伴和转入往来单位不能相同。\n业务伙伴:%s 转入往来单位:%s'
-                                %(order.partner_id.name, order.to_partner_id.name))
+                                % (order.partner_id.name, order.to_partner_id.name))
 
             # 核销预收预付
             for line in order.advance_payment_ids:
                 order_reconcile += line.this_reconcile
                 decimal_amount = self.env.ref('core.decimal_amount')
                 if float_compare(line.this_reconcile, line.to_reconcile, precision_digits=decimal_amount.digits) == 1:
-                    raise UserError(u'核销金额不能大于未核销金额。\n核销金额:%s 未核销金额:%s'%(line.this_reconcile, line.to_reconcile))
+                    raise UserError(u'核销金额不能大于未核销金额。\n核销金额:%s 未核销金额:%s' % (
+                        line.this_reconcile, line.to_reconcile))
 
                 # 更新每一行的已核销余额、未核销余额
                 line.name.to_reconcile -= line.this_reconcile
@@ -1072,36 +1091,36 @@ class reconcile_order(models.Model):
                 decimal_amount = self.env.ref('core.decimal_amount')
                 if float_compare(order_reconcile, invoice_reconcile, precision_digits=decimal_amount.digits) != 0:
                     raise UserError(u'核销金额必须相同, %s 不等于 %s'
-                                     % (order_reconcile, invoice_reconcile))
+                                    % (order_reconcile, invoice_reconcile))
 
             order.state = 'done'
         return True
 
 
-class advance_payment(models.Model):
+class AdvancePayment(models.Model):
     _name = 'advance.payment'
     _description = u'核销单预收付款行'
 
     pay_reconcile_id = fields.Many2one('reconcile.order',
-                            string=u'核销单', ondelete='cascade',
-                            help=u'核销单预收付款行对应的核销单')
+                                       string=u'核销单', ondelete='cascade',
+                                       help=u'核销单预收付款行对应的核销单')
     name = fields.Many2one('money.order', string=u'预收/付款单',
-                    copy=False, required=True, ondelete='cascade',
-                    help=u'核销单预收/付款行对应的预收/付款单')
+                           copy=False, required=True, ondelete='cascade',
+                           help=u'核销单预收/付款行对应的预收/付款单')
     date = fields.Date(string=u'单据日期',
                        help=u'单据创建日期')
     amount = fields.Float(string=u'单据金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'预收/付款单的预收/付金额')
+                          digits=dp.get_precision('Amount'),
+                          help=u'预收/付款单的预收/付金额')
     reconciled = fields.Float(string=u'已核销金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'已核销的预收/预付款金额')
+                              digits=dp.get_precision('Amount'),
+                              help=u'已核销的预收/预付款金额')
     to_reconcile = fields.Float(string=u'未核销金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'未核销的预收/预付款金额')
+                                digits=dp.get_precision('Amount'),
+                                help=u'未核销的预收/预付款金额')
     this_reconcile = fields.Float(string=u'本次核销金额',
-                        digits=dp.get_precision('Amount'),
-                        help=u'本次核销的预收/预付款金额')
+                                  digits=dp.get_precision('Amount'),
+                                  help=u'本次核销的预收/预付款金额')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -1109,7 +1128,7 @@ class advance_payment(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class cost_line(models.Model):
+class CostLine(models.Model):
     _name = 'cost.line'
     _description = u"采购销售费用"
 
@@ -1134,7 +1153,7 @@ class cost_line(models.Model):
                           digits=dp.get_precision('Amount'),
                           help=u'采购/销售费用金额')
     tax_rate = fields.Float(u'税率(%)',
-                            default=lambda self:self.env.user.company_id.import_tax_rate,
+                            default=lambda self: self.env.user.company_id.import_tax_rate,
                             help=u'默认值取公司进项税率')
     tax = fields.Float(u'税额',
                        digits=dp.get_precision('Amount'),

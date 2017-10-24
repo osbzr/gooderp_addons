@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class sell_receipt_wizard(models.TransientModel):
+class SellReceiptWizard(models.TransientModel):
     _name = 'sell.receipt.wizard'
     _description = u'销售收款一览表向导'
 
@@ -51,7 +51,7 @@ class sell_receipt_wizard(models.TransientModel):
         if self.user_id:
             cond.append(('user_id', '=', self.user_id.id))
         if self.warehouse_id:
-            cond += ['|',('warehouse_id', '=', self.warehouse_id.id),
+            cond += ['|', ('warehouse_id', '=', self.warehouse_id.id),
                      ('warehouse_dest_id', '=', self.warehouse_id.id)]
         return cond
 
@@ -59,7 +59,7 @@ class sell_receipt_wizard(models.TransientModel):
         '''计算该发货单的已收款'''
         receipt = 0
         for order in self.env['money.order'].search(
-                    [('state', '=', 'done')], order='name'):
+                [('state', '=', 'done')], order='name'):
             for source in order.source_ids:
                 if source.name.name == delivery.name:
                     receipt += source.this_reconcile
@@ -68,7 +68,7 @@ class sell_receipt_wizard(models.TransientModel):
     def _prepare_sell_receipt(self, delivery):
         '''对于传入的发货单/退货单，为创建销售收款一览表准备数据'''
         self.ensure_one()
-        factor = delivery.is_return and -1 or 1 # 如果是退货则金额均取反
+        factor = delivery.is_return and -1 or 1  # 如果是退货则金额均取反
         sell_amount = factor * (delivery.discount_amount + delivery.amount)
         discount_amount = factor * delivery.discount_amount
         amount = factor * delivery.amount
@@ -78,7 +78,8 @@ class sell_receipt_wizard(models.TransientModel):
         # 计算该发货单的已收款
         receipt = self._compute_receipt(delivery)
         # 计算回款率
-        receipt_rate = (amount + partner_cost) != 0 and (receipt / (amount + partner_cost)) * 100 or 0
+        receipt_rate = (amount + partner_cost) != 0 and (receipt /
+                                                         (amount + partner_cost)) * 100 or 0
         return {
             'c_category_id': delivery.partner_id.c_category_id.id,
             'partner_id': delivery.partner_id.id,
@@ -102,7 +103,8 @@ class sell_receipt_wizard(models.TransientModel):
         self.ensure_one()
         res = []
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s'%(self.date_start, self.date_end))
+            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' %
+                            (self.date_start, self.date_end))
 
         delivery_obj = self.env['sell.delivery']
         for delivery in delivery_obj.search(self._get_domain(), order='partner_id'):
