@@ -265,7 +265,7 @@ class StaffWages(models.Model):
             self.env['other.money.order.line'].create({
                 'other_money_id': other_money_order.id,
                 'amount': line.all_wage,
-                'category_id': StaffWages and staff_wages.id,
+                'category_id': StaffWages and StaffWages.id,
                 'auxiliary_id': line.name.auxiliary_id.id,
             })
         if self.totoal_endowment:

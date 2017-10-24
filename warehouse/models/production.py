@@ -692,7 +692,7 @@ class Outsource(models.Model):
     def update_parent_cost(self):
         for Outsource in self:
             cost = sum(child.cost for child in Outsource.line_out_ids) + \
-                Outsource.Outsource_fee
+                Outsource.outsource_fee
             Outsource.apportion_cost(cost)
         return True
 
