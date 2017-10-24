@@ -14,6 +14,7 @@ class ProductStyle(models.Model):
 
 class Goods(models.Model):
     _inherit = ['goods', 'website.published.mixin']
+    _name = 'goods'
 
     website_size_x = fields.Integer('Size X',
                                     default=1)
