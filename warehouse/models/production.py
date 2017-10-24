@@ -472,7 +472,7 @@ class WhAssembly(models.Model):
         return True
 
 
-class Outsource(models.Model):
+class outsource(models.Model):
     _name = 'outsource'
     _description = u'委外加工单'
     _inherit = ['mail.thread']
@@ -653,13 +653,13 @@ class Outsource(models.Model):
         return {'domain': domain}
 
     def apportion_cost(self, cost):
-        for Outsource in self:
-            if not Outsource.line_in_ids:
+        for outsource in self:
+            if not outsource.line_in_ids:
                 continue
 
             collects = []
-            ignore_move = [line.id for line in Outsource.line_in_ids]
-            for parent in Outsource.line_in_ids:
+            ignore_move = [line.id for line in outsource.line_in_ids]
+            for parent in outsource.line_in_ids:
                 collects.append((parent,
                                  parent.goods_id.get_suggested_cost_by_warehouse(
                                      parent.warehouse_dest_id, parent.goods_qty,
@@ -690,10 +690,10 @@ class Outsource(models.Model):
         return True
 
     def update_parent_cost(self):
-        for Outsource in self:
-            cost = sum(child.cost for child in Outsource.line_out_ids) + \
-                Outsource.outsource_fee
-            Outsource.apportion_cost(cost)
+        for outsource in self:
+            cost = sum(child.cost for child in outsource.line_out_ids) + \
+                outsource.outsource_fee
+            outsource.apportion_cost(cost)
         return True
 
     @api.multi
@@ -711,13 +711,13 @@ class Outsource(models.Model):
     def create(self, vals):
         vals.update({'finance_category_id': self.env.ref(
             'finance.categ_outsource').id})
-        self = super(Outsource, self).create(vals)
+        self = super(outsource, self).create(vals)
         self.update_parent_cost()
         return self
 
     @api.multi
     def write(self, vals):
-        res = super(Outsource, self).write(vals)
+        res = super(outsource, self).write(vals)
         self.update_parent_cost()
         return res
 
@@ -747,7 +747,7 @@ class Outsource(models.Model):
     def create_voucher_line(self, data):
         return [self.env['voucher.line'].create(data_line) for data_line in data]
 
-    def create_vourcher_line_data(self, Outsource, voucher_row):
+    def create_vourcher_line_data(self, outsource, voucher_row):
         """
         准备入库凭证行数据
         借：库存商品（商品上）
@@ -758,7 +758,7 @@ class Outsource(models.Model):
         """
         line_out_data, line_in_data = [], []
         line_out_credit = 0.0
-        for line_out in Outsource.line_out_ids:
+        for line_out in outsource.line_out_ids:
             if line_out.cost:
                 line_out_credit += line_out.cost
 
@@ -768,9 +768,9 @@ class Outsource(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
                                   'account_id': account_id,
-                                  'name': u'%s 原料 %s' % (outsource.move_id.name, Outsource.move_id.note or '')
+                                  'name': u'%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')
                                   })
-        for line_in in Outsource.line_in_ids:  # 借方行
+        for line_in in outsource.line_in_ids:  # 借方行
             if line_in.cost:
                 account_id = line_in.goods_id.category_id.account_id.id
                 line_in_data.append({'debit': line_in.cost,
@@ -778,7 +778,7 @@ class Outsource(models.Model):
                                      'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
-                                     'name': u'%s 成品 %s' % (outsource.move_id.name, Outsource.move_id.note or '')
+                                     'name': u'%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
                                      })
         return line_out_data + line_in_data
 
@@ -805,7 +805,7 @@ class Outsource(models.Model):
                                  'account_id': account_id,
                                  'name': u'%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
                                  })
-        for line_out in Outsource.line_out_ids:  # 贷方行
+        for line_out in outsource.line_out_ids:  # 贷方行
             if line_out.cost:
                 account_id = line_out.goods_id.category_id.account_id.id
                 line_out_data.append({'credit': line_out.cost,
@@ -816,7 +816,7 @@ class Outsource(models.Model):
                                       'name': u'%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')})
         return line_out_data + line_in_data
 
-    def outsource_create_voucher_line(self, Outsource, voucher_row):
+    def outsource_create_voucher_line(self, outsource, voucher_row):
         """
         创建入库凭证行
         :param outsource: 委外加工单
@@ -824,24 +824,24 @@ class Outsource(models.Model):
         :return:
         """
         voucher_line_data = []
-        if Outsource.outsource_fee:
-            account_row = Outsource.create_uid.company_id.operating_cost_account_id  # 公司上的生产费用科目
+        if outsource.outsource_fee:
+            account_row = outsource.create_uid.company_id.operating_cost_account_id  # 公司上的生产费用科目
             # 贷方行
             voucher_line_data.append({'name': u'委外费用', 'account_id': account_row.id,
-                                      'credit': Outsource.outsource_fee, 'voucher_id': voucher_row.id})
+                                      'credit': outsource.outsource_fee, 'voucher_id': voucher_row.id})
 
         voucher_line_data += self.create_vourcher_line_data(
-            Outsource, voucher_row)
+            outsource, voucher_row)
         self.create_voucher_line(voucher_line_data)
 
-    def create_out_voucher_line(self, Outsource, voucher):
+    def create_out_voucher_line(self, outsource, voucher):
         """
         创建出库凭证行
         :param outsource: 委外加工单
         :param voucher: 出库凭证
         :return:
         """
-        voucher_line_data = self.pre_out_vourcher_line_data(Outsource, voucher)
+        voucher_line_data = self.pre_out_vourcher_line_data(outsource, voucher)
 
         self.create_voucher_line(voucher_line_data)
 
@@ -850,11 +850,11 @@ class Outsource(models.Model):
         生成入库凭证并审核
         :return:
         """
-        for Outsource in self:
-            voucher_row = self.env['voucher'].create({'date': Outsource.date})
-            self.outsource_create_voucher_line(Outsource, voucher_row)  # 入库凭证
+        for outsource in self:
+            voucher_row = self.env['voucher'].create({'date': outsource.date})
+            self.outsource_create_voucher_line(outsource, voucher_row)  # 入库凭证
 
-            Outsource.voucher_id = voucher_row.id
+            outsource.voucher_id = voucher_row.id
             voucher_row.voucher_done()
 
     def create_out_voucher(self):
@@ -862,11 +862,11 @@ class Outsource(models.Model):
         生成出库凭证并审核
         :return:
         """
-        for Outsource in self:
-            out_voucher = self.env['voucher'].create({'date': Outsource.date})
-            self.create_out_voucher_line(Outsource, out_voucher)  # 出库凭证
+        for outsource in self:
+            out_voucher = self.env['voucher'].create({'date': outsource.date})
+            self.create_out_voucher_line(outsource, out_voucher)  # 出库凭证
 
-            Outsource.out_voucher_id = out_voucher.id
+            outsource.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
     @api.multi
