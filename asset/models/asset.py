@@ -429,7 +429,7 @@ class CreateChangWizard(models.TransientModel):
             """生成凭证"""
             categ = self.env.ref('money.core_category_purchase')
             money_invoice = self.env['money.invoice'].create({
-                'name': u'固定资产变更' + asset.code,
+                'name': u'固定资产变更' + Asset.code,
                         'partner_id': self.chang_partner_id.id,
                         'category_id': categ.id,
                         'date': self.chang_date,

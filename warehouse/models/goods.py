@@ -166,7 +166,7 @@ class Goods(models.Model):
                 uos_qty_to_go -= matching_uos_qty
             else:
                 if not ignore_stock and qty_to_go > 0 and not self.env.context.get('wh_in_line_ids'):
-                    raise UserError(u'商品%s的库存数量不够本次出库' % (goods.name,))
+                    raise UserError(u'商品%s的库存数量不够本次出库' % (Goods.name,))
                 if self.env.context.get('wh_in_line_ids'):
                     domain = [('id', 'in', self.env.context.get('wh_in_line_ids')),
                               ('state', '=', 'done'),

@@ -224,7 +224,7 @@ class CreateWave(models.TransientModel):
                     picking_qty = remaining_picking_qty
 
                 self.env['wave.line.location'].create({
-                    'wave_line_id': wave_line.id,
+                    'wave_line_id': WaveLine.id,
                     'location_id': loc.id,
                     'picking_qty': picking_qty
                 })
