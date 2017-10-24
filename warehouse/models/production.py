@@ -782,7 +782,7 @@ class Outsource(models.Model):
                                      })
         return line_out_data + line_in_data
 
-    def pre_out_vourcher_line_data(self, Outsource, voucher):
+    def pre_out_vourcher_line_data(self, outsource, voucher):
         """
         准备出库凭证行数据
         借：委托加工物资（核算分类上）
@@ -793,7 +793,7 @@ class Outsource(models.Model):
         """
         line_out_data, line_in_data = [], []
         line_out_debit = 0.0
-        for line_out in Outsource.line_out_ids:
+        for line_out in outsource.line_out_ids:
             if line_out.cost:
                 line_out_debit += line_out.cost
 
