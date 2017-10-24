@@ -13,7 +13,7 @@ READONLY_STATES = {
 ISODATEFORMAT = '%Y-%m-%d'
 
 
-class sell_delivery(models.Model):
+class SellDelivery(models.Model):
     _name = 'sell.delivery'
     _inherits = {'wh.move': 'sell_move_id'}
     _inherit = ['mail.thread']
@@ -21,7 +21,7 @@ class sell_delivery(models.Model):
     _order = 'date desc, id desc'
 
     @api.one
-    @api.depends('line_out_ids.subtotal', 'discount_amount', 'partner_cost', 
+    @api.depends('line_out_ids.subtotal', 'discount_amount', 'partner_cost',
                  'receipt', 'partner_id', 'line_in_ids.subtotal')
     def _compute_all_amount(self):
         '''当优惠金额改变时，改变优惠后金额、本次欠款和总欠款'''
@@ -59,10 +59,10 @@ class sell_delivery(models.Model):
 
     currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True,
                                   help=u'外币币别')
-    sell_move_id = fields.Many2one('wh.move', u'发货单', required=True, 
+    sell_move_id = fields.Many2one('wh.move', u'发货单', required=True,
                                    ondelete='cascade',
                                    help=u'发货单号')
-    is_return = fields.Boolean(u'是否退货', default=lambda self: \
+    is_return = fields.Boolean(u'是否退货', default=lambda self:
                                self.env.context.get('is_return'),
                                help=u'是否为退货类型')
     order_id = fields.Many2one('sell.order', u'订单号', copy=False,
@@ -72,35 +72,36 @@ class sell_delivery(models.Model):
                                  copy=False, ondelete='set null',
                                  help=u'产生的发票号')
     date_due = fields.Date(u'到期日期', copy=False,
-                           default=lambda self: fields.Date.context_today(self),
+                           default=lambda self: fields.Date.context_today(
+                               self),
                            help=u'收款截止日期')
     discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
                                  help=u'整单优惠率')
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
-                            digits=dp.get_precision('Amount'),
-                            help=u'整单优惠金额，可由优惠率自动计算得出，也可手动输入')
-    amount = fields.Float(u'优惠后金额', compute=_compute_all_amount, 
+                                   digits=dp.get_precision('Amount'),
+                                   help=u'整单优惠金额，可由优惠率自动计算得出，也可手动输入')
+    amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits=dp.get_precision('Amount'),
                           help=u'总金额减去优惠金额')
     partner_cost = fields.Float(u'客户承担费用',
-                        digits=dp.get_precision('Amount'),
-                        help=u'客户承担费用')
+                                digits=dp.get_precision('Amount'),
+                                help=u'客户承担费用')
     receipt = fields.Float(u'本次收款', states=READONLY_STATES,
                            digits=dp.get_precision('Amount'),
                            help=u'本次收款金额')
     bank_account_id = fields.Many2one('bank.account',
                                       u'结算账户', ondelete='restrict',
                                       help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
-    debt = fields.Float(u'本次欠款', compute=_compute_all_amount, 
+    debt = fields.Float(u'本次欠款', compute=_compute_all_amount,
                         store=True, readonly=True, copy=False,
                         digits=dp.get_precision('Amount'),
                         help=u'本次欠款金额')
-    total_debt = fields.Float(u'总欠款', compute=_compute_all_amount, 
+    total_debt = fields.Float(u'总欠款', compute=_compute_all_amount,
                               store=True, readonly=True, copy=False,
                               digits=dp.get_precision('Amount'),
                               help=u'该客户的总欠款金额')
-    cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用', 
+    cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用',
                                     copy=False,
                                     help=u'销售费用明细行')
     money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
@@ -139,7 +140,8 @@ class sell_delivery(models.Model):
                 if child.is_default_add:
                     self.address_id = child.id
             if self.partner_id.child_ids and not any([child.is_default_add for child in self.partner_id.child_ids]):
-                partners_add = self.env['partner.address'].search([('partner_id', '=', self.partner_id.id)], order='id')
+                partners_add = self.env['partner.address'].search(
+                    [('partner_id', '=', self.partner_id.id)], order='id')
                 self.address_id = partners_add[0].id
 
             for line in self.line_out_ids:
@@ -155,7 +157,8 @@ class sell_delivery(models.Model):
                 else:
                     line.tax_rate = self.env.user.company_id.output_tax_rate
 
-            address_list = [child_list.id for child_list in self.partner_id.child_ids]
+            address_list = [
+                child_list.id for child_list in self.partner_id.child_ids]
             if address_list:
                 return {'domain': {'address_id': [('id', 'in', address_list)]}}
             else:
@@ -175,7 +178,7 @@ class sell_delivery(models.Model):
             self.discount_amount = total * self.discount_rate * 0.01
 
     def get_move_origin(self, vals):
-        return self._name + (self.env.context.get('is_return') and '.return' 
+        return self._name + (self.env.context.get('is_return') and '.return'
                              or '.sell')
 
     @api.model
@@ -193,7 +196,7 @@ class sell_delivery(models.Model):
             'finance_category_id': self.env.ref('finance.categ_sell_goods').id,
         })
 
-        return super(sell_delivery, self).create(vals)
+        return super(SellDelivery, self).create(vals)
 
     @api.multi
     def unlink(self):
@@ -211,7 +214,7 @@ class sell_delivery(models.Model):
         """
         auto_in = self.env['wh.in'].create(vals)
         line_ids = [line.id for line in auto_in.line_in_ids]
-        self.with_context({'wh_in_line_ids':line_ids}).sell_delivery_done()
+        self.with_context({'wh_in_line_ids': line_ids}).sell_delivery_done()
         return True
 
     @api.one
@@ -236,7 +239,7 @@ class sell_delivery(models.Model):
                                  precision_digits=decimal_amount.digits) == 1:
                     raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！\n\
                      本次发货金额:%s\n 客户应收余额:%s\n 本次收款金额:%s\n客户信用额度:%s' % (
-                    amount, self.receipt, self.partner_id.receivable, self.partner_id.credit_limit))
+                        amount, self.receipt, self.partner_id.receivable, self.partner_id.credit_limit))
 
     def _line_qty_write(self):
         if self.order_id:
@@ -275,9 +278,10 @@ class sell_delivery(models.Model):
             tax_amount = - sum(line.tax_amount for line in self.line_in_ids)
         category = self.env.ref('money.core_category_sale')
         invoice_id = False
-        if not float_is_zero(amount,2):
+        if not float_is_zero(amount, 2):
             invoice_id = self.env['money.invoice'].create(
-                self._get_invoice_vals(self.partner_id, category, self.date, amount, tax_amount)
+                self._get_invoice_vals(
+                    self.partner_id, category, self.date, amount, tax_amount)
             )
         return invoice_id
 
@@ -286,9 +290,10 @@ class sell_delivery(models.Model):
         invoice_id = False
         if sum(cost_line.amount for cost_line in self.cost_line_ids) > 0:
             for line in self.cost_line_ids:
-                if not float_is_zero(line.amount,2):
+                if not float_is_zero(line.amount, 2):
                     invoice_id = self.env['money.invoice'].create(
-                        self._get_invoice_vals(line.partner_id, line.category_id, self.date, line.amount + line.tax, line.tax)
+                        self._get_invoice_vals(
+                            line.partner_id, line.category_id, self.date, line.amount + line.tax, line.tax)
                     )
         return invoice_id
 
@@ -393,10 +398,11 @@ class sell_delivery(models.Model):
             receive_source_result = []
             # 预收款
             adv_pay_orders = self.env['money.order'].search([('partner_id', '=', self.partner_id.id),
-                                            ('type', '=', 'get'),
-                                            ('state', '=', 'done'),
-                                            ('to_reconcile', '!=', 0),
-                                            ('sell_id', '=', self.order_id.id)])
+                                                             ('type', '=', 'get'),
+                                                             ('state', '=', 'done'),
+                                                             ('to_reconcile',
+                                                              '!=', 0),
+                                                             ('sell_id', '=', self.order_id.id)])
             for order in adv_pay_orders:
                 adv_pay_result.append((0, 0, {'name': order.id,
                                               'amount': order.amount,
@@ -406,31 +412,34 @@ class sell_delivery(models.Model):
                                               'this_reconcile': order.to_reconcile,
                                               }))
             # 结算单
-            receive_source_name = [delivery.name for delivery in self.order_id.delivery_ids]
+            receive_source_name = [
+                delivery.name for delivery in self.order_id.delivery_ids]
             receive_source_orders = self.env['money.invoice'].search([('category_id.type', '=', 'income'),
-                                            ('partner_id', '=', self.partner_id.id),
-                                            ('to_reconcile', '!=', 0),
-                                            ('name', 'in', receive_source_name)])
+                                                                      ('partner_id', '=',
+                                                                       self.partner_id.id),
+                                                                      ('to_reconcile',
+                                                                       '!=', 0),
+                                                                      ('name', 'in', receive_source_name)])
             for invoice in receive_source_orders:
                 receive_source_result.append((0, 0, {
-                                                'name': invoice.id,
-                                                'category_id': invoice.category_id.id,
-                                                'amount': invoice.amount,
-                                                'date': invoice.date,
-                                                'reconciled': invoice.reconciled,
-                                                'to_reconcile': invoice.to_reconcile,
-                                                'date_due': invoice.date_due,
-                                                'this_reconcile': invoice.to_reconcile,
-                                                }))
+                    'name': invoice.id,
+                    'category_id': invoice.category_id.id,
+                    'amount': invoice.amount,
+                    'date': invoice.date,
+                    'reconciled': invoice.reconciled,
+                    'to_reconcile': invoice.to_reconcile,
+                    'date_due': invoice.date_due,
+                    'this_reconcile': invoice.to_reconcile,
+                }))
             # 创建核销单
             reconcile_order = self.env['reconcile.order'].create({
-                                                'partner_id': self.partner_id.id,
-                                                'business_type': 'adv_pay_to_get',
-                                                'advance_payment_ids': adv_pay_result,
-                                                'receivable_source_ids': receive_source_result,
-                                                'note': u'自动核销',
-                                                })
-            reconcile_order.reconcile_order_done() # 自动审核
+                'partner_id': self.partner_id.id,
+                'business_type': 'adv_pay_to_get',
+                'advance_payment_ids': adv_pay_result,
+                'receivable_source_ids': receive_source_result,
+                'note': u'自动核销',
+            })
+            reconcile_order.reconcile_order_done()  # 自动审核
 
     @api.multi
     def sell_delivery_done(self):
@@ -439,12 +448,13 @@ class sell_delivery(models.Model):
             record._wrong_delivery_done()
             # 库存不足 生成零的
             if self.env.user.company_id.is_enable_negative_stock:
-                result_vals = self.env['wh.move'].create_zero_wh_in(record,record._name)
+                result_vals = self.env['wh.move'].create_zero_wh_in(
+                    record, record._name)
                 if result_vals:
                     return result_vals
             # 调用wh.move中审核方法，更新审核人和审核状态
             record.sell_move_id.approve_order()
-            #将发货/退货数量写入销货订单行
+            # 将发货/退货数量写入销货订单行
             if record.order_id:
                 record._line_qty_write()
             voucher = False
@@ -465,7 +475,8 @@ class sell_delivery(models.Model):
                 flag = not record.is_return and 1 or -1
                 amount = flag * (record.amount + record.partner_cost)
                 this_reconcile = flag * record.receipt
-                money_order = record._make_money_order(invoice_id, amount, this_reconcile)
+                money_order = record._make_money_order(
+                    invoice_id, amount, this_reconcile)
                 money_order.money_order_done()
 
             # 先收款后发货订单自动核销
@@ -480,14 +491,14 @@ class sell_delivery(models.Model):
         '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的结算单、收款单及凭证'''
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(
-                [('name', '=', self.invoice_id.id)])
+            [('name', '=', self.invoice_id.id)])
         for line in source_line:
             line.money_id.money_order_draft()
             line.money_id.unlink()
             # FIXME:查找产生的核销单，反审核后删掉
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
-                [('name', '=', self.invoice_id.name)])
+            [('name', '=', self.invoice_id.name)])
         # 不能反审核已核销的发货单
         for invoice in invoice_ids:
             if invoice.to_reconcile == 0 and invoice.reconciled == invoice.amount:
@@ -520,7 +531,6 @@ class sell_delivery(models.Model):
             voucher.voucher_draft()
         voucher.unlink()
 
-
     @api.multi
     def sell_to_return(self):
         '''销售发货单转化为销售退货单'''
@@ -542,7 +552,8 @@ class sell_delivery(models.Model):
         for order in return_order:
             for return_line in order.line_in_ids:
                 # 用产品、属性、批次做key记录已退货数量
-                t_key = (return_line.goods_id.id,return_line.attribute_id.id,return_line.lot)
+                t_key = (return_line.goods_id.id,
+                         return_line.attribute_id.id, return_line.lot)
                 if return_goods.get(t_key):
                     return_goods[t_key] += return_line.goods_qty
                 else:
@@ -550,7 +561,7 @@ class sell_delivery(models.Model):
         receipt_line = []
         for line in self.line_out_ids:
             qty = line.goods_qty
-            l_key = (line.goods_id.id,line.attribute_id.id,line.lot_id.lot)
+            l_key = (line.goods_id.id, line.attribute_id.id, line.lot_id.lot)
             if return_goods.get(l_key):
                 qty = qty - return_goods[l_key]
             if qty > 0:
@@ -561,14 +572,14 @@ class sell_delivery(models.Model):
                     'warehouse_id': line.warehouse_dest_id.id,
                     'warehouse_dest_id': line.warehouse_id.id,
                     'goods_qty': qty,
-                    'sell_line_id':line.sell_line_id.id,
+                    'sell_line_id': line.sell_line_id.id,
                     'price_taxed': line.price_taxed,
                     'discount_rate': line.discount_rate,
                     'discount_amount': line.discount_amount,
                     'type': 'in',
                 }
                 if line.goods_id.using_batch:
-                    dic.update({'lot':line.lot_id.lot})
+                    dic.update({'lot': line.lot_id.lot})
                 receipt_line.append(dic)
         if len(receipt_line) == 0:
             raise UserError(u'该订单已全部退货！')
@@ -601,8 +612,7 @@ class sell_delivery(models.Model):
         }
 
 
-
-class wh_move_line(models.Model):
+class WhMoveLine(models.Model):
     _inherit = 'wh.move.line'
     _description = u'销售发货单行'
 
@@ -610,18 +620,20 @@ class wh_move_line(models.Model):
                                    ondelete='cascade',
                                    help=u'对应的销货订单行')
 
-    @api.onchange('warehouse_id','goods_id')
+    @api.onchange('warehouse_id', 'goods_id')
     def onchange_warehouse_id(self):
         '''当订单行的仓库变化时，带出定价策略中的折扣率'''
         if self.warehouse_id and self.goods_id:
             partner_id = self.env.context.get('default_partner')
-            partner = self.env['partner'].browse(partner_id) or self.move_id.partner_id
+            partner = self.env['partner'].browse(
+                partner_id) or self.move_id.partner_id
             warehouse = self.warehouse_id
             goods = self.goods_id
             date = self.env.context.get('default_date') or self.move_id.date
             if self.env.context.get('warehouse_type') == 'customer' or \
                     self.env.context.get('warehouse_dest_type') == 'customer':
-                pricing = self.env['pricing'].get_pricing_id(partner,warehouse,goods,date)
+                pricing = self.env['pricing'].get_pricing_id(
+                    partner, warehouse, goods, date)
                 if pricing:
                     self.discount_rate = pricing.discount_rate
                 else:
@@ -643,4 +655,4 @@ class wh_move_line(models.Model):
                     ((self.type == 'out' and not is_return) or (self.type == 'in' and is_return)):
                 self._delivery_get_price_and_tax()
 
-        return super(wh_move_line, self).onchange_goods_id()
+        return super(WhMoveLine, self).onchange_goods_id()

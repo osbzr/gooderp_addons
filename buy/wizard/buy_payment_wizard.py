@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class buy_payment_wizard(models.TransientModel):
+class BuyPaymentWizard(models.TransientModel):
     _name = 'buy.payment.wizard'
     _description = u'采购付款一览表向导'
 
@@ -20,15 +20,15 @@ class buy_payment_wizard(models.TransientModel):
     date_start = fields.Date(u'开始日期', default=_default_date_start,
                              help=u'报表汇总的开始日期，默认为公司启用日期')
     date_end = fields.Date(u'结束日期', default=_default_date_end,
-                             help=u'报表汇总的结束日期，默认为当前日期')
+                           help=u'报表汇总的结束日期，默认为当前日期')
     s_category_id = fields.Many2one('core.category', u'供应商类别',
-                             help=u'按指定供应商类别进行统计')
+                                    help=u'按指定供应商类别进行统计')
     partner_id = fields.Many2one('partner', u'供应商',
-                             help=u'按指定供应商进行统计')
+                                 help=u'按指定供应商进行统计')
     order_id = fields.Many2one('buy.receipt', u'采购单号',
-                             help=u'按指定采购单号进行统计')
+                               help=u'按指定采购单号进行统计')
     warehouse_dest_id = fields.Many2one('warehouse', u'仓库',
-                             help=u'按指定仓库进行统计')
+                                        help=u'按指定仓库进行统计')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -49,7 +49,7 @@ class buy_payment_wizard(models.TransientModel):
         if self.order_id:
             cond.append(('id', '=', self.order_id.id))
         if self.warehouse_dest_id:
-            cond += ['|',('buy_move_id.warehouse_dest_id', '=', self.warehouse_dest_id.id),
+            cond += ['|', ('buy_move_id.warehouse_dest_id', '=', self.warehouse_dest_id.id),
                      ('buy_move_id.warehouse_id', '=', self.warehouse_dest_id.id)]
         return cond
 
@@ -57,7 +57,7 @@ class buy_payment_wizard(models.TransientModel):
         '''计算该入库单的已付款和应付款余额'''
         payment = 0
         for order in self.env['money.order'].search(
-                    [('state', '=', 'done')], order='name'):
+                [('state', '=', 'done')], order='name'):
             for source in order.source_ids:
                 if source.name.name == receipt.name:
                     payment += source.this_reconcile
@@ -71,7 +71,7 @@ class buy_payment_wizard(models.TransientModel):
     def _prepare_buy_payment(self, receipt):
         '''对于传入的入库单，为创建采购付款一览表准备数据'''
         self.ensure_one()
-        factor = not receipt.is_return and 1 or -1 # 如果是退货则金额均取反
+        factor = not receipt.is_return and 1 or -1  # 如果是退货则金额均取反
         purchase_amount = factor * (receipt.discount_amount + receipt.amount)
         discount_amount = factor * receipt.discount_amount
         amount = factor * receipt.amount
@@ -103,7 +103,8 @@ class buy_payment_wizard(models.TransientModel):
         receipt_obj = self.env['buy.receipt']
         for receipt in receipt_obj.search(self._get_domain(), order='partner_id,date'):
             # 用查找到的入库单信息来创建一览表
-            line = self.env['buy.payment'].create(self._prepare_buy_payment(receipt))
+            line = self.env['buy.payment'].create(
+                self._prepare_buy_payment(receipt))
             res.append(line.id)
 
         return {

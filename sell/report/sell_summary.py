@@ -5,7 +5,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import models, fields
 
 
-class report_sell_summary(models.Model):
+class ReportSellSummary(models.Model):
     _name = 'report.sell.summary'
     _description = u'销售汇总表'
     _auto = False
@@ -23,7 +23,8 @@ class report_sell_summary(models.Model):
     attribute_id = fields.Char(u'属性')
     warehouse = fields.Char(u'仓库')
     goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
-    goods_uos_qty = fields.Float(u'辅助单位数量', digits=dp.get_precision('Quantity'))
+    goods_uos_qty = fields.Float(
+        u'辅助单位数量', digits=dp.get_precision('Quantity'))
     price = fields.Float(u'单价', digits=dp.get_precision('Price'))
     amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))

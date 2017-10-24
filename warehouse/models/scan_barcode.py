@@ -2,7 +2,8 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
-class scan_barcode(models.Model):
+
+class ScanBarcode(models.Model):
     _name = 'scan.barcode'
     scan_barcode_input_code = fields.Char(string='输入要扫描的条码')
 
@@ -25,7 +26,8 @@ class scan_barcode(models.Model):
                                                                                        conversion)
         if not line_out_data.get(code):
             if not create_line:
-                line_out_list.append((0, 0, self.env['wh.move'].prepare_move_line_data(att, val, goods, move)))
+                line_out_list.append(
+                    (0, 0, self.env['wh.move'].prepare_move_line_data(att, val, goods, move)))
         for currency_code, line in line_out_data.iteritems():
             if isinstance(line.id, int):
                 if currency_code == code:
@@ -56,7 +58,8 @@ class scan_barcode(models.Model):
                 code_list = [self.scan_barcode_input_code]
             for code in code_list:
                 line_out_data = self.prepare_line_out_data(self.line_out_ids)
-                line_out_list = self.contract_barcode_line_data(line_out_data, vals, code)
+                line_out_list = self.contract_barcode_line_data(
+                    line_out_data, vals, code)
                 if isinstance(line_out_list, dict):
                     return line_out_list
                 self.line_out_ids = line_out_list

@@ -2,27 +2,28 @@
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
-import time,datetime
+import time
+import datetime
 
 # 请假单审核状态可选值
 LEAVE_STATES = [
     ('draft', u'未审核'),
-    ('done', u'已审核'),]
+    ('done', u'已审核'), ]
 
-class staff_leave(models.Model):
+
+class StaffLeave(models.Model):
     _name = 'staff.leave'
     _description = u'请假单'
     _inherit = ['mail.thread']
-
 
     @api.model
     def _set_staff_id(self):
         return self.env.uid
 
     name = fields.Text(string=u'请假缘由',
-                readonly = True,
-               states = {'draft': [('readonly', False)]},
-    )
+                       readonly=True,
+                       states={'draft': [('readonly', False)]},
+                       )
     user_id = fields.Many2one('res.users',
                               string=u'请假人',
                               default=_set_staff_id,
@@ -34,14 +35,14 @@ class staff_leave(models.Model):
                                  states={'draft': [('readonly', False)]}
                                  )
     date_stop = fields.Datetime(string=u'回来时间',
-                                readonly = True,
-                                states = {'draft': [('readonly', False)]})
-    leave_type = fields.Selection([('no_pay', u'无薪'),('with_pay', u'带薪'),
-                                   ('compensation_day', u'补偿日数'),('sick_leave', u'病假')],
-                                  required = True,string=u'准假类型',readonly = True,
-                                states = {'draft': [('readonly', False)]})
-    leave_dates = fields.Float(u'请假天数', readonly = True,
-                               states = {'draft': [('readonly', False)]})
+                                readonly=True,
+                                states={'draft': [('readonly', False)]})
+    leave_type = fields.Selection([('no_pay', u'无薪'), ('with_pay', u'带薪'),
+                                   ('compensation_day', u'补偿日数'), ('sick_leave', u'病假')],
+                                  required=True, string=u'准假类型', readonly=True,
+                                  states={'draft': [('readonly', False)]})
+    leave_dates = fields.Float(u'请假天数', readonly=True,
+                               states={'draft': [('readonly', False)]})
     state = fields.Selection(LEAVE_STATES, u'审核状态', readonly=True,
                              help=u"购货订单的审核状态", index=True, copy=False,
                              default='draft')
@@ -51,14 +52,12 @@ class staff_leave(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
-
     @api.one
     def leave_done(self):
         '''审核请假单'''
         if self.state == 'done':
             raise UserError(u'请不要重复审核！')
         self.state = 'done'
-
 
     @api.one
     def leave_draft(self):
@@ -71,5 +70,4 @@ class staff_leave(models.Model):
     @api.constrains('leave_dates')
     def check_leave_dates(self):
         if self.leave_dates <= 0:
-            raise UserError (u'请假天数不能小于或等于零')
-
+            raise UserError(u'请假天数不能小于或等于零')

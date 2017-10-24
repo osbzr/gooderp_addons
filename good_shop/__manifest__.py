@@ -16,9 +16,9 @@ Allows your customers to manage their shopping from a beautiful web interface.
         'money',
     ],
     'data': [
-             'security/ir.model.access.csv',
-             'data/data.xml',
-             'views/good_shop_templates.xml',
-             'views/goods_view.xml',
+        'security/ir.model.access.csv',
+        'data/data.xml',
+        'views/good_shop_templates.xml',
+        'views/goods_view.xml',
     ],
 }

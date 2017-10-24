@@ -5,21 +5,22 @@ from odoo import models, fields, api
 import math
 
 
-class action_report_picking_wrapped(report_sxw.rml_parse):
+class ActionReportPickingWrapped(report_sxw.rml_parse):
 
     def __init__(self, cr, uid, name, context=None):
-        super(action_report_picking_wrapped, self).__init__(cr, uid, name, context=context)
+        super(ActionReportPickingWrapped, self).__init__(
+            cr, uid, name, context=context)
         self.localcontext.update({
-                'paginate': self._paginate,
-                'rmb_upper': self._rmb_upper,
-                'rmb_format': self._rmb_format,
-            })
+            'paginate': self._paginate,
+            'rmb_upper': self._rmb_upper,
+            'rmb_format': self._rmb_format,
+        })
         self.context = context
 
     def _rmb_upper(self, value):
         env = api.Environment(self.cr, self.uid, self.context)
         return env['res.currency'].rmb_upper(value)
-    
+
     def _rmb_format(self, value):
         """
                         将数值按位数分开
@@ -41,9 +42,9 @@ class action_report_picking_wrapped(report_sxw.rml_parse):
         return int(math.ceil(float(count) / max_per_page))
 
 
-class report_voucher(osv.AbstractModel):
+class ReportVoucher(osv.AbstractModel):
     _name = 'report.finance.report_voucher_view'
     _inherit = 'report.abstract_report'
     _template = 'finance.report_voucher_view'
-    _wrapped_report_class = action_report_picking_wrapped
+    _wrapped_report_class = ActionReportPickingWrapped
     _description = u'会计凭证打印'

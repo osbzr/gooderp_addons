@@ -5,10 +5,10 @@ from datetime import datetime
 from odoo.exceptions import UserError
 
 
-class test_staff_wages(TransactionCase):
+class TestStaffWages(TransactionCase):
 
     def setUp(self):
-        super(test_staff_wages, self).setUp()
+        super(TestStaffWages, self).setUp()
         self.staff_wages = self.env.ref('staff_wages.staff_wages_lili')
         # 调用下员工onchange自动带出五险一金
         for line in self.staff_wages.line_ids:
@@ -36,11 +36,11 @@ class test_staff_wages(TransactionCase):
         # 在工资表上增加人员 Admin 并重新计提
         l_change_voucher = self.staff_wages.change_voucher_id
         l_line = self.env['wages.line'].create({'name': self.env.ref('staff.staff_1').id,
-                                       'basic_wage': 5000,
-                                       'basic_date': 22,
-                                       'date_number': 23,
-                                       'order_id': self.staff_wages.id,
-                                       })
+                                                'basic_wage': 5000,
+                                                'basic_date': 22,
+                                                'date_number': 23,
+                                                'order_id': self.staff_wages.id,
+                                                })
         l_line.change_wage_addhour()
         l_line.change_add_wage()
         self.staff_wages._total_amount_wage()
@@ -56,7 +56,7 @@ class test_staff_wages(TransactionCase):
         self.staff_wages.other_money_order.other_money_done()
         self.staff_wages.staff_wages_draft()
 
-        #删除工资单
+        # 删除工资单
         self.staff_wages.unlink()
 
     def test_personal_tax_value(self):
@@ -104,5 +104,3 @@ class test_staff_wages(TransactionCase):
         self.staff_wages.line_ids.unlink()
         with self.assertRaises(UserError):
             self.staff_wages.staff_wages_accrued()
-
-

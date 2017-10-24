@@ -4,14 +4,15 @@ from utils import safe_division
 from odoo.exceptions import UserError
 from odoo import models, fields, api
 
-class goods(models.Model):
+
+class Goods(models.Model):
     _inherit = 'goods'
 
     net_weight = fields.Float(u'净重')
 
     # 使用SQL来取得指定商品情况下的库存数量
     def get_stock_qty(self):
-        for goods in self:
+        for Goods in self:
             self.env.cr.execute('''
                 SELECT sum(line.qty_remaining) as qty,
                        sum(line.qty_remaining * (line.cost / line.goods_qty)) as cost,
@@ -25,7 +26,7 @@ class goods(models.Model):
                   AND line.goods_id = %s
 
                 GROUP BY wh.name
-            ''' % (goods.id,))
+            ''' % (Goods.id,))
 
             return self.env.cr.dictfetchall()
 
@@ -47,7 +48,8 @@ class goods(models.Model):
 
                 domain.append(('id', 'not in', ignore))
 
-            move = self.env['wh.move.line'].search(domain, limit=1, order='cost_time desc, id desc')
+            move = self.env['wh.move.line'].search(
+                domain, limit=1, order='cost_time desc, id desc')
             if move:
                 return move.cost_unit
 
@@ -58,7 +60,8 @@ class goods(models.Model):
         # 存在一种情况，计算一条line的成本的时候，先done掉该line，之后在通过该函数
         # 查询成本，此时百分百搜到当前的line，所以添加ignore参数来忽略掉指定的line
         if lot_id:
-            records, cost = self.get_matching_records_by_lot(lot_id, qty, suggested=True)
+            records, cost = self.get_matching_records_by_lot(
+                lot_id, qty, suggested=True)
         else:
             records, cost = self.get_matching_records(
                 warehouse, qty, attribute=attribute, ignore_stock=True, ignore=ignore_move)
@@ -121,12 +124,12 @@ class goods(models.Model):
         :return: 匹配记录和成本
         """
         matching_records = []
-        for goods in self:
+        for Goods in self:
             domain = [
                 ('qty_remaining', '>', 0),
                 ('state', '=', 'done'),
                 ('warehouse_dest_id', '=', warehouse.id),
-                ('goods_id', '=', goods.id)
+                ('goods_id', '=', Goods.id)
             ]
             if ignore:
                 if isinstance(ignore, (long, int)):
@@ -139,11 +142,13 @@ class goods(models.Model):
 
             # 内部移库，从源库位移到目的库位，匹配时从源库位取值; location.py confirm_change 方法
             if self.env.context.get('location'):
-                domain.append(('location_id', '=', self.env.context.get('location')))
+                domain.append(
+                    ('location_id', '=', self.env.context.get('location')))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
             # 出库顺序按 库位 就近、先到期先出、先进先出
-            lines = self.env['wh.move.line'].search(domain, order='location_id, expiration_date, cost_time, id')
+            lines = self.env['wh.move.line'].search(
+                domain, order='location_id, expiration_date, cost_time, id')
 
             qty_to_go, uos_qty_to_go, cost = qty, uos_qty, 0    # 分别为待出库商品的数量、辅助数量和成本
             for line in lines:
@@ -151,7 +156,7 @@ class goods(models.Model):
                     break
 
                 matching_qty = min(line.qty_remaining, qty_to_go)
-                matching_uos_qty = matching_qty/goods.conversion
+                matching_uos_qty = matching_qty / Goods.conversion
 
                 matching_records.append({'line_in_id': line.id, 'expiration_date': line.expiration_date,
                                          'qty': matching_qty, 'uos_qty': matching_uos_qty})
@@ -161,15 +166,16 @@ class goods(models.Model):
                 uos_qty_to_go -= matching_uos_qty
             else:
                 if not ignore_stock and qty_to_go > 0 and not self.env.context.get('wh_in_line_ids'):
-                    raise UserError(u'商品%s的库存数量不够本次出库' % (goods.name,))
+                    raise UserError(u'商品%s的库存数量不够本次出库' % (Goods.name,))
                 if self.env.context.get('wh_in_line_ids'):
                     domain = [('id', 'in', self.env.context.get('wh_in_line_ids')),
                               ('state', '=', 'done'),
                               ('warehouse_dest_id', '=', warehouse.id),
-                              ('goods_id', '=', goods.id)]
+                              ('goods_id', '=', Goods.id)]
                     if attribute:
                         domain.append(('attribute_id', '=', attribute.id))
-                    line_in_id = self.env['wh.move.line'].search(domain, order='expiration_date, cost_time, id')
+                    line_in_id = self.env['wh.move.line'].search(
+                        domain, order='expiration_date, cost_time, id')
                     if line_in_id:
                         matching_records.append({'line_in_id': line_in_id.id, 'expiration_date': line_in_id.expiration_date,
                                                  'qty': qty_to_go, 'uos_qty': uos_qty_to_go})

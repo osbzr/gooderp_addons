@@ -6,10 +6,12 @@ import time
 
 class TestWarehouseOrder(TransactionCase):
     ''' 测试仓库的其他出库单单据和调拨单 '''
+
     def setUp(self):
         super(TestWarehouseOrder, self).setUp()
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin1').date = '2016-02-06'
         self.env.ref('warehouse.wh_in_whin3').date = '2016-02-06'
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
@@ -19,12 +21,15 @@ class TestWarehouseOrder(TransactionCase):
 
         self.others_in = self.browse_ref('warehouse.wh_in_whin1')
         self.others_in_cable = self.browse_ref('warehouse.wh_move_line_15')
-        self.others_in_keyboard_mouse = self.browse_ref('warehouse.wh_move_line_16')
+        self.others_in_keyboard_mouse = self.browse_ref(
+            'warehouse.wh_move_line_16')
 
         self.others_in_2 = self.browse_ref('warehouse.wh_in_whin3')
-        self.others_in_2_keyboard_mouse = self.browse_ref('warehouse.wh_move_line_keyboard_mouse_in_2')
+        self.others_in_2_keyboard_mouse = self.browse_ref(
+            'warehouse.wh_move_line_keyboard_mouse_in_2')
 
-        self.others_in_keyboard_mouse = self.browse_ref('warehouse.wh_move_line_16')
+        self.others_in_keyboard_mouse = self.browse_ref(
+            'warehouse.wh_move_line_16')
 
         self.others_out = self.browse_ref('warehouse.wh_out_whout0')
         self.others_out_2 = self.browse_ref('warehouse.wh_out_whout1')
@@ -51,7 +56,8 @@ class TestWarehouseOrder(TransactionCase):
         self.others_out_2.approve_order()
 
     def test_approve(self):
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
 
         # 此时其他入库单的others_in的剩余数量应该为0
         self.assertEqual(self.others_in_cable.qty_remaining, 0)
@@ -117,7 +123,8 @@ class TestWarehouseOrder(TransactionCase):
         self.assertTrue(not self.others_out.exists())
 
     def test_cancel_approve(self):
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
 
         # 存在已经被匹配的出库时入库无法被取消
         with self.assertRaises(UserError):
@@ -163,7 +170,8 @@ class TestWarehouseOrder(TransactionCase):
             self.others_in.approve_order()
 
     def test_origin(self):
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.assertEqual(self.others_in.origin, 'wh.in.others')
         self.assertEqual(self.others_out.origin, 'wh.out.others')
         self.assertEqual(self.internal.origin, 'wh.internal')
@@ -184,9 +192,10 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_get_default_warehouse(self):
         '''获取调出仓库'''
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         order = self.env['wh.out'].with_context({
-             'warehouse_type': 'stock',
+            'warehouse_type': 'stock',
         }).create({'type': 'others',
                    'line_out_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id,
                                             'type': 'out',
@@ -200,9 +209,10 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_get_default_warehouse_dest(self):
         '''获取调入仓库'''
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         order = self.env['wh.in'].with_context({
-             'warehouse_dest_type': 'stock'
+            'warehouse_dest_type': 'stock'
         }).create({'type': 'others',
                    'line_in_ids': [(0, 0, {'goods_id': self.browse_ref('goods.mouse').id})]})
         # 验证明细行上仓库是否是订单上调入仓库
@@ -218,7 +228,8 @@ class TestWarehouseOrder(TransactionCase):
         self.others_out.type = 'inventory'
         warehouse_inventory = self.browse_ref('warehouse.warehouse_inventory')
         self.others_out.onchange_type()
-        self.assertTrue(self.others_out.warehouse_dest_id == warehouse_inventory)
+        self.assertTrue(self.others_out.warehouse_dest_id ==
+                        warehouse_inventory)
 
         # 其它入库单
         self.others_in_2.type = 'inventory'
@@ -241,38 +252,38 @@ class TestWarehouseOrder(TransactionCase):
         ''' 其他出库单审核商品不足时调用创建盘盈入库方法 '''
         for line in self.others_out.line_out_ids:
             vals = {
-                    'type':'inventory',
-                    'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
-                    'warehouse_dest_id':self.others_out.warehouse_id.id,
-                    'line_in_ids':[(0, 0, {
-                                'goods_id':line.goods_id.id,
-                                'attribute_id':line.attribute_id.id,
-                                'goods_uos_qty':line.goods_uos_qty,
-                                'uos_id':line.uos_id.id,
-                                'goods_qty':line.goods_qty,
-                                'uom_id':line.uom_id.id,
-                                'cost_unit':line.goods_id.cost
-                                            }
-                                    )]
-                        }
+                'type': 'inventory',
+                'warehouse_id': self.env.ref('warehouse.warehouse_inventory').id,
+                'warehouse_dest_id': self.others_out.warehouse_id.id,
+                'line_in_ids': [(0, 0, {
+                        'goods_id': line.goods_id.id,
+                        'attribute_id': line.attribute_id.id,
+                        'goods_uos_qty': line.goods_uos_qty,
+                        'uos_id': line.uos_id.id,
+                                'goods_qty': line.goods_qty,
+                                'uom_id': line.uom_id.id,
+                                'cost_unit': line.goods_id.cost
+                                }
+                )]
+            }
             self.others_out.goods_inventory(vals)
 
     def test_goods_inventory_internal(self):
         ''' 内部调拨单审核商品不足时调用创建盘盈入库方法 '''
         for line in self.internal.line_out_ids:
             vals = {
-                    'type':'inventory',
-                    'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
-                    'warehouse_dest_id':self.internal.warehouse_id.id,
-                    'line_in_ids':[(0, 0, {
-                                'goods_id':line.goods_id.id,
-                                'attribute_id':line.attribute_id.id,
-                                'goods_uos_qty':line.goods_uos_qty,
-                                'uos_id':line.uos_id.id,
-                                'goods_qty':line.goods_qty,
-                                'uom_id':line.uom_id.id,
-                                'cost_unit':line.goods_id.cost
-                                            }
-                                    )]
-                        }
+                'type': 'inventory',
+                'warehouse_id': self.env.ref('warehouse.warehouse_inventory').id,
+                'warehouse_dest_id': self.internal.warehouse_id.id,
+                'line_in_ids': [(0, 0, {
+                        'goods_id': line.goods_id.id,
+                        'attribute_id': line.attribute_id.id,
+                        'goods_uos_qty': line.goods_uos_qty,
+                        'uos_id': line.uos_id.id,
+                                'goods_qty': line.goods_qty,
+                                'uom_id': line.uom_id.id,
+                                'cost_unit': line.goods_id.cost
+                                }
+                )]
+            }
             self.internal.goods_inventory(vals)

@@ -9,7 +9,8 @@ import pickle
 from odoo import models, api
 from odoo.exceptions import UserError
 
-class report_base(models.Model):
+
+class ReportBase(models.Model):
     _name = 'report.base'
     _description = u'使用search_read来直接生成数据的基本类，其他类可以直接异名继承当前类来重用搜索、过滤、分组等函数'
 
@@ -104,7 +105,8 @@ class report_base(models.Model):
             domain = domains[index]
             index += 1
             if domain == '|':
-                left_index, right_index = self.get_next_or_domain(domains, index)
+                left_index, right_index = self.get_next_or_domain(
+                    domains, index)
 
                 if not self._compute_domain_util(result, domains[index:left_index]) and not self._compute_domain_util(result, domains[left_index:right_index]):
                     return False
@@ -135,18 +137,21 @@ class report_base(models.Model):
             return collect
 
         res = []
-        values = self.search_read(domain=domain, fields=fields, offset=offset, limit=limit or 80, order=orderby)
+        values = self.search_read(
+            domain=domain, fields=fields, offset=offset, limit=limit or 80, order=orderby)
 
         if groupby:
             key = operator.itemgetter(groupby[0])
             for group, itervalue in itertools.groupby(sorted(values, key=key), key):
-                collect = {'__domain': [(groupby[0], '=', group)], groupby[0]: group, groupby[0] + '_count': 0}
-                collect = reduce(lambda collect, value: dict_plus(collect, value), itervalue, collect)
+                collect = {'__domain': [
+                    (groupby[0], '=', group)], groupby[0]: group, groupby[0] + '_count': 0}
+                collect = reduce(lambda collect, value: dict_plus(
+                    collect, value), itervalue, collect)
 
                 if len(groupby) > 1:
                     collect.update({
-                            '__context': {'group_by': groupby[1:]}
-                        })
+                        '__context': {'group_by': groupby[1:]}
+                    })
 
                 if domain:
                     collect['__domain'].extend(domain)
@@ -159,7 +164,8 @@ class report_base(models.Model):
         # TODO 暂时不支持多重排序
         if order:
             order = order.partition(',')[0].partition(' ')
-            result.sort(key=lambda item: item.get(order[0]), reverse=order[2] == 'ASC')
+            result.sort(key=lambda item: item.get(
+                order[0]), reverse=order[2] == 'ASC')
 
         return result
 

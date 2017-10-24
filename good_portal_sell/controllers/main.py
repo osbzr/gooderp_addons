@@ -8,12 +8,12 @@ from odoo.http import request
 from odoo.addons.good_portal.controllers.main import website_account
 
 
-class website_account(website_account):
+class WebsiteAccount(website_account):
 
     @http.route()
     def account(self, **kw):
         """ Add sales documents to main account page """
-        response = super(website_account, self).account(**kw)
+        response = super(WebsiteAccount, self).account(**kw)
         partner = request.env.user.gooderp_partner_id
 
         # 销售单
@@ -40,7 +40,8 @@ class website_account(website_account):
         ]
         archive_groups = self._get_archive_groups('sell.order', domain)
         if date_begin and date_end:
-            domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
+            domain += [('create_date', '>', date_begin),
+                       ('create_date', '<=', date_end)]
 
         # count for pager
         order_count = SaleOrder.search_count(domain)
@@ -53,7 +54,8 @@ class website_account(website_account):
             step=self._items_per_page
         )
         # content according to pager and archive selected
-        orders = SaleOrder.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        orders = SaleOrder.search(
+            domain, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'date': date_begin,

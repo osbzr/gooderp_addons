@@ -3,7 +3,8 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
 
-class test_staff(TransactionCase):
+
+class TestStaff(TransactionCase):
 
     def test_get_image(self):
         '''拿到用户头像,职位的onchange'''
@@ -12,8 +13,8 @@ class test_staff(TransactionCase):
             'login': 'lucy@osbzr.com',
         })
         staff_pro = self.env['staff'].create({
-            'identification_id':111111,
-            'work_phone':12345678901,
+            'identification_id': 111111,
+            'work_phone': 12345678901,
             'work_email': 'lucy@osbzr.com',
             'name': 'Lucy',
             'user_id': user_lucy.id,
@@ -25,7 +26,8 @@ class test_staff(TransactionCase):
 
         job = self.browse_ref('staff.ir_cron_module_remind_contract_over_date')
         job.interval_type = 'minutes'
-        job.nextcall = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+        job.nextcall = (datetime.now() + timedelta(hours=8)
+                        ).strftime('%Y-%m-%d %H:%M:%S')
         job.doall = True
         # not staff.contract_ids
         self.env['staff'].staff_contract_over_date()
@@ -42,24 +44,26 @@ class test_staff(TransactionCase):
         staff_lily.parent_id = self.env.ref('staff.staff_1').id
         self.env['staff'].staff_contract_over_date()
 
-class test_staff_department(TransactionCase):
+
+class TestStaffDepartment(TransactionCase):
     ''' 测试 部门 '''
+
     def test_check_parent_id(self):
         ''' 测试 上级部门不能选择自己和下级的部门 '''
         department_1 = self.env.ref('staff.department_1')
         department_2 = self.env['staff.department'].create({
-                                                            'name': '财务部',
-                                                            'parent_id': department_1.id,
-                                                            })
+            'name': '财务部',
+            'parent_id': department_1.id,
+        })
         with self.assertRaises(ValidationError):
             department_1.parent_id = department_2.id
 
 
-class test_mail_message(TransactionCase):
+class TestMailMessage(TransactionCase):
 
     def setUp(self):
         '''准备基本数据'''
-        super(test_mail_message, self).setUp()
+        super(TestMailMessage, self).setUp()
         self.staff = self.browse_ref('staff.staff_1')
 
     def test_staff_birthday_message(self):
@@ -67,13 +71,16 @@ class test_mail_message(TransactionCase):
 
         # 设置了员工生日
         self.staff.birthday = datetime.now()
-        job = self.browse_ref('staff.ir_cron_module_update_notification_birthday')
+        job = self.browse_ref(
+            'staff.ir_cron_module_update_notification_birthday')
         job.interval_type = 'minutes'
-        job.nextcall = (datetime.now() + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
+        job.nextcall = (datetime.now() + timedelta(hours=8)
+                        ).strftime('%Y-%m-%d %H:%M:%S')
         job.doall = True
         self.env['mail.message'].staff_birthday_message()
 
-class test_res_users(TransactionCase):
+
+class TestResUsers(TransactionCase):
 
     def test_check_user_id(self):
         ''' 测试 一个用户只能对应一个员工 '''
@@ -84,19 +91,22 @@ class test_res_users(TransactionCase):
         with self.assertRaises(ValidationError):
             self.env.ref('staff.staff_1').user_id = user.id
 
-class test_leave(TransactionCase):
+
+class TestLeave(TransactionCase):
     ''' 测试 请假 '''
+
     def setUp(self):
         '''准备基本数据'''
-        super(test_leave, self).setUp()
+        super(TestLeave, self).setUp()
         self.leave = self.browse_ref('staff.leave_1')
 
     def test_set_staff_id(self):
         ''' 测试 请假人 默认值 '''
         self.env['staff.leave'].create({
-                                        'name': 'go back home',
-                                        'leave_type': 'no_pay',
-                                        })
+            'name': 'go back home',
+            'leave_type': 'no_pay',
+        })
+
     def test_leave_done(self):
         '''审核请假单'''
         self.leave.leave_done()
@@ -110,7 +120,7 @@ class test_leave(TransactionCase):
         self.leave.leave_done()
         self.leave.leave_draft()
         self.assertTrue(self.leave.state == 'draft')
-         # 重复反审核审核报错
+        # 重复反审核审核报错
         with self.assertRaises(UserError):
             self.leave.leave_draft()
 

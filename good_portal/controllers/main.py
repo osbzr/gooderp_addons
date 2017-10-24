@@ -65,7 +65,8 @@ class website_account(http.Controller):
             values.update({'error': error, 'error_message': error_message})
             values.update(post)
             if not error:
-                values = {key: post[key] for key in self.MANDATORY_BILLING_FIELDS}
+                values = {key: post[key]
+                          for key in self.MANDATORY_BILLING_FIELDS}
 
                 partner.sudo().write(values)
                 if redirect:
@@ -92,7 +93,8 @@ class website_account(http.Controller):
         if [err for err in error.values() if err == 'missing']:
             error_message.append(u'必输字段不能为空')
 
-        unknown = [k for k in data.iterkeys() if k not in self.MANDATORY_BILLING_FIELDS]
+        unknown = [k for k in data.iterkeys(
+        ) if k not in self.MANDATORY_BILLING_FIELDS]
         if unknown:
             error['common'] = 'Unknown field'
             error_message.append(u"未知字段 '%s'" % ','.join(unknown))

@@ -3,7 +3,8 @@
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
 
-class sell_order_track(models.TransientModel):
+
+class SellOrderTrack(models.TransientModel):
     _name = 'sell.order.track'
     _description = u'销售订单跟踪表'
 

@@ -5,7 +5,7 @@ from odoo import fields
 from odoo import api
 
 
-class ir_ui_menu(models.Model):
+class IrUiMenu(models.Model):
     _inherit = 'ir.ui.menu'
 
     create_tag = fields.Boolean(u'直接创建')

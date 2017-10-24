@@ -2,34 +2,35 @@
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
-class test_common_dialog_wizard(TransactionCase):
+
+class TestCommonDialogWizard(TransactionCase):
 
     def setUp(self):
         '''准备数据'''
-        super(test_common_dialog_wizard, self).setUp()
+        super(TestCommonDialogWizard, self).setUp()
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
 
     def test_do_confirm(self):
         '''弹窗确认按钮，正常情况'''
         vals = {}
         for line in self.delivery.line_out_ids:
             vals = {
-                    'type':'inventory',
-                    'warehouse_id':self.env.ref('warehouse.warehouse_inventory').id,
-                    'warehouse_dest_id':self.delivery.warehouse_id.id,
-                    'line_in_ids':[(0, 0, {
-                                'goods_id':line.goods_id.id,
-                                'attribute_id':line.attribute_id.id,
-                                'uos_id':line.uos_id.id,
-                                'goods_qty':line.goods_qty,
-                                'uom_id':line.uom_id.id,
-                                'cost_unit':line.goods_id.cost
-                                            }
-                                    )]
-                        }
+                'type': 'inventory',
+                'warehouse_id': self.env.ref('warehouse.warehouse_inventory').id,
+                'warehouse_dest_id': self.delivery.warehouse_id.id,
+                'line_in_ids': [(0, 0, {
+                        'goods_id': line.goods_id.id,
+                        'attribute_id': line.attribute_id.id,
+                        'uos_id': line.uos_id.id,
+                        'goods_qty': line.goods_qty,
+                                'uom_id': line.uom_id.id,
+                                'cost_unit': line.goods_id.cost
+                                }
+                )]
+            }
         wizard = self.env['common.dialog.wizard'].with_context({
             'active_ids': self.delivery.id,
             'active_model': 'sell.delivery',

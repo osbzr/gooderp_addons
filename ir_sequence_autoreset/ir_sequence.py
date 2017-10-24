@@ -20,30 +20,35 @@
 #
 ##############################################################################
 
-from odoo import models, fields, api,_
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import pytz
 from datetime import datetime
 
-class ir_sequence(models.Model):
+
+class IrSequence(models.Model):
     _inherit = 'ir.sequence'
 
     auto_reset = fields.Boolean('Auto Reset')
     reset_period = fields.Selection(
-            [('year', 'Every Year'), ('month', 'Every Month'), ('day', 'Every Day'), ('h24', 'Every Hour'), ('min', 'Every Minute'), ('sec', 'Every Second')],
-            'Reset Period', required=True, default='month')
-    reset_time = fields.Char('Last reset time', size=64, help="Last time the sequence was reset")
-    reset_init_number = fields.Integer('Reset Number', required=True, default=1,help="Reset number of this sequence")
-
-
+        [('year', 'Every Year'), ('month', 'Every Month'), ('day', 'Every Day'),
+         ('h24', 'Every Hour'), ('min', 'Every Minute'), ('sec', 'Every Second')],
+        'Reset Period', required=True, default='month')
+    reset_time = fields.Char('Last reset time', size=64,
+                             help="Last time the sequence was reset")
+    reset_init_number = fields.Integer(
+        'Reset Number', required=True, default=1, help="Reset number of this sequence")
 
     def get_next_char(self, number_next):
         def _interpolation_dict():
-            now = range_date = effective_date = datetime.now(pytz.timezone(self._context.get('tz') or 'UTC'))
+            now = range_date = effective_date = datetime.now(
+                pytz.timezone(self._context.get('tz') or 'UTC'))
             if self._context.get('ir_sequence_date'):
-                effective_date = datetime.strptime(self._context.get('ir_sequence_date'), '%Y-%m-%d')
+                effective_date = datetime.strptime(
+                    self._context.get('ir_sequence_date'), '%Y-%m-%d')
             if self._context.get('ir_sequence_date_range'):
-                range_date = datetime.strptime(self._context.get('ir_sequence_date_range'), '%Y-%m-%d')
+                range_date = datetime.strptime(self._context.get(
+                    'ir_sequence_date_range'), '%Y-%m-%d')
             sequences = {'year': '%Y', 'month': '%m', 'day': '%d', 'y': '%y', 'doy': '%j', 'woy': '%W',
                          'weekday': '%w', 'h24': '%H', 'h12': '%I', 'min': '%M', 'sec': '%S'}
             res = {}
@@ -57,11 +62,13 @@ class ir_sequence(models.Model):
         current_time = d.get(self['reset_period'])
         number_next_actual = False
         if self['auto_reset'] and current_time != self['reset_time']:
-            self.env.cr.execute("UPDATE ir_sequence SET reset_time=%s WHERE id=%s ", (current_time, self['id']))
+            self.env.cr.execute(
+                "UPDATE ir_sequence SET reset_time=%s WHERE id=%s ", (current_time, self['id']))
             self.env.cr.commit()
             number_next = (self['reset_init_number'],)
-            number_next_actual = self['reset_init_number'] + self['number_increment']
-        return_vals = super(ir_sequence, self).get_next_char(number_next)
+            number_next_actual = self['reset_init_number'] + \
+                self['number_increment']
+        return_vals = super(IrSequence, self).get_next_char(number_next)
         if number_next_actual:
             self.sudo().number_next_actual = number_next_actual
             self.sudo().number_next = number_next_actual

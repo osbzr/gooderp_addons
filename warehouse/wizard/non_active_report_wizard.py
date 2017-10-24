@@ -6,7 +6,7 @@ import pytz
 from lxml import etree
 
 
-class non_active_report(models.TransientModel):
+class NonActiveReport(models.TransientModel):
     _name = 'non.active.report'
     _description = u'呆滞料报表'
 
@@ -28,13 +28,15 @@ class non_active_report(models.TransientModel):
         :param submenu:
         :return:
         """
-        res = super(non_active_report, self).fields_view_get(
+        res = super(NonActiveReport, self).fields_view_get(
             view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
         if self._context.get('first_stage_day'):
-            now_date = datetime.strftime(datetime.now(pytz.timezone("UTC")), '%Y-%m-%d')
+            now_date = datetime.strftime(
+                datetime.now(pytz.timezone("UTC")), '%Y-%m-%d')
             doc = etree.XML(res['arch'])
             for node in doc.xpath("//field[@name='first_stage_day_qty']"):
-                node.set('string', u"0~%s天" % (self._context.get('first_stage_day')))
+                node.set('string', u"0~%s天" %
+                         (self._context.get('first_stage_day')))
             for node in doc.xpath("//field[@name='second_stage_day_qty']"):
                 node.set('string',
                          u"%s天~%s天" % (self._context.get('first_stage_day'), self._context.get('second_stage_day')))
@@ -42,12 +44,13 @@ class non_active_report(models.TransientModel):
                 node.set('string',
                          u"%s天~%s天" % (self._context.get('second_stage_day'), self._context.get('third_stage_day')))
             for node in doc.xpath("//field[@name='four_stage_day_qty']"):
-                node.set('string', u"大于%s天" % (self._context.get('third_stage_day')))
+                node.set('string', u"大于%s天" %
+                         (self._context.get('third_stage_day')))
             res['arch'] = etree.tostring(doc)
         return res
 
 
-class non_active_report_wizard(models.TransientModel):
+class NonActiveReportWizard(models.TransientModel):
     _name = 'non.active.report.wizard'
     _description = u'呆滞料报表向导'
 
@@ -75,7 +78,8 @@ class non_active_report_wizard(models.TransientModel):
             wahouse_id_sql = "AND wh_dest.id =%s" % (warehouse_id.id)
         else:
             wahouse_id_sql = "AND 1=1"
-        now_date = datetime.strftime(datetime.now(pytz.timezone("UTC")), '%Y-%m-%d')
+        now_date = datetime.strftime(
+            datetime.now(pytz.timezone("UTC")), '%Y-%m-%d')
         vals = {'now_date': now_date, 'first_stage_day': first_stage_day, 'wahouse_id_sql': wahouse_id_sql,
                 'second_stage_day': second_stage_day, 'third_stage_day': third_stage_day}
 

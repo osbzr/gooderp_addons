@@ -5,7 +5,7 @@ import odoo.addons.decimal_precision as dp
 from odoo import models, fields
 
 
-class report_stock_balance(models.Model):
+class ReportStockBalance(models.Model):
     _name = 'report.stock.balance'
     _description = u'库存余额表'
     _auto = False
@@ -20,7 +20,8 @@ class report_stock_balance(models.Model):
     attribute_id = fields.Char(u'属性')
     warehouse = fields.Char(u'仓库')
     goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
-    goods_uos_qty = fields.Float(u'辅助单位数量', digits=dp.get_precision('Quantity'))
+    goods_uos_qty = fields.Float(
+        u'辅助单位数量', digits=dp.get_precision('Quantity'))
     cost = fields.Float(u'成本', digits=dp.get_precision('Amount'))
 
     def init(self):

@@ -10,4 +10,3 @@ import test_warehouse_order
 import test_qc_rule
 import test_scan_barcode
 import test_location
-

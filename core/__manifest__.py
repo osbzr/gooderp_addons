@@ -24,14 +24,14 @@
                 ],
     'demo': [
         'data/core_demo.xml',
-        ],
+    ],
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
         'data/core_data.xml',
         'views/core_view.xml',
         'views/core_templates.xml',
-        ],
+    ],
     'qweb': [
         'static/src/xml/*.xml',
     ],

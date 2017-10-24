@@ -3,27 +3,27 @@ from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
 
-class test_create_wave(TransactionCase):
+class TestCreateWave(TransactionCase):
 
     def setUp(self):
         ''' 准备基本数据 '''
-        super(test_create_wave, self).setUp()
+        super(TestCreateWave, self).setUp()
         self.order = self.env.ref('sell.sell_order_2')
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.others_wh_in = self.env.ref('warehouse.wh_in_whin0')
-        self.env.ref('warehouse.wh_move_line_14').location_id = self.env.ref('warehouse.a001_location').id
+        self.env.ref('warehouse.wh_move_line_14').location_id = self.env.ref(
+            'warehouse.a001_location').id
         # 补足库存数量
         self.others_wh_in.approve_order()
-
 
     def test_fields_view_get(self):
         ''' 测试 fields_view_get '''
         self.env['create.wave'].with_context({
-                                              'active_model': 'sell.delivery',
-                                              'active_ids': self.delivery.id,
-                                              }).fields_view_get(None, 'form', False, False)
+            'active_model': 'sell.delivery',
+            'active_ids': self.delivery.id,
+        }).fields_view_get(None, 'form', False, False)
 
     def test_fields_view_get_diff_express_type(self):
         ''' 测试 fields_view_get 发货方式不一样的发货单不能生成同一拣货单 '''
@@ -32,52 +32,54 @@ class test_create_wave(TransactionCase):
         order_1 = self.env.ref('sell.sell_order_1')
         self.env.ref('sell.sell_order_line_1').tax_rate = 0
         order_1.sell_order_done()
-        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        delivery_1 = self.env['sell.delivery'].search(
+            [('order_id', '=', order_1.id)])
         delivery_1.express_type = 'SF'
         with self.assertRaises(UserError):
             self.env['create.wave'].with_context({
-                                                  'active_model': 'sell.delivery',
-                                                  'active_ids': [self.delivery.id, delivery_1.id],
-                                                  }).fields_view_get(None, 'form', False, False)
+                'active_model': 'sell.delivery',
+                'active_ids': [self.delivery.id, delivery_1.id],
+            }).fields_view_get(None, 'form', False, False)
 
     def test_fields_view_get_diff_warehouse(self):
         ''' 测试 fields_view_get 仓库不一样的发货单不能生成同一拣货单 '''
         order_1 = self.env.ref('sell.sell_order_1')
         self.env.ref('sell.sell_order_line_1').tax_rate = 0
         order_1.sell_order_done()
-        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        delivery_1 = self.env['sell.delivery'].search(
+            [('order_id', '=', order_1.id)])
         with self.assertRaises(UserError):
             self.env['create.wave'].with_context({
-                                                  'active_model': 'sell.delivery',
-                                                  'active_ids': [self.delivery.id, delivery_1.id],
-                                                  }).fields_view_get(None, 'form', False, False)
+                'active_model': 'sell.delivery',
+                'active_ids': [self.delivery.id, delivery_1.id],
+            }).fields_view_get(None, 'form', False, False)
 
     def test_create_wave(self):
         ''' 测试 create_wave '''
         wave_wizard = self.env['create.wave'].with_context({
-                                            'active_ids': self.delivery.id}).create({
-                                            'active_model': 'sell.delivery',
-                                             })
+            'active_ids': self.delivery.id}).create({
+                'active_model': 'sell.delivery',
+            })
         wave_wizard.create_wave()
 
         # 请不要重复生成分拣货单
         with self.assertRaises(UserError):
             self.env['create.wave'].with_context({
-                                                  'active_model': 'sell.delivery',
-                                                  'active_ids': self.delivery.id,
-                                                  }).fields_view_get(None, 'form', False, False)
+                'active_model': 'sell.delivery',
+                'active_ids': self.delivery.id,
+            }).fields_view_get(None, 'form', False, False)
 
     def test_create_wave_same_goods_line(self):
         ''' 测试 create_wave has same goods line'''
         self.delivery.line_out_ids = [(0, 0, {'goods_id': self.env.ref('goods.cable').id,
-                                         'goods_qty': 1,
-                                         'tax_rate': 17.0,
-                                         'type': 'out'})]
+                                              'goods_qty': 1,
+                                              'tax_rate': 17.0,
+                                              'type': 'out'})]
 
         wave_wizard = self.env['create.wave'].with_context({
-                                            'active_ids': self.delivery.id}).create({
-                                            'active_model': 'sell.delivery',
-                                             })
+            'active_ids': self.delivery.id}).create({
+                'active_model': 'sell.delivery',
+            })
         wave_wizard.create_wave()
 
     def test_create_wave_add_loc_no_qty(self):
@@ -87,29 +89,29 @@ class test_create_wave(TransactionCase):
         self.others_wh_in.approve_order()
 
         wave_wizard = self.env['create.wave'].with_context({
-                                        'active_ids': self.delivery.id}).create({
-                                        'active_model': 'sell.delivery',
-                                         })
+            'active_ids': self.delivery.id}).create({
+                'active_model': 'sell.delivery',
+            })
         wave_wizard.create_wave()
 
 
-class test_wave(TransactionCase):
+class TestWave(TransactionCase):
 
     def setUp(self):
         ''' 准备基本数据 '''
-        super(test_wave, self).setUp()
+        super(TestWave, self).setUp()
         # 补足库存数量
         self.env.ref('warehouse.wh_in_whin0').approve_order()
         self.order = self.env.ref('sell.sell_order_2')
         self.env.ref('sell.sell_order_line_2_3').tax_rate = 0
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
 
         self.wave_wizard = self.env['create.wave'].with_context({
-                                            'active_ids': self.delivery.id}).create({
-                                            'active_model': 'sell.delivery',
-                                             })
+            'active_ids': self.delivery.id}).create({
+                'active_model': 'sell.delivery',
+            })
         self.wave_wizard.create_wave()
         self.wave = self.env['wave'].search([])
 
@@ -124,12 +126,12 @@ class test_wave(TransactionCase):
         self.order.warehouse_id = self.env.ref('core.warehouse_general').id
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
 
         self.wave_wizard = self.env['create.wave'].with_context({
-                                            'active_ids': self.delivery.id}).create({
-                                            'active_model': 'sell.delivery',
-                                             })
+            'active_ids': self.delivery.id}).create({
+                'active_model': 'sell.delivery',
+            })
         with self.assertRaises(UserError):
             self.wave_wizard.create_wave()
 
@@ -137,7 +139,8 @@ class test_wave(TransactionCase):
         ''' 测试 report_wave'''
         report_wave = self.wave[0].report_wave()
         # 调用 report_wave 类里的 render_html 方法
-        self.env['report.warehouse_wave.report_wave_view'].render_html(report_wave['context']['active_ids'])
+        self.env['report.warehouse_wave.report_wave_view'].render_html(
+            report_wave['context']['active_ids'])
 
     def test_print_express_menu(self):
         ''' 测试 print_express_menu'''
@@ -158,16 +161,17 @@ class test_wave(TransactionCase):
         order_1.discount_amount = 0
         order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
         order_1.sell_order_done()
-        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        delivery_1 = self.env['sell.delivery'].search(
+            [('order_id', '=', order_1.id)])
         delivery_1.date = '2016-01-02'
         delivery_1.express_code = '123456'
         wave_wizard = self.env['create.wave'].with_context({
-                                            'active_ids': delivery_1.id}).create({
-                                            'active_model': 'sell.delivery',
-                                             })
+            'active_ids': delivery_1.id}).create({
+                'active_model': 'sell.delivery',
+            })
         wave_wizard.create_wave()
         wave_2 = self.env['wave'].search([])
-        pack = self.env['do.pack'].create({ })
+        pack = self.env['do.pack'].create({})
         pack.scan_barcode('123456', pack.id)
 
         # 发货单已经打包发货,捡货单不允许删除
@@ -177,11 +181,11 @@ class test_wave(TransactionCase):
             wave_2.unlink()
 
 
-class test_do_pack(TransactionCase):
+class TestDoPack(TransactionCase):
 
     def setUp(self):
         ''' 准备基本数据 '''
-        super(test_do_pack, self).setUp()
+        super(TestDoPack, self).setUp()
         # 补足库存数量
         self.env.ref('warehouse.wh_in_whin0').approve_order()
         self.order = self.env.ref('sell.sell_order_2')
@@ -190,24 +194,24 @@ class test_do_pack(TransactionCase):
         self.order.discount_amount = 0
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
-                       [('order_id', '=', self.order.id)])
+            [('order_id', '=', self.order.id)])
         self.delivery.express_code = '123456'
 
         self.wave_wizard = self.env['create.wave'].with_context({
-                                            'active_ids': self.delivery.id}).create({
-                                            'active_model': 'sell.delivery',
-                                             })
+            'active_ids': self.delivery.id}).create({
+                'active_model': 'sell.delivery',
+            })
         self.wave_wizard.create_wave()
         self.wave = self.env['wave'].search([])
 
     def test_unlink(self):
         ''' 测试 pack unlink'''
-        pack = self.env['do.pack'].create({ })
+        pack = self.env['do.pack'].create({})
         pack.scan_barcode('123456', pack.id)
         pack.unlink()
 
         # 已打包完成，记录不能删除
-        pack = self.env['do.pack'].create({ })
+        pack = self.env['do.pack'].create({})
         pack.scan_barcode('123456', pack.id)
 
         self.env.ref('goods.cable').barcode = '000'
@@ -217,7 +221,7 @@ class test_do_pack(TransactionCase):
 
     def test_scan_barcode(self):
         ''' 测试 scan_barcode'''
-        pack = self.env['do.pack'].create({ })
+        pack = self.env['do.pack'].create({})
         pack.scan_barcode('123456', pack.id)
 
         # 扫描产品在打包行上
@@ -246,15 +250,16 @@ class test_do_pack(TransactionCase):
         self.env.ref('sell.sell_order_line_2_3').order_id = order_1.id
         self.env.ref('sell.sell_order_line_2_3').tax_rate = 0
         order_1.sell_order_done()
-        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        delivery_1 = self.env['sell.delivery'].search(
+            [('order_id', '=', order_1.id)])
         delivery_1.express_code = '8888'
         wave_wizard = self.env['create.wave'].with_context({
-                                            'active_ids': delivery_1.id}).create({
-                                            'active_model': 'sell.delivery',
-                                             })
+            'active_ids': delivery_1.id}).create({
+                'active_model': 'sell.delivery',
+            })
         wave_wizard.create_wave()
 
-        pack = self.env['do.pack'].create({ })
+        pack = self.env['do.pack'].create({})
         pack.scan_barcode('8888', pack.id)
         self.env.ref('goods.mouse').barcode = '222'
         pack.scan_barcode('222', pack.id)

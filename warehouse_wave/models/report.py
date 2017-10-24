@@ -3,7 +3,8 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 import datetime
 
-class report_wave(models.AbstractModel):
+
+class ReportWave(models.AbstractModel):
     _name = 'report.warehouse_wave.report_wave_view'
     _template = None
     _wrapped_report_class = None

@@ -17,7 +17,7 @@ READONLY_STATES = {
 }
 
 
-class buy_adjust(models.Model):
+class BuyAdjust(models.Model):
     _name = "buy.adjust"
     _inherit = ['mail.thread']
     _description = u"采购变更单"
@@ -26,8 +26,8 @@ class buy_adjust(models.Model):
     name = fields.Char(u'单据编号', copy=False,
                        help=u'变更单编号，保存时可自动生成')
     order_id = fields.Many2one('buy.order', u'原始单据', states=READONLY_STATES,
-                             copy=False, ondelete='restrict',
-                             help=u'要调整的原始购货订单，只能调整已审核且没有全部入库的购货订单')
+                               copy=False, ondelete='restrict',
+                               help=u'要调整的原始购货订单，只能调整已审核且没有全部入库的购货订单')
     date = fields.Date(u'单据日期', states=READONLY_STATES,
                        default=lambda self: fields.Date.context_today(self),
                        index=True, copy=False,
@@ -36,8 +36,8 @@ class buy_adjust(models.Model):
                                states=READONLY_STATES, copy=True,
                                help=u'变更单明细行，不允许为空')
     approve_uid = fields.Many2one('res.users', u'审核人',
-                            copy=False, ondelete='restrict',
-                            help=u'审核变更单的人')
+                                  copy=False, ondelete='restrict',
+                                  help=u'审核变更单的人')
     state = fields.Selection(BUY_ORDER_STATES, u'审核状态',
                              index=True, copy=False,
                              default='draft',
@@ -62,9 +62,9 @@ class buy_adjust(models.Model):
     def unlink(self):
         for order in self:
             if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据\n采购变更单%s已经审核'%order.name)
+                raise UserError(u'不能删除已审核的单据\n采购变更单%s已经审核' % order.name)
 
-        return super(buy_adjust, self).unlink()
+        return super(BuyAdjust, self).unlink()
 
     def _get_vals(self, line):
         '''返回创建 buy order line 时所需数据'''
@@ -90,62 +90,67 @@ class buy_adjust(models.Model):
         当新增商品时，则更新原单据及入库单分单明细行。
         '''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！\n采购变更单%s已审核'%self.name)
+            raise UserError(u'请不要重复审核！\n采购变更单%s已审核' % self.name)
         if not self.line_ids:
             raise UserError(u'请输入商品明细行！')
         for line in self.line_ids:
-            if  line.price_taxed < 0:
-                raise UserError(u'商品含税单价不能小于0！\n单价:%s'%line.price_taxed)
+            if line.price_taxed < 0:
+                raise UserError(u'商品含税单价不能小于0！\n单价:%s' % line.price_taxed)
         buy_receipt = self.env['buy.receipt'].search(
-                    [('order_id', '=', self.order_id.id),
-                     ('state', '=', 'draft')])
+            [('order_id', '=', self.order_id.id),
+             ('state', '=', 'draft')])
         if not buy_receipt:
             raise UserError(u'采购入库单已全部入库，不能调整')
         for line in self.line_ids:
             origin_line = self.env['buy.order.line'].search(
-                        [('goods_id', '=', line.goods_id.id),
-                         ('attribute_id', '=', line.attribute_id.id),
-                         ('order_id', '=', self.order_id.id)])
+                [('goods_id', '=', line.goods_id.id),
+                 ('attribute_id', '=', line.attribute_id.id),
+                 ('order_id', '=', self.order_id.id)])
             if len(origin_line) > 1:
                 raise UserError(u'要调整的商品%s在原始单据中不唯一' % line.goods_id.name)
             if origin_line:
-                origin_line.quantity += line.quantity # 调整后数量
+                origin_line.quantity += line.quantity  # 调整后数量
                 new_note = u'变更单：%s %s。\n' % (self.name, line.note)
                 origin_line.note = (origin_line.note and
                                     origin_line.note + new_note or new_note)
                 if origin_line.quantity < origin_line.quantity_in:
-                    raise UserError(u'%s调整后数量不能小于原订单已入库数量' % line.goods_id.name)
+                    raise UserError(u'%s调整后数量不能小于原订单已入库数量' %
+                                    line.goods_id.name)
                 elif origin_line.quantity > origin_line.quantity_in:
                     # 查找出原购货订单产生的草稿状态的入库单明细行，并更新它
                     move_line = self.env['wh.move.line'].search(
-                                    [('buy_line_id', '=', origin_line.id),
-                                     ('state', '=', 'draft')])
+                        [('buy_line_id', '=', origin_line.id),
+                         ('state', '=', 'draft')])
                     if move_line:
                         move_line.goods_qty += line.quantity
                         move_line.note = (move_line.note and
                                           move_line.note or move_line.note + origin_line.note)
                     else:
-                        raise UserError(u'商品%s已全部入库，建议新建购货订单' % line.goods_id.name)
+                        raise UserError(u'商品%s已全部入库，建议新建购货订单' %
+                                        line.goods_id.name)
                 # 调整后数量与已入库数量相等时，删除产生的入库单分单
                 else:
                     buy_receipt.unlink()
             else:
-                new_line = self.env['buy.order.line'].create(self._get_vals(line))
+                new_line = self.env['buy.order.line'].create(
+                    self._get_vals(line))
                 receipt_line = []
                 if line.goods_id.force_batch_one:
                     i = 0
                     while i < line.quantity:
                         i += 1
                         receipt_line.append(
-                                    self.order_id.get_receipt_line(new_line, single=True))
+                            self.order_id.get_receipt_line(new_line, single=True))
                 else:
-                    receipt_line.append(self.order_id.get_receipt_line(new_line, single=False))
-                buy_receipt.write({'line_in_ids': [(0, 0, li[0]) for li in receipt_line]})
+                    receipt_line.append(
+                        self.order_id.get_receipt_line(new_line, single=False))
+                buy_receipt.write(
+                    {'line_in_ids': [(0, 0, li[0]) for li in receipt_line]})
         self.state = 'done'
         self.approve_uid = self._uid
 
 
-class buy_adjust_line(models.Model):
+class BuyAdjustLine(models.Model):
     _name = 'buy.adjust.line'
     _description = u'采购变更单明细'
 
@@ -160,13 +165,14 @@ class buy_adjust_line(models.Model):
     def _compute_all_amount(self):
         '''当订单行的数量、单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
         if self.tax_rate > 100:
-            raise UserError(u'税率不能输入超过100的数\n税率:%s!'%self.tax_rate)
+            raise UserError(u'税率不能输入超过100的数\n税率:%s!' % self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError(u'税率不能输入负数\n税率:%s!'%self.tax_rate)
-        self.price = self.price_taxed / (1 + self.tax_rate * 0.01) # 不含税单价
-        self.subtotal = self.price_taxed * self.quantity - self.discount_amount # 价税合计
-        self.tax_amount = self.subtotal / (100 + self.tax_rate) * self.tax_rate # 税额
-        self.amount = self.subtotal - self.tax_amount # 金额
+            raise UserError(u'税率不能输入负数\n税率:%s!' % self.tax_rate)
+        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)  # 不含税单价
+        self.subtotal = self.price_taxed * self.quantity - self.discount_amount  # 价税合计
+        self.tax_amount = self.subtotal / \
+            (100 + self.tax_rate) * self.tax_rate  # 税额
+        self.amount = self.subtotal - self.tax_amount  # 金额
 
     @api.one
     def _inverse_price(self):
@@ -217,7 +223,7 @@ class buy_adjust_line(models.Model):
                           store=True, readonly=True,
                           digits=dp.get_precision('Amount'),
                           help=u'金额  = 价税合计  - 税额')
-    tax_rate = fields.Float(u'税率(%)', default=lambda self:self.env.user.company_id.import_tax_rate,
+    tax_rate = fields.Float(u'税率(%)', default=lambda self: self.env.user.company_id.import_tax_rate,
                             help=u'默认值取公司进项税率')
     tax_amount = fields.Float(u'税额', compute=_compute_all_amount,
                               store=True, readonly=True,

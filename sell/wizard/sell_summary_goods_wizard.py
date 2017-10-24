@@ -5,7 +5,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class sell_summary_goods_wizard(models.TransientModel):
+class SellSummaryGoodsWizard(models.TransientModel):
     _name = 'sell.summary.goods.wizard'
     _description = u'销售汇总表（按商品）向导'
 
@@ -26,7 +26,7 @@ class sell_summary_goods_wizard(models.TransientModel):
     goods_id = fields.Many2one('goods', u'商品',
                                help=u'按指定商品进行统计')
     goods_categ_id = fields.Many2one('core.category', u'商品类别',
-                               help=u'按指定商品类别进行统计')
+                                     help=u'按指定商品类别进行统计')
     warehouse_id = fields.Many2one('warehouse', u'仓库',
                                    help=u'按指定仓库进行统计')
     company_id = fields.Many2one(
@@ -39,7 +39,8 @@ class sell_summary_goods_wizard(models.TransientModel):
     def button_ok(self):
         self.ensure_one()
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' % (self.date_start, self.date_end))
+            raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' %
+                            (self.date_start, self.date_end))
 
         return {
             'name': u'销售汇总表（按商品）',

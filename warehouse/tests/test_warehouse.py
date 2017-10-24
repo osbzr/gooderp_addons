@@ -7,7 +7,8 @@ class TestWarehouse(TransactionCase):
     def setUp(self):
         super(TestWarehouse, self).setUp()
 
-        self.env.ref('core.goods_category_1').account_id = self.env.ref('finance.account_goods').id
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
         self.env.ref('warehouse.wh_in_whin0').date = '2016-02-06'
 
         self.hd_warehouse = self.browse_ref('warehouse.hd_stock')
@@ -66,50 +67,46 @@ class TestWarehouse(TransactionCase):
         '''扫码出入库'''
         warehouse = self.env['wh.move']
         barcode = '12345678987'
-        #其它入库单扫码
+        # 其它入库单扫码
         model_name = 'wh.in'
         order = self.env.ref('warehouse.wh_in_whin3')
-        warehouse.scan_barcode(model_name,barcode,order.id)
-        warehouse.scan_barcode(model_name,barcode,order.id)
-        #其他出库单扫码
+        warehouse.scan_barcode(model_name, barcode, order.id)
+        warehouse.scan_barcode(model_name, barcode, order.id)
+        # 其他出库单扫码
         model_name = 'wh.out'
         order = self.env.ref('warehouse.wh_out_wh_out_attribute')
-        warehouse.scan_barcode(model_name,barcode,order.id)
-        warehouse.scan_barcode(model_name,barcode,order.id)
+        warehouse.scan_barcode(model_name, barcode, order.id)
+        warehouse.scan_barcode(model_name, barcode, order.id)
 
-        #调拔单的扫描条码
+        # 调拔单的扫描条码
         model_name = 'wh.internal'
         order = self.env.ref('warehouse.wh_internal_whint0')
-        warehouse.scan_barcode(model_name,barcode,order.id)
+        warehouse.scan_barcode(model_name, barcode, order.id)
         # 能找到 barcode 对应的商品
-        self.env.ref('warehouse.wh_move_line_17').goods_id = self.env.ref('goods.iphone').id
-        warehouse.scan_barcode(model_name,barcode,order.id)
+        self.env.ref('warehouse.wh_move_line_17').goods_id = self.env.ref(
+            'goods.iphone').id
+        warehouse.scan_barcode(model_name, barcode, order.id)
 
-        #盘点单的扫描条码
+        # 盘点单的扫描条码
         model_name = 'wh.inventory'
         order = self.env.ref('warehouse.wh_inventory_0')
         warehouse.scan_barcode(model_name, barcode, order.id)
         warehouse.scan_barcode(model_name, barcode, order.id)
 
-        #商品不存在报错
+        # 商品不存在报错
         barcode = '12342312312'
         with self.assertRaises(UserError):
-            warehouse.scan_barcode(model_name,barcode,order.id)
+            warehouse.scan_barcode(model_name, barcode, order.id)
 
         # 商品的条形码扫码出入库
         barcode = '123456789'
-        #其它入库单扫码
+        # 其它入库单扫码
         model_name = 'wh.in'
         order = self.env.ref('warehouse.wh_in_whin3')
-        warehouse.scan_barcode(model_name,barcode,order.id)
-        warehouse.scan_barcode(model_name,barcode,order.id)
-        #其他出库单扫码
+        warehouse.scan_barcode(model_name, barcode, order.id)
+        warehouse.scan_barcode(model_name, barcode, order.id)
+        # 其他出库单扫码
         model_name = 'wh.out'
         order = self.env.ref('warehouse.wh_out_wh_out_attribute')
-        warehouse.scan_barcode(model_name,barcode,order.id)
-        warehouse.scan_barcode(model_name,barcode,order.id)
-        
-        
-        
-        
-        
+        warehouse.scan_barcode(model_name, barcode, order.id)
+        warehouse.scan_barcode(model_name, barcode, order.id)

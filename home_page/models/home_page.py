@@ -2,7 +2,9 @@
 from odoo import api, fields, models
 from odoo.tools.safe_eval import safe_eval as eval
 from datetime import datetime
-class home_report_type(models.Model):
+
+
+class HomeReportType(models.Model):
     _name = "home.report.type"
     _description = u"用来分类报表,让相似的报表显示在一起"
     name = fields.Char(u'报表类别', help=u'在home.page 中报表类别不同类别的可以分组,组别的名称!')
@@ -14,7 +16,7 @@ class home_report_type(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
 
-class home_page(models.Model):
+class HomePage(models.Model):
     _name = "home.page"
     _rec_name = "note_one"
     _description = u"本模块就是一些常用操作的集合,也是小量级各方数据显示的平台！"
@@ -25,17 +27,20 @@ class home_page(models.Model):
                                                                                          的跳转的对应的模型的action')
     menu_type = fields.Selection([(u'all_business', u'业务总览'), (u'amount_summary', u'金额汇总'), (u'report', u'实时报表')],
                                  string=u'类型', required="1", help=u'选定本条记录的类型,本字段会决定本条记录属于那一块')
-    domain = fields.Char(u'页面的过滤', default='[]', help=u'字符串条件,用来过滤出您所选的视图中的数据!')
+    domain = fields.Char(u'页面的过滤', default='[]',
+                         help=u'字符串条件,用来过滤出您所选的视图中的数据!')
     note_one = fields.Char(u'第一个显示名称', help=u'在首页中的相应的文字显示内容')
     compute_field_one = fields.Many2one('ir.model.fields', string=u'需要计算的字段', help=u'在首页中有用于数字显示的元素的,\
                                                             仅适合小量数据的计算数字对应的视图或模型中的字段!')
     compute_type = fields.Selection([(u'sum', u'sum'), (u'average', u'average')], default="sum", string=u"计算类型",
                                     help=u'对于所选的计算字段的计算方式!注:目前只支持sum')
     context = fields.Char(u'动作的上下文', help=u'对应跳转视图传进去的参数!')
-    is_active = fields.Boolean(u'是否可用', default=True, help=u'为了方便调试,首页美观性,或临时性替换首页元素!')
+    is_active = fields.Boolean(
+        u'是否可用', default=True, help=u'为了方便调试,首页美观性,或临时性替换首页元素!')
     report_type_id = fields.Many2one('home.report.type', string='报表类别', help=u'类型为 实时报表时 要选择报表类别,\
                                     可以对不同类型的报表进行分组!')
-    group_ids = fields.Many2many('res.groups','home_page_group_rel','home_page_id','group_id',string='用户组')
+    group_ids = fields.Many2many(
+        'res.groups', 'home_page_group_rel', 'home_page_id', 'group_id', string='用户组')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -58,7 +63,7 @@ class home_page(models.Model):
         views_ids = [view.view_id.id for view in action.action.view_ids]
         note_one, view_mode, res_model = action.note_one, action.action.view_mode, action.action.res_model
         domain, action_id, context, view_id = action.action.domain, action.id, action.action.context, \
-                                              views_ids or False
+            views_ids or False
         action_name, target = action.action.name, action.action.target
         return [note_one, view_mode, res_model, domain, context, view_id, action_name, target]
 
@@ -76,20 +81,24 @@ class home_page(models.Model):
         elif action.menu_type == 'amount_summary':
             # 金额汇总类
             compute_domain = eval(action.domain or '[]')
-            res_model_objs = self.env[action.action.res_model].search(compute_domain)
+            res_model_objs = self.env[action.action.res_model].search(
+                compute_domain)
             field_compute = action.compute_field_one.name
             # 最新的金额
-            compute_value = sum([res_model_obj[field_compute] for res_model_obj in res_model_objs])
+            compute_value = sum([res_model_obj[field_compute]
+                                 for res_model_obj in res_model_objs])
             # 返回结果
             action_vals[0] = "%s  %s" % (action_vals[0], compute_value)
             action_url_list['top'].append(action_vals)
         else:
             action_vals[0] = "%s   " % action_vals[0]
-            type_sequence_str = "%s;%s" % (action.report_type_id.sequence, action.report_type_id.name)
+            type_sequence_str = "%s;%s" % (
+                action.report_type_id.sequence, action.report_type_id.name)
             if action_url_list['right'].get(type_sequence_str):
                 action_url_list['right'][type_sequence_str].append(action_vals)
             else:
-                action_url_list['right'].update({type_sequence_str: [action_vals]})
+                action_url_list['right'].update(
+                    {type_sequence_str: [action_vals]})
 
     @api.model
     def get_action_url(self):
@@ -109,5 +118,6 @@ class home_page(models.Model):
             if not [group.id for group in action.group_ids] or\
                     list(set([group.id for group in action.group_ids]).intersection(user_group_list)):
                 self.construction_action_url_list(action, action_url_list)
-        action_url_list['right'] = sorted(action_url_list['right'].items(), key=lambda d: d[0])
+        action_url_list['right'] = sorted(
+            action_url_list['right'].items(), key=lambda d: d[0])
         return action_url_list

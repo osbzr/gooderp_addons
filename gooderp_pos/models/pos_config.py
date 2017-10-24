@@ -5,6 +5,7 @@ import uuid
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+
 class PosConfig(models.Model):
     _name = 'pos.config'
     _description = u'POS设置'
@@ -21,22 +22,28 @@ class PosConfig(models.Model):
 
     name = fields.Char(string=u'POS名称', index=True, required=True)
     cash_control = fields.Boolean(string=u'现金管理')
-    receipt_footer = fields.Text(string=u'收据页脚', help=u"在打印出来的收据中插入一段简短文字作为页脚。")
+    receipt_footer = fields.Text(
+        string=u'收据页脚', help=u"在打印出来的收据中插入一段简短文字作为页脚。")
     proxy_ip = fields.Char(string=u'IP地址', size=45,
-        help=u'硬件代理的主机名或IP地址，如果留空则会被自动检测到。')
+                           help=u'硬件代理的主机名或IP地址，如果留空则会被自动检测到。')
     active = fields.Boolean(u'有效', default=True)
-    uuid = fields.Char(u'唯一识别码', readonly=True, default=lambda self: str(uuid.uuid4()), help=u'唯一识别码')
-    sequence_id = fields.Many2one('ir.sequence', string=u'订单号序列', readonly=True, copy=False)
+    uuid = fields.Char(u'唯一识别码', readonly=True,
+                       default=lambda self: str(uuid.uuid4()), help=u'唯一识别码')
+    sequence_id = fields.Many2one(
+        'ir.sequence', string=u'订单号序列', readonly=True, copy=False)
     session_ids = fields.One2many('pos.session', 'config_id', string=u'会话')
-    current_session_id = fields.Many2one('pos.session', compute='_compute_current_session', string=u"当前会话")
+    current_session_id = fields.Many2one(
+        'pos.session', compute='_compute_current_session', string=u"当前会话")
     current_session_state = fields.Char(compute='_compute_current_session')
-    last_session_closing_date = fields.Date(u'最近会话关闭日期', compute='_compute_last_session')
+    last_session_closing_date = fields.Date(
+        u'最近会话关闭日期', compute='_compute_last_session')
 
-    company_id = fields.Many2one('res.company', string=u'公司', required=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one(
+        'res.company', string=u'公司', required=True, default=lambda self: self.env.user.company_id)
     group_pos_manager_id = fields.Many2one('res.groups', string=u'POS管理组',
-        help=u'管理POS这个POS缓存的组')
+                                           help=u'管理POS这个POS缓存的组')
     group_pos_user_id = fields.Many2one('res.groups', string=u'POS用户组',
-        help=u'可以使用这POS页面的人')
+                                        help=u'可以使用这POS页面的人')
     tip_product_id = fields.Many2one('goods', string=u'提示产品')
     bank_account_ids = fields.Many2many(
         'bank.account', 'pos_config_bank_account_rel',
@@ -76,9 +83,11 @@ class PosConfig(models.Model):
         result = []
         for config in self:
             if (not config.session_ids) or (config.session_ids[0].state == 'closed'):
-                result.append((config.id, config.name + ' (' + _('not used') + ')'))
+                result.append((config.id, config.name +
+                               ' (' + _('not used') + ')'))
                 continue
-            result.append((config.id, config.name + ' (' + config.session_ids[0].user_id.name + ')'))
+            result.append((config.id, config.name +
+                           ' (' + config.session_ids[0].user_id.name + ')'))
         return result
 
     @api.model
