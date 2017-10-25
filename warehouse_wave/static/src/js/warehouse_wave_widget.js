@@ -68,6 +68,7 @@ odoo.define('warehouse.wave', function(require) {
                         res[res_keys[res_key]] = result[i+1][res_keys[res_key]]
                     }
                     JSON.stringify(res)
+                    all_print.append($("<div style='page-break-after:always;'></div>"));
                     all_print.append($(QWeb.render('temp_detail_info', {'detail_infos': res})));
 
                     all_print.append($("<div style='page-break-after:always;'></div>"));
