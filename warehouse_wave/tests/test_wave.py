@@ -17,6 +17,7 @@ class TestCreateWave(TransactionCase):
             'warehouse.a001_location').id
         # 补足库存数量
         self.others_wh_in.approve_order()
+        self.delivery.express_type = 'SF'
 
     def test_fields_view_get(self):
         ''' 测试 fields_view_get '''

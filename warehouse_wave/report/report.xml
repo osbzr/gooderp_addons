@@ -17,9 +17,9 @@
                 <t t-set="data_report_header_spacing" t-value="1"/>			    
                 <div class="page">
                 	<div class="oe_structure">
-                		<div class="row">
+                		<div class="row" style="font-size: 8px;">
                 			<div class='text-center'>
-                				<h2 class='oe_inline'>捡货单</h2>
+                				<h2 class='oe_inline' style="font-size: 12px;">捡货单</h2>
                 			</div>
                 			<div style="float:left">
 	                			<p>拣货单号:<span t-field="o.name"/></p>
