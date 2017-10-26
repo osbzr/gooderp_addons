@@ -153,13 +153,13 @@ class WhMove(models.Model):
             total_price += line.subtotal
 
         # 装箱单数据
-        package_list = {'0 任务栏号': [],
+        package_list = {'0 拣货单号': [move_row.wave_id.name],
                         '1 内部订单号': [move_row.name],
-                        '2 店铺名称': [],
+                        '2 店铺名称': [move_row.company_id.name],
                         '3 外部订单号': [move_row.name],
                         '4 收货人': [move_row.partner_id.name],
                         '5 订单日期': [move_row.date],
-                        '6 应付款': [move_row.partner_id.receivable],
+                        '6 应付款': [total_price],
                         '7 lines': line_dict,
                         '8 总件数': [move_row.total_qty],
                         '9 总价格': [total_price],
