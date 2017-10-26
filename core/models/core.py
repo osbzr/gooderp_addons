@@ -22,6 +22,28 @@ def create(self, vals):
 
 models.BaseModel.create = create
 
+class BaseModelExtend(models.AbstractModel):
+    _name = 'basemodel.extend'
+
+    '''
+    增加作废方法
+    '''
+    def _register_hook(self):
+        '''
+        Register method in BaseModel 
+        '''
+        @api.multi
+        def action_cancel(self):
+            for record in self:
+                if self.state != 'draft':
+                    raise UserError(u'只能作废草稿状态的单据')
+                else:
+                    self.state = 'cancel'
+            return True
+        models.BaseModel.action_cancel = action_cancel
+        return super(BaseModelExtend, self)._register_hook()
+
+
 # 分类的类别
 
 CORE_CATEGORY_TYPE = [('customer', u'客户'),

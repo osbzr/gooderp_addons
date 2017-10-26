@@ -23,7 +23,7 @@
             <field name="name">money.order.tree</field>
             <field name="model">money.order</field>
             <field name="arch" type="xml">
-                <tree string="收付款单" colors='blue:state == "draft"'>
+                <tree string="收付款单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="name" string="单据编号"/>
                     <field name="date"/>
                     <field name="partner_id"/>
@@ -46,6 +46,8 @@
                 		type="object" class="oe_highlight" groups='money.group_money_manager'/>
 					<button name="money_order_draft" states="done" string="反审核" 
 						type="object" groups='money.group_money_manager'/>
+                    <button name="action_cancel" states="draft" string="作废"
+						type="object"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
