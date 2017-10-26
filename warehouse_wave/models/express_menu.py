@@ -3,9 +3,9 @@
 from odoo import models, fields, api
 import hashlib
 import base64
-import httplib2
 import json
 import urllib
+import urllib2
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
 
@@ -123,16 +123,15 @@ class WhMove(models.Model):
                 'RequestType': '1007',
                 'DataType': '2',
                 'DataSign': self.encrypt_kdn(request_data, appkey)}
-        http = httplib2.Http()
-        response, content = http.request(
-            path, 'POST', headers=header, body=urllib.urlencode(data))
-        content = content.replace('true', 'True').replace('false', 'False')
-        self.express_code = (safe_eval(content).get(
+        req = urllib2.Request(path, urllib.urlencode(data), header)
+        resp = urllib2.urlopen(req).read()
+        content = json.loads(resp)
+        self.express_code = (content.get(
             'Order', {})).get('LogisticCode', "")
-        self.express_menu = str(safe_eval(content).get('PrintTemplate'))
+        self.express_menu = content.get('PrintTemplate')
         if not self.express_code:
-            raise UserError("获取快递面单失败!\n原因:%s" % str(content))
-        return str(safe_eval(content).get('PrintTemplate'))
+            raise UserError("获取快递面单失败!\n原因:%s" % str(resp))
+        return self.express_menu
 
     def encrypt_kdn(self, data, appkey):
         """
