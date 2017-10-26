@@ -13,17 +13,11 @@
 		<template id="report_wave_view">
 			<t t-foreach="docs" t-as="o">
 			<t t-call="report.html_container">
+			    <t t-set="data_report_margin_top" t-value="1"/>
+                <t t-set="data_report_header_spacing" t-value="1"/>			    
                 <div class="page">
                 	<div class="oe_structure">
                 		<div class="row">
-                            <div class='text-left'>
-                                <h5 t-field="o.create_date"/>
-                            </div>
-                            <div class='text-right'>
-                                <p class="mt16"><img t-if="o.name" t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %('Code128', o.name, 600, 160)" style="width:150px;"/></p>
-                                <p class="mt16"><strong t-field="o.name"/></p>
-                            </div>
-                            
                 			<div class='text-center'>
                 				<h2 class='oe_inline'>捡货单</h2>
                 			</div>
