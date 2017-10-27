@@ -13,13 +13,13 @@
 		<template id="report_wave_view">
 			<t t-foreach="docs" t-as="o">
 			<t t-call="report.html_container">
-			    <t t-set="data_report_margin_top" t-value="1"/>
+			    <t t-set="data_report_margin_top" t-value="20"/>
                 <t t-set="data_report_header_spacing" t-value="1"/>			    
                 <div class="page">
                 	<div class="oe_structure">
-                		<div class="row" style="font-size: 8px;">
+                		<div class="row" style="font-size: 12px;">
                 			<div class='text-center'>
-                				<h2 class='oe_inline' style="font-size: 12px;">捡货单</h2>
+                				<h2 class='oe_inline' style="font-size: 16px;">捡货单</h2>
                 			</div>
                 			<div style="float:left">
 	                			<p>拣货单号:<span t-field="o.name"/></p>
