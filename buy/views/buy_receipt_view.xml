@@ -58,6 +58,7 @@
                             <field name="finance_category_id" invisible="1"/>
                         </group>
                         <group>
+                            <field name="ref"/>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="order_id" readonly="1"/>
                             <field name='invoice_id' readonly='1'/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data noupdate="0">
+	<data noupdate="1">
 		<!--添加出纳组-->
 		<record id="group_cashier" model="res.groups">
 			<field name='name'>出纳</field>

@@ -343,6 +343,7 @@ class SellOrder(models.Model):
             'user_id': self.user_id.id,
             'date': self.delivery_date,
             'order_id': self.id,
+            'ref':self.ref,
             'origin': 'sell.delivery',
             'note': self.note,
             'discount_rate': self.discount_rate,
