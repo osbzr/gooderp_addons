@@ -108,7 +108,8 @@ class TestWave(TransactionCase):
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
-
+        self.delivery.express_type = 'SF'
+        
         self.wave_wizard = self.env['create.wave'].with_context({
             'active_ids': self.delivery.id}).create({
                 'active_model': 'sell.delivery',
@@ -197,6 +198,7 @@ class TestDoPack(TransactionCase):
         self.delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
         self.delivery.express_code = '123456'
+        self.delivery.express_type = 'SF'
 
         self.wave_wizard = self.env['create.wave'].with_context({
             'active_ids': self.delivery.id}).create({
