@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data noupdate="0">
+	<data noupdate="1">
 		<!--添加管理仓库组-->
 		<record id="group_warehouse" model="res.groups">
 			<field name='name'>仓库</field>

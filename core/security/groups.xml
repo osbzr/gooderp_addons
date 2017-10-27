@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data noupdate="0">
+	<data noupdate="1">
 		<!--
 		为了满足用户界面的权限设置需要，将用户组分成这些功能类别 
 		-->
