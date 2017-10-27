@@ -256,6 +256,7 @@ class TestDoPack(TransactionCase):
         delivery_1 = self.env['sell.delivery'].search(
             [('order_id', '=', order_1.id)])
         delivery_1.express_code = '8888'
+        delivery_1.express_type = 'SF'
         wave_wizard = self.env['create.wave'].with_context({
             'active_ids': delivery_1.id}).create({
                 'active_model': 'sell.delivery',
