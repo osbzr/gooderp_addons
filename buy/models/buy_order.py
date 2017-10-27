@@ -379,6 +379,7 @@ class BuyOrder(models.Model):
             'date': self.planned_date,
             'date_due': self.planned_date,
             'order_id': self.id,
+            'ref':self.ref,
             'origin': 'buy.receipt',
             'note': self.note,
             'discount_rate': self.discount_rate,
