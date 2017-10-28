@@ -167,6 +167,7 @@ class TestWave(TransactionCase):
             [('order_id', '=', order_1.id)])
         delivery_1.date = '2016-01-02'
         delivery_1.express_code = '123456'
+        self.delivery.express_type = 'SF'
         wave_wizard = self.env['create.wave'].with_context({
             'active_ids': delivery_1.id}).create({
                 'active_model': 'sell.delivery',
