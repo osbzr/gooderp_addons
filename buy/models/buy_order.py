@@ -46,7 +46,7 @@ class BuyOrder(models.Model):
     @api.one
     @api.depends('line_ids.subtotal', 'discount_amount')
     def _compute_amount(self):
-        '''当订单行和优惠金额改变时，改变优惠后金额'''
+        '''当订单行和优惠金额改变时，改变成交金额'''
         total = sum(line.subtotal for line in self.line_ids)
         self.amount = total - self.discount_amount
 
@@ -158,7 +158,7 @@ class BuyOrder(models.Model):
                                    track_visibility='always',
                                    digits=dp.get_precision('Amount'),
                                    help=u'整单优惠金额，可由优惠率自动计算出来，也可手动输入')
-    amount = fields.Float(u'优惠后金额',
+    amount = fields.Float(u'成交金额',
                           store=True,
                           compute='_compute_amount',
                           track_visibility='always',

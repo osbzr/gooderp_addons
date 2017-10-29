@@ -16,7 +16,7 @@
                     <field name="order_name"/>
                     <field name="purchase_amount" sum="采购金额合计"/>
                     <field name="discount_amount" sum="优惠金额合计" groups='buy.buy_discount_groups'/>
-                    <field name="amount" sum="优惠后金额合计" groups='buy.buy_discount_groups'/>
+                    <field name="amount" sum="成交金额合计" groups='buy.buy_discount_groups'/>
                     <field name="payment" sum="已付款合计"/>
                     <field name="balance" sum="应付款余额合计"/>
                     <field name="payment_rate" avg='1'/>

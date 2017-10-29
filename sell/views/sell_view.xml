@@ -309,8 +309,6 @@
                 			<group>
                 				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
                 				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
-                				<field name="debt"/>
-                				<field name="total_debt"/>
                 			</group>
             			</group>
 						<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -514,8 +512,6 @@
                 			<group>
                 				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
                 				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
-                				<field name="debt"/>
-                				<field name="total_debt"/>
                 				<field name="create_date" readonly="1" string="录单时间"/>
                 				<field name="write_date" readonly="1" string="最后修改时间"/>
                 			</group>
