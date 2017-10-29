@@ -177,6 +177,7 @@
                 <field name="voucher_id" position="after">
                 	<field name="buy_id"
 				            	invisible="context.get('default_get', 0)" 
+								domian="[('state','=','done')]"
 								groups="buy.buy_groups" 
 								attrs="{'readonly':[('state', '!=', 'draft')]}"/>
                 </field>
