@@ -47,7 +47,7 @@ class CostOrder(models.Model):
     @api.one
     @api.depends('line_ids.amount', 'line_ids.tax_amount')
     def _compute_amount(self):
-        '''当订单行和优惠金额改变时，改变优惠后金额'''
+        '''当订单行和优惠金额改变时，改变成交金额'''
         self.amount = sum(line.amount for line in self.line_ids)
         self.tax_amount = sum(line.tax_amount for line in self.line_ids)
 

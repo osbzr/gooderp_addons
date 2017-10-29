@@ -33,6 +33,29 @@ class VoucherTemplateLine(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    
+    @api.multi
+    @api.onchange('account_id')
+    def onchange_account_id(self):
+        self.currency_id = self.account_id.currency_id
+        self.rate_silent = self.account_id.currency_id.rate
+        res = {
+            'domain': {
+                'partner_id': [('name', '=', False)],
+                'goods_id': [('name', '=', False)],
+                'auxiliary_id': [('name', '=', False)]}}
+        if not self.account_id or not self.account_id.auxiliary_financing:
+            return res
+        if self.account_id.auxiliary_financing == 'customer':
+            res['domain']['partner_id'] = [('c_category_id', '!=', False)]
+        elif self.account_id.auxiliary_financing == 'supplier':
+            res['domain']['partner_id'] = [('s_category_id', '!=', False)]
+        elif self.account_id.auxiliary_financing == 'goods':
+            res['domain']['goods_id'] = []
+        else:
+            res['domain']['auxiliary_id'] = [
+                ('type', '=', self.account_id.auxiliary_financing)]
+        return res
 
 
 class VoucherTemplateWizard(models.TransientModel):

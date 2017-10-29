@@ -24,7 +24,7 @@ class SellDelivery(models.Model):
     @api.depends('line_out_ids.subtotal', 'discount_amount', 'partner_cost',
                  'receipt', 'partner_id', 'line_in_ids.subtotal')
     def _compute_all_amount(self):
-        '''当优惠金额改变时，改变优惠后金额、本次欠款和总欠款'''
+        '''当优惠金额改变时，改变成交金额'''
         total = 0
         if self.line_out_ids:
             # 发货时优惠前总金
@@ -33,9 +33,6 @@ class SellDelivery(models.Model):
             # 退货时优惠前总金额
             total = sum(line.subtotal for line in self.line_in_ids)
         self.amount = total - self.discount_amount
-        self.debt = self.amount - self.receipt + self.partner_cost
-        # 本次欠款变化时，总欠款应该变化
-        self.total_debt = self.partner_id.receivable + self.debt
 
     @api.one
     @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
@@ -80,7 +77,7 @@ class SellDelivery(models.Model):
     discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
                                    digits=dp.get_precision('Amount'),
                                    help=u'整单优惠金额，可由优惠率自动计算得出，也可手动输入')
-    amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
+    amount = fields.Float(u'成交金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits=dp.get_precision('Amount'),
                           help=u'总金额减去优惠金额')
@@ -93,14 +90,6 @@ class SellDelivery(models.Model):
     bank_account_id = fields.Many2one('bank.account',
                                       u'结算账户', ondelete='restrict',
                                       help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
-    debt = fields.Float(u'本次欠款', compute=_compute_all_amount,
-                        store=True, readonly=True, copy=False,
-                        digits=dp.get_precision('Amount'),
-                        help=u'本次欠款金额')
-    total_debt = fields.Float(u'总欠款', compute=_compute_all_amount,
-                              store=True, readonly=True, copy=False,
-                              digits=dp.get_precision('Amount'),
-                              help=u'该客户的总欠款金额')
     cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用',
                                     copy=False,
                                     help=u'销售费用明细行')
@@ -229,7 +218,7 @@ class SellDelivery(models.Model):
             raise UserError(u'收款额不为空时，请选择结算账户！')
         decimal_amount = self.env.ref('core.decimal_amount')
         if float_compare(self.receipt, self.amount + self.partner_cost, precision_digits=decimal_amount.digits) == 1:
-            raise UserError(u'本次收款金额不能大于优惠后金额！\n本次收款金额:%s 优惠后金额:%s' %
+            raise UserError(u'本次收款金额不能大于成交金额！\n本次收款金额:%s 成交金额:%s' %
                             (self.receipt, self.amount + self.partner_cost))
         # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
         if not self.is_return:

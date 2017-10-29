@@ -147,7 +147,6 @@
                                                 'invisible': [('invoice_by_receipt','=',False)]}"/>
                             <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')],
                                                         'invisible': [('invoice_by_receipt','=',False)]}"/>
-                            <field name="debt"/>
                         </group>
                     </group>
                     <group>
@@ -334,7 +333,6 @@
                         <group>
                         	<field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
                             <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="debt"/>
                         </group>
                     </group>
                     <group>
