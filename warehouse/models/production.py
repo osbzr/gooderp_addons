@@ -47,6 +47,7 @@ class WhAssembly(models.Model):
     goods_id = fields.Many2one('goods', string=u'组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
+    lot = fields.Char(u'批号')
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [
@@ -312,6 +313,9 @@ class WhAssembly(models.Model):
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
+            if order.lot:                     # 入库批次
+                for line in order.line_in_ids:
+                    line.lot = order.lot
             order.line_in_ids.action_done()  # 完成成品入库
 
             order.update_parent_cost()
@@ -502,6 +506,7 @@ class outsource(models.Model):
     goods_id = fields.Many2one('goods', string=u'组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
+    lot = fields.Char(u'批号')
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [
@@ -890,6 +895,9 @@ class outsource(models.Model):
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
+            if order.lot:                     # 入库批次
+                for line in order.line_in_ids:
+                    line.lot = order.lot
             order.line_in_ids.action_done()  # 完成成品入库
 
             # 如果委外费用存在，生成 结算单
@@ -963,6 +971,8 @@ class WhDisassembly(models.Model):
     goods_id = fields.Many2one('goods', string=u'组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},)
+    lot_id = fields.Many2one('wh.move.line', u'批号',
+                             help=u'用于拆卸的组合件批号')
     goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [
@@ -1153,6 +1163,8 @@ class WhDisassembly(models.Model):
 
             for line_out in order.line_out_ids:
                 if line_out.state != 'done':
+                    if order.lot_id:      #出库批次
+                        line_out.lot_id = order.lot_id
                     line_out.action_done()
 
             order.create_out_voucher()   # 生成出库凭证并审核

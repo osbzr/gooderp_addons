@@ -17,6 +17,7 @@ class TestCreateWave(TransactionCase):
             'warehouse.a001_location').id
         # 补足库存数量
         self.others_wh_in.approve_order()
+        self.delivery.express_type = 'SF'
 
     def test_fields_view_get(self):
         ''' 测试 fields_view_get '''
@@ -107,7 +108,8 @@ class TestWave(TransactionCase):
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
-
+        self.delivery.express_type = 'SF'
+        
         self.wave_wizard = self.env['create.wave'].with_context({
             'active_ids': self.delivery.id}).create({
                 'active_model': 'sell.delivery',
@@ -165,6 +167,7 @@ class TestWave(TransactionCase):
             [('order_id', '=', order_1.id)])
         delivery_1.date = '2016-01-02'
         delivery_1.express_code = '123456'
+        delivery_1.express_type = 'SF'
         wave_wizard = self.env['create.wave'].with_context({
             'active_ids': delivery_1.id}).create({
                 'active_model': 'sell.delivery',
@@ -196,6 +199,7 @@ class TestDoPack(TransactionCase):
         self.delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
         self.delivery.express_code = '123456'
+        self.delivery.express_type = 'SF'
 
         self.wave_wizard = self.env['create.wave'].with_context({
             'active_ids': self.delivery.id}).create({
@@ -253,6 +257,7 @@ class TestDoPack(TransactionCase):
         delivery_1 = self.env['sell.delivery'].search(
             [('order_id', '=', order_1.id)])
         delivery_1.express_code = '8888'
+        delivery_1.express_type = 'SF'
         wave_wizard = self.env['create.wave'].with_context({
             'active_ids': delivery_1.id}).create({
                 'active_model': 'sell.delivery',

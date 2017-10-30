@@ -3,9 +3,9 @@
 from odoo import models, fields, api
 import hashlib
 import base64
-import httplib2
 import json
 import urllib
+import urllib2
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
 
@@ -64,7 +64,7 @@ class WhMove(models.Model):
                       ProvinceName=ware_hosue_row.province_id.name or u'上海',
                       CityName=ware_hosue_row.city_id.city_name or u'上海',
                       ExpAreaName=ware_hosue_row.county_id.county_name or u'浦东新区',
-                      Address=(ware_hosue_row.detail_address or u'金海路2588号B-213') + u'格子号：' + pakge_sequence if pakge_sequence else '')
+                      Address=(ware_hosue_row.detail_address or u'金海路2588号B-213'))
         return sender
 
     def get_receiver_goods_message(self):
@@ -123,16 +123,15 @@ class WhMove(models.Model):
                 'RequestType': '1007',
                 'DataType': '2',
                 'DataSign': self.encrypt_kdn(request_data, appkey)}
-        http = httplib2.Http()
-        response, content = http.request(
-            path, 'POST', headers=header, body=urllib.urlencode(data))
-        content = content.replace('true', 'True').replace('false', 'False')
-        self.express_code = (safe_eval(content).get(
+        req = urllib2.Request(path, urllib.urlencode(data), header)
+        resp = urllib2.urlopen(req).read()
+        content = json.loads(resp)
+        self.express_code = (content.get(
             'Order', {})).get('LogisticCode', "")
-        self.express_menu = str(safe_eval(content).get('PrintTemplate'))
+        self.express_menu = content.get('PrintTemplate')
         if not self.express_code:
-            raise UserError("获取快递面单失败!\n原因:%s" % str(content))
-        return str(safe_eval(content).get('PrintTemplate'))
+            raise UserError("获取快递面单失败!\n原因:%s" % str(resp))
+        return self.express_menu
 
     def encrypt_kdn(self, data, appkey):
         """
@@ -148,22 +147,21 @@ class WhMove(models.Model):
         line_dict = []
         total_price = 0
         for line in move_row.line_out_ids:
-            # code, name, goods_qty, price, subtotal
-            line_dict.append([line.goods_id.code, line.goods_id.name,
-                              line.goods_qty, line.price, line.subtotal])
-            total_price += line.subtotal
+            # code, name, goods_qty
+            line_dict.append([line.goods_id.code,
+                              line.goods_id.name,
+                              line.goods_qty])
 
         # 装箱单数据
-        package_list = {'0 任务栏号': [],
+        package_list = {'0 拣货单号': [move_row.wave_id.name],
                         '1 内部订单号': [move_row.name],
-                        '2 店铺名称': [],
-                        '3 外部订单号': [move_row.name],
+                        '2 店铺名称': [move_row.company_id.name],
+                        '3 外部订单号': [move_row.ref],
                         '4 收货人': [move_row.partner_id.name],
                         '5 订单日期': [move_row.date],
-                        '6 应付款': [move_row.partner_id.receivable],
+                        '6 格子号': [move_row.pakge_sequence],
                         '7 lines': line_dict,
                         '8 总件数': [move_row.total_qty],
-                        '9 总价格': [total_price],
                         }
         return package_list
 

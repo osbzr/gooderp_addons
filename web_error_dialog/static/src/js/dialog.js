@@ -23,8 +23,7 @@ odoo.define('web.gooderp_dialog', function(require) {
             }
             var audio;
             audio = new Audio();
-            var ext = audio.canPlayType("audio/ogg; codecs=vorbis") ? ".ogg" : ".mp3";
-            audio.src = session.url("/mail/static/src/audio/ting" + ext);
+            audio.src = session.url("/gooderp_pos/static/src/sounds/error.wav");
             audio.play();
             new Dialog(this, {
                 size: 'medium',

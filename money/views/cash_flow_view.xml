@@ -68,7 +68,7 @@
                 <field name="name">cash.flow.statement.tree</field>
                 <field name="model">cash.flow.statement</field>
                 <field name="arch" type="xml">
-                    <tree string="现金流量表">
+                    <tree string="现金流量表" create="false">
                         <field name="name"/>
                         <field name="line_num"/>
                         <field name="year_amount"/>

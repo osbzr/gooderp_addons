@@ -220,6 +220,7 @@
 								<field name="is_return" invisible="1"/>
             				</group>
             				<group>
+							    <field name="ref"/>
             					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
             					<field name='order_id' readonly='1'/>
 								<field name='finance_category_id'/>
@@ -308,8 +309,6 @@
                 			<group>
                 				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
                 				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
-                				<field name="debt"/>
-                				<field name="total_debt"/>
                 			</group>
             			</group>
 						<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -513,8 +512,6 @@
                 			<group>
                 				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
                 				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
-                				<field name="debt"/>
-                				<field name="total_debt"/>
                 				<field name="create_date" readonly="1" string="录单时间"/>
                 				<field name="write_date" readonly="1" string="最后修改时间"/>
                 			</group>
@@ -790,6 +787,7 @@
                 <field name="voucher_id" position="after">
                 	<field name="sell_id"
 				            	invisible="context.get('default_pay', 0)" 
+								domain="[('state','=','done')]"
 								groups="sell.sell_groups" 
 								attrs="{'readonly':[('state', '!=', 'draft')]}"/>
                 </field>

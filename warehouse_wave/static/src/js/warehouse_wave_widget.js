@@ -6,6 +6,7 @@ odoo.define('warehouse.wave', function(require) {
     var Model = require('web.Model');
     var core = require('web.core');
     var Widget = require('web.Widget');
+    var session = require('web.session');
 
     var QWeb = core.qweb;
     var _t = core._t;
@@ -30,6 +31,11 @@ odoo.define('warehouse.wave', function(require) {
                             new Model("do.pack").call("scan_barcode", [self.model, $this.val(), self.datarecord.id]).then(
                                 function(result) {
                                     // TODO 如何让barcode自动获得焦点
+                                    var audio;
+                                    audio = new Audio();
+                                    var ext = audio.canPlayType("audio/ogg; codecs=vorbis") ? ".ogg" : ".mp3";
+                                    audio.src = session.url("/mail/static/src/audio/ting" + ext);
+                                    audio.play();
                                     if (result == 'done'){
                                         self.do_action({
                                         type: 'ir.actions.act_window',
@@ -40,8 +46,8 @@ odoo.define('warehouse.wave', function(require) {
                                         target: 'inline',
                                         });
                                     }else{
-                                    self.reload();
-                                    self.$el.find('input').val('');
+                                        self.reload();
+                                        self.$el.find('input').val('');
                                     }
                                 }
                             );
@@ -68,6 +74,7 @@ odoo.define('warehouse.wave', function(require) {
                         res[res_keys[res_key]] = result[i+1][res_keys[res_key]]
                     }
                     JSON.stringify(res)
+                    all_print.append($("<div style='page-break-after:always;'></div>"));
                     all_print.append($(QWeb.render('temp_detail_info', {'detail_infos': res})));
 
                     all_print.append($("<div style='page-break-after:always;'></div>"));

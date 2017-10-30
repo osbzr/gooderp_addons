@@ -434,7 +434,7 @@ class TestReceiptWizard(TransactionCase):
         for line in source_line:
             line.money_id.money_order_done()
 
-        # 销货订单产生发货单，并审核发货单，优惠后金额和本次收款均为0
+        # 销货订单产生发货单，并审核发货单，成交金额和本次收款均为0
         new_delivery = self.delivery.copy()
 #         new_delivery.discount_amount = (new_delivery.amount
 #                                         + new_delivery.discount_amount)

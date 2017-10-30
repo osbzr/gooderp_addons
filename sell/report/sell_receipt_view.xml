@@ -17,7 +17,7 @@
                     <field name="order_name"/>
                     <field name="sell_amount" sum="销售金额合计"/>
                     <field name="discount_amount" sum="优惠金额合计" groups='sell.sell_discount_groups'/>
-                    <field name="amount" sum="优惠后金额合计" groups='sell.sell_discount_groups'/>
+                    <field name="amount" sum="成交金额合计" groups='sell.sell_discount_groups'/>
                     <field name="partner_cost" sum="客户承担费用合计"/>
                     <field name="receipt" sum="已收款合计"/>
                     <field name="balance" sum="应收款余额合计"/>

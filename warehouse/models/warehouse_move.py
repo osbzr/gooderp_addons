@@ -51,6 +51,7 @@ class WhMove(models.Model):
                          help=u'移库类型')
     name = fields.Char(u'单据编号', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')
+    ref = fields.Char(u'外部单号')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft',
                              index=True,
                              help=u'移库单状态标识，新建时状态为未审核;审核后状态为已审核')

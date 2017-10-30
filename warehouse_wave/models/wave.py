@@ -169,6 +169,8 @@ class CreateWave(models.TransientModel):
         express_type = ''  # 快递方式
         wave_row = self.env['wave'].create({})
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
+            if not active_model.express_type:
+                raise UserError(u'请先输入%s的承运商' % active_model.name)
             available_line = []
             for line in active_model.line_out_ids:
                 if not warehouse_id:

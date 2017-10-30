@@ -116,6 +116,7 @@ class MoneyOrder(models.Model):
     state = fields.Selection([
         ('draft', u'未审核'),
         ('done', u'已审核'),
+        ('cancel', u'已作废'),
     ], string=u'状态', readonly=True,
         default='draft', copy=False, index=True,
         help=u'收/付款单状态标识，新建时状态为未审核;审核后状态为已审核')
