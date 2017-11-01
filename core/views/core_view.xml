@@ -116,28 +116,24 @@
 		<record id="company_form" model="ir.ui.view">
 			<field name="name">company.form</field>
 			<field name="model">res.company</field>
-			<field name="arch" type="xml">
-				<form string="公司" create='0'>
-					<group>
-						<field name="logo" widget="image"  class="oe_avatar oe_left"/>
-                        <field name="name" class="oe_inline"/>
-						<field name="rml_header1" string="口号"/>
-						<field name="website"/>
-						<field name="street" required="1"/>
-						<field name="phone" required="1"/>
-						<field name="fax" string="手机"/>
-						<field name='email' string='公司邮箱'/>
-						<field name="zip"/>
-						<field name="start_date" groups="base.group_no_one" />
-						<field name="currency_id"/>
-						<field name="cost_method"/>
-						<field name="draft_invoice"/>
-						<field name="tax_number"/>
-						<field name="import_tax_rate"/>
-						<field name="output_tax_rate"/>
-						<field name="bank_account_id"/>
-					</group>
-				</form>
+			<field name="inherit_id" ref="base.view_company_form" />
+            <field name="arch" type="xml">
+               <xpath expr="//notebook" position="inside">
+                    <page string="会计属性">
+						<group>
+					  		<group>
+								<field name="start_date" groups="base.group_no_one" />
+								<field name="cost_method"/>
+								<field name="draft_invoice"/>
+								<field name="bank_account_id"/>
+					  		</group>
+					  		<group>
+					    		<field name="import_tax_rate"/>
+								<field name="output_tax_rate"/>
+					  		</group>
+					  	</group>
+				    </page>
+				</xpath>
 			</field>
 		</record>
 		<record id="company_action" model="ir.actions.act_window">
