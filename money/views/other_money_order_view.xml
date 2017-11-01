@@ -6,7 +6,7 @@
             <field name="name">other.money.order.tree</field>
             <field name="model">other.money.order</field>
             <field name="arch" type="xml">
-                <tree string="其他收支单" colors='blue:state == "draft"'>
+                <tree string="其他收支单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="name"/>
                     <field name="date"/>
                     <field name="partner_id"/>
@@ -28,6 +28,7 @@
                 <header>
 					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
 					<button name="other_money_draft" states="done" string="反审核" type="object"/>
+                    <button name="action_cancel" states="draft" string="作废" type="object"/>
 					<!-- <button name="print_other_money_order" states="done" string="打印" type="object" class="oe_highlight"/> -->
                     <field name="state" widget="statusbar"/>
                 </header>

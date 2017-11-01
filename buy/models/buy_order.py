@@ -29,7 +29,7 @@ from odoo.tools import float_compare, float_is_zero
 BUY_ORDER_STATES = [
     ('draft', u'未审核'),
     ('done', u'已审核'),
-]
+    ('cancel', u'已作废')]
 
 # 字段只读状态
 READONLY_STATES = {

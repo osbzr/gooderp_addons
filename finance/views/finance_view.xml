@@ -34,6 +34,7 @@
 	                <header>
 	                	<button name='voucher_done' states="draft" string="审核" type="object" class="oe_highlight"/>
 	                	<button name='voucher_draft' states="done" string="反审核" type="object"/>
+                          <button name="action_cancel" states="draft" string="作废" type="object"/>
 	                    <field name="state" widget="statusbar" readonly="1"/>
 	                </header>
                     <sheet>
@@ -88,7 +89,7 @@
             <field name="name">voucher.tree</field>
             <field name="model">voucher</field>
             <field name="arch" type="xml">
-                <tree string="会计凭证" colors="blue:state == 'draft';">
+                <tree string="会计凭证" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="document_word_id"/>
                     <field name="date"/>
                     <field name="name"/>
@@ -151,7 +152,7 @@
             <field name="name">voucher.line.tree</field>
             <field name="model">voucher.line</field>
             <field name="arch" type="xml">
-                <tree string='分录查询'  create="false" edit='false'>
+                <tree string='分录查询' colors='blue:state == "draft";lightgray:state == "cancel"' create="false" edit='false'>
                     <field name='voucher_id'/>
                     <button name="view_document" type="object" string="查看凭证"
                             icon="fa-search" class="oe_highlight"/>

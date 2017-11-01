@@ -11,7 +11,7 @@ class WhMove(models.Model):
     MOVE_STATE = [
         ('draft', u'草稿'),
         ('done', u'已审核'),
-    ]
+        ('cancel', u'已作废'),]
 
     @api.one
     @api.depends('line_out_ids', 'line_in_ids')

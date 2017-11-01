@@ -10,7 +10,7 @@ STOCK_REQUEST_STATES = [
     ('unsubmit', u'未提交'),
     ('draft', u'未审核'),
     ('done', u'已审核'),
-]
+    ('cancel', u'已作废')]
 
 
 class StockRequest(models.Model):

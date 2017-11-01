@@ -6,7 +6,7 @@
             <field name="name">money.transfer.order.tree</field>
             <field name="model">money.transfer.order</field>
             <field name="arch" type="xml">
-                <tree string="资金转账单" colors='blue:state == "draft"'>
+                <tree string="资金转账单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="name"/>
                     <field name="date"/>
                     <field name="state"/>
@@ -26,6 +26,7 @@
                         <button name="money_transfer_done" states="draft" string="审核" type="object"
                                 class="oe_highlight"/>
                         <button name="money_transfer_draft" states="done" string="反审核" type="object"/>
+                        <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>

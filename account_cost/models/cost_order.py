@@ -30,7 +30,7 @@ COST_ORDER_STATES = [
     ('draft', u'未审核'),
     ('done', u'已审核'),
     ('cancel', u'已中止'),
-]
+    ('cancel', u'已作废')]
 
 # 字段只读状态
 READONLY_STATES = {

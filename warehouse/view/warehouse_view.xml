@@ -293,6 +293,7 @@
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft'
 																	groups='warehouse.other_out_picking_groups'/>
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
                     <sheet>
@@ -404,7 +405,7 @@
             <field name='name'>wh.out.tree</field>
             <field name='model'>wh.out</field>
             <field name='arch' type='xml'>
-                <tree string='其他出库单' colors='blue:state == "draft"'>
+                <tree string='其他出库单' colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name='name' />
                     <field name='date' />
                     <field name='type' />
@@ -575,6 +576,8 @@
                     <header>
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name="action_cancel" states="draft" string="作废"
+                        type="object"/>
                         <field name='state' widget='statusbar' readonly='1' />                    </header>
                     <sheet>
                         <div class="oe_title">
@@ -641,7 +644,7 @@
             <field name='name'>wh.internal.tree</field>
             <field name='model'>wh.internal</field>
             <field name='arch' type='xml'>
-                <tree string='调拨单' colors='blue:state == "draft"'>
+                <tree string='调拨单' colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name='name' />
                     <field name='date' />
                     <field name='warehouse_id'/>

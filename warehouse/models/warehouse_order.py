@@ -18,7 +18,7 @@ class WhOut(models.Model):
     TYPE_SELECTION = [
         ('inventory', u'盘亏'),
         ('others', u'其他出库'),
-    ]
+        ('cancel', u'已作废')]
 
     move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
                               help=u'其他出库单对应的移库单')

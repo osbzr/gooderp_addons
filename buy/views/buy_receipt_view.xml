@@ -7,7 +7,7 @@
             <field name="name">buy.receipt.tree</field>
             <field name="model">buy.receipt</field>
             <field name="arch" type="xml">
-                <tree string="采购入库单" colors='blue:state == "draft"'>
+                <tree string="采购入库单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -36,6 +36,7 @@
                     <button name='buy_to_return' type='object' states="done" string='生成退货单' class="oe_highlight"/>
                 	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
                 	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
+                    <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>
@@ -202,7 +203,7 @@
             <field name="name">buy.return.tree</field>
             <field name="model">buy.receipt</field>
             <field name="arch" type="xml">
-                <tree string="采购退货单" colors='blue:state == "draft"'>
+                <tree string="采购退货单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name='date'/>
             		<field name='name'/>
             		<field name="order_id"/>
@@ -229,6 +230,7 @@
                 <header>
                 	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
                 	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
+                     <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>

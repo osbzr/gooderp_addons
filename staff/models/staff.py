@@ -44,7 +44,7 @@ class StaffDepartment(models.Model):
             view_id = self.env.ref('staff.view_staff_department_form').id
 
             return {
-                'name': '部门/' + child_department.name,
+                'name': u'部门/' + child_department.name,
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'staff.department',

@@ -15,7 +15,7 @@
             <field name='name'>stock.request.tree</field>
             <field name='model'>stock.request</field>
             <field name='arch' type='xml'>
-                <tree string='补货申请'>
+                <tree string='补货申请' colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="name"/>
                     <field name="user_id"/>
                     <field name="date"/>
@@ -32,6 +32,7 @@
                     <header>
                         <button name="stock_query" states="unsubmit" string="查询库存" type="object" class="oe_highlight"/>
                         <button name="stock_request_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                        <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>

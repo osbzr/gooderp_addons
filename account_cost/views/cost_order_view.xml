@@ -7,7 +7,7 @@
 			<field name="name">cost.order.tree</field>
 			<field name="model">cost.order</field>
 			<field name="arch" type="xml">
-				<tree string="服务订单">
+				<tree string="服务订单" colors='blue:state == "draft";lightgray:state == "cancel"'>
 					<field name="date"/>
 					<field name="name"/>
 					<field name="partner_id"/>
@@ -27,6 +27,7 @@
 					<header>
 						<button name="cost_order_confim" states="draft" string="审核" type="object" class="oe_highlight"/>
 						<button name="cost_order_draft" states="done" string="反审核" type="object"/>
+                        <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
 					</header>
 					<sheet>

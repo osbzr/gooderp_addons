@@ -6,7 +6,7 @@
             <field name="name">reconcile.order.tree</field>
             <field name="model">reconcile.order</field>
             <field name="arch" type="xml">
-                <tree string="Reconcile Order" colors='blue:state == "draft"'>
+                <tree string="Reconcile Order" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="name"/>
                     <field name="date"/>
                     <field name="partner_id"/>
@@ -23,6 +23,7 @@
                 <form string="Reconcile Order">
                 <header>
                 	<button name="reconcile_order_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                    <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
                 <sheet>
