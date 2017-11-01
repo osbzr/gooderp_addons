@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+import datetime
 from odoo import api, fields, models
 
 
@@ -14,8 +14,8 @@ class Partner(models.Model):
         Date range [180 days ago, now]
         '''
         self.ensure_one()
-        date_end = datetime.today()
-        date_start = datetime.strptime(
+        date_end = datetime.datetime.today()
+        date_start = datetime.datetime.strptime(
             self.env.user.company_id.start_date, '%Y-%m-%d')
 
         if (date_end - date_start).days > 180:
