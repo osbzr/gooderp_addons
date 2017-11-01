@@ -24,7 +24,7 @@ class BuyReceipt(models.Model):
     @api.depends('line_in_ids.subtotal', 'discount_amount',
                  'payment', 'line_out_ids.subtotal', 'delivery_fee')
     def _compute_all_amount(self):
-        '''当优惠金额改变时，改变优惠后金额和本次欠款'''
+        '''当优惠金额改变时，改变成交金额'''
         total = 0
         if self.line_in_ids:
             # 入库时优惠前总金额
@@ -33,7 +33,6 @@ class BuyReceipt(models.Model):
             # 退货时优惠前总金额
             total = sum(line.subtotal for line in self.line_out_ids)
         self.amount = total - self.discount_amount + self.delivery_fee
-        self.debt = self.amount - self.payment
 
     @api.one
     @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
@@ -79,7 +78,7 @@ class BuyReceipt(models.Model):
                                    help=u'整单优惠金额，可由优惠率自动计算得出，也可手动输入')
     invoice_by_receipt = fields.Boolean(string=u"按收货结算", default=True,
                                         help=u'如未勾选此项，可在资金行里输入付款金额，订单保存后，采购人员可以单击资金行上的【确认】按钮。')
-    amount = fields.Float(u'优惠后金额', compute=_compute_all_amount,
+    amount = fields.Float(u'成交金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits=dp.get_precision('Amount'),
                           help=u'总金额减去优惠金额')
@@ -89,10 +88,6 @@ class BuyReceipt(models.Model):
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
                                       ondelete='restrict',
                                       help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
-    debt = fields.Float(u'本次欠款', compute=_compute_all_amount,
-                        store=True, readonly=True, copy=False,
-                        digits=dp.get_precision('Amount'),
-                        help=u'本次欠款金额')
     cost_line_ids = fields.One2many('cost.line', 'buy_id', u'采购费用', copy=False,
                                     help=u'采购费用明细行')
     money_state = fields.Char(u'付款状态', compute=_get_buy_money_state,

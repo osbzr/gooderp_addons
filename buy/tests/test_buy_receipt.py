@@ -27,7 +27,7 @@ class TestBuyReceipt(TransactionCase):
         self.env.ref('money.pay_2000').money_order_done()
 
     def test_compute_all_amount(self):
-        '''测试当优惠金额改变时，改变优惠后金额和本次欠款'''
+        '''测试当优惠金额改变时，改变成交金额'''
         self.receipt.discount_amount = 5
         self.assertTrue(self.receipt.amount == 580)
 

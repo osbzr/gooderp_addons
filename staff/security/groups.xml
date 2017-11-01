@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data noupdate="0">
+	<data noupdate="1">
     <record id='hr_groups' model='res.groups'>
 			<field name='name'>员工</field>
 			<field name='category_id' ref="core.good_staff"/>

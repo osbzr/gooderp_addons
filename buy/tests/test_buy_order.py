@@ -18,7 +18,7 @@ class TestBuyOrder(TransactionCase):
         self.env.ref('money.pay_2000').money_order_done()
 
     def test_onchange_discount_rate(self):
-        ''' 优惠率改变时，改变优惠金额，优惠后金额也改变'''
+        ''' 优惠率改变时，改变优惠金额，成交金额也改变'''
         amount_before = self.order.amount
         discount_amount_before = self.order.discount_amount
         self.order.discount_rate = 10
