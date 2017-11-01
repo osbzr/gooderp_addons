@@ -583,6 +583,7 @@ class MoneyOrderLine(models.Model):
 class MoneyInvoice(models.Model):
     _name = 'money.invoice'
     _description = u'结算单'
+    _order = 'date DESC'
 
     @api.model
     def _get_category_id(self):
