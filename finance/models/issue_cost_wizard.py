@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
+from odoo.tools import float_is_zero
 
 
 class MonthProductCost(models.Model):
@@ -159,12 +160,13 @@ class MonthProductCost(models.Model):
                 create_vals, period_id)  # 发出时已结转的实际成本
 
             diff_cost = current_period_out_cost - real_out_cost  # 两者之差
-            if diff_cost:  # 贷方
+            if not float_is_zero(diff_cost,2):  # 贷方
                 voucher_line_data = {'name': u'发出成本', 'credit': diff_cost,
                                      'account_id': goods_row.category_id.account_id.id,
                                      'goods_id': create_vals.get('goods_id'),
                                      'goods_qty': create_vals.get('current_period_out_qty')}
                 voucher_line_data_list.append([0, 0, voucher_line_data.copy()])
+                all_balance_price += diff_cost
             # 创建 发出成本
             create_vals.update({'current_period_out_cost': current_period_out_cost,
                                 'current_period_remaining_cost': create_vals.get('period_begin_cost', 0) +
@@ -173,7 +175,6 @@ class MonthProductCost(models.Model):
                                 })
             self.create(create_vals)
 
-            all_balance_price += diff_cost
         if all_balance_price != 0:  # 借方
             voucher_line_data_list.append(
                 [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
