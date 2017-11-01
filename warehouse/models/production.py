@@ -21,7 +21,7 @@ class WhAssembly(models.Model):
 
     state = fields.Selection([('draft', u'草稿'),
                               ('feeding', u'已发料'),
-                              ('done', u'完成')
+                              ('done', u'完成'),
                               ('cancel', u'已作废')],
                              u'状态', copy=False, default='draft',
                              index=True,
