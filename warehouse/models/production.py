@@ -489,7 +489,8 @@ class outsource(models.Model):
 
     state = fields.Selection([('draft', u'草稿'),
                               ('feeding', u'已发料'),
-                              ('done', u'完成')],
+                              ('done', u'完成'),
+                              ('cancel', u'已作废')],
                              u'状态', copy=False, default='draft',
                              index=True,
                              help=u'委外加工单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
@@ -946,7 +947,8 @@ class WhDisassembly(models.Model):
 
     state = fields.Selection([('draft', u'草稿'),
                               ('feeding', u'已发料'),
-                              ('done', u'完成')],
+                              ('done', u'完成'),
+                              ('cancel', u'已作废')],
                              u'状态', copy=False, default='draft',
                              index=True,
                              help=u'拆卸单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
