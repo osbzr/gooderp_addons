@@ -455,6 +455,7 @@
                     <header>
                         <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
                         <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' readonly='1' />                    </header>
                     <sheet>
                         <div>
@@ -526,7 +527,7 @@
             <field name='name'>wh.in.tree</field>
             <field name='model'>wh.in</field>
             <field name='arch' type='xml'>
-                <tree string='其他入库单' colors='blue:state == "draft"'>
+                <tree string='其他入库单' colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name='name' />
                     <field name='date' />
                     <field name='warehouse_dest_id'/>
