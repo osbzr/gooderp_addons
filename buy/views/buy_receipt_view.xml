@@ -10,7 +10,7 @@
                 <tree string="采购入库单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name='date'/>
             		<field name='name'/>
-            		<field name="order_id"/>
+                    <field name="order_id" groups='buy.buy_groups'/>
                     <field name="partner_id"/>
                     <field name="user_id"/>
                     <field name="amount" sum="总金额"/>
@@ -61,10 +61,10 @@
                         <group>
                             <field name="ref"/>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="order_id" readonly="1"/>
-                            <field name='invoice_id' readonly='1'/>
-                            <field name='voucher_id'/>
-                            <field name="money_state" readonly='1'/>
+                            <field name="order_id" readonly="1" groups='buy.buy_groups'/>
+                            <field name='invoice_id' readonly='1' groups='base.group_no_one'/>
+                            <field name='voucher_id' groups='base.group_no_one'/>
+                            <field name="money_state" readonly='1' groups='base.group_no_one'/>
                             <field name='currency_id' readonly='1'
                                    groups='finance.group_multi_currency'/>
                             <field name="modifying" invisible="1"/>
@@ -93,8 +93,7 @@
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="uom_id"/>
 		                            <field name="price" groups='goods.view_cost_groups'/>
-		                            <field name="price_taxed" groups='buy.in_tax_groups,goods.view_cost_groups'/>
-				 					<field name='cost_unit' groups='goods.view_cost_groups'/>
+		                            <field name="price_taxed" groups='buy.in_tax_groups'/>
 		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
 		                            <field name="discount_amount" groups='buy.buy_line_discount_groups' readonly="0" sum="合计折扣额"/>
 		                            <field name="amount" string="购货金额" sum="合计金额" groups='goods.view_cost_groups'/>
@@ -176,7 +175,7 @@
             <field name="arch" type="xml">
                 <search string="采购入库单">
                     <field name="name"/>
-                    <field name="order_id"/>
+                    <field name="order_id" groups='buy.buy_groups'/>
                     <field name="partner_id"/>
                     <field name="state"/>
                     <field name="money_state"/>
@@ -206,7 +205,7 @@
                 <tree string="采购退货单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name='date'/>
             		<field name='name'/>
-            		<field name="order_id"/>
+                    <field name="order_id" groups='buy.buy_groups'/>
                     <field name="partner_id"/>
                     <field name="amount" sum="总金额"/>
             		<field name='payment'/>
@@ -252,7 +251,7 @@
                         </group>
                         <group>
                         	<field name="date_due" required="1" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="order_id" readonly="1"/>
+                            <field name="order_id" readonly="1" groups='buy.buy_groups'/>
                             <field name='origin_id' readonly='1'/>
                             <field name='invoice_id' readonly='1'/>
                             <field name='voucher_id'/>
@@ -363,7 +362,7 @@
             <field name="arch" type="xml">
                 <search string="采购退货单">
                     <field name="name"/>
-                    <field name="order_id"/>
+                    <field name="order_id" groups='buy.buy_groups'/>
                     <field name="partner_id"/>
                     <field name="state"/>
                     <field name="return_state"/>
