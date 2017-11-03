@@ -167,6 +167,11 @@ class SellOrder(models.Model):
         'sell.delivery', 'order_id', string='Deliverys', copy=False)
     delivery_count = fields.Integer(
         compute='_compute_delivery', string='Deliverys Count', default=0)
+    pay_method = fields.Many2one('core.value',
+                                 string=u'付款方式',
+                                 ondelete='restrict',
+                                 domain=[('type', '=', 'pay_method')],
+                                 context={'type': 'pay_method'})
 
     @api.onchange('address_id')
     def onchange_partner_address(self):
