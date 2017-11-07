@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 商品导出默认字段 -->
+        <record id='goods_export' model="ir.exports">
+            <field name="name">商品</field>
+            <field name="resource">goods</field>
+        </record>
+        <record id='goods_export_line_code' model="ir.exports.line">
+            <field name="name">code</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+        <record id='goods_export_line_name' model="ir.exports.line">
+            <field name="name">name</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+         <record id='goods_export_line_brand' model="ir.exports.line">
+            <field name="name">brand</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+        <record id='goods_export_line_category_id' model="ir.exports.line">
+            <field name="name">category_id</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+         <record id='goods_export_line_uom_id' model="ir.exports.line">
+            <field name="name">uom_id</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+        <record id='goods_export_line_cost' model="ir.exports.line">
+            <field name="name">cost</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+
+        <!-- 客户导出默认字段 -->
+        <record id='customer_export' model="ir.exports">
+            <field name="name">客户</field>
+            <field name="resource">partner</field>
+        </record>
+        <record id='customer_export_name' model="ir.exports.line">
+            <field name="name">name</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+        <record id='customer_export_main_mobile' model="ir.exports.line">
+            <field name="name">main_mobile</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+        <record id='customer_export_c_category_id' model="ir.exports.line">
+            <field name="name">c_category_id</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+        <record id='customer_export_s_category_id' model="ir.exports.line">
+            <field name="name">s_category_id</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+        <record id='customer_export_main_address' model="ir.exports.line">
+            <field name="name">main_address</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+        <record id='customer_export_main_contact' model="ir.exports.line">
+            <field name="name">main_contact</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+        <record id='customer_export_address' model="ir.exports.line">
+            <field name="name">address</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+        <record id='customer_export_tax_num' model="ir.exports.line">
+            <field name="name">tax_num</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+
+        <!-- 供应商导出默认字段 -->
+        <record id='supplier_export' model="ir.exports">
+            <field name="name">供应商</field>
+            <field name="resource">partner</field>
+        </record>
+        <record id='supplier_export_name' model="ir.exports.line">
+            <field name="name">name</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+        <record id='supplier_export_mobile' model="ir.exports.line">
+            <field name="name">main_mobile</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+        <record id='supplier_export_s_category_id' model="ir.exports.line">
+            <field name="name">s_category_id</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+        <record id='supplier_export_c_category_id' model="ir.exports.line">
+            <field name="name">c_category_id</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+        <record id='supplier_export_main_address' model="ir.exports.line">
+            <field name="name">main_address</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+        <record id='supplier_export_bank_name' model="ir.exports.line">
+            <field name="name">bank_name</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+        <record id='supplier_export_bank_num' model="ir.exports.line">
+            <field name="name">bank_num</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+
+        <!-- 员工导出默认字段 -->
+        <record id='staff_export' model="ir.exports">
+            <field name="name">员工</field>
+            <field name="resource">staff</field>
+        </record>
+        <record id='staff_export_user_id' model="ir.exports.line">
+            <field name="name">user_id</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+        <record id='staff_export_company_id' model="ir.exports.line">
+            <field name="name">company_id</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+    </data>
+</openerp>

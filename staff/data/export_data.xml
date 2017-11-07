@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 员工导出默认字段 -->
+        <record id='staff_export_work_email' model="ir.exports.line">
+            <field name="name">work_email</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+        <record id='staff_export_work_phone' model="ir.exports.line">
+            <field name="name">work_phone</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+        <record id='staff_export_identification_id' model="ir.exports.line">
+            <field name="name">identification_id</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+        <record id='staff_export_bank_name' model="ir.exports.line">
+            <field name="name">bank_name</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+        <record id='staff_export_bank_num' model="ir.exports.line">
+            <field name="name">bank_num</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+        <record id='staff_export_gender' model="ir.exports.line">
+            <field name="name">gender</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+        <record id='staff_export_marital' model="ir.exports.line">
+            <field name="name">marital</field>
+            <field name="export_id" ref="core.staff_export"/>
+        </record>
+
+    </data>
+</openerp>

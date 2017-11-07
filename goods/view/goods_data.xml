@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 商品导出默认字段 -->
+        <record id='goods_export_line_goods_class_id' model="ir.exports.line">
+            <field name="name">goods_class_id</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+        <record id='goods_export_line_barcode' model="ir.exports.line">
+            <field name="name">barcode</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+        <record id='goods_export_line_price' model="ir.exports.line">
+            <field name="name">price</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+        <record id='goods_export_line_using_batch' model="ir.exports.line">
+            <field name="name">using_batch</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+        <record id='goods_export_line_supplier_id' model="ir.exports.line">
+            <field name="name">supplier_id</field>
+            <field name="export_id" ref="core.goods_export"/>
+        </record>
+    </data>
+</openerp>

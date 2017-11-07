@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="1">
+		<!-- 客户导出默认添加应收期初字段 -->
+		<record id='customer_export_receivable_init' model="ir.exports.line">
+            <field name="name">receivable_init</field>
+            <field name="export_id" ref="core.customer_export"/>
+        </record>
+		<!-- 供应商导出默认添加应收期初字段 -->
+		<record id='supplier_export_payable_init' model="ir.exports.line">
+            <field name="name">payable_init</field>
+            <field name="export_id" ref="core.supplier_export"/>
+        </record>
+	</data>
+</openerp>
