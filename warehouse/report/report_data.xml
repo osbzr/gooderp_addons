@@ -33,7 +33,7 @@
             <field name='inherit_id' ref='warehouse.wh_in_form'/>
                 <field name='arch' type='xml'>
                 	<button name='cancel_approved_order' position='after'>
-                		<button name='%(warehouse.report_wh_in)d' type='action' string='打印' class='oe_highlight' states='done' />
+                		<button name='%(warehouse.report_wh_in)d' type='action' string='打印' class='oe_highlight'/>
                 	</button>
                 </field>
         </record>
@@ -51,7 +51,7 @@
             <field name='inherit_id' ref='warehouse.wh_internal_form'/>
                 <field name='arch' type='xml'>
                 	<button name='cancel_approved_order' position='after'>
-                		<button name='%(warehouse.report_wh_internal)d' type='action' string='打印' class='oe_highlight' states='done' />
+                		<button name='%(warehouse.report_wh_internal)d' type='action' string='打印' class='oe_highlight'/>
                 	</button>
                 </field>
         </record>
@@ -69,7 +69,7 @@
             <field name='inherit_id' ref='warehouse.wh_inventory_form'/>
                 <field name='arch' type='xml'>
                 	<button name='requery_inventory' position='after'>
-                		<button name='%(warehouse.report_wh_inventory)d' type='action' string='打印' class='oe_highlight' states='done' />
+                		<button name='%(warehouse.report_wh_inventory)d' type='action' string='打印' class='oe_highlight'/>
                 	</button>
                 </field>
         </record>
@@ -87,7 +87,7 @@
             <field name='inherit_id' ref='warehouse.wh_assembly_form'/>
                 <field name='arch' type='xml'>
                 	<button name='update_bom' position='after'>
-                		<button name='%(warehouse.report_wh_assembly)d' type='action' string='打印' class='oe_highlight' states='done' />
+                		<button name='%(warehouse.report_wh_assembly)d' type='action' string='打印' class='oe_highlight'/>
                 	</button>
                 </field>
         </record>
@@ -105,7 +105,7 @@
             <field name='inherit_id' ref='warehouse.wh_disassembly_form'/>
                 <field name='arch' type='xml'>
                 	<button name='update_bom' position='after'>
-                		<button name='%(warehouse.report_wh_disassembly)d' type='action' string='打印' class='oe_highlight' states='done' />
+                		<button name='%(warehouse.report_wh_disassembly)d' type='action' string='打印' class='oe_highlight'/>
                 	</button>
                 </field>
         </record>
