@@ -13,8 +13,9 @@
 	                	</group>
                         <footer>
                             <button name="button_checkout" type="object" string="结账" class="oe_highlight"/>
-                            or
-                            <button name="button_counter_checkout" type="object" string="反结账" class="oe_highlight"/>
+                            _
+                            <button name="button_counter_checkout" type="object" string="反结账" 
+                                                       groups="base.group_no_one" class="oe_highlight"/>
                         </footer>
                 	</group>
                 </form>

@@ -108,22 +108,41 @@ class MonthProductCost(models.Model):
                 'current_period_remaining_cost': sum_goods_cost
                 }
 
+    def _get_cost_method(self, goods_id):
+        '''
+        批次管理的产品使用个别计价
+        先取产品的计价方式，再取公司上的计价方式
+        '''
+        goods = self.env.get('goods').browse(goods_id)
+        if goods.using_batch:
+            return 'fifo'
+        if goods.cost_method:
+            return goods.cost_method
+        else:
+            return self.env.user.company_id.cost_method
+
     @api.multi
-    def compute_balance_price(self, data_dcit):
+    def compute_balance_price(self, data_dict):
         """
 可以用其他算法计算发出成本
         """
-        if self.env.user.company_id.cost_method == 'average':
+        cost_method = self._get_cost_method(data_dict.get("goods_id"))
+        if cost_method == 'average':
             # 本月该商品的结存单价 = （上月该商品的成本余额 + 本月入库成本 ）/ (上月数量余额 + 本月入库数量)
             # 则本月发出成本 = 结存单价 * 发出数量
-            balance_price = (data_dcit.get("period_begin_cost", 0) + data_dcit.get("current_period_in_cost", 0)) / \
-                            ((data_dcit.get("period_begin_qty", 0) +
-                              data_dcit.get("current_period_in_qty", 0)) or 1)
+            balance_price = (data_dict.get("period_begin_cost", 0) + data_dict.get("current_period_in_cost", 0)) / \
+                            ((data_dict.get("period_begin_qty", 0) +
+                              data_dict.get("current_period_in_qty", 0)) or 1)
             month_cost = balance_price * \
-                data_dcit.get("current_period_out_qty", 0)
-        else:
+                data_dict.get("current_period_out_qty", 0)
+        if cost_method == 'fifo':
             # 实际成本
-            month_cost = data_dcit.get("current_period_out_cost", 0)
+            month_cost = data_dict.get("current_period_out_cost", 0)
+        if cost_method == 'std':
+            # 定额成本
+            goods = self.env.get('goods').browse(goods_id)
+            month_cost =  goods.price * \
+                data_dict.get("current_period_out_qty", 0)
         return round(month_cost, 2)
 
     @api.multi

@@ -6,6 +6,7 @@ from odoo.tools import misc
 # 成本计算方法，已实现 先入先出
 
 CORE_COST_METHOD = [('average', u'全月一次加权平均法'),
+                    ('std',u'定额成本'),
                     ('fifo', u'先进先出法'),
                     ]
 
