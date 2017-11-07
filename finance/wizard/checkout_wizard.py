@@ -37,6 +37,8 @@ class CheckoutWizard(models.TransientModel):
         ''' 月末结账：结账 按钮 '''
         for balance in self:
             if balance.period_id:
+                if balance.period_id.is_closed:
+                    raise UserError(u'本期间%s已结账' % balance.period_id.name)
                 # 调用 生成科目余额表 向导的 计算上一个会计期间方法，得到 上一个会计期间
                 last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(
                     balance.period_id)
@@ -44,6 +46,7 @@ class CheckoutWizard(models.TransientModel):
                     if not last_period.is_closed:
                         raise UserError(u'上一个会计期间%s未结账' % last_period.name)
                 if balance.period_id.is_closed:
+                    # TODO 此处重复，应去掉
                     raise UserError(u'本期间%s已结账' % balance.period_id.name)
                 else:
                     voucher_obj = self.env['voucher']

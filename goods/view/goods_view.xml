@@ -53,6 +53,7 @@
 									<group name="price_info">
 									    <field name='price'/>
 										<field name='cost' groups='goods.view_cost_groups'/>
+										<field name='cost_method' groups='goods.view_cost_groups'/>
 										<field name='supplier_id' context="{'form_view_ref': 'core.supplier_address_form'}" groups='goods.view_cost_groups'/>
 									</group>
 									<group name="warehouse_info">
