@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+from datetime import datetime,timedelta
 from odoo import api, fields, models
 
 
@@ -14,12 +14,12 @@ class Partner(models.Model):
         Date range [180 days ago, now]
         '''
         self.ensure_one()
-        date_end = datetime.datetime.today()
-        date_start = datetime.datetime.strptime(
+        date_end = datetime.today()
+        date_start = datetime.strptime(
             self.env.user.company_id.start_date, '%Y-%m-%d')
 
-        if (date_end - date_start).days > 180:
-            date_start = date_end - datetime.timedelta(days=180)
+        if (date_end - date_start).days > 365:
+            date_start = date_end - timedelta(days=365)
 
         buy_order_track_wizard_obj = self.env['buy.order.track.wizard'].create({'date_start': date_start,
                                                                                 'date_end': date_end,
