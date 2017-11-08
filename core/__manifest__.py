@@ -29,7 +29,6 @@
         'security/groups.xml',
         'security/ir.model.access.csv',
         'data/core_data.xml',
-        'data/export_data.xml',
         'views/core_view.xml',
         'views/core_templates.xml',
     ],
