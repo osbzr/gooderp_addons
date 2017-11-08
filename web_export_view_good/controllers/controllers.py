@@ -45,9 +45,10 @@ class ReportTemplate(models.Model):
     _name = "report.template"
     _description = u'报表模板'
 
-    model_id = fields.Many2one('ir.model', u'模型')
-    file_address = fields.Char(u'模板文件路径')
+    model_id = fields.Many2one('ir.model', u'模型',required=True)
+    file_address = fields.Char(u'模板文件路径',required=True)
     active = fields.Boolean(u'可用', default=True)
+    blank_rows = fields.Integer(u'空白行数',required=True)
 
     @api.model
     def get_time(self, model):
@@ -55,7 +56,8 @@ class ReportTemplate(models.Model):
         report_model = self.env['report.template'].search(
             [('model_id.model', '=', model)], limit=1)
         file_address = report_model and report_model[0].file_address or False
-        return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address)
+        blank_rows = report_model and report_model[0].blank_rows or False
+        return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address,blank_rows)
 
 
 def content_disposition(filename):
@@ -111,7 +113,8 @@ class ExcelExportView(ExcelExport, ):
             return cell
 
         previousCell = _getOutCell(outSheet, col, row)
-        outSheet.write(row, col, value)
+        if value:
+            outSheet.write(row, col, value)
         # HACK, PART II
         if previousCell:
             newCell = _getOutCell(outSheet, col, row)

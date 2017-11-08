@@ -78,11 +78,13 @@
     	<record id='export_buy_receipt_in' model='report.template'>
     		<field name='model_id' ref='buy.model_buy_receipt'/>
     		<field name='file_address'>buy/template/buy_receipt_in.xls</field>
+            <field name="blank_rows">1</field>
             <field name='active' >True</field>
     	</record>
     	<record id='export_buy_order' model='report.template'>
     		<field name='model_id' ref='buy.model_buy_order'/>
     		<field name='file_address'>buy/template/buy_order.xls</field>
+            <field name="blank_rows">1</field>
             <field name='active' >True</field>
     	</record>
     </data>
