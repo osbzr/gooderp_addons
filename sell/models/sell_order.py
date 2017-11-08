@@ -286,10 +286,10 @@ class SellOrder(models.Model):
         '''反审核销货订单'''
         if self.state == 'draft':
             raise UserError(u'请不要重复反审核！')
-        for line in self.line_ids:
-            line.quantity_out = 0
         if self.goods_state != u'未出库':
             raise UserError(u'该销货订单已经发货，不能反审核！')
+        for line in self.line_ids:
+            line.quantity_out = 0
         # 查找产生的发货单并删除
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.name)])
