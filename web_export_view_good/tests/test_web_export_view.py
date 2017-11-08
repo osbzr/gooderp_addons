@@ -18,12 +18,14 @@ class TestWebExportViewTwo(TransactionCase):
                 u'model': u'partner',
                 u'rows': [[u'\u5ba2\u6237\u7c7b\u522b', u'\u7f16\u53f7', u'\u540d\u79f0', u'\u5e94\u6536\u4f59\u989d'],
                           [u'\u4e00\u7ea7\u5ba2\u6237', u'jd', u'\u4eac\u4e1c', 0], [u'\u5408\u8ba1', u' ', u' ', 0], [u'\u64cd\u4f5c\u4eba', u'admin', u'\u64cd\u4f5c\u65f6\u95f4', u'2016-05-05']],
-                u'file_address': "%s%s" % (os.path.split(os.path.realpath(__file__))[0], "/hello.xls")}
+                u'file_address': "%s%s" % (os.path.split(os.path.realpath(__file__))[0], "/hello.xls"),
+                u'blank_rows':1}
         a = ExcelExportView()
         a.from_data_excel(data.get('headers'), [
                           data.get("rows"), data.get("file_address")])
         data.update({u'rows': [[u'\u5ba2\u6237\u7c7b\u522b', u'\u7f16\u53f7', u'\u540d\u79f0', u'\u5e94\u6536\u4f59\u989d']],
-                     u'file_address': "%s%s" % (os.path.split(os.path.realpath(__file__))[0], "/None.xls")})
+                     u'file_address': "%s%s" % (os.path.split(os.path.realpath(__file__))[0], "/None.xls"),
+                     u'blank_rows':1})
         a.from_data_excel(data.get('headers'), [
                           data.get("rows"), data.get("file_address")])
         data_two = {"model": "res.users", "headers": [u"用户", " ", " ", " "],
@@ -32,7 +34,8 @@ class TestWebExportViewTwo(TransactionCase):
                                  u"Chinese (CN) / 简体中文", u"2016年05月09日"],
                              ["Demo User", "demo", u"Chinese (CN) / 简体中文", ""],
                              [u"操作人", "admin", u"操作时间", "2016-05-09"]],
-                    "file_address": ''}
+                    "file_address": '',
+                    "blank_rows":1}
         a.from_data_excel(data_two.get('headers'), [data_two.get("rows"), ''])
 
 
@@ -40,7 +43,7 @@ class TestReportTemplate(TransactionCase):
 
     def test_compute_model_name(self):
         template = self.env['report.template'].create(
-            {'active': True, 'file_address': u'dqjioie'})
+            {'active': True, 'file_address': u'dqjioie', 'blank_rows':1})
         template.get_time('res.partner')
 
 
