@@ -43,7 +43,7 @@ class TestReportTemplate(TransactionCase):
 
     def test_compute_model_name(self):
         template = self.env['report.template'].create(
-            {'active': True, 'model_id':'partner','file_address': u'dqjioie', 'blank_rows':1})
+            {'active': True, 'model_id': self.env.ref('base.model_res_users').id, 'file_address': u'/hello.xls', 'blank_rows':1})
         template.get_time('res.partner')
 
 

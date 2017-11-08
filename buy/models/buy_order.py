@@ -319,8 +319,6 @@ class BuyOrder(models.Model):
             raise UserError(u'请不要重复反审核！')
         if self.goods_state != u'未入库':
             raise UserError(u'该购货订单已经收货，不能反审核！')
-        for line in self.line_ids:
-            line.quantity_in = 0
         # 查找产生的入库单并删除
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.name)])
