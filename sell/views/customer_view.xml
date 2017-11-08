@@ -8,7 +8,7 @@
 			<xpath expr='//div' position='before'>
 				<div class="oe_button_box" name="button_box">
 					<button type="object"
-							string="购货记录"
+							string="购货记录(最近1年)"
 							name="action_view_sell_history"
 							class="oe_stat_button"
 							icon="fa-list-alt">

@@ -34,6 +34,7 @@
         'security/groups.xml',
         'view/goods_view.xml',
         'view/goods_class_view.xml',
+        'view/goods_data.xml',
         'action/goods_action.xml',
         'menu/goods_menu.xml',
         'security/ir.model.access.csv',

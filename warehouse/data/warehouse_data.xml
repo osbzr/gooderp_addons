@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data noupdate='1'>
+        <record id='warehouse_in_export' model='ir.exports'>
+            <field name='name'>其他入库仓库</field>
+            <field name="resource">wh.in</field>
+            <field name="export_fields" eval="[(5, 0, 0),
+                                             (0, 0, {'name': 'is_init'}),
+                                             (0, 0, {'name': 'finance_category_id'}),
+                                             (0, 0, {'name': 'warehouse_dest_id'}),
+                                             (0, 0, {'name': 'date'}),
+                                             (0, 0, {'name': 'user_id'}),
+                                             ]"/>
+        </record>
+
         <record id='warehouse_supplier' model='warehouse'>
             <field name='name'>供应商仓库</field>
             <field name='code'>Supplier</field>
