@@ -20,5 +20,6 @@
         'views/staff.xml',
         'views/leave.xml',
         'data/mail_data.xml',
+        'data/export_data.xml',
     ],
 }

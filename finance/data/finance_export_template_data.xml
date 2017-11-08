@@ -4,12 +4,14 @@
         <record id="template_balance_sheet" model="report.template">
             <field name="model_id"  ref="finance.model_balance_sheet" />
             <field name="file_address">finance/xls/balance_sheet.xls</field>
+            <field name="blank_rows">1</field>
             <field name="active">True</field>
         </record>
 
         <record id="template_profit_statement" model="report.template">
             <field name="model_id"  ref="finance.model_profit_statement"/>
             <field name="file_address">finance/xls/profit.xls</field>
+            <field name="blank_rows">1</field>
             <field name="active">True</field>
         </record>
     </data>

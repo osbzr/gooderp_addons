@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 员工导出默认字段 -->
+        <record id='staff_export' model="ir.exports">
+            <field name="name">员工</field>
+            <field name="resource">staff</field>
+            <field name="export_fields" eval="[(5, 0, 0),
+                                             (0, 0, {'name': 'user_id'}),
+                                             (0, 0, {'name': 'company_id'}),
+                                             (0, 0, {'name': 'work_email'}),
+                                             (0, 0, {'name': 'work_phone'}),
+                                             (0, 0, {'name': 'identification_id'}),
+                                             (0, 0, {'name': 'bank_name'}),
+                                             (0, 0, {'name': 'bank_num'}),
+                                             (0, 0, {'name': 'gender'}),
+                                             (0, 0, {'name': 'marital'})
+                                             ]"/>
+        </record>
+    </data>
+</openerp>

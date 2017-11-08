@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 商品导出默认字段 -->
+        <record id='goods_export' model="ir.exports">
+            <field name="name">商品</field>
+            <field name="resource">goods</field>
+            <field name="export_fields" eval="[(5, 0, 0),
+                                             (0, 0, {'name': 'code'}),
+                                             (0, 0, {'name': 'name'}),
+                                             (0, 0, {'name': 'brand'}),
+                                             (0, 0, {'name': 'category_id'}),
+                                             (0, 0, {'name': 'uom_id'}),
+                                             (0, 0, {'name': 'cost'}),
+                                             (0, 0, {'name': 'goods_class_id'}),
+                                             (0, 0, {'name': 'barcode'}),
+                                             (0, 0, {'name': 'price'}),
+                                             (0, 0, {'name': 'using_batch'}),
+                                             (0, 0, {'name': 'supplier_id'})
+                                             ]"/>
+        </record>
+    </data>
+</openerp>

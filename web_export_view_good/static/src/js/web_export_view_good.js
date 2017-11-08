@@ -136,8 +136,11 @@ function button_export_action () {
                     }
                     export_rows.splice(0, 0, newArray);
                 }
-                export_rows.splice(0, 0, []);
+                for(var i=0;i<data[2];i++){
+                    export_rows.splice(i, 0, []);
+                }
                 header[0] =  view.name
+
                 $.blockUI();
                 view.session.get_file({
 				                url: '/web/export/export_xls_view',

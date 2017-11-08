@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="1">
+        <!-- 客户导出默认添加字段 -->
+        <record id='customer_export' model="ir.exports">
+            <field name="name">客户</field>
+            <field name="resource">partner</field>
+            <field name="export_fields" eval="[(5, 0, 0),
+                                             (0, 0, {'name': 'name'}),
+                                             (0, 0, {'name': 'main_mobile'}),
+                                             (0, 0, {'name': 'c_category_id'}),
+                                             (0, 0, {'name': 's_category_id'}),
+                                             (0, 0, {'name': 'main_address'}),
+                                             (0, 0, {'name': 'main_contact'}),
+                                             (0, 0, {'name': 'address'}),
+                                             (0, 0, {'name': 'tax_num'}),
+                                             (0, 0, {'name': 'receivable_init'}),
+                                             ]"/>
+        </record>
+
+		<!-- 供应商导出默认添加字段 -->
+		<record id='supplier_export' model="ir.exports">
+            <field name="name">供应商</field>
+            <field name="resource">partner</field>
+            <field name="export_fields" eval="[(5, 0, 0),
+                                             (0, 0, {'name': 'name'}),
+                                             (0, 0, {'name': 'main_mobile'}),
+                                             (0, 0, {'name': 'c_category_id'}),
+                                             (0, 0, {'name': 's_category_id'}),
+                                             (0, 0, {'name': 'main_address'}),
+                                             (0, 0, {'name': 'bank_name'}),
+                                             (0, 0, {'name': 'bank_num'}),
+                                             (0, 0, {'name': 'payable_init'})
+                                             ]"/>
+        </record>
+	</data>
+</openerp>
