@@ -90,11 +90,9 @@
             <field name="model">voucher</field>
             <field name="arch" type="xml">
                 <tree string="会计凭证" colors='blue:state == "draft";lightgray:state == "cancel"'>
-                    <field name="document_word_id"/>
-                    <field name="date"/>
-                    <field name="name"/>
-                    <field name="att_count"/>
                     <field name="period_id"/>
+                    <field name="name"/>
+                    <field name="date"/>
                     <field name="amount_text" widget="bgcolor" bgcolor="info" bgsize="4"/>
                     <field name="line_ids" widget="relation_sublist" options="{'field': 'name'}"
                            groups = 'finance.view_detail' string='凭证摘要'/>

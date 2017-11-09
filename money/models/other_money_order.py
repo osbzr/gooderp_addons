@@ -209,8 +209,8 @@ class OtherMoneyOrder(models.Model):
         if self.is_init:
             vouch_obj = self.env['voucher'].search([('is_init', '=', True)])
             if not vouch_obj:
-                vouch_obj = self.env['voucher'].create({'date': self.date})
-            vouch_obj.is_init = True
+                vouch_obj = self.env['voucher'].create({'date': self.date,
+                                                        'is_init': True})
         else:
             vouch_obj = self.env['voucher'].create({'date': self.date})
         if self.is_init:
