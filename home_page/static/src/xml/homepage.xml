@@ -6,7 +6,7 @@
                     <div class='row-fluid'>
                         <div class='span12 feature-bg text-center'>
                                 <a>
-                                <h1>数据统计</h1></a>
+                                <h1>关键指标</h1></a>
                         </div>
                     </div>
             </div>
@@ -16,7 +16,7 @@
         <div class='main_div'>
             <div class='row-fluid'>
                 <div class='span12 feature-bg text-center'>
-                    <a><h1>业务总览</h1></a>
+                    <a><h1>主要功能</h1></a>
                  </div>
             </div>
 
@@ -26,7 +26,7 @@
         <div class='container right_div'  >
             <div class='row-fluid'>
                 <div class='span12 feature-bg text-center '>
-                    <a><h1>实时报表</h1></a>
+                    <a><h1>常用报表</h1></a>
                 </div>
             </div>
          </div>

@@ -6,7 +6,7 @@
 		    <field name="name" >采购</field>
 		</record>
         <record id="amount_summary_buy_receipt_action" model="home.page">
-        	<field name="sequence">12</field>
+			<field name="sequence">8</field>
 		    <field name="action" ref="buy.buy_receipt_action"/>
 		    <field name="menu_type">amount_summary</field>
 		    <field name="domain" >[('is_return','=',False),('state','=','done')]</field>
@@ -16,7 +16,7 @@
 		</record>
 
         <record id="buy_order_track_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">28</field>
 		    <field name="action" ref="buy.buy_order_track_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_2"/>
@@ -24,28 +24,28 @@
 		</record>
 
         <record id="buy_order_detail_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">29</field>
 		    <field name="action" ref="buy.buy_order_detail_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_2"/>
 		    <field name="note_one" >采购明细表</field>
 		</record>
         <record id="buy_summary_goods_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">30</field>
 		    <field name="action" ref="buy.buy_summary_goods_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_2"/>
 		    <field name="note_one" >采购汇总表（按商品）</field>
 		</record>
         <record id="buy_summary_partner_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">31</field>
 		    <field name="action" ref="buy.buy_summary_partner_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_2"/>
 		    <field name="note_one" >采购汇总表（按供应商）</field>
 		</record>
          <record id="buy_payment_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">27</field>
 		    <field name="action" ref="buy.buy_payment_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_2"/>
@@ -53,20 +53,20 @@
 		</record>
 
 		<record id="supplier_statements_report_wizard_action_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">34</field>
 		    <field name="action" ref="supplier_statements_report_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="money.home_report_type_3"/>
 		    <field name="note_one" >供应商对账单向导</field>
 		</record>
 		<record id="all_business_buy_receipt_action" model="home.page">
-        	<field name="sequence">13</field>
+        	<field name="sequence">16</field>
 		    <field name="action" ref="buy.buy_receipt_action"/>
 		    <field name="view_id" ref="buy.buy_receipt_tree"/>
 		    <field name="menu_type">all_business</field>
 		    <field name="domain" >[('is_return','=',False)]</field>
 		    <field name="context" >{'is_return':False, 'warehouse_type': 'supplier'}</field>
-		    <field name="note_one" >采购入库</field>
+		    <field name="note_one" >采购入库单</field>
 		</record>
 	</data>
 </openerp>

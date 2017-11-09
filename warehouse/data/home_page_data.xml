@@ -6,7 +6,7 @@
 		    <field name="name" >仓库</field>
 		</record>
         <record id="report_stock_transceive_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">36</field>
 		    <field name="action" ref="report_stock_transceive_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_ware_house"/>

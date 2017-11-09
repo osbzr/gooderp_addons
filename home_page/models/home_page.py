@@ -22,22 +22,22 @@ class HomePage(models.Model):
     _description = u"本模块就是一些常用操作的集合,也是小量级各方数据显示的平台！"
     _order = "sequence"
 
-    sequence = fields.Integer(u'序列', help=u'用来确定 每条记录在首页中的显示的顺序(而不仅仅是记录的顺序)')
-    action = fields.Many2one('ir.actions.act_window', string=u'快捷页面', required='1', help=u'设置首页点击事假,\
-                                                                                         的跳转的对应的模型的action')
-    menu_type = fields.Selection([(u'all_business', u'业务总览'), (u'amount_summary', u'金额汇总'), (u'report', u'实时报表')],
+    sequence = fields.Integer(u'序号', help=u'用来确定 每条记录在首页中的显示的顺序(而不仅仅是记录的顺序)')
+    action = fields.Many2one('ir.actions.act_window', string=u'动作', required='1', help=u'设置首页点击事件,\
+                                                                                         跳转对应的模型action')
+    menu_type = fields.Selection([(u'all_business', u'主要功能'), (u'amount_summary', u'关键指标'), (u'report', u'常用报表')],
                                  string=u'类型', required="1", help=u'选定本条记录的类型,本字段会决定本条记录属于那一块')
-    domain = fields.Char(u'页面的过滤', default='[]',
+    domain = fields.Char(u'过滤', default='[]',
                          help=u'字符串条件,用来过滤出您所选的视图中的数据!')
-    note_one = fields.Char(u'第一个显示名称', help=u'在首页中的相应的文字显示内容')
-    compute_field_one = fields.Many2one('ir.model.fields', string=u'需要计算的字段', help=u'在首页中有用于数字显示的元素的,\
+    note_one = fields.Char(u'名称', help=u'在首页中的相应的文字显示内容')
+    compute_field_one = fields.Many2one('ir.model.fields', string=u'计算字段', help=u'在首页中有用于数字显示的元素的,\
                                                             仅适合小量数据的计算数字对应的视图或模型中的字段!')
-    compute_type = fields.Selection([(u'sum', u'sum'), (u'average', u'average')], default="sum", string=u"计算类型",
+    compute_type = fields.Selection([(u'sum', u'sum'), (u'average', u'average')], default="sum", string=u"计算方式",
                                     help=u'对于所选的计算字段的计算方式!注:目前只支持sum')
-    context = fields.Char(u'动作的上下文', help=u'对应跳转视图传进去的参数!')
+    context = fields.Char(u'上下文', help=u'对应跳转视图传进去的参数!')
     is_active = fields.Boolean(
-        u'是否可用', default=True, help=u'为了方便调试,首页美观性,或临时性替换首页元素!')
-    report_type_id = fields.Many2one('home.report.type', string='报表类别', help=u'类型为 实时报表时 要选择报表类别,\
+        u'可用', default=True, help=u'为了方便调试,首页美观性,或临时性替换首页元素!')
+    report_type_id = fields.Many2one('home.report.type', string='报表类别', help=u'类型为 常用报表时 要选择报表类别,\
                                     可以对不同类型的报表进行分组!')
     group_ids = fields.Many2many(
         'res.groups', 'home_page_group_rel', 'home_page_id', 'group_id', string='用户组')
