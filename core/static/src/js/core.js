@@ -117,25 +117,7 @@ odoo.define('core.core', function (require) {
             this._super.apply(this, arguments);
         },
     });
-    /**2016-11-15 开阖静静(gilbert@osbzr.com)
-    *在页面的 表头部分 添加公司图标 及公司名称
-     */
-    UserMenu.include({
-          do_update: function () {
-            var self =this;
-            this._super.apply(this, arguments);
-            var $company_avatar = this.$('.oe_top_company_bar_avatar');
-            if (!session.uid) {
-                $company_avatar.attr('src', $company_avatar.data('default-src'));
-                return $.when();
-            }
-            new Model("res.company").call("read", [session.company_id]).then(function(data) {
-                self.$('.oe_topbar_company_name').text(data[0]['display_name']);
-            })
-            var company_avatar_src = session.url('/web/image', {model:'res.company', field: 'logo', id:session.company_id});
-            $company_avatar.attr('src', company_avatar_src);
-        },
-    });
+
     /**
      * 2016-11-15 开阖静静(gilbert@osbzr.com)
      * 把设置默认值的的按钮菜单 放到form菜单的更多里面。
