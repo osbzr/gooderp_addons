@@ -231,6 +231,8 @@
 							<group>
 								<field name="c_category_id" required="1"/>
 								<field name="s_category_id"/>
+								<field name="bank_name"/>
+								<field name="bank_num"/>
 								<field name="receivable"/>
 								<field name="tax_rate"/>
 								<field name="tag_ids" widget="many2many_tags"/>

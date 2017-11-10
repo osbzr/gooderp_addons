@@ -29,19 +29,28 @@
             <field name="arch" type="xml">
                 <form string="首页设置">
                     <group>
-                        <field name="sequence" invisible="1"/>
-                        <field name="action" attrs="{'required':[('menu_type','=','all_business')]}"/>
-                        <!--<field name="view_id" domain="[('type', '=', 'tree')]"/> #TODO 这个字段发现没有意义暂时取消 试用一段时间-->
-                        <field name="menu_type" required='1'/>
-                        <field name="report_type_id" attrs="{'invisible':[('menu_type','!=','report')],'required':[('menu_type','=','report')]}"
-                        widget="selection"/>
-                        <field name="domain" atts="{'required':[('menu_type','in',('all_business','amount_summary')]}"/>
-                        <field name="compute_field_one" attrs="{'required':[('menu_type','=','top')]}"/>
-                        <field name="note_one" attrs="{'required':[('menu_type','=','main')]}"/>
-                        <field name="compute_type" /> 
-                        <field name="context" attrs="{'required':[('menu_type','in',('top','left'))]}"/>
-                         <field name="group_ids"  widget="many2many_tags" />
-                        <field name="is_active"/>
+                        <group>
+                            <field name="note_one" attrs="{'required':[('menu_type','=','main')]}"/>
+                            <field name="compute_field_one" attrs="{'required':[('menu_type','=','top')]}"/>
+                            <field name="compute_type" />
+                        </group>
+                        <group>
+                            <field name="menu_type" required='1'/>
+                            <field name="report_type_id" attrs="{'invisible':[('menu_type','!=','report')],'required':[('menu_type','=','report')]}"
+                                widget="selection"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="action" attrs="{'required':[('menu_type','=','all_business')]}"/>
+                            <field name="domain" atts="{'required':[('menu_type','in',('all_business','amount_summary')]}"/>
+                            <field name="context" attrs="{'required':[('menu_type','in',('top','left'))]}"/>
+                        </group>
+                        <group>
+                            <field name="group_ids"  widget="many2many_tags" />
+                            <field name="is_active"/>
+                        </group>
                     </group>
                 </form>
             </field>

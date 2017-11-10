@@ -206,8 +206,8 @@ class WhIn(models.Model):
         if self.is_init:
             vouch_id = self.env['voucher'].search([('is_init', '=', True)])
             if not vouch_id:
-                vouch_id = self.env['voucher'].create({'date': self.date})
-                vouch_id.is_init = True
+                vouch_id = self.env['voucher'].create({'date': self.date,
+                                                       'is_init': True})
         else:
             vouch_id = self.env['voucher'].create({'date': self.date})
         self.voucher_id = vouch_id

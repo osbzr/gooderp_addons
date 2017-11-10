@@ -67,9 +67,9 @@ class MoneyInvoice(models.Model):
                     [('is_init', '=', True)])
                 if not vouch_obj:
                     vouch_obj = self.env['voucher'].create(
-                        {'date': invoice.date})
+                        {'date': invoice.date,
+                         'is_init': True})
                 invoice.write({'voucher_id': vouch_obj.id})
-                vouch_obj.is_init = True
             else:
                 vouch_obj = self.env['voucher'].create({'date': invoice.date})
                 invoice.write({'voucher_id': vouch_obj.id})

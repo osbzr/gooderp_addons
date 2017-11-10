@@ -94,15 +94,14 @@ class Voucher(models.Model):
         :return: 主要是把 凭证的 state改变
         """
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'凭证%s已经审核,请不要重复审核！' % self.name)
         if self.period_id.is_closed:
             raise UserError(u'该会计期间已结账！不能审核')
         if not self.line_ids:
             raise ValidationError(u'请输入凭证行')
         for line in self.line_ids:
             if line.debit + line.credit == 0:
-                raise ValidationError(u'单行凭证行 %s 借和贷不能同时为0\n 借方金额为: %s 贷方金额为:%s' % (
-                    line.account_id.name, line.debit, line.credit))
+                raise ValidationError(u'单行凭证行 %s 借和贷不能同时为0' % line.account_id.name)
             if line.debit * line.credit != 0:
                 raise ValidationError(u'单行凭证行不能同时输入借和贷\n 摘要为%s的凭证行 借方为:%s 贷方为:%s' %
                                       (line.name, line.debit, line.credit))
@@ -112,7 +111,7 @@ class Voucher(models.Model):
         debit_sum = round(debit_sum, precision)
         credit_sum = round(credit_sum, precision)
         if debit_sum != credit_sum:
-            raise ValidationError(u'借贷方不平!\n 借方合计:%s 贷方合计:%s' %
+            raise ValidationError(u'借贷方不平，无法审核!\n 借方合计:%s 贷方合计:%s' %
                                   (debit_sum, credit_sum))
 
         self.state = 'done'

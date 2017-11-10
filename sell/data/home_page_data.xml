@@ -6,7 +6,7 @@
 		    <field name="name" >销货</field>
 		</record>
         <record id="amount_summary_sell_delivery_action" model="home.page">
-        	<field name="sequence">13</field>
+			<field name="sequence">7</field>
 		    <field name="action" ref="sell.sell_delivery_action"/>
 		    <field name="menu_type">amount_summary</field>
 		    <field name="domain" >[('is_return','=',False),('state','=','done')]</field>
@@ -16,7 +16,7 @@
 		</record>
 
         <record id="sell_order_track_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">23</field>
 		    <field name="action" ref="sell.sell_order_track_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_1"/>
@@ -24,7 +24,7 @@
 		</record>
 
         <record id="sell_order_detail_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">24</field>
 		    <field name="action" ref="sell.sell_order_detail_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_1"/>
@@ -32,21 +32,21 @@
 		</record>
 
         <record id="sell_summary_goods_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">25</field>
 		    <field name="action" ref="sell.sell_summary_goods_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_1"/>
 		    <field name="note_one" >销售汇总表（按商品）</field>
 		</record>
         <record id="sell_top_ten_wizard_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">26</field>
 		    <field name="action" ref="sell.sell_top_ten_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_1"/>
 		    <field name="note_one" >销量前十商品</field>
 		</record>
 		<record id="all_business_sell_delivery_action" model="home.page">
-        	<field name="sequence">13</field>
+        	<field name="sequence">17</field>
 		    <field name="action" ref="sell.sell_delivery_action"/>
 		    <field name="view_id" ref="sell.sell_delivery_tree"/>
 		    <field name="menu_type">all_business</field>
@@ -55,7 +55,7 @@
 		    <field name="note_one" >销售发货单</field>
 		</record>
 		<record id="customer_statements_report_wizard_action_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">35</field>
 		    <field name="action" ref="customer_statements_report_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="money.home_report_type_3"/>

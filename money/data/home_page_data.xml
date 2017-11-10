@@ -7,7 +7,7 @@
 		</record>
 
         <record id="report_other_money_statements_action_report2" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">32</field>
 		    <field name="action" ref="other_money_statements_report_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_3"/>
@@ -15,7 +15,7 @@
 		</record>
 
 		<record id="bank_statements_report_wizard_action_action_report" model="home.page">
-			<field name="sequence">14</field>
+			<field name="sequence">33</field>
 		    <field name="action" ref="bank_statements_report_wizard_action"/>
 		    <field name="menu_type">report</field>
 			<field name="report_type_id" ref="home_report_type_3"/>
@@ -23,7 +23,7 @@
 		</record>
 
         <record id="amount_summary_bank_account_action" model="home.page">
-        	<field name="sequence">1</field>
+			<field name="sequence">5</field>
             <field name="action" ref="core.bank_account_action"/>
             <field name="menu_type">amount_summary</field>
             <field name="note_one">账户余额</field>
@@ -33,7 +33,7 @@
         </record>
 
         <record id="home_page_amount_summary_customer_action" model="home.page">
-        	<field name="sequence">1</field>
+			<field name="sequence">1</field>
             <field name="action" ref="core.customer_action"/>
             <field name="menu_type">amount_summary</field>
             <field name="note_one">应收余额</field>
@@ -43,7 +43,7 @@
         </record>
 
 		<record id="home_page_amount_summary_customer_over" model="home.page">
-        	<field name="sequence">1</field>
+			<field name="sequence">2</field>
             <field name="action" ref="money.money_invoice_action"/>
             <field name="menu_type">amount_summary</field>
             <field name="note_one">逾期应收</field>
@@ -53,7 +53,7 @@
         </record>
 
         <record id="home_page_amount_summary_vendor_action" model="home.page">
-        	<field name="sequence">1</field>
+			<field name="sequence">3</field>
             <field name="action" ref="core.vendor_action"/>
             <field name="menu_type">amount_summary</field>
             <field name="note_one">应付余额</field>
@@ -63,7 +63,7 @@
         </record>
 
         <record id="home_page_amount_summary_vendor_over" model="home.page">
-        	<field name="sequence">1</field>
+			<field name="sequence">4</field>
             <field name="action" ref="money.money_invoice_action"/>
             <field name="menu_type">amount_summary</field>
             <field name="note_one">逾期应付</field>
@@ -73,7 +73,7 @@
         </record>
 
 		<record id="all_business_money_receipt_action" model="home.page">
-        	<field name="sequence">1</field>
+        	<field name="sequence">9</field>
 		    <field name="action" ref="money.money_receipt_action"/>
 		    <field name="menu_type">all_business</field>
 		    <field name="domain" >[('type','=','get')]</field>
@@ -82,7 +82,7 @@
 		</record>
 
 		<record id="all_business_money_payment_action" model="home.page">
-        	<field name="sequence">2</field>
+        	<field name="sequence">10</field>
 		    <field name="action" ref="money.money_payment_action"/>
 		    <field name="menu_type">all_business</field>
 		    <field name="domain" >[('type','=','pay'),('state','=','done')]</field>
@@ -91,14 +91,14 @@
 		</record>
 
 		<record id="home_page_money_transfer_order_action" model="home.page">
-        	<field name="sequence">3</field>
+        	<field name="sequence">11</field>
 		    <field name="action" ref="money.money_transfer_order_action"/>
 		    <field name="menu_type">all_business</field>
 		    <field name="note_one" >转账单</field>
 		</record>
 
 		<record id="home_page_other_money_receipt_action" model="home.page">
-        	<field name="sequence">5</field>
+        	<field name="sequence">13</field>
 		    <field name="action" ref="money.other_money_receipt_action"/>
 		    <field name="menu_type">all_business</field>
 			<field  name='context'>{'type':'other_get'}</field>
@@ -107,7 +107,7 @@
 		</record>
 
 		<record id="home_page_other_money_payment_action" model="home.page">
-        	<field name="sequence">6</field>
+        	<field name="sequence">14</field>
 		    <field name="action" ref="money.other_money_receipt_action"/>
 		    <field name="menu_type">all_business</field>
 			<field  name='context'>{'type':'other_pay'}</field>
@@ -116,7 +116,7 @@
 		</record>
 
 		<record id="home_page_reconcile_action" model="home.page">
-        	<field name="sequence">4</field>
+        	<field name="sequence">12</field>
 		    <field name="action" ref="money.reconcile_action"/>
 		    <field name="menu_type">all_business</field>
 		    <field name="note_one" >核销单</field>

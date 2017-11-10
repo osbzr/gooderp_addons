@@ -1,7 +1,7 @@
 <openerp>
 	<data noupdate='1'>
         <record id="all_business_amount_summary_task" model="home.page">
-        	<field name="sequence">13</field>
+        	<field name="sequence">15</field>
 		    <field name="action" ref="task.action_task"/>
 		    <field name="menu_type">all_business</field>
 		    <field name="domain" >[]</field>
