@@ -25,5 +25,5 @@
         'views/assets.xml',
         'views/web.xml',
     ],
-    'auto_install': True,
+    'auto_install': False,
 }
