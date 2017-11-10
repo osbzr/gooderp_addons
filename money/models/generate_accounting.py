@@ -68,10 +68,11 @@ class MoneyInvoice(models.Model):
                 if not vouch_obj:
                     vouch_obj = self.env['voucher'].create(
                         {'date': invoice.date,
-                         'is_init': True})
+                         'is_init': True,
+                         'ref': '%s,%s' % (self._name, self.id)})
                 invoice.write({'voucher_id': vouch_obj.id})
             else:
-                vouch_obj = self.env['voucher'].create({'date': invoice.date})
+                vouch_obj = self.env['voucher'].create({'date': invoice.date, 'ref': '%s,%s' % (self._name, self.id)})
                 invoice.write({'voucher_id': vouch_obj.id})
             if not invoice.category_id.account_id:
                 raise UserError(u'请配置%s的会计科目' % (invoice.category_id.name))

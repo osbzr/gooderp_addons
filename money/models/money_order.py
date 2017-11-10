@@ -428,7 +428,7 @@ class MoneyOrder(models.Model):
         :param name: 收款单名称
         :return: 创建的凭证
         """
-        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         # self.write({'voucher_id': vouch_obj.id})
         amount_all = 0.0
         line_data = False
@@ -488,7 +488,7 @@ class MoneyOrder(models.Model):
         :param name: 付款单名称
         :return: 创建的凭证
         """
-        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         # self.write({'voucher_id': vouch_obj.id})
 
         amount_all = 0.0

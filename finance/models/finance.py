@@ -52,6 +52,13 @@ class Voucher(models.Model):
             create_date = now_date
         return create_date
 
+    @api.model
+    def _select_objects(self):
+        records = self.env['business.data.table'].search([])
+        models = self.env['ir.model'].search(
+            [('model', 'in', [record.name for record in records])])
+        return [(model.model, model.name) for model in models]
+
     @api.one
     @api.depends('date')
     def _compute_period_id(self):
@@ -86,6 +93,8 @@ class Voucher(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    ref = fields.Reference(string=u'前置单据',
+                           selection='_select_objects')
 
     @api.one
     def voucher_done(self):
@@ -128,11 +137,18 @@ class Voucher(models.Model):
                 line.debit = 0
 
     @api.one
+    def voucher_can_be_draft(self):
+        if self.ref:
+            raise UserError(u'不能反审核由其他单据生成的凭证！')
+        self.voucher_draft()
+
+    @api.one
     def voucher_draft(self):
         if self.state == 'draft':
             raise UserError(u'凭证%s已经反审核,请不要重复反审核！' % self.name)
         if self.period_id.is_closed:
             raise UserError(u'%s期 会计期间已结账！不能反审核' % self.period_id.name)
+
         self.state = 'draft'
 
     @api.one
