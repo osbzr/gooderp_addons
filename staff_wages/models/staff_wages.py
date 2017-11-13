@@ -195,7 +195,7 @@ class StaffWages(models.Model):
         :return:
         """
         self.ensure_one()
-        vouch_obj = self.env['voucher'].create({'date': date})
+        vouch_obj = self.env['voucher'].create({'date': date, 'ref': '%s,%s' % (self._name, self.id)})
         credit_account = self.env.ref('staff_wages.staff_wages')
         res = {}
         for line in self.line_ids:

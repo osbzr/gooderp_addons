@@ -218,7 +218,7 @@ class Asset(models.Model):
     def _construction_generate_voucher(self):
         ''' 贷方科目选择在建工程，直接生成凭证 '''
         vals = {}
-        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         self.write({'voucher_id': vouch_obj.id})
         vals.update({'vouch_obj_id': vouch_obj.id, 'name': self.name, 'string': u'固定资产',
                      'amount': self.amount, 'credit_account_id': self.account_credit.id,
@@ -347,7 +347,7 @@ class CreateCleanWizard(models.TransientModel):
     @api.one
     def _generate_voucher(self, Asset):
         ''' 生成凭证，并审核 '''
-        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
         depreciation = Asset.depreciation_previous + depreciation2
         income = Asset.cost - depreciation

@@ -159,7 +159,7 @@ class MoneyTransferOrder(models.Model):
     @api.multi
     def create_voucher(self):
         """创建凭证并审核"""
-        vouch_obj = self.env['voucher'].create({'date': self.date})
+        vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         vals = {}
         for line in self.line_ids:
             out_currency_id = line.out_bank_id.account_id.currency_id.id or self.env.user.company_id.currency_id.id

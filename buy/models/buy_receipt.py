@@ -345,7 +345,7 @@ class BuyReceipt(models.Model):
         采购退货单生成的金额为负
         '''
         self.ensure_one()
-        vouch_id = self.env['voucher'].create({'date': self.date})
+        vouch_id = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
 
         sum_amount = 0
         if not self.is_return:

@@ -351,7 +351,7 @@ class SellDelivery(models.Model):
         退货单生成的金额为负
         '''
         self.ensure_one()
-        voucher = self.env['voucher'].create({'date': self.date})
+        voucher = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
 
         sum_amount = 0
         line_ids = self.is_return and self.line_in_ids or self.line_out_ids

@@ -87,7 +87,7 @@ class WhOut(models.Model):
         借：如果出库类型为盘亏，取科目 1901 待处理财产损益；如果为其他，取核算类别的会计科目
         贷：库存商品（商品分类上会计科目）
         '''
-        voucher = self.env['voucher'].create({'date': self.date})
+        voucher = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         credit_sum = 0  # 贷方之和
         for line in self.line_out_ids:
             if line.cost:   # 贷方行（多行）
@@ -207,9 +207,10 @@ class WhIn(models.Model):
             vouch_id = self.env['voucher'].search([('is_init', '=', True)])
             if not vouch_id:
                 vouch_id = self.env['voucher'].create({'date': self.date,
-                                                       'is_init': True})
+                                                       'is_init': True,
+                                                       'ref': '%s,%s' % (self._name, self.id)})
         else:
-            vouch_id = self.env['voucher'].create({'date': self.date})
+            vouch_id = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         self.voucher_id = vouch_id
         debit_sum = 0
         for line in self.line_in_ids:

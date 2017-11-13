@@ -40,6 +40,12 @@ class TestVoucher(TransactionCase):
         with self.assertRaises(UserError):
             voucher.voucher_draft()
 
+    def test_voucher_can_be_draft(self):
+        '''测试反审核报错'''
+        voucher = self.env.ref('finance.voucher_1')
+        voucher.voucher_done()
+        voucher.voucher_can_be_draft()
+
     def test_voucher_done_costs_types_out(self):
         '''费用类科目只能在借方记账'''
         voucher = self.env['voucher'].create({

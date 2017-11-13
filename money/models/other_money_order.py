@@ -50,7 +50,7 @@ class OtherMoneyOrder(models.Model):
     def unlink(self):
         """
         只能删除未审核的单据
-        :return: 
+        :return:
         """
         for order in self:
             if order.state == 'done':
@@ -210,9 +210,10 @@ class OtherMoneyOrder(models.Model):
             vouch_obj = self.env['voucher'].search([('is_init', '=', True)])
             if not vouch_obj:
                 vouch_obj = self.env['voucher'].create({'date': self.date,
-                                                        'is_init': True})
+                                                        'is_init': True,
+                                                        'ref': '%s,%s' % (self._name, self.id)})
         else:
-            vouch_obj = self.env['voucher'].create({'date': self.date})
+            vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         if self.is_init:
             init_obj = 'other_money_order-%s' % (self.id)
 
