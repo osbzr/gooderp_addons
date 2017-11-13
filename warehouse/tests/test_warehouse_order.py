@@ -248,6 +248,14 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.approve_order()
         self.others_in_2.cancel_approved_order()
 
+    def test_voucher_can_be_draft(self):
+        '''其他单据生成的凭证不能反审核'''
+        voucher = self.env.ref('finance.voucher_1')
+        voucher.ref = 'wh.in,1'
+        voucher.voucher_done()
+        with self.assertRaises(UserError):
+            voucher.voucher_can_be_draft()
+
     def test_goods_inventory_others_out(self):
         ''' 其他出库单审核商品不足时调用创建盘盈入库方法 '''
         for line in self.others_out.line_out_ids:

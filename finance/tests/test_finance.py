@@ -46,12 +46,6 @@ class TestVoucher(TransactionCase):
         voucher.voucher_done()
         voucher.voucher_can_be_draft()
 
-        # 其他单据生成的凭证不能反审核
-        voucher.ref = 'wh.in,1'
-        voucher.voucher_done()
-        with self.assertRaises(UserError):
-            voucher.voucher_can_be_draft()
-
     def test_voucher_done_costs_types_out(self):
         '''费用类科目只能在借方记账'''
         voucher = self.env['voucher'].create({

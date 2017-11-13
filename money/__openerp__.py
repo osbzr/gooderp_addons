@@ -49,7 +49,7 @@
         'views/generate_accounting.xml',
         'data/home_page_data.xml',
         'report/report_data.xml',
-        'report/print.xml',
+        # 'report/print.xml',
         'report/print_money_order.xml',
     ],
     'demo': [
