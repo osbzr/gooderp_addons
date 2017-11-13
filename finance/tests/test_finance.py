@@ -47,7 +47,6 @@ class TestVoucher(TransactionCase):
         voucher.voucher_can_be_draft()
 
         # 其他单据生成的凭证不能反审核
-        voucher.voucher_draft()
         voucher.ref = 'wh.in,1'
         voucher.voucher_done()
         with self.assertRaises(UserError):
