@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="sell_delivery_parts_goods_form" model="ir.ui.view">
+            <field name="name">sell.delivery.parts.goods.form</field>
+            <field name="model">goods</field>
+            <field name="inherit_id" ref="goods.goods_form"/>
+            <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="is_assembly_sell"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</openerp>
