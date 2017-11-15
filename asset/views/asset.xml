@@ -12,7 +12,7 @@
                     <field name='category_id'/>
 					<field name='cost'/>
 					<field name='no_depreciation'/>
-                    <field name='surplus_value'/>
+                    <field name='net_value'/>
                     <field name="cost_depreciation"/>					
                     <field name='state'/>
 				</tree>
@@ -114,9 +114,10 @@
                                 <field name="name"/>
                                 <field name="category_id"/>
                                 <field name="cost"/>
+                                <field name="surplus_value"/>
                             </group>
                             <group>
-                                <field name="surplus_value"/>
+                                <field name="net_value"/>
                                 <field name="no_depreciation"/>
                                 <field name="depreciation_number"/>
                                 <field name="depreciation_value"/>

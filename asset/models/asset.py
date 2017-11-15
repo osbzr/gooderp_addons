@@ -65,6 +65,12 @@ class Asset(models.Model):
     def _get_cost_depreciation(self):
         self.cost_depreciation = (
             self.surplus_value - self.depreciation_value) / (self.depreciation_number or 1)
+    
+    @api.one
+    @api.depends('surplus_value', 'line_ids')
+    def _get_net_value(self):
+        self.net_value = self.surplus_value - sum(
+            [l.cost_depreciation for l in self.line_ids] )
 
     code = fields.Char(u'编号', required="1", states=READONLY_STATES)
     date = fields.Date(u'记帐日期', required=True, states=READONLY_STATES)
@@ -95,8 +101,10 @@ class Asset(models.Model):
         'Amount'), required=True, states=READONLY_STATES)
     depreciation_number = fields.Integer(
         u'折旧期间数', required=True, states=READONLY_STATES)
-    surplus_value = fields.Float(u'净值', digits=dp.get_precision(
+    surplus_value = fields.Float(u'原值', digits=dp.get_precision(
         'Amount'), store=True, compute='_get_surplus_value')
+    net_value = fields.Float(u'净值',digits=dp.get_precision(
+        'Amount'), store=True, compute='_get_net_value')
     depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision(
         'Amount'), required=True, states=READONLY_STATES)
     account_credit = fields.Many2one(
