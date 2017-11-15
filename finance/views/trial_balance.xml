@@ -43,7 +43,7 @@
             <field name="arch" type="xml">
                  <search>
                     <group expand="0" string="分组">
-                        <filter string="会计区间" domain="[]" context="{'group_by':'period_id'}"/>
+                        <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
                         <filter string="科目" domain="[]" context="{'group_by':'subject_name_id'}"/>
                     </group>
                  </search>

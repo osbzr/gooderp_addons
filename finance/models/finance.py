@@ -432,7 +432,7 @@ class FinancePeriod(models.Model):
             return period_id
 
     _sql_constraints = [
-        ('period_uniq', 'unique (year,month)', u'会计区间不能重复'),
+        ('period_uniq', 'unique (year,month)', u'会计期间不能重复'),
     ]
 
 

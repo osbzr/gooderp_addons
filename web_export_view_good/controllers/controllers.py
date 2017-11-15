@@ -171,7 +171,7 @@ class ExcelExportView(ExcelExport, ):
                     else:
                         columnwidth.update(
                             {cell_index: len("%s" % (cell_value))})
-                    if row_index == 1:
+                    if row_index == 0:
                         cell_style = colour_style
                     elif row_index != len(rows) - 1:
                         cell_style = base_style
