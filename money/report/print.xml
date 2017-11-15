@@ -4,7 +4,7 @@
         <report
             id="other_money_order_print"
             string="打印其他收入/支出"
-            model="account.invoice"
+            model="other.money.order"
             report_type="qweb-pdf"
             file="money.print_money_order"
             name="money.report_other_money_order"

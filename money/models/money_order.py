@@ -68,18 +68,6 @@ class MoneyOrder(models.Model):
 
         return super(MoneyOrder, self).write(values)
 
-    @api.multi
-    def unlink(self):
-        """
-        已审核的money.order不允许删除
-        :return:
-        """
-        for order in self:
-            if order.state == 'done':
-                raise UserError(u'不可以删除已经审核的单据')
-
-        return super(MoneyOrder, self).unlink()
-
     @api.one
     @api.depends('discount_amount',
                  'line_ids.amount',
