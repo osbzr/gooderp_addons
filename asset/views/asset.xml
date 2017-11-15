@@ -11,9 +11,9 @@
 					<field name='name'/>
                     <field name='category_id'/>
 					<field name='cost'/>
-					<field name='no_depreciation'/>
                     <field name='net_value'/>
                     <field name="cost_depreciation"/>					
+					<field name='no_depreciation'/>
                     <field name='state'/>
 				</tree>
 			</field>
