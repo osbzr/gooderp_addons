@@ -465,11 +465,3 @@ class WhMoveLine(models.Model):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
         price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = self.goods_qty * price * self.discount_rate * 0.01
-
-    @api.multi
-    def unlink(self):
-        for line in self:
-            if line.state == 'done':
-                raise UserError(u'不可以删除已经完成的明细')
-
-        return super(WhMoveLine, self).unlink()

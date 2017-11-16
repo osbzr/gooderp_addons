@@ -720,8 +720,6 @@ class MoneyInvoice(models.Model):
             if invoice.name == '.' and invoice.reconciled == 0.0:
                 self.money_invoice_draft()
                 continue
-            if invoice.state == 'done':
-                raise UserError(u'不可以删除已经审核的单据')
 
         return super(MoneyInvoice, self).unlink()
 
@@ -849,18 +847,6 @@ class ReconcileOrder(models.Model):
         ('get_to_get', u'应收转应收'),
         ('pay_to_pay', u'应付转应付'),
     ]
-
-    @api.multi
-    def unlink(self):
-        """
-        核销单已经审核不能再删除
-        :return:
-        """
-        for order in self:
-            if order.state == 'done':
-                raise UserError(u'不可以删除已经审核的单据')
-
-        return super(ReconcileOrder, self).unlink()
 
     state = fields.Selection([
         ('draft', u'未审核'),

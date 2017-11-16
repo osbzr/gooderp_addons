@@ -344,15 +344,6 @@ class WhAssembly(models.Model):
             order.state = 'feeding'
             order.move_id.state = 'draft'
 
-    @api.multi
-    @inherits()
-    def unlink(self):
-        for order in self:
-            if order.state != 'draft':
-                raise UserError(u'只删除草稿状态的单据')
-
-        return order.move_id.unlink()
-
     @api.model
     @create_name
     @create_origin
@@ -702,15 +693,6 @@ class outsource(models.Model):
                 outsource.outsource_fee
             outsource.apportion_cost(cost)
         return True
-
-    @api.multi
-    @inherits()
-    def unlink(self):
-        for order in self:
-            if order.state != 'draft':
-                raise UserError(u'只删除草稿状态的单据')
-
-        return order.move_id.unlink()
 
     @api.model
     @create_name
@@ -1207,15 +1189,6 @@ class WhDisassembly(models.Model):
             order.approve_date = False
             order.state = 'feeding'
             order.move_id.state = 'draft'
-
-    @api.multi
-    @inherits()
-    def unlink(self):
-        for order in self:
-            if order.state != 'draft':
-                raise UserError(u'只删除草稿状态的单据')
-
-        return order.move_id.unlink()
 
     @api.model
     @create_name
