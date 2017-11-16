@@ -694,6 +694,15 @@ class outsource(models.Model):
             outsource.apportion_cost(cost)
         return True
 
+    @api.multi
+    @inherits()
+    def unlink(self):
+        for order in self:
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
+
     @api.model
     @create_name
     @create_origin
@@ -1194,7 +1203,10 @@ class WhDisassembly(models.Model):
     @inherits()
     def unlink(self):
         for order in self:
-            return order.move_id.unlink()
+            if order.state != 'draft':
+                raise UserError(u'只删除草稿状态的单据')
+
+        return order.move_id.unlink()
 
     @api.model
     @create_name
