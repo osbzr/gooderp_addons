@@ -4,7 +4,7 @@
         	parent='finance.voucher_home_menu' sequence='11'/>
         <menuitem id='asset_line_menu_finance' name="固定资产折旧明细" action='asset_line_action'
         	parent='finance.voucher_books_menu' sequence='110'/>
-        <menuitem id='create_depreciation_menu_finance' name="资产折旧" action='create_depreciation_action'
+        <menuitem id='create_depreciation_menu_finance' name="固定资产折旧" action='create_depreciation_action'
         	parent='finance.checkout_menu' sequence='11'/>
         <menuitem id='asset_category_finance' name="固定资产分类" action='asset_category_action'
         	parent='finance.finance_setting_menu' sequence='31'/>

@@ -4,7 +4,7 @@
 			<field name="sequence">6</field>
 		    <field name="action" ref="asset.asset_action"/>
 		    <field name="menu_type">amount_summary</field>
-			<field name="compute_field_one" ref="asset.field_asset_surplus_value"/>
+			<field name="compute_field_one" ref="asset.field_asset_net_value"/>
 		    <field name="note_one" >固定资产净值</field>
 		</record>
     </data>
