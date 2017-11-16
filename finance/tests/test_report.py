@@ -272,7 +272,7 @@ class TestCheckoutWizard(TransactionCase):
         self.env.ref('finance.voucher_12_2_debit').debit = 100000
         self.env.ref('finance.voucher_12_2_credit').credit = 100000
         wizard.button_checkout()
-        # 检查下一个会计区间
+        # 检查下一个会计期间
         self.env.ref('finance.voucher_1').voucher_done()
         self.env.ref('finance.voucher_2').voucher_done()
         self.env.ref('finance.voucher_4').voucher_done()

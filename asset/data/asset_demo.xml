@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
-        <!-- 固定资产 -->
+        <!-- 非现款购买的固定资产固定资产 -->
         <record id="asset_car" model="asset">
         	<field name="code">001</field>
             <field name="date">2016-04-01</field>

@@ -128,20 +128,22 @@
             <field name="model">voucher.line</field>
             <field name="arch" type="xml">
                 <search string="Search Voucher Line">
+                    <field name='period_id'/>
                     <field name='voucher_id'/>
-                    <field name='date'/>
                     <field name='name' filter_domain="[('name','ilike',self)]"/>
                     <field name='account_id'/>
                     <field name='partner_id'/>
                     <field name='goods_id'/>
                     <field name='auxiliary_id'/>
+                    <field name='date'/>
                     <separator/>
                     <filter string="本期"
                             domain="[('voucher_id.date','&gt;=',(context_today()).strftime('%%Y-%%m-01')),
                             ('voucher_id.date','&lt;=',(context_today()).strftime('%%Y-%%m-%%d'))]"/>
+                    <filter string="隐藏作废"
+                            domain="[('state','!=','cancel')]"/>
                     <group expand="0" string="分组">
-                        <filter string="会计凭证" domain="[]" context="{'group_by':'voucher_id'}"/>
-                        <filter string="会计区间" domain="[]" context="{'group_by':'period_id'}"/>
+                        <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
                         <filter string="会计科目" domain="[]" context="{'group_by':'account_id'}"/>
                     </group>
                 </search>
@@ -152,11 +154,11 @@
             <field name="model">voucher.line</field>
             <field name="arch" type="xml">
                 <tree string='分录查询' colors='blue:state == "draft";lightgray:state == "cancel"' create="false" edit='false'>
+                    <field name='date'/>
+                    <field name='period_id'/>
                     <field name='voucher_id'/>
                     <button name="view_document" type="object" string="查看凭证"
                             icon="fa-search" class="oe_highlight"/>
-                    <field name='period_id'/>
-                    <field name='date'/>
                     <field name='name'/>
                     <field name='account_id'/>
                     <field name='debit' sum='借方合计' widget="bgcolor" color="success"/>
