@@ -1190,6 +1190,12 @@ class WhDisassembly(models.Model):
             order.state = 'feeding'
             order.move_id.state = 'draft'
 
+    @api.multi
+    @inherits()
+    def unlink(self):
+        for order in self:
+            return order.move_id.unlink()
+
     @api.model
     @create_name
     @create_origin
