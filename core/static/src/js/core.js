@@ -35,6 +35,7 @@ odoo.define('core.core', function (require) {
             });
         },
         pad_table_to: function (count) {
+            count -=3;    /* 表格预留空行太多很难看 */
             if (this.records.length >= count ||
                 _(this.columns).any(function (column) { return column.meta; })) {
                 return;

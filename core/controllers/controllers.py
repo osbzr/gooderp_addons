@@ -5,6 +5,7 @@ import functools
 from odoo import http, tools
 import odoo, os, sys, jinja2
 from odoo.addons.web.controllers.main import Database
+from odoo.addons.web.controllers.main import Home
 from odoo.addons.web.controllers import main
 from odoo.modules import get_resource_path
 from cStringIO import StringIO
@@ -19,6 +20,12 @@ else:
 env = main.jinja2.Environment(loader=loader, autoescape=True)
 env.filters["json"] = json.dumps
 db_monodb = http.db_monodb
+
+
+class GoodERPLogin(Home):
+	@http.route('/login', type='http', auth="none")
+    def login(self, db, login, key):
+        return login_and_redirect(db, login, key)
 
 
 class GoodERPDB(Database):
