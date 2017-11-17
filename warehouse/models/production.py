@@ -349,7 +349,7 @@ class WhAssembly(models.Model):
     def unlink(self):
         for order in self:
             if order.state != 'draft':
-                raise UserError(u'只能删除草稿状态的单据')
+                raise UserError(u'不能删除已审核的单据')
 
         return order.move_id.unlink()
 

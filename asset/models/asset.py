@@ -332,7 +332,7 @@ class Asset(models.Model):
     def unlink(self):
         for record in self:
             if record.state != 'draft':
-                raise UserError(u'只能删除草稿状态的固定资产')
+                raise UserError(u'不能删除已审核的单据')
 
         return super(Asset, self).unlink()
 
