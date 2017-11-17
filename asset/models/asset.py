@@ -75,9 +75,18 @@ class Asset(models.Model):
         ''' 计算每月折旧 '''
         if self.no_depreciation == True:  # 不提折旧不要算
             self.cost_depreciation = 0
-        else:                             # 原值减残值，再除以折旧期数
-            self.cost_depreciation = (self.surplus_value - self.depreciation_value) \
-                                     / (self.depreciation_number or 1)
+        else:                             # 原值减残值减已折旧额，再除以剩余折旧期数
+            dep_his_count = 0     # 已提期数
+            dep_his_amount = 0    # 已提折旧
+            for l in self.line_ids:
+                dep_his_amount += l.cost_depreciation
+                dep_his_count += 1
+            if dep_his_count == self.depreciation_number:
+                self.cost_depreciation = 0      # 已提完
+            else:
+                self.cost_depreciation = (self.surplus_value - self.depreciation_value
+                                          - dep_his_amount) \
+                                          / (self.depreciation_number - dep_his_count)
     
     @api.one
     @api.depends('surplus_value', 'line_ids','state')
