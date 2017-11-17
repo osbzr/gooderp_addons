@@ -403,9 +403,6 @@ class StaffWages(models.Model):
         :return:
         """
         for record in self:
-            if record.state != 'draft':
-                raise UserError(u'不能删除已审核的单据(%s)' % record.name)
-
             # 先解除凭证和工资单关系，再将它们删除
             voucher, record.voucher_id = record.voucher_id, False
             change_voucher, record.change_voucher_id = record.change_voucher_id, False

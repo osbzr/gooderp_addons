@@ -46,18 +46,6 @@ class OtherMoneyOrder(models.Model):
 
         return super(OtherMoneyOrder, self).create(values)
 
-    @api.multi
-    def unlink(self):
-        """
-        只能删除未审核的单据
-        :return:
-        """
-        for order in self:
-            if order.state == 'done':
-                raise UserError(u'不可以删除已经审核的单据(%s)' % order.name)
-
-        return super(OtherMoneyOrder, self).unlink()
-
     @api.one
     @api.depends('line_ids.amount', 'line_ids.tax_amount')
     def _compute_total_amount(self):

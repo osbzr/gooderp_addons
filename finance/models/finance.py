@@ -157,13 +157,6 @@ class Voucher(models.Model):
         # todo 实现明细行总金额
         self.amount_text = str(sum([line.debit for line in self.line_ids]))
 
-    @api.multi
-    def unlink(self):
-        for active_voucher in self:
-            if active_voucher.state == 'done':
-                raise UserError(u'凭证%s已审核,不能删除已审核的凭证' % active_voucher.name)
-        return super(Voucher, self).unlink()
-
     # 重载write 方法
     @api.multi
     def write(self, vals):

@@ -221,14 +221,6 @@ class SellOrder(models.Model):
         total = sum(line.subtotal for line in self.line_ids)
         self.discount_amount = total * self.discount_rate * 0.01
 
-    @api.multi
-    def unlink(self):
-        for order in self:
-            if order.state == 'done':
-                raise UserError(u'不能删除已审核的销货订单')
-
-        return super(SellOrder, self).unlink()
-
     def _get_vals(self):
         '''返回创建 money_order 时所需数据'''
         flag = (self.type == 'sell' and 1 or -1)  # 用来标志发库或退货

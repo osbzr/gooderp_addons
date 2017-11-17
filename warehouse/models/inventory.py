@@ -78,9 +78,6 @@ class WhInventory(models.Model):
     @api.multi
     def unlink(self):
         for inventory in self:
-            if inventory.state == 'done':
-                raise UserError(u'不可以删除一个完成的单据')
-
             inventory.delete_confirmed_wh()
 
         return super(WhInventory, self).unlink()

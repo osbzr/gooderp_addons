@@ -58,14 +58,6 @@ class BuyAdjust(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
-    @api.multi
-    def unlink(self):
-        for order in self:
-            if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据\n采购变更单%s已经审核' % order.name)
-
-        return super(BuyAdjust, self).unlink()
-
     def _get_vals(self, line):
         '''返回创建 buy order line 时所需数据'''
         return {

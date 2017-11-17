@@ -58,14 +58,6 @@ class SellAdjust(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
-    @api.multi
-    def unlink(self):
-        for order in self:
-            if order.state == 'done':
-                raise UserError(u'不能删除已审核的销售变更单')
-
-        return super(SellAdjust, self).unlink()
-
     @api.one
     def sell_adjust_done(self):
         '''审核销售变更单：
