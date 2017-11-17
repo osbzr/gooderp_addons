@@ -328,6 +328,14 @@ class Asset(models.Model):
         self.state = 'draft'
         return True
 
+    @api.multi
+    def unlink(self):
+        for record in self:
+            if record.state != 'draft':
+                raise UserError(u'只能删除草稿状态的固定资产')
+
+        return super(Asset, self).unlink()
+
 
 class CreateCleanWizard(models.TransientModel):
     '''固定资产清理'''
