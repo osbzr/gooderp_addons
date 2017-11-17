@@ -23,24 +23,24 @@ db_monodb = http.db_monodb
 
 
 class GoodERPLogin(Home):
-	@http.route('/login', type='http', auth="none")
+    @http.route('/login', type='http', auth="none")
     def login(self, db, login, key):
         return login_and_redirect(db, login, key)
 
 
 class GoodERPDB(Database):
-	def _render_template(self, **d):
-		d.setdefault('manage', True)
-		d['insecure'] = odoo.tools.config['admin_passwd'] == 'admin'
-		d['list_db'] = odoo.tools.config['list_db']
-		d['langs'] = odoo.service.db.exp_list_lang()
-		d['countries'] = odoo.service.db.exp_list_countries()
-		# databases list
-		d['databases'] = []
-		try:
-				d['databases'] = http.db_list()
-		except odoo.exceptions.AccessDenied:
-				monodb = db_monodb()
-				if monodb:
-						d['databases'] = [monodb]
-		return env.get_template("gooderp_database_manager.html").render(d)
+    def _render_template(self, **d):
+        d.setdefault('manage', True)
+        d['insecure'] = odoo.tools.config['admin_passwd'] == 'admin'
+        d['list_db'] = odoo.tools.config['list_db']
+        d['langs'] = odoo.service.db.exp_list_lang()
+        d['countries'] = odoo.service.db.exp_list_countries()
+        # databases list
+        d['databases'] = []
+        try:
+            d['databases'] = http.db_list()
+        except odoo.exceptions.AccessDenied:
+            monodb = db_monodb()
+            if monodb:
+                d['databases'] = [monodb]
+        return env.get_template("gooderp_database_manager.html").render(d)
