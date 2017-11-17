@@ -12,6 +12,7 @@
             </xpath>
         </template>
         <template id="web_login"  inherit_id="web.login" name="web_login" >
+             <!-- 登录界面email改成用户 -->
              <xpath expr="//div[@class='form-group field-login']/label" position="replace">
                  <label for="login" class="control-label">用户</label>
              </xpath>
