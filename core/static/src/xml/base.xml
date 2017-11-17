@@ -35,15 +35,6 @@
 			<span name="delete" class="fa fa-trash-o"/>
 		</td>
 	</tr>
-	<t t-extend="UserMenu">
-		<t t-jquery="li > a[data-menu='documentation']" t-operation="replace"></t>
-		<t t-jquery="li.divider" t-operation="replace">
-		</t>
-		<t t-jquery="li > a[data-menu='support']" t-operation="replace">
-		</t>
-		<t t-jquery="li > a[data-menu='account']" t-operation="replace">
-		</t>
-	</t>
 	 <t t-extend="ListView">
        <t t-jquery="thead" t-operation="replace">
            <thead>

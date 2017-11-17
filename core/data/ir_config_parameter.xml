@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="0">
+        <record id="app_odoo_customize.app_system_name" model="ir.config_parameter">
+            <field name="key">app_system_name</field>
+            <field name="value">GoodERP</field>
+        </record>
+
+        <record id="app_odoo_customize.app_show_lang" model="ir.config_parameter">
+            <field name="key">app_show_lang</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_debug" model="ir.config_parameter">
+            <field name="key">app_show_debug</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_documentation" model="ir.config_parameter">
+            <field name="key">app_show_documentation</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_documentation_dev" model="ir.config_parameter">
+            <field name="key">app_show_documentation_dev</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_support" model="ir.config_parameter">
+            <field name="key">app_show_support</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_account" model="ir.config_parameter">
+            <field name="key">app_show_account</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_enterprise" model="ir.config_parameter">
+            <field name="key">app_show_enterprise</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_share" model="ir.config_parameter">
+            <field name="key">app_show_share</field>
+            <field name="value">False</field>
+        </record>
+        <record id="app_odoo_customize.app_show_poweredby" model="ir.config_parameter">
+            <field name="key">app_show_poweredby</field>
+            <field name="value">False</field>
+        </record>
+        
+        <record id="app_odoo_customize.app_documentation_url" model="ir.config_parameter">
+            <field name="key">app_documentation_url</field>
+            <field name="value">https://www.kancloud.cn/osbzr/gooderp_user_manual/295107</field>
+        </record>
+        <record id="app_odoo_customize.app_documentation_dev_url" model="ir.config_parameter">
+            <field name="key">app_documentation_dev_url</field>
+            <field name="value">http://www.sunpop.cn/documentation/10.0/index.html</field>
+        </record>
+        <record id="app_odoo_customize.app_support_url" model="ir.config_parameter">
+            <field name="key">app_support_url</field>
+            <field name="value">http://shang.qq.com/wpa/qunwpa?idkey=f0b47f9891e6f5361c4bdc841c424eb13035d981da9451995eca13cb42273725</field>
+        </record>
+        <record id="app_odoo_customize.app_account_title" model="ir.config_parameter">
+            <field name="key">app_account_title</field>
+            <field name="value">GoodERP参考大全</field>
+        </record>
+        <record id="app_odoo_customize.app_account_url" model="ir.config_parameter">
+            <field name="key">app_account_url</field>
+            <field name="value">https://www.kancloud.cn/gooderp/gooderp-complete-reference/395480</field>
+        </record>
+    </data>
+</openerp>

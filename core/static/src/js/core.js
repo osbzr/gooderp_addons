@@ -137,24 +137,6 @@ odoo.define('core.core', function (require) {
             this.open_defaults_dialog();
         },
     });
-    /**2016-11-09  开阖静静(gilbert@osbzr.com)
-     * 頁面title 換成自己定義的字符！
-     */
-
-    WebClient.include({
-         init: function(parent) {
-                this._super(parent);
-                this.set('title_part', {"zopenerp": "GoodERP"});
-         },
-        set_title_part: function(part, title) {
-            var tmp = _.clone(this.get("title_part"));
-            tmp[part] = title;
-            if ('zopenerp' in tmp){
-                tmp['zopenerp'] = 'GoodERP';
-            }
-            this.set("title_part", tmp);
-        },
-    });
     /**2016-11-23  开阖静静(gilbert@osbzr.com)
     * pivot 视图改造 (在pivot 视图中 特殊颜色 标示满足条件的字段) 只需要在对应的字段上例如
     *<field name="goods_qty" type="measure" pivot_color="{'color':'blue','greater_than_field':'cost'}"/>
