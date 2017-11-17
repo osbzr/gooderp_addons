@@ -251,9 +251,9 @@ class WhMoveLine(models.Model):
         return new_id
 
     @api.one
-    @api.depends('cost_unit', 'goods_qty')
+    @api.depends('cost_unit', 'goods_qty', 'discount_amount')
     def _compute_cost(self):
-        self.cost = self.cost_unit * self.goods_qty
+        self.cost = self.cost_unit * self.goods_qty - self.discount_amount
 
     @api.one
     def _inverse_cost(self):
@@ -462,6 +462,12 @@ class WhMoveLine(models.Model):
 
     @api.onchange('goods_qty', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
-        '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
+        """当数量、单价或优惠率发生变化时，优惠金额发生变化"""
         price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = self.goods_qty * price * self.discount_rate * 0.01
+
+    @api.multi
+    @api.onchange('discount_amount')
+    def onchange_discount_amount(self):
+        """当优惠金额发生变化时，重新取默认的单位成本，以便计算实际的单位成本"""
+        self.compute_suggested_cost()

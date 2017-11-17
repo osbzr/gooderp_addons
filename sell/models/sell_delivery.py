@@ -230,7 +230,7 @@ class SellDelivery(models.Model):
     def _line_qty_write(self):
         if self.order_id:
             for line in self.line_in_ids:
-                line.sell_line_id.quantity_out -= line.goods_qty
+                    line.sell_line_id.quantity_out += line.goods_qty
             for line in self.line_out_ids:
                 line.sell_line_id.quantity_out += line.goods_qty
 
@@ -505,7 +505,7 @@ class SellDelivery(models.Model):
             })
         # 将原始订单中已执行数量清零
         if self.order_id:
-            line_ids = not self.is_return and self.line_in_ids or self.line_out_ids
+            line_ids = self.is_return and self.line_in_ids or self.line_out_ids
             for line in line_ids:
                 line.sell_line_id.quantity_out -= line.goods_qty
         # 调用wh.move中反审核方法，更新审核人和审核状态

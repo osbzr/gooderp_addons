@@ -39,7 +39,8 @@ class SellOrderTrackWizard(models.TransientModel):
         '''返回wizard界面上条件'''
         domain = [
             ('order_id.date', '>=', self.date_start),
-            ('order_id.date', '<=', self.date_end)
+            ('order_id.date', '<=', self.date_end),
+            ('order_id.state', '!=', 'cancel')
         ]
         if self.goods_id:
             domain.append(('goods_id', '=', self.goods_id.id))
