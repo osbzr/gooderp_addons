@@ -277,7 +277,7 @@ class MoneyOrder(models.Model):
             if order.type == 'get' and not order.partner_id.c_category_id.account_id:
                 raise UserError(u'请输入客户类别(%s)上的科目' %
                                 order.partner_id.c_category_id.name)
-            if order.advance_payment < 0:
+            if order.advance_payment < 0 and order.source_ids:
                 raise UserError(u'本次核销金额不能大于付款金额。\n差额: %s' %
                                 (order.advance_payment))
 
