@@ -230,7 +230,10 @@ class SellDelivery(models.Model):
     def _line_qty_write(self):
         if self.order_id:
             for line in self.line_in_ids:
+                if self.order_id.type == 'return':
                     line.sell_line_id.quantity_out += line.goods_qty
+                else:
+                    line.sell_line_id.quantity_out -= line.goods_qty
             for line in self.line_out_ids:
                 line.sell_line_id.quantity_out += line.goods_qty
 
