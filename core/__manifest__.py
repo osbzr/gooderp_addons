@@ -21,6 +21,7 @@
                 'home_page',
                 'web_error_dialog',
                 'common_dialog',
+                'app_odoo_customize',
                 ],
     'demo': [
         'data/core_demo.xml',
@@ -29,6 +30,7 @@
         'security/groups.xml',
         'security/ir.model.access.csv',
         'data/core_data.xml',
+        'data/ir_config_parameter.xml',
         'views/core_view.xml',
         'views/core_templates.xml',
     ],

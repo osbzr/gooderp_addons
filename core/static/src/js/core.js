@@ -35,6 +35,7 @@ odoo.define('core.core', function (require) {
             });
         },
         pad_table_to: function (count) {
+            count -=3;    /* 表格预留空行太多很难看 */
             if (this.records.length >= count ||
                 _(this.columns).any(function (column) { return column.meta; })) {
                 return;
@@ -135,24 +136,6 @@ odoo.define('core.core', function (require) {
         },
         on_click_set_defaults:function() {
             this.open_defaults_dialog();
-        },
-    });
-    /**2016-11-09  开阖静静(gilbert@osbzr.com)
-     * 頁面title 換成自己定義的字符！
-     */
-
-    WebClient.include({
-         init: function(parent) {
-                this._super(parent);
-                this.set('title_part', {"zopenerp": "GoodERP"});
-         },
-        set_title_part: function(part, title) {
-            var tmp = _.clone(this.get("title_part"));
-            tmp[part] = title;
-            if ('zopenerp' in tmp){
-                tmp['zopenerp'] = 'GoodERP';
-            }
-            this.set("title_part", tmp);
         },
     });
     /**2016-11-23  开阖静静(gilbert@osbzr.com)
