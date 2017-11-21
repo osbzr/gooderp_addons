@@ -13,15 +13,13 @@ class CustomerStatementsReport(models.Model):
     @api.one
     @api.depends('amount', 'pay_amount', 'partner_id')
     def _compute_balance_amount(self):
-        pre_record = self.search(
-            [('id', '=', self.id - 1), ('partner_id', '=', self.partner_id.id)])
         # 相邻的两条记录，partner不同，应收款余额重新计算
-        if pre_record:
-            before_balance = pre_record.balance_amount
-        else:
-            before_balance = 0
-        self.balance_amount += before_balance + \
-            self.amount - self.pay_amount - self.discount_money
+        pre_record = self.search(
+            [('id', '<=', self.id), ('partner_id', '=', self.partner_id.id)])
+        compute_amount = 0.0
+        for pre in pre_record:
+            compute_amount += pre.amount - pre.pay_amount
+        self.balance_amount = compute_amount - self.discount_money
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)

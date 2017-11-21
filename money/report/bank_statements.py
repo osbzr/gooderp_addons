@@ -15,9 +15,9 @@ class BankStatementsReport(models.Model):
     def _compute_balance(self):
         # 相邻的两条记录，bank_id不同，重新计算账户余额
         pre_record = self.search(
-            [('id', '=', self.id - 1), ('bank_id', '=', self.bank_id.id)])
-        before_balance = pre_record and pre_record.balance or 0
-        self.balance = before_balance + self.get - self.pay
+            [('id', '<=', self.id), ('bank_id', '=', self.bank_id.id)])
+        for pre in pre_record:
+            self.balance += pre.get - pre.pay
 
     bank_id = fields.Many2one('bank.account', string=u'账户名称', readonly=True)
     date = fields.Date(string=u'日期', readonly=True)
