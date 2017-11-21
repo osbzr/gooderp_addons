@@ -595,7 +595,6 @@ class CreateDepreciationWizard(models.TransientModel):
 
     @api.multi
     def _get_voucher_line(self, Asset, cost_depreciation, vouch_obj):
-
         ''' 借：累计折旧 '''
         res = {}
         if Asset.account_depreciation.id not in res:
@@ -610,13 +609,12 @@ class CreateDepreciationWizard(models.TransientModel):
         ''' 贷：费用科目 '''
         if Asset.account_accumulated_depreciation.id not in res:
             res[Asset.account_accumulated_depreciation.id] = {'credit': 0}
-
-        val = res[Asset.account_accumulated_depreciation.id]
-        val.update({'credit': val.get('credit') + cost_depreciation,
-                    'voucher_id': vouch_obj.id,
-                    'account_id': Asset.account_accumulated_depreciation.id,
-                    'name': u'固定资产折旧',
-                    })
+            val = res[Asset.account_accumulated_depreciation.id]
+            val.update({'credit': val.get('credit') + cost_depreciation,
+                        'voucher_id': vouch_obj.id,
+                        'account_id': Asset.account_accumulated_depreciation.id,
+                        'name': u'固定资产折旧',
+                        })
         return res
 
     @api.multi
@@ -639,7 +637,7 @@ class CreateDepreciationWizard(models.TransientModel):
         ''' 资产折旧，生成凭证和折旧明细'''
 
         vouch_obj = self.env['voucher'].create({'date': self.date})
-        res = {}
+        res = []
         asset_line_id_list = []
         for Asset in self.env['asset'].search([('no_depreciation', '=', False),           # 提折旧的
                                                ('state', '=', 'done'),                    # 已审核
@@ -657,15 +655,32 @@ class CreateDepreciationWizard(models.TransientModel):
                     cost_depreciation = Asset.surplus_value - total
                     Asset.no_depreciation = 1
                 # 构造凭证明细行字典
-                res = self._get_voucher_line(
-                    Asset, cost_depreciation, vouch_obj)
+                res.append(self._get_voucher_line(
+                    Asset, cost_depreciation, vouch_obj))
+
                 # 生成折旧明细行
                 asset_line_row = self._generate_asset_line(
                     Asset, cost_depreciation, total)
                 asset_line_id_list.append(asset_line_row.id)
-        # 生成凭证明细
-        for account_id, val in res.iteritems():
-            self.env['voucher.line'].create(dict(val, account_id=account_id))
+        # 构造凭证明细行字典
+        debit_line_dict, credit_line_dict = {}, {}
+        for i in range(len(res)):
+            for account_id, val in res[i].iteritems():
+                # 生成借方凭证明细
+                if 'debit' in val.keys():
+                    if account_id not in debit_line_dict:
+                        debit_line_dict[account_id] = val
+                    else:
+                        debit_line_dict[account_id]['debit'] += val['debit']
+                # 生成贷方凭证明细
+                if 'credit' in val.keys():
+                    if account_id not in credit_line_dict:
+                        credit_line_dict[account_id] = val
+                    else:
+                        credit_line_dict[account_id]['credit'] += val['credit']
+        line_dict = dict(debit_line_dict.items() + credit_line_dict.items())
+        for account_id, val in line_dict.iteritems():
+            self.env['voucher.line'].create(dict(val, account_id=account_id)) # 创建凭证行
 
         # 没有凭证行则报错
         if not vouch_obj.line_ids:

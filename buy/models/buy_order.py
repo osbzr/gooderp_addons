@@ -250,14 +250,6 @@ class BuyOrder(models.Model):
                 else:
                     line.tax_rate = self.env.user.company_id.import_tax_rate
 
-    @api.multi
-    def unlink(self):
-        for order in self:
-            if order.state == 'done':
-                raise UserError(u'不能删除已审核的单据(%s)' % order.name)
-
-        return super(BuyOrder, self).unlink()
-
     def _get_vals(self):
         '''返回创建 money_order 时所需数据'''
         flag = (self.type == 'buy' and 1 or -1)  # 用来标志入库或退货

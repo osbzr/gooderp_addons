@@ -296,14 +296,6 @@ class WhMove(models.Model):
                 self.env[line_model].create(
                     self.prepare_move_line_data(att, val, goods, move))
 
-    @api.multi
-    def unlink(self):
-        for move in self:
-            if move.state == 'done':
-                raise UserError(u'不可以删除已经完成的单据')
-
-            return super(WhMove, self).unlink()
-
     def check_qc_result(self):
         """
         检验质检报告是否上传

@@ -159,9 +159,6 @@ class BuyReceipt(models.Model):
     @api.multi
     def unlink(self):
         for receipt in self:
-            if receipt.state == 'done':
-                raise UserError(u'不能删除已审核的单据')
-
             receipt.buy_move_id.unlink()
 
     @api.one

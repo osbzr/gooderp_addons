@@ -104,14 +104,6 @@ class CostOrder(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
     #pay_ids=fields.One2many("payment.plan","cost_id",string=u"付款计划", help=u'分批付款时使用付款计划')
 
-    @api.multi
-    def unlink(self):
-        for order in self:
-            if order.state != 'draft':
-                raise UserError(u'不能删除已审核/取消的单据(%s)' % order.name)
-
-        return super(CostOrder, self).unlink()
-
     def _get_vals(self):
         '''返回创建 money_order 时所需数据'''
         money_lines = [{

@@ -105,7 +105,7 @@ class TestMailThread(TransactionCase):
             self.order.unlink()
         # 已审核的单据不可删除
         self.order.buy_order_done()
-        with self.assertRaises(UserError):
+        with self.assertRaises(ValidationError):
             self.order.unlink()
 
 
