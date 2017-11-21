@@ -16,10 +16,8 @@ class CustomerStatementsReport(models.Model):
         # 相邻的两条记录，partner不同，应收款余额重新计算
         pre_record = self.search(
             [('id', '<=', self.id), ('partner_id', '=', self.partner_id.id)])
-        compute_amount = 0.0
         for pre in pre_record:
-            compute_amount += pre.amount - pre.pay_amount
-        self.balance_amount = compute_amount - self.discount_money
+            self.balance_amount += pre.amount - pre.pay_amount - self.discount_money
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
