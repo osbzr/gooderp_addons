@@ -13,6 +13,7 @@
 				<form string='审批'>
                     <group>
                         <field name='model_id'/>
+						<field name='applicable_domain'/>
 						<field name='type'/>
                         <field name='is_department_approve'/>
                     </group>
@@ -31,10 +32,12 @@
 			<field name='model'>good_process.process</field>
 			<field name='arch' type='xml'>
 				<tree string='审批'>
+					<field name='sequence'/>
 					<field name='model_id'/>
 					<field name='type'/>
 					<field name='is_department_approve'/>
-					<field name='active'  invisible='1'/>
+					<field name='applicable_domain'/>
+					<field name='active' invisible='1'/>
 				</tree>
 			</field>
 		</record>
