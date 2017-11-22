@@ -141,10 +141,10 @@ class TestMoneyOrder(TransactionCase):
         with self.assertRaises(UserError):
             money.money_order_done()
         self.partner_id = self.env.ref('core.jd')
-        # advance_payment < 0, 执行'核销金额不能大于付款金额'
-        self.env.ref('money.pay_2000').line_ids.amount = -10.0
+        # 执行'核销金额不能大于付款金额'
+        money.line_ids.amount = 10.0
         with self.assertRaises(UserError):
-            self.env.ref('money.pay_2000').money_order_done()
+            money.money_order_done()
 
         # 清空一级客户类别的科目，审核时报错
         self.env.ref('core.customer_category_1').account_id = False
