@@ -30,6 +30,7 @@ class ReportSellSummary(models.Model):
     tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
     subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
     margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
+    date = fields.Date(u'日期')
 
     def init(self):
         cr = self._cr
@@ -50,6 +51,7 @@ class ReportSellSummary(models.Model):
                     uom.name AS uom,
                     uos.name AS uos,
                     wh.name AS warehouse,
+                    wm.date AS date,
                     SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_uos_qty
                            ELSE - wml.goods_uos_qty END) AS goods_uos_qty,
                     SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
@@ -87,7 +89,7 @@ class ReportSellSummary(models.Model):
                   AND wm.origin like 'sell.delivery%%'
                   AND (goods.no_stock is null or goods.no_stock = FALSE)
 
-                GROUP BY wm.partner_id, wm.user_id, staff.department_id, goods.name, goods.id, goods.brand, loc.name, wml.lot, attribute.name, uom.name, uos.name, wh.name, wml.cost_unit
+                GROUP BY wm.partner_id, wm.user_id, staff.department_id, goods.name, goods.id, goods.brand, loc.name, wml.lot, attribute.name, uom.name, uos.name, wh.name, wml.cost_unit,wm.date
 
                 ORDER BY goods.name, wh.name, goods_qty asc
             )

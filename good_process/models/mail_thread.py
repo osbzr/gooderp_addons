@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.tools.safe_eval import safe_eval
 
 
 class MailThread(models.AbstractModel):
@@ -55,15 +56,27 @@ class MailThread(models.AbstractModel):
                 return_vals = staff_row.parent_id.user_id
         return return_vals
 
-    def __add_approver__(self, thread_row, model_name):
+    def __add_approver__(self, thread_row, model_name, active_id):
         # TODO 加上当前用户的部门经理
         approver_rows = []
         users = []
-        process_rows = self.env['good_process.process'].search(
-            [('model_id.model', '=', model_name), ('type', '=', getattr(thread_row, 'type', False))])
-        groups = self.__get_groups__(process_rows)
+        process_rows = self.env['good_process.process'].search([('model_id.model', '=', model_name),
+                                                                ('type', '=', getattr(thread_row, 'type', False))],
+                                                               order='sequence')
+        process_row = False
+        for process in process_rows:
+            domain = [('id', '=', active_id)]
+            if process.applicable_domain:
+                domain += safe_eval(process.applicable_domain)
+            if self.env[model_name].search(domain):
+                process_row = process
+                break
+        if not process_row:
+            return []
+
+        groups = self.__get_groups__(process_row)
         department_manager = self.__get_user_manager__(
-            thread_row, process_rows)
+            thread_row, process_row)
         if department_manager:
             users.append((department_manager, 0, False))
         users.extend(self.__get_users__(groups))
@@ -136,7 +149,7 @@ class MailThread(models.AbstractModel):
             approver_rows.unlink()
             message = self.__good_approver_send_message__(
                 active_id, active_model, u'拒绝')
-            return_vals = self.__add_approver__(mode_row, active_model)
+            return_vals = self.__add_approver__(mode_row, active_model, active_id)
 
         else:
             return_vals = u'已经通过不能拒绝！'
@@ -145,7 +158,7 @@ class MailThread(models.AbstractModel):
     @api.model
     def create(self, vals):
         thread_row = super(MailThread, self).create(vals)
-        approvers = self.__add_approver__(thread_row, self._name)
+        approvers = self.__add_approver__(thread_row, self._name, thread_row.id)
         thread_row._approver_num = len(approvers)
         return thread_row
 
@@ -177,7 +190,7 @@ class MailThread(models.AbstractModel):
                     raise ValidationError(u'已审批不可修改')
                 if change_state == 'draft':
                     vals.update({
-                        '_approver_num': len(self.__add_approver__(th, th._name)),
+                        '_approver_num': len(self.__add_approver__(th, th._name, th.id)),
                     })
             # 审批中，审核时报错，修改其他字段报错
             elif len(th._to_approver_ids) < th._approver_num:
@@ -202,9 +215,21 @@ class MailThread(models.AbstractModel):
     def __get_user_group__(self, active_id,  active_model, users, mode_row):
         all_groups = []
         process_rows = self.env['good_process.process'].search([('model_id.model', '=', active_model),
-                                                                ('type', '=', getattr(mode_row, 'type', False))])
+                                                                ('type', '=', getattr(mode_row, 'type', False))],
+                                                               order='sequence')
+        process_row = False
+        for process in process_rows:
+            domain = [('id', '=', active_id)]
+            if process.applicable_domain:
+                domain += safe_eval(process.applicable_domain)
+            if self.env[active_model].search(domain):
+                process_row = process
+                break
+        if not process_row:
+            return users, []
+
         line_rows = self.env['good_process.process_line'].search(
-            [('process_id', '=', process_rows.id)], order='sequence')
+            [('process_id', '=', process_row.id)], order='sequence')
         least_num = 'default_vals'
         for line in line_rows:
             approver_s = self.env['good_process.approver'].search([('model', '=', active_model),
@@ -322,16 +347,19 @@ class Process(models.Model):
     line_ids = fields.One2many(
         'good_process.process_line', 'process_id', string=u'审批组')
     active = fields.Boolean(u'启用', default=True)
+    applicable_domain = fields.Char(u'适用条件')
+    sequence = fields.Integer(u'优先级')
 
     @api.one
-    @api.constrains('model_id', 'type')
+    @api.constrains('model_id', 'type', 'applicable_domain')
     def check_model_id(self):
         records = self.search([
             ('model_id', '=', self.model_id.id),
             ('type', '=', self.type),
-            ('id', '!=', self.id)])
+            ('id', '!=', self.id),
+            ('applicable_domain', '=', self.applicable_domain)])
         if records:
-            raise ValidationError(u'同种单据的审批规则必须唯一')
+            raise ValidationError(u'审批规则必须唯一')
 
     @api.model
     def create(self, vals):

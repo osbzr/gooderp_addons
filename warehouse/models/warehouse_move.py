@@ -54,7 +54,8 @@ class WhMove(models.Model):
     ref = fields.Char(u'外部单号')
     state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft',
                              index=True,
-                             help=u'移库单状态标识，新建时状态为未审核;审核后状态为已审核')
+                             help=u'移库单状态标识，新建时状态为未审核;审核后状态为已审核',
+                             track_visibility='onchange')
     partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict',
                                  help=u'该单据对应的业务伙伴')
     date = fields.Date(u'单据日期', required=True, copy=False, default=fields.Date.context_today,
@@ -100,6 +101,7 @@ class WhMove(models.Model):
         states={'done': [('readonly', True)]},
         default=lambda self: self.env.user,
         help=u'单据经办人',
+        track_visibility='onchange'
     )
     express_type = fields.Char(string='承运商')
     express_code = fields.Char(u'快递单号', copy=False)

@@ -7,6 +7,7 @@
             <field name="model">report.sell.summary</field>
             <field name="arch" type="xml">
                 <tree string="销售汇总表" create="false">
+                    <field name="date"/>
                     <field name="partner_id"/>
                     <field name="user_id"/>
                     <field name="goods_id"/>
