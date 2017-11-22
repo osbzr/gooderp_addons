@@ -35,7 +35,6 @@ class PartnerStatementsReportWizard(models.Model):
         if self.from_date > self.to_date:
             raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' %
                             (self.from_date, self.to_date))
-        res = self.env['bank.statements.report'].search([])
 
         view = self.env.ref('money.bank_statements_report_tree')
 

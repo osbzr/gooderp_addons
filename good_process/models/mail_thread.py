@@ -65,7 +65,6 @@ class MailThread(models.AbstractModel):
                                                                order='sequence')
         process_row = False
         for process in process_rows:
-            print "__add_approver__", process
             domain = [('id', '=', active_id)]
             if process.applicable_domain:
                 domain += safe_eval(process.applicable_domain)
@@ -220,8 +219,6 @@ class MailThread(models.AbstractModel):
                                                                order='sequence')
         process_row = False
         for process in process_rows:
-            print "__get_user_group__", process
-            print "process.applicable_domain", process.applicable_domain
             domain = [('id', '=', active_id)]
             if process.applicable_domain:
                 domain += safe_eval(process.applicable_domain)
@@ -353,15 +350,16 @@ class Process(models.Model):
     applicable_domain = fields.Char(u'适用条件')
     sequence = fields.Integer(u'优先级')
 
-    # @api.one
-    # @api.constrains('model_id', 'type')
-    # def check_model_id(self):
-    #     records = self.search([
-    #         ('model_id', '=', self.model_id.id),
-    #         ('type', '=', self.type),
-    #         ('id', '!=', self.id)])
-    #     if records:
-    #         raise ValidationError(u'同种单据的审批规则必须唯一')
+    @api.one
+    @api.constrains('model_id', 'type', 'applicable_domain')
+    def check_model_id(self):
+        records = self.search([
+            ('model_id', '=', self.model_id.id),
+            ('type', '=', self.type),
+            ('id', '!=', self.id),
+            ('applicable_domain', '=', self.applicable_domain)])
+        if records:
+            raise ValidationError(u'审批规则必须唯一')
 
     @api.model
     def create(self, vals):
