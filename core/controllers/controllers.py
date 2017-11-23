@@ -25,7 +25,7 @@ db_monodb = http.db_monodb
 class GoodERPLogin(Home):
     @http.route('/login', type='http', auth="none")
     def login(self, db, login, key):
-        return login_and_redirect(db, login, key)
+        return main.login_and_redirect(db, login, key)
 
 
 class GoodERPDB(Database):
