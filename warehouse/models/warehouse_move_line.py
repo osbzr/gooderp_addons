@@ -245,7 +245,7 @@ class WhMoveLine(models.Model):
                 # 建议将产品上架到现有库位上
                 new_id.location_id = new_id.env['location'].search([('goods_id', '=', new_id.goods_id.id),
                                                                     ('attribute_id', '=',
-                                                                     new_id.attribute_id.id),
+                                                                     new_id.attribute_id and new_id.attribute_id.id),
                                                                     ('warehouse_id', '=', new_id.warehouse_dest_id.id)],
                                                                    limit=1)
         return new_id
