@@ -294,10 +294,18 @@ class WhAssembly(models.Model):
             out_voucher.voucher_done()
 
     @api.multi
+    def check_is_child_enable(self):
+        for child_line in self.line_out_ids:
+            for parent_line in self.line_in_ids:
+                if child_line.goods_id.id == parent_line.goods_id.id and child_line.attribute_id.id == parent_line.attribute_id.id:
+                    raise UserError(u'子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
+
+    @api.multi
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
             order.check_parent_length()
+            order.check_is_child_enable()
 
             for line_out in order.line_out_ids:
                 if line_out.state != 'done':
@@ -877,10 +885,18 @@ class outsource(models.Model):
             out_voucher.voucher_done()
 
     @api.multi
+    def check_is_child_enable(self):
+        for child_line in self.line_out_ids:
+            for parent_line in self.line_in_ids:
+                if child_line.goods_id.id == parent_line.goods_id.id and child_line.attribute_id.id == parent_line.attribute_id.id:
+                    raise UserError(u'子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
+
+    @api.multi
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
             order.check_parent_length()
+            order.check_is_child_enable()
 
             for line_out in order.line_out_ids:
                 if line_out.state != 'done':
@@ -1159,10 +1175,18 @@ class WhDisassembly(models.Model):
             disassembly.out_voucher_id = out_voucher.id
             out_voucher.voucher_done()
 
+    @api.multi
+    def check_is_child_enable(self):
+        for child_line in self.line_in_ids:
+            for parent_line in self.line_out_ids:
+                if child_line.goods_id.id == parent_line.goods_id.id and child_line.attribute_id.id == parent_line.attribute_id.id:
+                    raise UserError(u'子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
+
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
             order.check_parent_length()
+            order.check_is_child_enable()
 
             for line_out in order.line_out_ids:
                 if line_out.state != 'done':

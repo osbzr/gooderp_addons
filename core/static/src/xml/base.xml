@@ -95,6 +95,7 @@
 	<t t-extend="HiddenInputFile" t-name="HiddenInputPDFFile">
         <t t-jquery="input[type='file']:first" t-operation="replace">
             <input type="file" class="o_form_input_file" name="ufile" accept="application/pdf" />
+            <input t-if="widget.widget=='image'" type="file" class="o_form_input_file" name="ufile" accept="image/jpeg,image/jpg,image/png"/>
         </t>
     </t>
 	<t t-extend="FieldMany2ManyTag">
