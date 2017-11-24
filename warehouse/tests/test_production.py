@@ -46,6 +46,30 @@ class TestProduction(TransactionCase):
         self.assertEqual(self.assembly.state, 'done')
         self.assertEqual(self.disassembly.state, 'done')
 
+    def test_check_is_child_enable_assembly(self):
+        # 组装 子件中不能包含与组合件中相同的 产品+属性
+        mouse_line = self.env.ref('warehouse.wh_move_line_3')
+        mouse_line.goods_id = self.env.ref('goods.mouse').id
+
+        with self.assertRaises(UserError):
+            self.assembly.approve_feeding()
+
+    def test_check_is_child_enable_disassembly(self):
+        # 拆卸 子件中不能包含与组合件中相同的 产品+属性
+        mouse_line = self.env.ref('warehouse.wh_move_line_7')
+        mouse_line.goods_id = self.env.ref('goods.mouse').id
+
+        with self.assertRaises(UserError):
+            self.disassembly.approve_feeding()
+
+    def test_check_is_child_enable_outsource(self):
+        # 委外加工单 子件中不能包含与组合件中相同的 产品+属性
+        mouse_line = self.env.ref('warehouse.wh_move_line_out3')
+        mouse_line.goods_id = self.env.ref('goods.mouse').id
+
+        with self.assertRaises(UserError):
+            self.outsource_out1.approve_feeding()
+
     def test_cancel(self):
         self.assembly.approve_feeding()
         self.assembly.approve_order()
