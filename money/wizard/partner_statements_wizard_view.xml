@@ -1,6 +1,20 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <record id='report_supplier_statements_report' model='ir.actions.report.xml'>
+            <field name='name'>供应商对账单</field>
+            <field name='model'>partner.statements.report.wizard</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>supplier.statements.report</field>
+            <field name='template_file'>money/template/supplier.statements.report.docx</field>
+        </record>
+		<record id='report_customer_statements_report' model='ir.actions.report.xml'>
+            <field name='name'>客户对账单</field>
+            <field name='model'>partner.statements.report.wizard</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>customer.statements.report</field>
+            <field name='template_file'>money/template/customer.statements.report.docx</field>
+        </record>
         <!--业务伙伴对账单向导 form-->
     	<record id="partner_statements_report_wizard_form" model="ir.ui.view">
             <field name="name">partner.statements.report.wizard.form</field>
@@ -18,11 +32,38 @@
                         </group>
                     </group>
                     <footer>
-                        <button name='partner_statements_without_goods' string='不带商品明细的对账单' type='object' class='oe_highlight'/>
+                        <button name="%(money.report_supplier_statements_report)d" string="不带商品明细的对账单" type="action"
+								context="{'partner_id':partner_id,'from_date':from_date,'to_date':to_date}" class='oe_highlight'/>
                         <button name='partner_statements_with_goods' string='带商品明细的对账单' type='object' class='oe_highlight'/>
                         or
                         <button string='取消' class='oe_link' special='cancel'/>
                 	</footer>
+                </form>
+            </field>
+        </record>
+
+		<record id="customer_statements_report_wizard_form" model="ir.ui.view">
+            <field name="name">partner.statements.report.wizard.form</field>
+            <field name="model">partner.statements.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Partner Statements Report Wizard">
+                    <group>
+                        <group>
+				            <field name="partner_id"
+                                options="{'no_open': True, 'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="%(money.report_customer_statements_report)d" string="不带商品明细的对账单" type="action"
+								context="{'partner_id':partner_id,'from_date':from_date,'to_date':to_date}" class='oe_highlight'/>
+                        <button name='partner_statements_with_goods' string='带商品明细的对账单' type='object' class='oe_highlight'/>
+                        or
+                        <button string='取消' class='oe_link' special='cancel'/>
+                    </footer>
                 </form>
             </field>
         </record>
