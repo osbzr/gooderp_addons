@@ -35,15 +35,18 @@ class Goods(models.Model):
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         '''在many2one字段中支持按编号搜索'''
         args = args or []
+        code_search_goods = []
         if name:
             args.append(('code', 'ilike', name))
             goods_ids = self.search(args)
             if goods_ids:
-                return goods_ids.name_get()
-            else:
-                args.remove(('code', 'ilike', name))
-        return super(Goods, self).name_search(name=name, args=args,
+                code_search_goods = goods_ids.name_get()
+
+            args.remove(('code', 'ilike', name))
+        search_goods = super(Goods, self).name_search(name=name, args=args,
                                               operator=operator, limit=limit)
+        goods = code_search_goods + search_goods
+        return goods
 
     @api.model
     def create(self, vals):
