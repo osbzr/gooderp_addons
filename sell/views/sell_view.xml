@@ -147,6 +147,7 @@
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
                     <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+					<filter name="user_id" string="我的订单" domain="[('user_id','=',uid)]"/>
                     <separator/>
                     <filter name="not out" string="未出库" domain="[('goods_state','=',u'未出库')]"/>
                     <filter name="part out" string="部分出库" domain="[('goods_state','=',u'部分出库')]"/>
@@ -665,7 +666,7 @@
         	<field name='view_type'>form</field>
         	<field name='view_mode'>tree,form</field>
         	<field name='view_id' ref='sell_order_tree'/>
-        	<field name="context">{'warehouse_type': 'stock'}</field>
+			<field name="context">{'warehouse_type': 'stock','search_default_user_id':1}</field>
         	<field name="help" type="html">
                <p class="oe_view_nocontent_create">
                 	 点击创建销货订单
