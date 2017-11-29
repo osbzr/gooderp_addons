@@ -10,6 +10,7 @@ from odoo.tools import misc
 import ooxml
 from ooxml import parse, serialize, importer
 import codecs
+from datetime import datetime
 
 import pdfkit
 _logger = logging.getLogger(__name__)
@@ -114,6 +115,8 @@ class ReportDocx(report_sxw):
         report_ids = report_obj.search([('report_name', '=', self.name[7:])])
         self.title = report_ids[0].name
         if report_ids[0].report_type == 'docx':
+            print "ids", ids
+            print "report_ids", report_ids
             return self.create_source_docx(cr, uid, ids, report_ids[0], context)
 
         return super(ReportDocx, self).create(cr, uid, ids, data, context)
@@ -175,6 +178,10 @@ class ReportDocx(report_sxw):
 
     def get_docx_data(self, cr, uid, ids, report, context):
         env = api.Environment(cr, uid, context)
+        # 打印时， 在消息处显示打印人
+        message = str((datetime.now()).strftime('%Y-%m-%d %H:%M:%S')) + ' ' + env.user.name + u' 打印了该单据'
+        env.get(report.model).message_post(body=message)
+
         return env.get(report.model).browse(ids)
 
     def _save_file(self, folder_name, file):
