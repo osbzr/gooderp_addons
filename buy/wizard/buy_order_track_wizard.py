@@ -84,6 +84,7 @@ class BuyOrderTrackWizard(models.TransientModel):
             'planned_date': line.order_id.planned_date,
             'wh_in_date': self._get_wh_in_date(line),  # 入库日期
             'note': line.note,
+            'type': line.order_id.type,
         }
 
     @api.multi

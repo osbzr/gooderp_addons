@@ -13,6 +13,7 @@
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
                     <field name="uom"/>
                     <field name="date"/>
+                    <field name="type"/>
                     <field name="order_name"/>
                     <field name="partner_id"/>
                     <field name="warehouse_dest_id"/>

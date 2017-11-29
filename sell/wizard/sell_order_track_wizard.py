@@ -84,6 +84,7 @@ class SellOrderTrackWizard(models.TransientModel):
             'delivery_date': line.order_id.delivery_date,
             'wh_out_date': self._get_wh_out_date(line),  # 出库日期
             'note': line.note,
+            'type': line.order_id.type,
         }
 
     @api.multi
