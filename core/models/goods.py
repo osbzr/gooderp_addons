@@ -45,8 +45,10 @@ class Goods(models.Model):
             args.remove(('code', 'ilike', name))
         search_goods = super(Goods, self).name_search(name=name, args=args,
                                               operator=operator, limit=limit)
-        goods = code_search_goods + search_goods
-        return goods
+        for good_tup in code_search_goods: # 去除重复产品
+            if good_tup not in search_goods:
+                search_goods.append(good_tup)
+        return search_goods
 
     @api.model
     def create(self, vals):

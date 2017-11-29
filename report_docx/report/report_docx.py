@@ -178,9 +178,11 @@ class ReportDocx(report_sxw):
 
     def get_docx_data(self, cr, uid, ids, report, context):
         env = api.Environment(cr, uid, context)
-        records = env.get(report.model).browse(ids)
-        records.message_post(body=str((datetime.now()).strftime('%Y-%m-%d %H:%M:%S')) + ' ' + env.user.name + u' 打印了该单据')
-        return records
+        # 打印时， 在消息处显示打印人
+        message = str((datetime.now()).strftime('%Y-%m-%d %H:%M:%S')) + ' ' + env.user.name + u' 打印了该单据'
+        env.get(report.model).message_post(body=message)
+
+        return env.get(report.model).browse(ids)
 
     def _save_file(self, folder_name, file):
         out_stream = open(folder_name, 'wb')
