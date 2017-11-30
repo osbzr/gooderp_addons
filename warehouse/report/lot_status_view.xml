@@ -12,7 +12,9 @@
                     <field name='attribute_id' groups='goods.multi_attrs_groups' />
                     <field name='lot' groups='goods.batch_groups' />
                     <field name='uos_qty' groups='goods.auxiliary_unit_groups' />
+                    <field name="cost"/>
                     <field name='qty' />
+                    <field name="amount"/>
                     <field name='date' />
                     <field name='warehouse' groups='warehouse.multi_warehouse_groups' />
                     <field name='status' />
@@ -48,7 +50,9 @@
                 	<field name='goods' type='row' />
                     <field name='lot' type='row' groups='goods.batch_groups' />
                     <field name='warehouse' type='col' groups='warehouse.multi_warehouse_groups' />
+                    <field name='cost' type='measure' />
                     <field name='qty' type='measure' />
+                    <field name='amount' type='measure' />
                 </pivot>
             </field>
         </record>
