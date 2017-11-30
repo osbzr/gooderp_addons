@@ -115,8 +115,6 @@ class ReportDocx(report_sxw):
         report_ids = report_obj.search([('report_name', '=', self.name[7:])])
         self.title = report_ids[0].name
         if report_ids[0].report_type == 'docx':
-            print "ids", ids
-            print "report_ids", report_ids
             return self.create_source_docx(cr, uid, ids, report_ids[0], context)
 
         return super(ReportDocx, self).create(cr, uid, ids, data, context)

@@ -20,6 +20,8 @@ class ReportLotStatus(models.Model):
     date = fields.Date(u'日期')
     qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     uos_qty = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'))
+    cost = fields.Float(u'单价', digits=dp.get_precision('Amount'))
+    amount = fields.Float(u'金额', digits=dp.get_precision('Amount'))
 
     def init(self):
         cr = self._cr
@@ -29,6 +31,8 @@ class ReportLotStatus(models.Model):
             create or replace view report_lot_status as (
                 SELECT MIN(line.id) as id,
                         goods.name as goods,
+                        goods.cost as cost,
+                        goods.cost * sum(line.qty_remaining) as amount,
                         uom.name as uom,
                         uos.name as uos,
                         line.lot as lot,
@@ -50,7 +54,7 @@ class ReportLotStatus(models.Model):
                   AND wh.type = 'stock'
                   AND line.state = 'done'
 
-                GROUP BY goods, uom, uos, lot, attribute_id, warehouse
+                GROUP BY goods, uom, uos, lot, attribute_id, warehouse, goods.cost
 
                 ORDER BY goods, lot, warehouse
             )

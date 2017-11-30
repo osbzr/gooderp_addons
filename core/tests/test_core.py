@@ -25,6 +25,18 @@ class TestCore(TransactionCase):
         res = self.env['partner'].name_search('jd')
         self.assertEqual(res, real_result)
 
+    def test_partner_write(self):
+        ''' 测试 业务伙伴应收/应付余额不为0时，不允许取消对应的客户/供应商身份 '''
+        partner = self.env.ref('core.jd')
+        partner.receivable = 100
+        with self.assertRaises(UserError):
+            partner.c_category_id = False
+
+        partner = self.env.ref('core.lenovo')
+        partner.payable = 100
+        with self.assertRaises(UserError):
+            partner.s_category_id = False
+
     def test_res_currency(self):
         """测试阿拉伯数字转换成中文大写数字的方法"""
         self.env['res.currency'].rmb_upper(10000100.3)
