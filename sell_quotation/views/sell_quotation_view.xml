@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- 报价单 tree 视图 -->
+    	<record id='sell_quotation_tree' model='ir.ui.view'>
+        	<field name='name'>sell.quotation.tree</field>
+        	<field name='model'>sell.quotation</field>
+        	<field name='arch' type='xml'>
+                <tree string='报价单' colors='blue:state == "draft";lightgray:state == "cancel"'>
+            		<field name='date'/>
+            		<field name='name'/>
+            		<field name='user_id'/>
+            		<field name='partner_id'/>
+                    <field name='partner_address_id'/>
+                    <field name='mobile'/>
+                    <field name='state'/>
+            	</tree>
+        	</field>
+    	</record>
+
+    	<!-- 报价单 form 视图 -->
+    	<record id='sell_quotation_form' model='ir.ui.view'>
+        	<field name='name'>sell.quotation.form</field>
+        	<field name='model'>sell.quotation</field>
+        	<field name='arch' type='xml'>
+            	<form string='报价单'>
+            		<header>
+            			<button name='sell_quotation_done' states='draft' string='审核' type='object' class='oe_highlight'/>
+            			<button name="sell_quotation_draft" states="done" string="反审核" type="object"/>
+                        <button name="action_cancel" states="draft" string="作废" type="object"/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,done,cancel"/>
+            		</header>
+            		<sheet>
+            			<group>
+            				<group>
+            					<field name='partner_id' required='1'
+            						domain="[('c_category_id', '!=', False)]"
+            						context="{'form_view_ref': 'core.customer_address_form'}"/>
+            					<field name='partner_address_id' options="{'no_open': True, 'no_create': True}"/>
+                                <field name="contact"/>
+            				    <field name='mobile'/>
+            					<field name='user_id'
+                                       options="{'no_open': True, 'no_create': True}"/>
+            				</group>
+            				<group>
+							    <field name='date'/>
+            					<field name='opportunity_id'/>
+                                <field name='validate_to'/>
+							</group>
+            			</group>
+            			<notebook>
+            				<page string="报价单行">
+            					<field name='line_ids'>
+                 					<tree string='报价单行' editable='bottom'>
+                 						<field name='goods_id' domain="[('not_saleable','=',False)]"/>
+                                        <field name='price'/>
+                 						<field name='qty'/>
+                 						<field name='uom_id'/>
+										<field name="partner_id" invisible="1"/>
+										<field name="date" invisible="1"/>
+										<field name="state" invisible="1"/>
+				 					</tree>
+				 				</field>
+				 				<field name="note" placeholder="暂无备注信息"/>
+				 			</page>
+				 		</notebook>
+            		</sheet>
+                	<div class="oe_chatter">
+                    	<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+						<field name="_to_approver_ids" widget="goodprocess" readonly="1"/>
+                    	<field name="message_ids" widget="mail_thread"/>
+                	</div>
+            	</form>
+        	</field>
+    	</record>
+
+    	<record id="sell_quotation_search" model="ir.ui.view">
+            <field name="name">sell.quotation.search</field>
+            <field name="model">sell.quotation</field>
+            <field name="arch" type="xml">
+                <search string="报价单">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+					<filter name="user_id" string="我的订单" domain="[('user_id','=',uid)]"/>
+                    <group expand="0" string="分组">
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="报价日期" domain="[]" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- 报价单 action -->
+    	<record id='sell_quotation_action' model='ir.actions.act_window'>
+        	<field name='name'>报价单</field>
+        	<field name='res_model'>sell.quotation</field>
+        	<field name='view_type'>form</field>
+        	<field name='view_mode'>tree,form</field>
+        	<field name='view_id' ref='sell_quotation_tree'/>
+			<field name="context">{'search_default_user_id':1}</field>
+        	<field name="help" type="html">
+               <p class="oe_view_nocontent_create">
+                	 点击创建报价单
+               </p>
+             </field>
+    	</record>
+
+		<!-- 继承销货订单 form 视图 -->
+        <record id="quotation_sell_order_form_inherit" model="ir.ui.view">
+            <field name="name">quotation sell order form inherit</field>
+            <field name="model">sell.order</field>
+            <field name="inherit_id" ref="sell.sell_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='line_ids']/tree/field[@name='price_taxed']" position='attributes'>
+                    <attribute name='readonly'>1</attribute>
+                </xpath>
+				<xpath expr="//field[@name='line_ids']/tree/field[@name='price']" position='attributes'>
+                    <attribute name='readonly'>1</attribute>
+                </xpath>
+			</field>
+		</record>
+
+        <menuitem id='sell_quotation_menu' name='报价单' action='sell_quotation_action'
+                  parent='sell.sell_order_menu_root' sequence='0' groups='sell.sell_groups'/>
+    </data>
+</openerp>
