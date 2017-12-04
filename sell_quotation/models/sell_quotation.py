@@ -145,7 +145,6 @@ class SellQuotationLine(models.Model):
                              ondelete='restrict',
                              string=u'计量单位',
                              required=True)
-    price_readonly = fields.Boolean(u'价格是否只读', compute=_compute_price_readonly)
 
     @api.multi
     @api.onchange('goods_id')
@@ -159,18 +158,24 @@ class SellQuotationLine(models.Model):
 class SellOrderLine(models.Model):
     _inherit = 'sell.order.line'
 
+    price_taxed = fields.Float(u'含税单价',
+                               digits=dp.get_precision('Price'),
+                               readonly=1,
+                               help=u'含税单价，取商品零售价')
+
     @api.multi
-    @api.onchange('goods_id')
+    @api.onchange('goods_id','quantity')
     def onchange_goods_id(self):
-        '''当订单行的商品变化时，带出商品上的单位、默认仓库、价格、税率'''
+        ''' 当订单行的商品变化时，带出商品上的单位、默认仓库、价格、税率 '''
         super(SellOrderLine, self).onchange_goods_id()
         if self.goods_id:
             rec = self.env['sell.quotation.line'].search([('goods_id', '=', self.goods_id.id),
                                                           ('partner_id', '=', self.order_id.partner_id.id),
                                                           ('state', '=', 'done')],
                                                          order='date desc')
-            print "res", rec
             if not rec:
-                raise UserError(u'请为客户%s，产品%s建立报价' % (self.order_id.partner_id.name, self.goods_id.name))
+                raise UserError(u'客户%s商品%s不存在已审核的报价单！' % (self.order_id.partner_id.name, self.goods_id.name))
+            if self.quantity < rec[0].qty:
+                raise UserError(u'商品%s数量不能小于报价单中起订数量%s' % (self.goods_id.name, rec[0].qty))
 
             self.price_taxed = rec[0].price

@@ -50,7 +50,7 @@
             			</group>
             			<notebook>
             				<page string="报价单行">
-            					<field name='line_ids'>
+            					<field name='line_ids' context="{'readonly_by_pass': True}">
                  					<tree string='报价单行' editable='bottom'>
                  						<field name='goods_id' domain="[('not_saleable','=',False)]"/>
                                         <field name='price'/>
@@ -109,19 +109,19 @@
     	</record>
 
 		<!-- 继承销货订单 form 视图 -->
-        <record id="quotation_sell_order_form_inherit" model="ir.ui.view">
-            <field name="name">quotation sell order form inherit</field>
-            <field name="model">sell.order</field>
-            <field name="inherit_id" ref="sell.sell_order_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='line_ids']/tree/field[@name='price_taxed']" position='attributes'>
-                    <attribute name='readonly'>1</attribute>
-                </xpath>
-				<xpath expr="//field[@name='line_ids']/tree/field[@name='price']" position='attributes'>
-                    <attribute name='readonly'>1</attribute>
-                </xpath>
-			</field>
-		</record>
+        <!--<record id="quotation_sell_order_form_inherit" model="ir.ui.view">-->
+            <!--<field name="name">quotation sell order form inherit</field>-->
+            <!--<field name="model">sell.order</field>-->
+            <!--<field name="inherit_id" ref="sell.sell_order_form"/>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<xpath expr="//field[@name='line_ids']/tree/field[@name='price_taxed']" position='attributes'>-->
+                    <!--<attribute name='readonly'>1</attribute>-->
+                <!--</xpath>-->
+				<!--<xpath expr="//field[@name='line_ids']/tree/field[@name='price']" position='attributes'>-->
+                    <!--<attribute name='readonly'>1</attribute>-->
+                <!--</xpath>-->
+			<!--</field>-->
+		<!--</record>-->
 
         <menuitem id='sell_quotation_menu' name='报价单' action='sell_quotation_action'
                   parent='sell.sell_order_menu_root' sequence='0' groups='sell.sell_groups'/>
