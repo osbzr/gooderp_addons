@@ -275,5 +275,34 @@
         
         <menuitem action="staff_job_action" id="menu_staff_job" sequence="5" parent="menu_staff_configuration"/>
 
+        <!-- 继承 公司 form 添加社保信息 -->
+		<record id="staff_company_form_inherit" model="ir.ui.view">
+			<field name="name">staff.company.form.inherit</field>
+			<field name="model">res.company</field>
+			<field name="inherit_id" ref="base.view_company_form" />
+            <field name="arch" type="xml">
+               <xpath expr="//notebook/page[2]" position="after">
+                    <page string="社保信息">
+						<group>
+					  		<group>
+                                <field name="housing_fund_co_ratio"/>
+								<field name="endowment_co_ratio"/>
+								<field name="health_co_ratio"/>
+								<field name="unemployment_co_ratio"/>
+                                <field name="injury_ratio"/>
+                                <field name="maternity_ratio"/>
+					  		</group>
+					  		<group>
+                                <field name="housing_fund_ratio"/>
+					    		<field name="endowment_ratio"/>
+								<field name="health_ratio"/>
+                                <field name="unemployment_ratio"/>
+					  		</group>
+					  	</group>
+				    </page>
+				</xpath>
+			</field>
+		</record>
+
     </data>
 </openerp>
