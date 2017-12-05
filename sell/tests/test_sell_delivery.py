@@ -463,12 +463,6 @@ class TestWhMoveLine(TransactionCase):
 
             break
 
-    def test_inverse_price(self):
-        '''由不含税价反算含税价，保存时生效'''
-        for line in self.new_delivery.line_out_ids:
-            line.price = 10
-            self.assertAlmostEqual(line.price_taxed, 11.7)
-
     def test_onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价'''
         for line in self.new_delivery.line_out_ids:
