@@ -22,13 +22,13 @@ class SellSummaryGoodsWizard(models.TransientModel):
     date_end = fields.Date(u'结束日期', default=_default_date_end,
                            help=u'报表汇总的结束日期，默认为当前日期')
     partner_id = fields.Many2one('partner', u'客户',
-                                 help=u'按指定客户进行统计')
+                                 help=u'只统计选定的客户')
     goods_id = fields.Many2one('goods', u'商品',
-                               help=u'按指定商品进行统计')
+                               help=u'只统计选定的商品')
     goods_categ_id = fields.Many2one('core.category', u'商品类别',
-                                     help=u'按指定商品类别进行统计')
+                                     help=u'只统计选定的商品类别')
     warehouse_id = fields.Many2one('warehouse', u'仓库',
-                                   help=u'按指定仓库进行统计')
+                                   help=u'只统计选定的仓库')
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
