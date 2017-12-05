@@ -13,6 +13,7 @@
     'application': True,
     'depends': ['sell','good_crm'],
     'data': [
+        'security/ir.model.access.csv',
         'views/sell_quotation_view.xml',
         'data/sell_quotation_data.xml',
     ],

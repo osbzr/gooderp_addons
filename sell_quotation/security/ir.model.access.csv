@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sell_quotation,access_sell_quotation,model_sell_quotation,,1,1,1,1
+access_sell_quotation_line,access_sell_quotation_line,model_sell_quotation_line,,1,1,1,1

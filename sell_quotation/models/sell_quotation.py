@@ -158,24 +158,33 @@ class SellQuotationLine(models.Model):
 class SellOrderLine(models.Model):
     _inherit = 'sell.order.line'
 
+    quotation_line_id = fields.Many2one('sell.quotation.line', string=u'报价单行')
+
     price_taxed = fields.Float(u'含税单价',
                                digits=dp.get_precision('Price'),
-                               readonly=1,
+                               store=True,
+                               related='quotation_line_id.price',
                                help=u'含税单价，取商品零售价')
+    quantity = fields.Float(u'数量',
+                            default=0,
+                            required=True,
+                            digits=dp.get_precision('Quantity'),
+                            help=u'下单数量')
 
     @api.multi
-    @api.onchange('goods_id','quantity')
-    def onchange_goods_id(self):
+    @api.onchange('quantity')
+    def onchange_quantity(self):
         ''' 当订单行的商品变化时，带出商品上的单位、默认仓库、价格、税率 '''
-        super(SellOrderLine, self).onchange_goods_id()
-        if self.goods_id:
+        if self.quantity:
             rec = self.env['sell.quotation.line'].search([('goods_id', '=', self.goods_id.id),
                                                           ('partner_id', '=', self.order_id.partner_id.id),
-                                                          ('state', '=', 'done')],
+                                                          ('state', '=', 'done'),
+                                                          ('qty', '<=', self.quantity)],
                                                          order='date desc')
             if not rec:
-                raise UserError(u'客户%s商品%s不存在已审核的报价单！' % (self.order_id.partner_id.name, self.goods_id.name))
-            if self.quantity < rec[0].qty:
-                raise UserError(u'商品%s数量不能小于报价单中起订数量%s' % (self.goods_id.name, rec[0].qty))
+                raise UserError(u'客户%s商品%s不存在已审核的起订量低于%s的报价单！' % (self.order_id.partner_id.name, self.goods_id.name, self.quantity))
 
-            self.price_taxed = rec[0].price
+            if rec:
+                self.quotation_line_id = rec[0].id
+            else:
+                self.quotation_line_id = False
