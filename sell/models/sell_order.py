@@ -467,11 +467,6 @@ class SellOrderLine(models.Model):
             self.amount = self.subtotal - self.tax_amount  # 本位币金额
             self.currency_amount = currency_amount  # 外币金额
 
-    @api.one
-    def _inverse_price(self):
-        '''由不含税价反算含税价，保存时生效'''
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
-
     @api.onchange('price', 'tax_rate')
     def onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价。
@@ -514,7 +509,6 @@ class SellOrderLine(models.Model):
                                 help=u'销货订单产生的发货单/退货单已执行数量')
     price = fields.Float(u'销售单价',
                          compute=_compute_all_amount,
-                         inverse=_inverse_price,
                          store=True,
                          digits=dp.get_precision('Price'),
                          help=u'不含税单价，由含税单价计算得出')
