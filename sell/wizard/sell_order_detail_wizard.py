@@ -63,7 +63,7 @@ class SellOrderDetailWizard(models.TransientModel):
             'view_type': 'form',
             'view_mode': 'tree,pivot',
             'view_id': False,
-            'views': [(view.id, 'tree'), (graph_view.id, 'graph')],
+            'views': [(view.id, 'tree'), (graph_view.id, 'graph'), (graph_view.id, 'pivot')],
             'res_model': 'sell.order.detail',
             'type': 'ir.actions.act_window',
             'domain': domain,

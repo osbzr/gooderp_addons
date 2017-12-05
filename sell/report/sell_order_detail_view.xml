@@ -23,6 +23,7 @@
                     <field name="tax_amount" sum="税额合计" groups='sell.out_tax_groups'/>
                     <field name="subtotal" sum="价税合计的合计" groups='sell.out_tax_groups'/>
                     <field name="margin" sum="毛利合计"/>
+                    <field name="money_state"/>
                     <field name="note"/>
                 </tree>
             </field>
@@ -34,7 +35,10 @@
                 <pivot string="销售明细表">
                     <field name='goods_id' type='row'/>
                     <field name='warehouse_id' type='col'/>
-                    <field name='qty' type='measure' />
+                    <field name='qty' type='measure'/>
+                    <field name="price" type="measure"/>
+                    <field name="amount" type='measure'/>
+                    <field name="margin" type="measure"/>
                 </pivot>
             </field>
         </record>
