@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 报价单序列号 -->
+        <record id="seq_sell_quotation" model="ir.sequence">
+            <field name="name">Sell Quotation</field>
+            <field name="code">sell.quotation</field>
+            <field name="prefix">SQ</field>
+            <field name="padding">5</field>
+        </record>
+        <!-- 本模块的以下数据表可以清空 -->
+        <record id="remove_sell_quotation" model="business.data.table">
+            <field name="name">sell.quotation</field>
+        </record>
+        <record id="remove_sell_quotation_line" model="business.data.table">
+            <field name="name">sell.quotation.line</field>
+        </record>
+    </data>
+</openerp>
