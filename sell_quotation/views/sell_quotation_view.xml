@@ -108,7 +108,7 @@
              </field>
     	</record>
 
-		 继承销货订单 form 视图
+		 <!-- 继承销货订单 form 视图 -->
         <record id="quotation_sell_order_form_inherit" model="ir.ui.view">
             <field name="name">quotation sell order form inherit</field>
             <field name="model">sell.order</field>
@@ -121,7 +121,7 @@
                     <attribute name='readonly'>1</attribute>
                 </xpath>
 				<xpath expr="//field[@name='line_ids']/tree/field[@name='price']" position='attributes'>
-                    <attribute name='readonly'>1</attribute>
+                    <attribute name='invisible'>1</attribute>
                 </xpath>
 			</field>
 		</record>

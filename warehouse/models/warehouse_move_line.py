@@ -59,11 +59,6 @@ class WhMoveLine(models.Model):
             (100 + self.tax_rate) * self.tax_rate  # 税额
         self.amount = self.subtotal - self.tax_amount  # 金额
 
-    @api.one
-    def _inverse_price(self):
-        '''由不含税价反算含税价，保存时生效'''
-        self.price_taxed = self.price * (1 + self.tax_rate * 0.01)
-
     @api.onchange('price', 'tax_rate')
     def onchange_price(self):
         '''当订单行的不含税单价改变时，改变含税单价'''
@@ -193,7 +188,6 @@ class WhMoveLine(models.Model):
 
     price = fields.Float(u'单价',
                          compute=_compute_all_amount,
-                         inverse=_inverse_price,
                          store=True,
                          digits=dp.get_precision('Price'),
                          help=u'商品的单价')

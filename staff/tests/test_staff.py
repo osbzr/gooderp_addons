@@ -44,6 +44,24 @@ class TestStaff(TransactionCase):
         staff_lily.parent_id = self.env.ref('staff.staff_1').id
         self.env['staff'].staff_contract_over_date()
 
+    def test_onchange_basic_wage(self):
+        ''' 测试：选择基本工资时带出五险一金比例，计算出应交金额并填充 '''
+        company = self.env['res.company']._company_default_get()
+        company.endowment_ratio = 8
+        # company.health_ratio = 2
+        # company.unemployment_ratio = 0.5
+        # company.housing_fund_ratio = 7
+        # company.endowment_co_ratio = 20
+        # company.health_co_ratio = 10
+        # company.unemployment_co_ratio = 1
+        # company.injury_ratio = 1
+        # company.maternity_ratio = 0.5
+        # company.housing_fund_co_ratio = 7
+
+        lili_contract = self.env.ref('staff.contract_staff_lili')
+        lili_contract.basic_wage = 13000
+        lili_contract.onchange_basic_wage()
+
 
 class TestStaffDepartment(TransactionCase):
     ''' 测试 部门 '''
