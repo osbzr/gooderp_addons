@@ -28,6 +28,7 @@ class PartnerStatementsReportWizard(models.TransientModel):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    is_doc = fields.Boolean(u'打印word格式')
 
     @api.multi
     def partner_statements_without_goods(self):
