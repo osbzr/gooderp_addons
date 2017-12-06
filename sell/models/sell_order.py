@@ -449,7 +449,6 @@ class SellOrderLine(models.Model):
         if self.tax_rate < 0:
             raise UserError(u'税率不能输入负数\n 输入税率:%s' % self.tax_rate)
         if self.order_id.currency_id.id == self.env.user.company_id.currency_id.id:
-            self.price = self.price_taxed / (1 + self.tax_rate * 0.01)  # 不含税单价
             self.subtotal = self.price_taxed * self.quantity - self.discount_amount  # 价税合计
             self.tax_amount = self.subtotal / \
                 (100 + self.tax_rate) * self.tax_rate  # 税额
@@ -458,8 +457,6 @@ class SellOrderLine(models.Model):
             rate_silent = self.env['res.currency'].get_rate_silent(
                 self.order_id.date, self.order_id.currency_id.id) or 1
             currency_amount = self.quantity * self.price_taxed - self.discount_amount
-            self.price = self.price_taxed * \
-                rate_silent / (1 + self.tax_rate * 0.01)
             self.subtotal = (self.price_taxed * self.quantity -
                              self.discount_amount) * rate_silent  # 价税合计
             self.tax_amount = self.subtotal / \
@@ -508,7 +505,6 @@ class SellOrderLine(models.Model):
                                 digits=dp.get_precision('Quantity'),
                                 help=u'销货订单产生的发货单/退货单已执行数量')
     price = fields.Float(u'销售单价',
-                         compute=_compute_all_amount,
                          store=True,
                          digits=dp.get_precision('Price'),
                          help=u'不含税单价，由含税单价计算得出')
@@ -581,6 +577,6 @@ class SellOrderLine(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、单价或优惠率发生变化时，优惠金额发生变化'''
-        price = self.price_taxed / (1 + self.tax_rate * 0.01)
-        self.discount_amount = self.quantity * price \
+        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.discount_amount = self.quantity * self.price \
             * self.discount_rate * 0.01
