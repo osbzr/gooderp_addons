@@ -153,7 +153,6 @@ class SellAdjustLine(models.Model):
             raise UserError(u'税率不能输入超过100的数')
         if self.tax_rate < 0:
             raise UserError(u'税率不能输入负数')
-        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)  # 不含税单价
         self.subtotal = self.price_taxed * self.quantity - self.discount_amount  # 价税合计
         self.tax_amount = self.subtotal / \
             (100 + self.tax_rate) * self.tax_rate  # 税额
@@ -186,7 +185,6 @@ class SellAdjustLine(models.Model):
                             digits=dp.get_precision('Quantity'),
                             help=u'相对于原单据对应明细行的调整数量，可正可负')
     price = fields.Float(u'销售单价',
-                         compute=_compute_all_amount,
                          store=True,
                          digits=dp.get_precision('Price'),
                          help=u'不含税单价，由含税单价计算得出')
@@ -245,6 +243,6 @@ class SellAdjustLine(models.Model):
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         '''当数量、含税单价或优惠率发生变化时，优惠金额发生变化'''
-        price = self.price_taxed / (1 + self.tax_rate * 0.01)
-        self.discount_amount = (self.quantity * price *
+        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.discount_amount = (self.quantity * self.price *
                                 self.discount_rate * 0.01)

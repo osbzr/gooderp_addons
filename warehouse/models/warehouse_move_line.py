@@ -53,7 +53,6 @@ class WhMoveLine(models.Model):
             raise UserError(u'税率不能输入超过100的数')
         if self.tax_rate < 0:
             raise UserError(u'税率不能输入负数')
-        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)  # 不含税单价
         self.subtotal = self.price_taxed * self.goods_qty - self.discount_amount  # 价税合计
         self.tax_amount = self.subtotal / \
             (100 + self.tax_rate) * self.tax_rate  # 税额
@@ -187,7 +186,6 @@ class WhMoveLine(models.Model):
                                  help=u'商品的辅助数量')
 
     price = fields.Float(u'单价',
-                         compute=_compute_all_amount,
                          store=True,
                          digits=dp.get_precision('Price'),
                          help=u'商品的单价')
@@ -457,8 +455,8 @@ class WhMoveLine(models.Model):
     @api.onchange('goods_qty', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):
         """当数量、单价或优惠率发生变化时，优惠金额发生变化"""
-        price = self.price_taxed / (1 + self.tax_rate * 0.01)
-        self.discount_amount = self.goods_qty * price * self.discount_rate * 0.01
+        self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
+        self.discount_amount = self.goods_qty * self.price * self.discount_rate * 0.01
 
     @api.multi
     @api.onchange('discount_amount')
