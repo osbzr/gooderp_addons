@@ -96,3 +96,13 @@ class TestSupplierStatements(TransactionCase):
         for report in list(set(supplier_statement_goods) - set(supplier_statement_goods_init)):
             self.assertNotEqual(str(report.balance_amount), 'kaihe11')
             report.find_source_order()
+
+
+class TestPartner(TransactionCase):
+    def test_action_view_buy_history(self):
+        """ 测试 供应商购货记录（最近一年）"""
+        supplier_lenovo = self.env.ref('core.lenovo')
+        supplier_lenovo.action_view_buy_history()
+        # 测试 时间间隔大于1年的 if
+        self.env.user.company_id.start_date = '2016-01-01'
+        supplier_lenovo.action_view_buy_history()
