@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
+        <!--- 报价单 测试数据 -->
         <record id="sell_quotation_1" model="sell.quotation">
             <field name="partner_id" ref="core.jd"/>
             <field name="date">2016-11-02</field>

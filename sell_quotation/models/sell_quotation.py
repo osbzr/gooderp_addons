@@ -174,17 +174,16 @@ class SellOrderLine(models.Model):
     @api.multi
     @api.onchange('quantity')
     def onchange_quantity(self):
-        ''' 当订单行的商品变化时，带出商品上的单位、默认仓库、价格、税率 '''
+        ''' 当订单行的商品变化时，带出报价单 '''
         if self.quantity:
             rec = self.env['sell.quotation.line'].search([('goods_id', '=', self.goods_id.id),
                                                           ('partner_id', '=', self.order_id.partner_id.id),
                                                           ('state', '=', 'done'),
                                                           ('qty', '<=', self.quantity)],
                                                          order='date desc')
+            self.quotation_line_id = False
             if not rec:
                 raise UserError(u'客户%s商品%s不存在已审核的起订量低于%s的报价单！' % (self.order_id.partner_id.name, self.goods_id.name, self.quantity))
 
             if rec:
                 self.quotation_line_id = rec[0].id
-            else:
-                self.quotation_line_id = False

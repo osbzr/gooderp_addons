@@ -71,3 +71,33 @@ class TestSellQuotation(TransactionCase):
                                                       })
         self.sell_quotation.partner_address_id = address.id
         self.sell_quotation.onchange_partner_address_id()
+
+
+class TestSellQuotationLine(TransactionCase):
+    def setUp(self):
+        super(TestSellQuotationLine, self).setUp()
+        self.sell_quotation_line = self.env.ref('sell_quotation.sell_quotation_line_1')
+
+    def test_onchange_goods_id(self):
+        ''' 当报价单行的商品变化时，带出商品上的计量单位、含税价 '''
+        goods = self.env.ref('goods.keyboard')
+        self.sell_quotation_line.goods_id = goods.id
+        self.sell_quotation_line.onchange_goods_id()
+
+
+class TestSellOrderLine(TransactionCase):
+    def setUp(self):
+        super(TestSellOrderLine, self).setUp()
+        self.sell_line = self.env.ref('sell.sell_order_line_1')
+        self.sell_quotation = self.env.ref('sell_quotation.sell_quotation_1')
+
+    def test_onchange_quantity(self):
+        ''' 当销货订单行的商品变化时，带出报价单 '''
+        self.sell_line.quantity = 80
+        # 报价单不存在，报错
+        with self.assertRaises(UserError):
+            self.sell_line.onchange_quantity()
+
+        # 报价单存在
+        self.sell_quotation.sell_quotation_done()
+        self.sell_line.onchange_quantity()
