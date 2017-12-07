@@ -347,6 +347,37 @@ class TestVoucherTemplateWizard(TransactionCase):
         self.voucher.onchange_template_id()
 
 
+class TestVoucherTemplateLine(TransactionCase):
+    def setUp(self):
+        super(TestVoucherTemplateLine, self).setUp()
+        self.voucher = self.env.ref('finance.voucher_1')
+        self.voucher_template_wizard = self.env['voucher.template.wizard'].create({
+            'name': '测试模板', 'voucher_id': self.voucher.id,
+        })
+
+    def test_onchange_account_id(self):
+        """ 凭证模板行上会计科目字段的onchange测试 """
+        self.voucher_template_wizard.save_as_template()
+        template = self.env['voucher.template'].search([])[0] if self.env[
+            'voucher.template'].search([]) else False
+        print "template", template
+        for line in template.line_ids:
+            # 会计科目不存在
+            line.account_id = False
+            line.onchange_account_id()
+
+            line.account_id = self.env.ref('finance.small_business_chart1403').id
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'goods'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'customer'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'supplier'
+            line.onchange_account_id()
+            line.account_id.auxiliary_financing = 'project'
+            line.onchange_account_id()
+            break
+
 class TestCheckoutWizard(TransactionCase):
     def setUp(self):
         super(TestCheckoutWizard, self).setUp()
