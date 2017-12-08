@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <!--- 报价单 测试数据 -->
+        <record id="sell_quotation_1" model="sell.quotation">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="date">2016-11-02</field>
+        </record>
+        <record id="sell_quotation_line_1" model="sell.quotation.line">
+            <field name="uom_id" ref="core.uom_pc"/>
+            <field name="goods_id" ref="goods.mouse"/>
+            <field name="quotation_id" ref="sell_quotation_1"/>
+            <field eval="2000.0" name="price"/>
+            <field eval="60.0" name="qty"/>
+        </record>
+        <record id="sell_quotation_2" model="sell.quotation">
+            <field name="partner_id" ref="core.jd"/>
+            <field name="date">2016-11-02</field>
+        </record>
+    </data>
+</openerp>

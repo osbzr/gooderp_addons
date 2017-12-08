@@ -48,3 +48,13 @@ class TestMonthProductCost(TransactionCase):
         company.cost_method = 'fifo'
         self.env['month.product.cost'].generate_issue_cost(
             self.period_id, '2016-01-31')
+
+
+class TestPartner(TransactionCase):
+    def test_action_view_sell_history(self):
+        """ 测试 客户购货记录（最近一年）"""
+        customer_yixun = self.env.ref('core.yixun')
+        customer_yixun.action_view_sell_history()
+        # 测试 时间间隔大于1年的 if
+        self.env.user.company_id.start_date = '2016-01-01'
+        customer_yixun.action_view_sell_history()

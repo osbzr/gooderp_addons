@@ -18,5 +18,6 @@
         'data/sell_quotation_data.xml',
     ],
     'demo': [
+        'data/demo.xml',
     ]
 }
