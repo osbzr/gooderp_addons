@@ -178,7 +178,7 @@ class TestSellOrder(TransactionCase):
         """ 测试 查看发货/退货单 """
         self.order.sell_order_done()
         self.order.action_view_delivery()
-
+        self.env.ref('core.jd').credit_limit = 0
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
         for line in delivery.line_out_ids:
