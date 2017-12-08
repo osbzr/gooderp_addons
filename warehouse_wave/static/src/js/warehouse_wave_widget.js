@@ -28,7 +28,9 @@ odoo.define('warehouse.wave', function(require) {
                                 menu.do_reload_needaction();
                             }
                         }).then(function() {
-                            new Model("do.pack").call("scan_barcode", [self.model, $this.val(), self.datarecord.id]).then(
+                            var input_code = $this.val();
+                            self.$el.find('input').val('');
+                            new Model("do.pack").call("scan_barcode", [self.model, input_code, self.datarecord.id]).then(
                                 function(result) {
                                     // TODO 如何让barcode自动获得焦点
                                     var audio;
@@ -47,7 +49,6 @@ odoo.define('warehouse.wave', function(require) {
                                         });
                                     }else{
                                         self.reload();
-                                        self.$el.find('input').val('');
                                     }
                                 }
                             );

@@ -325,6 +325,10 @@ class DoPack(models.Model):
                 else:
                     move_row = self.env['wh.move'].search(
                         [('express_code', '=', code)])
+                    if not move_row:
+                        raise UserError(u'面单号不存在！')
+                    if move_row.state == 'done':
+                        raise UserError(u'发货单已经打包完成!')
                     scan_code = move_row.name
                 self.scan_one_barcode(scan_code, pack_row)
                 if pack_row.is_pack:
