@@ -174,6 +174,18 @@ class TestSellOrder(TransactionCase):
         with self.assertRaises(UserError):
             self.order.sell_order_draft()
 
+    def test_action_view_delivery(self):
+        """ 测试 查看发货/退货单 """
+        self.order.sell_order_done()
+        self.order.action_view_delivery()
+
+        delivery = self.env['sell.delivery'].search(
+            [('order_id', '=', self.order.id)])
+        for line in delivery.line_out_ids:
+            line.goods_qty = 8
+        delivery.sell_delivery_done()
+        self.order.action_view_delivery()
+
 
 class TestSellOrderLine(TransactionCase):
 

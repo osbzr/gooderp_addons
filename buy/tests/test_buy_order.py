@@ -241,6 +241,18 @@ class TestBuyOrder(TransactionCase):
         self.order.receipt_ids[0].buy_receipt_done()
         self.order.action_view_invoice()
 
+    def test_action_view_receipt(self):
+        """ 测试 查看发货/退货单 """
+        self.order.buy_order_done()
+        self.order.action_view_receipt()
+
+        receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id)])
+        for line in receipt.line_in_ids:
+            line.goods_qty = 1
+        receipt.buy_receipt_done()
+        self.order.action_view_receipt()
+
 
 class TestBuyOrderLine(TransactionCase):
 
