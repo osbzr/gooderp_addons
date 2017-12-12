@@ -1,7 +1,7 @@
 [![在线试用](http://www.gooderp.org/logo.png)](http://demo.gooderp.org:8888/login?db=demo&login=demo&key=demo) 在线试用
 
 ----
-[![Join the chat at https://gitter.im/osbzr/gooderp](https://badges.gitter.im/osbzr/gooderp.svg)](https://gitter.im/osbzr/gooderp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Backers on Open Collective](https://opencollective.com/gooderp_addons/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/gooderp_addons/sponsors/badge.svg)](#sponsors) [![Join the chat at https://gitter.im/osbzr/gooderp](https://badges.gitter.im/osbzr/gooderp.svg)](https://gitter.im/osbzr/gooderp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![License: AGPL-3](https://img.shields.io/badge/licence-AGPL--3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0-standalone.html)
 [![Build Status](https://travis-ci.org/osbzr/gooderp_addons.svg?branch=master)](https://travis-ci.org/osbzr/gooderp_addons)
 [![Coverage Status](https://coveralls.io/repos/github/osbzr/gooderp_addons/badge.svg?branch=master)](https://coveralls.io/github/osbzr/gooderp_addons?branch=master)
@@ -118,3 +118,32 @@ http://www.gooderp.org
 6. 鼓励非程序员参与测试，特别是实施顾问和最终用户
 
 7. 开展多种双赢合作模式
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute]](CONTRIBUTING.md).
+<a href="graphs/contributors"><img src="https://opencollective.com/gooderp_addons/contributors.svg?width=890" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/gooderp_addons#backer)]
+
+<a href="https://opencollective.com/gooderp_addons#backers" target="_blank"><img src="https://opencollective.com/gooderp_addons/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/gooderp_addons#sponsor)]
+
+<a href="https://opencollective.com/gooderp_addons/sponsor/0/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/1/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/2/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/3/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/4/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/5/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/6/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/7/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/8/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/gooderp_addons/sponsor/9/website" target="_blank"><img src="https://opencollective.com/gooderp_addons/sponsor/9/avatar.svg"></a>
+
+
