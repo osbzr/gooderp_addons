@@ -395,7 +395,7 @@ class WhAssembly(models.Model):
                 'goods_qty': line.goods_qty,
                 'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                 'uos_id': line.goods_id.uos_id.id,
-                'attribute_id': line.attribute_id,
+                'attribute_id': line.attribute_id.id,
             } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
@@ -414,7 +414,7 @@ class WhAssembly(models.Model):
                     'cost': cost,
                     'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                     'uos_id': line.goods_id.uos_id.id,
-                    'attribute_id': line.attribute_id,
+                    'attribute_id': line.attribute_id.id,
                 })
             self.line_in_ids = False
             self.line_out_ids = False
@@ -427,6 +427,7 @@ class WhAssembly(models.Model):
             self.is_many_to_many_combinations = False
             self.goods_qty = line_in_ids[0].get("goods_qty")
             self.goods_id = line_in_ids[0].get("goods_id")
+            self.attribute_id = line_in_ids[0].get("attribute_id")
             domain = {'goods_id': [('id', '=', self.goods_id.id)]}
 
         elif len(line_in_ids) > 1:
@@ -619,6 +620,7 @@ class outsource(models.Model):
         if self.bom_id:
             line_in_ids = [{
                 'goods_id': line.goods_id.id,
+                'attribute_id': line.attribute_id.id,
                 'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
                 'warehouse_dest_id': warehouse_id.id,
                 'uom_id': line.goods_id.uom_id.id,
@@ -634,6 +636,7 @@ class outsource(models.Model):
                         warehouse_id[0], line.goods_qty)
                 line_out_ids.append({
                     'goods_id': line.goods_id.id,
+                    'attribute_id': line.attribute_id.id,
                     'warehouse_id': warehouse_id.id,
                     'warehouse_dest_id': self.env[
                         'warehouse'].get_warehouse_by_type('production').id,
@@ -656,6 +659,7 @@ class outsource(models.Model):
             self.is_many_to_many_combinations = False
             self.goods_qty = line_in_ids[0].get("goods_qty")
             self.goods_id = line_in_ids[0].get("goods_id")
+            self.attribute_id = line_in_ids[0].get('attribute_id')
             domain = {'goods_id': [('id', '=', self.goods_id.id)]}
         elif len(line_in_ids) > 1:
             self.is_many_to_many_combinations = True
@@ -1342,6 +1346,7 @@ class WhDisassembly(models.Model):
                         warehouse_id, line.goods_qty)
                 line_out_ids.append({
                     'goods_id': line.goods_id,
+                    'attribute_id': line.attribute_id.id,
                     'warehouse_id': self.env[
                         'warehouse'].get_warehouse_by_type('production').id,
                     'warehouse_dest_id': warehouse_id.id,
@@ -1356,6 +1361,7 @@ class WhDisassembly(models.Model):
 
             line_in_ids = [{
                 'goods_id': line.goods_id.id,
+                'attribute_id': line.attribute_id.id,
                 'warehouse_id': warehouse_id,
                 'warehouse_dest_id': self.env[
                     'warehouse'].get_warehouse_by_type('production').id,
