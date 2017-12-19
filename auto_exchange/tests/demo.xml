@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <!--- 自动取汇率 测试数据 -->
+        <record id="auto_exchange_line_1" model="auto.exchange.line">
+            <field name="date">2016-02-18</field>
+            <field name="currency_id" ref="base.USD"/>
+        </record>
+    </data>
+</openerp>
