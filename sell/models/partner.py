@@ -15,7 +15,7 @@ class Partner(models.Model):
     def action_view_sell_history(self):
         '''
         This function returns an action that display sell history of given sells order ids.
-        Date range [180 days ago, now]
+        Date range [365 days ago, now]
         '''
 
         self.ensure_one()
