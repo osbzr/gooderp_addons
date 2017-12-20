@@ -10,6 +10,7 @@
             		<field name='operating_cost_account_id'/>
             		<field name='is_enable_negative_stock'/>
                     <field name='endmonth_generation_cost'/>
+                    <field name="wh_scrap_id"/>
             	</field>
             </field>
         </record>

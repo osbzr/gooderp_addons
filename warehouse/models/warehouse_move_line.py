@@ -224,6 +224,7 @@ class WhMoveLine(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    scrap = fields.Boolean(u'报废')
 
     @api.model
     def create(self, vals):
@@ -326,6 +327,32 @@ class WhMoveLine(models.Model):
             if line.type == 'in' and line.location_id:
                 line.location_id.write(
                     {'attribute_id': line.attribute_id.id, 'goods_id': line.goods_id.id})
+
+            if line.type == 'in' and line.scrap:
+                if not self.env.user.company_id.wh_scrap_id:
+                    raise UserError(u'请在公司上输入废品库')
+                dic = {
+                    'type': 'internal',
+                    'goods_id': line.goods_id.id,
+                    'uom_id': line.uom_id.id,
+                    'attribute_id': line.attribute_id.id,
+                    'goods_qty': line.goods_qty,
+                    'warehouse_id': line.warehouse_dest_id.id,
+                    'warehouse_dest_id': self.env.user.company_id.wh_scrap_id.id
+                }
+                wh_internal = self.env['wh.internal'].search([('ref', '=', line.move_id.name)])
+                if not wh_internal:
+                    value = {
+                        'ref': line.move_id.name,
+                        'date': fields.Datetime.now(self),
+                        'warehouse_id': line.warehouse_dest_id.id,
+                        'warehouse_dest_id': self.env.user.company_id.wh_scrap_id.id,
+                        'line_out_ids': [(0, 0, dic)],
+                    }
+                    self.env['wh.internal'].create(value)
+                else:
+                    dic['move_id'] = wh_internal.move_id.id
+                    self.env['wh.move.line'].create(dic)
 
     def check_cancel(self):
         pass
