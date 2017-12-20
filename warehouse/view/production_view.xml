@@ -155,6 +155,7 @@
                                     <field name='cost_unit' string='入库单位成本' readonly='1' />
                                     <field name='cost' string='入库金额' readonly='1' sum='1' />
                                       <field name='expiration_date' groups='warehouse.group_expiration_date' />
+                                      <field name="scrap"/>
                                     <field name='note' string='备注' />
                                     <field name='using_batch' invisible='1' />
                                     <field name='force_batch_one' invisible='1' />
@@ -358,6 +359,7 @@
                                     <field name='cost_unit' string='入库单位成本' readonly='1'/>
                                     <field name='cost' string='入库金额' readonly='1' sum='1'/>
                                     <field name='expiration_date' groups='warehouse.group_expiration_date' />
+                                    <field name="scrap"/>
                                     <field name='note' string='备注'/>
                                     <field name='using_batch' invisible='1'/>
                                     <field name='force_batch_one' invisible='1'/>
@@ -602,6 +604,7 @@
                                         <field name='cost_unit' string='入库单位成本' readonly='1' />
                                         <field name='cost' string='入库金额' readonly='1' sum='1' />
                                         <field name='expiration_date' groups='warehouse.group_expiration_date' />
+                                        <field name="scrap"/>
                                         <field name='note' string='备注' />
                                         <field name='using_batch' invisible='1' />
                                         <field name='force_batch_one' invisible='1' />

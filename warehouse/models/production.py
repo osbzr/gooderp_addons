@@ -327,6 +327,10 @@ class WhAssembly(models.Model):
                     line.lot = order.lot
             order.line_in_ids.action_done()  # 完成成品入库
 
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.approve_order()
+
             order.update_parent_cost()
             order.wh_assembly_create_voucher()  # 生成入库凭证并审核
 
@@ -340,6 +344,11 @@ class WhAssembly(models.Model):
     def cancel_approved_order(self):
         for order in self:
             order.line_in_ids.action_cancel()
+
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.cancel_approved_order()
+                wh_internal.unlink()
 
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
@@ -922,6 +931,10 @@ class outsource(models.Model):
                     line.lot = order.lot
             order.line_in_ids.action_done()  # 完成成品入库
 
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.approve_order()
+
             # 如果委外费用存在，生成 结算单
             if order.outsource_fee:
                 order._create_money_invoice()
@@ -939,6 +952,11 @@ class outsource(models.Model):
     def cancel_approved_order(self):
         for order in self:
             order.line_in_ids.action_cancel()
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.cancel_approved_order()
+                wh_internal.unlink()
+
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
             if voucher.state == 'done':
@@ -1211,6 +1229,10 @@ class WhDisassembly(models.Model):
             order.move_id.check_qc_result()  # 检验质检报告是否上传
             order.line_in_ids.action_done()  # 完成成品入库
 
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.approve_order()
+
             order.update_child_cost()
             order.wh_disassembly_create_voucher()  # 生成入库凭证并审核
 
@@ -1224,6 +1246,10 @@ class WhDisassembly(models.Model):
     def cancel_approved_order(self):
         for order in self:
             order.line_in_ids.action_cancel()
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.cancel_approved_order()
+                wh_internal.unlink()
 
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
