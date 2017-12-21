@@ -122,6 +122,8 @@ odoo.define('core.core', function (require) {
     /**
      * 2016-11-15 开阖静静(gilbert@osbzr.com)
      * 把设置默认值的的按钮菜单 放到form菜单的更多里面。
+     * 2017-12-21 Sam(lgz.sam@qq.com)
+     * form view中有input设置autofoucs=true，优先设置input获取焦点
     */
     FormView.include({
        render_sidebar: function($node) {
@@ -137,6 +139,20 @@ odoo.define('core.core', function (require) {
         on_click_set_defaults:function() {
             this.open_defaults_dialog();
         },
+
+        autofocus: function() {
+            this._super.apply(this, arguments);
+
+            var input_widgets = $(':input')
+            for (var i = 0; i < input_widgets.length; i += 1){
+                var input_widget = input_widgets[i]
+                if (input_widget.autofocus) {
+                    if (input_widget.focus() !== false) {
+                        break;
+                    }
+                }
+            }
+        }
     });
     /**2016-11-23  开阖静静(gilbert@osbzr.com)
     * pivot 视图改造 (在pivot 视图中 特殊颜色 标示满足条件的字段) 只需要在对应的字段上例如
