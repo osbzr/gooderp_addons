@@ -33,6 +33,7 @@
                                 <tree string="联系人地址" editable="bottom">
 	                    	        <field name="contact" required="1"/>
 	                    	        <field name="mobile" required="1"/>
+                                    <field name="job"/>
 	                    	        <field name="phone"/>
 	                    	        <field name="qq"/>
                                     <field name="email" widget="email"/>
