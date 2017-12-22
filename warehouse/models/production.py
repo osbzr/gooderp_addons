@@ -104,7 +104,7 @@ class WhAssembly(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        if self.goods_id:
+        if self.goods_id and not self.bom_id:
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                                  'uom_id': self.goods_id.uom_id.id, 'uos_id': self.goods_id.uos_id.id,
                                  'type': 'in'}]
@@ -436,7 +436,6 @@ class WhAssembly(models.Model):
             self.is_many_to_many_combinations = False
             self.goods_qty = line_in_ids[0].get("goods_qty")
             self.goods_id = line_in_ids[0].get("goods_id")
-            self.attribute_id = line_in_ids[0].get("attribute_id")
             domain = {'goods_id': [('id', '=', self.goods_id.id)]}
 
         elif len(line_in_ids) > 1:
@@ -556,7 +555,7 @@ class outsource(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        if self.goods_id:
+        if self.goods_id and not self.bom_id:
             self.line_in_ids = False
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                                  'uom_id': self.goods_id.uom_id.id, 'uos_id': self.goods_id.uos_id.id,
@@ -668,7 +667,6 @@ class outsource(models.Model):
             self.is_many_to_many_combinations = False
             self.goods_qty = line_in_ids[0].get("goods_qty")
             self.goods_id = line_in_ids[0].get("goods_id")
-            self.attribute_id = line_in_ids[0].get('attribute_id')
             domain = {'goods_id': [('id', '=', self.goods_id.id)]}
         elif len(line_in_ids) > 1:
             self.is_many_to_many_combinations = True
@@ -1289,7 +1287,7 @@ class WhDisassembly(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        if self.goods_id:
+        if self.goods_id and not self.bom_id:
             warehouse_id = self.env['warehouse'].search(
                 [('type', '=', 'stock')], limit=1)
             self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
