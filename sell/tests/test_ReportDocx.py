@@ -39,8 +39,8 @@ class TestReportDocx(TransactionCase):
         self.report_pdf_sell.create(
             self.cr, self.uid, self.sell_order.id, self.ir_actions_pdf, self.env.context)
         self.report_pdf_sell = self.ir_actions_pdf._lookup_report('sell.order')
-#         self.ir_actions_pdf.write({'report_type':'pdf'})
-#         self.report_pdf_sell.create(self.cr, self.uid,self.sell_order.id, self.ir_actions, self.env.context)
+        self.ir_actions_pdf.write({'report_type':'pdf'})
+        self.report_pdf_sell.create(self.cr, self.uid,self.sell_order.id, self.ir_actions, self.env.context)
 
     def test_lookup_report_no_r(self):
         ''' 测试 执行 ir_report '''

@@ -221,12 +221,12 @@
 							<group>
 								<field name="code"/>
 								<field name="main_mobile"/>
+								<field name="main_contact"/>
 								<field name="main_address"/>
 								<field name="tax_num"/>
 								<field name="credit_limit"/>
 								<field name="responsible_id"/>
 								<field name="share_id"/>
-								<field name="main_contact"/>
 							</group>
 							<group>
 								<field name="c_category_id" required="1"/>
@@ -315,8 +315,10 @@
 						<group>
 							<group>
 								<field name="code"/>
+								<field name="main_contact"/>
 								<field name="main_mobile"/>
 								<field name="main_address"/>
+								<field name="tax_num"/>
 								<field name="tax_rate"/>
 							</group>
 							<group>

@@ -311,6 +311,9 @@ class MoneyOrder(models.Model):
                 source.name.to_reconcile -= source.this_reconcile
                 source.name.reconciled += source.this_reconcile
 
+                if source.this_reconcile == 0: # 如果核销行的本次付款金额为0，删除
+                    source.unlink()
+
             # 生成凭证并审核
             if order.type == 'get':
                 voucher = order.create_money_order_get_voucher(
