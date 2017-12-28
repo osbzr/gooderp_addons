@@ -76,6 +76,11 @@ class TestStaffDepartment(TransactionCase):
         with self.assertRaises(ValidationError):
             department_1.parent_id = department_2.id
 
+    def test_view_detail(self):
+        ''' 测试部门tree 打开部门 '''
+        department_1 = self.env.ref('staff.department_1')
+        department_1.view_detail()
+
 
 class TestMailMessage(TransactionCase):
 
