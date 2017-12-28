@@ -3,7 +3,7 @@
     <data>
         <!-- 固定资产 -->
         <record id="backup_demo" model="db.backup">
-            <field name="name">openerp_test</field>
+            <field name="name">openerp_template</field>
         </record>
     </data>
 </openerp>
