@@ -181,6 +181,7 @@ class BankAccount(models.Model):
     _description = u'账户'
 
     name = fields.Char(u'名称', required=True)
+    num = fields.Char(u'账号')
     balance = fields.Float(u'余额', readonly=True,
                            digits=dp.get_precision('Amount'))
     active = fields.Boolean(u'启用', default=True)

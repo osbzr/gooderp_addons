@@ -7,7 +7,7 @@
             <field name="model">bank.account</field>
             <field name='inherit_id' ref='core.bank_account_tree' />
             <field name="arch" type="xml">
-                <field name="name" position="after">
+                <field name="balance" position="before">
 					<field name="account_id"/>
                     <field name="init_balance"/>
                 </field>
