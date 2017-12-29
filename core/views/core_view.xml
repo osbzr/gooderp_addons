@@ -399,6 +399,7 @@
 			<field name="arch" type="xml">
 				<tree editable="TOP" string="账户">
 					<field name="name"/>
+					<field name="num"/>
 					<field name="balance" sum='sum'/>
 				    <field name='active' invisible='1'/>
 				</tree>
@@ -410,6 +411,7 @@
             <field name="arch" type="xml">
                 <search string="账户">
                     <field name="name"/>
+					<field name="num"/>
                 </search>
             </field>
         </record>
