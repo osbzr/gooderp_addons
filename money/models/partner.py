@@ -75,7 +75,8 @@ class Partner(models.Model):
         self.ensure_one()
         view = self.env.ref('money.partner_statements_report_wizard_form')
         ctx = {'default_partner_id': self.id}
-        if self.c_category_id.type == 'customer':
+        # 既是客户又是供应商的业务伙伴，根据是在客户还是供应商界面点击的 查看对账单 按钮，显示不同的明细
+        if self.c_category_id.type == 'customer' and self.env.context.get('is_customer_view'):
             ctx.update({'default_customer': True})
         else:
             ctx.update({'default_supplier': True})
