@@ -96,9 +96,21 @@ class SupplierStatementsReport(models.Model):
                         0 AS balance_amount,
                         Null AS note
                 FROM reconcile_order AS ro
-                LEFT JOIN money_invoice AS mi ON mi.name = ro.name
                 LEFT JOIN source_order_line AS sol ON sol.payable_reconcile_id = ro.id
-                WHERE ro.state = 'done' AND mi.state = 'done' AND mi.name ilike 'RO%'
+                WHERE ro.state = 'done' AND ro.business_type in ('get_to_pay', 'pay_to_pay')
+                UNION ALL
+                SELECT ro.to_partner_id AS partner_id,
+                        ro.name,
+                        ro.date,
+                        ro.write_date AS done_date,
+                        sol.this_reconcile AS amount,
+                        0 AS pay_amount,
+                        0 AS discount_money,
+                        0 AS balance_amount,
+                        ro.note AS note
+                FROM reconcile_order AS ro
+                LEFT JOIN source_order_line AS sol ON sol.payable_reconcile_id = ro.id
+                WHERE ro.state = 'done' AND ro.business_type = 'pay_to_pay'
                 ) AS ps)
         """)
 
