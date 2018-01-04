@@ -244,9 +244,9 @@ class WhMoveLine(models.Model):
         return new_id
 
     @api.one
-    @api.depends('cost_unit', 'goods_qty', 'discount_amount')
+    @api.depends('price', 'goods_qty', 'discount_amount')
     def _compute_cost(self):
-        self.cost = self.cost_unit * self.goods_qty - self.discount_amount
+        self.cost = self.price * self.goods_qty - self.discount_amount
 
     @api.one
     def _inverse_cost(self):
