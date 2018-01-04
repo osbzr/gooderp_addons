@@ -49,6 +49,8 @@ class TestCreateWave(TransactionCase):
         order_1.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search(
             [('order_id', '=', order_1.id)])
+        self.delivery.express_type = 'SF'
+        delivery_1.express_type = 'SF'
         with self.assertRaises(UserError):
             self.env['create.wave'].with_context({
                 'active_model': 'sell.delivery',
@@ -95,6 +97,32 @@ class TestCreateWave(TransactionCase):
             })
         wave_wizard.create_wave()
 
+    def test_create_wave_goods_no_stock(self):
+        ''' 测试 create_wave，发货单行存在 虚拟商品 '''
+        order_1 = self.env.ref('sell.sell_order_1')
+        self.env.ref('sell.sell_order_line_3').order_id = order_1.id
+        self.env.ref('goods.cable').no_stock = True # sell_order_line_3 上的商品设置为 虚拟商品
+        order_1.sell_order_done()
+        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        delivery_1.express_type = 'SF'
+        wave_wizard = self.env['create.wave'].with_context({'active_ids': delivery_1.id}).create({
+            'active_model': 'sell.delivery',
+        })
+        # 勾选的订单缺货
+        with self.assertRaises(UserError):
+            wave_wizard.create_wave()
+
+        # 发货单行存在 虚拟商品
+        order_1.sell_order_draft()
+        self.env.ref('sell.sell_order_line_1').order_id = self.order.id
+        order_1.sell_order_done()
+        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        delivery_1.express_type = 'SF'
+        wave_wizard = self.env['create.wave'].with_context({'active_ids': delivery_1.id}).create({
+            'active_model': 'sell.delivery',
+        })
+        wave_wizard.create_wave()
+
 
 class TestWave(TransactionCase):
 
@@ -109,7 +137,7 @@ class TestWave(TransactionCase):
         self.delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
         self.delivery.express_type = 'SF'
-        
+
         self.wave_wizard = self.env['create.wave'].with_context({
             'active_ids': self.delivery.id}).create({
                 'active_model': 'sell.delivery',
@@ -223,6 +251,12 @@ class TestDoPack(TransactionCase):
         with self.assertRaises(UserError):
             pack.unlink()
 
+    def test_scan_one_barcode(self):
+        ''' 对于一个条码的处理,请先扫描快递面单 '''
+        pack = self.env['do.pack'].create({})
+        with self.assertRaises(UserError):
+            pack.scan_one_barcode('123456', pack)
+
     def test_scan_barcode(self):
         ''' 测试 scan_barcode'''
         pack = self.env['do.pack'].create({})
@@ -242,6 +276,15 @@ class TestDoPack(TransactionCase):
         # scan_one_barcode 请先扫描快递面单
         with self.assertRaises(UserError):
             pack.scan_barcode('6666', '')
+
+    def test_scan_barcode_no_goods_line(self):
+        ''' 测试 scan_barcode 扫描产品不在打包行上'''
+        pack = self.env['do.pack'].create({})
+        pack.scan_barcode('123456', pack.id)
+        # 扫描产品不在打包行上
+        self.env.ref('goods.cable').barcode = '111'
+        with self.assertRaises(UserError):
+            pack.scan_barcode('000', pack.id)
 
     def test_scan_barcode_needs_pack_qty(self):
         ''' 测试 scan_barcode 要求发货数量 < 打包数量 '''

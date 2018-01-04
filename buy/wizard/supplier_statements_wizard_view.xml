@@ -8,7 +8,8 @@
             <field name='inherit_id' ref='core.vendor_tree' />
             <field name="arch" type="xml">
                 <field name="payable" position="after">
-                    <button name="partner_statements" type="object" string="查看对账单" icon="fa-search" class="oe_highlight"/>
+                    <button name="partner_statements" type="object" string="查看对账单" icon="fa-search"
+                            context="{'is_customer_view': False}" class="oe_highlight"/>
 				</field>
             </field>
         </record>
