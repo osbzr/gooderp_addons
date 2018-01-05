@@ -549,9 +549,6 @@ class WhMoveLine(models.Model):
     buy_line_id = fields.Many2one('buy.order.line',
                                   u'购货单行', ondelete='cascade',
                                   help=u'对应的购货订单行')
-    share_cost = fields.Float(u'采购费用',
-                              digits=dp.get_precision('Amount'),
-                              help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
 
     def _buy_get_price_and_tax(self):
         self.tax_rate = self.env.user.company_id.import_tax_rate
