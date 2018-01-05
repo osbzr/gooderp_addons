@@ -225,6 +225,9 @@ class WhMoveLine(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     scrap = fields.Boolean(u'报废')
+    share_cost = fields.Float(u'采购费用',
+                              digits=dp.get_precision('Amount'),
+                              help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
 
     @api.model
     def create(self, vals):
