@@ -19,10 +19,12 @@ class TestGoods(TransactionCase):
         self.others_in_cable = self.browse_ref('warehouse.wh_move_line_15')
         self.others_in_keyboard_mouse = self.browse_ref(
             'warehouse.wh_move_line_16')
+        self.others_in_cable.cost = self.others_in_cable.cost_unit * self.others_in_cable.goods_qty
+        self.others_in_keyboard_mouse.cost = self.others_in_keyboard_mouse.cost_unit * self.others_in_keyboard_mouse.goods_qty
         self.others_in_2 = self.browse_ref('warehouse.wh_in_whin3')
         self.others_in_2_keyboard_mouse = self.browse_ref(
             'warehouse.wh_move_line_keyboard_mouse_in_2')
-
+        self.others_in_2_keyboard_mouse.cost = self.others_in_2_keyboard_mouse.cost_unit * self.others_in_2_keyboard_mouse.goods_qty
         self.goods_keyboard_mouse = self.browse_ref('goods.keyboard_mouse')
         self.goods_cable = self.browse_ref('goods.cable')
 

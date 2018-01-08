@@ -28,6 +28,14 @@ class TestProduction(TransactionCase):
         self.disassembly_keyboard = self.browse_ref('warehouse.wh_move_line_9')
 
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
+        in_mouse_1 = self.env.ref('warehouse.wh_move_line_12')
+        in_mouse_1.cost = in_mouse_1.cost_unit * in_mouse_1.goods_qty
+        in_mouse_2 = self.env.ref('warehouse.wh_move_line_mouse_2')
+        in_mouse_2.cost = in_mouse_2.cost_unit * in_mouse_2.goods_qty
+        in_keyboard = self.env.ref('warehouse.wh_move_line_13')
+        in_keyboard.cost = in_keyboard.cost_unit * in_keyboard.goods_qty
+        in_cable = self.env.ref('warehouse.wh_move_line_14')
+        in_cable.cost = in_cable.cost_unit * in_cable.goods_qty
         self.overage_in.approve_order()
 
         self.outsource_out1 = self.browse_ref('warehouse.outsource_out1')

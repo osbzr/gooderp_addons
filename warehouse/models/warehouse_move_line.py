@@ -225,6 +225,9 @@ class WhMoveLine(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     scrap = fields.Boolean(u'报废')
+    share_cost = fields.Float(u'采购费用',
+                              digits=dp.get_precision('Amount'),
+                              help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
 
     @api.model
     def create(self, vals):
@@ -244,9 +247,13 @@ class WhMoveLine(models.Model):
         return new_id
 
     @api.one
-    @api.depends('cost_unit', 'goods_qty', 'discount_amount')
+    @api.depends('cost_unit', 'price', 'goods_qty', 'discount_amount', 'share_cost')
     def _compute_cost(self):
-        self.cost = self.cost_unit * self.goods_qty - self.discount_amount
+        if self.env.context.get('type') == 'in' and self.goods_id:
+            if self.price:
+                self.cost = self.price * self.goods_qty - self.discount_amount + self.share_cost
+            elif self.cost_unit:
+                self.cost = self.cost_unit * self.goods_qty - self.discount_amount + self.share_cost
 
     @api.one
     def _inverse_cost(self):
