@@ -21,11 +21,11 @@
                 <tree editable="top" string="科目">
                     <field name="code"/>
                     <field name="name"/>
-                    <field name="currency_id" groups='finance.group_multi_currency'/>
-                    <field name="exchange" groups='finance.group_multi_currency'/>
                     <field name="costs_types"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
+                    <field name="currency_id" groups='finance.group_multi_currency'/>
+                    <field name="exchange" groups='finance.group_multi_currency'/>
                     <field name='active'  invisible='1'/>
                 </tree>
             </field>
