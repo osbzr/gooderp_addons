@@ -152,6 +152,7 @@ class PartnerAddress(models.Model):
     town = fields.Char(u'乡镇')
     detail_address = fields.Char(u'详细地址')
     is_default_add = fields.Boolean(u'是否默认地址')
+    job = fields.Char(u'职务')
 
     @api.multi
     def name_get(self):

@@ -1,6 +1,22 @@
 # -*- coding: utf-8 -*-
 
 from odoo.tests.common import TransactionCase
+from odoo.exceptions import ValidationError
+
+
+class TestGoodsClass(TransactionCase):
+
+    def setUp(self):
+        ''' 基本数据 '''
+        super(TestGoodsClass, self).setUp()
+        self.fruits_vegetables = self.env.ref('goods.fruits_vegetables')
+        self.partner_services = self.env.ref('goods.partner_services')
+
+    def test_check_category_recursion(self):
+        ''' 测试，创建循环分类'''
+        self.fruits_vegetables.parent_id = self.partner_services.id
+        with self.assertRaises(ValidationError):
+            self.partner_services.parent_id = self.fruits_vegetables.id
 
 
 class TestGoods(TransactionCase):

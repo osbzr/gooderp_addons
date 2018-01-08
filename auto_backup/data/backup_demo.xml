@@ -1,9 +1,11 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
-        <!-- 固定资产 -->
-        <record id="backup_demo" model="db.backup">
-            <field name="name">openerp_test</field>
-        </record>
+        <!-- db backup -->
+        <!--<record id="backup_demo" model="db.backup">-->
+            <!--<field name="name">gooderp_test</field>-->
+            <!--<field name="host">127.0.0.1</field>-->
+            <!--<field name="port">8069</field>-->
+        <!--</record>-->
     </data>
 </openerp>

@@ -18,6 +18,7 @@
         'security/auto_exchange_data.xml',
     ],
     'demo': [
+        'tests/demo.xml',
     ],
     'qweb': [
         "static/src/xml/*.xml",

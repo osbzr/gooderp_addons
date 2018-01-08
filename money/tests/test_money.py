@@ -682,7 +682,7 @@ class TestPartner(TransactionCase):
 
     def test_partner(self):
         ''' 客户、供应商对账单 和  银行帐'''
-        self.env.ref('core.jd').partner_statements()
+        self.env.ref('core.jd').with_context({'is_customer_view':True}).partner_statements()
         self.env.ref('core.lenovo').partner_statements()
         self.env.ref('core.comm').bank_statements()
 

@@ -104,7 +104,7 @@ class WhAssembly(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        if self.goods_id:
+        if self.goods_id and not self.bom_id:
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                                  'uom_id': self.goods_id.uom_id.id, 'uos_id': self.goods_id.uos_id.id,
                                  'type': 'in'}]
@@ -327,6 +327,10 @@ class WhAssembly(models.Model):
                     line.lot = order.lot
             order.line_in_ids.action_done()  # 完成成品入库
 
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.approve_order()
+
             order.update_parent_cost()
             order.wh_assembly_create_voucher()  # 生成入库凭证并审核
 
@@ -340,6 +344,11 @@ class WhAssembly(models.Model):
     def cancel_approved_order(self):
         for order in self:
             order.line_in_ids.action_cancel()
+
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.cancel_approved_order()
+                wh_internal.unlink()
 
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
@@ -395,7 +404,7 @@ class WhAssembly(models.Model):
                 'goods_qty': line.goods_qty,
                 'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                 'uos_id': line.goods_id.uos_id.id,
-                'attribute_id': line.attribute_id,
+                'attribute_id': line.attribute_id.id,
             } for line in self.bom_id.line_parent_ids]
 
             for line in self.bom_id.line_child_ids:
@@ -414,7 +423,7 @@ class WhAssembly(models.Model):
                     'cost': cost,
                     'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
                     'uos_id': line.goods_id.uos_id.id,
-                    'attribute_id': line.attribute_id,
+                    'attribute_id': line.attribute_id.id,
                 })
             self.line_in_ids = False
             self.line_out_ids = False
@@ -546,7 +555,7 @@ class outsource(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        if self.goods_id:
+        if self.goods_id and not self.bom_id:
             self.line_in_ids = False
             self.line_in_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
                                  'uom_id': self.goods_id.uom_id.id, 'uos_id': self.goods_id.uos_id.id,
@@ -619,6 +628,7 @@ class outsource(models.Model):
         if self.bom_id:
             line_in_ids = [{
                 'goods_id': line.goods_id.id,
+                'attribute_id': line.attribute_id.id,
                 'warehouse_id': self.env['warehouse'].get_warehouse_by_type('production').id,
                 'warehouse_dest_id': warehouse_id.id,
                 'uom_id': line.goods_id.uom_id.id,
@@ -634,6 +644,7 @@ class outsource(models.Model):
                         warehouse_id[0], line.goods_qty)
                 line_out_ids.append({
                     'goods_id': line.goods_id.id,
+                    'attribute_id': line.attribute_id.id,
                     'warehouse_id': warehouse_id.id,
                     'warehouse_dest_id': self.env[
                         'warehouse'].get_warehouse_by_type('production').id,
@@ -918,6 +929,10 @@ class outsource(models.Model):
                     line.lot = order.lot
             order.line_in_ids.action_done()  # 完成成品入库
 
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.approve_order()
+
             # 如果委外费用存在，生成 结算单
             if order.outsource_fee:
                 order._create_money_invoice()
@@ -935,6 +950,11 @@ class outsource(models.Model):
     def cancel_approved_order(self):
         for order in self:
             order.line_in_ids.action_cancel()
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.cancel_approved_order()
+                wh_internal.unlink()
+
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
             if voucher.state == 'done':
@@ -1207,6 +1227,10 @@ class WhDisassembly(models.Model):
             order.move_id.check_qc_result()  # 检验质检报告是否上传
             order.line_in_ids.action_done()  # 完成成品入库
 
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.approve_order()
+
             order.update_child_cost()
             order.wh_disassembly_create_voucher()  # 生成入库凭证并审核
 
@@ -1220,6 +1244,10 @@ class WhDisassembly(models.Model):
     def cancel_approved_order(self):
         for order in self:
             order.line_in_ids.action_cancel()
+            wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
+            if wh_internal:
+                wh_internal.cancel_approved_order()
+                wh_internal.unlink()
 
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
@@ -1259,7 +1287,7 @@ class WhDisassembly(models.Model):
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
-        if self.goods_id:
+        if self.goods_id and not self.bom_id:
             warehouse_id = self.env['warehouse'].search(
                 [('type', '=', 'stock')], limit=1)
             self.line_out_ids = [{'goods_id': self.goods_id.id, 'product_uos_qty': 1, 'goods_qty': 1,
@@ -1342,6 +1370,7 @@ class WhDisassembly(models.Model):
                         warehouse_id, line.goods_qty)
                 line_out_ids.append({
                     'goods_id': line.goods_id,
+                    'attribute_id': line.attribute_id.id,
                     'warehouse_id': self.env[
                         'warehouse'].get_warehouse_by_type('production').id,
                     'warehouse_dest_id': warehouse_id.id,
@@ -1356,6 +1385,7 @@ class WhDisassembly(models.Model):
 
             line_in_ids = [{
                 'goods_id': line.goods_id.id,
+                'attribute_id': line.attribute_id.id,
                 'warehouse_id': warehouse_id,
                 'warehouse_dest_id': self.env[
                     'warehouse'].get_warehouse_by_type('production').id,

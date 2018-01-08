@@ -33,12 +33,24 @@ class TestReportDocxPartner(TransactionCase):
         self.report_docx_customer.create(
             self.cr, self.uid, self.money_order_customer.id, self.ir_actions_customer, ctx_customer)
 
+        # 有 customer.statements.report 记录, 但记录在开始日期前
+        ctx_customer['from_date'] = '2016-02-21'
+        ctx_customer['to_date'] = '2016-02-22'
+        self.report_docx_customer.create(
+            self.cr, self.uid, self.money_order_customer.id, self.ir_actions_customer, ctx_customer)
+
         # 有 supplier.statements.report 记录
         self.money_order_supplier.money_order_done()
         ctx_supplier = self.env.context.copy()
         ctx_supplier['partner_id'] = self.env.ref('core.lenovo').id
         ctx_supplier['from_date'] = '2016-02-18'
         ctx_supplier['to_date'] = '2016-02-21'
+        self.report_docx_supplier.create(
+            self.cr, self.uid, self.money_order_supplier.id, self.ir_actions_supplier, ctx_supplier)
+
+        # 有 supplier.statements.report 记录, 但记录在开始日期前
+        ctx_supplier['from_date'] = '2016-02-21'
+        ctx_supplier['to_date'] = '2016-02-22'
         self.report_docx_supplier.create(
             self.cr, self.uid, self.money_order_supplier.id, self.ir_actions_supplier, ctx_supplier)
 

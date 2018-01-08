@@ -29,8 +29,9 @@
                 <xpath expr="//group" position="after">
                     <field name="child_ids">
                     	<tree string="联系人地址" editable="bottom">
-	                    	<field name="contact"/>
-	                    	<field name="mobile"/>
+                            <field name="contact" required="1"/>
+                            <field name="mobile" required="1"/>
+                            <field name="job"/>
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>
                             <field name="email" widget="email"/>
@@ -73,14 +74,15 @@
                     	<tree string="联系人地址" editable="bottom">
 	                    	<field name="contact" required="1"/>
 	                    	<field name="mobile" required="1"/>
+                            <field name="job"/>
 	                    	<field name="phone"/>
 	                    	<field name="qq"/>
                             <field name="email" widget="email"/>
 	                    	<field name="province_id" />
-        			<field name="city_id" />
-        			<field name="county_id"  />
-        			<field name="town" />
-        			<field name="detail_address" />
+                            <field name="city_id" />
+                            <field name="county_id"  />
+                            <field name="town" />
+                            <field name="detail_address" />
 	                    	<field name="is_default_add"/>
 	                    </tree>
 	                </field>

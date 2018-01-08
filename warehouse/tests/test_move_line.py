@@ -15,6 +15,7 @@ class TestMoveLine(TransactionCase):
             'warehouse.wh_move_line_keyboard_mouse_in_2')
 
         self.mouse_in_line = self.browse_ref('warehouse.wh_move_line_12')
+        self.mouse_in_line.cost = self.mouse_in_line.cost_unit * self.mouse_in_line.goods_qty
         self.mouse_out_line = self.browse_ref('warehouse.wh_move_line_0')
 
         self.cable_int_line = self.browse_ref('warehouse.wh_move_line_17')
@@ -110,7 +111,9 @@ class TestMoveLine(TransactionCase):
         attribute_in = self.browse_ref('warehouse.wh_in_wh_in_attribute')
 
         white_iphone = self.browse_ref('warehouse.wh_move_line_iphone_in_1')
+        white_iphone.cost = white_iphone.cost_unit * white_iphone.goods_qty
         black_iphone = self.browse_ref('warehouse.wh_move_line_iphone_in_2')
+        black_iphone.cost = black_iphone.cost_unit * black_iphone.goods_qty
 
         out_iphone = self.browse_ref('warehouse.wh_move_line_iphone_out')
 

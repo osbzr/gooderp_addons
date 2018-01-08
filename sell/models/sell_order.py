@@ -315,6 +315,7 @@ class SellOrder(models.Model):
             'goods_qty': qty,
             'uom_id': line.uom_id.id,
             'cost_unit': line.goods_id.cost,
+            'price': line.price,
             'price_taxed': line.price_taxed,
             'discount_rate': line.discount_rate,
             'discount_amount': discount_amount,

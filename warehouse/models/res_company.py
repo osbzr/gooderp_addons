@@ -6,6 +6,9 @@ class ResCompany(models.Model):
     '''继承公司对象,添加字段'''
     _inherit = 'res.company'
 
+    wh_scrap_id = fields.Many2one('warehouse',
+                                  string=u'废品库')
+
     @api.model
     def _get_operating_cost_account_id(self):
         return self._get_operating_cost_account_id_impl()

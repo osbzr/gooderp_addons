@@ -28,6 +28,14 @@ class TestProduction(TransactionCase):
         self.disassembly_keyboard = self.browse_ref('warehouse.wh_move_line_9')
 
         self.overage_in = self.browse_ref('warehouse.wh_in_whin0')
+        in_mouse_1 = self.env.ref('warehouse.wh_move_line_12')
+        in_mouse_1.cost = in_mouse_1.cost_unit * in_mouse_1.goods_qty
+        in_mouse_2 = self.env.ref('warehouse.wh_move_line_mouse_2')
+        in_mouse_2.cost = in_mouse_2.cost_unit * in_mouse_2.goods_qty
+        in_keyboard = self.env.ref('warehouse.wh_move_line_13')
+        in_keyboard.cost = in_keyboard.cost_unit * in_keyboard.goods_qty
+        in_cable = self.env.ref('warehouse.wh_move_line_14')
+        in_cable.cost = in_cable.cost_unit * in_cable.goods_qty
         self.overage_in.approve_order()
 
         self.outsource_out1 = self.browse_ref('warehouse.outsource_out1')
@@ -45,6 +53,37 @@ class TestProduction(TransactionCase):
 
         self.assertEqual(self.assembly.state, 'done')
         self.assertEqual(self.disassembly.state, 'done')
+
+    def test_assembly_apporve_exist_scape(self):
+        # 组装单成品入库存在报废
+        self.assembly_mutli.approve_feeding()
+        self.assembly_mutli_keyboard_mouse_1.goods_qty = 10
+        self.assembly_mutli_keyboard_mouse_2.scrap = True
+        # 请在公司上输入 废品库
+        with self.assertRaises(UserError):
+            self.assembly_mutli.approve_order()
+
+        self.env.user.company_id.wh_scrap_id = self.env.ref('warehouse.bj_stock').id
+        self.assembly_mutli.approve_order()
+
+    def test_disassembly_apporve_exist_scape(self):
+        # 拆卸单子产品入库存在报废
+        # 先组装，后拆卸可以正常出入库
+        self.assembly.approve_feeding()
+        self.assembly.approve_order()
+
+        self.disassembly.approve_feeding()
+        self.disassembly_mouse.scrap = True
+        self.env.user.company_id.wh_scrap_id = self.env.ref('warehouse.bj_stock').id
+        self.disassembly.approve_order()
+
+    def test_outsource_apporve_exist_scape(self):
+        # 拆卸单子产品入库存在报废
+        self.outsource_out1.approve_feeding()
+        keyboard_mouse = self.env.ref('warehouse.wh_move_line_out3')
+        keyboard_mouse.scrap = True
+        self.env.user.company_id.wh_scrap_id = self.env.ref('warehouse.bj_stock').id
+        self.outsource_out1.approve_order()
 
     def test_check_is_child_enable_assembly(self):
         # 组装 子件中不能包含与组合件中相同的 产品+属性
