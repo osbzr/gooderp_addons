@@ -97,6 +97,7 @@
             <field name='name'>库存余额表</field>
             <field name='res_model'>report.stock.balance</field>
             <field name='view_mode'>pivot,tree</field>
+            <field name='limit'>80000</field>
             <field name='view_id' ref='report_stock_balance_graph' />
         </record>
 
