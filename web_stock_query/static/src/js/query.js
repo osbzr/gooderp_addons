@@ -107,6 +107,7 @@ odoo.define('web.stock_query', function(require) {
                 type: 'ir.actions.act_window',
                 res_model: 'report.stock.balance',
                 views: [[false, 'pivot'], [false, 'list']],
+                limit:80000,
                 target: 'current',
                 name: '库存余额表',
             });

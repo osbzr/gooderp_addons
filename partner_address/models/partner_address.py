@@ -142,6 +142,7 @@ class PartnerAddress(models.Model):
     _name = 'partner.address'
     _inherit = "state.city.county"
     _description = u'联系人地址'
+    _rec_name = 'detail_address'
 
     partner_id = fields.Many2one('partner', u'业务伙伴')
     contact = fields.Char(u'联系人')
