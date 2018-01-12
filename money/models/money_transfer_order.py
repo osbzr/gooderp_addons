@@ -146,6 +146,7 @@ class MoneyTransferOrder(models.Model):
         # 反审核凭证并删除
         if voucher.state == 'done':
             voucher.voucher_draft()
+            voucher.unlink()
         return True
 
     @api.multi
