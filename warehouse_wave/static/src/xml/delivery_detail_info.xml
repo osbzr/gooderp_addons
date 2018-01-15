@@ -6,10 +6,21 @@
             <t t-set='count' t-value='0'/>
             <t t-foreach="detail_infos" t-as="info">
                 <t t-set='count' t-value='count+1'/>
-                <t t-if="count &lt; 8 ">
+                <t t-if="count &gt; 1 and count &lt; 6">
                     <strong t-esc="info.split(' ')[1]"/><span>：</span>
                     <t t-foreach="detail_infos[info]" t-as="show_details">
                         <t t-esc="show_details"/>
+                    </t>
+                    <br/>
+                </t>
+                <t t-if="count == 1 or count == 7">
+                    <span style="font-size: 22px;">
+                        <t t-esc="info.split(' ')[1]"/>：
+                    </span>
+                    <t t-foreach="detail_infos[info]" t-as="show_details">
+                        <span style="font-size: 22px;">
+                            <t t-esc="show_details"/>
+                        </span>
                     </t>
                     <br/>
                 </t>
