@@ -19,6 +19,7 @@
 			<field name="model">wave</field>
 			<field name="arch" type="xml">
 				<tree create='false' edit='false'>
+					<field name="create_date" string="创建时间"/>
 					<field name="name"/>
 					<field name='express_type'/>
 					<field name="order_type"/>
@@ -47,6 +48,7 @@
         	<field name='arch' type='xml'>
 			    <field name='order_id' position='after'>
 				    <field name='express_type'/>
+					<field name="express_code"/>
 					<field name='wave_id'/>
 					<field name='pakge_sequence'/>
 				</field>
