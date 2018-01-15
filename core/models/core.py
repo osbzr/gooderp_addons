@@ -54,10 +54,10 @@ class BaseModelExtend(models.AbstractModel):
         @api.multi
         def action_cancel(self):
             for record in self:
-                if self.state != 'draft':
+                if record.state != 'draft':
                     raise UserError(u'只能作废草稿状态的单据')
                 else:
-                    self.state = 'cancel'
+                    record.state = 'cancel'
             return True
         models.BaseModel.action_cancel = action_cancel
         return super(BaseModelExtend, self)._register_hook()
