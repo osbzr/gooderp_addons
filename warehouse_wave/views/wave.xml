@@ -19,6 +19,7 @@
 			<field name="model">wave</field>
 			<field name="arch" type="xml">
 				<tree create='false' edit='false'>
+					<field name="create_date" string="创建时间"/>
 					<field name="name"/>
 					<field name='express_type'/>
 					<field name="order_type"/>
@@ -26,6 +27,7 @@
 					<button name="report_wave" type="object" string='打印拣货单'/>
 					<button name="print_express_menu" type="object" string='打印快递面单'/>
 					<button name="print_package_list" type="object" string='打印装箱单'/>
+					<button name="delivery_list" type="object" string='发货单列表'/>
 				</tree>
 			</field>
 		</record>
@@ -47,6 +49,7 @@
         	<field name='arch' type='xml'>
 			    <field name='order_id' position='after'>
 				    <field name='express_type'/>
+					<field name="express_code"/>
 					<field name='wave_id'/>
 					<field name='pakge_sequence'/>
 				</field>
@@ -80,6 +83,42 @@
             view_mode="form"
             target="new"
             />
+		<act_window id="print_express_info"
+            name='打印快递面单'
+            res_model="delivery.express.package.print"
+			src_model="sell.delivery"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new"
+			context="{'express_info': True}"
+            />
+		<act_window id="print_package_info"
+            name='打印装箱单'
+            res_model="delivery.express.package.print"
+			src_model="sell.delivery"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new"
+			context="{'package_info': True}"
+            />
+
+	<record id="delivery_express_package_print_form" model="ir.ui.view">
+        <field name="name">delivery.express.package.print</field>
+        <field name="model">delivery.express.package.print</field>
+        <field name="arch" type="xml">
+            <form string="delivery.express.package.print">
+				<group>
+					<field name="note" placeholder="简要说明请求内容"/>
+				</group>
+				<footer>
+					<button name="button_print" string="打印" type="object" class="oe_highlight"/>
+					or <button string="取消" class="oe_link" special="cancel"/>
+				</footer>
+            </form>
+        </field>
+    </record>
 
 	<!--打包对应的tree和form  #TODO: 技术点没掌握,在编辑状态下的前后端交互掌握不完全,所以没办法做成wizard 形式
 		以后掌握了要进行修改

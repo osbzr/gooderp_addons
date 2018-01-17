@@ -581,3 +581,38 @@ class SellOrderLine(models.Model):
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = self.quantity * self.price \
             * self.discount_rate * 0.01
+
+
+class ApproveMultiSellOrder(models.TransientModel):
+    _name = "approve.multi.sell.order"
+    _description = u'批量审核销售订单'
+
+    @api.multi
+    def set_default_note(self):
+        """
+        设置默认值, 用来确认要批量审核的订单
+        """
+        context = self.env.context
+        order_names = [order.name for order in self.env['sell.order'].browse(context.get('active_ids'))]
+        return '-'.join(order_names)
+
+    note = fields.Char(u'本次处理销售订单', default=set_default_note, readonly=True)
+
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+        """ 根据内容判断 报出错误 """
+        res = super(ApproveMultiSellOrder, self).fields_view_get(view_id, view_type, toolbar=toolbar, submenu=False)
+        orders = self.env['sell.order'].browse(self.env.context.get('active_ids'))
+        done_lists = ''
+        for order in orders:
+            if order.state == 'done':
+                done_lists += order.name
+        if done_lists:
+            raise UserError(u'销货订单 ' + done_lists + u' 已审核!')
+        return res
+
+    @api.multi
+    def approve_sell_order(self):
+        """ 审核销售订单 """
+        for order in self.env['sell.order'].search([('id', 'in', self.env.context.get('active_ids'))]):
+            order.sell_order_done()

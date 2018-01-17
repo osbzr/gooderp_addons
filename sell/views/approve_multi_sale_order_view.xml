@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+		<record id="approve_multi_sell_order_from" model="ir.ui.view">
+				<field name="name">approve.multi.sell.order.form</field>
+				<field name="model">approve.multi.sell.order</field>
+				<field name="arch" type="xml">
+					<form>
+						<group>
+							<field name="note" />
+						</group>
+						<footer>
+							<button name="approve_sell_order"  string="确定" type="object" class="oe_highlight"/>
+							 或者
+							<button string="取消" class="oe_link" special="cancel"/>
+						</footer>
+					</form>
+				</field>
+		</record>
+
+		<act_window id="approve_multi_sell_order_action"
+			name='批量审核销售订单'
+			res_model="approve.multi.sell.order"
+			src_model="sell.order"
+			multi="True"
+			view_type="form"
+			view_mode="form"
+			target="new"
+			/>
+	</data>
+</openerp>

@@ -17,6 +17,7 @@ class Wave(models.Model):
 
     @api.multi
     def print_express_menu(self):
+        ''' 打印快递面单 '''
         move_rows = self.env['wh.move'].search([('wave_id', '=', self.id)])
         return {'type': 'ir.actions.client',
                 'tag': 'warehouse_wave.print_express_menu',
@@ -26,6 +27,7 @@ class Wave(models.Model):
 
     @api.multi
     def print_package_list(self):
+        ''' 打印装箱单 '''
         move_rows = self.env['wh.move'].search([('wave_id', '=', self.id)])
         return {'type': 'ir.actions.client',
                 'tag': 'warehouse_wave.print_express_package',
@@ -43,6 +45,23 @@ class Wave(models.Model):
             records[0].state = 'printed'
 
         return self.env['report'].get_action(self, 'warehouse_wave.report_wave_view')
+
+    @api.multi
+    def delivery_list(self):
+        for wave in self:
+            delivery_lists = self.env['sell.delivery'].search([('wave_id', '=', wave.id)])
+            view_id = self.env.ref('sell.sell_delivery_tree').id
+            return {
+                'name': u'销售发货单',
+                'view_type': 'form',
+                'view_mode': 'tree',
+                'view_id': False,
+                'views': [(view_id, 'tree')],
+                'res_model': 'sell.delivery',
+                'type': 'ir.actions.act_window',
+                'domain': [('id', 'in', [delivery.id for delivery in delivery_lists])],
+                'target': 'current',
+            }
 
     @api.multi
     def unlink(self):
@@ -374,3 +393,39 @@ class PackLine(models.Model):
     goods_id = fields.Many2one('goods', string='商品')
     goods_qty = fields.Float(u'要发货数量')
     pack_qty = fields.Float(u'打包数量')
+
+
+class delivery_express_package_print(models.TransientModel):
+    _name = "delivery.express.package.print"
+    _description = u'销售发货单打印'
+    _rec_name = 'note'
+
+    note = fields.Char(u'说明', readonly=True)
+
+    @api.model
+    def default_get(self, fields):
+        '''  '''
+        defaults = {}
+        if self._context.get('express_info'):
+            defaults['note'] = u'打印销售发货单的快递面单'
+        if self._context.get('package_info'):
+            defaults['note'] = u'打印销售发货单的装箱单'
+        return defaults
+
+    @api.multi
+    def button_print(self):
+        ''' 打印销售发货单的快递面单、装箱单 '''
+        delivery_orders = self.env['sell.delivery'].search([('id', 'in', self._context.get('active_ids'))])
+        move_rows = self.env['wh.move'].search([('id', 'in', [move.sell_move_id.id for move in delivery_orders])])
+        if self._context.get('express_info'):
+            return {'type': 'ir.actions.client',
+                    'tag': 'warehouse_wave.print_express_menu',
+                    'context': {'move_ids': [move.id for move in move_rows]},
+                    'target': 'current',
+                    }
+        if self._context.get('package_info'):
+            return {'type': 'ir.actions.client',
+                    'tag': 'warehouse_wave.print_express_package',
+                    'context': {'move_ids': [move.id for move in move_rows]},
+                    'target': 'current',
+                    }
