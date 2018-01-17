@@ -59,7 +59,7 @@
                                                 </t>
 	                						</td>
                                             <td>
-												<t t-foreach="l.move_line_ids" t-as="move_line">
+												<t t-foreach="l.move_line_ids.sorted(key=lambda x: x.move_id.pakge_sequence)" t-as="move_line">
 	                								(<span t-field="move_line.move_id.pakge_sequence"/>)<br/>
 												</t>
 	                						</td>
