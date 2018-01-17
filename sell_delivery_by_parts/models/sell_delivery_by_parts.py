@@ -25,7 +25,7 @@ class WhMoveLine(models.Model):
             # 如果是组合产品，查找对应子产品
             bom_line_parent = bom_line_obj.search([('goods_id', '=', goods.id),
                                                    ('bom_id.type', '=', 'assembly'),
-                                                   ('attribute_id', '=', vals['attribute_id']),
+                                                   ('attribute_id', '=', vals.get('attribute_id')),
                                                    ('type', '=', 'parent')])
             if not bom_line_parent:
                 raise UserError(u'请先建立组合销售产品%s的物料清单！' % goods.name)
