@@ -288,3 +288,42 @@ class TestSellOrderLine(TransactionCase):
         self.sell_order_line.discount_rate = 20
         self.sell_order_line.onchange_discount_rate()
         self.assertEqual(self.sell_order_line.amount, 93.6)
+
+
+class TestApproveMultiSellOrder(TransactionCase):
+    def setUp(self):
+        ''' setUp Data '''
+        super(TestApproveMultiSellOrder, self).setUp()
+        self.env.ref('core.jd').credit_limit = 100000
+        self.order = self.env.ref('sell.sell_order_1')
+        self.order_2 = self.env.ref('sell.sell_order_2')
+        self.partner_id = self.env.ref('core.jd')
+
+        # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
+        self.env.ref('money.get_40000').money_order_done()
+        self.env.ref('money.pay_2000').money_order_done()
+
+    def test_fields_view_get(self):
+        ''' Test: fields_view_get '''
+        sell_obj = self.env['approve.multi.sell.order']
+        # 报错：存在销售订单已审核的单据
+        self.order_2.sell_order_done()
+        with self.assertRaises(UserError):
+            sell_obj.with_context({
+                'active_model': 'sell.order',
+                'active_ids': [self.order.id, self.order_2.id]
+            }).fields_view_get(None, 'form', False, False)
+
+    def test_approve_sell_order(self):
+        ''' Test: approve_sell_order '''
+        sell_obj = self.env['approve.multi.sell.order']
+        # 批量审核销售订单
+        sell_obj.with_context({
+            'active_ids': [self.order.id, self.order_2.id]
+        }).approve_sell_order()
+
+    def test_set_default_note(self):
+        ''' Test: set_default_note '''
+        sell_obj = self.env['approve.multi.sell.order']
+        # 设置默认值
+        sell_obj.set_default_note()
