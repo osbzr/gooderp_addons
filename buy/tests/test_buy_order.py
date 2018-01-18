@@ -17,6 +17,17 @@ class TestBuyOrder(TransactionCase):
         self.env.ref('money.get_40000').money_order_done()
         self.env.ref('money.pay_2000').money_order_done()
 
+    def test_get_paid_amount(self):
+        ''' 测试：计算购货订单付款/退款 '''
+        self.order.buy_order_done()
+        receipt = self.env['buy.receipt'].search([('order_id', '=', self.order.id)])
+        receipt.payment = 1
+        receipt.bank_account_id = self.env.ref('core.comm').id
+        receipt.buy_receipt_done()
+        money = self.env['money.order'].search([('buy_id', '=', self.order.id)])
+        money.money_order_done()
+        self.assertTrue(self.order.paid_amount == 1)
+
     def test_onchange_discount_rate(self):
         ''' 优惠率改变时，改变优惠金额，成交金额也改变'''
         amount_before = self.order.amount
@@ -279,6 +290,11 @@ class TestBuyOrderLine(TransactionCase):
 
     def test_compute_all_amount_foreign_currency(self):
         '''外币测试：当订单行的数量、含税单价、折扣额、税率改变时，改变购货金额、税额、价税合计'''
+        # 单据上外币是公司本位币
+        self.order.currency_id = self.env.ref('base.CNY')
+        for line in self.order.line_ids:
+            line.price_taxed = 11.7
+        # 外币
         self.order.currency_id = self.env.ref('base.EUR')
         for line in self.order.line_ids:
             line.price_taxed = 11.7
