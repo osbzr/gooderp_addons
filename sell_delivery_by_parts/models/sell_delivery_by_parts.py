@@ -41,7 +41,7 @@ class WhMoveLine(models.Model):
                 child_vals['goods_id'] = child.goods_id.id
                 child_vals['attribute_id'] = child.attribute_id.id
                 child_vals['goods_qty'] = vals['goods_qty'] * child.goods_qty
-                if price_sum:
+                if vals.get('price_taxed') and price_sum:
                     child_vals['price_taxed'] = child.goods_id.price * vals['price_taxed'] / price_sum
                 else:
                     child_vals['price_taxed'] = 0
