@@ -48,6 +48,54 @@ class TestSellDelivery(TransactionCase):
         self.county_id = self.env['all.county'].search(
             [('county_name', '=', u'正定县')])
 
+    def test_sell_to_return(self):
+        self.delivery.sell_delivery_done()
+        self.delivery.sell_to_return()
+
+        # 销售发货单存在草稿状态的退货单！
+        with self.assertRaises(UserError):
+            self.delivery.sell_to_return()
+
+        # 部分退货
+        return_order = self.env['sell.delivery'].search([
+            ('is_return', '=', True),
+            ('origin_id', '=', self.delivery.id),
+            ('state', '=', 'draft')
+        ])
+        for line_in in return_order.line_in_ids:
+            line_in.goods_qty = 4
+        return_order.sell_delivery_done()
+
+        # 二次退货
+        self.delivery.sell_to_return()
+        return_order_2 = self.env['sell.delivery'].search([
+            ('is_return', '=', True),
+            ('origin_id', '=', self.delivery.id),
+            ('state', '=', 'draft')
+        ])
+        for line_in in return_order_2.line_in_ids:
+            line_in.goods_qty = 4
+        return_order_2.sell_delivery_done()
+
+        # 三次退货，执行 if return_goods.get(t_key)
+        self.delivery.sell_to_return()
+
+    def test_sell_to_return_all_return(self):
+        ''' Test raise error: all is return '''
+        self.delivery.sell_delivery_done()
+        self.delivery.sell_to_return()
+
+        return_order = self.env['sell.delivery'].search([
+            ('is_return', '=', True),
+            ('origin_id', '=', self.delivery.id),
+            ('state', '=', 'draft')
+        ])
+        return_order.sell_delivery_done()
+
+        with self.assertRaises(UserError):
+            self.delivery.sell_to_return()
+
+
     def test_onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
         # partner 不存在默认联系人
