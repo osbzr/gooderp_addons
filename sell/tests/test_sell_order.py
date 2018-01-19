@@ -186,6 +186,22 @@ class TestSellOrder(TransactionCase):
         delivery.sell_delivery_done()
         self.order.action_view_delivery()
 
+        # 先入库
+        order_2 = self.env.ref('sell.sell_order_2')
+        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        warehouse_obj.approve_order()
+        order_2.sell_order_done()
+
+        delivery_2 = self.env['sell.delivery'].search([('order_id', '=', order_2.id)])
+        for line in delivery_2.line_out_ids:
+            line.goods_qty = 8
+        delivery_2.sell_delivery_done()
+        # len(delivery_ids) > 1
+        order_2.action_view_delivery()
+
+        # compute_delivery_count
+        self.assertTrue(order_2.delivery_count == 2)
+
 
 class TestSellOrderLine(TransactionCase):
 
@@ -214,7 +230,12 @@ class TestSellOrderLine(TransactionCase):
         self.assertEqual(self.sell_order_line.subtotal, 107)
 
     def test_compute_all_amount_foreign_currency(self):
-        '''外币测试：当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
+        # '''外币测试：当订单行的数量、含税单价、折扣额、税率改变时，改变销售金额、税额、价税合计'''
+        # 本位币
+        self.order.currency_id = self.env.ref('base.CNY')
+        for line in self.order.line_ids:
+            line.price_taxed = 11.7
+
         self.order.currency_id = self.env.ref('base.EUR')
         for line in self.order.line_ids:
             line.price_taxed = 11.7
