@@ -6,5 +6,9 @@
             <field name="date">2016-02-18</field>
             <field name="currency_id" ref="base.USD"/>
         </record>
+        <record id="auto_exchange_line_2" model="auto.exchange.line">
+            <field name="date">2016-02-18</field>
+            <field name="currency_id" ref="base.BSD"/>
+        </record>
     </data>
 </openerp>
