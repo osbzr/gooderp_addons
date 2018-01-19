@@ -131,6 +131,17 @@ class TestAsset(TransactionCase):
         self.asset.asset_done()
         self.asset.asset_draft()
 
+    def test_get_cost_depreciation(self):
+        ''' Test: _get_cost_depreciation '''
+        self.asset.asset_done()
+        # 提一次折旧
+        wizard = self.env['create.depreciation.wizard'].create({'date': '2016-05-01'})
+        wizard.create_depreciation()
+        self.asset.depreciation_number = 12
+
+        # 已提完
+        self.asset.depreciation_number = 1
+
 
 class TestCreateCleanWizard(TransactionCase):
 
@@ -224,6 +235,10 @@ class TestDepreciationWizard(TransactionCase):
         self.wizard = self.env['create.depreciation.wizard'].create(
             {'date': '2016-05-01'})
 
+    def test_get_last_date(self):
+        ''' 取本月的最后一天作为默认折旧日 '''
+        self.env['create.depreciation.wizard'].create({})
+
     def test_compute_period_id(self):
         '''资产折旧：计算期间'''
         self.wizard._compute_period_id()
@@ -237,11 +252,11 @@ class TestDepreciationWizard(TransactionCase):
 
     def test_create_depreciation_surplusValue(self):
         ''' 测试 surplus_value <= (total + cost_depreciation) '''
+        self.asset.asset_done()
         self.asset.depreciation_number = 1
         self.asset.depreciation_previous = 950
         self.asset.depreciation_value = 1000
-        with self.assertRaises(UserError):
-            self.wizard.create_depreciation()
+        self.wizard.create_depreciation()
 
     def test_create_depreciation_no_voucher_line(self):
         '''报错：本期所有固定资产都已折旧'''
@@ -249,6 +264,14 @@ class TestDepreciationWizard(TransactionCase):
             {'date': '2016-04-01'})
         with self.assertRaises(UserError):
             wizard.create_depreciation()
+
+    def test_create_depreciation_account_diff(self):
+        ''' 多个固定资产生成凭证 '''
+        asset_2 = self.asset.copy()
+        asset_2.asset_done()
+        self.asset.asset_done()
+        wizard = self.env['create.depreciation.wizard'].create({'date': '2016-05-01'})
+        wizard.create_depreciation()
 
 
 class TestVoucher(TransactionCase):
