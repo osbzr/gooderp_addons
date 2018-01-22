@@ -66,7 +66,7 @@ class Currency(models.Model):
         '''用爬虫的方法取得中国银行汇率'''
         http = httplib2.Http()
         if self.name not in currency_code:
-            raise UserError(u'中国银行找不到您的(%s)币别汇率' % self.currency_id.name)
+            raise UserError(u'中国银行找不到您的(%s)币别汇率' % self.name)
         url = 'http://srh.bankofchina.com/search/whpj/search.jsp'
         body = {
             'erectDate': line_date,

@@ -180,6 +180,10 @@ class TestWave(TransactionCase):
         ''' 测试 print_package_list'''
         self.wave[0].print_package_list()
 
+    def test_delivery_list(self):
+        ''' Test: delivery_list '''
+        self.wave[0].delivery_list()
+
     def test_unlink(self):
         ''' 测试 wave unlink'''
         self.wave[0].unlink()
@@ -314,3 +318,26 @@ class TestDoPack(TransactionCase):
         # 发货单要发货的商品已经充足
         with self.assertRaises(UserError):
             pack.scan_barcode('222', pack.id)
+
+
+class TestDeliveryExpressPackagePrint(TransactionCase):
+
+    def setUp(self):
+        ''' setUp Data '''
+        super(TestDeliveryExpressPackagePrint, self).setUp()
+        self.order = self.env.ref('sell.sell_order_2')
+        self.order.sell_order_done()
+        self.delivery = self.env['sell.delivery'].search(
+            [('order_id', '=', self.order.id)])
+
+    def test_button_print(self):
+        ''' Test: button_print method, default_get method '''
+        print_obj = self.env['delivery.express.package.print']
+        print_obj.with_context({'active_ids': [self.delivery.id],
+                                'express_info': True}).default_get(False)
+        print_obj.with_context({'active_ids': [self.delivery.id],
+                                'package_info': True}).default_get(False)
+        print_obj.with_context({'active_ids': [self.delivery.id],
+                                'express_info': True}).button_print()
+        print_obj.with_context({'active_ids': [self.delivery.id],
+                                'package_info': True}).button_print()
