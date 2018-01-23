@@ -198,6 +198,46 @@ class TestInventory(TransactionCase):
 
         self.assertEqual(results, real_results)
 
+    def test_check_done_state_done(self):
+        ''' Test: check_done state == 'done' '''
+        for line in self.inventory.line_ids:
+            if line.goods_id.name == u'鼠标':
+                mouse = line
+
+        # 实际数量小与系统库存一个的时候，差异数量为-1
+        mouse.inventory_qty = mouse.real_qty - 1
+        mouse.onchange_qty()
+        # 此时鼠标数量-1，生成一个鼠标的出库单
+        self.inventory.generate_inventory()
+
+        self.inventory.out_id.approve_order()
+        self.inventory.out_id.cancel_approved_order()
+
+    def test_get_difference_uos_qty(self):
+        ''' Test: _get_difference_uos_qty '''
+        for line in self.inventory.line_ids:
+            if line.goods_id.name == u'鼠标':
+                mouse = line
+
+        # 实际辅助数量少1个
+        mouse.inventory_uos_qty = mouse.inventory_qty - 1
+        mouse.onchange_uos_qty()
+        self.assertEqual(mouse.difference_uos_qty, -1)
+
+    def test_check_difference_identical(self):
+        ''' Test: check_difference_identical '''
+        for line in self.inventory.line_ids:
+            if line.goods_id.name == u'鼠标':
+                mouse = line
+
+        # 实际辅助数量少1个
+        mouse.inventory_uos_qty = mouse.inventory_qty - 1
+        mouse.onchange_uos_qty()
+        self.assertEqual(mouse.difference_uos_qty, -1)
+        # 盘盈盘亏数量应该与辅助单位的盘盈盘亏数量盈亏方向不一致
+        mouse.difference_qty = 1
+        mouse.check_difference_identical()
+
     def test_check_done(self):
         '''盘盈盘亏产生的入库单和出库单审核时检查'''
         self.inventory.query_inventory()
