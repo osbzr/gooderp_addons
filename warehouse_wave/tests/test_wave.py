@@ -319,6 +319,30 @@ class TestDoPack(TransactionCase):
         with self.assertRaises(UserError):
             pack.scan_barcode('222', pack.id)
 
+    def test_scan_barcode_is_pack_ok(self):
+        ''' 测试 is_pack_ok, common.dialog.wizard '''
+        order_1 = self.env.ref('sell.sell_order_1')
+        order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.env.ref('sell.sell_order_line_1').quantity = 1
+        self.env.ref('sell.sell_order_line_1').discount_amount = 0
+        self.env.ref('sell.sell_order_line_1').tax_rate = 0
+        order_1.discount_amount = 0
+        order_1.sell_order_done()
+        delivery_1 = self.env['sell.delivery'].search(
+            [('order_id', '=', order_1.id)])
+        delivery_1.express_code = '8888'
+        delivery_1.express_type = 'SF'
+        delivery_1.date = '2016-11-02'
+        wave_wizard = self.env['create.wave'].with_context({ 'active_ids': delivery_1.id}).create({
+            'active_model': 'sell.delivery'})
+        wave_wizard.create_wave()
+
+        self.env.ref('warehouse.wh_in_whin0').cancel_approved_order()
+        pack = self.env['do.pack'].create({})
+        pack.scan_barcode('8888', pack.id)
+        self.env.ref('goods.mouse').barcode = '222'
+        pack.scan_barcode('222', pack.id)
+
 
 class TestDeliveryExpressPackagePrint(TransactionCase):
 
