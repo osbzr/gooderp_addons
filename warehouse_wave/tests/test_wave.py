@@ -332,7 +332,7 @@ class TestDoPack(TransactionCase):
             [('order_id', '=', order_1.id)])
         delivery_1.express_code = '8888'
         delivery_1.express_type = 'SF'
-        delivery_1.date = '2016-11-02'
+        delivery_1.date = '2016-01-02'
         wave_wizard = self.env['create.wave'].with_context({ 'active_ids': delivery_1.id}).create({
             'active_model': 'sell.delivery'})
         wave_wizard.create_wave()
