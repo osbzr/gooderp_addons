@@ -11,6 +11,12 @@ class TestProcess(TransactionCase):
             self.env['good_process.process'].create({
                 'model_id': self.env.ref('buy.model_buy_order').id,
             })
+        # 审批规则必须唯一
+        with self.assertRaises(ValidationError):
+            self.env['good_process.process'].create({
+                'model_id': self.env.ref('buy.model_buy_order').id,
+                'type': 'buy'
+            })
 
 
 class TestMailThread(TransactionCase):
@@ -122,3 +128,19 @@ class TestApprover(TransactionCase):
         """查看并处理"""
         env2 = self.env(self.env.cr, self.user_demo.id, self.env.context)
         self.order.with_env(env2)._to_approver_ids[0].goto()
+
+        process = self.env['good_process.process'].create({
+            'model_id': self.env.ref('buy.model_buy_receipt').id,
+            'type': 'out',
+            'is_department_approve': True
+        })
+        self.env['good_process.process_line'].create({
+            'process_id': process.id,
+            'sequence': 0,
+            'group_id': self.env.ref('scm.group_process_buy_order').id,
+            'is_all_approve': True})
+
+        env2 = self.env(self.env.cr, self.user_demo.id, self.env.context)
+        receipt = self.env.ref('buy.buy_receipt_return_1').copy()
+        if receipt._to_approver_ids:
+            receipt.with_env(env2)._to_approver_ids[0].goto()

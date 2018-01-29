@@ -4,6 +4,7 @@ from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
 from odoo import fields, models, api
 from odoo.tools import float_compare, float_is_zero
+import calendar
 
 
 class TestVoucher(TransactionCase):
@@ -196,6 +197,12 @@ class TestVoucher(TransactionCase):
         setting_row.execute()
         voucher_obj._default_voucher_date()
         voucher_obj.create({})
+
+
+class TestVoucherLine(TransactionCase):
+    def test_view_document(self):
+        ''' Test: view document method '''
+        self.env.ref('finance.voucher_line_1_debit').view_document()
 
 
 class TestPeriod(TransactionCase):
@@ -432,6 +439,14 @@ class TestCheckoutWizard(TransactionCase):
                                                                         "default_voucher_date": "today"})
         setting_row_month.execute()
         checkout_wizard_obj.recreate_voucher_name(period_id)
+
+    def test_get_last_date(self):
+        ''' Test: _get_last_date '''
+        datetime_str_list = datetime.now().strftime("%Y-%m-%d").split('-')
+        day = calendar.monthrange(int(datetime_str_list[0]), int(datetime_str_list[1]))
+
+        c_w = self.env['checkout.wizard'].create({})
+        self.assertEqual(c_w.date, '-'.join([datetime_str_list[0], datetime_str_list[1], str(day[1])]))
 
 
 class TestMonthProductCost(TransactionCase):

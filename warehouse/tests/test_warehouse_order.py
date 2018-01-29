@@ -295,3 +295,43 @@ class TestWarehouseOrder(TransactionCase):
                 )]
             }
             self.internal.goods_inventory(vals)
+
+
+class TestCheckOutWizard(TransactionCase):
+    # 放在这里测试，因为代码实现时，需要安装 warehouse 模块
+    def test_button_checkout_diff_cost(self):
+        ''' Test button_checkout：diff_cost '''
+        # 期初 keyboard_mouse 产品数量及成本
+        self.env.ref('finance.period_201411').is_closed = False
+        self.env.ref('warehouse.wh_in_whin1').date = '2014-11-06'
+        self.env.ref('warehouse.wh_move_line_16').cost = 600
+        self.browse_ref('warehouse.wh_in_whin1').approve_order() # 入库 48
+
+        others_out_1 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_1.date = '2014-11-06'
+        others_out_1.approve_order() # 出库 24
+        self.env.ref('finance.period_201411').is_closed = True
+
+        # 当月入库 keyboard_mouse 产品数量及成本
+        self.env.ref('warehouse.wh_in_whin3').date = '2014-12-06'
+        self.env.ref('warehouse.wh_move_line_keyboard_mouse_in_2').cost = 400
+        self.browse_ref('warehouse.wh_in_whin3').approve_order()
+        # 当月出库
+        others_out_2 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_2.date = '2014-12-06'
+        others_out_2.approve_order()
+        # 月末结账
+        wizard_2 = self.env['checkout.wizard'].create({'date': '20141213'})
+        wizard_2.onchange_period_id()
+        self.env['month.product.cost'].generate_issue_cost(wizard_2.period_id, wizard_2.date)
+        self.env.ref('finance.period_201412').is_closed = True
+
+        # 发出成本算法为 定额成本std
+        others_out_3 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_3.date = '2015-12-06'
+        self.env.ref('goods.keyboard_mouse').cost_method = 'std'
+        others_out_3.approve_order()
+        # 月末结账
+        wizard_3 = self.env['checkout.wizard'].create({'date': '20151213'})
+        wizard_3.onchange_period_id()
+        self.env['month.product.cost'].generate_issue_cost(wizard_3.period_id, wizard_3.date)
