@@ -140,7 +140,7 @@ class MonthProductCost(models.Model):
             month_cost = data_dict.get("current_period_out_cost", 0)
         if cost_method == 'std':
             # 定额成本
-            goods = self.env.get('goods').browse(goods_id)
+            goods = self.env.get('goods').browse(data_dict.get("goods_id"))
             month_cost =  goods.price * \
                 data_dict.get("current_period_out_qty", 0)
         return round(month_cost, 2)

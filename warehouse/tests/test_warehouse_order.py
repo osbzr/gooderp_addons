@@ -309,7 +309,7 @@ class TestCheckOutWizard(TransactionCase):
 
         others_out_1 = self.env.ref('warehouse.wh_out_whout1')
         others_out_1.date = '2014-11-06'
-        others_out_1.approve_order() # 出库 48
+        others_out_1.approve_order() # 出库 24
         self.env.ref('finance.period_201411').is_closed = True
 
         # 当月入库 keyboard_mouse 产品数量及成本
@@ -324,3 +324,14 @@ class TestCheckOutWizard(TransactionCase):
         wizard_2 = self.env['checkout.wizard'].create({'date': '20141213'})
         wizard_2.onchange_period_id()
         self.env['month.product.cost'].generate_issue_cost(wizard_2.period_id, wizard_2.date)
+        self.env.ref('finance.period_201412').is_closed = True
+
+        # 发出成本算法为 定额成本std
+        others_out_3 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_3.date = '2015-12-06'
+        self.env.ref('goods.keyboard_mouse').cost_method = 'std'
+        others_out_3.approve_order()
+        # 月末结账
+        wizard_3 = self.env['checkout.wizard'].create({'date': '20151213'})
+        wizard_3.onchange_period_id()
+        self.env['month.product.cost'].generate_issue_cost(wizard_3.period_id, wizard_3.date)
