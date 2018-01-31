@@ -1,6 +1,0 @@
-#!/bin/bash
-xset s off
-xset -dpms
-
-export HOME=/tmp
-/usr/bin/firefox http://localhost:8069/gooderp_pos/display &

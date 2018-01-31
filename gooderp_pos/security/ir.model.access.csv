@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_pos_config,access_pos_config,model_pos_config,,1,1,1,1
-access_pos_session,access_pos_session,model_pos_session,,1,1,1,1
-access_payment_line,access_payment_line,model_payment_line,,1,1,1,1
-access_pos_order,access_pos_order,model_pos_order,,1,1,1,1
-access_pos_order_line,access_pos_order_line,model_pos_order_line,,1,1,1,1
-access_pos_payment_line,access_pos_payment_line,model_pos_payment_line,,1,1,1,1
