@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+        <template id="assets_backend" name="Core" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/good_process/static/src/js/good_process.js"></script>
+            </xpath>
+        </template>
+		<record id='good_process_process_form' model='ir.ui.view'>
+			<field name='name'>good_process.process</field>
+			<field name='model'>good_process.process</field>
+			<field name='arch' type='xml'>
+				<form string='审批'>
+                    <group>
+                        <field name='model_id'/>
+						<field name='applicable_domain'/>
+						<field name='type'/>
+                        <field name='is_department_approve'/>
+                    </group>
+                    <field name='line_ids'>
+						<tree editable='TOP' string='审批'>
+							<field name='sequence'/>
+							<field name='group_id' domain="[('category_id','=', %(good_process.gooderp_approver_groups)d)]"/>
+							<field name='is_all_approve' />
+						</tree>
+					</field>
+				</form>
+			</field>
+		</record>
+		<record id='good_process_process_tree' model='ir.ui.view'>
+			<field name='name'>attribute value value tree</field>
+			<field name='model'>good_process.process</field>
+			<field name='arch' type='xml'>
+				<tree string='审批'>
+					<field name='sequence'/>
+					<field name='model_id'/>
+					<field name='type'/>
+					<field name='is_department_approve'/>
+					<field name='applicable_domain'/>
+					<field name='active' invisible='1'/>
+				</tree>
+			</field>
+		</record>
+
+        <record id='good_process_process_action' model='ir.actions.act_window'>
+            <field name='name'>审批设置</field>
+            <field name='res_model'>good_process.process</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+        <menuitem id='good_process_process_menu' name='审批设置' action='good_process_process_action'
+                  parent='core.system_menu' sequence='20'/>
+
+
+
+		<record id='good_process_approver_kanban' model='ir.ui.view'>
+			<field name='name'>good_process.approver</field>
+			<field name='model'>good_process.approver</field>
+			<field name='arch' type='xml'>
+			<!--
+				<tree string='待审批单据' create="0" delete="0">
+				    <field name='creator'/>
+					<field name='model_type'/>
+					<field name='record_name'/>
+					<button name='goto' type='object' string="查看并处理" class="oe_highlight"/>
+					<field name='group_id'/>
+					<field name='sequence'/>
+				</tree>
+			-->
+			<kanban create="0">
+                  <field name='creator'/>
+				  <field name='model_type'/>
+				  <field name='record_name'/>
+				  <button name='goto' type='object' string="查看并处理" class="oe_highlight"/>
+				  <field name='group_id'/>
+                  <templates>
+                    <t t-name="kanban-box">
+                      <div>
+                          <div class="oe_module_desc">
+							  <span><field name='creator'/> 申请 </span>
+							  <span><field name='group_id'/> 审批 </span>
+				              <span><field name='model_type'/> </span>
+				              <span><field name='record_name'/></span>
+                          </div>
+						  <div>
+						      <button type="object" class="btn btn-primary pull-right btn-sm" name="goto">查看并处理</button>
+						  </div>
+                      </div>
+                    </t>
+                  </templates>
+                </kanban>
+			</field>
+		</record>
+
+        <record id='good_process_approver_action' model='ir.actions.act_window'>
+            <field name='name'>待审批单据</field>
+            <field name='res_model'>good_process.approver</field>
+            <field name='view_mode'>kanban</field>
+			<field name='domain'>[('user_id','=',uid)]</field>
+        </record>
+
+		<menuitem id='menu_to_approve_process' name='待审批' action='good_process_approver_action'
+		   groups="home_page.group_mail" web_icon="good_process,static/description/icon.png" sequence='998'/>
+
+    </data>
+</openerp>
