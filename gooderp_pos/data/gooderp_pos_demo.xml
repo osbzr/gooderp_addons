@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <record id="pos_config_sell" model="pos.config">
-        <field name="name">零售测试</field>
-        <field name="warehouse_id" ref="warehouse.hd_stock"/>
-    </record>
-</odoo>
