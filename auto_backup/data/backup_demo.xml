@@ -2,10 +2,10 @@
 <openerp>
     <data>
         <!-- db backup -->
-        <!--<record id="backup_demo" model="db.backup">-->
-            <!--<field name="name">gooderp_test</field>-->
-            <!--<field name="host">127.0.0.1</field>-->
-            <!--<field name="port">8069</field>-->
-        <!--</record>-->
+        <record id="backup_demo" model="db.backup">-->
+            <field name="name">openerp_test</field>
+            <field name="host">0.0.0.0</field>
+            <field name="port">8069</field>
+        </record>
     </data>
 </openerp>
