@@ -96,9 +96,21 @@ class SellAdjust(models.Model):
                         [('sell_line_id', '=', origin_line.id),
                          ('state', '=', 'draft')])
                     if move_line:
-                        move_line.goods_qty += line.quantity
-                        move_line.note = (move_line.note and
-                                          move_line.note or move_line.note + origin_line.note)
+                        if line.goods_id.force_batch_one:
+                            if line.quantity > 0:
+                                for count in range(line.quantity):
+                                    move_line[0].copy()
+                            else:
+                                count = -line.quantity
+                                for line in move_line:
+                                    move_line.unlink()
+                                    count -= 1
+                                    if count == 0:
+                                        break                               
+                        else:
+                            move_line.goods_qty += line.quantity
+                            move_line.note = (move_line.note and
+                                              move_line.note or move_line.note + origin_line.note)
                     else:
                         raise UserError(u'商品 %s 已全部入库，建议新建购货订单' %
                                         line.goods_id.name)
