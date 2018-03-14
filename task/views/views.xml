@@ -139,9 +139,9 @@
 			<field name="arch" type="xml">
 				<tree>
 					<field name="sequence" widget="handle"/>
+					<field name="project_id"/>
 					<field name="name"/>
 					<field name="user_id"/>
-					<field name="project_id"/>
 					<field name="next_action"/>
 					<field name="next_datetime"/>
 					<field name="status"/>

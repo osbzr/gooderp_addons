@@ -7,13 +7,13 @@
             <field name='arch' type='xml'>
                 <tree string='批次余额表'>
                     <field name='goods' />
-                    <field name='uom' />
-                    <field name='uos' groups='goods.auxiliary_unit_groups' />
                     <field name='attribute_id' groups='goods.multi_attrs_groups' />
                     <field name='lot' groups='goods.batch_groups' />
-                    <field name='uos_qty' groups='goods.auxiliary_unit_groups' />
-                    <field name="cost"/>
                     <field name='qty' />
+                    <field name='uom' />
+                    <field name='uos_qty' groups='goods.auxiliary_unit_groups' />
+                    <field name='uos' groups='goods.auxiliary_unit_groups' />
+                    <field name="cost"/>
                     <field name="amount"/>
                     <field name='date' />
                     <field name='warehouse' groups='warehouse.multi_warehouse_groups' />

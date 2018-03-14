@@ -118,10 +118,10 @@
                     <field name='goods_id' />
                     <field name='attribute_id' groups='goods.multi_attrs_groups' />
                     <field name='lot' groups='goods.batch_groups' />
-                    <field name='goods_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' />
-                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' sum='1' />
                     <field name='uom_id' />
+                    <field name='goods_uos_qty' sum='1' groups='goods.auxiliary_unit_groups' sum='1' />
+                    <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='warehouse_id' groups='warehouse.multi_warehouse_groups' />
                     <field name='warehouse_dest_id' groups='warehouse.multi_warehouse_groups' />
                     <field name='qty_remaining' />
@@ -130,9 +130,9 @@
                     <field name='line_net_weight' sum="净重合计" groups="warehouse.manager_net_weight_group"/>
                     <field name='cost' sum='1' groups='goods.view_cost_groups' />
                     <field name='expiration_date' groups='warehouse.group_expiration_date' />
-                    <field name='note' />
                     <field name='type' />
                     <field name='state' />
+                    <field name='note' />
                 </tree>
             </field>
         </record>
@@ -411,9 +411,6 @@
                     <field name='type' />
                     <field name='warehouse_id'/>
                     <field name='amount_total' />
-                    <field name='partner_id' string='客户' />
-                    <field name='create_uid' string='制单人' />
-                    <field name='approve_uid' />
                     <field name='note' />
                     <field name='state' />
                     <field name="_approve_state"/>
@@ -533,12 +530,9 @@
                     <field name='warehouse_dest_id'/>
                     <field name='type' />
                     <field name='amount_total' />
-                    <field name='partner_id' string='供应商' />
-                    <field name='create_uid' string='制单人' />
-                    <field name='approve_uid' />
-                    <field name='note' />
                     <field name='state' />
                     <field name="_approve_state"/>
+                    <field name='note' />
                 </tree>
             </field>
         </record>
@@ -652,11 +646,9 @@
                     <field name='warehouse_dest_id'/>
 					<field name='total_qty'/>
                     <field name='amount_total' />
-                    <field name='create_uid' string='制单人' />
-                    <field name='approve_uid' />
-                    <field name='note' />
                     <field name='state' />
                     <field name="_approve_state"/>
+                    <field name='note' />
                 </tree>
             </field>
         </record>

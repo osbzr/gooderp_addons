@@ -113,8 +113,8 @@
                     <field name="name"/>
                     <field name="work_phone"/>
                     <field name="work_email"/>
-                    <field name="department_id"/>
                     <field name="job_id"/>
+                    <field name="department_id"/>
                     <field name="parent_id"/>
                     <field name='active'  invisible='1'/>
                 </tree>

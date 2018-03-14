@@ -8,8 +8,7 @@
 				<tree string='商品'>
 					<field name='code' />
 					<field name='name' />
-					<field name='brand'/>
-					<field name='category_id' />
+					<field name='goods_class_id'/>
 					<field name='uom_id' />
 					<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 					<field name='conversion' string='转化率' groups='goods.auxiliary_unit_groups' />

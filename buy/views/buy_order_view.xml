@@ -13,9 +13,6 @@
 					<field name="type"/>
 					<field name="partner_id"/>
 					<field name="amount" sum="合计"/>
-					<field name="planned_date"/>
-					<field name="create_uid" string="制单人"/>
-					<field name="approve_uid"/>
 					<field name='currency_id'
 						 groups='finance.group_multi_currency'/>
 					<field name="state"/>
