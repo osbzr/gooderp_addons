@@ -173,7 +173,7 @@ class DbBackup(models.Model):
         pg_passwd = os.environ.get(
             'PGPASSWORD') or tools.config['db_password'] or False
         data = ''
-        if not pg_passwd:
+        if not tools.config['db_password']:
             _logger.error(
                 'DUMP DB: %s failed! Please verify the configuration of the database password on the server. '
                 'You may need to create a .pgpass file for authentication, or specify `db_password` in the '

@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
+import socket
 
 
 class TestDbBackup(TransactionCase):
 
     def setUp(self):
-        ''' 准备数据 '''
+        ''' setUp Data '''
         super(TestDbBackup, self).setUp()
-        self.obj = self.env.get('db.backup')
-        # self.back = self.env.ref('auto_backup.backup_demo')
+        self.ip = socket.gethostbyname("www.gooderp.org")
+        confs = self.env['db.backup'].get_db_list(host="%s" % self.ip, port='8888')
+        name = confs and confs[0] or 'gooderp'
+        self.backup = self.env['db.backup'].create({
+            "name": "%s" % name,
+            "host": "%s" % self.ip,
+            "port": "8888",
+        })
+
+    def test_schedule_backup(self):
+        ''' Test：Database atuo backup '''
+        self.backup.schedule_backup()
 
     def test_schedule_backup_pgtool(self):
-        ''' 测试：数据库自动备份 '''
-        self.obj.schedule_backup_pgtool()
+        ''' Test：Database atuo backup '''
+        self.backup.schedule_backup_pgtool()
