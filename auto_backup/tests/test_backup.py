@@ -17,9 +17,9 @@ class TestDbBackup(TransactionCase):
             "port": "8888",
         })
 
-    def test_schedule_backup(self):
-        ''' Test：Database atuo backup '''
-        self.backup.schedule_backup()
+    # def test_schedule_backup(self):
+    #     ''' Test：Database atuo backup '''
+    #     self.backup.schedule_backup()
 
     def test_schedule_backup_pgtool(self):
         ''' Test：Database atuo backup '''
