@@ -6,19 +6,19 @@
             <field name="model">buy.order.track</field>
             <field name="arch" type="xml">
                 <tree string="采购订单跟踪表" create="false">
-                	<field name="goods_code"/>
-                    <field name="goods_id"/>
-                    <button name="view_detail" type="object" string="查看明细" icon="fa-search"
-                    	attrs="{'invisible': [('goods_id','=',False)]}"/>
-                    <field name="attribute" groups='goods.multi_attrs_groups'/>
-                    <field name="uom"/>
                     <field name="date"/>
                     <field name="type"/>
                     <field name="order_name"/>
                     <field name="partner_id"/>
                     <field name="warehouse_dest_id"/>
+                	<field name="goods_code"/>
+                    <field name="goods_id"/>
+                    <field name="attribute" groups='goods.multi_attrs_groups'/>
+                    <button name="view_detail" type="object" string="查看明细" icon="fa-search"
+                    	attrs="{'invisible': [('goods_id','=',False)]}"/>
                     <field name="goods_state"/>
                     <field name="qty" sum='1'/>
+                    <field name="uom"/>
                     <field name="amount" sum='1'/>
                     <field name="qty_not_in" sum='1'/>
                     <field name="planned_date"/>

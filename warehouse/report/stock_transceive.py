@@ -82,7 +82,6 @@ class ReportStockTransceive(models.Model):
         return '''
         WHERE line.state = 'done'
           AND wh.type = 'stock'
-          AND line.date >= '{date_start}'
           AND line.date < '{date_end}'
           %s
         ''' % extra

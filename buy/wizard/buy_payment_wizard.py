@@ -80,6 +80,7 @@ class BuyPaymentWizard(models.TransientModel):
         # 计算该入库单的已付款
         payment = self._compute_payment(receipt)
         return {
+            's_category_id': receipt.partner_id.s_category_id.id,
             'partner_id': receipt.partner_id.id,
             'type': order_type,
             'date': receipt.date,

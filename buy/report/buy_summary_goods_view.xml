@@ -12,10 +12,10 @@
                     <button name="view_detail" type="object" string="查看明细" icon="fa-search"/>
                     <field name="attribute" groups='goods.multi_attrs_groups'/>
                     <field name="warehouse_dest" groups='warehouse.multi_warehouse_groups'/>
-                    <field name="qty_uos" sum="辅助数量合计" groups='goods.auxiliary_unit_groups'/>
-                    <field name="uos" groups='goods.auxiliary_unit_groups'/>
                     <field name="qty" sum="基本数量合计"/>
                     <field name="uom"/>
+                    <field name="qty_uos" sum="辅助数量合计" groups='goods.auxiliary_unit_groups'/>
+                    <field name="uos" groups='goods.auxiliary_unit_groups'/>
                     <field name="price"/>
                     <field name="amount" sum="采购金额合计"/>
                     <field name="tax_amount" sum="税额合计" groups='buy.in_tax_groups'/>

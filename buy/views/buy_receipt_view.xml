@@ -16,8 +16,6 @@
                     <field name="amount" sum="总金额"/>
             		<field name='payment'/>
             		<field name='date_due'/>
-                    <field name="create_uid" string="制单人"/>
-                    <field name="approve_uid"/>
                     <field name='currency_id'
                            groups='finance.group_multi_currency'/>
                     <field name='state'/>
@@ -213,7 +211,6 @@
             		<field name='payment'/>
             		<field name='date_due'/>
                     <field name="create_uid" string="制单人"/>
-                    <field name="approve_uid"/>
                     <field name='currency_id'
                            groups='finance.group_multi_currency'/>
                     <field name='state'/>

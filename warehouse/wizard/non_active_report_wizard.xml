@@ -28,7 +28,7 @@
             <field name='name'>non.active.report.tree</field>
             <field name='model'>non.active.report</field>
             <field name='arch' type='xml'>
-                <tree string='批号跟踪表'>
+                <tree string='呆滞料报表'>
                   <field name="warehouse_id"/>
                   <field name="goods_id"/>
                   <field name="first_stage_day_qty" />

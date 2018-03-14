@@ -10,6 +10,8 @@
                     <field name="name"/>
                     <field name="date"/>
                     <field name="partner_id"/>
+                    <field name="business_type"/>
+                    <!-- 这里还应加上核销金额 -->
                     <field name="state"/>
                 </tree>
             </field>

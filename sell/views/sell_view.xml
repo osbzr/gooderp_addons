@@ -14,8 +14,6 @@
             		<field name='partner_id'/>
             		<field name="amount" sum="合计"/>
             		<field name='delivery_date'/>
-            		<field name="create_uid" string="制单人"/>
-                    <field name="approve_uid"/>
                     <field name='state'/>
 					<field name="_approve_state"/>
             		<field name='goods_state'/>
@@ -178,8 +176,6 @@
             		<field name='partner_id'/>
 					<field name='total_qty'/>
             		<field name="amount" sum="总金额"/>
-            		<field name="create_uid" string="制单人"/>
-                    <field name="approve_uid"/>
 					<field name='currency_id'
 						   groups='finance.group_multi_currency'/>
                     <field name='state'/>
@@ -385,10 +381,8 @@
             		<field name='partner_id'/>
 					<field name='total_qty'/>
             		<field name="amount" sum="总金额"/>
-            		<field name='receipt'/>
+            		<field name='receipt' string="本次退款"/>
             		<field name='date_due'/>
-            		<field name="create_uid" string="制单人"/>
-                    <field name="approve_uid"/>
 					<field name='currency_id'
 						   groups='finance.group_multi_currency'/>
                     <field name='state'/>
