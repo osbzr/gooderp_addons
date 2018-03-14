@@ -6,7 +6,7 @@ import socket
 class TestDbBackup(TransactionCase):
 
     def setUp(self):
-        ''' setUp Data '''
+        ''' 准备数据 '''
         super(TestDbBackup, self).setUp()
         self.ip = socket.gethostbyname("www.gooderp.org")
         confs = self.env['db.backup'].get_db_list(host="%s" % self.ip, port='8888')
@@ -16,11 +16,3 @@ class TestDbBackup(TransactionCase):
             "host": "%s" % self.ip,
             "port": "8888",
         })
-
-    # def test_schedule_backup(self):
-    #     ''' Test：Database atuo backup '''
-    #     self.backup.schedule_backup()
-
-    def test_schedule_backup_pgtool(self):
-        ''' Test：Database atuo backup '''
-        self.backup.schedule_backup_pgtool()
