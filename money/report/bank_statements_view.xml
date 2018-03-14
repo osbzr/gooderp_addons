@@ -10,11 +10,11 @@
                 	<field name="date"/>
                     <field name="name"/>
                     <button name="find_source_order" type="object" string="查看原始单据" icon="fa-search" class="oe_highlight"/>
-                    <field name="note"/>
+                    <field name="partner_id"/>
                     <field name="get" sum="收入"/>
                     <field name="pay" sum="支出"/>
-                    <field name="partner_id"/>
                     <field name="balance"/>
+                    <field name="note"/>
                 </tree>
             </field>
         </record>
