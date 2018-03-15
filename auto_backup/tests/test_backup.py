@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
+import socket
 
 
 class TestDbBackup(TransactionCase):
 
     def setUp(self):
-        ''' 准备数据 '''
+        ''' setUp Data '''
         super(TestDbBackup, self).setUp()
-        self.obj = self.env.get('db.backup')
-        # self.back = self.env.ref('auto_backup.backup_demo')
+        self.backup = self.env.ref('auto_backup.backup_demo')
+
+    def test_schedule_backup(self):
+        ''' Test：Database atuo backup '''
+        self.backup.schedule_backup()
 
     def test_schedule_backup_pgtool(self):
-        ''' 测试：数据库自动备份 '''
-        self.obj.schedule_backup_pgtool()
+        ''' Test：Database atuo backup '''
+        self.backup.schedule_backup_pgtool()
