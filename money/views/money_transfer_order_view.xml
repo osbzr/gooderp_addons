@@ -9,8 +9,8 @@
                 <tree string="资金转账单" colors='blue:state == "draft";lightgray:state == "cancel"'>
                     <field name="name"/>
                     <field name="date"/>
-                    <field name="state"/>
                     <field name="transfer_amount"/>
+                    <field name="state"/>
                     <field name="_approve_state"/>
                 </tree>
             </field>
