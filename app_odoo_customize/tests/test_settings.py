@@ -8,7 +8,8 @@ class TestSettings(TransactionCase):
         super(TestSettings, self).setUp()
 
     def test_create(self):
-        self.env['app.theme.config.settings'].create({
+        setting = self.env['app.theme.config.settings'].create({
             'app_system_name': 'GoodERP',
         })
-        
+        setting.set_default_all()
+
