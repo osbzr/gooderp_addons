@@ -179,7 +179,7 @@ class DbBackup(models.Model):
                 'You may need to create a .pgpass file for authentication, or specify `db_password` in the '
                 'server configuration file.\n %s', db_name, data)
             raise Exception, "Couldn't dump database"
-        os.environ['PGPASSWORD'] = tools.config['db_password']
+        os.environ['PGPASSWORD'] = pg_passwd
         cmd = ['pg_dump', '--format=c', '--no-owner']
         if tools.config['db_user']:
             cmd.append('--username=' + tools.config['db_user'])
