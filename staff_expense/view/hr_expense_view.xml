@@ -100,8 +100,6 @@
                                 <field name='date'/>
                                 <field name='staff'/>
                                 <field name='invoice_all_total'/>
-                                <field name='other_money_order'/>
-                                <field name='money_invoice'/>
 							</group>
                             <group>
                                 <field name='select'/>
