@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- action -->
+        <record id="hr_expense_action" model="ir.actions.act_window">
+            <field name="name">员工报销</field>
+            <field name="res_model">hr.expense</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="expense_line_search" model="ir.ui.view">
+            <field name="name">expense.line.search</field>
+            <field name="model">hr.expense.line</field>
+            <field name="arch" type="xml">
+                <search string="选单策略">
+                    <field name='staff'/>
+                    <field name='date'/>
+                    <field name='name'/>
+                    <field name='invoice_name'/>
+                    <field name='invoice_total'/>
+                    <field name='note'/>
+                    <field name='state'/>
+                    <field name='is_refused'/>
+                    <filter string="选择报销" domain="[('is_refused','=', False)]" name="mb_ok"/>
+                    <group expand="0" string="分组">
+                        <filter string="员工" domain="[]" context="{'group_by':'staff'}"/>
+                        <filter string="日期" domain="[]" context="{'group_by':'date:day'}"/>
+                        <filter string="状态" domain="[]" context="{'group_by':'state'}"/>
+                        <filter string="分类" domain="[]" context="{'group_by':'category_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="hr_expense_line_action" model="ir.actions.act_window">
+            <field name="name">费用发票</field>
+            <field name="res_model">hr.expense.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="expense_line_search"/>
+            <field name="context">{'search_default_mb_ok':1}</field>
+        </record>
+
+	</data>
+</openerp>

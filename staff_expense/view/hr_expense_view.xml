@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+
+		<!--费用发票设置tree-->
+        <record id='hr_expense_line_tree' model='ir.ui.view'>
+			<field name='name'>hr.expense.line.tree</field>
+			<field name='model'>hr.expense.line</field>
+			<field name='arch' type='xml'>
+				<tree string='费用发票'>
+                    <field name='date'/>
+                    <field name='name'/>
+                    <field name='invoice_name'/>
+                    <field name='invoice_total'/>
+                    <field name='note'/>
+                    <field name='state'/>
+                    <field name='staff'/>
+				</tree>
+			</field>
+		</record>
+
+        <!--费用发票设置form-->
+		<record id='hr_expense_line_form' model='ir.ui.view'>
+			<field name='name'>hr.expense.line.form</field>
+			<field name='model'>hr.expense.line</field>
+			<field name='arch' type='xml'>
+                <form string="费用发票">
+                    <header>
+            			<button name='hr_expense_line_config' states='draft' type='object' string='审核' class='oe_highlight'/>
+						<button name='hr_expense_line_draft' states='config' type='object' string='反审核'/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,config,done"/>
+            		</header>
+			    	<sheet>
+                        <div class="oe_button_box">
+                            <button name="action_get_attachment_view"
+                                class="oe_stat_button"
+                                icon="fa-book"
+                                type="object">
+                                <field name="attachment_number" widget="statinfo" string="附件"/>
+                            </button>
+                        </div>
+                        <div class="oe_edit_only oe_title" attrs="{'readonly':[('state', '!=', 'draft')]}">
+                            <label string="扫描条码 "/>
+                                <input type='text' class="do_input_invoice_code" autofocus="true"/>
+                        </div>
+                        <group>
+                            <group>
+                                <field name='order_id' readonly = '1'/>
+                                <field name='date'/>
+                                <field name='staff'/>
+                                <field name='invoice_total'/>
+							</group>
+                            <group>
+                                <field name='invoice_type'/>
+                                <field name='invoice_code'/>
+                                <field name='invoice_name'/>
+                                <field name='category_id' domain="[('type', '=', 'other_pay')]"/>
+                                <field name='invoice_amount'/>
+                                <field name='invoice_tax'/>
+							</group>
+                        </group>
+                        <group>
+                            <field name='note'/>
+                        </group>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+        <!--报销设置tree-->
+        <record id='hr_expense_tree' model='ir.ui.view'>
+			<field name='name'>hr.expense.tree</field>
+			<field name='model'>hr.expense</field>
+			<field name='arch' type='xml'>
+				<tree string='费用发票'>
+                    <field name='date'/>
+                    <field name='staff'/>
+                    <field name='name'/>
+                    <field name='invoice_all_total'/>
+                    <field name='note'/>
+                    <field name='state'/>
+				</tree>
+			</field>
+		</record>
+
+        <!--报销设置form-->
+        <record id='hr_expense_form' model='ir.ui.view'>
+			<field name='name'>hr.expense.form</field>
+			<field name='model'>hr.expense</field>
+			<field name='arch' type='xml'>
+                <form string="报销费用">
+                    <header>
+            			<button name='hr_expense_config' states='draft' type='object' string='审核' class='oe_highlight'/>
+						<button name='hr_expense_draft' states='config' type='object' string='反审核'/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,config,done"/>
+            		</header>
+			    	<sheet>
+                        <group>
+                            <group>
+                                <field name='date'/>
+                                <field name='staff'/>
+                                <field name='invoice_all_total'/>
+                                <field name='other_money_order'/>
+                                <field name='money_invoice'/>
+							</group>
+                            <group>
+                                <field name='select'/>
+                                <field name="partner_id" attrs="{'readonly': [('select', '!=', 'company')], 'required':[('select', '=', 'company')]}"
+                                       domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
+                                <field name="bank_account_id" attrs="{'readonly': [('select', '!=', 'my')], 'required':[('select', '=', 'my')]}" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="报销费用明细">
+			                	<field name="line_ids" nolabel="1" widget="many2many" domain="[('state', '=', 'config'),('staff','=',staff),('is_refused','=',False)]" options="{'not_delete': True, 'reload_on_button': True, 'no_create': True}">
+                                    <tree decoration-danger="is_refused">
+				                		<field name="name"/>
+				                		<field name='invoice_code'/>
+				                		<field name="invoice_name"/>
+                                        <field name="invoice_total"/>
+                                        <field name="category_id"/>
+				                		<field name="note"/>
+                                        <field name="state" invisible="1"/>
+                                        <field name="is_refused" invisible="True"/>
+				                	</tree>
+			                	</field>
+			                </page>
+			            </notebook>
+                        <group>
+                            <field name='note'/>
+                        </group>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+	</data>
+</openerp>
