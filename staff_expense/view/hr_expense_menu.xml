@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--根菜单-->
+		<menuitem id='hr_expense' name='费用报销' parent='staff.menu_staff_root' sequence='10'/>
+        <!-- 基础设置 -->
+        <menuitem id="hr_expense_country" name='员工报销' action="hr_expense_action"
+            parent="hr_expense" sequence="10"/>
+        <menuitem id="hr_expense_line_category" name='费用发票' action="hr_expense_line_action"
+            parent="hr_expense" sequence="0"/>
+	</data>
+</openerp>

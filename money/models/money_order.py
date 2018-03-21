@@ -762,6 +762,9 @@ class MoneyInvoice(models.Model):
         if self.env.get('cost.order') != None:
             res_models += ['cost.order']
             views += ['account_cost.cost_order_form']
+        if self.env.get('hr.expense') != None:
+            res_models += ['hr.expense']
+            views += ['staff_expense.hr_expense_form']
         if u'固定资产变更' in self.name:
             code = self.name.replace(u'固定资产变更', '')
         elif u'固定资产' in self.name:
