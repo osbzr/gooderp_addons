@@ -28,10 +28,6 @@ class TestReconcileOrder(TransactionCase):
         self.get_invoice.partner_id.receivable = 0
         c_category_id = self.get_invoice.partner_id.c_category_id.id
         self.get_invoice.partner_id.s_category_id = self.env.ref('core.supplier_category_1').id
-        self.get_invoice.partner_id.c_category_id = False
-        with self.assertRaises(UserError):
-            # 客户找不到科目
-            self.get_invoice.money_invoice_done()
         self.get_invoice.category_id.account_id = False
         self.get_invoice.partner_id.c_category_id = c_category_id
         with self.assertRaises(UserError):
