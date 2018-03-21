@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    OpenERP, Open Source Management Solution
+#    GOODERP, Open Source Management Solution
 #    Copyright (C) 2018  德清武康开源软件工作室().
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ from odoo.exceptions import UserError
 
 # 字段只读状态
 READONLY_STATES = {
-        'config': [('readonly', True)],
+        'confirm': [('readonly', True)],
         'done': [('readonly', True)],
     }
 
@@ -39,14 +39,14 @@ class hr_expense(models.Model):
                        states={'draft': [('readonly', False)]},
                        copy=False,required=True,
                        help=u'报销发生日期')
-    staff = fields.Many2one('staff', u'报销员工', required=True,help=u'用关键字段查找并关联类别')
+    staff = fields.Many2one('staff', u'报销员工', required=True,help=u'选择员工')
     invoice_all_total = fields.Float(string=u'费用金额合计', store=True, readonly=True,
                                  compute='_compute_invoice_all_total', track_visibility='always',
                                  digits=dp.get_precision('Amount'))
-    state = fields.Selection([('draft', u'草稿'),
-                              ('config', u'已提交'),
-                              ('done', u'已支付')], u'状态', default='draft',store=True,compute='_stat_to_done')
-    select = fields.Selection([
+    state = fields.typeion([('draft', u'草稿'),
+                              ('confirm', u'已提交'),
+                              ('done', u'已支付')], u'状态', default='draft',store=True,compute='_state_to_done')
+    type = fields.typeion([
         ('company', u'付给公司'),
         ('my', u'付给报销人')], string=u'支付方式：',default='my', required=True, help=u'支付给个人时走其他付款单，支付给公司时走结算单')
     line_ids = fields.One2many('hr.expense.line', 'order_id', u'明细发票行',
@@ -54,7 +54,7 @@ class hr_expense(models.Model):
     note = fields.Text(u"备注")
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
                                       ondelete='restrict',
-                                      help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
+                                      help=u'付给个人/公司')
     partner_id = fields.Many2one('partner', u'供应商',
                                  help=u'直接支付给供应商')
 
@@ -64,11 +64,13 @@ class hr_expense(models.Model):
         'other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
 
     @api.depends('other_money_order.state')
-    def _stat_to_done(self):
+    def _state_to_done(self):
+        self.state = self.state or 'draft'
         if self.other_money_order and self.other_money_order.state == 'done':
             self.state = 'done'
         if self.other_money_order and self.other_money_order.state == 'draft':
-            self.state = 'config'
+            self.state = 'confirm'
+        '''付给公司走公司对帐了，跟报销人已经没有关系，所以不DONE了吧'''
 
     @api.depends('line_ids')
     def _compute_invoice_all_total(self):
@@ -85,7 +87,7 @@ class hr_expense(models.Model):
                 category_id.append(line.category_id.id)
             if line.staff.id != self.staff.id:
                 raise UserError(u"费用明细必须是同一人！")
-        if self.select == 'company':
+        if self.type == 'company':
             if len(category_id) > 1:
                 raise UserError(u"申报支付给公司的费用必须同一类别！")
 
@@ -108,12 +110,12 @@ class hr_expense(models.Model):
                 raise UserError(u'只能删除草稿状态的费用报销单')
         super(hr_expense, self).unlink()
 
-    def hr_expense_config(self):
-        if self.select == 'company':
+    def hr_expense_confirm(self):
+        if self.type == 'company':
             self.to_money_invoice()
-        if self.select == 'my':
+        if self.type == 'my':
             self.to_other_money_order()
-        self.state = 'config'
+        self.state = 'confirm'
 
     def hr_expense_draft(self):
         '''删掉其他应付款单'''
@@ -136,9 +138,11 @@ class hr_expense(models.Model):
     def to_money_invoice(self):
         tax = 0
         for line in self.line_ids:
+            bill_number = ''
             if line.invoice_type =='zy':
                 tax += line.invoice_tax
-
+            bill_number += str(line.invoice_nameber)
+            #todo 测试一下
         money_invoice = self.env['money.invoice'].create({
             'name': self.name,
             'partner_id': self.partner_id.id,
@@ -149,7 +153,8 @@ class hr_expense(models.Model):
             'to_reconcile': self.invoice_all_total,
             'date_due': fields.Date.context_today(self),
             'state': 'draft',
-            'tax_amount': tax
+            'tax_amount': tax,
+            'bill_number':bill_number
         })
         self.write({'money_invoice': money_invoice.id})
 
@@ -163,6 +168,7 @@ class hr_expense(models.Model):
         })
         self.write({'other_money_order': other_money_order.id})
         for line in self.line_ids:
+            #增值税专用发票（ZY）税额可以抵扣！
             if line.invoice_type !='zy':
                 invoice_tax = 0
                 invoice_amount = line.invoice_amount +line.invoice_tax
@@ -172,7 +178,7 @@ class hr_expense(models.Model):
             self.env['other.money.order.line'].create({
                 'other_money_id': other_money_order.id,
                 'amount': invoice_amount,
-                'tax_rate': round(line.invoice_amount and line.invoice_tax / line.invoice_amount * 100,0) or 0,
+                'tax_rate': round(line.invoice_amount and invoice_tax / line.invoice_amount * 100,0) or 0,
                 'tax_amount': invoice_tax,
                 'category_id': line.category_id and line.category_id.id
             })
@@ -180,16 +186,15 @@ class hr_expense(models.Model):
 class hr_expense_line(models.Model):
     '''费用明细'''
     _name = 'hr.expense.line'
-    _order = "name"
-    do_fire = fields.Char(u"抄描区")
+    _order = "date"
     name = fields.Char(u'单据编号',
                        index=True,
                        copy=False,
                        help=u"报销单的唯一编号，当创建时它会自动生成下一个编号。")
     staff = fields.Many2one('staff', required=True, string = u'报销员工', help=u'用关键字段查找并关联类别')
-    invoice_type = fields.Selection([('pt', u'增值税普通发票'),
+    invoice_type = fields.typeion([('pt', u'增值税普通发票'),
                               ('zy', u'增值税专用发票'),
-                              ('dz',u'已支付')], u'状态', )
+                              ('dz',u'电子普通发票')], u'状态', )
     invoice_code = fields.Char(u"发票代码",copy = False)
     invoice_name = fields.Char(u"发票号码",copy = False)
     invoice_amount = fields.Float(string=u'发票金额',digits=dp.get_precision('Amount'), required=True,help=u'如是增值税发票请填不含税金额')
@@ -197,9 +202,9 @@ class hr_expense_line(models.Model):
     invoice_total = fields.Float(string=u'发票金额合计', store=True, readonly=True,
                         compute='_compute_cost_total', digits=dp.get_precision('Amount'))
     note = fields.Text(u"备注")
-    state = fields.Selection([('draft', u'草稿'),
-                              ('config', u'已提交'),
-                              ('done',u'已支付')], u'状态', default='draft',store=True,compute='_stat_to_done')
+    state = fields.typeion([('draft', u'草稿'),
+                              ('confirm', u'已提交'),
+                              ('done',u'已支付')], u'状态', default='draft',store=True,compute='_state_to_done')
     category_id = fields.Many2one('core.category',
                                   u'类别', ondelete='restrict',required=True,
                                   help=u'类型：运费、咨询费等')
@@ -212,15 +217,15 @@ class hr_expense_line(models.Model):
     is_refused = fields.Boolean(string="已被使用", store = True, compute='_compute_is_choose', readonly=True, copy=False)
 
     _sql_constraints = [
-        ('unique__', 'unique (invoice_code, invoice_name)', u'发票代码+发票号码不能相同!'),
+        ('unique_invoice_code_name', 'unique (invoice_code, invoice_name)', u'发票代码+发票号码不能相同!'),
     ]
     attachment_number = fields.Integer(compute='_compute_attachment_number', string=u'附件号')
 
-    def hr_expense_line_config(self):
-        self.state = 'config'
+    def hr_expense_line_confirm(self):
+        self.state = 'confirm'
 
     def hr_expense_line_draft(self):
-        if self.state == 'config' and not self.is_refused:
+        if self.state == 'confirm' and not self.is_refused:
             self.state = 'draft'
         else:
             raise UserError(u"请先解除关联单据%s"%self.order_id.name)
@@ -228,19 +233,19 @@ class hr_expense_line(models.Model):
 
     @api.depends('invoice_amount', 'invoice_tax')
     def _compute_cost_total(self):
-        for expense in self:
-            expense.invoice_total = expense.invoice_amount + expense.invoice_tax
+        for expense_line in self:
+            expense_line.invoice_total = expense_line.invoice_amount + expense_line.invoice_tax
 
     @api.depends('order_id')
     def _compute_is_choose(self):
-        for expense in self:
-            if expense.order_id:
-                expense.is_refused = True
+        for expense_line in self:
+            if expense_line.order_id:
+                expense_line.is_refused = True
             else:
-                expense.is_refused = False
+                expense_line.is_refused = False
 
     @api.model
-    def shaomiaofapiao(self, model_name, barcode, order_id):
+    def saomiaofapiao(self, model_name, barcode, order_id):
         """
         扫描发票条码
         :param model_name: 模型名
@@ -249,7 +254,7 @@ class hr_expense_line(models.Model):
 
         01,10,033001600211,11255692,349997.85,20180227,62521957050111533932,7DF9,
         01：第一个属性值，尚未搞清楚含义；
-        10：第二个属性值，代表发票种类代码，10-增值税电子普通发票，04-增值税普通发票，01-增值税专用发票；
+        10：第二个属性值，代表发票种类代码，10-电子普通发票，04-增值税普通发票，01-增值税专用发票；
         033001600211：第三个属性值，代表发票代码；
         11255692：第四个属性值，代表发票号码；
         349997.85：第五个属性值，代表开票金额（不含税）；
@@ -305,8 +310,9 @@ class hr_expense_line(models.Model):
         super(hr_expense_line, self).unlink()
 
     @api.depends('order_id.state')
-    def _stat_to_done(self):
+    def _state_to_done(self):
+        self.state = self.order_id and self.order_id.state or 'draft'
         if self.order_id and self.order_id.state == 'done':
             self.state = 'done'
-        if self.order_id and self.order_id.state == 'config':
-            self.state = 'config'
+        if self.order_id and self.order_id.state == 'confirm':
+            self.state = 'confirm'

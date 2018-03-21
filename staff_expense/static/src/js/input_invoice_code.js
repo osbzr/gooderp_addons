@@ -24,7 +24,7 @@ FormView.include({
                             menu.do_reload_needaction();
                         }
                     }).then(function() {
-                        new Model("hr.expense.line").call("shaomiaofapiao",[self.model, $this.val(), self.datarecord.id]).then(
+                        new Model("hr.expense.line").call("saomiaofapiao",[self.model, $this.val(), self.datarecord.id]).then(
                             function() {
                                 self.reload();
                                 self.$el.find('input').val('');

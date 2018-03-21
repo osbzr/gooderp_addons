@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data noupdate="1">
-        <!-- 购货订单序列号 -->
+        <!-- 费用报销单序列号 -->
         <record id="seq_hr_expense" model="ir.sequence">
             <field name="name">Expense</field>
             <field name="code">hr.expense</field>

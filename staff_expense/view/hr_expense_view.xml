@@ -102,10 +102,10 @@
                                 <field name='invoice_all_total'/>
 							</group>
                             <group>
-                                <field name='select'/>
-                                <field name="partner_id" attrs="{'readonly': [('select', '!=', 'company')], 'required':[('select', '=', 'company')]}"
+                                <field name='type'/>
+                                <field name="partner_id" attrs="{'readonly': [('type', '!=', 'company')], 'required':[('type', '=', 'company')]}"
                                        domain="[('s_category_id', '!=', False)]" context="{'form_view_ref': 'core.supplier_address_form'}"/>
-                                <field name="bank_account_id" attrs="{'readonly': [('select', '!=', 'my')], 'required':[('select', '=', 'my')]}" />
+                                <field name="bank_account_id" attrs="{'readonly': [('type', '!=', 'my')], 'required':[('type', '=', 'my')]}" />
                             </group>
                         </group>
                         <notebook>
