@@ -104,7 +104,16 @@ class SellAdjust(models.Model):
                                         line.goods_id.name)
                 # 调整后数量与已出库数量相等时，删除产生的发货单分单
                 else:
-                    delivery.unlink()
+                    # 先删除对应的发货单行
+                    move_line = self.env['wh.move.line'].search(
+                        [('sell_line_id', '=', origin_line.id), ('state', '=',
+                                                                 'draft')])
+                    if move_line:
+                        move_line.unlink()
+
+                    # 如果发货单明细没有了，则删除发货单
+                    if len(delivery.sell_move_id.line_out_ids) == 0:
+                        delivery.unlink()
             else:
                 vals = {
                     'order_id': self.order_id.id,
