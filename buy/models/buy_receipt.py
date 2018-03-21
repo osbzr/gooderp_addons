@@ -503,6 +503,9 @@ class BuyReceipt(models.Model):
                     'buy_line_id': line.buy_line_id.id,
                     'goods_qty': qty,
                     'price_taxed': line.price_taxed,
+                    'price': line.price,
+                    'tax_rate':line.tax_rate,
+                    'cost_unit': line.cost_unit,
                     'discount_rate': line.discount_rate,
                     'discount_amount': line.discount_amount,
                     'type': 'out'
