@@ -15,6 +15,7 @@
                     <field name='note'/>
                     <field name='state'/>
                     <field name='staff'/>
+                    <field name='is_pay'/>
 				</tree>
 			</field>
 		</record>
@@ -26,9 +27,9 @@
 			<field name='arch' type='xml'>
                 <form string="费用发票">
                     <header>
-            			<button name='hr_expense_line_config' states='draft' type='object' string='审核' class='oe_highlight'/>
-						<button name='hr_expense_line_draft' states='config' type='object' string='反审核'/>
-						<field name='state' widget='statusbar' statusbar_visible="draft,config,done"/>
+            			<button name='hr_expense_line_confirm' states='draft' type='object' string='审核' class='oe_highlight'/>
+						<button name='hr_expense_line_draft' states='confirm' type='object' string='反审核'/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,confirm"/>
             		</header>
 			    	<sheet>
                         <div class="oe_button_box">
@@ -60,6 +61,7 @@
 							</group>
                         </group>
                         <group>
+                            <field name='is_pay' readonly="1"/>
                             <field name='note'/>
                         </group>
                     </sheet>
@@ -90,9 +92,9 @@
 			<field name='arch' type='xml'>
                 <form string="报销费用">
                     <header>
-            			<button name='hr_expense_config' states='draft' type='object' string='审核' class='oe_highlight'/>
-						<button name='hr_expense_draft' states='config' type='object' string='反审核'/>
-						<field name='state' widget='statusbar' statusbar_visible="draft,config,done"/>
+            			<button name='hr_expense_confirm' states='draft' type='object' string='审核' class='oe_highlight'/>
+						<button name='hr_expense_draft' states='confirm' type='object' string='反审核'/>
+						<field name='state' widget='statusbar' statusbar_visible="draft,confirm,done"/>
             		</header>
 			    	<sheet>
                         <group>
@@ -110,7 +112,7 @@
                         </group>
                         <notebook>
                             <page string="报销费用明细">
-			                	<field name="line_ids" nolabel="1" widget="many2many" domain="[('state', '=', 'config'),('staff','=',staff),('is_refused','=',False)]" options="{'not_delete': True, 'reload_on_button': True, 'no_create': True}">
+			                	<field name="line_ids" nolabel="1" widget="many2many" domain="[('state', '=', 'confirm'),('staff','=',staff),('is_refused','=',False)]" options="{'not_delete': True, 'reload_on_button': True, 'no_create': True}">
                                     <tree decoration-danger="is_refused">
 				                		<field name="name"/>
 				                		<field name='invoice_code'/>

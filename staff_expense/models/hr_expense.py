@@ -43,10 +43,10 @@ class hr_expense(models.Model):
     invoice_all_total = fields.Float(string=u'费用金额合计', store=True, readonly=True,
                                  compute='_compute_invoice_all_total', track_visibility='always',
                                  digits=dp.get_precision('Amount'))
-    state = fields.typeion([('draft', u'草稿'),
+    state = fields.Selection([('draft', u'草稿'),
                               ('confirm', u'已提交'),
                               ('done', u'已支付')], u'状态', default='draft',store=True,compute='_state_to_done')
-    type = fields.typeion([
+    type = fields.Selection([
         ('company', u'付给公司'),
         ('my', u'付给报销人')], string=u'支付方式：',default='my', required=True, help=u'支付给个人时走其他付款单，支付给公司时走结算单')
     line_ids = fields.One2many('hr.expense.line', 'order_id', u'明细发票行',
@@ -137,11 +137,12 @@ class hr_expense(models.Model):
     @api.one
     def to_money_invoice(self):
         tax = 0
+        bill_number = ''
         for line in self.line_ids:
-            bill_number = ''
             if line.invoice_type =='zy':
                 tax += line.invoice_tax
-            bill_number += str(line.invoice_nameber)
+            if line.invoice_name:
+                bill_number ='%s,%s'%(line.invoice_name,bill_number)
             #todo 测试一下
         money_invoice = self.env['money.invoice'].create({
             'name': self.name,
@@ -192,7 +193,7 @@ class hr_expense_line(models.Model):
                        copy=False,
                        help=u"报销单的唯一编号，当创建时它会自动生成下一个编号。")
     staff = fields.Many2one('staff', required=True, string = u'报销员工', help=u'用关键字段查找并关联类别')
-    invoice_type = fields.typeion([('pt', u'增值税普通发票'),
+    invoice_type = fields.Selection([('pt', u'增值税普通发票'),
                               ('zy', u'增值税专用发票'),
                               ('dz',u'电子普通发票')], u'状态', )
     invoice_code = fields.Char(u"发票代码",copy = False)
@@ -201,10 +202,11 @@ class hr_expense_line(models.Model):
     invoice_tax = fields.Float(string=u'发票税额',digits=dp.get_precision('Amount'), help=u'如是增值税发票请填不含税金额')
     invoice_total = fields.Float(string=u'发票金额合计', store=True, readonly=True,
                         compute='_compute_cost_total', digits=dp.get_precision('Amount'))
+    invoice_heck_code = fields.Char(u"发票校验码", copy=False)
+    invoice_date = fields.Char(u"发票日期", copy=False)
     note = fields.Text(u"备注")
-    state = fields.typeion([('draft', u'草稿'),
-                              ('confirm', u'已提交'),
-                              ('done',u'已支付')], u'状态', default='draft',store=True,compute='_state_to_done')
+    state = fields.Selection([('draft', u'草稿'),
+                              ('confirm', u'已提交')], u'状态',default='draft',copy = False)
     category_id = fields.Many2one('core.category',
                                   u'类别', ondelete='restrict',required=True,
                                   help=u'类型：运费、咨询费等')
@@ -215,6 +217,7 @@ class hr_expense_line(models.Model):
                        help=u'费用发生日期')
     order_id = fields.Many2one('hr.expense', u'报销单号',  index = True, copy = False, readonly = True)
     is_refused = fields.Boolean(string="已被使用", store = True, compute='_compute_is_choose', readonly=True, copy=False)
+    is_pay = fields.Boolean(string="已付款", store = True, compute='_compute_is_pay', readonly=True, copy=False)
 
     _sql_constraints = [
         ('unique_invoice_code_name', 'unique (invoice_code, invoice_name)', u'发票代码+发票号码不能相同!'),
@@ -271,13 +274,16 @@ class hr_expense_line(models.Model):
         if code[0] == '01':
             if code[1] == '10':
                 invoice_type = 'dz'
+                invoice_heck_code = code[6]
             if code[1] == '01':
                 invoice_type = 'zy'
             if code[1] == '04':
                 invoice_type = 'pt'
+                invoice_heck_code = code[6]
             invoice_code = code[2]
             invoice_name = code[3]
             invoice_amount = round(float(code[4]),2)
+            invoice_date = code[5]
             invoice_tax = 0
         self.browse(order_id).write({
             'invoice_type':invoice_type,
@@ -285,6 +291,8 @@ class hr_expense_line(models.Model):
             'invoice_name': invoice_name,
             'invoice_amount': invoice_amount,
             'invoice_tax': invoice_tax,
+            'invoice_heck_code':invoice_heck_code,
+            'invoice_date':invoice_date
         })
 
     @api.multi
@@ -309,10 +317,10 @@ class hr_expense_line(models.Model):
                 raise UserError(u'只能删除草稿状态的费用发票')
         super(hr_expense_line, self).unlink()
 
+    @api.one
     @api.depends('order_id.state')
-    def _state_to_done(self):
-        self.state = self.order_id and self.order_id.state or 'draft'
-        if self.order_id and self.order_id.state == 'done':
-            self.state = 'done'
-        if self.order_id and self.order_id.state == 'confirm':
-            self.state = 'confirm'
+    def _compute_is_pay(self):
+        if self.order_id and self.order_id.state =='done':
+            self.is_pay = True
+        else:
+            self.is_pay = False
