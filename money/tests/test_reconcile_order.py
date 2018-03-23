@@ -26,12 +26,12 @@ class TestReconcileOrder(TransactionCase):
     def test_money_invoice_done(self):
         # money.invoice 没有设置科目 银行账户没设置科目
         self.get_invoice.partner_id.receivable = 0
-        self.get_invoice.partner_id.c_category_id = False
-        self.get_invoice.partner_id.s_category_id = False
-        with self.assertRaises(UserError):
-            self.get_invoice.money_invoice_done()
+        c_category_id = self.get_invoice.partner_id.c_category_id.id
+        self.get_invoice.partner_id.s_category_id = self.env.ref('core.supplier_category_1').id
         self.get_invoice.category_id.account_id = False
+        self.get_invoice.partner_id.c_category_id = c_category_id
         with self.assertRaises(UserError):
+            # 结算单类别找不到科目
             self.get_invoice.money_invoice_done()
 
     def test_adv_pay_to_get(self):
