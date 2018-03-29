@@ -482,8 +482,19 @@ class SellDelivery(models.Model):
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
         for line in source_line:
-            line.money_id.money_order_draft()
-            line.money_id.unlink()
+            line.money_id.money_order_draft() # 反审核收款单
+            # 判断收款单 源单行 是否有别的行存在
+            other_source_line = []
+            for s_line in line.money_id.source_ids:
+                if s_line.id != line.id:
+                    other_source_line.append(s_line)
+            # 收款单 源单行 不存在别的行，删除收款单；否则删除收款单行，并对原收款单审核
+            if not other_source_line:
+                line.money_id.unlink()
+            else:
+                line.unlink()
+                other_source_line[0].money_id.money_order_done()
+
             # FIXME:查找产生的核销单，反审核后删掉
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
