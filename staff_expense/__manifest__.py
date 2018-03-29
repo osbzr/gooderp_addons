@@ -19,6 +19,7 @@
         'security/ir.model.access.csv',
     ],
     'demo': [
+        'tests/staff_expense_demo.xml'
     ],
     'qweb': [
         "static/src/xml/*.xml",
