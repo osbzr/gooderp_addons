@@ -274,6 +274,42 @@ class TestBuyReceipt(TransactionCase):
             [('order_id', '=', self.order.id)])
         self.assertTrue(len(receipt) == 2)
 
+    def test_buy_receipt_draft_handle_money_order(self):
+        '''buy receipt_draft: handle money order in different situations'''
+        # 先审核入库单，再反审核
+        self.receipt.bank_account_id = self.bank_account.id
+        self.receipt.payment = 100
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 2
+        self.receipt.buy_receipt_done()
+        self.receipt.buy_receipt_draft()
+        # 修改入库单，再次审核，并不产生分单
+        for line in self.receipt.line_in_ids:
+            line.goods_qty = 3
+        self.receipt.buy_receipt_done()
+        receipts = self.env['buy.receipt'].search(
+            [('order_id', '=', self.order.id)])
+        for receipt in receipts:
+            if receipt.state != 'done':
+                receipt.buy_receipt_done()
+
+        money_orders = self.env['money.order'].search([('partner_id', '=', self.env.ref('core.lenovo').id),
+                                                       ('state', '=', 'draft')])
+        for m in money_orders:
+            m.money_order_done()
+
+        # 建入库单对应的付款单
+        money_order = self.env['money.order'].with_context({'type': 'pay'}).create({
+            'partner_id': self.env.ref('core.lenovo').id,
+            'line_ids': [(0, 0, {
+                'bank_id': self.env.ref('core.comm').id,
+                'amount': 300.0})]
+        })
+        money_order.onchange_partner_id()
+        # 反审核采购入库单
+        receipts and receipts[0].buy_receipt_draft()  # 付款单 源单行 有别的行存在
+        len(receipts) > 1 and receipts[1].buy_receipt_draft()  # 付款单 源单行 不存在别的行
+
     def test_scan_barcode(self):
         '''采购扫码出入库'''
         warehouse = self.env['wh.move']
