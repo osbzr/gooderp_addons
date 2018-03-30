@@ -79,6 +79,7 @@ class SellOrder(models.Model):
     contact = fields.Char(u'联系人', states=READONLY_STATES,
                           help=u'客户方的联系人')
     address_id = fields.Many2one('partner.address', u'地址', states=READONLY_STATES,
+                                 domain="[('partner_id', '=', partner_id)]",
                                  help=u'联系地址')
     mobile = fields.Char(u'手机', states=READONLY_STATES,
                          help=u'联系手机')

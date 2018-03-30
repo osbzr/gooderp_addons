@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- 费用报销单序列号 -->
+        <record id="seq_hr_expense" model="ir.sequence">
+            <field name="name">Expense</field>
+            <field name="code">hr.expense</field>
+            <field name="prefix">报销</field>
+            <field name="padding">5</field>
+        </record>
+        <record id="seq_hr_expense_line" model="ir.sequence">
+            <field name="name">Expense Cost</field>
+            <field name="code">hr.expense.line</field>
+            <field name="prefix">报销发票</field>
+            <field name="padding">5</field>
+        </record>
+    </data>
+</openerp>

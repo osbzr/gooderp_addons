@@ -320,6 +320,33 @@ class TestSellDelivery(TransactionCase):
             [('order_id', '=', self.order.id)])
         self.assertTrue(len(delivery) == 2)
 
+    def test_sell_delivery_draft_money_order_process(self):
+        ''' sell delivery draft: handle money order in case of different situation'''
+        # 先审核发货单，再反审核
+        self.delivery.bank_account_id = self.bank_account.id
+        self.delivery.receipt = 5
+        for line in self.delivery.line_out_ids:
+            line.goods_qty = 8
+        self.delivery.sell_delivery_done()
+        deliverys = self.env['sell.delivery'].search(
+            [('order_id', '=', self.order.id)])
+        for delivery in deliverys:
+            if delivery.state != 'done':
+                for line in delivery.line_out_ids:
+                    line.goods_qty = 8
+                delivery.sell_delivery_done()
+        # 建发货单对应的收款单
+        money_order = self.env['money.order'].with_context({'type': 'get'}).create({
+            'partner_id': self.env.ref('core.jd').id,
+            'line_ids': [(0, 0, {
+                'bank_id': self.env.ref('core.comm').id,
+                'amount': 30000.0})]
+        })
+        money_order.onchange_partner_id()
+        # 反审核销售发货单
+        deliverys and deliverys[0].sell_delivery_draft() # 收款单 源单行 有别的行存在
+        len(deliverys) > 1 and deliverys[1].sell_delivery_draft() # 收款单 源单行 不存在别的行
+
     def test_no_stock(self):
         ''' 测试虚拟商品出库 '''
         delivery = self.delivery.copy()

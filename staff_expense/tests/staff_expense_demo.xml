@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 费用发票 -->
+        <record id="employee_expense_1" model="hr.expense.line">
+            <field name="staff" ref='staff.lili'/>
+            <field name='category_id' ref='core.cat_freight'/>
+            <field name='invoice_amount'>1000</field>
+            <field name='invoice_tax'>100</field>
+        </record>
+        <record id="employee_expense_2" model="hr.expense.line">
+            <field name="staff" ref='staff.staff_1'/>
+            <field name='category_id' ref='core.cat_freight'/>
+            <field name='invoice_amount'>280</field>
+            <field name='invoice_tax'>10</field>
+        </record>
+    </data>
+</openerp>

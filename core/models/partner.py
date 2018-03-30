@@ -60,6 +60,12 @@ class Partner(models.Model):
         ('name_uniq', 'unique(name)', '业务伙伴不能重名')
     ]
 
+    @api.constrains('name', 'c_category_id', 's_category_id')
+    def _check_category_exists(self):
+        # 客户 或 供应商 类别有一个必输
+        if self.name and  not self.s_category_id and not self.c_category_id:
+            raise UserError(u'请选择类别')
+
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         """
