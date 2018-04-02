@@ -235,7 +235,7 @@ class SellDelivery(models.Model):
                 else:
                     line.sell_line_id.quantity_out -= line.goods_qty
             for line in self.line_out_ids:
-                line.sell_line_id.quantity_out += line.goods_qty
+                line.sell_line_id.write({'quantity_out':line.sell_line_id.quantity_out += line.goods_qty})
 
         return
 
