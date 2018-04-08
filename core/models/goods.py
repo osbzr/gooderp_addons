@@ -37,6 +37,9 @@ class Goods(models.Model):
         args = args or []
         code_search_goods = []
         if name:
+            goods_id = self.search([('code','=',name)])
+            if goods_id:
+                return goods_id.name_get()
             args.append(('code', 'ilike', name))
             goods_ids = self.search(args)
             if goods_ids:
