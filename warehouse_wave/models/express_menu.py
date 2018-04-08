@@ -58,22 +58,22 @@ class WhMove(models.Model):
         return shipping_type_config
 
     def get_sender(self, ware_hosue_row, pakge_sequence):
-        add_info = u'；格子号:'
+        add_info_sequence = u'；格子号:'
         if pakge_sequence:
-            add_info += pakge_sequence
+            add_info_sequence += pakge_sequence
         else:
-            add_info += u' '
-        add_info += u'；拣货单:'
+            add_info_sequence += u' '
+        add_info_wave_name = u'；拣货单:'
         if self.wave_id:
-            add_info += self.wave_id.name
+            add_info_wave_name += self.wave_id.name
 
         sender = dict(Company=ware_hosue_row.company_id.name,
                       Name=ware_hosue_row.principal_id.name or ware_hosue_row.company_id.name or '',
-                      Mobile=ware_hosue_row.principal_id.work_phone or ware_hosue_row.company_id.phone,
+                      Mobile=((ware_hosue_row.principal_id.work_phone or ware_hosue_row.company_id.phone) + add_info_wave_name),
                       ProvinceName=ware_hosue_row.province_id.name or u'上海',
                       CityName=ware_hosue_row.city_id.city_name or u'上海',
                       ExpAreaName=ware_hosue_row.county_id.county_name or u'浦东新区',
-                      Address=((ware_hosue_row.detail_address or u'金海路2588号B-213') + add_info))
+                      Address=((ware_hosue_row.detail_address or u'金海路2588号B-213') + add_info_sequence))
         return sender
 
     def get_receiver_goods_message(self):
@@ -139,7 +139,9 @@ class WhMove(models.Model):
             'Order', {})).get('LogisticCode', "")
         self.express_menu = content.get('PrintTemplate')
         if not self.express_code:
-            raise UserError("获取快递面单失败!\n原因:%s" % str(resp))
+            raise UserError("获取快递面单失败!\n原因:%s %s" % (str(resp),
+                                        str(receiver)))
+
         return self.express_menu
 
     def encrypt_kdn(self, data, appkey):

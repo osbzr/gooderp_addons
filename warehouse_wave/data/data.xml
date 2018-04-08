@@ -3,7 +3,7 @@
     <data noupdate="1">
         <!--  服务单编号 -->
         <record id="seq_wave_order" model="ir.sequence">
-            <field name="name">捡货单</field>
+            <field name="name">拣货单</field>
             <field name="code">wave</field>
             <field name="prefix">WAVE</field>
             <field name="padding">14</field>

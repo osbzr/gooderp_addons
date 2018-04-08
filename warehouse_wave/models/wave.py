@@ -66,14 +66,14 @@ class Wave(models.Model):
     @api.multi
     def unlink(self):
         """
-        1.有部分已经打包,捡货单不能进行删除
+        1.有部分已经打包,拣货单不能进行删除
         2.能删除了,要把一些相关联的字段清空 如pakge_sequence
         """
         for wave_row in self:
             wh_move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id),
                                                        ('pakge_sequence', '=', False)])
             if wh_move_rows:
-                raise UserError(u"""发货单%s已经打包发货,捡货单%s不允许删除!
+                raise UserError(u"""发货单%s已经打包发货,拣货单%s不允许删除!
                                  """ % (u'-'.join([move_row.name for move_row in wh_move_rows]),
                                         wave_row.name))
             # 清空发货单上的格子号
@@ -158,7 +158,7 @@ class CreateWave(models.TransientModel):
 
     def build_wave_line_data(self, product_location_num_dict):
         """
-        构造捡货单行的 数据
+        构造拣货单行的 数据
         """
         return_line_data = []
         sequence = 1
