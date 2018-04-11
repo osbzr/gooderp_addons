@@ -58,7 +58,7 @@ class WhMove(models.Model):
         return shipping_type_config
 
     def get_sender(self, ware_hosue_row, pakge_sequence):
-        add_info = '(' + pakge_sequence + ')' + self.wave_id.name
+        add_info = self.wave_id and ('(' + pakge_sequence + ')' + self.wave_id.name) or ''
 
         sender = dict(Company=ware_hosue_row.company_id.name,
                       Name=ware_hosue_row.principal_id.name or ware_hosue_row.company_id.name or '',
@@ -133,7 +133,7 @@ class WhMove(models.Model):
         self.express_menu = content.get('PrintTemplate')
         if not self.express_code:
             raise UserError("获取快递面单失败!\n原因:%s %s" % (str(resp),
-                                        str(receiver)))
+                                        str(request_data)))
 
         return self.express_menu
 
