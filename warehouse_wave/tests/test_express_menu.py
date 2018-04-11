@@ -12,6 +12,10 @@ class TestExpressMenu(TransactionCase):
         self.order.sell_order_done()
         self.delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
+        self.wave_wizard = self.env['create.wave'].with_context({
+            'active_ids': self.delivery.id}).create({
+                'active_model': 'sell.delivery',
+            })
 
     def test_get_moves_html(self):
         ''' 测试 get_moves_html '''
