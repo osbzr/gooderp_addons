@@ -9,8 +9,7 @@ odoo.define('web.menu_create', function(require) {
             this.on('menu_bound', this, function() {
                 var $all_menus = self.$el.parents('.o_web_client').find('.o_sub_menu').find('[data-menu]');
                 var all_menu_ids = _.map($all_menus, function (menu) {return parseInt($(menu).attr('data-menu'), 10);});
-                // 注释掉，为了隐藏 配置--可选值菜单 的 新建 按钮
-                // this.do_load_create_tag(all_menu_ids);
+                this.do_load_create_tag(all_menu_ids);
             });
         },
         do_load_create_tag: function(menu_ids) {
