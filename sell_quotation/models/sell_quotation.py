@@ -4,10 +4,10 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 
-# 销货订单审核状态可选值
+# 销货订单确认状态可选值
 SELL_QUOTATION_STATES = [
-    ('draft', u'未审核'),
-    ('done', u'已审核'),
+    ('draft', u'草稿'),
+    ('done', u'已确认'),
     ('cancel', u'已作废')]
 
 # 字段只读状态
@@ -60,7 +60,7 @@ class SellQuotation(models.Model):
                                string=u'明细行',
                                states=READONLY_STATES)
     state = fields.Selection(SELL_QUOTATION_STATES,
-                             string=u'审核状态',
+                             string=u'确认状态',
                              readonly=True,
                              index=True,
                              copy=False,
@@ -98,10 +98,10 @@ class SellQuotation(models.Model):
 
     @api.multi
     def sell_quotation_done(self):
-        ''' 审核报价单 '''
+        ''' 确认报价单 '''
         for quotation in self:
             if quotation.state == 'done':
-                raise UserError(u'请不要重复审核！')
+                raise UserError(u'请不要重复确认！')
             if not quotation.line_ids:
                 raise UserError(u'请输入明细行！')
 
@@ -109,10 +109,10 @@ class SellQuotation(models.Model):
 
     @api.multi
     def sell_quotation_draft(self):
-        ''' 反审核报价单 '''
+        ''' 撤销确认报价单 '''
         for quotation in self:
             if quotation.state == 'draft':
-                raise UserError(u'请不要重复反审核！')
+                raise UserError(u'请不要重复撤销确认！')
 
             quotation.state = 'draft'
 
@@ -134,7 +134,7 @@ class SellQuotationLine(models.Model):
                        readonly=1,
                        store=True)
     state = fields.Selection(related='quotation_id.state',
-                             string=u'审核状态',
+                             string=u'确认状态',
                              readonly=1)
     goods_id = fields.Many2one('goods',
                                string=u'产品',
@@ -183,7 +183,7 @@ class SellOrderLine(models.Model):
                                                          order='date desc')
             self.quotation_line_id = False
             if not rec:
-                raise UserError(u'客户%s商品%s不存在已审核的起订量低于%s的报价单！' % (self.order_id.partner_id.name, self.goods_id.name, self.quantity))
+                raise UserError(u'客户%s商品%s不存在已确认的起订量低于%s的报价单！' % (self.order_id.partner_id.name, self.goods_id.name, self.quantity))
 
             if rec:
                 self.quotation_line_id = rec[0].id

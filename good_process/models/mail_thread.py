@@ -181,9 +181,9 @@ class MailThread(models.AbstractModel):
                 continue
             change_state = vals.get('state', False)
 
-            # 已提交，审核时报错
+            # 已提交，确认时报错
             if len(th._to_approver_ids) == th._approver_num and change_state:
-                raise ValidationError(u"审批后才能审核")
+                raise ValidationError(u"审批后才能确认")
             # 已审批
             if not len(th._to_approver_ids):
                 if not change_state:
@@ -192,10 +192,10 @@ class MailThread(models.AbstractModel):
                     vals.update({
                         '_approver_num': len(self.__add_approver__(th, th._name, th.id)),
                     })
-            # 审批中，审核时报错，修改其他字段报错
+            # 审批中，确认时报错，修改其他字段报错
             elif len(th._to_approver_ids) < th._approver_num:
                 if change_state:
-                    raise ValidationError(u"审批后才能审核")
+                    raise ValidationError(u"审批后才能确认")
                 raise ValidationError(u"审批中不可修改")
 
         thread_row = super(MailThread, self).write(vals)

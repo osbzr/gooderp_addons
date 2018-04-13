@@ -25,7 +25,7 @@ class WhMoveLine(models.Model):
 
     MOVE_LINE_STATE = [
         ('draft', u'草稿'),
-        ('done', u'已审核'),
+        ('done', u'已完成'),
     ]
 
     ORIGIN_EXPLAIN = {
@@ -122,8 +122,8 @@ class WhMoveLine(models.Model):
                               help=u'出库/入库/移库单行对应的移库单')
     date = fields.Date(u'完成日期', copy=False,
                        help=u'单据完成日期')
-    cost_time = fields.Datetime(u'审核时间', copy=False,
-                                help=u'单据审核时间')
+    cost_time = fields.Datetime(u'确认时间', copy=False,
+                                help=u'单据确认时间')
     type = fields.Selection(MOVE_LINE_TYPE,
                             u'类型',
                             required=True,
@@ -131,7 +131,7 @@ class WhMoveLine(models.Model):
                             help=u'类型：出库、入库 或者 内部调拨')
     state = fields.Selection(MOVE_LINE_STATE, u'状态', copy=False, default='draft',
                              index=True,
-                             help=u'状态标识，新建时状态为草稿;审核后状态为已审核')
+                             help=u'状态标识，新建时状态为草稿;确认后状态为已完成')
     goods_id = fields.Many2one('goods', string=u'商品', required=True,
                                index=True, ondelete='restrict',
                                help=u'该单据行对应的商品')
@@ -227,7 +227,7 @@ class WhMoveLine(models.Model):
     scrap = fields.Boolean(u'报废')
     share_cost = fields.Float(u'采购费用',
                               digits=dp.get_precision('Amount'),
-                              help=u'点击分摊按钮或审核时将采购费用进行分摊得出的费用')
+                              help=u'点击分摊按钮或确认时将采购费用进行分摊得出的费用')
 
     @api.model
     def create(self, vals):

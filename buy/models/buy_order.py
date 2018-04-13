@@ -25,10 +25,10 @@ from odoo.exceptions import UserError
 from datetime import datetime
 from odoo.tools import float_compare, float_is_zero
 
-# 购货订单审核状态可选值
+# 购货订单确认状态可选值
 BUY_ORDER_STATES = [
-    ('draft', u'未审核'),
-    ('done', u'已审核'),
+    ('draft', u'草稿'),
+    ('done', u'已确认'),
     ('cancel', u'已作废')]
 
 # 字段只读状态
@@ -167,20 +167,20 @@ class BuyOrder(models.Model):
     prepayment = fields.Float(u'预付款',
                               states=READONLY_STATES,
                               digits=dp.get_precision('Amount'),
-                              help=u'输入预付款审核购货订单，会产生一张付款单')
+                              help=u'输入预付款确认购货订单，会产生一张付款单')
     bank_account_id = fields.Many2one('bank.account',
                                       u'结算账户',
                                       ondelete='restrict',
                                       help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
     approve_uid = fields.Many2one('res.users',
-                                  u'审核人',
+                                  u'确认人',
                                   copy=False,
                                   ondelete='restrict',
-                                  help=u'审核单据的人')
+                                  help=u'确认单据的人')
     state = fields.Selection(BUY_ORDER_STATES,
-                             u'审核状态',
+                             u'确认状态',
                              readonly=True,
-                             help=u"购货订单的审核状态",
+                             help=u"购货订单的确认状态",
                              index=True,
                              copy=False,
                              default='draft')
@@ -286,9 +286,9 @@ class BuyOrder(models.Model):
 
     @api.one
     def buy_order_done(self):
-        '''审核购货订单'''
+        '''确认购货订单'''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核')
+            raise UserError(u'请不要重复确认')
         if not self.line_ids:
             raise UserError(u'请输入商品明细行')
         for line in self.line_ids:
@@ -306,16 +306,16 @@ class BuyOrder(models.Model):
 
     @api.one
     def buy_order_draft(self):
-        '''反审核购货订单'''
+        '''撤销确认购货订单'''
         if self.state == 'draft':
-            raise UserError(u'请不要重复反审核！')
+            raise UserError(u'请不要重复撤销确认！')
         if self.goods_state != u'未入库':
-            raise UserError(u'该购货订单已经收货，不能反审核！')
+            raise UserError(u'该购货订单已经收货，不能撤销确认！')
         # 查找产生的入库单并删除
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.name)])
         receipt.unlink()
-        # 查找产生的付款单并反审核，删除
+        # 查找产生的付款单并撤销确认，删除
         money_order = self.env['money.order'].search(
             [('origin_name', '=', self.name)])
         if money_order:

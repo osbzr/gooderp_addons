@@ -25,8 +25,8 @@
         	<field name='arch' type='xml'>
             	<form string='报价单'>
             		<header>
-            			<button name='sell_quotation_done' states='draft' string='审核' type='object' class='oe_highlight'/>
-            			<button name="sell_quotation_draft" states="done" string="反审核" type="object"/>
+            			<button name='sell_quotation_done' states='draft' string='确认' type='object' class='oe_highlight'/>
+            			<button name="sell_quotation_draft" states="done" string="撤销确认" type="object"/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done,cancel"/>
             		</header>
@@ -83,7 +83,7 @@
                     <field name="partner_id"/>
                     <field name="state"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
 					<filter name="user_id" string="我的订单" domain="[('user_id','=',uid)]"/>
                     <group expand="0" string="分组">
                         <filter string="客户" domain="[]" context="{'group_by':'partner_id'}"/>

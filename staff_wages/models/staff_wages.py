@@ -28,14 +28,14 @@ class StaffWages(models.Model):
         u'会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核')], u'状态', default='draft',
+                              ('done', u'已完成')], u'状态', default='draft',
                              index=True,
                              )
     line_ids = fields.One2many('wages.line', 'order_id', u'工资明细行', states=READONLY_STATES,
                                copy=True)
     payment = fields.Many2one('bank.account', u'付款方式')
     other_money_order = fields.Many2one('other.money.order', u'对应付款单', readonly=True, ondelete='restrict',
-                                        help=u'审核时生成的对应付款单', copy=False)
+                                        help=u'确认时生成的对应付款单', copy=False)
     voucher_id = fields.Many2one(
         'voucher', u'计提工资凭证', readonly=True, ondelete='restrict', copy=False)
     change_voucher_id = fields.Many2one(
@@ -84,7 +84,7 @@ class StaffWages(models.Model):
     @api.one
     def staff_wages_confirm(self):
         """
-        审核方法
+        确认方法
         :return:
         """
         if not self.voucher_id:
@@ -99,7 +99,7 @@ class StaffWages(models.Model):
 
     def voucher_unlink(self, voucher):
         """
-        删除凭证时，判断如果已审核则反审核并删除
+        删除凭证时，判断如果已确认则撤销确认并删除
         :param voucher: 凭证
         :return:
         """

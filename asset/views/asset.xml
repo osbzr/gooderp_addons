@@ -99,8 +99,8 @@
 			<field name='arch' type='xml'>
                 <form string="固定资产">
 	                <header>
-	                	<button name='asset_done' states="draft" string="审核" type="object" class="oe_highlight"/>
-	                	<button name='asset_draft' states="done" string="反审核" type="object" />
+	                	<button name='asset_done' states="draft" string="确认" type="object" class="oe_highlight"/>
+	                	<button name='asset_draft' states="done" string="撤销确认" type="object" />
                         <button name="%(create_clean_action)d" string="清理固定资产" type="action" class="btn-primary"
                         attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         <button name="%(create_chang_action)d" string="变更固定资产" type="action" class="btn-primary"

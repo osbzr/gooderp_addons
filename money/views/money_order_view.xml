@@ -42,9 +42,9 @@
             <field name="arch" type="xml">
                 <form string="收付款单">
                 <header>
-                	<button name="money_order_done" states="draft" string="审核" 
+                	<button name="money_order_done" states="draft" string="确认" 
                 		type="object" class="oe_highlight" groups='money.group_money_manager'/>
-					<button name="money_order_draft" states="done" string="反审核" 
+					<button name="money_order_draft" states="done" string="撤销确认" 
 						type="object" groups='money.group_money_manager'/>
                     <button name="action_cancel" states="draft" string="作废"
 						type="object"/>
@@ -130,8 +130,8 @@
                     <field name="partner_id"/>
                     <field name="amount"/>
                     <field name="state"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
                     <group expand="0" string="分组">
                         <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
@@ -191,7 +191,7 @@
                     <field name="reconciled" sum="已核销金额" readonly="1"/>
                     <field name="to_reconcile" sum="未核销金额" readonly="1"/>
                     <field name="tax_amount" readonly="1"/>
-                    <button name="money_invoice_done" states="draft" string="审核" type="object"/>
+                    <button name="money_invoice_done" states="draft" string="确认" type="object"/>
                     <field name="auxiliary_id"/>
                     <field name="bill_number"/>
                     <field name="date_due"/>
@@ -210,7 +210,7 @@
             <field name="arch" type="xml">
                 <form string="结算单">
                 <header>
-                     <button name="money_invoice_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                     <button name="money_invoice_done" states="draft" string="确认" type="object" class="oe_highlight"/>
                  </header>
                   <sheet>
                     <group>

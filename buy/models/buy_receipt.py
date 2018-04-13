@@ -101,7 +101,7 @@ class BuyReceipt(models.Model):
     modifying = fields.Boolean(u'差错修改中', default=False,
                                help=u'是否处于差错修改中')
     voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True,
-                                 help=u'审核时产生的入库凭证')
+                                 help=u'入库时产生的入库凭证')
     origin_id = fields.Many2one('buy.receipt', u'来源单据')
     currency_id = fields.Many2one('res.currency',
                                   u'外币币别',
@@ -164,7 +164,7 @@ class BuyReceipt(models.Model):
     @api.one
     def _wrong_receipt_done(self):
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复入库！')
         batch_one_list_wh = []
         batch_one_list = []
         for line in self.line_in_ids:

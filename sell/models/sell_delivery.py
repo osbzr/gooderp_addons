@@ -109,7 +109,7 @@ class SellDelivery(models.Model):
                                help=u'是否处于差错修改中')
     origin_id = fields.Many2one('sell.delivery', u'来源单据')
     voucher_id = fields.Many2one('voucher', u'出库凭证', readonly=True,
-                                 help=u'审核时产生的出库凭证')
+                                 help=u'发货时产生的出库凭证')
 
     @api.onchange('address_id')
     def onchange_address_id(self):
@@ -207,7 +207,7 @@ class SellDelivery(models.Model):
     def _wrong_delivery_done(self):
         '''审核时不合法的给出报错'''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复发货！')
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'商品 %s 的数量和商品含税单价不能小于0！' % line.goods_id.name)
@@ -502,7 +502,7 @@ class SellDelivery(models.Model):
         # 不能反审核已核销的发货单
         for invoice in invoice_ids:
             if invoice.to_reconcile == 0 and invoice.reconciled == invoice.amount:
-                raise UserError(u'发货单已核销，不能反审核！')
+                raise UserError(u'发货单已核销，不能撤销发货！')
         invoice_ids.money_invoice_draft()
         invoice_ids.unlink()
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单

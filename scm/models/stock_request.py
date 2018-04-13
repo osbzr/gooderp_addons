@@ -5,11 +5,11 @@ import odoo.addons.decimal_precision as dp
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
-# 补货申请单审核状态可选值
+# 补货申请单确认状态可选值
 STOCK_REQUEST_STATES = [
     ('unsubmit', u'未提交'),
-    ('draft', u'未审核'),
-    ('done', u'已审核'),
+    ('draft', u'未确认'),
+    ('done', u'已确认'),
     ('cancel', u'已作废')]
 
 
@@ -34,8 +34,8 @@ class StockRequest(models.Model):
                                'request_id',
                                u'补货申请行',
                                states={'done': [('readonly', True)]})
-    state = fields.Selection(STOCK_REQUEST_STATES, u'审核状态', readonly=True,
-                             help=u"补货申请的审核状态", copy=False,
+    state = fields.Selection(STOCK_REQUEST_STATES, u'确认状态', readonly=True,
+                             help=u"补货申请的确认状态", copy=False,
                              index=True,
                              default='unsubmit')
     company_id = fields.Many2one(
@@ -55,8 +55,8 @@ class StockRequest(models.Model):
             qty = 0  # 当前数量
             to_delivery_qty = 0  # 未发货数量
             to_receipt_qty = 0  # 未到货数量
-            to_sell_qty = 0  # 未审核销货数量
-            to_buy_qty = 0  # 未审核购货数量
+            to_sell_qty = 0  # 未确认销货数量
+            to_buy_qty = 0  # 未确认购货数量
 
             wh_move_lines = self.env['wh.move.line'].search(
                 [('goods_id', '=', good.id)])
@@ -294,7 +294,7 @@ class StockRequest(models.Model):
                                                                  line.goods_id.id),
                                                                 ('attribute_id', '=', line.attribute_id.id)])
             if len(buy_order_line) > 1:
-                raise UserError(u'供应商%s 商品%s%s 存在多条未审核购货订单行。请联系采购人员处理。'
+                raise UserError(u'供应商%s 商品%s%s 存在多条未确认购货订单行。请联系采购人员处理。'
                                 % (line.supplier_id.name, line.goods_id.name, line.attribute_id.name or ''))
 
             if buy_order_line:
@@ -318,10 +318,10 @@ class StockRequestLine(models.Model):
     goods_id = fields.Many2one('goods', u'商品')
     attribute_id = fields.Many2one('attribute', u'属性')
     qty = fields.Float(u'当前数量', digits=dp.get_precision('Quantity'))
-    to_sell_qty = fields.Float(u'未审核销货数量', digits=dp.get_precision('Quantity'))
+    to_sell_qty = fields.Float(u'未确认销货数量', digits=dp.get_precision('Quantity'))
     to_delivery_qty = fields.Float(
         u'未发货数量', digits=dp.get_precision('Quantity'))
-    to_buy_qty = fields.Float(u'未审核购货数量', digits=dp.get_precision('Quantity'))
+    to_buy_qty = fields.Float(u'未确认购货数量', digits=dp.get_precision('Quantity'))
     to_receipt_qty = fields.Float(
         u'未到货数量', digits=dp.get_precision('Quantity'))
     min_stock_qty = fields.Float(

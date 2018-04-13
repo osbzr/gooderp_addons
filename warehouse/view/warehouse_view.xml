@@ -149,7 +149,7 @@
                     <field name='warehouse_id'/>
                     <field name='warehouse_dest_id'/>
                     <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
-                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='done' string='已完成' domain="[('state', '=', 'done')]"/>
                     <separator/>
                     <filter name='out' string='出库' domain="[('type', '=', 'out')]"/>
                     <filter name='in' string='入库' domain="[('type', '=', 'in')]"/>
@@ -290,9 +290,9 @@
             <field name='arch' type='xml'>
                 <form string='其他出库单'>
                     <header>
-                        <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft'
+                        <button name='approve_order' type='object' string='出库' class='oe_highlight' states='draft'
 																	groups='warehouse.other_out_picking_groups'/>
-                        <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name='cancel_approved_order' type='object' string='撤销出库' states='done' />
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' readonly='1' />
                     </header>
@@ -431,7 +431,7 @@
                     <field name='amount_total'/>
                     <field name='state'/>
                     <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
-                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='done' string='已完成' domain="[('state', '=', 'done')]"/>
                     <filter name='others' string='其他出库' domain="[('type', '=', 'others')]"/>
                     <filter name='inventory' string='盘亏' domain="[('type', '=', 'inventory')]"/>
                     <group expand="0" string="分组">
@@ -450,8 +450,8 @@
             <field name='arch' type='xml'>
                 <form string='其他入库单'>
                     <header>
-                        <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
-                        <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name='approve_order' type='object' string='入库' class='oe_highlight' states='draft' />
+                        <button name='cancel_approved_order' type='object' string='撤销入库' states='done' />
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' readonly='1' />                    </header>
                     <sheet>
@@ -550,7 +550,7 @@
                     <field name='amount_total'/>
                     <field name='state'/>
                     <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
-                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='done' string='已完成' domain="[('state', '=', 'done')]"/>
                     <filter name='others' string='其他入库' domain="[('type', '=', 'others')]"/>
                     <filter name='inventory' string='盘盈' domain="[('type', '=', 'inventory')]"/>
                     <group expand="0" string="分组">
@@ -569,8 +569,8 @@
             <field name='arch' type='xml'>
                 <form string='调拨单'>
                     <header>
-                        <button name='approve_order' type='object' string='审核' class='oe_highlight' states='draft' />
-                        <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name='approve_order' type='object' string='入库' class='oe_highlight' states='draft' />
+                        <button name='cancel_approved_order' type='object' string='撤销入库' states='done' />
                         <button name="action_cancel" states="draft" string="作废"
                         type="object"/>
                         <field name='state' widget='statusbar' readonly='1' />                    </header>
@@ -667,7 +667,7 @@
                     <field name='approve_uid'/>
                     <field name='state'/>
                     <filter name='draft' string='草稿' domain="[('state', '=', 'draft')]"/>
-                    <filter name='done' string='已审核' domain="[('state', '=', 'done')]"/>
+                    <filter name='done' string='已完成' domain="[('state', '=', 'done')]"/>
                     <group expand="0" string="分组">
                         <filter string="调出仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
                         <filter string="调入仓库" domain="[]" context="{'group_by':'warehouse_dest_id'}"/>

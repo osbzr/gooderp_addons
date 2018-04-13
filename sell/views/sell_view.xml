@@ -32,8 +32,8 @@
         	<field name='arch' type='xml'> 
             	<form string='销货订单'>
             		<header>
-            			<button name='sell_order_done' states='draft' string='审核' type='object' class='oe_highlight'/>
-            			<button name="sell_order_draft" states="done" string="反审核" type="object"/>
+            			<button name='sell_order_done' states='draft' string='确认' type='object' class='oe_highlight'/>
+            			<button name="sell_order_draft" states="done" string="撤销确认" type="object"/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
@@ -144,7 +144,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
 					<filter name="user_id" string="我的订单" domain="[('user_id','=',uid)]"/>
                     <separator/>
                     <filter name="not out" string="未出库" domain="[('goods_state','=',u'未出库')]"/>
@@ -193,8 +193,8 @@
             	<form string='销售发货单'>
             		<header>
 						<button name='sell_to_return' type='object' states="done" string='生成退货单' class="oe_highlight"/>
-            			<button name='sell_delivery_done' states='draft' type='object' string='审核' class='oe_highlight'/>
-						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
+            			<button name='sell_delivery_done' states='draft' type='object' string='发货' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='撤销发货'/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
@@ -352,7 +352,7 @@
                     <field name="approve_uid"/>
                     <field name="warehouse_id"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已完成" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not paid" string="未收款" domain="[('money_state','=',u'未收款')]"/>
                     <filter name="part paid" string="部分收款" domain="[('money_state','=',u'部分收款')]"/>
@@ -399,8 +399,8 @@
         	<field name='arch' type='xml'>
             	<form string='销售退货单'>
             		<header>
-            			<button name='sell_delivery_done' states="draft" type='object' string='审核' class='oe_highlight'/>
-						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
+            			<button name='sell_delivery_done' states="draft" type='object' string='退货' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='撤销退货'/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
@@ -538,7 +538,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已完成" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
                     <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
@@ -576,7 +576,7 @@
             <field name="arch" type="xml">
                 <form string="销售变更单">
                 <header>
-                	<button name="sell_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="sell_adjust_done" states="draft" string="确认" type="object" class="oe_highlight"/>
                      <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
                 </header>
@@ -645,7 +645,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
                     <group expand="0" string="分组">
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                     </group>
