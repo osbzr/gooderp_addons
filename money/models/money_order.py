@@ -92,13 +92,15 @@ class MoneyOrder(models.Model):
         self.amount = amount
 
     @api.one
-    @api.depends('partner_id')
+    @api.depends('partner_id','type')
     def _compute_currency_id(self):
         """
         取出币别
         :return:
         """
-        partner_currency_id = self.partner_id.c_category_id.account_id.currency_id.id or self.partner_id.s_category_id.account_id.currency_id.id
+        partner_currency_id = (self.type == 'get')                                    \
+                          and self.partner_id.c_category_id.account_id.currency_id.id \
+                          or self.partner_id.s_category_id.account_id.currency_id.id
         self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
 
     state = fields.Selection([
