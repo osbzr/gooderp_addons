@@ -33,7 +33,7 @@
                 <header>
                     <button name='buy_to_return' type='object' states="done" string='生成退货单' class="oe_highlight"/>
                 	<button name="buy_receipt_done" states="draft" string="入库" type="object" class="oe_highlight"/>
-                	<button name="buy_receipt_draft" states="done" string="撤销入库" type="object"/>
+                	<button name="buy_receipt_draft" states="done" string="撤销" type="object"/>
                     <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
@@ -226,8 +226,8 @@
             <field name="arch" type="xml">
                 <form string="采购退货单">
                 <header>
-                	<button name="buy_receipt_done" states="draft" string="退货" type="object" class="oe_highlight"/>
-                	<button name="buy_receipt_draft" states="done" string="撤销退货" type="object"/>
+                	<button name="buy_receipt_done" states="draft" string="出库" type="object" class="oe_highlight"/>
+                	<button name="buy_receipt_draft" states="done" string="撤销" type="object"/>
                      <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>

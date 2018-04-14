@@ -30,7 +30,7 @@
 				<form string="购货订单">
 					<header>
 						<button name="buy_order_done" states="draft" string="确认" type="object" class="oe_highlight"/>
-						<button name="buy_order_draft" states="done" string="撤销确认" type="object"/>
+						<button name="buy_order_draft" states="done" string="撤销" type="object"/>
                           <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
 					</header>
