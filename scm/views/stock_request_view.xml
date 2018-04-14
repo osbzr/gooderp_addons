@@ -31,7 +31,7 @@
                 <form string='补货申请'>
                     <header>
                         <button name="stock_query" states="unsubmit" string="查询库存" type="object" class="oe_highlight"/>
-                        <button name="stock_request_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                        <button name="stock_request_done" states="draft" string="确认" type="object" class="oe_highlight"/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name="state" widget="statusbar"/>
                     </header>

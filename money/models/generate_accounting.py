@@ -25,12 +25,12 @@ class MoneyInvoice(models.Model):
     _inherit = 'money.invoice'
     voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
                                  copy=False,
-                                 help=u'结算单审核时生成的对应凭证')
+                                 help=u'结算单确认时生成的对应凭证')
 
     @api.multi
     def money_invoice_draft(self):
         """
-        反审核结算单时，反审核凭证
+        撤销确认结算单时，撤销确认凭证
         :return: 
         """
         res = super(MoneyInvoice, self).money_invoice_draft()
@@ -55,7 +55,7 @@ class MoneyInvoice(models.Model):
     @api.multi
     def money_invoice_done(self):
         """
-        审核结算单时，创建凭证并审核
+        确认结算单时，创建凭证并确认
         :return: 
         """
         res = super(MoneyInvoice, self).money_invoice_done()
@@ -98,7 +98,7 @@ class MoneyInvoice(models.Model):
             if invoice.is_init:
                 vals.update({'init_obj': 'money_invoice', })
             invoice.create_voucher_line(vals)
-            # 删除初始非需要的凭证明细行,不审核凭证
+            # 删除初始非需要的凭证明细行,不确认凭证
             if invoice.is_init:
                 vouch_line_ids = self.env['voucher.line'].search([
                     ('account_id', '=', invoice.category_id.account_id.id),

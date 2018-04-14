@@ -106,7 +106,7 @@ class Goods(models.Model):
             raise UserError(u'批号没有被指定，无法获得成本')
 
         if not suggested and lot_id.state != 'done':
-            raise UserError(u'批号%s还没有实际入库，请先审核该入库' % lot_id.move_id.name)
+            raise UserError(u'批号%s还没有实际入库，请先确认该入库' % lot_id.move_id.name)
 
         if qty > lot_id.qty_remaining and not self.env.context.get('wh_in_line_ids'):
             raise UserError(u'商品%s的库存数量不够本次出库' % (self.name,))

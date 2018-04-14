@@ -23,8 +23,8 @@
 				<form string="员工工资单">
 					<header>
 						<button name="staff_wages_accrued" states="draft" string="计提" type="object" class="oe_highlight"/>
-						<button name="staff_wages_confirm" states="draft" string="审核" type="object" class="oe_highlight"/>
-						<button name="staff_wages_draft" states="done" string="反审核" type="object"/>
+						<button name="staff_wages_confirm" states="draft" string="确认" type="object" class="oe_highlight"/>
+						<button name="staff_wages_draft" states="done" string="撤销确认" type="object"/>
 						<field name="state" widget="statusbar" readonly="1"/>
 					</header>
 					<sheet>

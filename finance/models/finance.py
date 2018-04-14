@@ -82,7 +82,7 @@ class Voucher(models.Model):
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
                                track_visibility='always', help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核'),
+                              ('done', u'已确认'),
                               ('cancel', u'已作废')], u'状态', default='draft',
                              index=True,
                              track_visibility='always', help=u'凭证所属状态!')
@@ -99,13 +99,13 @@ class Voucher(models.Model):
     @api.one
     def voucher_done(self):
         """
-        审核 凭证按钮 所调用的方法
+        确认 凭证按钮 所调用的方法
         :return: 主要是把 凭证的 state改变
         """
         if self.state == 'done':
-            raise UserError(u'凭证%s已经审核,请不要重复审核！' % self.name)
+            raise UserError(u'凭证%s已经确认,请不要重复确认！' % self.name)
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间已结账！不能审核')
+            raise UserError(u'该会计期间已结账！不能确认')
         if not self.line_ids:
             raise ValidationError(u'请输入凭证行')
         for line in self.line_ids:
@@ -120,7 +120,7 @@ class Voucher(models.Model):
         debit_sum = round(debit_sum, precision)
         credit_sum = round(credit_sum, precision)
         if debit_sum != credit_sum:
-            raise ValidationError(u'借贷方不平，无法审核!\n 借方合计:%s 贷方合计:%s' %
+            raise ValidationError(u'借贷方不平，无法确认!\n 借方合计:%s 贷方合计:%s' %
                                   (debit_sum, credit_sum))
 
         self.state = 'done'
@@ -139,15 +139,15 @@ class Voucher(models.Model):
     @api.one
     def voucher_can_be_draft(self):
         if self.ref:
-            raise UserError(u'不能反审核由其他单据生成的凭证！')
+            raise UserError(u'不能撤销确认由其他单据生成的凭证！')
         self.voucher_draft()
 
     @api.one
     def voucher_draft(self):
         if self.state == 'draft':
-            raise UserError(u'凭证%s已经反审核,请不要重复反审核！' % self.name)
+            raise UserError(u'凭证%s已经撤销确认,请不要重复撤销！' % self.name)
         if self.period_id.is_closed:
-            raise UserError(u'%s期 会计期间已结账！不能反审核' % self.period_id.name)
+            raise UserError(u'%s期 会计期间已结账！不能撤销确认' % self.period_id.name)
 
         self.state = 'draft'
 
@@ -165,12 +165,12 @@ class Voucher(models.Model):
                 return super(Voucher, self).write(vals)
             if order.period_id.is_closed is True:
                 raise UserError(u'%s期 会计期间已结账，凭证不能再修改！' % order.period_id.name)
-            if len(vals) == 1 and vals.get('state', False):  # 审核or反审核
+            if len(vals) == 1 and vals.get('state', False):  # 确认or撤销确认
                 return super(Voucher, self).write(vals)
             else:
                 order = self.browse(order.id)
                 if order.state == 'done':
-                    raise UserError(u'凭证%s已审核！修改请先反审核！' % order.name)
+                    raise UserError(u'凭证%s已确认！修改请先撤销！' % order.name)
             return super(Voucher, self).write(vals)
 
 
@@ -230,7 +230,7 @@ class VoucherLine(models.Model):
         以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现', ondelete='restrict')
     date = fields.Date(compute='_compute_voucher_date',
                        store=True, string=u'凭证日期')
-    state = fields.Selection([('draft', u'草稿'), ('done', u'已审核'),('cancel', u'已作废')], compute='_compute_voucher_state',
+    state = fields.Selection([('draft', u'草稿'), ('done', u'已确认'),('cancel', u'已作废')], compute='_compute_voucher_state',
                              index=True,
                              store=True, string=u'状态')
     init_obj = fields.Char(u'初始化对象', help=u'描述本条凭证行由哪个单证生成而来')
@@ -279,7 +279,7 @@ class VoucherLine(models.Model):
     def unlink(self):
         for active_voucher_line in self:
             if active_voucher_line.voucher_id.state == 'done':
-                raise UserError(u'不能删除已审核的凭证行\n 所属凭证%s  凭证行摘要%s'
+                raise UserError(u'不能删除已确认的凭证行\n 所属凭证%s  凭证行摘要%s'
                                 % (active_voucher_line.voucher_id.name, active_voucher_line.name))
         return super(VoucherLine, self).unlink()
 
