@@ -70,6 +70,7 @@
 								<field name='currency_id' readonly='1'
 									 groups='finance.group_multi_currency'/>
 							    <field name='pay_method'/>
+								<field name="express_type"/>
 							</group>
             			</group>
             			<notebook>

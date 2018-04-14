@@ -184,6 +184,7 @@ class SellOrder(models.Model):
                                  ondelete='restrict',
                                  domain=[('type', '=', 'pay_method')],
                                  context={'type': 'pay_method'})
+    express_type = fields.Char(u'承运商')
 
     @api.onchange('address_id')
     def onchange_partner_address(self):
@@ -362,6 +363,7 @@ class SellOrder(models.Model):
             'contact': self.contact,
             'address_id': self.address_id.id,
             'mobile': self.mobile,
+            'express_type': self.express_type,
         })
         if self.type == 'sell':
             delivery_id.write({'line_out_ids': [
