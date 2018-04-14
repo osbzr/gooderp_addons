@@ -32,8 +32,8 @@
                 <form string="采购入库单">
                 <header>
                     <button name='buy_to_return' type='object' states="done" string='生成退货单' class="oe_highlight"/>
-                	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
-                	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
+                	<button name="buy_receipt_done" states="draft" string="入库" type="object" class="oe_highlight"/>
+                	<button name="buy_receipt_draft" states="done" string="撤销" type="object"/>
                     <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
@@ -182,7 +182,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已完成" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not paid" string="未付款" domain="[('money_state','=',u'未付款')]"/>
                     <filter name="part paid" string="部分付款" domain="[('money_state','=',u'部分付款')]"/>
@@ -226,8 +226,8 @@
             <field name="arch" type="xml">
                 <form string="采购退货单">
                 <header>
-                	<button name="buy_receipt_done" states="draft" string="审核" type="object" class="oe_highlight"/>
-                	<button name="buy_receipt_draft" states="done" string="反审核" type="object"/>
+                	<button name="buy_receipt_done" states="draft" string="出库" type="object" class="oe_highlight"/>
+                	<button name="buy_receipt_draft" states="done" string="撤销" type="object"/>
                      <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
@@ -368,7 +368,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已完成" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
                     <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
