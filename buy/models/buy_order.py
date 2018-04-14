@@ -49,6 +49,12 @@ class BuyOrder(models.Model):
         '''当订单行和优惠金额改变时，改变成交金额'''
         total = sum(line.subtotal for line in self.line_ids)
         self.amount = total - self.discount_amount
+    
+    @api.one
+    @api.depends('line_ids.quantity')
+    def _compute_qty(self):
+        '''当订单行数量改变时，更新总数量'''
+        self.total_qty = sum(line.quantity for line in self.line_ids)
 
     @api.one
     @api.depends('line_ids.quantity', 'line_ids.quantity_in')
@@ -164,6 +170,11 @@ class BuyOrder(models.Model):
                           track_visibility='always',
                           digits=dp.get_precision('Amount'),
                           help=u'总金额减去优惠金额')
+    total_qty = fields.Float(string=u'数量合计', store=True, readonly=True,
+                          compute='_compute_qty',
+                          track_visibility='always',
+                          digits=dp.get_precision('Quantity'),
+                          help=u'数量总计')
     prepayment = fields.Float(u'预付款',
                               states=READONLY_STATES,
                               digits=dp.get_precision('Amount'),

@@ -31,6 +31,12 @@ class SellOrder(models.Model):
         self.amount = total - self.discount_amount
 
     @api.one
+    @api.depends('line_ids.quantity')
+    def _compute_qty(self):
+        '''当订单行数量改变时，更新总数量'''
+        self.total_qty = sum(line.quantity for line in self.line_ids)
+
+    @api.one
     @api.depends('line_ids.quantity', 'line_ids.quantity_out')
     def _get_sell_goods_state(self):
         '''返回发货状态'''
@@ -133,6 +139,11 @@ class SellOrder(models.Model):
                           compute='_compute_amount', track_visibility='always',
                           digits=dp.get_precision('Amount'),
                           help=u'总金额减去优惠金额')
+    total_qty = fields.Float(string=u'数量合计', store=True, readonly=True,
+                          compute='_compute_qty',
+                          track_visibility='always',
+                          digits=dp.get_precision('Quantity'),
+                          help=u'数量总计')
     pre_receipt = fields.Float(u'预收款', states=READONLY_STATES,
                                digits=dp.get_precision('Amount'),
                                help=u'输入预收款确认销货订单，会产生一张收款单')
