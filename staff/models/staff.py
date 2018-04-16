@@ -72,6 +72,10 @@ class StaffJob(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name,department_id)', '同部门的职位不能重复！')
+    ]
+
 
 class StaffEmployeeCategory(models.Model):
     _name = "staff.employee.category"
