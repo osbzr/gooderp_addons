@@ -23,7 +23,7 @@ def create(self, vals):
 models.BaseModel.create = create
 
 
-# 不能删除已审核的单据，避免在所有单据对象上重载
+# 不能删除已确认的单据，避免在所有单据对象上重载
 
 unlink_original = models.BaseModel.unlink
 
@@ -33,7 +33,7 @@ def unlink(self):
     for record in self:
         if 'state' in record._fields.keys():
             if record.state == 'done':
-                raise UserError(u'不能删除已审核的单据！')
+                raise UserError(u'不能删除已确认的单据！')
 
         unlink_original(record)
 

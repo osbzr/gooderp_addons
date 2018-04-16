@@ -51,9 +51,9 @@ class WhInventory(models.Model):
         INVENTORY_STATE, u'状态', copy=False, default='draft',
         index=True,
         help=u'盘点单状态，新建时状态为草稿;'
-             u'点击查询后为审核后状态为查询中;'
-             u'有盘亏盘盈时生成的其他出入库单没有审核时状态为待确认盘盈盘亏;'
-             u'盘亏盘盈生成的其他出入库单审核后状态为完成')
+             u'点击查询后为确认后状态为查询中;'
+             u'有盘亏盘盈时生成的其他出入库单没有确认时状态为待确认盘盈盘亏;'
+             u'盘亏盘盈生成的其他出入库单确认后状态为完成')
     line_ids = fields.One2many(
         'wh.inventory.line', 'inventory_id', u'明细', copy=False,
         help=u'盘点单的明细行')
@@ -87,7 +87,7 @@ class WhInventory(models.Model):
             if inventory.state == 'confirmed':
                 if (inventory.out_id and inventory.out_id.state == 'done') \
                         or (inventory.in_id and inventory.in_id.state == 'done'):
-                    raise UserError(u'请先反审核掉相关的盘盈盘亏单据')
+                    raise UserError(u'请先撤销掉相关的盘盈盘亏单据')
                 else:
                     inventory.out_id.unlink()
                     inventory.in_id.unlink()

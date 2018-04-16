@@ -29,8 +29,8 @@
 			<field name="arch" type="xml">
 				<form string="购货订单">
 					<header>
-						<button name="buy_order_done" states="draft" string="审核" type="object" class="oe_highlight"/>
-						<button name="buy_order_draft" states="done" string="反审核" type="object"/>
+						<button name="buy_order_done" states="draft" string="确认" type="object" class="oe_highlight"/>
+						<button name="buy_order_draft" states="done" string="撤销" type="object"/>
                           <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
 					</header>
@@ -149,7 +149,7 @@
 					<field name="create_uid" string="制单人"/>
 					<field name="approve_uid"/>
 					<filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-					<filter name="done" string="已审核" domain="[('state','=','done')]"/>
+					<filter name="done" string="已确认" domain="[('state','=','done')]"/>
 					<separator/>
 					<filter name="not in" string="未入库" domain="[('goods_state','=',u'未入库')]"/>
 					<filter name="part in" string="部分入库" domain="[('goods_state','=',u'部分入库')]"/>

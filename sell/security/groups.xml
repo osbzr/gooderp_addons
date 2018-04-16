@@ -31,5 +31,9 @@
 			<field name='category_id' ref="core.good_sell"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
+		<record id='own_data_groups' model='res.groups'>
+			<field name='name'>只看自己的销售数据</field>
+			<field name='category_id' ref="core.good_sell"/>
+		</record>
 	</data>
 </openerp>

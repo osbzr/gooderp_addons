@@ -60,6 +60,8 @@ class DataModelProxy(object):
         if not temp:
             if field and field.type in ('integer', 'float'):
                 return 0
+        if field.type == 'float' and int(temp) == temp:
+            temp = int(temp)
 
         return temp or ''
 

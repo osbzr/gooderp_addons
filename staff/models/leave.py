@@ -5,10 +5,10 @@ from odoo.exceptions import UserError
 import time
 import datetime
 
-# 请假单审核状态可选值
+# 请假单确认状态可选值
 LEAVE_STATES = [
-    ('draft', u'未审核'),
-    ('done', u'已审核'), ]
+    ('draft', u'未确认'),
+    ('done', u'已确认'), ]
 
 
 class StaffLeave(models.Model):
@@ -43,8 +43,8 @@ class StaffLeave(models.Model):
                                   states={'draft': [('readonly', False)]})
     leave_dates = fields.Float(u'请假天数', readonly=True,
                                states={'draft': [('readonly', False)]})
-    state = fields.Selection(LEAVE_STATES, u'审核状态', readonly=True,
-                             help=u"购货订单的审核状态", index=True, copy=False,
+    state = fields.Selection(LEAVE_STATES, u'状态', readonly=True,
+                             help=u"请假单的状态", index=True, copy=False,
                              default='draft')
     company_id = fields.Many2one(
         'res.company',
@@ -54,16 +54,16 @@ class StaffLeave(models.Model):
 
     @api.one
     def leave_done(self):
-        '''审核请假单'''
+        '''确认请假单'''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复确认！')
         self.state = 'done'
 
     @api.one
     def leave_draft(self):
-        '''反审核请假单'''
+        '''撤销确认请假单'''
         if self.state == 'draft':
-            raise UserError(u'请不要重复反审核！')
+            raise UserError(u'请不要重复撤销确认！')
         self.state = 'draft'
 
     @api.one

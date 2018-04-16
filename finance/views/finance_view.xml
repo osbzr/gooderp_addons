@@ -32,8 +32,8 @@
             <field name="arch" type="xml">
                 <form string="会计凭证">
 	                <header>
-	                	<button name='voucher_done' states="draft" string="审核" type="object" class="oe_highlight"/>
-                        <button name='voucher_can_be_draft' states="done" string="反审核" type="object"/>
+	                	<button name='voucher_done' states="draft" string="确认" type="object" class="oe_highlight"/>
+                        <button name='voucher_can_be_draft' states="done" string="撤销确认" type="object"/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
 	                    <field name="state" widget="statusbar" readonly="1"/>
 	                </header>

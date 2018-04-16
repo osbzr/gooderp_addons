@@ -52,12 +52,12 @@ class CheckoutWizard(models.TransientModel):
                     voucher_obj = self.env['voucher']
                     voucher_ids = voucher_obj.search(
                         [('period_id', '=', balance.period_id.id)])
-                    draft_voucher_count = 0  # 未审核凭证个数
+                    draft_voucher_count = 0  # 未确认凭证个数
                     for voucher_id in voucher_ids:
                         if voucher_id.state != 'done':
                             draft_voucher_count += 1
                     if draft_voucher_count != 0:
-                        raise UserError(u'该期间有%s张凭证未审核' % draft_voucher_count)
+                        raise UserError(u'该期间有%s张凭证未确认' % draft_voucher_count)
                     else:
                         voucher_line = []  # 生成的结账凭证行
                         account_obj = self.env['finance.account']
@@ -166,7 +166,7 @@ class CheckoutWizard(models.TransientModel):
                                          (0, 0, line) for line in year_line_ids],
                                      }
                             year_account = voucher_obj.create(value)  # 创建结转凭证
-                            year_account.voucher_done()  # 凭证审核
+                            year_account.voucher_done()  # 凭证确认
                     # 生成科目余额表
                     trial_wizard = self.env['create.trial.balance.wizard'].create({
                         'period_id': balance.period_id.id,
