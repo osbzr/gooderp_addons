@@ -21,7 +21,7 @@
                     </group>
                     <footer>
                         <button name='open_report' string='确定' type='object' class='oe_highlight'/>
-                        or
+                        或者
                         <button string='取消' class='oe_link' special='cancel'/>
                     </footer>
                 </form>
