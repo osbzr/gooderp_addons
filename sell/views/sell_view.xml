@@ -196,7 +196,7 @@
 						<button name='sell_to_return' type='object' states="done" string='生成退货单' class="oe_highlight"/>
             			<button name='sell_delivery_done' states='draft' type='object' string='发货' class='oe_highlight'/>
 						<button name='sell_delivery_draft' states='done' type='object' string='撤销'/>
-                        <button name="action_cancel" states="draft" string="作废" type="object"/>
+                        <button name="action_cancel" states="draft" string="作废" groups='sell.group_sell' type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
             		<sheet>
@@ -402,7 +402,7 @@
             		<header>
             			<button name='sell_delivery_done' states="draft" type='object' string='入库' class='oe_highlight'/>
 						<button name='sell_delivery_draft' states='done' type='object' string='撤销'/>
-                        <button name="action_cancel" states="draft" string="作废" type="object"/>
+                        <button name="action_cancel" states="draft" string="作废" groups='sell.group_sell' type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
             		<sheet>
