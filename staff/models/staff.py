@@ -81,7 +81,7 @@ class StaffEmployeeCategory(models.Model):
     _name = "staff.employee.category"
     _description = u'员工层级'
 
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称',required=True)
     parent_id = fields.Many2one('staff.employee.category', u'上级标签', index=True)
     chield_ids = fields.One2many(
         'staff.employee.category', 'parent_id', u'下级标签')
