@@ -119,6 +119,14 @@ class CoreCategory(models.Model):
         ('name_uniq', 'unique(type, name)', '同类型的类别不能重名')
     ]
 
+    @api.multi
+    def unlink(self):
+        for record in self:
+            if record.note:
+                raise UserError(u'不能删除系统创建的类别')
+
+        return super(CoreCategory, self).unlink()
+
 
 class Uom(models.Model):
     _name = 'uom'
