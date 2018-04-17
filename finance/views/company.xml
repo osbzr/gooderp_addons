@@ -9,6 +9,8 @@
             	<field name='draft_invoice' position='after'>
             		<field name='profit_account'/>
             		<field name='remain_account'/>
+                </field>
+                <field name='output_tax_rate' position='after'>
             		<field name='import_tax_account'/>
             		<field name='output_tax_account'/>
             	</field>

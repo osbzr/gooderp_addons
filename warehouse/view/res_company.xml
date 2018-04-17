@@ -7,10 +7,10 @@
             <field name='inherit_id' ref='core.company_form' />
             <field name="arch" type="xml">
             	<field name='draft_invoice' position='after'>
-            		<field name='operating_cost_account_id'/>
             		<field name='is_enable_negative_stock'/>
                     <field name='endmonth_generation_cost'/>
                     <field name="wh_scrap_id"/>
+                    <field name='operating_cost_account_id'/>
             	</field>
             </field>
         </record>
