@@ -242,6 +242,7 @@ class Task(models.Model):
         default=lambda self: self.env['res.company']._company_default_get()
     )
     tag_ids = fields.Many2many('core.value',
+                               ondelete='restrict',
                                string=u'标签',
                                domain=[('type', '=', 'task_tag')],
                                context={'type': 'task_tag'})
