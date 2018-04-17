@@ -220,25 +220,25 @@
 						<group>
 							<group>
 								<field name="code"/>
+								<field name="c_category_id" required="1"/>
 								<field name="main_mobile"/>
 								<field name="main_contact"/>
-								<field name="main_address"/>
-								<field name="tax_num"/>
 								<field name="credit_limit"/>
+								<field name="tag_ids" widget="many2many_tags"/>
 								<field name="responsible_id"/>
 								<field name="share_id"/>
-							</group>
-							<group>
-								<field name="c_category_id" required="1"/>
-								<field name="s_category_id"/>
-								<field name="bank_name"/>
-								<field name="bank_num"/>
-								<field name="receivable"/>
-								<field name="tax_rate"/>
-								<field name="tag_ids" widget="many2many_tags"/>
 								<field name="source"/>
 							</group>
+							<group>
+								<field name="tax_rate"/>
+								<field name="bank_name"/>
+								<field name="bank_num"/>
+								<field name="main_address"/>
+								<field name="tax_num"/>
+								<field name="receivable"/>
+							</group>
 							<field name="note" placeholder="暂无备注信息"/>
+							<field name="s_category_id" placeholder="转为供应商"/>
 						</group>
 					</sheet>
 					<div class="oe_chatter">
@@ -315,21 +315,21 @@
 						<group>
 							<group>
 								<field name="code"/>
-								<field name="main_contact"/>
-								<field name="main_mobile"/>
-								<field name="main_address"/>
-								<field name="tax_num"/>
-								<field name="tax_rate"/>
-							</group>
-							<group>
 								<field name="s_category_id" required="1"/>
-								<field name="c_category_id" />
-								<field name="bank_name"/>
-								<field name="bank_num"/>
-								<field name="payable"/>
+								<field name="main_mobile"/>
+								<field name="main_contact"/>
 								<field name="tag_ids" widget="many2many_tags"/>
 							</group>
+							<group>
+								<field name="tax_rate"/>
+								<field name="bank_name"/>
+								<field name="bank_num"/>
+								<field name="main_address"/>
+								<field name="tax_num"/>
+								<field name="payable"/>
+							</group>
 							<field name="note" placeholder="暂无备注信息"/>
+						    <field name="c_category_id" placeholder="转为客户"/>
 						</group>
 					</sheet>
 					<div class="oe_chatter">
