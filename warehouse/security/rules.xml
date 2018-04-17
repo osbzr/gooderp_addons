@@ -5,7 +5,7 @@
             <field name='name'>仓管只能看自己仓库的单据</field>
             <field name='model_id' ref="warehouse.model_wh_move"/>
             <field name='domain_force'>['|',('warehouse_id.user_ids','in',user.id),('warehouse_dest_id.user_ids','in',user.id)]</field>
-            <field name='groups' eval="[(4,ref('warehouse.group_warehouse'))]"/>
+            <field name='groups' eval="[(4,ref('warehouse.own_warehouse_groups'))]"/>
             <field name='perm_read' eval='True'/>
             <field name='perm_write' eval='True'/>
             <field name='perm_create' eval='True'/>

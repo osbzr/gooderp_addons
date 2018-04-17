@@ -25,8 +25,8 @@
 			<field name="arch" type="xml">
 				<form string="费用订单">
 					<header>
-						<button name="cost_order_confim" states="draft" string="审核" type="object" class="oe_highlight"/>
-						<button name="cost_order_draft" states="done" string="反审核" type="object"/>
+						<button name="cost_order_confim" states="draft" string="确认" type="object" class="oe_highlight"/>
+						<button name="cost_order_draft" states="done" string="撤销确认" type="object"/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
 					</header>

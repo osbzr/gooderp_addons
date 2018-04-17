@@ -35,8 +35,8 @@
             <field name="arch" type="xml">
                 <form string="职位">
                     <header>
-						<button name="leave_done" states="draft" string="审核" type="object" class="oe_highlight" groups="staff.hr_senior_groups"/>
-						<button name="leave_draft" states="done" string="反审核" type="object" groups="staff.hr_senior_groups"/>
+						<button name="leave_done" states="draft" string="确认" type="object" class="oe_highlight" groups="staff.hr_senior_groups"/>
+						<button name="leave_draft" states="done" string="撤销确认" type="object" groups="staff.hr_senior_groups"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
 					</header>
                     <sheet>

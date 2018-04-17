@@ -8,7 +8,7 @@ from odoo.exceptions import UserError, ValidationError
 
 # 字段只读状态
 READONLY_STATES = {
-    'done': [('readonly', True)],      # 已审核
+    'done': [('readonly', True)],      # 已确认
     'clean': [('readonly', True)],     # 已清理
 }
 
@@ -119,7 +119,7 @@ class Asset(models.Model):
         'Amount'), store=True, compute='_get_cost_depreciation')
     
     state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已审核'),
+                              ('done', u'已确认'),
                               ('clean', u'已清理')], u'状态', default='draft',
                              index=True,)
 
@@ -201,11 +201,11 @@ class Asset(models.Model):
 
     @api.one
     def _wrong_asset_done(self):
-        ''' 固定资产审核入账前的验证 '''
+        ''' 固定资产确认入账前的验证 '''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复确认！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间(%s)已结账！不能审核' % self.period_id.name)
+            raise UserError(u'该会计期间(%s)已结账！不能确认' % self.period_id.name)
         if self.cost <= 0:
             raise UserError(u'金额必须大于0！\n金额:%s' % self.cost)
         if self.tax < 0:
@@ -235,7 +235,7 @@ class Asset(models.Model):
 
         ''' 因分类上只能设置一个固定资产科目，这里要用当前固定资产的对应科目替换凭证 '''
         
-        # 如未自动审核，则审核一下结算单
+        # 如未自动确认，则确认一下结算单
         if money_invoice.state != 'done':
             money_invoice.money_invoice_done()
         # 找到结算单对应的凭证行并修改科目
@@ -285,7 +285,7 @@ class Asset(models.Model):
 
     @api.one
     def asset_done(self):
-        ''' 审核固定资产 '''
+        ''' 确认固定资产 '''
         self._wrong_asset_done()
         # 非初始化固定资产生成入账凭证
         if not self.is_init:
@@ -305,15 +305,15 @@ class Asset(models.Model):
 
     @api.one
     def asset_draft(self):
-        ''' 反审核固定资产 '''
+        ''' 撤销确认固定资产 '''
         if self.state == 'draft':
-            raise UserError(u'请不要重复反审核！')
+            raise UserError(u'请不要重复撤销确认！')
         if self.line_ids:
-            raise UserError(u'已折旧不能反审核！')
+            raise UserError(u'已折旧不能撤销确认！')
         if self.chang_ids:
-            raise UserError(u'已变更不能反审核！')
+            raise UserError(u'已变更不能撤销确认！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间(%s)已结账！不能反审核' % self.period_id.name)
+            raise UserError(u'该会计期间(%s)已结账！不能撤销确认' % self.period_id.name)
 
         '''删掉凭证'''
         if self.voucher_id:
@@ -411,7 +411,7 @@ class CreateCleanWizard(models.TransientModel):
 
     @api.one
     def _generate_voucher(self, Asset):
-        ''' 生成凭证，并审核 '''
+        ''' 生成凭证，并确认 '''
         vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         depreciation2 = sum(line.cost_depreciation for line in Asset.line_ids)
         depreciation = Asset.depreciation_previous + depreciation2
@@ -507,7 +507,7 @@ class CreateChangWizard(models.TransientModel):
                         'tax_amount': self.chang_tax
             })
 
-            # 如未自动审核，则审核一下结算单
+            # 如未自动确认，则确认一下结算单
             if money_invoice.state != 'done':
                 money_invoice.money_invoice_done()
             #将分类上的资产科目替换为固定资产上的资产科目
@@ -640,7 +640,7 @@ class CreateDepreciationWizard(models.TransientModel):
         res = []
         asset_line_id_list = []
         for Asset in self.env['asset'].search([('no_depreciation', '=', False),           # 提折旧的
-                                               ('state', '=', 'done'),                    # 已审核
+                                               ('state', '=', 'done'),                    # 已确认
                                                ('period_id', '!=', self.period_id.id)]):  # 从入账下月开始
             # 本期间没有折旧过，本期间晚于固定资产入账期间
             if self.period_id not in [line.period_id for line in Asset.line_ids] and \
@@ -746,7 +746,7 @@ class Voucher(models.Model):
         res = {}
         if self.env['asset'].search([('is_init', '=', True),
                                      ('state', '=', 'draft')]):
-            raise UserError(u'有未审核的初始化固定资产')
+            raise UserError(u'有未确认的初始化固定资产')
         for Asset in self.env['asset'].search([('is_init', '=', True),
                                                ('state', '=', 'done')]):
             cost = Asset.cost

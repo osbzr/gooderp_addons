@@ -24,7 +24,7 @@
             <field name="arch" type="xml">
                 <form string="Reconcile Order">
                 <header>
-                	<button name="reconcile_order_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="reconcile_order_done" states="draft" string="确认" type="object" class="oe_highlight"/>
                     <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>
@@ -97,8 +97,8 @@
                     <field name="name"/>
                     <field name="partner_id"/>
                     <field name="state"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
                     <group expand="0" string="分组">
                         <filter string="业务伙伴" domain="[]" context="{'group_by':'partner_id'}"/>
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>

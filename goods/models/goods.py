@@ -15,7 +15,7 @@ class Goods(models.Model):
     attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
     image = fields.Binary(u'图片', attachment=True)
     supplier_id = fields.Many2one('partner',
-                                  u'供应商',
+                                  u'默认供应商',
                                   ondelete='restrict',
                                   domain=[('s_category_id', '!=', False)])
     price = fields.Float(u'零售价')

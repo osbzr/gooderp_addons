@@ -25,7 +25,7 @@
             <field name="arch" type="xml">
                 <form string="采购变更单">
                 <header>
-                	<button name="buy_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="buy_adjust_done" states="draft" string="确认" type="object" class="oe_highlight"/>
                     <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
                 </header>
@@ -95,7 +95,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
                     <group expand="0" string="分组">
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                     </group>

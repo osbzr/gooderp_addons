@@ -101,7 +101,7 @@
                     <header>
                         <button name='approve_feeding' type='object' string='发料' class='oe_highlight' states='draft,feeding'/>
                         <button name='approve_order' type='object' string='成品入库' class='oe_highlight' states='feeding'/>
-                        <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name='cancel_approved_order' type='object' string='撤销入库' states='done' />
                         <button name='update_bom' type='object' string='存为物料清单' />
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' statusbar_visible="draft,feeding,done"/>
@@ -294,7 +294,7 @@
                     <header>
                         <button name='approve_feeding' type='object' string='发料' class='oe_highlight' states='draft,feeding'/>
                         <button name='approve_order' type='object' string='成品入库' class='oe_highlight' states='feeding'/>
-                        <button name='cancel_approved_order' type='object' string='反审核' states='done'/>
+                        <button name='cancel_approved_order' type='object' string='撤销入库' states='done'/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' statusbar_visible="draft,feeding,done"/>
                     </header>
@@ -486,7 +486,7 @@
                     <header>
                         <button name='approve_feeding' type='object' string='发料' class='oe_highlight' states='draft,feeding'/>
                         <button name='approve_order' type='object' string='成品入库' class='oe_highlight' states='feeding'/>
-                        <button name='cancel_approved_order' type='object' string='反审核' states='done' />
+                        <button name='cancel_approved_order' type='object' string='撤销入库' states='done' />
                         <button name='update_bom' type='object' string='存为物料清单' />
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' statusbar_visible="draft,feeding,done"/>

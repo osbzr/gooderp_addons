@@ -58,14 +58,7 @@ class WhMove(models.Model):
         return shipping_type_config
 
     def get_sender(self, ware_hosue_row, pakge_sequence):
-        add_info = u'；格子号:'
-        if pakge_sequence:
-            add_info += pakge_sequence
-        else:
-            add_info += u' '
-        add_info += u'；拣货单:'
-        if self.wave_id:
-            add_info += self.wave_id.name
+        add_info = self.wave_id and ('(' + pakge_sequence + ')' + self.wave_id.name) or ''
 
         sender = dict(Company=ware_hosue_row.company_id.name,
                       Name=ware_hosue_row.principal_id.name or ware_hosue_row.company_id.name or '',
@@ -98,7 +91,7 @@ class WhMove(models.Model):
         goods = []
         qty = 0
         for line in self.line_out_ids:
-            goods.append(dict(GoodsName=line.goods_id.name,  # 产品名称
+            goods.append(dict(GoodsName=line.goods_id.code,  # 产品编号
                               Goodsquantity=int(line.goods_qty),  # 产品数量
                               GoodsWeight=1.0,  # 产品重量
                               GoodsCode=line.goods_id.code or '',  # 产品编码
@@ -139,7 +132,9 @@ class WhMove(models.Model):
             'Order', {})).get('LogisticCode', "")
         self.express_menu = content.get('PrintTemplate')
         if not self.express_code:
-            raise UserError("获取快递面单失败!\n原因:%s" % str(resp))
+            raise UserError("获取快递面单失败!\n原因:%s %s" % (str(resp),
+                                        str(request_data)))
+
         return self.express_menu
 
     def encrypt_kdn(self, data, appkey):

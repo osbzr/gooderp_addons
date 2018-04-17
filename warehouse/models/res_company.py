@@ -19,7 +19,7 @@ class ResCompany(models.Model):
 
     is_enable_negative_stock = fields.Boolean(u'允许负库存')
     endmonth_generation_cost = fields.Boolean(
-        u'月末生成凭证', help=u'月末结帐时一次性生成成本凭证')
+        u'月末生成出库凭证', help=u'月末结帐时一次性生成成本凭证')
     operating_cost_account_id = fields.Many2one('finance.account', default=_get_operating_cost_account_id,
                                                 ondelete='restrict',
                                                 string='生产费用科目', help='用在组装拆卸的费用上!')

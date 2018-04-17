@@ -25,10 +25,10 @@ from odoo.exceptions import UserError
 from datetime import datetime
 from odoo.tools import float_compare, float_is_zero
 
-# 购货订单审核状态可选值
+# 购货订单确认状态可选值
 COST_ORDER_STATES = [
-    ('draft', u'未审核'),
-    ('done', u'已审核'),
+    ('draft', u'草稿'),
+    ('done', u'已确认'),
     ('cancel', u'已中止'),
     ('cancel', u'已作废')]
 
@@ -65,7 +65,7 @@ class CostOrder(models.Model):
     note = fields.Text(u'备注', help=u'单据备注')
     prepayment = fields.Float(u'预付款', states=READONLY_STATES,
                               digits=dp.get_precision('Amount'),
-                              help=u'输入预付款审核购货订单，会产生一张付款单')
+                              help=u'输入预付款确认购货订单，会产生一张付款单')
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
                                       ondelete='restrict',
                                       help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
@@ -84,11 +84,11 @@ class CostOrder(models.Model):
                                    'cost_ids',
                                    'move_ids',
                                    u'费用分摊出入库明细', copy=False)
-    approve_uid = fields.Many2one('res.users', u'审核人',
+    approve_uid = fields.Many2one('res.users', u'确认人',
                                   copy=False, ondelete='restrict',
-                                  help=u'审核单据的人')
-    state = fields.Selection(COST_ORDER_STATES, u'审核状态', readonly=True,
-                             help=u"购货订单的审核状态", index=True, copy=False,
+                                  help=u'确认单据的人')
+    state = fields.Selection(COST_ORDER_STATES, u'确认状态', readonly=True,
+                             help=u"单据的确认状态", index=True, copy=False,
                              default='draft')
     amount = fields.Float(u'合计金额', store=True, readonly=True,
                           compute='_compute_amount', track_visibility='always',
@@ -194,14 +194,14 @@ class CostOrder(models.Model):
 
     @api.one
     def cost_order_confim(self):
-        '''审核服务订单'''
+        '''确认服务订单'''
         if not self.name:
             self.update(
                 {'name': self.env['ir.sequence'].next_by_code('cost.order') or '/'})
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复确认！')
         if self.state == 'cancel':
-            raise UserError(u'请不要审核已中止的订单！')
+            raise UserError(u'请不要确认已中止的订单！')
         if not self.line_ids:
             raise UserError(u'请输入服务明细行！')
         if not self.bank_account_id and self.prepayment:
@@ -215,9 +215,9 @@ class CostOrder(models.Model):
 
     @api.one
     def cost_order_draft(self):
-        '''反审核服务订单'''
+        '''撤销确认服务订单'''
         if self.state == 'draft':
-            raise UserError(u'请不要重复反审核！')
+            raise UserError(u'请不要重复撤销确认！')
 
         for mv_id in self.wm_ids:
             cost_line_id = mv_id
@@ -230,7 +230,7 @@ class CostOrder(models.Model):
             invoice_id.money_invoice_draft()
             invoice_id.unlink()
 
-        # 查找产生的付款单并反审核，删除
+        # 查找产生的付款单并撤销确认，删除
         money_order = self.env['money.order'].search(
             [('origin_name', '=', self.name)])
         if money_order:

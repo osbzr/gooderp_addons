@@ -30,7 +30,7 @@ class WhOut(models.Model):
                                 help=u'该出库单的出库金额总和')
     voucher_id = fields.Many2one('voucher', u'出库凭证',
                                  readonly=True,
-                                 help=u'该出库单的审核后生成的出库凭证')
+                                 help=u'该出库单的后生成的出库凭证')
 
     @api.multi
     @inherits_after()
@@ -152,7 +152,7 @@ class WhIn(models.Model):
                                 help=u'该入库单的入库金额总和')
     voucher_id = fields.Many2one('voucher', u'入库凭证',
                                  readonly=True,
-                                 help=u'该入库单的审核后生成的入库凭证')
+                                 help=u'该入库单确认后生成的入库凭证')
     is_init = fields.Boolean(u'初始化单')
 
     @api.multi
