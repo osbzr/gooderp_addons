@@ -13,15 +13,69 @@
         <menuitem action="base.action_currency_form" id="menu_action_currency_form" parent="finance_setting_menu" name='币别'
                   sequence="60" groups="finance.group_multi_currency"/>
 
+        <!-- VIEWS: "会计要素"
+        
+            - Model·········: finance.account.type
+            - _rec_name·····: name
+            - Domain········: []
+            - Context·······: {}
+            - Parent menu ··: base.menu_custom
+            - View priority·: 16    
+            - Sequence····..: 10
+            - Action help···: Something about finance.account.type
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+        <!-- Tree view for "finance.account.type" -->
+        <record id="view_finance_account_type_tree" model="ir.ui.view">
+            <field name="name">view.finance.account.type.tree</field>
+            <field name="model">finance.account.type</field>
+            <field name="type">tree</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <tree string="finance_account_type_tree" create="1" delete="1" edit="1">
+                    <field name="name" />
+                </tree>
+            </field>
+        </record>
+        <!-- Form view for "finance.account.type" -->
+        <record id="view_finance_account_type_form" model="ir.ui.view">
+            <field name="name">view.finance.account.type.form</field>
+            <field name="model">finance.account.type</field>
+            <field name="type">form</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <form string="finance_account_type_form" create="1" delete="1" edit="1">
+                    <header>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" />
+                                <field name="active" />
+                                <field name="costs_types" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
         <!--会计科目-->
         <record id="finance_account_tree" model="ir.ui.view">
             <field name="name">finance.account.tree</field>
             <field name="model">finance.account</field>
             <field name="arch" type="xml">
-                <tree editable="top" string="科目">
+                <tree editable="top" string="科目" create="0">
                     <field name="code"/>
                     <field name="name"/>
-                    <field name="costs_types"/>
+                    <field name="costs_types" invisible="0"/>
+                    <field name="account_type" readonly="0"/>
+                    <field name="user_type" readonly="1"/>
+                    <field name="parent_id" readonly="1"/>
+                    <field name="level" />
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
                     <field name="currency_id" groups='finance.group_multi_currency'/>
@@ -55,16 +109,76 @@
 
         <menuitem id='finance_account_menu' action='finance_account_action' parent='finance_setting_menu' sequence='20'/>
 
+        <!-- VIEWS: "Wizard Account Add Child"
+                
+                    - Model·········: wizard.account.add.child
+                    - _rec_name·····: name
+                    - Domain········: []
+                    - Context·······: {}
+                    - Parent menu ··: base.menu_custom
+                    - View priority·: 16    
+                    - Sequence····..: 10
+                    - Action help···: Something about wizard.account.add.child
+                - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+        <!-- Form view for "wizard.account.add.child" -->
+        <record id="view_wizard_account_add_child_form" model="ir.ui.view">
+            <field name="name">view.wizard.account.add.child.form</field>
+            <field name="model">wizard.account.add.child</field>
+            <field name="type">form</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="16" />
+            <field name="active" eval="True" />
+            <field name="arch" type="xml">
+                <form string="创建下级科目" create="0" delete="0" edit="1">
+                    <group>
+                        <group>
+                            <field name="parent_id" invisible="1" />
+                            <field name="parent_code" />
+                            <field name="parent_name" />
+                            <field name="account_code" />
+                            <field name="full_account_code" />
+                            <field name="account_name" />
+                        </group>
+                    </group>
+                    <footer>
+                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" confirm="新增下级科目，上级科目现有的记账凭证，将会被转入新增的下级科目!"/>
+                            或者
+                            <button string="取消" special="cancel" class="oe_link"/>
+                        </footer>
+                </form>
+            </field>
+        </record>
+        <!-- Main window action for "wizard.account.add.child" -->
+        <record id="action_wizard_account_add_child_act_window" model="ir.actions.act_window">
+            <field name="type">ir.actions.act_window</field>
+            <field name="name">新增下级科目</field>
+            <field name="res_model">wizard.account.add.child</field>
+            <field name="view_mode">form</field>
+            <field name="view_type">form</field>
+            <field name="target">new</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+        </record>
+        <!-- 动作绑定 -->
+        <record model="ir.values" id="validate_account_move_line_values">
+            <field name="model_id" ref="finance.model_finance_account" />
+            <field name="name">新增下级科目</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_wizard_account_add_child_act_window'))" />
+            <field name="key">action</field>
+            <field name="model">finance.account</field>
+        </record>
+
         <!--辅助核算-->
         <record id="auxiliary_financing_tree" model="ir.ui.view">
             <field name="name">auxiliary.financing.tree</field>
             <field name="model">auxiliary.financing</field>
             <field name="arch" type="xml">
                 <tree editable="TOP" string="辅助核算">
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="type"/>
-                    <field name='active'  invisible='1'/>
+                    <field name="code" />
+                    <field name="name" />
+                    <field name="type" />
+                    <field name='active' invisible='1' />
                 </tree>
             </field>
         </record>
