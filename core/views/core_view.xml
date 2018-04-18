@@ -108,9 +108,6 @@
 			<field name="search_view_id" ref="core_value_search"/>
 		</record>
 		<menuitem id='core_value_menu' name='可选值' action='core_value_action' parent='config_data_menu' sequence='3'/>
-		<record id="core_value_menu" model="ir.ui.menu">
-			<field name="create_tag">1</field>
-		</record>
 
 		<!--公司-->
 		<record id="company_form" model="ir.ui.view">
@@ -484,7 +481,7 @@
             <field name='model'>res.users</field>
              <field name="inherit_id" ref="base.view_users_form"/>
             <field name='arch' type='xml'>
-                <xpath expr="//label[@for='login']" position='attributes'>
+				<xpath expr="//label[@for='login']" position='attributes'>
                     <attribute name='string'>用户</attribute>
                 </xpath>
             </field>

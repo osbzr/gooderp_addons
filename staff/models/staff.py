@@ -2,6 +2,7 @@
 from odoo import fields, models, api, tools, modules
 from datetime import datetime
 from odoo.exceptions import UserError
+import re
 
 
 class StaffDepartment(models.Model):
@@ -72,12 +73,16 @@ class StaffJob(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name,department_id)', '同部门的职位不能重复！')
+    ]
+
 
 class StaffEmployeeCategory(models.Model):
     _name = "staff.employee.category"
     _description = u'员工层级'
 
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称',required=True)
     parent_id = fields.Many2one('staff.employee.category', u'上级标签', index=True)
     chield_ids = fields.One2many(
         'staff.employee.category', 'parent_id', u'下级标签')
@@ -102,6 +107,15 @@ class Staff(models.Model):
         if self.job_id:
             self.department_id = self.job_id.department_id
             self.parent_id = self.job_id.department_id.manager_id
+
+    @api.one
+    @api.constrains('work_email')
+    def _check_work_email(self):
+        ''' 验证 work_email 合法性 '''
+        if self.work_email:
+            res = re.match('^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$', self.work_email)
+            if not res:
+                raise UserError(u'请检查邮箱格式是否正确: %s' % self.work_email)
 
     auxiliary_id = fields.Many2one(
         string=u'辅助核算',

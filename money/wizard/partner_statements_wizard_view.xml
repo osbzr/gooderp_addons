@@ -39,7 +39,7 @@
                         <button name='partner_statements_without_goods' string='不带商品明细的对账单'
                                 attrs="{'invisible': [('is_doc','!=',False)]}" type='object' class='oe_highlight'/>
                         <button name='partner_statements_with_goods' string='带商品明细的对账单' type='object' class='oe_highlight'/>
-                        or
+                        或者
                         <button string='取消' class='oe_link' special='cancel'/>
                 	</footer>
                 </form>
