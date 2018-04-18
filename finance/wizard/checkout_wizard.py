@@ -52,7 +52,7 @@ class CheckoutWizard(models.TransientModel):
                     voucher_obj = self.env['voucher']
                     voucher_ids = voucher_obj.search(
                         [('period_id', '=', balance.period_id.id),
-                         ('state', '=', 'done')])
+                         ('state', '!=', 'cancel')])
                     draft_voucher_count = 0  # 未确认凭证个数
                     for voucher_id in voucher_ids:
                         if voucher_id.state != 'done':
