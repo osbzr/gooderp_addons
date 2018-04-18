@@ -71,8 +71,8 @@
                 <tree editable="top" string="科目" create="0">
                     <field name="code"/>
                     <field name="name"/>
-                    <field name="costs_types" invisible="0"/>
-                    <field name="account_type" readonly="0"/>
+                    <field name="costs_types" invisible="1"/>
+                    <field name="account_type" invisible="1"/>
                     <field name="user_type" readonly="1"/>
                     <field name="parent_id" readonly="1"/>
                     <field name="level" />
@@ -136,12 +136,14 @@
                             <field name="parent_code" />
                             <field name="parent_name" />
                             <field name="account_code" />
-                            <field name="full_account_code" />
+                            <field name="full_account_code" readonly="1"/>
                             <field name="account_name" />
+                            <field name="account_type" invisible="1"/>
                         </group>
                     </group>
                     <footer>
-                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" confirm="新增下级科目，上级科目现有的记账凭证，将会被转入新增的下级科目!"/>
+                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" confirm="新增下级科目，上级科目现有的记账凭证，将会被转入新增的下级科目!" attrs="{ 'invisible': [('account_type','=','view')]   }"/>
+                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" attrs="{ 'invisible': [('account_type','=','normal')]   }"/>
                             或者
                             <button string="取消" special="cancel" class="oe_link"/>
                         </footer>

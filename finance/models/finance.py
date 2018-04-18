@@ -464,7 +464,7 @@ class FinanceAccountType(models.Model):
         ('equity', u'所有者权益'),
         ('in', u'收入类'),
         ('out', u'费用类'),
-        ('inout', u'收入费用类'),
+        # ('inout', u'收入费用类'),
         ('cost', u'成本类'),
     ], u'类型', required="1", help=u'用于会计报表的生成。')
 
@@ -515,7 +515,7 @@ class FinanceAccount(models.Model):
         ('equity', u'所有者权益'),
         ('in', u'收入类'),
         ('out', u'费用类'),
-        ('inout', u'收入费用类'),
+        # ('inout', u'收入费用类'),
         ('cost', u'成本类'),
     ], u'类型', required="1", help=u'废弃不用，改为使用 user_type字段 动态维护', related='user_type.costs_types')
     account_type = fields.Selection(string=u'科目类型', selection=[('view', 'View'), ('normal', 'Normal')], default='normal')
@@ -524,7 +524,7 @@ class FinanceAccount(models.Model):
     parent_right = fields.Integer('Right Parent', index=1)
     parent_id = fields.Many2one(string=u'上级科目', comodel_name='finance.account', ondelete='restrict', domain="[('account_type','=','view')]" )
     child_ids = fields.One2many(string=u'下级科目', comodel_name='finance.account', inverse_name='parent_id', )
-    level = fields.Integer(string=u'科目级别', compute='_compute_level' )
+    level = fields.Integer(string=u'科目级次', compute='_compute_level' )
     currency_id = fields.Many2one('res.currency', u'外币币别')
     exchange = fields.Boolean(u'是否期末调汇')
     active = fields.Boolean(u'启用', default=True)
@@ -541,12 +541,12 @@ class FinanceAccount(models.Model):
                            )
     source = fields.Selection(
         string=u'创建来源',
-        selection=[('init', '初始化'), ('manual', '手工创建')], default='init'
+        selection=[('init', '初始化'), ('manual', '手工创建')], default='manual'
     )
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', u'科目名称必须唯一。'),
-        ('code', 'unique(code)', u'科目代码必须唯一。'),
+        ('code', 'unique(code)', u'科目编码必须唯一。'),
     ]
 
     @api.multi
@@ -631,7 +631,7 @@ class WizardAccountAddChild(models.TransientModel):
     )
 
     account_code = fields.Char(
-        string=u'科目编码', required=True
+        string=u'新增编码', required=True
     )
 
     full_account_code = fields.Char(
@@ -639,7 +639,12 @@ class WizardAccountAddChild(models.TransientModel):
     )
 
     account_name = fields.Char(
-        string=u'科目名称',
+        string=u'科目名称', required=True
+    )
+
+    account_type = fields.Selection(
+        string=u'Account Type',
+        selection=[('view', 'View'), ('normal', 'Normal')], related='parent_id.account_type'
     )
 
     @api.model
@@ -649,8 +654,8 @@ class WizardAccountAddChild(models.TransientModel):
 
         account_id = self.env.context.get('active_id')
         account = self.env['finance.account'].browse(account_id)
-        if account.level >= self.env['ir.values'].get_default('finance.config.settings', 'default_account_hierarchy_level'):
-            raise UserError('选择的科目层级是%s级，已经是最低层级科目了，不能建立在它下面建立下级科目！'% account.level)
+        if account.level >= int(self.env['ir.values'].get_default('finance.config.settings', 'default_account_hierarchy_level')):
+            raise UserError(u'选择的科目层级是%s级，已经是最低层级科目了，不能建立在它下面建立下级科目！'% account.level)
 
         res = super(WizardAccountAddChild, self).default_get(fields)
 
@@ -665,6 +670,7 @@ class WizardAccountAddChild(models.TransientModel):
         self.ensure_one()
         account_type = self.parent_id.account_type
         new_account = False
+        full_account_code = '%s%s'%(self.parent_code, self.account_code)
         if account_type == 'normal':
             # 挂账科目，需要进行科目转换
             # step1, 老科目改为临时名
@@ -677,14 +683,13 @@ class WizardAccountAddChild(models.TransientModel):
             # step2, 建新科目用作上级，类型为view，将上级科目设置为老科目的上级科目
             new_account = self.parent_id.copy(
                 {
-                    'code': origin_name,
-                    'name': origin_code,
+                    'code': origin_code,
+                    'name': origin_name,
                     'account_type': 'view',
-                    'parent_id': self.parent_id.id
                 })
             # step3, 老科目改为正式名
             self.parent_id.write({
-                'code': self.full_account_code,
+                'code': full_account_code,
                 'name': self.account_name,
                 'account_type': 'normal',
                 'parent_id': new_account.id
@@ -693,28 +698,17 @@ class WizardAccountAddChild(models.TransientModel):
         elif account_type == 'view':
             # 直接新增下级科目，无需转换科目
             new_account=self.parent_id.copy({
-                'code': self.full_account_code,
+                'code': full_account_code,
                 'name': self.account_name,
                 'account_type': 'normal',
                 'parent_id': self.parent_id.id
             })
 
         if not new_account:
-            raise UserError('新科目创建失败！')
+            raise UserError(u'新科目创建失败！')
 
-        view_id = self.env.ref(
-            'finance.finance_account_tree', False
-        )
-
-        return {
-            'name': _(' 新建的科目'),
-            'type': 'ir.actions.act_window',
-            'view_mode': 'tree',
-            'res_model': 'finance.account',
-            'target': 'inline',
-            'res_id': new_account.id,
-            'views': [(view_id.id if view_id else False, 'tree')],
-        } 
+        act_window = self.env.ref('finance.finance_account_action', False)
+        return act_window
 
     @api.onchange('account_code')
     def _onchange_account_code(self):
@@ -728,7 +722,7 @@ class WizardAccountAddChild(models.TransientModel):
             return {
             'warning': {
                 'title': u'错误',
-                'message': '下级科目编码长度与"下级科目编码递增长度"规则不符合！'
+                'message': u'下级科目编码长度与"下级科目编码递增长度"规则不符合！'
             }
         }
 
