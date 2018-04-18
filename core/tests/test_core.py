@@ -44,6 +44,11 @@ class TestCore(TransactionCase):
         self.assertTrue(
             self.env['res.currency'].rmb_upper(-10000100.3) == u'负壹仟万零壹佰元叁角整')
 
+    def test_core_category_unlink(self):
+        """不能删除系统创建的类别"""
+        with self.assertRaises(UserError):
+            self.env.ref('asset.asset').unlink()
+
 
 class TestResUsers(TransactionCase):
 
