@@ -14,6 +14,7 @@
                     <field name="category_id"/>
                     <field name="get" sum="收入合计"/>
                     <field name="pay" sum="支出合计"/>
+                    <field name="tax_amount" sum="税"/>
                     <field name="amount" sum="金额合计"/>
                 </tree>
             </field>
