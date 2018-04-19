@@ -1351,25 +1351,28 @@
             <field name="name">销售发货</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.account_cost"/>
+            <field name='note'>由系统创建</field>
         </record>
         <!-- 组装单、拆卸单 借方科目：生产成本-基本生产成本 -->
         <record id="categ_ass_disass" model="core.category">
             <field name="name">生产</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.small_business_chart4001001"/>
+            <field name='note'>由系统创建</field>
         </record>
         <!-- 委外 借方科目： -->
         <record id="categ_outsource" model="core.category">
             <field name="name">委外</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.small_business_chart1408"/>
+            <field name='note'>由系统创建</field>
         </record>
         <!-- 采购入库凭证 贷方科目：材料采购-->
         <record id="categ_buy_goods" model="core.category">
             <field name="name">采购入库</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.small_business_chart1401"/>
+            <field name='note'>由系统创建</field>
         </record>
-
     </data>
 </openerp>
