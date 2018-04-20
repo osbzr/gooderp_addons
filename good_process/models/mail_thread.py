@@ -157,9 +157,10 @@ class MailThread(models.AbstractModel):
 
     def is_current_model(self):
         """检查是否是当前对象"""
-        if not self.env.context.get('params', False):
-            return False
-        action_id = self.env.context['params']['action']
+        action_id = self.env.context.get('params', False) \
+                    and self.env.context['params'].get('action', False) \
+                    or False
+
         if not action_id:
             return False
         current_model = self.env['ir.actions.act_window'].browse(action_id).res_model
