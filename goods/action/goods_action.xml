@@ -13,6 +13,13 @@
             <field name='view_mode'>tree</field>
             <field name='view_id' ref='attribute_value_value_tree' />
         </record>
+        <record id="goods_attribute_action" model="ir.actions.act_window">
+			<field name="name">SKU</field>
+			<field name="res_model">attribute</field>
+			<field name="view_mode">tree</field>
+			<field name='view_id' ref='goods.goods_attribute_tree'/>
+            <field name="search_view_id" ref="goods.goods_attribute_tree_search"/>
+		</record>
         <record id="goods_class_action" model="ir.actions.act_window">
             <field name="name">商品分类</field>
             <field name="type">ir.actions.act_window</field>
