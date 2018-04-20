@@ -162,7 +162,7 @@ class MailThread(models.AbstractModel):
                     or False
 
         if not action_id:
-            return False
+            return True
         current_model = self.env['ir.actions.act_window'].browse(action_id).res_model
         if current_model != self._name:
             return False
