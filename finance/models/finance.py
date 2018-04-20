@@ -550,13 +550,13 @@ class AuxiliaryFinancing(models.Model):
     _name = 'auxiliary.financing'
     _description = u'辅助核算'
 
-    code = fields.Char(u'编码')
-    name = fields.Char(u'名称')
+    code = fields.Char(u'编码', required=True)
+    name = fields.Char(u'名称', required=True)
     type = fields.Selection([
         ('member', u'个人'),
         ('project', u'项目'),
         ('department', u'部门'),
-    ], u'分类', default=lambda self: self.env.context.get('type'))
+    ], u'分类', required=True, sdefault=lambda self: self.env.context.get('type'))
     active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
