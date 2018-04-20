@@ -66,7 +66,7 @@
             <field name="model">goods</field>
             <field name="inherit_id" ref="goods.goods_form"/>
             <field name="arch" type="xml">
-                <field name="attribute_ids" position="before">
+                <field name="supplier_id" position="after">
                     <field name="vendor_ids" colspan="2" nolabel="1" groups='goods.view_cost_groups'>
                         <tree string="goods" editable="bottom">
                             <field name="vendor_id"

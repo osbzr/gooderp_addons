@@ -51,13 +51,14 @@ class CheckoutWizard(models.TransientModel):
                 else:
                     voucher_obj = self.env['voucher']
                     voucher_ids = voucher_obj.search(
-                        [('period_id', '=', balance.period_id.id)])
-                    draft_voucher_count = 0  # 未审核凭证个数
+                        [('period_id', '=', balance.period_id.id),
+                         ('state', '!=', 'cancel')])
+                    draft_voucher_count = 0  # 未确认凭证个数
                     for voucher_id in voucher_ids:
                         if voucher_id.state != 'done':
                             draft_voucher_count += 1
                     if draft_voucher_count != 0:
-                        raise UserError(u'该期间有%s张凭证未审核' % draft_voucher_count)
+                        raise UserError(u'该期间有%s张凭证未确认' % draft_voucher_count)
                     else:
                         voucher_line = []  # 生成的结账凭证行
                         account_obj = self.env['finance.account']
@@ -72,7 +73,8 @@ class CheckoutWizard(models.TransientModel):
                         for revenue_account_id in revenue_account_ids:
                             voucher_line_ids = voucher_line_obj.search([
                                 ('account_id', '=', revenue_account_id.id),
-                                ('voucher_id.period_id', '=', balance.period_id.id)])
+                                ('voucher_id.period_id', '=', balance.period_id.id),
+                                ('state', '=', 'done')])
                             credit_total = 0
                             for voucher_line_id in voucher_line_ids:
                                 credit_total += voucher_line_id.credit - voucher_line_id.debit
@@ -88,7 +90,8 @@ class CheckoutWizard(models.TransientModel):
                         for expense_account_id in expense_account_ids:
                             voucher_line_ids = voucher_line_obj.search([
                                 ('account_id', '=', expense_account_id.id),
-                                ('voucher_id.period_id', '=', balance.period_id.id)])
+                                ('voucher_id.period_id', '=', balance.period_id.id),
+                                ('state', '=', 'done')])
                             debit_total = 0
                             for voucher_line_id in voucher_line_ids:
                                 debit_total += voucher_line_id.debit - voucher_line_id.credit
@@ -102,10 +105,8 @@ class CheckoutWizard(models.TransientModel):
                                 }
                                 voucher_line.append(res)
                         # 利润结余
-                        year_profit_account = company_obj.search([])[
-                            0].profit_account
-                        remain_account = company_obj.search(
-                            [])[0].remain_account
+                        year_profit_account = self.company_id.profit_account
+                        remain_account = self.company_id.remain_account
                         if not year_profit_account:
                             raise UserError(u'公司本年利润科目未配置')
                         if not remain_account:
@@ -140,7 +141,8 @@ class CheckoutWizard(models.TransientModel):
                     if balance.period_id.month == '12':
                         year_profit_ids = voucher_line_obj.search([
                             ('account_id', '=', year_profit_account.id),
-                            ('voucher_id.period_id.year', '=', balance.period_id.year)])
+                            ('voucher_id.period_id.year', '=', balance.period_id.year),
+                            ('state', '=', 'done')])
                         year_total = 0
                         for year_profit_id in year_profit_ids:
                             year_total += (year_profit_id.credit -
@@ -166,7 +168,7 @@ class CheckoutWizard(models.TransientModel):
                                          (0, 0, line) for line in year_line_ids],
                                      }
                             year_account = voucher_obj.create(value)  # 创建结转凭证
-                            year_account.voucher_done()  # 凭证审核
+                            year_account.voucher_done()  # 凭证确认
                     # 生成科目余额表
                     trial_wizard = self.env['create.trial.balance.wizard'].create({
                         'period_id': balance.period_id.id,
@@ -197,7 +199,9 @@ class CheckoutWizard(models.TransientModel):
                     if voucher_line or year_account:
                         # 因重置凭证号，查找最后一张结转凭证
                         voucher = self.env['voucher'].search(
-                            [('is_checkout', '=', True), ('period_id', '=', balance.period_id.id)], order="create_date desc",
+                            [('is_checkout', '=', True),
+                             ('period_id', '=', balance.period_id.id),
+                             ('state', '=', 'done')], order="create_date desc",
                             limit=1)
                         return {
                             'name': u'月末结账',
@@ -279,7 +283,8 @@ class CheckoutWizard(models.TransientModel):
                             last_voucher_number = reset_init_number
                         else:
                             # 查找上一期间最后凭证号
-                            last_period_voucher_name = voucher_obj.search([('period_id', '=', last_period.id)],
+                            last_period_voucher_name = voucher_obj.search([('period_id', '=', last_period.id),
+                                                                           ('state', '=', 'done')],
                                                                           order="create_date desc", limit=1).name
                             # 凭证号转换为数字
                             if last_period_voucher_name:  # 上一期间是否有凭证？
@@ -292,7 +297,7 @@ class CheckoutWizard(models.TransientModel):
                 else:
                     last_voucher_number = reset_init_number
                 voucher_ids = voucher_obj.search(
-                    [('period_id', '=', period_id.id)], order='create_date')
+                    [('period_id', '=', period_id.id), ('state', '=', 'done')], order='create_date')
                 for voucher_id in voucher_ids:
                     # 产生凭证号
                     next_voucher_name = '%%0%sd' % seq_id.padding % last_voucher_number
@@ -304,7 +309,7 @@ class CheckoutWizard(models.TransientModel):
             else:
                 last_voucher_number = reset_init_number
                 voucher_ids = voucher_obj.search(
-                    [('period_id', '=', period_id.id)], order='create_date')
+                    [('period_id', '=', period_id.id), ('state', '=', 'done')], order='create_date')
                 for voucher_id in voucher_ids:
                     # 产生凭证号
                     next_voucher_name = '%%0%sd' % seq_id.padding % last_voucher_number

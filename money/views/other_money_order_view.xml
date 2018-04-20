@@ -26,8 +26,8 @@
             <field name="arch" type="xml">
                 <form string="其他收支单">
                 <header>
-					<button name="other_money_done" states="draft" string="审核" type="object" class="oe_highlight"/>
-					<button name="other_money_draft" states="done" string="反审核" type="object"/>
+					<button name="other_money_done" states="draft" string="确认" type="object" class="oe_highlight"/>
+					<button name="other_money_draft" states="done" string="撤销确认" type="object"/>
                     <button name="action_cancel" states="draft" string="作废" type="object"/>
 					<!-- <button name="print_other_money_order" states="done" string="打印" type="object" class="oe_highlight"/> -->
                     <field name="state" widget="statusbar"/>
@@ -97,8 +97,8 @@
                     <field name="partner_id"/>
                     <field name="total_amount"/>
                     <field name="state"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
                     <filter string="往来单位" domain="[]" context="{'group_by':'partner_id'}"/>
                     <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                 </search>

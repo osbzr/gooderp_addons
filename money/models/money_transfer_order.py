@@ -30,12 +30,12 @@ class MoneyTransferOrder(models.Model):
     _inherit = ['mail.thread']
 
     state = fields.Selection([
-        ('draft', u'未审核'),
-        ('done', u'已审核'),
+        ('draft', u'草稿'),
+        ('done', u'已确认'),
         ('cancel', u'已作废'),
     ], string=u'状态', readonly=True,
         default='draft', copy=False, index=True,
-        help=u'资金转账单状态标识，新建时状态为未审核;审核后状态为已审核')
+        help=u'资金转账单状态标识，新建时状态为草稿;确认后状态为已确认')
     name = fields.Char(string=u'单据编号', copy=False, default='/',
                        help=u'单据编号，创建时会自动生成')
     date = fields.Date(string=u'单据日期', readonly=True,
@@ -56,7 +56,7 @@ class MoneyTransferOrder(models.Model):
                                  u'对应凭证',
                                  readonly=True,
                                  ondelete='restrict',
-                                 help=u'资金转账单审核时生成的对应凭证',
+                                 help=u'资金转账单确认时生成的对应凭证',
                                  copy=False)
     transfer_amount = fields.Float(
         compute='_compute_transfer_amount', string='转账总金额')

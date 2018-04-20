@@ -27,8 +27,8 @@
 			<field name='arch' type='xml'>
                 <form string="费用发票">
                     <header>
-            			<button name='hr_expense_line_confirm' states='draft' type='object' string='审核' class='oe_highlight'/>
-						<button name='hr_expense_line_draft' states='confirm' type='object' string='反审核'/>
+            			<button name='hr_expense_line_confirm' states='draft' type='object' string='确认' class='oe_highlight'/>
+						<button name='hr_expense_line_draft' states='confirm' type='object' string='撤销确认'/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,confirm"/>
             		</header>
 			    	<sheet>
@@ -92,8 +92,8 @@
 			<field name='arch' type='xml'>
                 <form string="报销费用">
                     <header>
-            			<button name='hr_expense_confirm' states='draft' type='object' string='审核' class='oe_highlight'/>
-						<button name='hr_expense_draft' states='confirm' type='object' string='反审核'/>
+            			<button name='hr_expense_confirm' states='draft' type='object' string='确认' class='oe_highlight'/>
+						<button name='hr_expense_draft' states='confirm' type='object' string='撤销确认'/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,confirm,done"/>
             		</header>
 			    	<sheet>

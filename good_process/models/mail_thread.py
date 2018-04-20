@@ -155,8 +155,24 @@ class MailThread(models.AbstractModel):
             return_vals = u'已经通过不能拒绝！'
         return return_vals, message or ''
 
+    def is_current_model(self):
+        """检查是否是当前对象"""
+        action_id = self.env.context.get('params', False) \
+                    and self.env.context['params'].get('action', False) \
+                    or False
+
+        if not action_id:
+            return True
+        current_model = self.env['ir.actions.act_window'].browse(action_id).res_model
+        if current_model != self._name:
+            return False
+        else:
+            return True
+
     @api.model
     def create(self, vals):
+        if not self.is_current_model():
+            return super(MailThread, self).create(vals)
         thread_row = super(MailThread, self).create(vals)
         approvers = self.__add_approver__(thread_row, self._name, thread_row.id)
         thread_row._approver_num = len(approvers)
@@ -167,6 +183,8 @@ class MailThread(models.AbstractModel):
         '''
         如果单据的审批流程已经开始（第一个人同意了才算开始） —— 至少一个审批人已经审批通过，不允许对此单据进行修改。
         '''
+        if not self.is_current_model():
+            return super(MailThread, self).write(vals)
         for th in self:
             ignore_fields = ['_approver_num',
                              '_to_approver_ids',
@@ -181,9 +199,9 @@ class MailThread(models.AbstractModel):
                 continue
             change_state = vals.get('state', False)
 
-            # 已提交，审核时报错
+            # 已提交，确认时报错
             if len(th._to_approver_ids) == th._approver_num and change_state:
-                raise ValidationError(u"审批后才能审核")
+                raise ValidationError(u"审批后才能确认")
             # 已审批
             if not len(th._to_approver_ids):
                 if not change_state:
@@ -192,10 +210,10 @@ class MailThread(models.AbstractModel):
                     vals.update({
                         '_approver_num': len(self.__add_approver__(th, th._name, th.id)),
                     })
-            # 审批中，审核时报错，修改其他字段报错
+            # 审批中，确认时报错，修改其他字段报错
             elif len(th._to_approver_ids) < th._approver_num:
                 if change_state:
-                    raise ValidationError(u"审批后才能审核")
+                    raise ValidationError(u"审批后才能确认")
                 raise ValidationError(u"审批中不可修改")
 
         thread_row = super(MailThread, self).write(vals)
@@ -203,6 +221,8 @@ class MailThread(models.AbstractModel):
 
     @api.multi
     def unlink(self):
+        if not self.is_current_model():
+            return super(MailThread, self).unlink()
         for th in self:
             if not len(th._to_approver_ids) and th._approver_num:
                 raise ValidationError(u"已审批不可删除")
@@ -298,6 +318,7 @@ class Approver(models.Model):
     model = fields.Char('模型', index=True)
     res_id = fields.Integer('ID', index=True)
     group_id = fields.Many2one('res.groups', string=u'审批组')
+    group_name = fields.Char(related='group_id.name', string=u'名字')
     user_id = fields.Many2one('res.users', string=u'用户')
     sequence = fields.Integer(string=u'顺序')
 
@@ -306,7 +327,9 @@ class Approver(models.Model):
         self.ensure_one()
         views = self.env['ir.ui.view'].search(
             [('model', '=', self.model), ('type', '=', 'form')])
-        if getattr(self.env[self.model].browse(self.res_id), 'is_return', False):
+        model_obj = self.env[self.model]
+        rec = model_obj.browse(self.res_id)
+        if getattr(rec, 'is_return', False):
             for v in views:
                 if '_return_' in v.xml_id:
                     vid = v.id
@@ -314,7 +337,7 @@ class Approver(models.Model):
         else:
             vid = views[0].id
 
-        return {
+        return_vals = {
             'name': u'审批',
             'view_type': 'form',
             'view_mode': 'form',
@@ -324,6 +347,15 @@ class Approver(models.Model):
             'type': 'ir.actions.act_window',
             'res_id': self.res_id,
         }
+        # 如果单据存在 type，根据type传回context
+        if hasattr(model_obj, 'type'):
+            rec_ctx = {}
+            if rec.type == 'get':
+                rec_ctx = {'default_get': 1}
+            if rec.type == 'pay':
+                rec_ctx = {'default_pay': 1}
+            return_vals['context'] = rec_ctx
+        return return_vals
 
     @api.model_cr
     def init(self):

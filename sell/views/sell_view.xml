@@ -32,8 +32,8 @@
         	<field name='arch' type='xml'> 
             	<form string='销货订单'>
             		<header>
-            			<button name='sell_order_done' states='draft' string='审核' type='object' class='oe_highlight'/>
-            			<button name="sell_order_draft" states="done" string="反审核" type="object"/>
+            			<button name='sell_order_done' states='draft' string='确认' type='object' class='oe_highlight'/>
+            			<button name="sell_order_draft" states="done" string="撤销" type="object"/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
@@ -70,6 +70,7 @@
 								<field name='currency_id' readonly='1'
 									 groups='finance.group_multi_currency'/>
 							    <field name='pay_method'/>
+								<field name="express_type"/>
 							</group>
             			</group>
             			<notebook>
@@ -144,7 +145,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
 					<filter name="user_id" string="我的订单" domain="[('user_id','=',uid)]"/>
                     <separator/>
                     <filter name="not out" string="未出库" domain="[('goods_state','=',u'未出库')]"/>
@@ -175,12 +176,12 @@
                     <field name='warehouse_id'/>
             		<field name='partner_id'/>
 					<field name='total_qty'/>
-            		<field name="amount" sum="总金额"/>
+            		<field name="amount" sum="总金额" groups='sell.group_sell'/>
 					<field name='currency_id'
 						   groups='finance.group_multi_currency'/>
                     <field name='state'/>
 					<field name="_approve_state"/>
-            		<field name='money_state'/>
+            		<field name='money_state' groups='sell.group_sell'/>
             	</tree>
         	</field>
     	</record>
@@ -193,9 +194,9 @@
             	<form string='销售发货单'>
             		<header>
 						<button name='sell_to_return' type='object' states="done" string='生成退货单' class="oe_highlight"/>
-            			<button name='sell_delivery_done' states='draft' type='object' string='审核' class='oe_highlight'/>
-						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
-                        <button name="action_cancel" states="draft" string="作废" type="object"/>
+            			<button name='sell_delivery_done' states='draft' type='object' string='发货' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='撤销'/>
+                        <button name="action_cancel" states="draft" string="作废" groups='sell.group_sell' type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
             		<sheet>
@@ -223,7 +224,7 @@
 							    <field name="ref"/>
             					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
                                 <field name='order_id' readonly='1' groups='sell.sell_groups'/>
-								<field name='finance_category_id'/>
+								<field name='finance_category_id' invisible="1"/>
                                 <field name='invoice_id' readonly='1' groups='base.group_no_one'/>
                                 <field name='voucher_id' readonly='1' groups='base.group_no_one'/>
                                 <field name="money_state" readonly="1" groups='base.group_no_one'/>
@@ -263,11 +264,11 @@
 				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
 				 						<field name='goods_qty' sum='数量合计'/>
 		         						<field name='uom_id'/>
-		         						<field name='price'/>
+		         						<field name='price' groups='sell.group_sell'/>
 				 						<field name="price_taxed" groups='sell.out_tax_groups'/>
 										<field name='discount_rate' groups='sell.sell_line_discount_groups'/>
 										<field name='discount_amount' sum='折扣额合计' groups='sell.sell_line_discount_groups'/>
-				 						<field name='amount' string='销售金额' sum='金额合计'/>
+				 						<field name='amount' string='销售金额' sum='金额合计' groups='sell.group_sell'/>
 				 						<field name='tax_rate' groups='sell.out_tax_groups'/>
 		         						<field name='tax_amount' sum='税额合计' groups='sell.out_tax_groups'/>
 				 						<field name='subtotal' sum='价税合计' groups='sell.out_tax_groups'/>
@@ -303,12 +304,12 @@
 		 				<group>
                 			<group>
 								<field name="discount_amount" string="抹零" groups='sell.sell_discount_groups'/>
-                    			<field name="amount"/>
+                    			<field name="amount" groups='sell.group_sell'/>
                     			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
                 			</group>
                 			<group>
-                				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
-                				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
+                				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
                 			</group>
             			</group>
 						<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -352,7 +353,7 @@
                     <field name="approve_uid"/>
                     <field name="warehouse_id"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已完成" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not paid" string="未收款" domain="[('money_state','=',u'未收款')]"/>
                     <filter name="part paid" string="部分收款" domain="[('money_state','=',u'部分收款')]"/>
@@ -380,7 +381,7 @@
                     <field name='warehouse_dest_id'/>
             		<field name='partner_id'/>
 					<field name='total_qty'/>
-            		<field name="amount" sum="总金额"/>
+            		<field name="amount" sum="总金额" groups='sell.group_sell'/>
             		<field name='receipt' string="本次退款"/>
             		<field name='date_due'/>
 					<field name='currency_id'
@@ -399,9 +400,9 @@
         	<field name='arch' type='xml'>
             	<form string='销售退货单'>
             		<header>
-            			<button name='sell_delivery_done' states="draft" type='object' string='审核' class='oe_highlight'/>
-						<button name='sell_delivery_draft' states='done' type='object' string='反审核'/>
-                        <button name="action_cancel" states="draft" string="作废" type="object"/>
+            			<button name='sell_delivery_done' states="draft" type='object' string='入库' class='oe_highlight'/>
+						<button name='sell_delivery_draft' states='done' type='object' string='撤销'/>
+                        <button name="action_cancel" states="draft" string="作废" groups='sell.group_sell' type="object"/>
 						<field name='state' widget='statusbar' statusbar_visible="draft,done"/>
             		</header>
             		<sheet>
@@ -428,7 +429,7 @@
             				<group>
             					<field name='date_due' required='1' attrs="{'readonly': [('state','!=','draft')]}"/>
                                 <field name='order_id' readonly='1' groups='sell.sell_groups'/>
-								<field name='finance_category_id'/>
+								<field name='finance_category_id' invisible="1"/>
             					<field name='invoice_id' readonly='1'/>
 								<field name='voucher_id' readonly='1'/>
             					<field name="return_state" readonly="1"/>
@@ -503,14 +504,14 @@
 		 				<group>
                 			<group>
 								<field name="discount_amount" groups='sell.sell_discount_groups'/>
-                    			<field name="amount"/>
+                    			<field name="amount" groups='sell.group_sell'/>
                     			<field name="partner_cost" attrs="{'readonly': [('state','!=','draft')]}"/>
                     			<field name="create_uid" readonly="1" string="制单人"/>
                     			<field name="approve_uid" readonly="1"/>
                 			</group>
                 			<group>
-                				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}"/>
-                				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
+                				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
                 				<field name="create_date" readonly="1" string="录单时间"/>
                 				<field name="write_date" readonly="1" string="最后修改时间"/>
                 			</group>
@@ -538,7 +539,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已完成" domain="[('state','=','done')]"/>
                     <separator/>
                     <filter name="not refund" string="未退款" domain="[('return_state','=',u'未退款')]"/>
                     <filter name="part refund" string="部分退款" domain="[('return_state','=',u'部分退款')]"/>
@@ -576,7 +577,7 @@
             <field name="arch" type="xml">
                 <form string="销售变更单">
                 <header>
-                	<button name="sell_adjust_done" states="draft" string="审核" type="object" class="oe_highlight"/>
+                	<button name="sell_adjust_done" states="draft" string="确认" type="object" class="oe_highlight"/>
                      <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" statusbar_colors='{"done":"blue"}' readonly="1"/>
                 </header>
@@ -645,7 +646,7 @@
                     <field name="create_uid" string="制单人"/>
                     <field name="approve_uid"/>
                     <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
                     <group expand="0" string="分组">
                         <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                     </group>
@@ -795,7 +796,7 @@
         </record>
 
     	<!--根菜单-->
-        <menuitem id='sell_menu' name='销货' groups='group_sell' web_icon="sell,static/description/icon.png"/>
+        <menuitem id='sell_menu' name='销货' groups='sell.group_sell' web_icon="sell,static/description/icon.png"/>
     	<menuitem id='sell_order_menu_root' name='销货' parent='sell_menu' sequence="1"/>
     	<menuitem id='sell_order_menu' name='销货订单' action='sell_order_action'
 			parent='sell_order_menu_root' sequence='1'

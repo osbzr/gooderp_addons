@@ -23,9 +23,9 @@
             <field name="arch" type="xml">
                 <form string="资金转账单">
                     <header>
-                        <button name="money_transfer_done" states="draft" string="审核" type="object"
+                        <button name="money_transfer_done" states="draft" string="确认" type="object"
                                 class="oe_highlight"/>
-                        <button name="money_transfer_draft" states="done" string="反审核" type="object"/>
+                        <button name="money_transfer_draft" states="done" string="撤销确认" type="object"/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name="state" widget="statusbar"/>
                     </header>
@@ -73,8 +73,8 @@
                     <field name="name"/>
                     <field name="create_uid" string='制单人'/>
                     <field name="state"/>
-                    <filter name="draft" string="未审核" domain="[('state','=','draft')]"/>
-                    <filter name="done" string="已审核" domain="[('state','=','done')]"/>
+                    <filter name="draft" string="草稿" domain="[('state','=','draft')]"/>
+                    <filter name="done" string="已确认" domain="[('state','=','done')]"/>
                     <filter string="单据日期" domain="[]" context="{'group_by':'date:day'}"/>
                 </search>
             </field>

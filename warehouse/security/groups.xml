@@ -31,9 +31,9 @@
 			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
-		<!--添加管理其它出库单审核组-->
+		<!--添加管理其它出库单确认组-->
 		<record id='other_out_picking_groups' model='res.groups'>
-			<field name='name'>其它出库单审核</field>
+			<field name='name'>其它出库单确认</field>
 			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
 		</record>
@@ -48,6 +48,10 @@
 			<field name='name'>管理多个库位</field>
 			<field name='category_id' ref="core.good_warehouse"/>
 			<field name="users" eval="[(4, ref('base.user_root'))]"/>
+		</record>
+		<record id='own_warehouse_groups' model='res.groups'>
+			<field name='name'>只管自己的仓库</field>
+			<field name='category_id' ref="core.good_warehouse"/>
 		</record>
 
 	</data>

@@ -19,7 +19,7 @@
 		</record>
 
 		<act_window id="approve_multi_sell_order_action"
-			name='批量审核销售订单'
+			name='批量确认销售订单'
 			res_model="approve.multi.sell.order"
 			src_model="sell.order"
 			multi="True"

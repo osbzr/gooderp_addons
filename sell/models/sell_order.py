@@ -5,10 +5,10 @@ import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
 
-# 销货订单审核状态可选值
+# 销货订单确认状态可选值
 SELL_ORDER_STATES = [
-    ('draft', u'未审核'),
-    ('done', u'已审核'),
+    ('draft', u'草稿'),
+    ('done', u'已确认'),
     ('cancel', u'已作废')]
 
 # 字段只读状态
@@ -29,6 +29,12 @@ class SellOrder(models.Model):
         '''当订单行和优惠金额改变时，改变成交金额'''
         total = sum(line.subtotal for line in self.line_ids)
         self.amount = total - self.discount_amount
+
+    @api.one
+    @api.depends('line_ids.quantity')
+    def _compute_qty(self):
+        '''当订单行数量改变时，更新总数量'''
+        self.total_qty = sum(line.quantity for line in self.line_ids)
 
     @api.one
     @api.depends('line_ids.quantity', 'line_ids.quantity_out')
@@ -133,17 +139,22 @@ class SellOrder(models.Model):
                           compute='_compute_amount', track_visibility='always',
                           digits=dp.get_precision('Amount'),
                           help=u'总金额减去优惠金额')
+    total_qty = fields.Float(string=u'数量合计', store=True, readonly=True,
+                          compute='_compute_qty',
+                          track_visibility='always',
+                          digits=dp.get_precision('Quantity'),
+                          help=u'数量总计')
     pre_receipt = fields.Float(u'预收款', states=READONLY_STATES,
                                digits=dp.get_precision('Amount'),
-                               help=u'输入预收款审核销货订单，会产生一张收款单')
+                               help=u'输入预收款确认销货订单，会产生一张收款单')
     bank_account_id = fields.Many2one('bank.account', u'结算账户',
                                       ondelete='restrict',
                                       help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
-    approve_uid = fields.Many2one('res.users', u'审核人', copy=False,
+    approve_uid = fields.Many2one('res.users', u'确认人', copy=False,
                                   ondelete='restrict',
-                                  help=u'审核单据的人')
-    state = fields.Selection(SELL_ORDER_STATES, u'审核状态', readonly=True,
-                             help=u"销货订单的审核状态", index=True,
+                                  help=u'确认单据的人')
+    state = fields.Selection(SELL_ORDER_STATES, u'确认状态', readonly=True,
+                             help=u"销货订单的确认状态", index=True,
                              copy=False, default='draft')
     goods_state = fields.Char(u'发货状态', compute=_get_sell_goods_state,
                               default=u'未出库',
@@ -173,6 +184,7 @@ class SellOrder(models.Model):
                                  ondelete='restrict',
                                  domain=[('type', '=', 'pay_method')],
                                  context={'type': 'pay_method'})
+    express_type = fields.Char(u'承运商')
 
     @api.onchange('address_id')
     def onchange_partner_address(self):
@@ -256,9 +268,9 @@ class SellOrder(models.Model):
 
     @api.one
     def sell_order_done(self):
-        '''审核销货订单'''
+        '''确认销货订单'''
         if self.state == 'done':
-            raise UserError(u'请不要重复审核！')
+            raise UserError(u'请不要重复确认！')
         if not self.line_ids:
             raise UserError(u'请输入商品明细行！')
         for line in self.line_ids:
@@ -276,11 +288,11 @@ class SellOrder(models.Model):
 
     @api.one
     def sell_order_draft(self):
-        '''反审核销货订单'''
+        '''撤销确认销货订单'''
         if self.state == 'draft':
-            raise UserError(u'请不要重复反审核！')
+            raise UserError(u'请不要重复撤销确认！')
         if self.goods_state != u'未出库':
-            raise UserError(u'该销货订单已经发货，不能反审核！')
+            raise UserError(u'该销货订单已经发货，不能撤销确认！')
         # 查找产生的发货单并删除
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.name)])
@@ -351,6 +363,7 @@ class SellOrder(models.Model):
             'contact': self.contact,
             'address_id': self.address_id.id,
             'mobile': self.mobile,
+            'express_type': self.express_type,
         })
         if self.type == 'sell':
             delivery_id.write({'line_out_ids': [
@@ -586,12 +599,12 @@ class SellOrderLine(models.Model):
 
 class ApproveMultiSellOrder(models.TransientModel):
     _name = "approve.multi.sell.order"
-    _description = u'批量审核销售订单'
+    _description = u'批量确认销售订单'
 
     @api.multi
     def set_default_note(self):
         """
-        设置默认值, 用来确认要批量审核的订单
+        设置默认值, 用来确认要批量确认的订单
         """
         context = self.env.context
         order_names = [order.name for order in self.env['sell.order'].browse(context.get('active_ids'))]
@@ -609,11 +622,11 @@ class ApproveMultiSellOrder(models.TransientModel):
             if order.state == 'done':
                 done_lists += order.name
         if done_lists:
-            raise UserError(u'销货订单 ' + done_lists + u' 已审核!')
+            raise UserError(u'销货订单 ' + done_lists + u' 已确认!')
         return res
 
     @api.multi
     def approve_sell_order(self):
-        """ 审核销售订单 """
+        """ 确认销售订单 """
         for order in self.env['sell.order'].search([('id', 'in', self.env.context.get('active_ids'))]):
             order.sell_order_done()

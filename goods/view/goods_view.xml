@@ -25,43 +25,59 @@
 				<form string='商品'>
 					<sheet>
                 		<group>
-							<group name="general_info">
+							<group>
 							    <field name='code'/>
 								<field name='name' required='1'/>
-								<field name='not_saleable'/>
-								<field name='brand'/>
-								<field name='goods_class_id'/>
-								<field name='category_id'/>
 								<field name='uom_id' required='1' />
-								<field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
-								<field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" groups='goods.auxiliary_unit_groups' />
-								<field name="tax_rate"/>
-								<field name='barcode' />
-								<field name='note'/>
 							</group>
-							<group name="image_info">
-	            				<div>
-	            					<field name='image' widget='image'
-	            						options='{"preview_image": "image", "width": "100%"}'/>
-	            				</div>
-							</group>
+							<group>
+								<field name='category_id'/>
+								<field name='goods_class_id'/>
+								<field name='brand'/>
+                            </group>
                 		</group>
 						<notebook>
-							<page name="advanced_info" string='高级'>
-								<group>
-									<group name="price_info">
-									    <field name='price'/>
-										<field name='cost' groups='goods.view_cost_groups'/>
-										<field name='cost_method' groups='goods.view_cost_groups'/>
-										<field name='supplier_id' context="{'form_view_ref': 'core.supplier_address_form'}" groups='goods.view_cost_groups'/>
+						    <page name="normal_info" string='基本信息'>
+							    <group>
+									<group>
+										<field name='attribute_ids' colspan="2" nolabel='1' groups='goods.multi_attrs_groups'/>
+										<field name='note' nolabel='1'/>
 									</group>
-									<group name="warehouse_info">
+									<group>
+										<field name='image' widget='image' nolabel='1'
+											options='{"preview_image": "image", "width": "100%"}'/>
+									</group>
+							    </group>
+							</page>
+							<page name="sell_info" string='销售'>
+								<group>
+									<group>
+								        <field name='not_saleable'/>
+									    <field name='price'/>
+								        <field name="tax_rate"/>
+									</group>
+								</group>
+							</page>
+							<page name="buy_info" string='采购'>
+								<group>
+									<group>
+										<field name='cost' groups='goods.view_cost_groups'/>
+										<field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
+										<field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" groups='goods.auxiliary_unit_groups' />
+										<field name='supplier_id' context="{'form_view_ref': 'core.supplier_address_form'}" groups='goods.view_cost_groups'/>
+							        </group>
+								</group>
+							</page>
+							<page name="wh_info" string='库存'>
+								<group>
+									<group>
 									    <field name='no_stock' groups='goods.no_stock_groups'/>
 										<field name='using_batch' groups='goods.batch_groups'/>
 										<field name='force_batch_one' attrs="{'invisible': [('using_batch', '=', False)]}"
-										groups='goods.batch_serial_groups' />
-									</group>
-									<field name='attribute_ids' colspan="2" nolabel='1' groups='goods.multi_attrs_groups'/>
+										       groups='goods.batch_serial_groups' />
+										<field name='cost_method' groups='goods.view_cost_groups'/>
+										<field name='barcode' />
+							        </group>
 								</group>
 							</page>
 						</notebook>
@@ -82,6 +98,16 @@
                         <filter string="商品类别" domain="[]" context="{'group_by':'category_id'}"/>
                     </group>
 				</search>
+			</field>
+		</record>
+		<record id='goods_attribute_tree' model='ir.ui.view'>
+			<field name='name'>goods.attribute.tree</field>
+			<field name='model'>attribute</field>
+			<field name='arch' type='xml'>
+				<tree string='SKU'>
+					<field name='goods_id'/>
+					<field name='name'/>
+				</tree>
 			</field>
 		</record>
 		<record id='attribute_form' model='ir.ui.view'>
@@ -113,5 +139,20 @@
 				</tree>
 			</field>
 		</record>
+		<!--产品查询search view-->
+        <record id="goods_attribute_tree_search" model="ir.ui.view">
+            <field name="name">goods.attribute.tree.search</field>
+            <field name="model">attribute</field>
+            <field name="arch" type="xml">
+                <search string="产品过滤">
+                    <field name="goods_id"/>
+					<field name='ean'/>
+                    <field name="name"/>
+                    <group expand="0" string="Group By">
+                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
 	</data>
 </openerp>

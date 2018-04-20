@@ -51,7 +51,7 @@ class MoneyOrder(models.Model):
                                                  ('state', '=', 'draft'),
                                                  ('id', '!=', self.id)])
         if orders:
-            raise UserError(u'该业务伙伴存在未审核的收/付款单，请先审核')
+            raise UserError(u'该业务伙伴存在未确认的收/付款单，请先确认')
 
         return super(MoneyOrder, self).create(values)
 
@@ -92,26 +92,28 @@ class MoneyOrder(models.Model):
         self.amount = amount
 
     @api.one
-    @api.depends('partner_id')
+    @api.depends('partner_id','type')
     def _compute_currency_id(self):
         """
         取出币别
         :return:
         """
-        partner_currency_id = self.partner_id.c_category_id.account_id.currency_id.id or self.partner_id.s_category_id.account_id.currency_id.id
+        partner_currency_id = (self.type == 'get')                                    \
+                          and self.partner_id.c_category_id.account_id.currency_id.id \
+                          or self.partner_id.s_category_id.account_id.currency_id.id
         self.currency_id = partner_currency_id or self.env.user.company_id.currency_id.id
 
     state = fields.Selection([
-        ('draft', u'未审核'),
-        ('done', u'已审核'),
+        ('draft', u'草稿'),
+        ('done', u'已完成'),
         ('cancel', u'已作废'),
     ], string=u'状态', readonly=True,
         default='draft', copy=False, index=True,
-        help=u'收/付款单状态标识，新建时状态为未审核;审核后状态为已审核')
+        help=u'收/付款单状态标识，新建时状态为草稿;确认后状态为已完成')
     partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
-                                 help=u'该单据对应的业务伙伴，单据审核时会影响他的应收应付余额')
+                                 help=u'该单据对应的业务伙伴，单据确认时会影响他的应收应付余额')
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
@@ -130,7 +132,7 @@ class MoneyOrder(models.Model):
                                           readonly=True,
                                           states={
                                               'draft': [('readonly', False)]},
-                                          help=u'收/付款单审核生成凭证时，手续费或折扣对应的科目')
+                                          help=u'收/付款单确认生成凭证时，手续费或折扣对应的科目')
     line_ids = fields.One2many('money.order.line', 'money_id',
                                string=u'收/付款单行', readonly=True,
                                states={'draft': [('readonly', False)]},
@@ -178,7 +180,7 @@ class MoneyOrder(models.Model):
                                  readonly=True,
                                  ondelete='restrict',
                                  copy=False,
-                                 help=u'收/付款单审核时生成的对应凭证')
+                                 help=u'收/付款单确认时生成的对应凭证')
 
     @api.multi
     def write_off_reset(self):
@@ -188,7 +190,7 @@ class MoneyOrder(models.Model):
         """
         self.ensure_one()
         if self.state != 'draft':
-            raise ValueError(u'已审核的单据不能执行这个操作')
+            raise ValueError(u'已确认的单据不能执行这个操作')
         for source in self.source_ids:
             source.this_reconcile = 0
         return True
@@ -550,7 +552,7 @@ class MoneyOrderLine(models.Model):
                                help=u'订单行对应的收付款单')
     bank_id = fields.Many2one('bank.account', string=u'结算账户',
                               required=True, ondelete='restrict',
-                              help=u'本次收款/付款所用的计算账户，审核收付款单会修改对应账户的金额')
+                              help=u'本次收款/付款所用的计算账户，确认收付款单会修改对应账户的金额')
     amount = fields.Float(string=u'金额',
                           digits=dp.get_precision('Amount'),
                           help=u'本次结算金额')
@@ -617,7 +619,7 @@ class MoneyInvoice(models.Model):
         ('done', u'完成')
     ], string=u'状态',
         default='draft', copy=False, index=True,
-        help=u'结算单状态标识，新建时状态为草稿;审核后状态为完成')
+        help=u'结算单状态标识，新建时状态为草稿;确认后状态为完成')
     partner_id = fields.Many2one('partner', string=u'往来单位',
                                  required=True,
                                  ondelete='restrict',
@@ -855,12 +857,12 @@ class ReconcileOrder(models.Model):
     ]
 
     state = fields.Selection([
-        ('draft', u'未审核'),
-        ('done', u'已审核'),
+        ('draft', u'草稿'),
+        ('done', u'已确认'),
         ('cancel', u'已作废'),
     ], string=u'状态', readonly=True,
         default='draft', copy=False, index=True,
-        help=u'核销单状态标识，新建时状态为未审核;审核后状态为已审核')
+        help=u'核销单状态标识，新建时状态为草稿;确认后状态为已确认')
     partner_id = fields.Many2one('partner', string=u'往来单位', required=True,
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
@@ -869,7 +871,7 @@ class ReconcileOrder(models.Model):
                                     readonly=True, ondelete='restrict',
                                     states={'draft': [('readonly', False)]},
                                     help=u'应收转应收、应付转应付时对应的转入业务伙伴，'
-                                    u'订单审核时会影响该业务伙伴的应收/应付')
+                                    u'订单确认时会影响该业务伙伴的应收/应付')
     advance_payment_ids = fields.One2many(
         'advance.payment', 'pay_reconcile_id',
         string=u'预收/付款单行', readonly=True,
@@ -1033,7 +1035,7 @@ class ReconcileOrder(models.Model):
         # 核销金额不能大于未核销金额
         for order in self:
             if order.state == 'done':
-                raise UserError(u'核销单%s已审核，不能再次审核。' % order.name)
+                raise UserError(u'核销单%s已确认，不能再次确认。' % order.name)
             order_reconcile, invoice_reconcile = 0, 0
             if self.business_type in ['get_to_get', 'pay_to_pay'] and order.partner_id == order.to_partner_id:
                 raise UserError(u'业务伙伴和转入往来单位不能相同。\n业务伙伴:%s 转入往来单位:%s'

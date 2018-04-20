@@ -54,16 +54,16 @@ class OtherMoneyOrder(models.Model):
                                 for line in self.line_ids)
 
     state = fields.Selection([
-        ('draft', u'未审核'),
-        ('done', u'已审核'),
+        ('draft', u'草稿'),
+        ('done', u'已确认'),
         ('cancel', u'已作废'),
     ], string=u'状态', readonly=True,
         default='draft', copy=False, index=True,
-        help=u'其他收支单状态标识，新建时状态为未审核;审核后状态为已审核')
+        help=u'其他收支单状态标识，新建时状态为草稿;确认后状态为已确认')
     partner_id = fields.Many2one('partner', string=u'往来单位',
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
-                                 help=u'单据对应的业务伙伴，单据审核时会影响他的应收应付余额')
+                                 help=u'单据对应的业务伙伴，单据确认时会影响他的应收应付余额')
     date = fields.Date(string=u'单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
@@ -107,7 +107,7 @@ class OtherMoneyOrder(models.Model):
                                  readonly=True,
                                  ondelete='restrict',
                                  copy=False,
-                                 help=u'其他收支单审核时生成的对应凭证')
+                                 help=u'其他收支单确认时生成的对应凭证')
     currency_amount = fields.Float(u'外币金额',
                                    digits=dp.get_precision('Amount'))
 

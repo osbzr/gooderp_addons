@@ -47,7 +47,8 @@ class CreateExchangeWizard(models.TransientModel):
         '''
         account_id = vals.get('account_id')
         voucher_lines = self.env['voucher.line'].search(
-            [('account_id', '=', account_id)])
+            [('account_id', '=', account_id),
+             ('state', '=', 'done')])
         account = vals.get('account')
         res = {}
         for line in voucher_lines:
@@ -108,7 +109,8 @@ class CreateExchangeWizard(models.TransientModel):
         '''
         account_id = vals.get('account_id')
         voucher_lines = self.env['voucher.line'].search(
-            [('account_id', '=', account_id)])
+            [('account_id', '=', account_id),
+             ('state', '=', 'done')])
         account = vals.get('account')
         currency_amount = 0
         debit = 0
@@ -151,7 +153,8 @@ class CreateExchangeWizard(models.TransientModel):
         当有主营业务收入,结汇等不需要汇兑损益的科目出现后，汇兑损益将不平，就会出现财务费用汇兑损益，
         '''
         vouch_obj = vals.get('vouch_obj_id')
-        voucher = self.env['voucher'].search([('id', '=', vouch_obj)])
+        voucher = self.env['voucher'].search([('id', '=', vouch_obj),
+                                              ('state', '=', 'done')])
         voucher_lines = voucher.line_ids
         account_id = self.env.ref('finance.account_exchange')
         exp = 0
