@@ -6,6 +6,7 @@
 			<field name="name">销售发票</field>
 			<field name="type">income</field>
 			<field name="account_id" ref="finance.account_income"/>
+			<field name='note'>由系统创建</field>
 		</record>
 
 		<!-- 支出类型：采购 -->
@@ -13,6 +14,7 @@
 			<field name="name">采购发票</field>
 			<field name="type">expense</field>
 			<field name="account_id" ref="finance.small_business_chart1401"/>
+			<field name='note'>由系统创建</field>
 		</record>
 
 		<!-- 其他支出：期初 -->
@@ -20,6 +22,7 @@
 			<field name="name">期初</field>
 			<field name="type">other_get</field>
 			<field name="account_id" ref="finance.account_init"/>
+			<field name='note'>由系统创建</field>
 		</record>
 
 		<!-- 添加 money 模块 business data table 数据 -->
