@@ -132,9 +132,13 @@ class AttributeValueValue(models.Model):
                                   domain=[('type', '=', 'attribute')],
                                   context={'type': 'attribute'},
                                   required='1')
-    name = fields.Char(u'值')
+    name = fields.Char(u'值', required=True)
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+
+    _sql_constraints = [
+        ('name_category_uniq', 'unique(category_id,name)', '同一属性的值不能重复')
+    ]
