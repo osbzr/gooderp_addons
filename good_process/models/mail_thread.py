@@ -155,8 +155,21 @@ class MailThread(models.AbstractModel):
             return_vals = u'已经通过不能拒绝！'
         return return_vals, message or ''
 
+    def is_current_model(self):
+        """检查是否是当前对象"""
+        action_id = self.env.context['params']['action']
+        if not action_id:
+            return False
+        current_model = self.env['ir.actions.act_window'].browse(action_id).res_model
+        if current_model != self._name:
+            return False
+        else:
+            return True
+
     @api.model
     def create(self, vals):
+        if not self.is_current_model():
+            return super(MailThread, self).create(vals)
         thread_row = super(MailThread, self).create(vals)
         approvers = self.__add_approver__(thread_row, self._name, thread_row.id)
         thread_row._approver_num = len(approvers)
@@ -167,6 +180,8 @@ class MailThread(models.AbstractModel):
         '''
         如果单据的审批流程已经开始（第一个人同意了才算开始） —— 至少一个审批人已经审批通过，不允许对此单据进行修改。
         '''
+        if not self.is_current_model():
+            return super(MailThread, self).write(vals)
         for th in self:
             ignore_fields = ['_approver_num',
                              '_to_approver_ids',
@@ -203,6 +218,8 @@ class MailThread(models.AbstractModel):
 
     @api.multi
     def unlink(self):
+        if not self.is_current_model():
+            return super(MailThread, self).unlink()
         for th in self:
             if not len(th._to_approver_ids) and th._approver_num:
                 raise ValidationError(u"已审批不可删除")
