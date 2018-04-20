@@ -367,7 +367,6 @@ class TestVoucherTemplateLine(TransactionCase):
         self.voucher_template_wizard.save_as_template()
         template = self.env['voucher.template'].search([])[0] if self.env[
             'voucher.template'].search([]) else False
-        print "template", template
         for line in template.line_ids:
             # 会计科目不存在
             line.account_id = False
@@ -420,6 +419,8 @@ class TestCheckoutWizard(TransactionCase):
         # 按年重置 上一个期间存在 已结账 两个期间的年不相同
         period_id = self.env.ref('finance.period_201603')
         last_period_id = self.env.ref('finance.period_201602')
+        self.env.ref('finance.period_201601').is_closed = True
+        self.env.ref('finance.period_201512').is_closed = True
         last_period_id.is_closed = True
         checkout_wizard_obj.recreate_voucher_name(period_id)
 

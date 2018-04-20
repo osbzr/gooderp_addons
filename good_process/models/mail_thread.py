@@ -318,6 +318,7 @@ class Approver(models.Model):
     model = fields.Char('模型', index=True)
     res_id = fields.Integer('ID', index=True)
     group_id = fields.Many2one('res.groups', string=u'审批组')
+    group_name = fields.Char(related='group_id.name', string=u'名字')
     user_id = fields.Many2one('res.users', string=u'用户')
     sequence = fields.Integer(string=u'顺序')
 
@@ -326,7 +327,9 @@ class Approver(models.Model):
         self.ensure_one()
         views = self.env['ir.ui.view'].search(
             [('model', '=', self.model), ('type', '=', 'form')])
-        if getattr(self.env[self.model].browse(self.res_id), 'is_return', False):
+        model_obj = self.env[self.model]
+        rec = model_obj.browse(self.res_id)
+        if getattr(rec, 'is_return', False):
             for v in views:
                 if '_return_' in v.xml_id:
                     vid = v.id
@@ -334,7 +337,7 @@ class Approver(models.Model):
         else:
             vid = views[0].id
 
-        return {
+        return_vals = {
             'name': u'审批',
             'view_type': 'form',
             'view_mode': 'form',
@@ -344,6 +347,15 @@ class Approver(models.Model):
             'type': 'ir.actions.act_window',
             'res_id': self.res_id,
         }
+        # 如果单据存在 type，根据type传回context
+        if hasattr(model_obj, 'type'):
+            rec_ctx = {}
+            if rec.type == 'get':
+                rec_ctx = {'default_get': 1}
+            if rec.type == 'pay':
+                rec_ctx = {'default_pay': 1}
+            return_vals['context'] = rec_ctx
+        return return_vals
 
     @api.model_cr
     def init(self):
