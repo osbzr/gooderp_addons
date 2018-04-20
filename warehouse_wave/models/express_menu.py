@@ -115,9 +115,9 @@ class WhMove(models.Model):
         remark = self.note or '小心轻放'
         shipping_type = self.express_type or 'YTO'
         receiver, commodity, qty = self.get_receiver_goods_message()
-        request_data = dict(OrderCode=order_code, PayType=1, ExpType=1, Cost=1.0, OtherCost=1.0,
+        request_data = dict(OrderCode=order_code, PayType=3, ExpType=1, Cost=1.0, OtherCost=1.0,
                             Sender=sender, Receiver=receiver, Commodity=commodity, Weight=1.0,
-                            Quantity=qty, Volume=0.0, Remark=remark, IsReturnPrintTemplate=1)
+                            Quantity=1, Volume=0.0, Remark=remark, IsReturnPrintTemplate=1)
         request_data.update(self.get_shipping_type_config(shipping_type))
         request_data = json.dumps(request_data)
         data = {'RequestData': request_data,
