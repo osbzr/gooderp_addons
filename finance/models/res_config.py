@@ -101,22 +101,3 @@ class FinanceConfigWizard(models.TransientModel):
         res = self.env['ir.values'].set_default('finance.config.settings', 'default_reset_init_number',
                                                 reset_init_number)
         return res
-
-class ResCompany(models.Model):
-    _inherit = 'res.company'
-
-    prohibit_manual_credit_account_ids = fields.Many2many(
-        string=u'贷方禁止手工记账科目',
-        comodel_name='finance.account',
-        relation='finance_account_finance_config_settings_credit_rel',
-        column1='finance_account_id',
-        column2='finance_config_settings',
-    )
-
-    prohibit_manual_debit_account_ids = fields.Many2many(
-        string=u'借方禁止手工记账科目',
-        comodel_name='finance.account',
-        relation='finance_account_finance_config_settings_debit_rel',
-        column1='finance_account_id',
-        column2='finance_config_settings',
-    )

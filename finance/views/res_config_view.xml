@@ -53,7 +53,6 @@
             </field>
         </record>
 
-
         <record id="view_finance_config_setting_action" model="ir.actions.act_window">
             <field name="name">会计设置</field>
             <field name="type">ir.actions.act_window</field>
@@ -61,29 +60,6 @@
             <field name="view_id" ref="view_finance_config"/>
             <field name="view_mode">form</field>
             <field name="target">inline</field>
-        </record>
-
-        <!-- VIEWS: "Company"
-                
-                    - Model·········: res.company
-                    - Base Addons···: base    
-                - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-        <!-- Form view for "res.company" -->
-        <record id="view_res_company_form" model="ir.ui.view">
-            <field name="name">view.res.company.form</field>
-            <field name="model">res.company</field>
-            <field name="inherit_id" ref="base.view_company_form" />
-            <field name="arch" type="xml">
-                <xpath expr="//notebook" position="inside">
-                    <page string="会计设置">
-                        <group>
-                            <field name="prohibit_manual_debit_account_ids" options="{'no_create': True, 'no_open': True, 'no_create_edit': True}" widget="many2many_tags"/>
-                            <field name="prohibit_manual_credit_account_ids" options="{'no_create': True, 'no_open': True, 'no_create_edit': True}" widget="many2many_tags"/>
-                        </group>
-                        
-                    </page>
-                </xpath>
-            </field>
         </record>
 
     </data>
