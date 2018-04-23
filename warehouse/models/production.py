@@ -851,9 +851,9 @@ class outsource(models.Model):
         """
         voucher_line_data = []
         if outsource.outsource_fee:
-            account_row = outsource.create_uid.company_id.operating_cost_account_id  # 公司上的生产费用科目
             # 贷方行
-            voucher_line_data.append({'name': u'委外费用', 'account_id': account_row.id,
+            voucher_line_data.append({'name': u'委外费用',
+                                      'account_id': self.env.ref('money.core_category_purchase').account_id.id, # 采购发票类别对应的科目
                                       'credit': outsource.outsource_fee, 'voucher_id': voucher_row.id})
 
         voucher_line_data += self.create_vourcher_line_data(

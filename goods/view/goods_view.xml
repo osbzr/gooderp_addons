@@ -104,7 +104,7 @@
 			<field name='name'>goods.attribute.tree</field>
 			<field name='model'>attribute</field>
 			<field name='arch' type='xml'>
-				<tree string='产品属性' edit="0" create='0'>
+				<tree string='SKU'>
 					<field name='goods_id'/>
 					<field name='name'/>
 				</tree>
