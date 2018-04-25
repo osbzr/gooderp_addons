@@ -556,7 +556,7 @@ class AuxiliaryFinancing(models.Model):
         ('member', u'个人'),
         ('project', u'项目'),
         ('department', u'部门'),
-    ], u'分类', required=True, sdefault=lambda self: self.env.context.get('type'))
+    ], u'分类', required=True, default=lambda self: self.env.context.get('type'))
     active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
