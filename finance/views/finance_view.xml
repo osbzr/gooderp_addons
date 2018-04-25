@@ -55,7 +55,7 @@
                             <tree editable='bottom'>
                                 <field name='name'/>
                                 <field name='account_id'  options="{'no_create': True}"
-                                       context="{'show_balance':True}"
+                                       context="{'show_balance':False}"
                                 />
                                 <field name='partner_id' options="{'no_open': True, 'no_create': True}"
                                        domain="[('name','=',False)]"/>
