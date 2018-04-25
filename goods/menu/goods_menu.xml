@@ -5,5 +5,6 @@
         <menuitem id='attribute_value_value_menu' name='属性值' parent='core.config_data_menu'
             groups="base.group_no_one"
         	action='attribute_value_value_action' sequence='4' />
+        <menuitem id='goods_attribute_menu' name='SKU' action='goods_attribute_action' parent='core.config_data_menu' groups="base.group_no_one" sequence='3'/>
     </data>
 </openerp>

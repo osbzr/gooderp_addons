@@ -100,6 +100,16 @@
 				</search>
 			</field>
 		</record>
+		<record id='goods_attribute_tree' model='ir.ui.view'>
+			<field name='name'>goods.attribute.tree</field>
+			<field name='model'>attribute</field>
+			<field name='arch' type='xml'>
+				<tree string='SKU'>
+					<field name='goods_id'/>
+					<field name='name'/>
+				</tree>
+			</field>
+		</record>
 		<record id='attribute_form' model='ir.ui.view'>
 			<field name='name'>attribute.form</field>
 			<field name='model'>attribute</field>
@@ -129,5 +139,20 @@
 				</tree>
 			</field>
 		</record>
+		<!--产品查询search view-->
+        <record id="goods_attribute_tree_search" model="ir.ui.view">
+            <field name="name">goods.attribute.tree.search</field>
+            <field name="model">attribute</field>
+            <field name="arch" type="xml">
+                <search string="产品过滤">
+                    <field name="goods_id"/>
+					<field name='ean'/>
+                    <field name="name"/>
+                    <group expand="0" string="Group By">
+                        <filter string="产品" domain="[]" context="{'group_by':'goods_id'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
 	</data>
 </openerp>

@@ -124,7 +124,7 @@
                                 <field name='fee'/>
                                 <field name='warehouse_dest_id' />
                                 <field name='is_many_to_many_combinations' />
-                                <field name='finance_category_id'/>
+                                <field name='finance_category_id' invisible="1"/>
                                 <field name='voucher_id' readonly='1'/>
                                 <field name='out_voucher_id' readonly='1'/>
                             </group>
@@ -319,7 +319,7 @@
                                 <field name='warehouse_dest_id'/>
                                 <field name='is_many_to_many_combinations'/>
                                 <field name='invoice_id' readonly='1' options="{'no_create': True}"/>
-                                <field name='finance_category_id'/>
+                                <field name='finance_category_id' invisible="1"/>
                                 <field name='voucher_id' readonly='1'/>
                                 <field name='out_voucher_id' readonly='1'/>
                             </group>
@@ -510,7 +510,7 @@
                                 <field name='fee' />
                                 <field name='warehouse_dest_id' />
                                 <field name='is_many_to_many_combinations' />
-                                <field name='finance_category_id'/>
+                                <field name='finance_category_id' invisible="1"/>
                                 <field name='voucher_id' readonly='1'/>
                                 <field name='out_voucher_id' readonly='1'/>
                             </group>

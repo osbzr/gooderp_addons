@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 继承 商品 form -->
+		<record id="goods_form_inherit" model="ir.ui.view">
+			<field name="name">goods.form.inherit</field>
+			<field name="model">goods</field>
+			<field name="inherit_id" ref="goods.goods_form" />
+            <field name="arch" type="xml">
+                <field name="code" position="attributes">
+                    <attribute name="required">1</attribute>
+                </field>
+			</field>
+		</record>
+    </data>
+</openerp>

@@ -71,13 +71,13 @@
 				  <field name='model_type'/>
 				  <field name='record_name'/>
 				  <button name='goto' type='object' string="查看并处理" class="oe_highlight"/>
-				  <field name='group_id'/>
+				  <field name='group_name'/>
                   <templates>
                     <t t-name="kanban-box">
                       <div>
                           <div class="oe_module_desc">
 							  <span><field name='creator'/> 申请 </span>
-							  <span><field name='group_id'/> 审批 </span>
+							  <span><field name='group_name'/> 审批 </span>
 				              <span><field name='model_type'/> </span>
 				              <span><field name='record_name'/></span>
                           </div>
