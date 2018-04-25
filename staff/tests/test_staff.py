@@ -73,7 +73,7 @@ class TestStaffDepartment(TransactionCase):
         department_1 = self.env.ref('staff.department_1')
         department_2 = self.env['staff.department'].create({
             'name': '财务部',
-            'code': 'finance',
+            'code': 'dep_finance',
             'type': 'department',
             'parent_id': department_1.id,
         })
