@@ -314,6 +314,63 @@
                 </search>
             </field>
         </record>
+		<record id="timeline_kanban" model="ir.ui.view">
+			<field name="name">timeline.kanban</field>
+			<field name="model">timeline</field>
+			<field name="arch" type="xml">
+				<kanban class="o_kanban_mobile">
+					<field name='task_id'/>
+					<field name='project_id'/>
+					<field name='just_done'/>
+					<field name='hours' groups='task.group_task_hours'/>
+					<field name="create_uid" string='创建人'/>
+					<field name='color'/>
+					<templates>
+						<t t-name="kanban-box">
+							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click_edit">
+								<div class="oe_dropdown_kanban">
+
+								  <!-- dropdown menu -->
+								  <span class="oe_dropdown_toggle">
+									<ul class="oe_dropdown_menu">
+									  <li><a type="delete">Delete</a></li>
+									  <li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
+									</ul>
+								  </span>
+								</div>
+								<!--<div class="oe_dropdown_toggle oe_dropdown_kanban">-->
+                                    <!--<span class="oe_e">í</span>-->
+                                    <!--<ul class="oe_dropdown_menu">-->
+                                        <!--<t t-if="widget.view.is_action_enabled('edit')"><li><a type="edit">Edit...</a></li></t>-->
+                                        <!--<t t-if="widget.view.is_action_enabled('delete')"><li><a type="delete">Delete</a></li></t>-->
+                                        <!--<li><ul class="oe_kanban_colorpicker" data-field="color"/></li>-->
+                                    <!--</ul>-->
+                                <!--</div>-->
+								<ul class="oe_kanban_colorpicker" data-field="color"/>
+								<div class="o_kanban_image">
+                                    <t>
+                                        <img t-att-src="kanban_image('res.users', 'image_small', record.create_uid.raw_value)"/>
+                                    </t>
+                                    <p>
+										<t t-esc="record.create_uid.value"/>
+									</p>
+                                </div>
+                                <div class="oe_kanban_details">
+									<p>
+										<t t-esc="record.project_id.value"/>
+										<t t-esc="record.task_id.value"/>
+										<t t-esc="record.just_done.value"/>
+										<div groups='task.group_task_hours'>
+											<t t-esc="record.hours.value"/>
+										</div>
+									</p>
+								</div>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
 		<record model="ir.ui.view" id="task_status_tree">
 			<field name="name">任务阶段</field>
 			<field name="model">task.status</field>
@@ -432,7 +489,7 @@
 		<record model="ir.actions.act_window" id="action_timeline">
 			<field name="name">工作日志</field>
 			<field name="res_model">timeline</field>
-			<field name="view_mode">tree,pivot</field>
+			<field name="view_mode">kanban,tree,pivot</field>
 			<field name="context">{'search_default_today_timeline': 1}</field>
 		</record>
 		<record model="ir.actions.act_window" id="action_timesheet_today">
@@ -442,6 +499,15 @@
 			<field name="domain">[('date', '=', context_today().strftime('%Y-%m-%d')),('user_id', '=', uid)]</field>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">点击创建今日的工作日志</p>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="action_timeline_today">
+			<field name="name">今日工作记录</field>
+			<field name="res_model">timeline</field>
+			<field name="view_mode">kanban,tree,form</field>
+			<field name="domain">[('create_uid', '=', uid)]</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建今日的工作记录</p>
 			</field>
 		</record>
 		<record model="ir.actions.act_window" id="action_task_status">
@@ -456,6 +522,8 @@
 		groups='task.group_task'/>
 		<menuitem name="今日" id="menu_timesheet" parent="menu_task_root"
 		action="action_timesheet_today" sequence='1'/>
+		<menuitem name="今日工作记录" id="menu_timeline" parent="menu_task_root"
+		action="action_timeline_today" sequence='3'/>
 		<menuitem name="主数据" id="menu_task_data" parent="menu_task_root" sequence='5'/>
 		<menuitem name="任务" id="menu_task" parent="menu_task_data"
 		action="action_task" sequence='1'/>

@@ -389,6 +389,8 @@ class Timeline(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )
+    color = fields.Integer('Color Index',
+                           default=0)
 
     @api.model
     def create(self, vals):
