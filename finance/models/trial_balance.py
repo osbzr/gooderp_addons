@@ -32,7 +32,10 @@ class TrialBalance(models.Model):
 
     period_id = fields.Many2one('finance.period', string=u'会计期间')
     subject_code = fields.Char(u'科目编码')
+    subject_name = fields.Char(u'科目')
     subject_name_id = fields.Many2one('finance.account', string=u'科目')
+    account_type = fields.Selection(string=u'科目类型', selection=[('view', 'View'), ('normal', 'Normal')], related='subject_name_id.account_type')
+    level = fields.Integer(string=u'科目级次', related='subject_name_id.level', store=True )
     year_init_debit = fields.Float(u'年初余额(借方)', digits=dp.get_precision(
         'Amount'), default=0, compute=_get_year_init)
     year_init_credit = fields.Float(u'年初余额(贷方)', digits=dp.get_precision(
@@ -54,6 +57,102 @@ class TrialBalance(models.Model):
     cumulative_occurrence_credit = fields.Float(
         u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'), default=0)
 
+    def button_change_number(self):
+        self.ensure_one()
+
+        view = self.env.ref('finance.change_cumulative_occurrence_wizard_form')
+
+        return {
+            'name': u'调整累计数',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'change.cumulative.occurrence.wizard',
+            'views': [(view.id, 'form')],
+            'view_id': view.id,
+            'target': 'new',
+            'context': dict(
+                self.env.context,
+                active_id = self.id,
+                active_ids = [self.id]
+            ),
+        }
+
+        return self.env.ref('finance.create_vouchers_summary_wizard_form')
+
+class ChangeCumulativeOccurrenceWizard(models.TransientModel):
+    """ The summary line for a class docstring should fit on one line.
+
+    """
+    _name = 'change.cumulative.occurrence.wizard'
+    _description = u'Change Cumulative Occurrence Wizard'
+
+    old_cumulative_occurrence_debit = fields.Float(
+        u'本年累计发生额(借方)', digits=dp.get_precision('Amount'))
+    cumulative_occurrence_debit = fields.Float(
+        u'本年累计发生额(借方)', digits=dp.get_precision('Amount'))
+    old_cumulative_occurrence_credit = fields.Float(
+        u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'))
+    cumulative_occurrence_credit = fields.Float(
+        u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'))
+
+    trial_balance_id = fields.Many2one(
+        string=u'Trial Balance',
+        comodel_name='trial.balance',
+        ondelete='set null',
+    )
+
+    @api.model
+    def default_get(self, fields):
+        if len(self.env.context.get('active_ids', False) ) >1 :
+            raise UserError( u'一次只能调整一行')
+        res = super(ChangeCumulativeOccurrenceWizard, self).default_get(fields)
+        active_id = self.env.context.get('active_id', False)
+        if active_id:
+            trial_balance_item = self.env['trial.balance'].browse( active_id)
+
+            if trial_balance_item.subject_name_id.account_type == 'view':
+                raise UserError( u'只能调整末级科目相关的行')
+            
+            res.update( {
+                        'cumulative_occurrence_debit': trial_balance_item.cumulative_occurrence_debit,
+                        'cumulative_occurrence_credit': trial_balance_item.cumulative_occurrence_credit,
+                        'old_cumulative_occurrence_debit': trial_balance_item.cumulative_occurrence_debit,
+                        'old_cumulative_occurrence_credit': trial_balance_item.cumulative_occurrence_credit,
+                        'trial_balance_id': active_id
+                })
+        return res
+    
+    @api.multi
+    def update_cumulative_occurrence(self):
+        parent_accounts =[]
+        account = self.trial_balance_id.subject_name_id
+        while account :
+            account = account.parent_id
+            parent_accounts.append(account)
+
+        self.trial_balance_id.cumulative_occurrence_debit  = self.cumulative_occurrence_debit
+        self.trial_balance_id.cumulative_occurrence_credit  = self.cumulative_occurrence_credit
+        diff_cumulative_occurrence_debit = self.cumulative_occurrence_debit - self.old_cumulative_occurrence_debit
+        diff_cumulative_occurrence_credit = self.cumulative_occurrence_credit - self.old_cumulative_occurrence_credit
+        for account in parent_accounts:
+            trial_balance_ids = self.env['trial.balance'].search( [ ('subject_name_id', '=', account.id), ('period_id', '=', self.trial_balance_id.period_id.id)])
+            for trial_balance_id in trial_balance_ids:
+                trial_balance_id.write({'cumulative_occurrence_debit' : trial_balance_id.cumulative_occurrence_debit +diff_cumulative_occurrence_debit})
+                trial_balance_id.write({'cumulative_occurrence_credit':  trial_balance_id.cumulative_occurrence_credit + diff_cumulative_occurrence_credit})
+
+        view = self.env.ref('finance.init_balance_tree')
+        return {
+            'type': 'ir.actions.act_window',
+            'name': u'科目余额表：' + self.trial_balance_id.period_id.name,
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'trial.balance',
+            'target': 'current',
+            'view_id': False,
+            'views': [(view.id, 'tree')],
+            'domain': [('period_id', '=', self.trial_balance_id.period_id.id)]
+        }
 
 class CreateTrialBalanceWizard(models.TransientModel):
     """根据输入的期间 生成科目余额表的 向导 """
@@ -74,6 +173,12 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
     period_id = fields.Many2one(
         'finance.period', default=_default_period_id, string=u'会计期间', help=u'限定生成期间的范围')
+    has_transaction = fields.Boolean(
+        string=u'有发生额',
+    )
+    has_balance = fields.Boolean(
+        string=u'有余额',
+    )
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -107,16 +212,28 @@ class CreateTrialBalanceWizard(models.TransientModel):
         """取出本期发生额
             返回结果是 科目 借 贷
          """
-        sql = '''select vol.account_id as account_id,
-                    sum(vol.debit) as debit,
-                    sum(vol.credit) as credit
-                 from voucher as vo
-                 left join voucher_line as vol
-                 on vo.id = vol.voucher_id
-                 where vo.period_id=%s
-                 group by vol.account_id'''
-        self.env.cr.execute(sql, (period_id,))
-        return self.env.cr.dictfetchall()
+        # sql = '''select vol.account_id as account_id,
+        #             sum(vol.debit) as debit,
+        #             sum(vol.credit) as credit
+        #          from voucher as vo
+        #          left join voucher_line as vol
+        #          on vo.id = vol.voucher_id
+        #          where vo.period_id=%s
+        #          group by vol.account_id'''
+        # self.env.cr.execute(sql, (period_id,))
+        # return self.env.cr.dictfetchall()
+        self.ensure_one()
+        data = []
+        for account in self.env['finance.account'].search([]):
+            account_balance = account.get_balance(period_id)
+            data.append( {
+                'account_id':account.id,
+                'debit': account_balance.get('debit'),
+                'credit': account_balance.get('credit'),
+                'balance': account_balance.get('balance')
+                })
+
+        return data
 
     @api.multi
     def create_trial_balance(self):
@@ -171,6 +288,14 @@ class CreateTrialBalanceWizard(models.TransientModel):
         if self.period_id == self.period_id.get_init_period():
             view_id = self.env.ref('finance.init_balance_tree').id
 
+        context = {}
+        if self.has_balance and not self.has_transaction:
+            context.update({'search_default_has_balance': 1 })
+        elif not self.has_balance and self.has_transaction:
+            context.update({'search_default_has_transaction': 1})
+        elif self.has_balance and self.has_transaction:
+            context.update({'search_default_has_balance': 1, 'search_default_has_transaction': 1 })
+
         return {
             'type': 'ir.actions.act_window',
             'name': u'科目余额表：' + self.period_id.name,
@@ -179,6 +304,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
             'res_model': 'trial.balance',
             'target': 'current',
             'view_id': False,
+            'context': context,
             'views': [(view_id, 'tree')],
             'domain': [('id', 'in', trial_balance_ids)]
         }
@@ -488,7 +614,18 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code),
                                                           ('code', '<=', self.subject_name_end_id.code)])
-        for account_line in subject_ids:
+        account_ids = []
+        for subject_id in subject_ids:
+            child_subject_ids = self.env['finance.account'].search([('id', 'child_of', subject_id.id)])
+            account_ids.extend(child_subject_ids)
+
+        new_account_ids =[]
+
+        for account in account_ids:
+            if account not in new_account_ids:
+                new_account_ids.append(account)
+
+        for account_line in new_account_ids:
             local_last_period = last_period
             local_currcy_period = self.period_begin_id
             break_flag = True
@@ -563,8 +700,19 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         # period_end = self.env['create.trial.balance.wizard'].compute_next_period_id(self.period_end_id)
         vouchers_summary_ids = []
         subject_ids = self.env['finance.account'].search([('code', '>=', self.subject_name_id.code),
-                                                          ('code', '<=', self.subject_name_end_id.code)])
-        for account_line in subject_ids:
+                                                         ('code', '<=', self.subject_name_end_id.code)])
+        account_ids = []
+        for subject_id in subject_ids:
+            child_subject_ids = self.env['finance.account'].search([('id', 'child_of', subject_id.id)])
+            account_ids.extend(child_subject_ids)
+
+        new_account_ids =[]
+
+        for account in account_ids:
+            if account not in new_account_ids:
+                new_account_ids.append(account)
+
+        for account_line in new_account_ids:
             local_last_period = last_period
             local_currcy_period = self.period_begin_id
             break_flag = True
