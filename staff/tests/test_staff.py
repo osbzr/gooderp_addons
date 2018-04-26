@@ -17,6 +17,8 @@ class TestStaff(TransactionCase):
             'work_phone': 12345678901,
             'work_email': 'lucy@osbzr.com',
             'name': 'Lucy',
+            'code': 'lucy',
+            'type': 'member',
             'user_id': user_lucy.id,
             'job_id': self.env.ref('staff.staff_job_1').id})
         staff_pro.onchange_job_id()
@@ -71,6 +73,8 @@ class TestStaffDepartment(TransactionCase):
         department_1 = self.env.ref('staff.department_1')
         department_2 = self.env['staff.department'].create({
             'name': '财务部',
+            'code': 'dep_finance',
+            'type': 'department',
             'parent_id': department_1.id,
         })
         with self.assertRaises(ValidationError):
