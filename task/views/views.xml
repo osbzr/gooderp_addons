@@ -314,57 +314,44 @@
                 </search>
             </field>
         </record>
+		<!-- timeline Form View -->
+		<record id="timeline_form" model="ir.ui.view">
+			<field name="name">timeline.form</field>
+			<field name="model">timeline</field>
+			<field name="arch" type="xml">
+				<form string="timeline" class="oe_form_nomargin o_note_form_view">
+					<sheet>
+						<field name="task_id" placeholder="任务"/>
+						<field name="hours" placeholder="小时数" />
+						<field name="just_done" placeholder="具体内容"/>
+					</sheet>
+				</form>
+			</field>
+		</record>
 		<record id="timeline_kanban" model="ir.ui.view">
 			<field name="name">timeline.kanban</field>
 			<field name="model">timeline</field>
 			<field name="arch" type="xml">
 				<kanban class="o_kanban_mobile">
-					<field name='task_id'/>
-					<field name='project_id'/>
-					<field name='just_done'/>
-					<field name='hours' groups='task.group_task_hours'/>
-					<field name="create_uid" string='创建人'/>
 					<field name='color'/>
 					<templates>
 						<t t-name="kanban-box">
 							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click_edit">
-								<div class="oe_dropdown_kanban">
-
-								  <!-- dropdown menu -->
-								  <span class="oe_dropdown_toggle">
-									<ul class="oe_dropdown_menu">
-									  <li><a type="delete">Delete</a></li>
-									  <li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
+								<div class="o_dropdown_kanban dropdown">
+									<a class="dropdown-toggle btn" data-toggle="dropdown" href="#" >
+										<span class="fa fa-bars fa-lg"/>
+									</a>
+									<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+										<li><a type="delete">删除</a></li>
+										<li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
 									</ul>
-								  </span>
 								</div>
-								<!--<div class="oe_dropdown_toggle oe_dropdown_kanban">-->
-                                    <!--<span class="oe_e">í</span>-->
-                                    <!--<ul class="oe_dropdown_menu">-->
-                                        <!--<t t-if="widget.view.is_action_enabled('edit')"><li><a type="edit">Edit...</a></li></t>-->
-                                        <!--<t t-if="widget.view.is_action_enabled('delete')"><li><a type="delete">Delete</a></li></t>-->
-                                        <!--<li><ul class="oe_kanban_colorpicker" data-field="color"/></li>-->
-                                    <!--</ul>-->
-                                <!--</div>-->
-								<ul class="oe_kanban_colorpicker" data-field="color"/>
-								<div class="o_kanban_image">
-                                    <t>
-                                        <img t-att-src="kanban_image('res.users', 'image_small', record.create_uid.raw_value)"/>
-                                    </t>
-                                    <p>
-										<t t-esc="record.create_uid.value"/>
-									</p>
-                                </div>
-                                <div class="oe_kanban_details">
-									<p>
-										<t t-esc="record.project_id.value"/>
-										<t t-esc="record.task_id.value"/>
-										<t t-esc="record.just_done.value"/>
-										<div groups='task.group_task_hours'>
-											<t t-esc="record.hours.value"/>
-										</div>
-									</p>
-								</div>
+								<span t-attf-class="oe_kanban_content">
+									<field name="just_done"/>
+									<div groups='task.group_task_hours'>
+										<field name="hours"/>
+									</div>
+								</span>
 							</div>
 						</t>
 					</templates>
