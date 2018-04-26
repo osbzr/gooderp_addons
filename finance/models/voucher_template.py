@@ -6,7 +6,7 @@ class VoucherTemplate(models.Model):
     _name = 'voucher.template'
     _description = u'凭证模板'
 
-    name = fields.Char(u'模板名称')
+    name = fields.Char(u'模板名称', required=True)
     line_ids = fields.One2many(
         'voucher.template.line', 'template_id', string='模板行')
     company_id = fields.Many2one(
