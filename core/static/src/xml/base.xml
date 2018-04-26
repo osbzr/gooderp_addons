@@ -57,7 +57,7 @@
                             ><div>
                             <t t-if="column.tag !== 'button'"  ><t t-raw="column.heading()"/></t>
                         </div></th>
-                         <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' "   rowspan="1" colspan="2" style='text-align:center;'><div>
+                         <th t-if="!column.meta and column.invisible !== '1' and column.merge=='False' "   rowspan="1" t-att-colspan="column.colspan" style='text-align:center;'><div>
                             <t t-if="column.tag !== 'button'"  ><t t-esc="column.base_string"/></t>
                         </div></th>
                     </t>
