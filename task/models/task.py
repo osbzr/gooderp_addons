@@ -317,6 +317,9 @@ class Timesheet(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )
+    color = fields.Integer('Color Index',
+                           default=0)
+
     _sql_constraints = [
         ('user_uniq', 'unique(user_id,date)', '同一个人一天只能创建一个工作日志')
     ]
