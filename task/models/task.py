@@ -261,10 +261,11 @@ class TaskStatus(models.Model):
     _description = u'任务阶段'
     _order = 'sequence, id'
 
-    name = fields.Char(u'名称')
+    name = fields.Char(u'名称', required=True)
     state = fields.Selection(TASK_STATES,
                              string=u'任务状态',
                              index=True,
+                             required=True,
                              default='doing')
     sequence = fields.Integer(u'顺序')
     company_id = fields.Many2one(
@@ -317,6 +318,9 @@ class Timesheet(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )
+    color = fields.Integer('Color Index',
+                           default=0)
+
     _sql_constraints = [
         ('user_uniq', 'unique(user_id,date)', '同一个人一天只能创建一个工作日志')
     ]
@@ -389,6 +393,8 @@ class Timeline(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )
+    color = fields.Integer('Color Index',
+                           default=0)
 
     @api.model
     def create(self, vals):

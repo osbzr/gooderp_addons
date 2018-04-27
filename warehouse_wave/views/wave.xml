@@ -114,7 +114,7 @@
 				</group>
 				<footer>
 					<button name="button_print" string="打印" type="object" class="oe_highlight"/>
-					or <button string="取消" class="oe_link" special="cancel"/>
+					或者 <button string="取消" class="oe_link" special="cancel"/>
 				</footer>
             </form>
         </field>

@@ -24,7 +24,7 @@
                         </group>
                         <footer>
                             <button name="button_ok" type="object" string="确定" class="oe_highlight"/>
-                            or
+                            或者
                             <button string="取消" class="oe_link" special="cancel"/>
                         </footer>
                     </group>

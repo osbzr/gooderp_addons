@@ -3,6 +3,7 @@ from odoo import api, fields, models, tools
 from odoo.exceptions import UserError
 import os
 from odoo.tools import misc
+import re
 # 成本计算方法，已实现 先入先出
 
 CORE_COST_METHOD = [('average', u'全月一次加权平均法'),
@@ -13,6 +14,16 @@ CORE_COST_METHOD = [('average', u'全月一次加权平均法'),
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
+
+    @api.one
+    @api.constrains('email')
+    def _check_email(self):
+        ''' 验证 email 合法性 '''
+        if self.email:
+            res = re.match('^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$', self.email)
+            if not res:
+                raise UserError(u'请检查邮箱格式是否正确: %s' % self.email)
+
     start_date = fields.Date(u'启用日期',
                              required=True,
                              default=lambda self: fields.Date.context_today(self))
