@@ -407,6 +407,9 @@ class BuyReceipt(models.Model):
             self._make_payment(invoice_id, amount, this_reconcile)
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id and not self.modifying:
+            # 如果已退货也已退款，不生成新的分单
+            if self.is_return and self.payment:
+                return True
             return self.order_id.buy_generate_receipt()
 
     @api.one
