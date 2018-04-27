@@ -49,7 +49,7 @@ class ReportTemplate(models.Model):
     file_address = fields.Char(u'模板文件路径',required=True)
     active = fields.Boolean(u'可用', default=True)
     blank_rows = fields.Integer(u'空白行数',required=True)
-    header_rows = fields.Integer(u'表头行数',required=True)
+    header_rows = fields.Integer(u'表头行数')
 
     @api.model
     def get_time(self, model):
