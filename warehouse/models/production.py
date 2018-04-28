@@ -1489,6 +1489,7 @@ class WhBom(osv.osv):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+    goods_id = fields.Many2one('goods', related='line_parent_ids.goods_id', string=u'组合商品')
 
 
 class WhBomLine(osv.osv):
