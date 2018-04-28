@@ -232,8 +232,8 @@ class CreateWave(models.TransientModel):
             available_locs = self.env['location'].search([('goods_id', '=', WaveLine.goods_id.id),
                                                           ('attribute_id', '=',
                                                            WaveLine.attribute_id.id),
-                                                          ('warehouse_id', '=', warehouse_id)])
-
+                                                          ('warehouse_id', '=', warehouse_id),
+                                                          ('current_qty', '!=', 0)])
             remaining_picking_qty = WaveLine.picking_qty
             for loc in available_locs:
                 if remaining_picking_qty < 0:
