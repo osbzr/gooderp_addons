@@ -51,12 +51,22 @@
 				<kanban class="o_kanban_mobile">
 					<field name="date"/>
 					<field name="user_id"/>
+					<field name="color"/>
 					<templates>
 						<t t-name="kanban-box">
-							<div t-attf-class="oe_kanban_card oe_kanban_global_click">
+							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+								<ul class="oe_kanban_colorpicker" data-field="color"/>
+								<div class="o_kanban_image">
+                                    <t>
+                                        <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)"/>
+                                    </t>
+                                    <p>
+										<t t-esc="record.user_id.value"/>
+									</p>
+                                </div>
 								<p>
 									<t t-esc="record.date.value"/>
-									<t t-esc="record.user_id.value"/>
+									<!--<t t-esc="record.user_id.value"/>-->
 								</p>
 							</div>
 						</t>
@@ -207,7 +217,7 @@
 					<field name="priority"/>
 					<templates>
 						<t t-name="kanban-box">
-							<div t-attf-class="oe_kanban_card oe_kanban_global_click">
+							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
 								<ul class="oe_kanban_colorpicker" data-field="color"/>
 								<div class="o_kanban_image">
                                     <t>
@@ -314,6 +324,51 @@
                 </search>
             </field>
         </record>
+		<!-- timeline Form View -->
+		<record id="timeline_form" model="ir.ui.view">
+			<field name="name">timeline.form</field>
+			<field name="model">timeline</field>
+			<field name="arch" type="xml">
+				<form string="timeline" class="oe_form_nomargin o_note_form_view">
+					<sheet>
+						<field name="timesheet_id" placeholder="今日工作日志" domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+						<field name="task_id" placeholder="任务" domain="[('user_id', 'in', [uid, False]),('status.state', '!=', 'done')]"/>
+						<field name="hours" placeholder="小时数" />
+						<field name="just_done" placeholder="具体内容"/>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record id="timeline_kanban" model="ir.ui.view">
+			<field name="name">timeline.kanban</field>
+			<field name="model">timeline</field>
+			<field name="arch" type="xml">
+				<kanban class="o_kanban_mobile">
+					<field name='color'/>
+					<templates>
+						<t t-name="kanban-box">
+							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click_edit">
+								<div class="o_dropdown_kanban dropdown">
+									<a class="dropdown-toggle btn" data-toggle="dropdown" href="#" >
+										<span class="fa fa-bars fa-lg"/>
+									</a>
+									<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+										<li><a type="delete">删除</a></li>
+										<li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
+									</ul>
+								</div>
+								<span t-attf-class="oe_kanban_content">
+									<field name="just_done"/>
+									<div groups='task.group_task_hours'>
+										<field name="hours"/>
+									</div>
+								</span>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
 		<record model="ir.ui.view" id="task_status_tree">
 			<field name="name">任务阶段</field>
 			<field name="model">task.status</field>
@@ -432,7 +487,7 @@
 		<record model="ir.actions.act_window" id="action_timeline">
 			<field name="name">工作日志</field>
 			<field name="res_model">timeline</field>
-			<field name="view_mode">tree,pivot</field>
+			<field name="view_mode">kanban,tree,pivot</field>
 			<field name="context">{'search_default_today_timeline': 1}</field>
 		</record>
 		<record model="ir.actions.act_window" id="action_timesheet_today">
@@ -442,6 +497,15 @@
 			<field name="domain">[('date', '=', context_today().strftime('%Y-%m-%d')),('user_id', '=', uid)]</field>
 			<field name="help" type="html">
 				<p class="oe_view_nocontent_create">点击创建今日的工作日志</p>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="action_timeline_today">
+			<field name="name">今日工作记录</field>
+			<field name="res_model">timeline</field>
+			<field name="view_mode">kanban,tree,form</field>
+			<field name="domain">[('timesheet_id.date', '=', context_today().strftime('%Y-%m-%d')),('timesheet_id.user_id', '=', uid)]</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">点击创建今日的工作记录</p>
 			</field>
 		</record>
 		<record model="ir.actions.act_window" id="action_task_status">
@@ -456,6 +520,8 @@
 		groups='task.group_task'/>
 		<menuitem name="今日" id="menu_timesheet" parent="menu_task_root"
 		action="action_timesheet_today" sequence='1'/>
+		<menuitem name="今日工作记录" id="menu_timeline" parent="menu_task_root"
+		action="action_timeline_today" sequence='3'/>
 		<menuitem name="主数据" id="menu_task_data" parent="menu_task_root" sequence='5'/>
 		<menuitem name="任务" id="menu_task" parent="menu_task_data"
 		action="action_task" sequence='1'/>

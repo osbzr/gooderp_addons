@@ -17,6 +17,7 @@
                     <field name="model_id"/>
                     <field name="file_address"/>
                     <field name="blank_rows"/>
+                    <field name="header_rows"/>
                     <field name="active" />
                 </tree>
             </field>

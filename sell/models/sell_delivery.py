@@ -473,6 +473,9 @@ class SellDelivery(models.Model):
 
             # 生成分拆单 FIXME:无法跳转到新生成的分单
             if record.order_id and not record.modifying:
+                # 如果已退货也已退款，不生成新的分单
+                if record.is_return and record.receipt:
+                    return True
                 return record.order_id.sell_generate_delivery()
 
     @api.one
