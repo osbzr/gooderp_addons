@@ -69,6 +69,7 @@
             <field name="model">finance.account</field>
             <field name="arch" type="xml">
                 <tree editable="top" string="科目" decoration-info="account_type == 'view'" create="0">
+                    <button name="button_add_child" string="增加下级科目" type="object" class="oe_highlight" invisible="context.get('hide_button',True)"/>
                     <field name="code"/>
                     <field name="name"/>
                     <field name="costs_types" invisible="1"/>
@@ -105,7 +106,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
-            <field name="context">{'modify_from_webclient':True}</field>
+            <field name="context">{'modify_from_webclient':True, 'hide_button':False}</field>
         </record>
 
         <menuitem id='finance_account_menu' action='finance_account_action' parent='finance_setting_menu' sequence='20'/>
@@ -186,11 +187,12 @@
                             <field name="full_account_code" readonly="1"/>
                             <field name="account_name" />
                             <field name="account_type" invisible="1"/>
+                            <field name="has_journal_items" invisible="1"/>
                         </group>
                     </group>
                     <footer>
-                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" confirm="新增下级科目，上级科目现有的记账凭证，将会被转入新增的下级科目!" attrs="{ 'invisible': [('account_type','=','view')]   }"/>
-                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" attrs="{ 'invisible': [('account_type','=','normal')]   }"/>
+                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" confirm="新增下级科目，上级科目现有的记账凭证，将会被转入新增的下级科目!" attrs="{ 'invisible': [('has_journal_items','=', False)]   }"/>
+                            <button name="create_account" string="创建科目" type="object" class="oe_highlight" attrs="{ 'invisible': [('has_journal_items','=',True)]   }"/>
                             或者
                             <button string="取消" special="cancel" class="oe_link"/>
                         </footer>
@@ -217,6 +219,8 @@
             <field name="key">action</field>
             <field name="model">finance.account</field>
         </record>
+
+        <delete id="validate_account_move_line_values" model="ir.values"/>
 
         <!--辅助核算-->
         <record id="auxiliary_financing_tree" model="ir.ui.view">
