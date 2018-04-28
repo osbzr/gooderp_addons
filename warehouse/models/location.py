@@ -8,7 +8,8 @@ class Location(models.Model):
     _description = u'货位'
     _order = 'name'
 
-    @api.multi
+    @api.one
+    @api.depends('goods_id', 'attribute_id')
     def _get_current_qty(self):
         # 获取当前 库位 的商品数量
         for Location in self:
