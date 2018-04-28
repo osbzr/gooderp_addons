@@ -35,7 +35,8 @@ class Location(models.Model):
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
                                    help=u'商品的属性')
     current_qty = fields.Integer(u'数量',
-                                 compute='_get_current_qty')
+                                 compute='_get_current_qty',
+                                 store=True)
 
     _sql_constraints = [
         ('wh_loc_uniq', 'unique(warehouse_id, name)', u'同仓库库位不能重名')
