@@ -242,14 +242,21 @@
             <field name="model">staff.job</field>
             <field name="arch" type="xml">
                 <form string="职位">
-                	<group>
-                		<field name='name'/>
-                        <field name='department_id'/>
-                		<field name='account_id'/>
-                	</group>
-                	<group>
-                		<field name='note' placeholder='描述...'/>
-                	</group>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name" placeholder="e.g. Sales Manager"/></h1>
+                        </div>
+                        <group name="staff_data">
+                            <group>
+                                <field name='department_id'/>
+                                <field name='account_id'/>
+                            </group>
+                        </group>
+                        <label for="note"/>
+                        <field name='note' placeholder='描述...'/>
+                    </sheet>
                 </form>
             </field>
         </record>

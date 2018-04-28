@@ -15,33 +15,6 @@ AVAILABLE_PRIORITIES = [
 ]
 
 
-# class hire_stage(models.Model):
-#     _name = "hire.stage"
-#     _description = "Stage of Recruitment"
-#     _order = 'sequence'
-#
-#     name = fields.Char(u"阶段名称", required=True)
-#     sequence = fields.Integer(
-#         u"顺序", default=10,
-#         help=u"阶段列表上的显示顺序")
-#     job_id = fields.Many2one('staff.job', string=u'工作职称',
-#                              ondelete='cascade',
-#                              help=u'使用这个阶段的具体工作,其他工作将不会使用这个阶段。')
-#     requirements = fields.Text(u"要求")
-#     template_id = fields.Many2one(
-#         'mail.template', "Use template",
-#         help="If set, a message is posted on the applicant using the template when the applicant is set to the stage.")
-#     fold = fields.Boolean(
-#         u"折叠",
-#         help="This stage is folded in the kanban view when there are no records in that stage to display.")
-#
-#     @api.model
-#     def default_get(self, fields):
-#         if self._context and self._context.get('default_job_id') and not self._context.get('hr_recruitment_stage_mono', False):
-#             context = dict(self._context)
-#             context.pop('default_job_id')
-#             self = self.with_context(context)
-#         return super(hire_stage, self).default_get(fields)
 class RecruitmentSource(models.Model):
     _name = "hr.recruitment.source"
     _description = "Source of Applicants"

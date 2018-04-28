@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 上海开阖软件 ((http:www.osbzr.com).)
+# Copyright 2018 上海开阖软件 ((http://www.osbzr.com).)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
@@ -16,12 +16,16 @@
     ],
     # always loaded
     'data': [
+        'data/hire_data.xml',
         'views/hire_view.xml',
+        'views/hire_config_settings_view.xml',
         'views/staff_job_view.xml',
+        'views/staff_department_view.xml',
+        'report/hire_report_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
     ],
     'installable': True,
-    'application': False,
+    'application': True,
 }
