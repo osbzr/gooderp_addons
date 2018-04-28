@@ -6,18 +6,18 @@
             <field name="name">trial.balance.form</field>
             <field name="model">trial.balance</field>
             <field name="arch" type="xml">
-                <tree string="科目余额表" decoration-info="account_type == 'view'" editable="TOP">
+                <tree string="科目余额表" decoration-info="account_type == 'view'" editable="TOP" default_order='subject_name_id'>
                     <field name="period_id" readonly="1"/>
                     <field name="subject_code" invisible="1"/>
                     <field name="subject_name_id" readonly="1"/>
                     <field name="level" invisible="1"/>
                     <field name="account_type" invisible="1"/>
-                    <field name="initial_balance_debit" sum="合计" base_string='期初余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
-                    <field name="initial_balance_credit" sum="合计"  merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
-                    <field name="current_occurrence_debit" sum="合计" base_string='本期发生' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
-                    <field name="current_occurrence_credit" sum="合计" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
-                    <field name="ending_balance_debit" sum="合计"    base_string='期末余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
-                    <field name="ending_balance_credit" sum="合计" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
+                    <field name="initial_balance_debit" base_string='期初余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
+                    <field name="initial_balance_credit" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
+                    <field name="current_occurrence_debit" base_string='本期发生' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
+                    <field name="current_occurrence_credit" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
+                    <field name="ending_balance_debit" base_string='期末余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
+                    <field name="ending_balance_credit" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
           		</tree>
             </field>
         </record>
@@ -26,7 +26,7 @@
             <field name="name">initial.balance.form</field>
             <field name="model">trial.balance</field>
             <field name="arch" type="xml">
-                <tree string="科目余额表" decoration-info="account_type == 'view'" editable="TOP">
+                <tree string="科目余额表" decoration-info="account_type == 'view'" editable="TOP" default_order='subject_name_id'>
                     <button name="button_change_number" string="调整累计数" type="object" class="oe_highlight" attrs="{ 'invisible': [('account_type','=','view')] }" />
                 	<field name="period_id" readonly="1"/>
                     <field name="subject_code" invisible="1"/>
