@@ -6,6 +6,8 @@ from odoo.exceptions import UserError
 class Wave(models.Model):
     _name = "wave"
     _description = u"拣货单"
+    _order = 'create_date desc'
+
     state = fields.Selection([('draft', '未打印'), ('printed', '已打印'),
                               ('done', '已完成')], string='状态', default='draft',
                              index=True,
