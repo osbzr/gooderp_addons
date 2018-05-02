@@ -516,13 +516,15 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     @api.multi
     def get_current_occurrence_amount(self, period, subject_name):
         """计算出 本期的科目的 voucher_line的明细记录 """
+        child_ids = self.env['finance.account'].search([('id','child_of',subject_name.id)])
+        account_ids = tuple(child_ids.ids)
         sql = ''' select vo.date as date, vo.id as voucher_id,COALESCE(vol.debit,0) as debit,vol.name
                   as summary,COALESCE(vol.credit,0) as credit
                   from voucher as vo left join voucher_line as vol
-                  on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id=%s
+                  on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id in %s
                   order by vo.name
                  '''
-        self.env.cr.execute(sql, (period.id, subject_name.id))
+        self.env.cr.execute(sql, (period.id, account_ids))
         sql_results = self.env.cr.dictfetchall()
         last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(
             period)
@@ -550,11 +552,13 @@ class CreateVouchersSummaryWizard(models.TransientModel):
     def get_unclose_year_balance(self, initial_balance_new, period, subject_name):
         """取得没有关闭的期间的 本期合计和 本年累计"""
         current_occurrence = {}
+        child_ids = self.env['finance.account'].search([('id','child_of',subject_name.id)])
+        account_ids = tuple(child_ids.ids)
         sql = ''' select  sum(COALESCE(vol.debit,0)) as debit,sum(COALESCE(vol.credit,0)) as credit
          from voucher as vo left join voucher_line as vol
-            on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id=%s
+            on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id in %s
                  group by vol.account_id'''
-        self.env.cr.execute(sql, (period.id, subject_name.id))
+        self.env.cr.execute(sql, (period.id, account_ids))
         sql_results = self.env.cr.dictfetchall()
         current_credit = 0
         current_debit = 0
@@ -569,9 +573,9 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         for line_period in compute_periods:
             sql = ''' select  sum(COALESCE(vol.debit,0)) as debit,sum(COALESCE(vol.credit,0)) as credit
              from voucher as vo left join voucher_line as vol
-                on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id=%s
+                on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id in %s
                      group by vol.account_id'''
-            self.env.cr.execute(sql, (line_period.id, subject_name.id))
+            self.env.cr.execute(sql, (line_period.id, account_ids))
             sql_results = self.env.cr.dictfetchall()
             if sql_results:
                 year_balance_debit = year_balance_debit + \
