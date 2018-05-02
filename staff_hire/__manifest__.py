@@ -18,14 +18,13 @@
     'data': [
         'data/hire_data.xml',
         'views/hire_view.xml',
-        'views/hire_config_settings_view.xml',
         'views/staff_job_view.xml',
-        'views/staff_department_view.xml',
+        # 'views/staff_department_view.xml',
         'report/hire_report_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
     ],
     'installable': True,
-    'application': True,
+    'application': False,
 }

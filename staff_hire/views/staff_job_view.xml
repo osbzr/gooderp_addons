@@ -2,7 +2,7 @@
 
     <record model="ir.actions.act_window" id="action_staff_job_new_application">
         <field name="name">New Application</field>
-        <field name="res_model">hr.applicant</field>
+        <field name="res_model">hire.applicant</field>
         <field name="view_type">form</field>
         <field name="view_mode">form</field>
         <field name="context">{'search_default_job_id': [active_id], 'default_job_id': active_id}</field>
@@ -48,7 +48,7 @@
                                             <div t-if="record.document_ids.raw_value.length > 0" class="row">
                                                 <div class="col-xs-9">
                                                     <a name="action_get_attachment_tree_view" type="object">
-                                                        Document(s)
+                                                        文档
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-3">
@@ -58,7 +58,7 @@
 
                                             <div class="row" name="recruitment">
                                                 <div class="col-xs-12">
-                                                    <a t-if="record.state.raw_value == 'recruit'" name="set_open" type="object">Recruitment Done</a>
+                                                    <a t-if="record.state.raw_value == 'recruit'" name="set_open" type="object">招聘结束</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -72,7 +72,7 @@
                                 <t t-if="record.state.raw_value == 'open'">
                                     <div class="row">
                                         <div class="col-xs-12 o_kanban_primary_left">
-                                            <button class="btn btn-primary" name="set_recruit" type="object">Start Recruitment</button>
+                                            <button class="btn btn-primary" name="set_recruit" type="object">开始招聘</button>
                                         </div>
                                     </div>
                                 </t>
@@ -80,7 +80,7 @@
                                 <div class="row">
                                     <div class="col-xs-4 o_kanban_card_manage_section o_kanban_manage_view">
                                         <div class="o_kanban_card_manage_title">
-                                            <span>View</span>
+                                            <span>查看</span>
                                         </div>
 
                                         <div>
@@ -92,7 +92,7 @@
                                     </div>
                                     <div class="col-xs-4 o_kanban_card_manage_section o_kanban_manage_new">
                                         <div class="o_kanban_card_manage_title">
-                                            <span>New</span>
+                                            <span>新建</span>
                                         </div>
 
                                         <div>
@@ -101,7 +101,7 @@
                                     </div>
                                     <div class="col-xs-4 o_kanban_card_manage_section o_kanban_manage_reports">
                                         <div class="o_kanban_card_manage_title">
-                                            <span>Reports</span>
+                                            <span>报表</span>
                                         </div>
 
                                     </div>
@@ -112,7 +112,7 @@
                                         <ul class="oe_kanban_colorpicker" data-field="color"/>
                                     </div>
                                     <div class="col-xs-4 text-right">
-                                        <a type="edit">Settings</a>
+                                        <a type="edit">设置</a>
                                     </div>
                                 </div>
                             </div>

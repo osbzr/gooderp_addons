@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <odoo>
-<data noupdate="1">
+<data noupdate="0">
         <!-- notify all employees of module installation -->
         <record model="mail.message" id="module_install_notification">
             <field name="model">mail.channel</field>
@@ -22,9 +22,9 @@
         <field name="name">Applicant: Refuse</field>
         <field name="subject">Application refused</field>
         <field name="email_to">${object.email_from | safe}</field>
-        <field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>
+        <!--<field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>-->
         <field name="lang">${object.partner_id and object.partner_id.lang or ''}</field>
-        <field name="model_id" ref="staff_hire.model_hr_applicant"/>
+        <field name="model_id" ref="staff_hire.model_hire_applicant"/>
         <field name="user_signature" eval="False"/>
         <field name="body_html"><![CDATA[
 <p>Dear ${object.partner_name or 'applicant'},</p>
@@ -38,9 +38,9 @@ Unfortunately, your profile does not match with our needs</p>
         <field name="name">Applicant: Interest</field>
         <field name="subject">Application approved</field>
         <field name="email_to">${object.email_from | safe}</field>
-        <field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>
-        <field name="lang">${object.partner_id and object.partner_id.lang or ''}</field>
-        <field name="model_id" ref="staff_hire.model_hr_applicant"/>
+        <!--<field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>-->
+        <!--<field name="lang">${object.partner_id and object.partner_id.lang or ''}</field>-->
+        <field name="model_id" ref="staff_hire.model_hire_applicant"/>
         <field name="user_signature" eval="False"/>
         <field name="body_html"><![CDATA[
 <p>Dear ${object.partner_name or 'applicant'},</p>
@@ -68,26 +68,26 @@ joining us as a ${object.job_id.name}
 
         <!--    Resource(type_id)        -->
 
-    <record model="hr.recruitment.degree" id="degree_graduate">
+    <record model="staff.hire.degree" id="degree_graduate">
         <field name="name">Graduate</field>
         <field name="sequence">1</field>
     </record>
-    <record model="hr.recruitment.degree" id="degree_bachelor">
+    <record model="staff.hire.degree" id="degree_bachelor">
         <field name="name">Bachelor Degree</field>
         <field name="sequence">2</field>
     </record>
-    <record model="hr.recruitment.degree" id="degree_licenced">
+    <record model="staff.hire.degree" id="degree_licenced">
         <field name="name">Master Degree</field>
         <field name="sequence">3</field>
     </record>
-    <record model="hr.recruitment.degree" id="degree_bac5">
+    <record model="staff.hire.degree" id="degree_bac5">
         <field name="name">Doctoral Degree</field>
         <field name="sequence">4</field>
     </record>
 
     <record id="mail_alias_jobs" model="mail.alias">
         <field name="alias_name">jobs</field>
-        <field name="alias_model_id" ref="model_hr_applicant"/>
+        <field name="alias_model_id" ref="model_hire_applicant"/>
         <field name="alias_user_id" ref="base.user_root"/>
         <field name="alias_parent_model_id" ref="model_staff_job"/>
     </record>
@@ -95,20 +95,20 @@ joining us as a ${object.job_id.name}
     <!-- Applicant-related subtypes for messaging / Chatter -->
     <record id="mt_applicant_new" model="mail.message.subtype">
         <field name="name">New Applicant</field>
-        <field name="res_model">hr.applicant</field>
+        <field name="res_model">hire.applicant</field>
         <field name="default" eval="False"/>
         <field name="hidden" eval="True"/>
         <field name="description">Applicant created</field>
     </record>
     <record id="mt_applicant_stage_changed" model="mail.message.subtype">
         <field name="name">Stage Changed</field>
-        <field name="res_model">hr.applicant</field>
+        <field name="res_model">hire.applicant</field>
         <field name="default" eval="False"/>
         <field name="description">Stage changed</field>
     </record>
     <record id="mt_applicant_hired" model="mail.message.subtype">
         <field name="name">Applicant Hired</field>
-        <field name="res_model">hr.applicant</field>
+        <field name="res_model">hire.applicant</field>
         <field name="default" eval="True"/>
         <field name="description">Applicant hired</field>
     </record>
@@ -145,17 +145,21 @@ joining us as a ${object.job_id.name}
     </record>
 
     <!-- Applicant Categories(Tag) -->
-    <record id="tag_applicant_reserve" model="hr.applicant.category">
-        <field name="name">Reserve</field>
+    <record id="tag_hire_applicant_reserve" model="core.value">
+        <field name="name">保留</field>
+        <field name="type">hire_categ</field>
     </record>
-    <record id="tag_applicant_manager" model="hr.applicant.category">
-        <field name="name">Manager</field>
+    <record id="tag_hire_applicant_manager" model="core.value">
+        <field name="name">经理</field>
+        <field name="type">hire_categ</field>
     </record>
-    <record id="tag_applicant_it" model="hr.applicant.category">
+    <record id="tag_hire_applicant_it" model="core.value">
         <field name="name">IT</field>
+        <field name="type">hire_categ</field>
     </record>
-    <record id="tag_applicant_sales" model="hr.applicant.category">
-        <field name="name">Sales</field>
+    <record id="tag_hire_applicant_sale" model="core.value">
+        <field name="name">销售</field>
+        <field name="type">hire_categ</field>
     </record>
     <!--<record model="utm.campaign" id="utm_campaign_job">-->
             <!--<field name="name">Job Campaign</field>-->

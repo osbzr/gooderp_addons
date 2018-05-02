@@ -7,15 +7,15 @@ class staff_department(models.Model):
     _inherit = 'staff.department'
 
     new_applicant_count = fields.Integer(
-        compute='_compute_new_applicant_count', string='New Applicant')
+        compute='_compute_new_applicant_count', string=u'新申请')
     new_hired_employee = fields.Integer(
-        compute='_compute_recruitment_stats', string='New Hired Employee')
+        compute='_compute_recruitment_stats', string=u'新雇佣的员工')
     expected_employee = fields.Integer(
-        compute='_compute_recruitment_stats', string='Expected Employee')
+        compute='_compute_recruitment_stats', string=u'预期的员工')
 
     @api.multi
     def _compute_new_applicant_count(self):
-        applicant_data = self.env['hr.applicant'].read_group(
+        applicant_data = self.env['hire.applicant'].read_group(
             [('department_id', 'in', self.ids), ('stage_id.sequence', '<=', '1')],
             ['department_id'], ['department_id'])
         result = dict((data['department_id'][0], data['department_id_count']) for data in applicant_data)

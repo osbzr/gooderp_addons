@@ -11,15 +11,15 @@ class staff(models.Model):
 
     @api.multi
     def _compute_newly_hired_staff(self):
-        read_group_result = self.env['hr.applicant'].read_group(
-            [('emp_id', 'in', self.ids), ('job_id.state', '=', 'recruit')],
-            ['emp_id'], ['emp_id'])
-        result = dict((data['emp_id'], data['emp_id_count'] > 0) for data in read_group_result)
+        read_group_result = self.env['hire.applicant'].read_group(
+            [('staff_id', 'in', self.ids), ('job_id.state', '=', 'recruit')],
+            ['staff_id'], ['staff_id'])
+        result = dict((data['staff_id'], data['staff_id_count'] > 0) for data in read_group_result)
         for record in self:
             record.newly_hired_staff = result.get(record.id, False)
 
     def _search_newly_hired_staff(self, operator, value):
-        applicants = self.env['hr.applicant'].search([('job_id.state', '=', 'recruit')])
+        applicants = self.env['hire.applicant'].search([('job_id.state', '=', 'recruit')])
         return [('id', 'in', applicants.ids)]
 
     # @api.multi

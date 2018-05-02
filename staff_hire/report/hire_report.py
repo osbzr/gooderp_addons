@@ -16,19 +16,18 @@ class staff_hire_report(models.Model):
     company_id = fields.Many2one('res.company', 'Company', readonly=True)
     date_create = fields.Datetime('Create Date', readonly=True)
     date_last_stage_update = fields.Datetime('Last Stage Update', readonly=True)
-    date_closed = fields.Date('Closed', readonly=True)
+    # date_closed = fields.Date('Closed', readonly=True)
     job_id = fields.Many2one('staff.job', 'Applied Job', readonly=True)
-    stage_id = fields.Many2one('hr.recruitment.stage', 'Stage')
-    type_id = fields.Many2one('hr.recruitment.degree', 'Degree')
+    stage_id = fields.Many2one('staff.hire.stage', 'Stage')
+    type_id = fields.Many2one('staff.hire.degree', 'Degree')
     department_id = fields.Many2one('staff.department', 'Department', readonly=True)
     priority = fields.Selection(staff_hire.AVAILABLE_PRIORITIES, 'Appreciation')
     salary_prop = fields.Float("Salary Proposed", digits=0)
     salary_prop_avg = fields.Float("Avg. Proposed Salary", group_operator="avg", digits=0)
     salary_exp = fields.Float("Salary Expected", digits=0)
     salary_exp_avg = fields.Float("Avg. Expected Salary", group_operator="avg", digits=0)
-    partner_id = fields.Many2one('partner', 'Partner', readonly=True)
     delay_close = fields.Float('Avg. Delay to Close', digits=(16, 2), readonly=True, group_operator="avg", help="Number of Days to close the project issue")
-    last_stage_id = fields.Many2one('hr.recruitment.stage', 'Last Stage')
+    last_stage_id = fields.Many2one('staff.hire.stage', 'Last Stage')
     # medium_id = fields.Many2one('utm.medium', 'Medium', readonly=True, help="This is the method of delivery. Ex: Postcard, Email, or Banner Ad")
     # source_id = fields.Many2one('utm.source', 'Source', readonly=True, help="This is the source of the link Ex: Search Engine, another domain, or name of email list")
 
@@ -41,9 +40,7 @@ class staff_hire_report(models.Model):
                      min(s.id) as id,
                      s.active,
                      s.create_date as date_create,
-                     date(s.date_closed) as date_closed,
                      s.date_last_stage_update as date_last_stage_update,
-                     s.partner_id,
                      s.company_id,
                      s.user_id,
                      s.job_id,
@@ -58,15 +55,12 @@ class staff_hire_report(models.Model):
                      (sum(salary_expected)/count(*)) as salary_exp_avg,
                      extract('epoch' from (s.write_date-s.create_date))/(3600*24) as delay_close,
                      count(*) as nbr
-                 from hr_applicant s
+                 from hire_applicant s
                  group by
                      s.active,
-                     s.date_open,
                      s.create_date,
                      s.write_date,
-                     s.date_closed,
                      s.date_last_stage_update,
-                     s.partner_id,
                      s.company_id,
                      s.user_id,
                      s.stage_id,

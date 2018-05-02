@@ -65,7 +65,7 @@
                     <field name="stage_id"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="date_create"/>
-                    <field name="date_closed"/>
+                    <!--<field name="date_closed"/>-->
                 </group>
                 <group expand="1" string="Group By">
                    <filter string="Responsible" name='User' context="{'group_by':'user_id'}"/>
@@ -88,8 +88,7 @@
         <field name="search_view_id" ref="view_staff_hire_report_search"/>
         <field name="context">{}</field>  <!-- force empty -->
     </record>
-    <menuitem name="Reports" id="report_staff_hire" parent="menu_staff_hire_root"
-    sequence="99" action="action_staff_hire_report_all"/>
+
     <record id="action_staff_hire_report_filtered_department" model="ir.actions.act_window">
         <field name="name">Recruitment Analysis</field>
         <field name="res_model">staff.hire.report</field>
@@ -113,6 +112,11 @@
             'default_job_id': active_id}
         </field>
     </record>
+
+    <menuitem id="menu_report" name="报表" groups="staff.hr_senior_groups"
+              parent="staff.menu_staff_root"/>
+    <menuitem id="report_staff_hire" name="招聘分析" parent="menu_report"
+              sequence="1" action="action_staff_hire_report_all"/>
 
 </data>
 </odoo>
