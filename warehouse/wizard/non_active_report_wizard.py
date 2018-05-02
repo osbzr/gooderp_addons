@@ -149,7 +149,7 @@ class NonActiveReportWizard(models.TransientModel):
                     ('goods_id', '=', vals.get('goods_id')),
                     ('attribute_id', '=', vals.get('attribute_id')),
                     ('warehouse_id.type', '=', 'stock'),
-                    ('warehouse_dest_id.type', '=', 'customer')])
+                    ('warehouse_dest_id.type', '=', 'customer')], order='write_date DESC', limit=1)
                 if latest_move_line:
                     vals['latest_move_date'] = latest_move_line.write_date
                     vals['latest_move_qty'] = latest_move_line.goods_qty
