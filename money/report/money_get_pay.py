@@ -31,8 +31,6 @@ class MoneyGetPayReport(models.Model):
                        digits=dp.get_precision('Amount'))
     pay = fields.Float(string=u'支出',
                        digits=dp.get_precision('Amount'))
-    tax_amount = fields.Float(string=u'税额',
-                              digits=dp.get_precision('Amount'))
     amount = fields.Float(string=u'金额',
                           digits=dp.get_precision('Amount'))
 
@@ -50,7 +48,6 @@ class MoneyGetPayReport(models.Model):
                     category_id,
                     get,
                     pay,
-                    tax_amount,
                     amount
             FROM
                 (
@@ -61,7 +58,6 @@ class MoneyGetPayReport(models.Model):
                         NULL AS category_id,
                         (CASE WHEN mo.type = 'get' THEN mo.amount ELSE 0 END) AS get,
                         (CASE WHEN mo.type = 'pay' THEN mo.amount ELSE 0 END) AS pay,
-                        0 AS tax_amount,
                         (CASE WHEN mo.type = 'get' THEN mo.amount ELSE -mo.amount END) AS amount
                 FROM money_order AS mo
                 WHERE mo.state = 'done'
@@ -71,9 +67,8 @@ class MoneyGetPayReport(models.Model):
                         omo.type,
                         omo.partner_id,
                         omol.category_id,
-                        (CASE WHEN omo.type = 'other_get' THEN omol.amount ELSE 0 END) AS get,
-                        (CASE WHEN omo.type = 'other_pay' THEN omol.amount ELSE 0 END) AS pay,
-                        omol.tax_amount AS tax_amount,
+                        (CASE WHEN omo.type = 'other_get' THEN omol.amount + omol.tax_amount ELSE 0 END) AS get,
+                        (CASE WHEN omo.type = 'other_pay' THEN omol.amount + omol.tax_amount ELSE 0 END) AS pay,
                         (CASE WHEN omo.type = 'other_get' THEN omol.amount + omol.tax_amount ELSE -(omol.amount + omol.tax_amount) END) AS amount
                 FROM other_money_order AS omo
                 LEFT JOIN other_money_order_line AS omol ON omo.id = omol.other_money_id
