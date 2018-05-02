@@ -24,7 +24,6 @@ class TestChangeLocation(TransactionCase):
         self.env.ref(
             'warehouse.wh_move_line_14').location_id = self.location.id
         # 填充库位数量
-        self.others_wh_in.location_id = self.location.id
         self.others_wh_in.approve_order()
 
         # location: a0001; goods: cable; qty: 12000
@@ -42,10 +41,8 @@ class TestChangeLocation(TransactionCase):
         self.location_b001.goods_id = self.env.ref('goods.cable').id
         self.change_loc.confirm_change()
 
-        self.assertEqual(self.location.current_qty, 12000)
-        self.assertEqual(self.location_b001.current_qty, 0)
-        # self.assertEqual(self.location.current_qty, 11999)
-        # self.assertEqual(self.location_b001.current_qty, 1)
+        self.assertEqual(self.location.current_qty, 11999)
+        self.assertEqual(self.location_b001.current_qty, 1)
 
         # 报错：请检查转出库位与转入库位的产品、产品属性是否都相同！
         self.location_b001.goods_id = self.env.ref('goods.mouse').id

@@ -8,8 +8,7 @@ class Location(models.Model):
     _description = u'货位'
     _order = 'name'
 
-    @api.one
-    @api.depends('goods_id', 'attribute_id')
+    @api.multi
     def _get_current_qty(self):
         # 获取当前 库位 的商品数量
         for Location in self:
@@ -22,6 +21,7 @@ class Location(models.Model):
                                                       '=', Location.id),
                                                      ('state', '=', 'done')])
             Location.current_qty = sum([line.qty_remaining for line in lines])
+            Location.save_qty = Location.current_qty
             if Location.current_qty == 0:
                 Location.goods_id = False
                 Location.attribute_id = False
@@ -36,8 +36,9 @@ class Location(models.Model):
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict',
                                    help=u'商品的属性')
     current_qty = fields.Integer(u'数量',
-                                 compute='_get_current_qty',
-                                 store=True)
+                                 compute='_get_current_qty'
+                                 )
+    save_qty = fields.Float(u'在手数量')
 
     _sql_constraints = [
         ('wh_loc_uniq', 'unique(warehouse_id, name)', u'同仓库库位不能重名')
@@ -95,7 +96,7 @@ class ChangeLocation(models.TransientModel):
                                 % (change.from_location.name, change.from_location.current_qty))
             # 转出库位与转入库位的 产品、产品属性要相同
             if (change.from_location.goods_id.id != change.to_location.goods_id.id and change.to_location.goods_id.id) or \
-                    (change.from_location.attribute_id.id != change.to_location.attribute_id.id):
+                    (change.from_location.attribute_id.id != change.to_location.attribute_id.id and change.to_location.attribute_id.id):
                 raise UserError(u'请检查转出库位与转入库位的产品、产品属性是否都相同！')
 
             # 创建 内部移库单
