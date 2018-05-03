@@ -241,15 +241,6 @@ class hire_applicant(models.Model):
         action['search_view_id'] = (self.env.ref('staff_hire.ir_attachment_view_search_inherit_staff_hire').id, )
         return action
 
-    # @api.multi
-    # def _track_template(self, tracking):
-    #     res = super(hire_applicant, self)._track_template(tracking)
-    #     applicant = self[0]
-    #     changes, dummy = tracking[applicant.id]
-    #     if 'stage_id' in changes and applicant.stage_id.template_id:
-    #         res['stage_id'] = (applicant.stage_id.template_id, {'composition_mode': 'mass_mail'})
-    #     return res
-
     @api.multi
     def _track_subtype(self, init_values):
         record = self[0]

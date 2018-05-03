@@ -13,9 +13,9 @@
         </record>
 
     <!-- Meeting Types (for interview meetings) -->
-    <!--<record model="calendar.event.type" id="categ_meet_interview">-->
-        <!--<field name="name">Interview</field>-->
-    <!--</record>-->
+    <record model="calendar.event.type" id="categ_meet_interview">
+        <field name="name">Interview</field>
+    </record>
 
     <!-- Templates for interest / refusing applicants -->
     <record id="email_template_data_applicant_refuse" model="mail.template">
@@ -65,8 +65,6 @@ joining us as a ${object.job_id.name}
 .</p>
 <p>Please welcome him/her and help him/her finding his/her marks.</p>]]></field>
     </record>
-
-        <!--    Resource(type_id)        -->
 
     <record model="core.value" id="degree_bachelor">
         <field name="name">大学本科</field>

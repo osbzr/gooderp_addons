@@ -10,7 +10,7 @@
     'summary': '员工招聘，工作申请，求职',
     'description': """管理招聘流程""",
     'depends': [
-        'staff',
+        'staff', 'calendar',
     ],
     # always loaded
     'data': [

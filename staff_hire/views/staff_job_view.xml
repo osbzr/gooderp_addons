@@ -14,8 +14,6 @@
         <field name="arch" type="xml">
             <kanban class="oe_background_grey o_kanban_dashboard o_hr_recruitment_kanban" on_create="hr_recruitment.create_job_simple">
                 <field name="name"/>
-                <!--<field name="alias_name"/>-->
-                <!--<field name="alias_domain"/>-->
                 <field name="department_id"/>
                 <field name="no_of_recruitment"/>
                 <field name="color"/>
@@ -30,9 +28,6 @@
                             <div class="o_kanban_card_header">
                                 <div class="o_kanban_card_header_title">
                                     <div class="o_primary"><t t-esc="record.name.value"/></div>
-                                    <!--<div t-if="record.alias_name.value and record.alias_domain.value and record.state.raw_value == 'recruit'" class="o_secondary o_job_alias">-->
-                                        <!--<small> <i class="fa fa-envelope-o"></i> <field name="alias_id"/> </small>-->
-                                    <!--</div>-->
                                 </div>
                                 <div class="o_kanban_manage_button_section">
                                     <a class="o_kanban_manage_toggle_button" href="#">More <i class="fa fa-caret-down"/></a>
@@ -48,7 +43,7 @@
                                             <div t-if="record.document_ids.raw_value.length > 0" class="row">
                                                 <div class="col-xs-9">
                                                     <a name="action_get_attachment_tree_view" type="object">
-                                                        文档
+                                                        简历
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-3">
@@ -134,7 +129,6 @@
                 <field name="expected_employees"/>
                 <field name="no_of_hired_employee"/>
                 <field name="state"/>
-                <!--<field name="message_needaction" invisible="1"/>-->
             </field>
         </field>
     </record>

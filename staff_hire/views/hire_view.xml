@@ -71,7 +71,7 @@
                         class="oe_stat_button"
                         icon="fa-book"
                         type="object">
-                        <field name="attachment_number" widget="statinfo" string="文档"/>
+                        <field name="attachment_number" widget="statinfo" string="简历"/>
                     </button>
                     <button name="action_get_created_employee"
                         class="oe_stat_button"
