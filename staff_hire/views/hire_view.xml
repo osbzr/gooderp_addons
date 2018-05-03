@@ -71,7 +71,7 @@
                         class="oe_stat_button"
                         icon="fa-book"
                         type="object">
-                        <field name="attachment_number" widget="statinfo" string="文档"/>
+                        <field name="attachment_number" widget="statinfo" string="简历"/>
                     </button>
                     <button name="action_get_created_employee"
                         class="oe_stat_button"
@@ -484,7 +484,7 @@
     <menuitem
         name="招聘"
         parent="staff.menu_staff_main"
-        id="menu_crm_case_categ0_act_job" action="crm_case_categ0_act_job" sequence="15" groups="base.group_no_one"/>
+        id="menu_crm_case_categ0_act_job" action="crm_case_categ0_act_job" sequence="15"/>
 
     <!-- Resume and Letters -->
     <record id="ir_attachment_view_search_inherit_staff_hire" model="ir.ui.view">
