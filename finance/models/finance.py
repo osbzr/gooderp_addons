@@ -550,7 +550,7 @@ class AuxiliaryFinancing(models.Model):
     _name = 'auxiliary.financing'
     _description = u'辅助核算'
 
-    code = fields.Char(u'编码', required=True)
+    code = fields.Char(u'编码')
     name = fields.Char(u'名称', required=True)
     type = fields.Selection([
         ('member', u'个人'),

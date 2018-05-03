@@ -92,7 +92,7 @@ class ChangeLocation(models.TransientModel):
                 raise UserError(u'转出数量不能大于库位现有数量，库位 %s 现有数量  %s'
                                 % (change.from_location.name, change.from_location.current_qty))
             # 转出库位与转入库位的 产品、产品属性要相同
-            if (change.from_location.goods_id.id != change.to_location.goods_id.id) or \
+            if (change.from_location.goods_id.id != change.to_location.goods_id.id and change.to_location.goods_id.id) or \
                     (change.from_location.attribute_id.id != change.to_location.attribute_id.id):
                 raise UserError(u'请检查转出库位与转入库位的产品、产品属性是否都相同！')
 

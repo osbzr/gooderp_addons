@@ -127,6 +127,9 @@ function button_export_action () {
                 operation_message[operation_message.length - 2] = "操作时间";
                 operation_message[operation_message.length - 1] = now_day.trim();
                 export_rows.push(operation_message);
+                for(var i=0;i<data[3];i++){
+                    export_rows.splice(i, 0, []);
+                }
                 if (view.dataset.context.attachment_information !== undefined) {
                     var arr = view.dataset.context.attachment_information.split(",");
                     var newArray = [];
