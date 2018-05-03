@@ -64,6 +64,7 @@
                 <search string="物料清单">
                     <field name="name"/>
                     <field name="type"/>
+                    <field name="goods_id"/>
                     <filter name="assembly" string="组装单" domain="[('type','=','assembly')]"/>
                     <filter name="disassembly" string="拆卸单" domain="[('type','=','disassembly')]"/>
                 </search>

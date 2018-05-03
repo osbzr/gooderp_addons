@@ -331,9 +331,13 @@ class WhMoveLine(models.Model):
                 'date': line.move_id.date,
                 'cost_time': fields.Datetime.now(self),
             })
-            if line.type == 'in' and line.location_id:
-                line.location_id.write(
-                    {'attribute_id': line.attribute_id.id, 'goods_id': line.goods_id.id})
+            if line.type in ('in', 'internal'):
+                locations = self.env['location'].search([('warehouse_id', '=', line.warehouse_dest_id.id)])
+                if locations and not line.location_id:
+                    raise UserError(u'调入仓库 %s 进行了库位管理，请在明细行输入库位' % line.warehouse_dest_id.name)
+                if line.location_id:
+                    line.location_id.write(
+                        {'attribute_id': line.attribute_id.id, 'goods_id': line.goods_id.id})
 
             if line.type == 'in' and line.scrap:
                 if not self.env.user.company_id.wh_scrap_id:

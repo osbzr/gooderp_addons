@@ -331,6 +331,13 @@ class WhMove(models.Model):
             order.line_out_ids.action_done()
             order.line_in_ids.action_done()
 
+        # 每次出库完成，清空本次出库前 库位上商品数量为0的商品和属性
+        for loc in self.env['location'].search([('save_qty', '=', 0),
+                                                '|', ('goods_id', '!=', False),
+                                                ('attribute_id', '!=', False)
+                                                ]):
+            loc.goods_id = False
+            loc.attribute_id = False
         return self.write({
             'approve_uid': self.env.uid,
             'approve_date': fields.Datetime.now(self),

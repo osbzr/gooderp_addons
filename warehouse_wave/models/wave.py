@@ -6,6 +6,8 @@ from odoo.exceptions import UserError
 class Wave(models.Model):
     _name = "wave"
     _description = u"拣货单"
+    _order = 'create_date desc'
+
     state = fields.Selection([('draft', '未打印'), ('printed', '已打印'),
                               ('done', '已完成')], string='状态', default='draft',
                              index=True,
@@ -232,8 +234,8 @@ class CreateWave(models.TransientModel):
             available_locs = self.env['location'].search([('goods_id', '=', WaveLine.goods_id.id),
                                                           ('attribute_id', '=',
                                                            WaveLine.attribute_id.id),
-                                                          ('warehouse_id', '=', warehouse_id)])
-
+                                                          ('warehouse_id', '=', warehouse_id),
+                                                          ('save_qty', '!=', 0)])
             remaining_picking_qty = WaveLine.picking_qty
             for loc in available_locs:
                 if remaining_picking_qty < 0:
