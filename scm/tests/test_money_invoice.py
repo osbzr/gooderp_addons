@@ -17,6 +17,8 @@ class TestMoneyInvoice(TransactionCase):
         self.return_order.sell_order_done()
         self.return_delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.return_order.id)])
+        for line in self.return_delivery.line_in_ids:
+            line.location_id = self.env.ref('warehouse.b001_location').id
 
         # 采购相关
         self.order = self.env.ref('buy.buy_order_1')
