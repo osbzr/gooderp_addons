@@ -866,46 +866,42 @@ class WizardAccountAddChild(models.TransientModel):
         self.ensure_one()
         account_type = self.parent_id.account_type
         new_account = False
-        full_account_code = '%s%s'%(self.parent_code, self.account_code)
+        full_account_code = '%s%s' % (self.parent_code, self.account_code)
         if account_type == 'normal':
-            # 挂账科目，需要进行科目转换
-            # step1, 老科目改为临时名
-            origin_name = self.parent_id.name
-            origin_code = self.parent_id.code
-            self.parent_id.write({
-                'code': 'tmp_%s' % self.parent_id.code,
-                'name': 'tmp_%s' % self.parent_id.name,
-            })
-            # step2, 建新科目用作上级，类型为view，将上级科目设置为老科目的上级科目
+            # 挂账科目，需要对现有凭证进行科目转换
+            # step1, 建新科目
             new_account = self.parent_id.copy(
                 {
-                    'code': origin_code,
-                    'name': origin_name,
-                    'account_type': 'view',
-                })
-            # step3, 老科目改为正式名
+                    'code': full_account_code,
+                    'name': self.account_name,
+                    'account_type': 'normal',
+                    'source': 'manual',
+                    'parent_id': self.parent_id.id
+                }
+            )
+            # step2, 将关联凭证改到新科目
+            self.env['voucher.line'].search([('account_id', '=', self.parent_id.id)]).write({'account_id': new_account.id})
+            # step3, 老科目改为 视图
             self.parent_id.write({
-                'code': full_account_code,
-                'name': self.account_name,
-                'account_type': 'normal',
-                'source': 'manual',
-                'parent_id': new_account.id
+                'account_type': 'view',
             })
 
         elif account_type == 'view':
             # 直接新增下级科目，无需转换科目
-            new_account=self.parent_id.copy({
-                'code': full_account_code,
-                'name': self.account_name,
-                'account_type': 'normal',
-                'source': 'manual',
-                'parent_id': self.parent_id.id
-            })
+            new_account = self.parent_id.copy(
+                {
+                    'code': full_account_code,
+                    'name': self.account_name,
+                    'account_type': 'normal',
+                    'source': 'manual',
+                    'parent_id': self.parent_id.id
+                }
+            )
 
         if not new_account:
             raise UserError(u'新科目创建失败！')
 
-        view =  self.env.ref('finance.finance_account_tree')
+        view = self.env.ref('finance.finance_account_tree')
 
         return {
             'name': u'科目',
