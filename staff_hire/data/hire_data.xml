@@ -68,21 +68,17 @@ joining us as a ${object.job_id.name}
 
         <!--    Resource(type_id)        -->
 
-    <record model="staff.hire.degree" id="degree_graduate">
-        <field name="name">Graduate</field>
-        <field name="sequence">1</field>
+    <record model="core.value" id="degree_bachelor">
+        <field name="name">大学本科</field>
+        <field name="type">hire_degree</field>
     </record>
-    <record model="staff.hire.degree" id="degree_bachelor">
-        <field name="name">Bachelor Degree</field>
-        <field name="sequence">2</field>
+    <record model="core.value" id="degree_master">
+        <field name="name">硕士</field>
+        <field name="type">hire_degree</field>
     </record>
-    <record model="staff.hire.degree" id="degree_licenced">
-        <field name="name">Master Degree</field>
-        <field name="sequence">3</field>
-    </record>
-    <record model="staff.hire.degree" id="degree_bac5">
-        <field name="name">Doctoral Degree</field>
-        <field name="sequence">4</field>
+    <record model="core.value" id="degree_doctoral">
+        <field name="name">博士</field>
+        <field name="type">hire_degree</field>
     </record>
 
     <record id="mail_alias_jobs" model="mail.alias">
@@ -98,19 +94,19 @@ joining us as a ${object.job_id.name}
         <field name="res_model">hire.applicant</field>
         <field name="default" eval="False"/>
         <field name="hidden" eval="True"/>
-        <field name="description">Applicant created</field>
+        <field name="description">应聘新建</field>
     </record>
     <record id="mt_applicant_stage_changed" model="mail.message.subtype">
         <field name="name">Stage Changed</field>
         <field name="res_model">hire.applicant</field>
         <field name="default" eval="False"/>
-        <field name="description">Stage changed</field>
+        <field name="description">阶段变更</field>
     </record>
     <record id="mt_applicant_hired" model="mail.message.subtype">
         <field name="name">Applicant Hired</field>
         <field name="res_model">hire.applicant</field>
         <field name="default" eval="True"/>
-        <field name="description">Applicant hired</field>
+        <field name="description">应聘者被聘用</field>
     </record>
 
     <!-- Job-related subtypes for messaging / Chatter -->
@@ -161,9 +157,6 @@ joining us as a ${object.job_id.name}
         <field name="name">销售</field>
         <field name="type">hire_categ</field>
     </record>
-    <!--<record model="utm.campaign" id="utm_campaign_job">-->
-            <!--<field name="name">Job Campaign</field>-->
-    <!--</record>-->
 
 </data>
 </odoo>

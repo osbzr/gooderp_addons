@@ -39,8 +39,8 @@
                 <field name="date_action" invisible="context.get('invisible_next_date', True)"/>
                 <field name="source_id"/>
                 <field name="priority"/>
-                <field name="type_id" invisible="1"/>
-                <field name="availability" invisible="1"/>
+                <field name="degree_id" invisible="1"/>
+                <field name="date_available" invisible="1"/>
                 <field name="department_id" invisible="context.get('invisible_department', True)"/>
                 <field name="user_id"/>
             </tree>
@@ -103,7 +103,7 @@
                     <group>
                         <field name="email_from" widget="email"/>
                         <field name="partner_mobile"/>
-                        <field name="type_id" placeholder="学历"/>
+                        <field name="degree_id" placeholder="学历"/>
                     </group>
                     <group>
                         <field name="user_id"/>
@@ -134,12 +134,12 @@
                             <span class="oe_inline" attrs="{'invisible':[('salary_proposed_extra','=',False)]}"> + </span>
                             <field name="salary_proposed_extra" class="oe_inline" placeholder="额外奖金或补贴..."/>
                         </div>
-                        <field name="availability"/>
+                        <field name="date_available"/>
                         <field name="staff_id" invisible="1"/>
                     </group>
                 </group>
                 <separator string="总结"/>
-                <field name="description" placeholder="面试反馈..."/>
+                <field name="note" placeholder="面试反馈..."/>
             </sheet>
             <div class="oe_chatter">
                 <field name="message_follower_ids" widget="mail_followers"/>
@@ -175,11 +175,11 @@
         <field name="model">hire.applicant</field>
         <field name="arch" type="xml">
             <search string="Search Applicants">
-                <field name="partner_name" filter_domain="['|',('partner_name','ilike',self),('email_from','ilike',self)]" string="Subject / Applicant"/>
+                <field name="partner_name" filter_domain="['|',('partner_name','ilike',self),('email_from','ilike',self)]" string="应聘者"/>
                 <filter string="我的" domain="[('user_id', '=', uid)]"/>
                 <filter string="未指派" domain="[('user_id', '=', False)]"/>
                 <separator/>
-                <filter string="下一行动日期" context="{'invisible_next_action':False, 'invisible_next_date':False}"
+                <filter string="下步计划日期" context="{'invisible_next_action':False, 'invisible_next_date':False}"
                     domain="[('date_action','&lt;&gt;',False)]" help="Filter and view on next actions and date"/>
                 <separator/>
                 <filter string="未读消息" name="message_needaction" domain="[('message_needaction','=',True)]"/>
@@ -195,7 +195,7 @@
                 <group expand="0" string="Group By">
                     <filter string="负责人" domain="[]"  context="{'group_by':'user_id'}"/>
                     <filter string="职位" domain="[]" context="{'group_by':'job_id'}"/>
-                    <filter string="学历" domain="[]" context="{'group_by':'type_id'}"/>
+                    <filter string="学历" domain="[]" context="{'group_by':'degree_id'}"/>
                     <filter string="阶段" domain="[]" context="{'group_by':'stage_id'}"/>
                     <filter string="创建日期" context="{'group_by':'create_date'}"/>
                     <filter string="最终阶段更新日期" context="{'group_by':'date_last_stage_update'}"/>
@@ -230,7 +230,7 @@
                 <field name="user_id"/>
                 <field name="user_email"/>
                 <field name="partner_name"/>
-                <field name="type_id"/>
+                <field name="degree_id"/>
                 <field name="job_id"/>
                 <field name="title_action"/>
                 <field name="department_id"/>
@@ -241,7 +241,7 @@
                 <templates>
                     <t t-name="kanban-tooltip">
                         <ul class="oe_kanban_tooltip">
-                            <li t-if="record.type_id.raw_value"><b>Degree:</b> <field name="type_id"/></li>
+                            <li t-if="record.degree_id.raw_value"><b>Degree:</b> <field name="degree_id"/></li>
                             <li t-if="record.department_id.raw_value"><b>Departement:</b> <field name="department_id"/></li>
                         </ul>
                     </t>
@@ -332,7 +332,7 @@
               </p><p>
                 With just a quick glance on the Odoo employee screen, you
                 can easily find all the information you need for each person;
-                contact data, job position, availability, etc.
+                contact data, job position, date_available, etc.
               </p>
             </field>
     </record>
@@ -615,48 +615,6 @@
         parent="staff.menu_staff_configuration"
         action="staff_hire_stage_act"
         sequence="10"/>
-
-    <!-- Degree Tree View -->
-    <record model="ir.ui.view" id="staff_hire_degree_tree">
-        <field name="name">staff.hire.degree.tree</field>
-        <field name="model">staff.hire.degree</field>
-        <field name="arch" type="xml">
-            <tree string="Degree">
-                <field name="sequence" invisible="1"/>
-                <field name="name"/>
-            </tree>
-        </field>
-    </record>
-
-    <!-- Degree Form View -->
-    <record model="ir.ui.view" id="staff_hire_degree_form">
-        <field name="name">staff.hire.degree.form</field>
-        <field name="model">staff.hire.degree</field>
-        <field name="arch" type="xml">
-            <form string="Degree">
-                <group>
-                    <field name="name"/>
-                    <field name="sequence" groups="base.group_no_one"/>
-                </group>
-            </form>
-        </field>
-    </record>
-
-    <!-- Degree Action -->
-    <record id="staff_hire_degree_action" model="ir.actions.act_window">
-        <field name="name">Degree</field>
-        <field name="res_model">staff.hire.degree</field>
-        <field name="view_type">form</field>
-        <field name="view_id" ref="staff_hire_degree_tree"/>
-    </record>
-
-     <menuitem
-            id="menu_staff_hire_degree"
-            name="学位"
-            parent="staff.menu_staff_configuration"
-            action="staff_hire_degree_action"
-            sequence="15" groups="base.group_no_one"/>
-
 
     <record id="hire_applicant_action_from_department" model="ir.actions.act_window">
         <field name="name">New Applications</field>

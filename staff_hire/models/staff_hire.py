@@ -43,17 +43,6 @@ class staff_hire_stage(models.Model):
         return super(staff_hire_stage, self).default_get(fields)
 
 
-class staff_hire_degree(models.Model):
-    _name = "staff.hire.degree"
-    _description = u"招聘的学历"
-    _sql_constraints = [
-        ('name_uniq', 'unique (name)', u'应聘者学历的名称必须唯一')
-    ]
-
-    name = fields.Char(u"学历", required=True)
-    sequence = fields.Integer(u"序号", default=1, help=u"按顺序显示列表中的各学历")
-
-
 class hire_applicant(models.Model):
     _name = "hire.applicant"
     _description = u"招聘"
@@ -83,7 +72,7 @@ class hire_applicant(models.Model):
         return company_id
 
     active = fields.Boolean(u"有效", default=True, help=u"如果“有效”字段设为false，它对信息进行隐藏但不删除它。")
-    description = fields.Text(u"说明")
+    note = fields.Text(u"备注")
     email_from = fields.Char(u"Email", size=128, help=u"这些人将收到电子邮件")
     # email_cc = fields.Text(u"关注者的电子邮件", size=252,
     #                        help=u"这些邮箱地址将添加到所有接收的发送邮件的抄送字段，用逗号分隔多个邮件地址。")
@@ -112,10 +101,13 @@ class hire_applicant(models.Model):
     salary_expected_extra = fields.Char(u"期望额外福利", help=u"除了期望薪资以外的福利待遇")
     salary_proposed = fields.Float(u"建议薪资", help=u"该公司的提议薪酬")
     salary_expected = fields.Float(u"期望薪资", help=u"申请人要求的薪酬")
-    availability = fields.Date(u"开始工作日期", help=u"申请人能够开始工作的日期")
+    date_available = fields.Date(u"开始工作日期", help=u"申请人能够开始工作的日期")
     partner_name = fields.Char(u"应聘者姓名", required=True)
     partner_mobile = fields.Char(u"手机", size=32, required=True)
-    type_id = fields.Many2one('staff.hire.degree', u"学历")
+    degree_id = fields.Many2one('core.value', u"学历",
+                              domain=[('type', '=', 'hire_degree')],
+                              context={'type': 'hire_degree'}
+                              )
     department_id = fields.Many2one('staff.department', u"部门")
     reference = fields.Char(u"推荐人")
     # day_open = fields.Float(compute='_compute_day', string=u"开启天数")
@@ -184,6 +176,13 @@ class hire_applicant(models.Model):
             'stage_id': stage_id
         }}
 
+    def _onchange_stage_id_internal(self, stage_id):
+        if not stage_id:
+            return {'value': {}}
+        stage = self.env['staff.hire.stage'].browse(stage_id)
+        if stage.fold:
+            return {'value': {'date_closed': fields.datetime.now()}}
+        return {'value': {'date_closed': False}}
 
     @api.model
     def create(self, vals):
@@ -210,12 +209,6 @@ class hire_applicant(models.Model):
         else:
             res = super(hire_applicant, self).write(vals)
         return res
-
-    # @api.model
-    # def get_empty_list_help(self, help):
-    #     return super(hire_applicant, self.with_context(empty_list_help_model='staff.job',
-    #                                               empty_list_help_id=self.env.context.get('default_job_id'),
-    #                                               empty_list_help_document_name=_("job applicants"))).get_empty_list_help(help)
 
     @api.multi
     def action_get_created_employee(self):
@@ -261,34 +254,43 @@ class hire_applicant(models.Model):
     #     if 'stage_id' in changes and applicant.stage_id.template_id:
     #         res['stage_id'] = (applicant.stage_id.template_id, {'composition_mode': 'mass_mail'})
     #     return res
-    #
-    # @api.multi
-    # def _track_subtype(self, init_values):
-    #     record = self[0]
-    #     if 'staff_id' in init_values and record.staff_id:
-    #         return 'staff_hire.mt_applicant_hired'
-    #     elif 'stage_id' in init_values and record.stage_id and record.stage_id.sequence <= 1:
-    #         return 'staff_hire.mt_applicant_new'
-    #     elif 'stage_id' in init_values and record.stage_id and record.stage_id.sequence > 1:
-    #         return 'staff_hire.mt_applicant_stage_changed'
-    #     return super(hire_applicant, self)._track_subtype(init_values)
+
+    @api.multi
+    def _track_subtype(self, init_values):
+        record = self[0]
+        if 'staff_id' in init_values and record.staff_id:
+            return 'staff_hire.mt_applicant_hired'
+        elif 'stage_id' in init_values and record.stage_id and record.stage_id.sequence <= 1:
+            return 'staff_hire.mt_applicant_new'
+        elif 'stage_id' in init_values and record.stage_id and record.stage_id.sequence > 1:
+            return 'staff_hire.mt_applicant_stage_changed'
+        return super(hire_applicant, self)._track_subtype(init_values)
 
     @api.multi
     def create_employee_from_applicant(self):
         """ Create an staff from the hire.applicants """
         staff = False
         for applicant in self:
-            if applicant.job_id and applicant.partner_name:
-                applicant.job_id.write({'no_of_hired_employee': applicant.job_id.no_of_hired_employee + 1})
-                staff = self.env['staff'].create({'name': applicant.partner_name,
-                                               'job_id': applicant.job_id.id,
-                                               'department_id': applicant.department_id.id or False,
-                                               'work_email': applicant.department_id and applicant.department_id.company_id and applicant.department_id.company_id.email or False,
-                                               'work_phone': applicant.department_id and applicant.department_id.company_id and applicant.department_id.company_id.phone or False,
-                                               'work_mobile': applicant.partner_mobile or False,
-                                                  })
-                applicant.write({'staff_id': staff.id})
-                # staff._broadcast_welcome()
+            if not applicant.salary_proposed:
+                raise UserError(u'请输入建议薪资')
+            applicant.job_id.write({'no_of_hired_employee': applicant.job_id.no_of_hired_employee + 1})
+            staff = self.env['staff'].create({'name': applicant.partner_name,
+                                           'job_id': applicant.job_id.id,
+                                           'department_id': applicant.department_id.id or False,
+                                           'work_email': applicant.department_id and applicant.department_id.company_id and applicant.department_id.company_id.email or False,
+                                           'work_phone': applicant.department_id and applicant.department_id.company_id and applicant.department_id.company_id.phone or False,
+                                           'work_mobile': applicant.partner_mobile or False,
+                                              })
+            vals_contract = {
+                'staff_id': staff.id,
+                'basic_wage': applicant.salary_proposed,
+                'job_id': applicant.job_id.id,
+                'over_date': fields.date.today(),
+            }
+            contract = staff.contract_ids.create(vals_contract)
+            contract.onchange_basic_wage()
+            applicant.write({'staff_id': staff.id})
+            # staff._broadcast_welcome()
 
         staff_action = self.env.ref('staff.staff_action')
         dict_act_window = staff_action.read([])[0]
@@ -306,15 +308,3 @@ class hire_applicant(models.Model):
         """ Reinsert the applicant into the recruitment pipe in the first stage"""
         default_stage_id = self._default_stage_id()
         self.write({'active': True, 'stage_id': default_stage_id})
-
-
-# class hire_applicant_category(models.Model):
-#     _name = "hire.applicant.category"
-#     _description = u"申请人类别"
-#
-#     name = fields.Char(u"名字", required=True)
-#     color = fields.Integer(string='Color Index')
-#
-#     _sql_constraints = [
-#             ('name_uniq', 'unique (name)', u"标签名已存在!"),
-#     ]

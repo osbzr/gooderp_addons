@@ -19,7 +19,7 @@ class staff_hire_report(models.Model):
     # date_closed = fields.Date('Closed', readonly=True)
     job_id = fields.Many2one('staff.job', 'Applied Job', readonly=True)
     stage_id = fields.Many2one('staff.hire.stage', 'Stage')
-    type_id = fields.Many2one('staff.hire.degree', 'Degree')
+    degree_id = fields.Many2one('core.value', 'Degree')
     department_id = fields.Many2one('staff.department', 'Department', readonly=True)
     priority = fields.Selection(staff_hire.AVAILABLE_PRIORITIES, 'Appreciation')
     salary_prop = fields.Float("Salary Proposed", digits=0)
@@ -44,7 +44,7 @@ class staff_hire_report(models.Model):
                      s.company_id,
                      s.user_id,
                      s.job_id,
-                     s.type_id,
+                     s.degree_id,
                      s.department_id,
                      s.priority,
                      s.stage_id,
@@ -65,7 +65,7 @@ class staff_hire_report(models.Model):
                      s.user_id,
                      s.stage_id,
                      s.last_stage_id,
-                     s.type_id,
+                     s.degree_id,
                      s.priority,
                      s.job_id,
                      s.department_id
