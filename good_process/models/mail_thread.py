@@ -160,7 +160,6 @@ class MailThread(models.AbstractModel):
         action_id = self.env.context.get('params', False) \
                     and self.env.context['params'].get('action', False) \
                     or False
-
         if not action_id:
             return True
         current_model = self.env['ir.actions.act_window'].browse(action_id).res_model

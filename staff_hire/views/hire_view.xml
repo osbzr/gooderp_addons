@@ -1,27 +1,8 @@
 <?xml version="1.0"?>
 <odoo>
     <data>
-
-    <!-- Stage -->
-    <record id="staff_job_stage_act" model="ir.actions.act_window">
-        <field name="name">招聘 / 申请阶段</field>
-        <field name="res_model">staff.hire.stage</field>
-        <field name="view_type">form</field>
-        <field name="domain">[]</field>
-        <field name="context">{}</field>
-        <field name="help" type="html">
-          <p class="oe_view_nocontent_create">
-            Click to add a new stage in the recruitment process.
-          </p><p>
-            Define here your stages of the recruitment process, for example:
-            qualification call, first interview, second interview, refused,
-            hired.
-          </p>
-        </field>
-    </record>
-
     <!-- Applicants -->
-    <record model="ir.ui.view" id="crm_case_tree_view_job">
+    <record model="ir.ui.view" id="hire_applicant_tree_view">
         <field name="name">hire.applicant.tree</field>
         <field name="model">hire.applicant</field>
         <field name="arch" type="xml">
@@ -47,7 +28,7 @@
         </field>
     </record>
 
-    <record model="ir.ui.view" id="crm_case_form_view_job">
+    <record model="ir.ui.view" id="hire_applicant_form_view">
         <field name="name">hire.applicant.form</field>
         <field name="model">hire.applicant</field>
         <field name="arch" type="xml">
@@ -149,7 +130,7 @@
         </field>
     </record>
 
-    <record model="ir.ui.view" id="crm_case_pivot_view_job">
+    <record model="ir.ui.view" id="hire_applicant_pivot_view">
         <field name="name">hire.applicant.pivot</field>
         <field name="model">hire.applicant</field>
         <field name="arch" type="xml">
@@ -160,7 +141,7 @@
         </field>
     </record>
 
-    <record model="ir.ui.view" id="crm_case_graph_view_job">
+    <record model="ir.ui.view" id="hire_applicant_graph_view">
         <field name="name">hire.applicant.graph</field>
         <field name="model">hire.applicant</field>
         <field name="arch" type="xml">
@@ -170,7 +151,7 @@
         </field>
     </record>
 
-    <record id="view_crm_case_jobs_filter" model="ir.ui.view">
+    <record id="hire_applicant_filter_view" model="ir.ui.view">
         <field name="name">hire.applicant.search</field>
         <field name="model">hire.applicant</field>
         <field name="arch" type="xml">
@@ -218,7 +199,7 @@
     </record>
 
     <!-- Hr Applicant Kanban View -->
-    <record model="ir.ui.view" id="hr_kanban_view_applicant">
+    <record model="ir.ui.view" id="hire_applicant_kanban_view">
         <field name="name">hire.applicant.kanban</field>
         <field name="model">hire.applicant</field>
         <field name="arch" type="xml">
@@ -290,7 +271,7 @@
     </record>
 
     <record model="ir.actions.act_window" id="action_staff_job_applications">
-        <field name="name">Applications</field>
+        <field name="name">招聘</field>
         <field name="res_model">hire.applicant</field>
         <field name="view_mode">kanban,tree,form,graph,calendar,pivot</field>
         <field name="context">{'search_default_job_id': [active_id], 'default_job_id': active_id}</field>
@@ -306,9 +287,9 @@
          </field>
     </record>
 
-    <!-- Action for the stat button of the no_employee -->
+    <!-- 工作职位form视图右上角员工按钮 -->
     <record model="ir.actions.act_window" id="action_staff_job_no_employee">
-        <field name="name">Employees</field>
+        <field name="name">员工</field>
         <field name="res_model">staff</field>
         <field name="view_mode">kanban,tree,form</field>
         <field name="context">{'search_default_job_id': active_id}</field>
@@ -322,34 +303,6 @@
               </p>
             </field>
     </record>
-
-    <record id="staff_job_simple_form" model="ir.ui.view">
-        <field name="name">staff.job.simple.form</field>
-        <field name="model">staff.job</field>
-        <field name="priority">200</field>
-        <field name="arch" type="xml">
-            <form string="Create a Job Position">
-                <sheet>
-                    <group>
-                        <field name="name" class="oe_inline" placeholder="e.g. Sales Manager"/>
-                    </group>
-                    <footer>
-                        <button string="Create" name="close_dialog" type="object" class="btn-primary"/>
-                        <button string="Discard" class="btn-default" special="cancel"/>
-                    </footer>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <record id="create_job_simple" model="ir.actions.act_window">
-        <field name="name">Create a Job Position</field>
-        <field name="res_model">staff.job</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="staff_job_simple_form"/>
-        <field name="target">new</field>
-    </record>
-
 
     <record id="staff_job_survey" model="ir.ui.view">
         <field name="name">staff.job.form1</field>
@@ -378,65 +331,30 @@
                     name="%(action_staff_job_applications)d"
                     context="{'default_user_id': user_id}"
                     type="action">
-                    <field name="application_count" widget="statinfo" string="Applications"/>
+                    <field name="application_count" widget="statinfo" string="招聘"/>
                 </button>
                 <button class="oe_stat_button"
                     icon="fa-users"
                     name="%(action_staff_job_no_employee)d"
                     type="action">
-                    <field name="no_of_employee" widget="statinfo" string="Employees"/>
+                    <field name="no_of_employee" widget="statinfo" string="员工"/>
                 </button>
                 <button class="oe_stat_button"
                     icon="fa-book"
                     name="action_get_attachment_tree_view"
                     type="object">
-                    <field name="documents_count" widget="statinfo" string="Documents"/>
+                    <field name="documents_count" widget="statinfo" string="简历"/>
                 </button>
             </div>
         </field>
     </record>
 
-        <!-- hr related job position menu action -->
-         <record model="ir.actions.act_window" id="action_staff_job">
-            <field name="name">职位</field>
-            <field name="res_model">staff.job</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">kanban,form</field>
-            <field name="context">{}</field>
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                  Click here to create a new job position.
-              </p><p>
-                  Once a job position is created, you can track related applications
-                  and manage the recruitment process.
-              </p>
-            </field>
-        </record>
-
-        <!-- hr related job position menu action -->
-         <record model="ir.actions.act_window" id="action_staff_job_config">
-            <field name="name">工作职位</field>
-            <field name="res_model">staff.job</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="context">{'search_default_in_recruitment': 1}</field>
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                  Click here to create a new job position.
-              </p><p>
-                  Once a job position is created, you can track the applicants
-                  and manage the recruitment process related to the job
-                  position.
-              </p>
-            </field>
-        </record>
-
-    <record model="ir.actions.act_window" id="crm_case_categ0_act_job">
+    <record model="ir.actions.act_window" id="action_hire_applicant">
         <field name="name">招聘</field>
         <field name="res_model">hire.applicant</field>
         <field name="view_mode">kanban,tree,form,pivot,graph,calendar</field>
         <field name="view_id" eval="False"/>
-        <field name="search_view_id" ref="view_crm_case_jobs_filter"/>
+        <field name="search_view_id" ref="hire_applicant_filter_view"/>
         <field name="context">{}</field>
         <field name="help" type="html">
           <p>
@@ -453,38 +371,35 @@
     <record model="ir.actions.act_window.view" id="action_hr_sec_kanban_view_act_job">
         <field name="sequence" eval="0"/>
         <field name="view_mode">kanban</field>
-        <field name="view_id" ref="hr_kanban_view_applicant"/>
-        <field name="act_window_id" ref="crm_case_categ0_act_job"/>
+        <field name="view_id" ref="hire_applicant_kanban_view"/>
+        <field name="act_window_id" ref="action_hire_applicant"/>
     </record>
 
     <record model="ir.actions.act_window.view" id="action_hr_sec_tree_view_act_job">
         <field name="sequence" eval="1"/>
         <field name="view_mode">tree</field>
-        <field name="view_id" ref="crm_case_tree_view_job"/>
-        <field name="act_window_id" ref="crm_case_categ0_act_job"/>
+        <field name="view_id" ref="hire_applicant_tree_view"/>
+        <field name="act_window_id" ref="action_hire_applicant"/>
     </record>
 
     <record model="ir.actions.act_window.view" id="action_hr_sec_form_view_act_job">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="crm_case_form_view_job"/>
-        <field name="act_window_id" ref="crm_case_categ0_act_job"/>
+        <field name="view_id" ref="hire_applicant_form_view"/>
+        <field name="act_window_id" ref="action_hire_applicant"/>
     </record>
 
     <record model="ir.actions.act_window.view" id="action_hr_sec_graph_view_act_job">
         <field name="sequence" eval="4"/>
         <field name="view_mode">graph</field>
-        <field name="view_id" ref="crm_case_graph_view_job"/>
-        <field name="act_window_id" ref="crm_case_categ0_act_job"/>
+        <field name="view_id" ref="hire_applicant_graph_view"/>
+        <field name="act_window_id" ref="action_hire_applicant"/>
     </record>
 
-
-
-    <!-- ALL JOBS REQUESTS -->
     <menuitem
         name="招聘"
         parent="staff.menu_staff_main"
-        id="menu_crm_case_categ0_act_job" action="crm_case_categ0_act_job" sequence="15"/>
+        id="menu_action_hire_applicant" action="action_hire_applicant" sequence="15"/>
 
     <!-- Resume and Letters -->
     <record id="ir_attachment_view_search_inherit_staff_hire" model="ir.ui.view">
@@ -507,26 +422,6 @@
             </xpath>
         </field>
     </record>
-    <record model="ir.actions.act_window" id="hire_applicant_resumes">
-        <field name="name">Resumes and Letters</field>
-        <field name="res_model">ir.attachment</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="view_id" ref="mail.view_document_file_kanban"/>
-        <field name="search_view_id" ref="ir_attachment_view_search_inherit_staff_hire"/>
-        <field name="domain">[('res_model','=','hire.applicant')]</field>
-        <field name="context">{'create': False}</field>
-        <field name="help" type="html">
-            <p>
-                No document yet.
-            </p><p>
-                This menu helps you search through resumes and motivation
-                letters. Odoo automatically indexes .PDF, .DOC, DOCX, .TXT
-                files so that you can search keywords from the content of these
-                files.
-            </p>
-        </field>
-    </record>
 
     <!-- Stage Tree View -->
     <record model="ir.ui.view" id="staff_hire_stage_tree">
@@ -547,7 +442,7 @@
         <field name="model">staff.hire.stage</field>
         <field name="arch" type="xml">
             <form string="Stage">
-                <group string="Stage Definition">
+                <group name="group_stage_def">
                     <group>
                         <field name="name"/>
                         <field name="sequence" groups="base.group_no_one"/>
@@ -558,15 +453,14 @@
                         <field name="template_id" domain= "[('model_id.model', '=', 'hire.applicant')]"/>
                     </group>
                 </group>
-                <separator string="Requirements"/>
-                <field name="requirements"/>
+                <field name="requirements" placeholder="要求"/>
             </form>
         </field>
     </record>
 
     <!-- Stage Action -->
     <record id="staff_hire_stage_act" model="ir.actions.act_window">
-        <field name="name">Stages</field>
+        <field name="name">阶段</field>
         <field name="res_model">staff.hire.stage</field>
         <field name="view_type">form</field>
         <field name="view_id" ref="staff_hire_stage_tree"/>
@@ -586,29 +480,6 @@
         parent="staff.menu_staff_configuration"
         action="staff_hire_stage_act"
         sequence="10"/>
-
-    <record id="hire_applicant_action_from_department" model="ir.actions.act_window">
-        <field name="name">New Applications</field>
-        <field name="res_model">hire.applicant</field>
-        <field name="view_mode">kanban,tree,form,graph,calendar,pivot</field>
-        <field name="context">{
-            'search_default_department_id': active_id,
-            'default_department_id': active_id}
-        </field>
-        <field name="domain">[('stage_id.sequence','&lt;=','1')]</field>
-    </record>
-
-    <record id="hr_employee_action_from_department" model="ir.actions.act_window">
-        <field name="name">Newly Hired Employees</field>
-        <field name="res_model">staff</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="context">{
-            'search_default_newly_hired_staff': 1,
-            'search_default_department_id': [active_id],
-            'default_department_id': active_id}
-        </field>
-    </record>
 
     </data>
 </odoo>
