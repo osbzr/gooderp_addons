@@ -190,7 +190,6 @@
                 <field name="stage_id" domain="[]"/>
                 <separator/>
                 <field name="categ_ids"/>
-                <!--<field name="attachment_ids" filter_domain="[('attachment_ids.index_content', 'ilike', self)]" string="Attachments"/>-->
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="负责人" domain="[]"  context="{'group_by':'user_id'}"/>
@@ -307,19 +306,6 @@
          </field>
     </record>
 
-    <!-- Jobs -->
-    <!--<record id="view_job_filter_recruitment" model="ir.ui.view">-->
-        <!--<field name="name">Job</field>-->
-        <!--<field name="model">staff.job</field>-->
-        <!--<field name="inherit_id" ref="hr.view_job_filter"/>-->
-        <!--<field name="arch" type="xml">-->
-            <!--<field name="department_id" positon="after">-->
-                <!--<separator/>-->
-                <!--<filter string="Unread Messages" name="message_needaction" domain="[('message_needaction','=',True)]"/>-->
-            <!--</field>-->
-        <!--</field>-->
-    <!--</record>-->
-
     <!-- Action for the stat button of the no_employee -->
     <record model="ir.actions.act_window" id="action_staff_job_no_employee">
         <field name="name">Employees</field>
@@ -346,13 +332,6 @@
                 <sheet>
                     <group>
                         <field name="name" class="oe_inline" placeholder="e.g. Sales Manager"/>
-                        <!--<label for="alias_name" string="Job Email" attrs="{'invisible': [('alias_domain', '=', False)]}" help="Define a specific contact address for this job position. If you keep it empty, the default email address will be used which is in human resources settings"/>-->
-                        <!--<div name="alias_def" attrs="{'invisible': [('alias_domain', '=', False)]}">-->
-                            <!--<field name="alias_id" class="oe_read_only" string="Email Alias" required="0"/>-->
-                            <!--<div class="oe_edit_only" name="edit_alias">-->
-                                <!--<field name="alias_name" class="oe_inline"/>@<field name="alias_domain" class="oe_inline" readonly="1"/>-->
-                            <!--</div>-->
-                        <!--</div>-->
                     </group>
                     <footer>
                         <button string="Create" name="close_dialog" type="object" class="btn-primary"/>
@@ -452,7 +431,6 @@
             </field>
         </record>
 
-    ######################## JOB OPPORTUNITIES (menu) ###########################
     <record model="ir.actions.act_window" id="crm_case_categ0_act_job">
         <field name="name">招聘</field>
         <field name="res_model">hire.applicant</field>
@@ -500,15 +478,9 @@
         <field name="act_window_id" ref="crm_case_categ0_act_job"/>
     </record>
 
-    <!--<menuitem-->
-        <!--name="招聘"-->
-        <!--id="menu_staff_hire_root"-->
-        <!--web_icon="staff_hire,static/description/icon.png"-->
-        <!--/>-->
 
 
     <!-- ALL JOBS REQUESTS -->
-    <!--<menuitem parent="menu_staff_hire_root" id="menu_job_position" action="action_staff_job" sequence="1"/>-->
     <menuitem
         name="招聘"
         parent="staff.menu_staff_main"
@@ -555,7 +527,6 @@
             </p>
         </field>
     </record>
-    <!--<menuitem name="简历与求职信" parent="staff_hire.menu_staff_hire_root" id="menu_crm_case_categ0_act_job02" action="hire_applicant_resumes" sequence="3"/>-->
 
     <!-- Stage Tree View -->
     <record model="ir.ui.view" id="staff_hire_stage_tree">
@@ -627,18 +598,6 @@
         <field name="domain">[('stage_id.sequence','&lt;=','1')]</field>
     </record>
 
-    <!--Hr Employee inherit search view-->
-    <!--<record id="hr_employee_view_search" model="ir.ui.view">-->
-        <!--<field name="name">staff.search.inherit</field>-->
-        <!--<field name="model">staff</field>-->
-        <!--<field name="inherit_id" ref="hr.view_employee_filter"/>-->
-        <!--<field name="arch" type="xml">-->
-            <!--<xpath expr="//field[@name='department_id']" position="after">-->
-                <!--<filter name="newly_hired_staff" string="New Hired" domain="[('newly_hired_staff', '=', True)]"/>-->
-            <!--</xpath>-->
-        <!--</field>-->
-    <!--</record>-->
-
     <record id="hr_employee_action_from_department" model="ir.actions.act_window">
         <field name="name">Newly Hired Employees</field>
         <field name="res_model">staff</field>
@@ -649,7 +608,6 @@
             'search_default_department_id': [active_id],
             'default_department_id': active_id}
         </field>
-        <!--<field name="search_view_id" ref="hr_employee_view_search"/>-->
     </record>
 
     </data>

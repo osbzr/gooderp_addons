@@ -14,10 +14,10 @@
     ],
     # always loaded
     'data': [
+        'security/ir.model.access.csv',
         'data/hire_data.xml',
         'views/hire_view.xml',
         'views/staff_job_view.xml',
-        # 'views/staff_department_view.xml',
         'report/hire_report_view.xml',
     ],
     # only loaded in demonstration mode

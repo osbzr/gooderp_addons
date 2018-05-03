@@ -74,9 +74,6 @@ class hire_applicant(models.Model):
     active = fields.Boolean(u"有效", default=True, help=u"如果“有效”字段设为false，它对信息进行隐藏但不删除它。")
     note = fields.Text(u"备注")
     email_from = fields.Char(u"Email", size=128, help=u"这些人将收到电子邮件")
-    # email_cc = fields.Text(u"关注者的电子邮件", size=252,
-    #                        help=u"这些邮箱地址将添加到所有接收的发送邮件的抄送字段，用逗号分隔多个邮件地址。")
-    # probability = fields.Float(u"概率")
     stage_id = fields.Many2one('staff.hire.stage', u'阶段', track_visibility='onchange',
                                domain="['|', ('job_id', '=', False), ('job_id', '=', job_id)]",
                                copy=False, index=True,
@@ -110,8 +107,6 @@ class hire_applicant(models.Model):
                               )
     department_id = fields.Many2one('staff.department', u"部门")
     reference = fields.Char(u"推荐人")
-    # day_open = fields.Float(compute='_compute_day', string=u"开启天数")
-    # day_close = fields.Float(compute='_compute_day', string=u"关闭天数")
     color = fields.Integer("Color Index", default=0)
     staff_id = fields.Many2one('staff', string=u"员工", track_visibility="onchange", help=u"关联员工")
     staff_name = fields.Char(related='staff_id.name', string=u"员工姓名")

@@ -16,7 +16,6 @@ class staff_hire_report(models.Model):
     company_id = fields.Many2one('res.company', 'Company', readonly=True)
     date_create = fields.Datetime('Create Date', readonly=True)
     date_last_stage_update = fields.Datetime('Last Stage Update', readonly=True)
-    # date_closed = fields.Date('Closed', readonly=True)
     job_id = fields.Many2one('staff.job', 'Applied Job', readonly=True)
     stage_id = fields.Many2one('staff.hire.stage', 'Stage')
     degree_id = fields.Many2one('core.value', 'Degree')
@@ -28,8 +27,6 @@ class staff_hire_report(models.Model):
     salary_exp_avg = fields.Float("Avg. Expected Salary", group_operator="avg", digits=0)
     delay_close = fields.Float('Avg. Delay to Close', digits=(16, 2), readonly=True, group_operator="avg", help="Number of Days to close the project issue")
     last_stage_id = fields.Many2one('staff.hire.stage', 'Last Stage')
-    # medium_id = fields.Many2one('utm.medium', 'Medium', readonly=True, help="This is the method of delivery. Ex: Postcard, Email, or Banner Ad")
-    # source_id = fields.Many2one('utm.source', 'Source', readonly=True, help="This is the source of the link Ex: Search Engine, another domain, or name of email list")
 
     @api.model_cr
     def init(self):
