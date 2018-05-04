@@ -7,10 +7,10 @@ from odoo.exceptions import UserError
 
 
 AVAILABLE_PRIORITIES = [
-    ('0', 'Normal'),
-    ('1', 'Good'),
-    ('2', 'Very Good'),
-    ('3', 'Excellent')
+    ('0', u'一般'),
+    ('1', u'良好'),
+    ('2', u'优秀'),
+    ('3', u'杰出')
 ]
 
 
@@ -19,7 +19,7 @@ class staff_hire_stage(models.Model):
     _description = u"招聘阶段"
     _order = 'sequence'
 
-    name = fields.Char(u"阶段名", required=True, translate=True)
+    name = fields.Char(u"阶段名", required=True)
     sequence = fields.Integer(
         u"序号", default=10,
         help=u"按顺序显示列表中的各阶段。")
@@ -207,9 +207,11 @@ class hire_applicant(models.Model):
 
     @api.multi
     def action_get_created_employee(self):
+        """跳到新创建的员工界面"""
         self.ensure_one()
         action = self.env['ir.actions.act_window'].for_xml_id('staff', 'staff_action')
         action['res_id'] = self.mapped('staff_id').ids[0]
+        action['domain'] = str([('id', '=', self.mapped('staff_id').ids[0])])
         return action
 
     @api.multi
@@ -223,10 +225,8 @@ class hire_applicant(models.Model):
         category = self.env.ref('staff_hire.categ_meet_interview')
         res = self.env['ir.actions.act_window'].for_xml_id('calendar', 'action_calendar_event')
         res['context'] = {
-            # 'search_default_partner_ids': self.partner_id.name,
             'default_partner_ids': partners.ids,
             'default_user_id': self.env.uid,
-            # 'default_name': self.name,
             'default_categ_ids': category and [category.id] or False,
         }
         return res

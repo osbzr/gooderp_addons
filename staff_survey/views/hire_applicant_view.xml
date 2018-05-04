@@ -26,8 +26,8 @@
                     context="{'survey_id': survey_id}"
                     attrs="{'invisible':[('survey_id','=',False)]}">
                     <div class="o_form_field o_stat_info">
-                        <span class="o_stat_text">Start</span>
-                        <span class="o_stat_text">Interview</span>
+                        <span class="o_stat_text">开始</span>
+                        <span class="o_stat_text">面试</span>
                     </div>
                 </button>
             </xpath>
