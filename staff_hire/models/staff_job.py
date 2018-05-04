@@ -71,10 +71,6 @@ class staff_job(models.Model):
         for job in self:
             job.application_count = result.get(job.id, 0)
 
-    @api.model
-    def create(self, vals):
-        return super(staff_job, self.with_context(mail_create_nolog=True)).create(vals)
-
     @api.multi
     def action_get_attachment_tree_view(self):
         action = self.env.ref('base.action_attachment').read()[0]

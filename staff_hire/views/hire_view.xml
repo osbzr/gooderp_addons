@@ -37,7 +37,7 @@
                 <button string="创建员工" name="create_employee_from_applicant" type="object"
                         class="oe_highlight" attrs="{'invisible': ['|',('staff_id', '!=', False),('active', '=', False)]}"/>
                 <button string="拒绝" name="archive_applicant" type="object" attrs="{'invisible': [('active', '=', False)]}"/>
-                <button string="重新打开申请" name="reset_applicant" type="object" attrs="{'invisible': [('active', '=', True)]}"/>
+                <button string="重新打开招聘" name="reset_applicant" type="object" attrs="{'invisible': [('active', '=', True)]}"/>
                 <field name="stage_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}" attrs="{'invisible': [('active', '=', False),('staff_id', '=', False)]}"/>
             </header>
             <sheet>
