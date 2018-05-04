@@ -207,9 +207,11 @@ class hire_applicant(models.Model):
 
     @api.multi
     def action_get_created_employee(self):
+        """跳到新创建的员工界面"""
         self.ensure_one()
         action = self.env['ir.actions.act_window'].for_xml_id('staff', 'staff_action')
         action['res_id'] = self.mapped('staff_id').ids[0]
+        action['domain'] = str([('id', '=', self.mapped('staff_id').ids[0])])
         return action
 
     @api.multi
@@ -223,10 +225,8 @@ class hire_applicant(models.Model):
         category = self.env.ref('staff_hire.categ_meet_interview')
         res = self.env['ir.actions.act_window'].for_xml_id('calendar', 'action_calendar_event')
         res['context'] = {
-            # 'search_default_partner_ids': self.partner_id.name,
             'default_partner_ids': partners.ids,
             'default_user_id': self.env.uid,
-            # 'default_name': self.name,
             'default_categ_ids': category and [category.id] or False,
         }
         return res

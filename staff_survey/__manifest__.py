@@ -13,7 +13,7 @@
         'staff_hire', 'survey',
     ],
     'data': [
-        # 'views/hire_applicant_view.xml',
+        'views/hire_applicant_view.xml',
         'views/staff_job_view.xml',
     ],
     'demo': [
