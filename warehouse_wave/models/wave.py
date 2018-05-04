@@ -73,7 +73,7 @@ class Wave(models.Model):
         """
         for wave_row in self:
             wh_move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id),
-                                                       ('pakge_sequence', '=', False)])
+                                                       ('state', '=', 'done')])
             if wh_move_rows:
                 raise UserError(u"""发货单%s已经打包发货,拣货单%s不允许删除!
                                  """ % (u'-'.join([move_row.name for move_row in wh_move_rows]),
