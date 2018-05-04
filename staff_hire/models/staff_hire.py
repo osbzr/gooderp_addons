@@ -7,10 +7,10 @@ from odoo.exceptions import UserError
 
 
 AVAILABLE_PRIORITIES = [
-    ('0', 'Normal'),
-    ('1', 'Good'),
-    ('2', 'Very Good'),
-    ('3', 'Excellent')
+    ('0', u'一般'),
+    ('1', u'良好'),
+    ('2', u'优秀'),
+    ('3', u'杰出')
 ]
 
 
@@ -19,7 +19,7 @@ class staff_hire_stage(models.Model):
     _description = u"招聘阶段"
     _order = 'sequence'
 
-    name = fields.Char(u"阶段名", required=True, translate=True)
+    name = fields.Char(u"阶段名", required=True)
     sequence = fields.Integer(
         u"序号", default=10,
         help=u"按顺序显示列表中的各阶段。")

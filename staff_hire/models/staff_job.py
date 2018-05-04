@@ -8,11 +8,10 @@ class staff_job(models.Model):
 
     @api.model
     def _default_address_id(self):
-        print 'ppppppp',self.env.user.company_id,self.env.user.company_id.name
         return self.env.user.company_id
 
     address_id = fields.Many2one(
-        'partner', u"工作地点", default=_default_address_id,
+        'res.company', u"工作地点", default=_default_address_id,
         help=u"员工工作的地址")
     application_ids = fields.One2many('hire.applicant', 'job_id', u"求职申请")
     application_count = fields.Integer(compute='_compute_application_count', string=u"求职申请数")
