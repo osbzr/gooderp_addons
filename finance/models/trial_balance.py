@@ -78,7 +78,71 @@ class TrialBalance(models.Model):
             ),
         }
 
-        return self.env.ref('finance.create_vouchers_summary_wizard_form')
+class CheckTrialBalanceWizard(models.TransientModel):
+    """ 检查试算平衡
+
+    """
+
+    _name = 'check.trial.balance.wizard'
+    _description = u'检查试算平衡'
+
+    @api.model
+    def _default_period_id(self):
+        return self._default_period_id_impl()
+
+    @api.model
+    def _default_period_id_impl(self):
+        """
+                        默认是当前会计期间
+        :return: 当前会计期间的对象
+        """
+        return self.env['finance.period'].get_date_now_period_id()
+
+    period_id = fields.Many2one(
+        'finance.period', default=_default_period_id, string=u'会计期间', help=u'检查试算平衡的期间')
+
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'公司',
+        change_default=True,
+        default=lambda self: self.env['res.company']._company_default_get())
+
+    @api.multi
+    def check_trial_balance(self):
+        self.ensure_one()
+        trial_balance_items = self.env['trial.balance'].search( [('period_id','=',self.period_id.id),('account_type','=','normal')])
+        if self.period_id == self.period_id.get_init_period():
+            total_cumulative_occurrence_debit = sum(trial_balance_items.mapped('cumulative_occurrence_debit'))
+            total_cumulative_occurrence_credit = sum(trial_balance_items.mapped('cumulative_occurrence_credit'))
+            if total_cumulative_occurrence_debit != total_cumulative_occurrence_credit:
+                raise UserError( u'本年累计借贷不平')
+        else:
+            total_initial_balance_debit = sum(trial_balance_items.mapped('initial_balance_debit'))
+            total_initial_balance_credit = sum(trial_balance_items.mapped('initial_balance_credit'))
+            total_current_occurrence_debit = sum(trial_balance_items.mapped('current_occurrence_debit'))
+            total_current_occurrence_credit = sum(trial_balance_items.mapped('current_occurrence_credit'))
+
+            if total_initial_balance_debit != total_initial_balance_credit:
+                raise UserError( u'期初借贷不平')
+
+            if total_current_occurrence_debit != total_current_occurrence_credit:
+                raise UserError( u'发生额借贷不平')
+
+        view_id = self.env.ref('finance.trial_balance_tree').id
+        if self.period_id == self.period_id.get_init_period():
+            view_id = self.env.ref('finance.init_balance_tree').id
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': u'科目余额表：' + self.period_id.name,
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'trial.balance',
+            'target': 'current',
+            'view_id': False,
+            'views': [(view_id, 'tree')],
+            'domain': [('period_id', '=', self.period_id.id)]
+        }
 
 class ChangeCumulativeOccurrenceWizard(models.TransientModel):
     """ The summary line for a class docstring should fit on one line.

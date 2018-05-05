@@ -99,6 +99,34 @@
         target="new" 
         />
 
+        <record id="check_trial_balance_wizard_form" model="ir.ui.view">
+            <field name="name">check.trial.balance.wizard.form</field>
+            <field name="model">check.trial.balance.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 60%%"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="check_trial_balance" string="试算平衡" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="check_trial_balance_wizard_action"
+            name='试算平衡'
+            res_model="check.trial.balance.wizard"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new" 
+            />
+
         <record id="change_cumulative_occurrence_wizard_form" model="ir.ui.view">
             <field name="name">change.cumulative.occurrence.wizard.form</field>
             <field name="model">change.cumulative.occurrence.wizard</field>
@@ -150,7 +178,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="科目明细帐表" type="object" class="oe_highlight"/>
+                        <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="科目明细账表" type="object" class="oe_highlight"/>
                          <button name="create_general_ledger_account" invisible="context.get('create_vouchers_summary')" string="科目总账" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
@@ -159,7 +187,7 @@
             </field>
         </record>
       <act_window id="create_vouchers_summary_wizard_action"
-        name='明细帐'
+        name='明细账'
         res_model="create.vouchers.summary.wizard"
         multi="True"
         view_type="form"
@@ -171,7 +199,7 @@
             <field name="name">trial.balance.form</field>
             <field name="model">vouchers.summary</field>
             <field name="arch" type="xml">
-                <tree string="科目明细帐" create="false" edit='false'>
+                <tree string="科目明细账" create="false" edit='false'>
                     <field name="date"/>
                     <field name="period_id"/>
                     <field name="voucher_id"/>
@@ -186,12 +214,12 @@
             </field>
         </record>
 
-		<!--明细帐 search 视图-->
+		<!--明细账 search 视图-->
 		<record id="vouchers_summary_search" model="ir.ui.view">
             <field name="name">vouchers.summary.search</field>
             <field name="model">vouchers.summary</field>
             <field name="arch" type="xml">
-                <search string="科目明细帐">
+                <search string="科目明细账">
                     <field name="date"/>
                     <field name="period_id"/>
                     <field name="voucher_id"/>
@@ -206,7 +234,7 @@
         </record>
 
         <record id="vouchers_summary_action" model="ir.actions.act_window">
-            <field name="name">明细帐</field>
+            <field name="name">明细账</field>
             <field name="res_model">vouchers.summary</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
@@ -236,12 +264,12 @@
             </field>
         </record>
 
-		<!--总帐 search 视图-->
+		<!--总账 search 视图-->
 		<record id="general_ledger_account_search" model="ir.ui.view">
             <field name="name">vougeneral.ledger.account.search</field>
             <field name="model">general.ledger.account</field>
             <field name="arch" type="xml">
-                <search string="科目总帐">
+                <search string="科目总账">
                     <field name="period_id"/>
                     <field name="summary"/>
                      <field name="direction" string="余额方向" domain="[('balance','=',u'平')]"/>
@@ -262,5 +290,6 @@
      <menuitem id='create_general_ledger_account_menu' action='create_ledger_account_action' parent='voucher_books_menu' sequence='60' name="科目总账"/>
      <menuitem id='create_vouchers_summary_menu' action='create_vouchers_summary_wizard_action' parent='voucher_books_menu' sequence='50' name="科目明细账"/>
 	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='22' name="科目余额表"/>
+     <menuitem id='check_trial_balance_menu' action='check_trial_balance_wizard_action' parent='voucher_books_menu' sequence='23' name="试算平衡"/>
     </data>
 </openerp>
