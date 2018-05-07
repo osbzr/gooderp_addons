@@ -139,6 +139,24 @@ class CheckTrialBalanceWizard(models.TransientModel):
 
         res.update({'period_id': period_id.id, 'is_init_period': is_init_period})
 
+        if is_init_period:
+            if self.total_cumulative_occurrence_debit != self.total_cumulative_occurrence_credit:
+                diff = self.total_cumulative_occurrence_debit - self.total_cumulative_occurrence_credit
+                res.update({ 'is_balance': False, 'result':'2', 'diff': diff })
+            else:
+                res.update({ 'is_balance': True, 'result':'1' })
+        else:
+
+            if self.total_initial_balance_debit != self.total_initial_balance_credit:
+                diff = self.total_initial_balance_debit - self.total_initial_balance_credit
+                res.update({ 'is_balance': False, 'result':'3', 'diff': diff })
+
+            elif self.total_current_occurrence_debit != self.total_current_occurrence_credit:
+                diff = self.total_current_occurrence_debit - self.total_current_occurrence_credit
+                res.update({ 'is_balance': False, 'result':'4', 'diff': diff })
+            else:
+                res.update({ 'is_balance': True, 'result':'1' })
+
         return res
 
     period_id = fields.Many2one(
@@ -167,7 +185,17 @@ class CheckTrialBalanceWizard(models.TransientModel):
     total_cumulative_occurrence_debit = fields.Float(
         u'本年累计发生额(借方)', digits=dp.get_precision('Amount'), default=0)
     total_cumulative_occurrence_credit = fields.Float(
-        u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'), default=0)    
+        u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'), default=0)
+    result = fields.Selection(
+            string=u'借贷平衡情况',
+            selection=[('1', u'借贷平衡'), ('2', u'本年累计发生额借贷不平'),('3', u'期初余额借贷不平'),('4', u'本期发生额借贷不平')]
+        )
+    is_balance = fields.Boolean(
+            string=u'Is Balance',
+        )
+    diff = fields.Float(
+            string=u'差异金额',
+        )    
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',

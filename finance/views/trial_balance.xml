@@ -122,11 +122,14 @@
                             <field name="total_cumulative_occurrence_credit" readonly="1"  attrs="{ 'invisible': [('is_init_period','=', False)]  }"/>
                             <field name="total_ending_balance_debit" readonly="1"/>
                             <field name="total_ending_balance_credit" readonly="1"/>
+                            <field name="result"  readonly="1"/>
+                            <field name="is_balance" invisible="1"/>
+                            <field name="diff" attrs="{ 'invisible': [('is_balance','=', True)]  }"/>
                         </group>
                     </group>
                     <footer>
-                        <button name="check_trial_balance" string="试算平衡" type="object" class="oe_highlight" /> 或者
-                        <button string="取消" class="oe_link" special="cancel" />
+                       <!--  <button name="check_trial_balance" string="试算平衡" type="object" class="oe_highlight" /> 或者 -->
+                        <button string="确认" class="oe_link" special="cancel" />
                     </footer>
                 </form>
             </field>
