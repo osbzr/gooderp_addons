@@ -132,6 +132,7 @@ class Voucher(models.Model):
                                   (debit_sum, credit_sum))
 
         self.state = 'done'
+        ''' #xuan
         if self.is_checkout:   # 月结凭证不做反转
             return True
         for line in self.line_ids:
@@ -143,6 +144,7 @@ class Voucher(models.Model):
                 # 收入类科目只能在贷方记账,比如退款给客户的情况
                 line.credit = -line.debit
                 line.debit = 0
+        '''
 
     @api.one
     def voucher_can_be_draft(self):
@@ -766,14 +768,25 @@ class FinanceAccount(models.Model):
         """
         限制科目删除条件
         """
+        parent_ids =[]
         for record in self:
+            if record.parent_id not in parent_ids:
+                parent_ids.append(record.parent_id)
+
             if record.source == 'init' and record.env.context.get('modify_from_webclient', False):
                 raise UserError(u'不能删除预设会计科目!')
 
             if record.env.context.get('modify_from_webclient', False) and record.voucher_line_ids:
                 raise UserError(u'不能删除有记账凭证的会计科目!')
     
-        return super(FinanceAccount, self).unlink()
+        result = super(FinanceAccount, self).unlink()
+        
+        # 如果 下级科目全删除了，则将 上级科目设置为 普通科目
+        for parent_id in parent_ids:
+            if len(parent_id.child_ids.ids) == 0:
+                parent_id.account_type = 'normal'
+
+        return result
 
     def button_add_child(self):
         self.ensure_one()
@@ -992,25 +1005,34 @@ class ResCompany(models.Model):
 class BankAccount(models.Model):
     _inherit = 'bank.account'
 
-    @api.one
-    @api.depends('account_id')
-    def _compute_currency_id(self):
-        self.currency_id = self.account_id.currency_id.id
-
     account_id = fields.Many2one('finance.account', u'科目', domain="[('account_type','=','normal')]")
     currency_id = fields.Many2one(
-        'res.currency', u'外币币别', compute='_compute_currency_id', store=True)
+        'res.currency', u'外币币别', related='account_id.currency_id', store=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
 
     @api.model
     def report_xml(self):
         TIMEFORMAT = "%Y%m%d"
-        time_now= time.localtime(time.time())
+        time_now = time.localtime(time.time())
+        date_str = time.strftime(TIMEFORMAT, time_now)
 
         report_model = self.env['report.template'].search([('model_id.model', '=', 'balance.sheet')], limit=1)
-        path = report_model and report_model[0].path or False
 
+        roo_path = report_model and report_model[0].path or False
         database_name = self.pool._db.dbname
+
+        folder_name = 'balance'
+
+        file_name = '%s_%s_%s' % (database_name, folder_name, date_str)
+
+        if roo_path:
+            path = '%s/%s/%s/%s' % (roo_path, database_name, folder_name, date_str)
+        else:
+            path = '%s/%s/%s' % (database_name, folder_name, date_str)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        export_file_name = '%s/%s' % (path, file_name)
 
         bank_account_ids = self.search([])
         data = []
@@ -1019,25 +1041,19 @@ class BankAccount(models.Model):
                 {
                     'database': database_name,
                     'name': bank_account.name,
-                    'number': bank_account.num,
+                    'number': bank_account.num or '',
                     'date': fields.Date.context_today(self),
                     'amount': bank_account.balance
                 }
             )
 
-        if path:
-            path = '%s/%s/%s' % (path, database_name, fields.Date.context_today(self))
-        else:
-            path = '%s/%s' % (database_name, fields.Date.context_today(self))
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        import sys  
-        reload(sys)  
-        sys.setdefaultencoding('utf8')  
-        xml_file = open('%s/%s.xml' % (path, u'银行账户%s' % str(time.strftime(TIMEFORMAT, time_now))), 'wb')
-        xml_string = xmltodict.unparse({'data': {'account':data}}, pretty=True)
+        import sys
+        reload(sys)
+        sys.setdefaultencoding('utf8')
+        xml_file = open('%s.xml' % (export_file_name), 'wb')
+        xml_string = xmltodict.unparse({'data': {'account': data}}, pretty=True)
         xml_file.write(xml_string)
+        xml_file.close()
 
 
 class CoreCategory(models.Model):
