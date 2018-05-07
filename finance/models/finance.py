@@ -925,7 +925,7 @@ class WizardAccountAddChild(models.TransientModel):
             'views': [(view.id, 'tree')],
             'view_id': view.id,
             'target': 'current',
-            'context': dict(self.env.context, hide_button=False),
+            'context': dict(self.env.context, hide_button=False, modify_from_webclient=True)
         }
 
     @api.onchange('account_code')
