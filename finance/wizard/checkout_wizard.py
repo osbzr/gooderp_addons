@@ -63,69 +63,178 @@ class CheckoutWizard(models.TransientModel):
                         account_obj = self.env['finance.account']
                         company_obj = self.env['res.company']
                         voucher_line_obj = self.env['voucher.line']
-                        revenue_account_ids = account_obj.search(
-                            [('costs_types', '=', 'in')])  # 收入类科目
-                        expense_account_ids = account_obj.search(
-                            [('costs_types', '=', 'out')])  # 费用类科目
-                        revenue_total = 0  # 收入类科目合计
-                        expense_total = 0  # 费用类科目合计
-                        for revenue_account_id in revenue_account_ids:
+                        # 非限定性净资产 科目
+                        account_unrestricted_net_asset_id = self.env.ref('finance.init_account_3101')
+                        # 限定性净资产 科目
+                        account_restricted_net_asset_id = self.env.ref('finance.init_account_3102')
+                        # 非限定性收入 科目
+                        account_unrestricted_revenue_ids =[]
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code','=','410101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '420101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '430101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '440101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '450101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '460101')], limit=1))
+                        account_unrestricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '490101')], limit=1))
+                        # 限定性收入 科目
+                        account_restricted_revenue_ids =[]
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '410102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '420102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '430102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '440102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '450102')], limit=1))
+                        account_restricted_revenue_ids.append(
+                            self.env['finance.account'].search([('code', '=', '460102')], limit=1))
+                        account_restricted_revenue_ids.append(self.env.ref('finance.init_account_490102'))
+                        # 费用 科目
+                        account_expense_ids =[]
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5101')], limit=1))
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5201')], limit=1))
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5301')], limit=1))
+                        account_expense_ids.append(
+                            self.env['finance.account'].search([('code', '=', '5401')], limit=1))
+                        total_revenue_unrestricted = 0  # 非限定性收入类科目合计
+                        total_revenue_restricted = 0  # 限定性收入类科目合计
+                        total_expense = 0  # 费用类科目合计
+
+                        # 处理非限制性收入
+                        __account_unrestricted_revenue_ids =[]
+                        print account_unrestricted_revenue_ids
+                        for account_id in account_unrestricted_revenue_ids:
+                            account_ids = self.env['finance.account'].search([('id','child_of',account_id.id),('account_type','=','normal')])
+                            __account_unrestricted_revenue_ids.extend(account_ids)
+                        print '1',__account_unrestricted_revenue_ids
+
+                        for account_id in __account_unrestricted_revenue_ids:
                             voucher_line_ids = voucher_line_obj.search([
-                                ('account_id', '=', revenue_account_id.id),
+                                ('account_id', '=', account_id.id),
                                 ('voucher_id.period_id', '=', balance.period_id.id)])
-                            credit_total = 0
+                            amount = 0
                             for voucher_line_id in voucher_line_ids:
-                                credit_total += voucher_line_id.credit - voucher_line_id.debit
-                            revenue_total += credit_total
-                            if credit_total != 0:  # 贷方冲借方
+                                amount += voucher_line_id.credit - voucher_line_id.debit
+
+                            total_revenue_unrestricted += amount
+                            if amount != 0:
                                 res = {
-                                    'name': u'月末结账',
-                                    'account_id': revenue_account_id.id,
-                                    'debit': credit_total,
-                                    'credit': 0,
-                                }
+                                        'name': u'月末结账',
+                                        'account_id': account_id.id,
+                                        'debit': amount,
+                                        'credit': 0,
+                                    }
                                 voucher_line.append(res)
-                        for expense_account_id in expense_account_ids:
+                        print '2',voucher_line
+
+                        # 处理限制性收入
+                        __account_restricted_revenue_ids =[]
+                        for account_id in account_restricted_revenue_ids:
+                            account_ids = self.env['finance.account'].search([('id','child_of',account_id.id),('account_type','=','normal')])
+                            __account_restricted_revenue_ids.extend(account_ids)
+
+                        for account_id in __account_restricted_revenue_ids:
                             voucher_line_ids = voucher_line_obj.search([
-                                ('account_id', '=', expense_account_id.id),
+                                ('account_id', '=', account_id.id),
                                 ('voucher_id.period_id', '=', balance.period_id.id)])
-                            debit_total = 0
+                            amount = 0
                             for voucher_line_id in voucher_line_ids:
-                                debit_total += voucher_line_id.debit - voucher_line_id.credit
-                            expense_total += debit_total
-                            if debit_total != 0:  # 借方冲贷方
+                                amount += voucher_line_id.credit - voucher_line_id.debit
+
+                            total_revenue_restricted += amount
+
+                            if amount != 0:
                                 res = {
-                                    'name': u'月末结账',
-                                    'account_id': expense_account_id.id,
-                                    'debit': 0,
-                                    'credit': debit_total,
-                                }
+                                        'name': u'月末结账',
+                                        'account_id': account_id.id,
+                                        'debit': amount,
+                                        'credit': 0,
+                                    }
                                 voucher_line.append(res)
-                        # 利润结余
-                        year_profit_account = company_obj.search([])[
-                            0].profit_account
-                        remain_account = company_obj.search(
-                            [])[0].remain_account
-                        if not year_profit_account:
-                            raise UserError(u'公司本年利润科目未配置')
-                        if not remain_account:
-                            raise UserError(u'公司未分配利润科目未配置')
-                        if (revenue_total - expense_total) > 0:
+
+                        #处理费用
+                        __account_expense_ids =[]
+                        for account_id in account_expense_ids:
+                            account_ids = self.env['finance.account'].search([('id','child_of',account_id.id),('account_type','=','normal')])
+                            __account_expense_ids.extend(account_ids)
+
+                        for account_id in __account_expense_ids:
+                            voucher_line_ids = voucher_line_obj.search([
+                                ('account_id', '=', account_id.id),
+                                ('voucher_id.period_id', '=', balance.period_id.id)])
+                            amount = 0
+                            for voucher_line_id in voucher_line_ids:
+                                amount += voucher_line_id.debit - voucher_line_id.credit
+
+                            total_expense += amount
+
+                            if amount > 0:
+                                res = {
+                                        'name': u'月末结账',
+                                        'account_id': account_id.id,
+                                        'debit': 0,
+                                        'credit': amount,
+                                    }
+                                voucher_line.append(res)
+                            if amount < 0:
+                                res = {
+                                        'name': u'月末结账',
+                                        'account_id': account_id.id,
+                                        'debit': amount,
+                                        'credit': 0,
+                                    }
+                                voucher_line.append(res)
+
+                        # 非限定性净资产 结转
+
+                        if total_revenue_unrestricted - total_expense > 0:
                             res = {
-                                'name': u'利润结余',
-                                'account_id': year_profit_account.id,
+                                'name': u'非限定净资产结余',
+                                'account_id': self.env.ref('finance.init_account_3101').id,
                                 'debit': 0,
-                                'credit': revenue_total - expense_total,
+                                'credit': total_revenue_unrestricted - total_expense,
                             }
                             voucher_line.append(res)
-                        if (revenue_total - expense_total) < 0:
+                        elif total_revenue_unrestricted - total_expense < 0:
                             res = {
-                                'name': u'利润结余',
-                                'account_id': year_profit_account.id,
-                                'debit': expense_total - revenue_total,
+                                'name': u'非限定净资产结余',
+                                'account_id': self.env.ref('finance.init_account_3101').id,
+                                'debit': total_expense - total_revenue_unrestricted,
+                                'credit':  0,
+                            }
+                            voucher_line.append(res)
+
+                        # 限定性净资产 结转
+
+                        if (total_revenue_restricted) > 0:
+                            res = {
+                                'name': u'净资产结余',
+                                'account_id': self.env.ref('finance.init_account_3102').id,
+                                'debit': 0,
+                                'credit': total_revenue_restricted,
+                            }
+                            voucher_line.append(res)
+                        if (total_revenue_restricted) < 0:
+                            res = {
+                                'name': u'净资产结余',
+                                'account_id': self.env.ref('finance.init_account_3102').id,
+                                'debit': total_revenue_restricted,
                                 'credit': 0,
                             }
                             voucher_line.append(res)
+                        print '99999',voucher_line
                         # 生成凭证
                         if voucher_line:
                             valus = {
@@ -136,37 +245,7 @@ class CheckoutWizard(models.TransientModel):
                             }
                             voucher = voucher_obj.create(valus)
                             voucher.voucher_done()
-                    year_account = None
-                    if balance.period_id.month == '12':
-                        year_profit_ids = voucher_line_obj.search([
-                            ('account_id', '=', year_profit_account.id),
-                            ('voucher_id.period_id.year', '=', balance.period_id.year)])
-                        year_total = 0
-                        for year_profit_id in year_profit_ids:
-                            year_total += (year_profit_id.credit -
-                                           year_profit_id.debit)
-                        precision = self.env['decimal.precision'].precision_get(
-                            'Amount')
-                        year_total = round(year_total, precision)
-                        if year_total != 0:
-                            year_line_ids = [{
-                                'name': u'年度结余',
-                                'account_id': remain_account.id,
-                                'debit': 0,
-                                'credit': year_total,
-                            }, {
-                                'name': u'年度结余',
-                                'account_id': year_profit_account.id,
-                                'debit': year_total,
-                                'credit': 0,
-                            }]
-                            value = {'is_checkout': True,
-                                     'date': balance.date,
-                                     'line_ids': [
-                                         (0, 0, line) for line in year_line_ids],
-                                     }
-                            year_account = voucher_obj.create(value)  # 创建结转凭证
-                            year_account.voucher_done()  # 凭证确认
+
                     # 生成科目余额表
                     trial_wizard = self.env['create.trial.balance.wizard'].create({
                         'period_id': balance.period_id.id,
@@ -194,7 +273,7 @@ class CheckoutWizard(models.TransientModel):
                                                                'month': str(int(balance.period_id.month) + 1), })
                     # 显示凭证
                     view = self.env.ref('finance.voucher_form')
-                    if voucher_line or year_account:
+                    if voucher_line :
                         # 因重置凭证号，查找最后一张结转凭证
                         voucher = self.env['voucher'].search(
                             [('is_checkout', '=', True), ('period_id', '=', balance.period_id.id)], order="create_date desc",

@@ -78,6 +78,36 @@ class TrialBalance(models.Model):
             ),
         }
 
+    @api.model
+    def check_trial_balance(self, period_id):
+        res = {}
+        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('level', '=', 1)])
+
+        field_list = [
+            "total_year_init_debit", "total_year_init_credit", "total_initial_balance_debit",
+            "total_initial_balance_credit", "total_current_occurrence_debit", "total_current_occurrence_credit",
+            "total_ending_balance_debit", "total_ending_balance_credit", "total_cumulative_occurrence_debit",
+            "total_cumulative_occurrence_credit"
+        ]
+        for field in field_list:
+            res.update({field: sum(trial_balance_items.mapped(field[6:]))})
+
+        if period_id == period_id.get_init_period():
+            diff = res.get('total_cumulative_occurrence_debit', 0) - res.get('total_cumulative_occurrence_credit', 0)
+            if diff != 0:
+                raise UserError(u'期间：%s 本年累计发生额借贷不平\n\n差异金额：%s' % (period_id.name, diff))
+        else:
+            diff = res.get('total_initial_balance_debit', 0) - res.get('total_initial_balance_credit', 0)
+            if diff != 0:
+                raise UserError(u'期间：%s 期初余额借贷不平\n\n差异金额：%s' % (period_id.name, diff))
+
+            diff = res.get('total_current_occurrence_debit', 0) - res.get('total_current_occurrence_credit', 0)
+            if diff != 0:
+                raise UserError(u'期间：%s 本期发生额借贷不平\n\n差异金额：%s' % (period_id.name, diff))
+
+        return True
+
+
 class CheckTrialBalanceWizard(models.TransientModel):
     """ 检查试算平衡
 
@@ -96,9 +126,7 @@ class CheckTrialBalanceWizard(models.TransientModel):
         is_init_period = False
         if period_id == period_id.get_init_period():
             is_init_period = True
-        trial_balance_items = self.env['trial.balance'].search(
-            [('period_id', '=', period_id.id), ('account_type', '=', 'normal')]
-        )
+        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('level', '=', 1)])
 
         field_list = [
             "total_year_init_debit", "total_year_init_credit", "total_initial_balance_debit",
@@ -113,20 +141,8 @@ class CheckTrialBalanceWizard(models.TransientModel):
 
         return res
 
-    @api.model
-    def _default_period_id(self):
-        return self._default_period_id_impl()
-
-    @api.model
-    def _default_period_id_impl(self):
-        """
-                        默认是当前会计期间
-        :return: 当前会计期间的对象
-        """
-        return self.env['finance.period'].get_date_now_period_id()
-
     period_id = fields.Many2one(
-        'finance.period', default=_default_period_id, string=u'会计期间', help=u'检查试算平衡的期间')
+        'finance.period', string=u'会计期间', help=u'检查试算平衡的期间')
 
     is_init_period = fields.Boolean(
         string=u'Is Init Period',
@@ -157,39 +173,6 @@ class CheckTrialBalanceWizard(models.TransientModel):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-
-    @api.multi
-    def check_trial_balance(self):
-        self.ensure_one()
-        if self.period_id == self.period_id.get_init_period():
-
-            if self.total_cumulative_occurrence_debit != self.total_cumulative_occurrence_credit:
-                raise UserError( u'本年累计发生额借贷不平\n\n差异值：%s' %(self.total_cumulative_occurrence_debit - self.total_cumulative_occurrence_credit))
-        else:
-
-            if self.total_initial_balance_debit != self.total_initial_balance_credit:
-                raise UserError( u'期初余额借贷不平\n\n差异值：%s' %(self.total_initial_balance_debit - self.total_initial_balance_credit))
-
-            if self.total_current_occurrence_debit != self.total_current_occurrence_credit:
-                raise UserError( u'本期发生额借贷不平\n\n差异值：%s' %(self.total_current_occurrence_debit - self.total_current_occurrence_credit))
-
-        view_id = self.env.ref('finance.trial_balance_tree').id
-        if self.period_id == self.period_id.get_init_period():
-            view_id = self.env.ref('finance.init_balance_tree').id
-
-        raise UserError( u'试算平衡通过！')
-
-        return {
-            'type': 'ir.actions.act_window',
-            'name': u'科目余额表：' + self.period_id.name,
-            'view_type': 'form',
-            'view_mode': 'tree',
-            'res_model': 'trial.balance',
-            'target': 'current',
-            'view_id': False,
-            'views': [(view_id, 'tree')],
-            'domain': [('period_id', '=', self.period_id.id)]
-        }
 
 class ChangeCumulativeOccurrenceWizard(models.TransientModel):
     """ The summary line for a class docstring should fit on one line.
