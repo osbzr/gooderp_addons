@@ -87,6 +87,33 @@ class CheckTrialBalanceWizard(models.TransientModel):
     _description = u'检查试算平衡'
 
     @api.model
+    def default_get(self, fields):
+        res = super(CheckTrialBalanceWizard, self).default_get(fields)
+        active_id = self.env.context.get('active_id', False)
+
+        trial_balance_item = self.env['trial.balance'].browse(active_id)
+        period_id = trial_balance_item.period_id
+        is_init_period = False
+        if period_id == period_id.get_init_period():
+            is_init_period = True
+        trial_balance_items = self.env['trial.balance'].search(
+            [('period_id', '=', period_id.id), ('account_type', '=', 'normal')]
+        )
+
+        field_list = [
+            "total_year_init_debit", "total_year_init_credit", "total_initial_balance_debit",
+            "total_initial_balance_credit", "total_current_occurrence_debit", "total_current_occurrence_credit",
+            "total_ending_balance_debit", "total_ending_balance_credit", "total_cumulative_occurrence_debit",
+            "total_cumulative_occurrence_credit"
+        ]
+        for field in field_list:
+            res.update({field: sum(trial_balance_items.mapped(field[6:]))})
+
+        res.update({'period_id': period_id.id, 'is_init_period': is_init_period})
+
+        return res
+
+    @api.model
     def _default_period_id(self):
         return self._default_period_id_impl()
 
@@ -101,6 +128,30 @@ class CheckTrialBalanceWizard(models.TransientModel):
     period_id = fields.Many2one(
         'finance.period', default=_default_period_id, string=u'会计期间', help=u'检查试算平衡的期间')
 
+    is_init_period = fields.Boolean(
+        string=u'Is Init Period',
+    )
+
+    total_year_init_debit = fields.Float(u'年初余额(借方)', digits=dp.get_precision(
+        'Amount'), default=0)
+    total_year_init_credit = fields.Float(u'年初余额(贷方)', digits=dp.get_precision(
+        'Amount'), default=0)
+    total_initial_balance_debit = fields.Float(
+        u'期初余额(借方)', digits=dp.get_precision('Amount'), default=0)
+    total_initial_balance_credit = fields.Float(
+        u'期初余额(贷方)', digits=dp.get_precision('Amount'), default=0)
+    total_current_occurrence_debit = fields.Float(
+        u'本期发生额(借方)', digits=dp.get_precision('Amount'), default=0)
+    total_current_occurrence_credit = fields.Float(
+        u'本期发生额(贷方)', digits=dp.get_precision('Amount'), default=0)
+    total_ending_balance_debit = fields.Float(
+        u'期末余额(借方)', digits=dp.get_precision('Amount'), default=0)
+    total_ending_balance_credit = fields.Float(
+        u'期末余额(贷方)', digits=dp.get_precision('Amount'), default=0)
+    total_cumulative_occurrence_debit = fields.Float(
+        u'本年累计发生额(借方)', digits=dp.get_precision('Amount'), default=0)
+    total_cumulative_occurrence_credit = fields.Float(
+        u'本年累计发生额(贷方)', digits=dp.get_precision('Amount'), default=0)    
     company_id = fields.Many2one(
         'res.company',
         string=u'公司',
@@ -110,27 +161,23 @@ class CheckTrialBalanceWizard(models.TransientModel):
     @api.multi
     def check_trial_balance(self):
         self.ensure_one()
-        trial_balance_items = self.env['trial.balance'].search( [('period_id','=',self.period_id.id),('account_type','=','normal')])
         if self.period_id == self.period_id.get_init_period():
-            total_cumulative_occurrence_debit = sum(trial_balance_items.mapped('cumulative_occurrence_debit'))
-            total_cumulative_occurrence_credit = sum(trial_balance_items.mapped('cumulative_occurrence_credit'))
-            if total_cumulative_occurrence_debit != total_cumulative_occurrence_credit:
-                raise UserError( u'本年累计借贷不平')
+
+            if self.total_cumulative_occurrence_debit != self.total_cumulative_occurrence_credit:
+                raise UserError( u'本年累计发生额借贷不平\n\n差异值：%s' %(self.total_cumulative_occurrence_debit - self.total_cumulative_occurrence_credit))
         else:
-            total_initial_balance_debit = sum(trial_balance_items.mapped('initial_balance_debit'))
-            total_initial_balance_credit = sum(trial_balance_items.mapped('initial_balance_credit'))
-            total_current_occurrence_debit = sum(trial_balance_items.mapped('current_occurrence_debit'))
-            total_current_occurrence_credit = sum(trial_balance_items.mapped('current_occurrence_credit'))
 
-            if total_initial_balance_debit != total_initial_balance_credit:
-                raise UserError( u'期初借贷不平')
+            if self.total_initial_balance_debit != self.total_initial_balance_credit:
+                raise UserError( u'期初余额借贷不平\n\n差异值：%s' %(self.total_initial_balance_debit - self.total_initial_balance_credit))
 
-            if total_current_occurrence_debit != total_current_occurrence_credit:
-                raise UserError( u'发生额借贷不平')
+            if self.total_current_occurrence_debit != self.total_current_occurrence_credit:
+                raise UserError( u'本期发生额借贷不平\n\n差异值：%s' %(self.total_current_occurrence_debit - self.total_current_occurrence_credit))
 
         view_id = self.env.ref('finance.trial_balance_tree').id
         if self.period_id == self.period_id.get_init_period():
             view_id = self.env.ref('finance.init_balance_tree').id
+
+        raise UserError( u'试算平衡通过！')
 
         return {
             'type': 'ir.actions.act_window',
