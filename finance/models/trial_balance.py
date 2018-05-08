@@ -406,6 +406,41 @@ class CreateTrialBalanceWizard(models.TransientModel):
                 trial_balance_dict, last_period))
             trial_balance_ids = [self.env['trial.balance'].create(vals).id for (key, vals) in
                                  trial_balance_dict.items()]
+
+        else:
+            # 更新 科目余额表， 将新出现的 科目加入到 科目余额表
+            trial_balance_dict = {}
+            period_id = self.period_id.id
+            last_period = self.compute_last_period_id(self.period_id)
+            current_occurrence_dic_list = self.get_period_balance(period_id)
+            exist_trial_balanace_accounts = self.env['trial.balance'].search( [('period_id', '=', period_id)]).mapped('subject_name_id')
+            for current_occurrence in current_occurrence_dic_list:
+                account = self.env['finance.account'].browse( current_occurrence.get('account_id'))
+                if account not in exist_trial_balanace_accounts:
+                    ending_balance_debit = ending_balance_credit = 0
+                    this_debit = current_occurrence.get('debit', 0) or 0
+                    this_credit = current_occurrence.get('credit', 0) or 0
+                    if account.balance_directions == 'in':
+                        ending_balance_debit = this_debit - this_credit
+                    else:
+                        ending_balance_credit = this_credit - this_debit
+                    account_dict = {'period_id': period_id,
+                                    'current_occurrence_debit': this_debit,
+                                    'current_occurrence_credit': this_credit,
+                                    'subject_code': account.code,
+                                    'initial_balance_credit': 0,
+                                    'initial_balance_debit': 0,
+                                    'ending_balance_debit': ending_balance_debit,
+                                    'ending_balance_credit': ending_balance_credit,
+                                    'cumulative_occurrence_debit': this_debit,
+                                    'cumulative_occurrence_credit': this_credit,
+                                    'subject_name_id': account.id}
+                    trial_balance_dict[account.id] = account_dict
+                    trial_balance_dict.update(self.construct_trial_balance_dict(
+                    trial_balance_dict, last_period))
+                    trial_balance_ids.extend( [self.env['trial.balance'].create(vals).id for (key, vals) in
+                                 trial_balance_dict.items()] )
+
         view_id = self.env.ref('finance.trial_balance_tree').id
         if self.period_id == self.period_id.get_init_period():
             view_id = self.env.ref('finance.init_balance_tree').id
