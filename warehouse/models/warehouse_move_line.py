@@ -26,6 +26,7 @@ class WhMoveLine(models.Model):
     MOVE_LINE_STATE = [
         ('draft', u'草稿'),
         ('done', u'已完成'),
+        ('cancel', u'已作废'),
     ]
 
     ORIGIN_EXPLAIN = {
@@ -368,14 +369,14 @@ class WhMoveLine(models.Model):
     def check_cancel(self):
         pass
 
-    def prev_action_cancel(self):
+    def prev_action_draft(self):
         pass
 
     @api.multi
-    def action_cancel(self):
+    def action_draft(self):
         for line in self:
             line.check_cancel()
-            line.prev_action_cancel()
+            line.prev_action_draft()
             line.write({
                 'state': 'draft',
                 'date': False,

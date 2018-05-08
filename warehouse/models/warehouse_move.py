@@ -355,14 +355,26 @@ class WhMove(models.Model):
         """
         for order in self:
             order.prev_cancel_approved_order()
-            order.line_out_ids.action_cancel()
-            order.line_in_ids.action_cancel()
+            order.line_out_ids.action_draft()
+            order.line_in_ids.action_draft()
 
         return self.write({
             'approve_uid': False,
             'approve_date': False,
             'state': 'draft',
         })
+
+    @api.multi
+    def write(self, vals):
+        """
+        作废明细行
+        """
+        if vals.get('state', False) == 'cancel':
+            for order in self:
+                order.line_out_ids.action_cancel()
+                order.line_in_ids.action_cancel()
+
+        return super(WhMove, self).write(vals)
 
     @api.multi
     def create_zero_wh_in(self, wh_in, model_name):

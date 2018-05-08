@@ -343,7 +343,7 @@ class WhAssembly(models.Model):
     @api.multi
     def cancel_approved_order(self):
         for order in self:
-            order.line_in_ids.action_cancel()
+            order.line_in_ids.action_draft()
 
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
@@ -949,7 +949,7 @@ class outsource(models.Model):
     @api.multi
     def cancel_approved_order(self):
         for order in self:
-            order.line_in_ids.action_cancel()
+            order.line_in_ids.action_draft()
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
                 wh_internal.cancel_approved_order()
@@ -1243,7 +1243,7 @@ class WhDisassembly(models.Model):
     @api.multi
     def cancel_approved_order(self):
         for order in self:
-            order.line_in_ids.action_cancel()
+            order.line_in_ids.action_draft()
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
                 wh_internal.cancel_approved_order()
