@@ -124,7 +124,7 @@
                             <field name="total_ending_balance_credit" readonly="1"/>
                             <field name="result"  readonly="1"/>
                             <field name="is_balance" invisible="1"/>
-                            <field name="diff" attrs="{ 'invisible': [('is_balance','=', True)]  }"/>
+                            <field name="diff" attrs="{ 'invisible': [('is_balance','=', True)]  }" readonly="1"/>
                         </group>
                     </group>
                     <footer>
@@ -171,14 +171,17 @@
                 <form>
                     <group>
                         <group>
+                            <field name="account_id" readonly="1"/>
+                            <field name="costs_types" readonly="1"/>
                             <field name="old_cumulative_occurrence_debit" invisible="1"/>
-                            <field name="cumulative_occurrence_debit" />
+                            <field name="cumulative_occurrence_debit" attrs="{ 'invisible': [('costs_types','in',('in','out'))]  }"/>
                             <field name="old_cumulative_occurrence_credit" invisible="1"/>
-                            <field name="cumulative_occurrence_credit" />
+                            <field name="cumulative_occurrence_credit" attrs="{ 'invisible': [('costs_types','in',('in','out'))]  }"/>
+                            <field name="cumulative_occurrence" attrs="{ 'invisible': [('costs_types','not in',('in','out'))]  }"/>
                         </group>
                     </group>
                     <footer>
-                        <button name="update_cumulative_occurrence" string="更新累计数" type="object" class="oe_highlight"/>
+                        <button name="update_cumulative_occurrence" string="更新" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
                     </footer>
