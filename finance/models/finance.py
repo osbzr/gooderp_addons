@@ -784,7 +784,7 @@ class FinanceAccount(models.Model):
         # 如果 下级科目全删除了，则将 上级科目设置为 普通科目
         for parent_id in parent_ids:
             if len(parent_id.child_ids.ids) == 0:
-                parent_id.account_type = 'normal'
+                parent_id.with_context(modify_from_webclient=False).account_type = 'normal'
 
         return result
 
