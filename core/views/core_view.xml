@@ -551,6 +551,10 @@
 		</record>
 		<menuitem id='menu_clean_business_data' name='清理业务数据表' action='action_clean_business_data' parent='base.menu_custom' sequence='70'/>
 
+		<record id="action_open_module_extra_better" model="ir.actions.client">
+			<field name="name">更多模块</field>
+			<field name="tag">better.list</field>
+		</record>
 
         <!-- 用权限组来隐藏系统自带的根菜单 -->
 		<record model="ir.ui.menu" id="base.menu_administration">
@@ -565,6 +569,8 @@
 		<menuitem  groups="-base.group_no_one,core.nobody_can_see" id="web_settings_dashboard.web_dashboard_menu" parent="base.menu_administration"  />
 		<menuitem parent="system_menu" id="menu_decimal_precision_form_copy" name="小数精度设置"
 				  action="decimal_precision.action_decimal_precision_form"/>
+		<menuitem id="menu_module_extra_better" parent="base.menu_management" name="更多应用" sequence="6" action="action_open_module_extra_better" />
+
 
 	</data>
 </openerp>
