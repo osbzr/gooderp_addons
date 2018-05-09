@@ -55,6 +55,8 @@ class ReportStockBalance(models.Model):
                 WHERE  wh.type = 'stock'
                   AND line.state = 'done'
                   AND ( goods.no_stock is null or goods.no_stock = FALSE)
+                  AND line.qty_remaining != 0
+
 
                 GROUP BY wh.name, line.lot, attribute.name, goods.name, goods.id, goods.brand, loc.name, uom.name, uos.name
 
