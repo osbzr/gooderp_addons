@@ -458,7 +458,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         else:
             ending_balance_credit = this_credit - this_debit
         account_dict = {
-            'period_id': period_id,
+            'period_id': period_id.id,
             'current_occurrence_debit': this_debit,
             'current_occurrence_credit': this_credit,
             'subject_code': account.code,
