@@ -70,7 +70,7 @@
             <field name="arch" type="xml">
                 <tree editable="top" string="科目" decoration-info="account_type == 'view'" create="0">
                     <button name="button_add_child" string="增加下级科目" type="object" class="oe_highlight" invisible="context.get('hide_button',True)"/>
-                    <field name="code"/>
+                    <field name="code" readonly="1"/>
                     <field name="name"/>
                     <field name="costs_types" invisible="1"/>
                     <field name="account_type" invisible="1"/>

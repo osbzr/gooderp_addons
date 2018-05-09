@@ -779,6 +779,9 @@ class FinanceAccount(models.Model):
             if record.env.context.get('modify_from_webclient', False) and record.voucher_line_ids:
                 raise UserError(u'不能删除有记账凭证的会计科目!')
 
+            if len(record.child_ids) != 0:
+                raise UserError(u'不能删除有下级科目的会计科目!')
+
             ir_record = self.env['ir.model.data'].search([('model','=','finance.account'),('res_id','=', record.id)])
             if ir_record:
                 ir_record.res_id = record.parent_id.id
