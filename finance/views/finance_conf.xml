@@ -85,6 +85,26 @@
                 </tree>
             </field>
         </record>
+        <record id="finance_account_form" model="ir.ui.view">
+            <field name="name">finance.account.tree</field>
+            <field name="model">finance.account</field>
+            <field name="arch" type="xml">
+                <form string="科目" create="0" delete="0" edit="0">
+                    <group>
+                        <group>
+                            <field name="code" />
+                            <field name="name" />
+                            <field name="level" />
+                            <field name="parent_id" />
+                        </group>
+                        <group>
+                            <field name="account_type" />
+                            <field name="user_type" />
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
 
 		<record id="finance_account_search" model="ir.ui.view">
             <field name="name">finance.account.search</field>
@@ -270,6 +290,25 @@
                     <field name="month" attrs="{'readonly': [('is_closed','=',True)]}"/>
                     <field name="is_closed" readonly='1'/>
                 </tree>
+            </field>
+        </record>
+        <record id="period_form" model="ir.ui.view">
+            <field name="name">finance.period.form</field>
+            <field name="model">finance.period</field>
+            <field name="arch" type="xml">
+                <form string="会计期间" delete='false' create="false" edit="false">
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="year" />
+                            <field name="month" />
+                        </group>
+                        <group>
+                            <field name="company_id" />
+                            <field name="is_closed" />
+                        </group>
+                    </group>
+                </form>
             </field>
         </record>
         <record id="finance_period_search" model="ir.ui.view">
