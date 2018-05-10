@@ -1491,6 +1491,15 @@ class WhBom(osv.osv):
         default=lambda self: self.env['res.company']._company_default_get())
     goods_id = fields.Many2one('goods', related='line_parent_ids.goods_id', string=u'组合商品')
 
+    @api.one
+    @api.constrains('line_parent_ids', 'line_child_ids')
+    def check_parent_child_unique(self):
+        """判断同一个产品不能是组合件又是子件"""
+        for child_line in self.line_child_ids:
+            for parent_line in self.line_parent_ids:
+                if child_line.goods_id == parent_line.goods_id and child_line.attribute_id == parent_line.attribute_id:
+                    raise UserError(u'组合件和子件不能相同，产品:%s' % parent_line.goods_id.name)
+
 
 class WhBomLine(osv.osv):
     _name = 'wh.bom.line'
