@@ -417,10 +417,33 @@ class CreateTrialBalanceWizard(models.TransientModel):
             for current_occurrence in current_occurrence_dic_list:
                 account = self.env['finance.account'].browse(current_occurrence.get('account_id'))
                 if account not in exist_trial_balanace_accounts:
-                    trial_balance_dict[account.id] = self._prepare_account_dict(current_occurrence, last_period)
-                    trial_balance_dict.update(self.construct_trial_balance_dict(trial_balance_dict, last_period))
+                    trial_balance_dict[account.id] = self._prepare_account_dict(current_occurrence, period_id)
 
-            trial_balance_ids.extend([self.env['trial.balance'].create(vals).id for (key, vals) in trial_balance_dict.items()])
+            trial_balance_dict.update(self.construct_trial_balance_dict(trial_balance_dict, last_period))
+
+            for (key, vals) in trial_balance_dict.items():
+                if key not in exist_trial_balanace_accounts.ids:
+                    trial_balance_ids.extend(self.env['trial.balance'].create(vals).ids)
+
+        # 对 科目余额表 上下级 数据重新计算
+        for trial_item in self.env['trial.balance'].search([('account_type', '=', 'view'),('period_id','=',self.period_id.id)], order='level desc'):
+            parent_account_id = trial_item.subject_name_id
+            child_account_ids = self.env['finance.account'].search( [('id', 'child_of', parent_account_id.id),('account_type','=', 'normal')])
+            child_trial_items = self.env['trial.balance'].search([('subject_name_id', 'in', child_account_ids.ids),('period_id','=',self.period_id.id)])
+            trial_item.write(
+                {
+                    "year_init_debit": sum(child_trial_items.mapped("year_init_debit")),
+                    "year_init_credit": sum(child_trial_items.mapped("year_init_credit")),
+                    "initial_balance_debit": sum(child_trial_items.mapped("initial_balance_debit")),
+                    "initial_balance_credit": sum(child_trial_items.mapped("initial_balance_credit")),
+                    "current_occurrence_debit": sum(child_trial_items.mapped("current_occurrence_debit")),
+                    "current_occurrence_credit": sum(child_trial_items.mapped("current_occurrence_credit")),
+                    "ending_balance_debit": sum(child_trial_items.mapped("ending_balance_debit")),
+                    "ending_balance_credit": sum(child_trial_items.mapped("ending_balance_credit")),
+                    "cumulative_occurrence_debit": sum(child_trial_items.mapped("cumulative_occurrence_debit")),
+                    "cumulative_occurrence_credit": sum(child_trial_items.mapped("cumulative_occurrence_credit")),
+                }
+            )
 
         view_id = self.env.ref('finance.trial_balance_tree').id
         if self.period_id == self.period_id.get_init_period():
@@ -449,7 +472,6 @@ class CreateTrialBalanceWizard(models.TransientModel):
 
     def _prepare_account_dict(self, current_occurrence, period_id):
         account = self.env['finance.account'].browse(current_occurrence.get('account_id'))
-        trial_balance_dict = {}
         ending_balance_debit = ending_balance_credit = 0
         this_debit = current_occurrence.get('debit', 0) or 0
         this_credit = current_occurrence.get('credit', 0) or 0
@@ -458,7 +480,7 @@ class CreateTrialBalanceWizard(models.TransientModel):
         else:
             ending_balance_credit = this_credit - this_debit
         account_dict = {
-            'period_id': period_id.id,
+            'period_id': period_id,
             'current_occurrence_debit': this_debit,
             'current_occurrence_credit': this_credit,
             'subject_code': account.code,
