@@ -1520,6 +1520,7 @@ class WhBomLine(osv.osv):
                                help=u'子件行/组合件行上的商品')
     goods_qty = fields.Float(
         u'数量', digits=dp.get_precision('Quantity'),
+        default=1.0,
         help=u'子件行/组合件行上的商品数量')
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
     company_id = fields.Many2one(
@@ -1527,3 +1528,10 @@ class WhBomLine(osv.osv):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+
+    @api.one
+    @api.constrains('goods_qty')
+    def check_goods_qty(self):
+        """验证商品数量大于0"""
+        if self.goods_qty <= 0:
+            raise UserError(u'商品 %s 的数量必须大于0' % self.goods_id.name)
