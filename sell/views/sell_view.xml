@@ -108,6 +108,7 @@
                         			<group>
 										<field name="pre_receipt"/>
                             			<field name="bank_account_id"/>
+                            			<field name="money_order_id"/>
                         			</group>
                     			</group>
                     			<group>
@@ -310,6 +311,7 @@
                 			<group>
                 				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
                 				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
+                				<field name="money_order_id" groups='sell.group_sell'/>
                 			</group>
             			</group>
 						<field name="note" placeholder="暂无备注信息" attrs="{'readonly': [('state','!=','draft')]}"/>
@@ -512,6 +514,7 @@
                 			<group>
                 				<field name="receipt" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
                 				<field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}" groups='sell.group_sell'/>
+                				<field name="money_order_id" groups='sell.group_sell'/>
                 				<field name="create_date" readonly="1" string="录单时间"/>
                 				<field name="write_date" readonly="1" string="最后修改时间"/>
                 			</group>

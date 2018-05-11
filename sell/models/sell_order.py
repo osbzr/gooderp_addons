@@ -185,6 +185,12 @@ class SellOrder(models.Model):
                                  domain=[('type', '=', 'pay_method')],
                                  context={'type': 'pay_method'})
     express_type = fields.Char(u'承运商')
+    money_order_id = fields.Many2one(
+        'money.order',
+        u'预收款单',
+        readonly=True,
+        copy=False,
+        help=u'输入预收款确认时产生的预收款单')
 
     @api.onchange('address_id')
     def onchange_partner_address(self):
@@ -264,6 +270,7 @@ class SellOrder(models.Model):
             money_order = self.with_context(type='get').env['money.order'].create(
                 self._get_vals()
             )
+            self.money_order_id = money_order.id
             money_order.money_order_done()
 
     @api.one
@@ -298,11 +305,9 @@ class SellOrder(models.Model):
             [('order_id', '=', self.name)])
         delivery.unlink()
         # 查找产生的收款单并删除
-        money_order = self.env['money.order'].search(
-            [('origin_name', '=', self.name)])
-        if money_order:
-            money_order.money_order_draft()
-            money_order.unlink()
+        if self.money_order_id:
+            self.money_order_id.money_order_draft()
+            self.money_order_id.unlink()
         self.state = 'draft'
         self.approve_uid = ''
 
