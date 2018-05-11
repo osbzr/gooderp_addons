@@ -33,8 +33,9 @@
             <field name="priority" eval="16" />
             <field name="active" eval="True" />
             <field name="arch" type="xml">
-                <tree string="finance_account_type_tree" create="1" delete="1" edit="1">
+                <tree string="finance_account_type_tree" create="false" delete="false" edit="false">
                     <field name="name" />
+                    <field name="costs_types" />
                 </tree>
             </field>
         </record>
@@ -47,15 +48,15 @@
             <field name="priority" eval="16" />
             <field name="active" eval="True" />
             <field name="arch" type="xml">
-                <form string="finance_account_type_form" create="1" delete="1" edit="1">
+                <form string="finance_account_type_form" create="false" delete="false" edit="false">
                     <header>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="name" />
-                                <field name="active" />
                                 <field name="costs_types" />
+                                <field name="active" />
                             </group>
                         </group>
                     </sheet>
@@ -99,7 +100,7 @@
                         </group>
                         <group>
                             <field name="account_type" />
-                            <field name="user_type" />
+                            <field name="user_type" invisible="1"/>
                         </group>
                     </group>
                 </form>
