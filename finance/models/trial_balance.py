@@ -81,7 +81,7 @@ class TrialBalance(models.Model):
     @api.model
     def check_trial_balance(self, period_id):
         res = {}
-        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('level', '=', 1)])
+        trial_balance_items = self.env['trial.balance'].search([('period_id', '=', period_id.id), ('account_type', '=', 'normal')])
 
         field_list = [
             "total_year_init_debit", "total_year_init_credit", "total_initial_balance_debit",
