@@ -707,7 +707,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         sql = ''' select vo.date as date, vo.id as voucher_id,COALESCE(vol.debit,0) as debit,vol.name
                   as summary,COALESCE(vol.credit,0) as credit
                   from voucher as vo left join voucher_line as vol
-                  on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id = %s
+                  on vo.id = vol.voucher_id where vo.state='done' and vo.period_id=%s and  vol.account_id = %s
                   order by vo.name
                  '''
         self.env.cr.execute(sql, (period.id, subject_name.id))
@@ -742,7 +742,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         account_ids = tuple(child_ids.ids)
         sql = ''' select  sum(COALESCE(vol.debit,0)) as debit,sum(COALESCE(vol.credit,0)) as credit
          from voucher as vo left join voucher_line as vol
-            on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id in %s
+            on vo.id = vol.voucher_id where vo.state='done' and vo.period_id=%s and  vol.account_id in %s
                  group by vol.account_id'''
         self.env.cr.execute(sql, (period.id, account_ids))
         sql_results = self.env.cr.dictfetchall()
@@ -759,7 +759,7 @@ class CreateVouchersSummaryWizard(models.TransientModel):
         for line_period in compute_periods:
             sql = ''' select  sum(COALESCE(vol.debit,0)) as debit,sum(COALESCE(vol.credit,0)) as credit
              from voucher as vo left join voucher_line as vol
-                on vo.id = vol.voucher_id where vo.period_id=%s and  vol.account_id in %s
+                on vo.id = vol.voucher_id where vo.state='done' and  vo.period_id=%s and  vol.account_id in %s
                      group by vol.account_id'''
             self.env.cr.execute(sql, (line_period.id, account_ids))
             sql_results = self.env.cr.dictfetchall()
