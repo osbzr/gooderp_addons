@@ -1491,6 +1491,15 @@ class WhBom(osv.osv):
         default=lambda self: self.env['res.company']._company_default_get())
     goods_id = fields.Many2one('goods', related='line_parent_ids.goods_id', string=u'组合商品')
 
+    @api.one
+    @api.constrains('line_parent_ids', 'line_child_ids')
+    def check_parent_child_unique(self):
+        """判断同一个产品不能是组合件又是子件"""
+        for child_line in self.line_child_ids:
+            for parent_line in self.line_parent_ids:
+                if child_line.goods_id == parent_line.goods_id and child_line.attribute_id == parent_line.attribute_id:
+                    raise UserError(u'组合件和子件不能相同，产品:%s' % parent_line.goods_id.name)
+
 
 class WhBomLine(osv.osv):
     _name = 'wh.bom.line'
@@ -1511,6 +1520,7 @@ class WhBomLine(osv.osv):
                                help=u'子件行/组合件行上的商品')
     goods_qty = fields.Float(
         u'数量', digits=dp.get_precision('Quantity'),
+        default=1.0,
         help=u'子件行/组合件行上的商品数量')
     attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
     company_id = fields.Many2one(
@@ -1518,3 +1528,10 @@ class WhBomLine(osv.osv):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
+
+    @api.one
+    @api.constrains('goods_qty')
+    def check_goods_qty(self):
+        """验证商品数量大于0"""
+        if self.goods_qty <= 0:
+            raise UserError(u'商品 %s 的数量必须大于0' % self.goods_id.name)
