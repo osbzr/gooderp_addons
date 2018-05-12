@@ -21,7 +21,7 @@ class Location(models.Model):
                                                       '=', Location.id),
                                                      ('state', '=', 'done')])
             Location.current_qty = sum([line.qty_remaining for line in lines])
-            Location.save_qty = Location.current_qty
+            Location.write({'save_qty': Location.current_qty})
             if Location.current_qty == 0:
                 Location.goods_id = False
                 Location.attribute_id = False

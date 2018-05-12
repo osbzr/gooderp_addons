@@ -17,6 +17,7 @@ odoo.define('core.core', function (require) {
     var _t = core._t;
     var FieldBinaryFile = core.form_widget_registry.get('binary');
     var utils = require('web.utils');
+    var Widget = require('web.Widget');
     /*
     One2many字段增加复制按钮
     */
@@ -368,6 +369,20 @@ odoo.define('core.core', function (require) {
             this.do_warn(_t("The following fields are invalid:"), warnings.join(''));
          },
     });
+
+var BetterList = Widget.extend({
+    template: 'BetterList',
+
+    init: function(parent, data){
+        return this._super.apply(this, arguments);
+    },
+
+    start: function(){
+        return true;
+    },
+});
+core.action_registry.add('better.list', BetterList);
+
 // realize pdf view function.
 var FieldPdfViewer = FieldBinaryFile.extend({
     template: 'FieldPdfViewer',

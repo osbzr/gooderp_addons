@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hire_applicant_tree_view_inherit" model="ir.ui.view">
+        <field name="name">hire.applicant.tree.inherit</field>
+        <field name="model">hire.applicant</field>
+        <field name="inherit_id" ref="staff_hire.hire_applicant_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='source_id']" position="after">
+                <field name="survey_id" invisible="1"/>
+                <field name="response_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hire_applicant_form_view_inherit" model="ir.ui.view">
+        <field name="name">hire.applicant.form.inherit</field>
+        <field name="model">hire.applicant</field>
+        <field name="inherit_id" ref="staff_hire.hire_applicant_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_makeMeeting']" position="after">
+                <button name="action_start_survey"
+                    class="oe_stat_button"
+                    icon="fa-user"
+                    type="object"
+                    help="Answer related job question"
+                    context="{'survey_id': survey_id}"
+                    attrs="{'invisible':[('survey_id','=',False)]}">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_text">开始</span>
+                        <span class="o_stat_text">面试</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='job_id']" position="before">
+                <field name="survey_id" invisible="1"/>
+                <field name="response_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hire_applicant_kanban_view_inherit" model="ir.ui.view">
+        <field name="name">hire.applicants.kanban.inherit</field>
+        <field name="model">hire.applicant</field>
+        <field name="inherit_id" ref="staff_hire.hire_applicant_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="before">
+                <field name="survey_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

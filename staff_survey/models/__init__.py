@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from . import staff_hire
-from . import staff
+from . import hire_applicant
 from . import staff_job

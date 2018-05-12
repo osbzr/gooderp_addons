@@ -174,7 +174,7 @@ class WhMove(models.Model):
         ''' 打印快递面单+装箱单 '''
         move_rows = self.browse(move_ids)
         return_html_list = []
-        for move_row in move_rows:
+        for move_row in move_rows.sorted(key=lambda x: int(x.pakge_sequence)):
             if move_row.express_code:
                 return_html_list.append(move_row.express_menu)
             else:
@@ -190,7 +190,7 @@ class WhMove(models.Model):
         ''' 打印装箱单 '''
         move_rows = self.browse(move_ids)
         return_html_list = []
-        for move_row in move_rows:
+        for move_row in move_rows.sorted(key=lambda x: int(x.pakge_sequence)):
             return_html_list.append(self.get_package_list_data(move_row))
 
         return return_html_list

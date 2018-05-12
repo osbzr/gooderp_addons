@@ -8,11 +8,10 @@ class staff_job(models.Model):
 
     @api.model
     def _default_address_id(self):
-        print 'ppppppp',self.env.user.company_id,self.env.user.company_id.name
         return self.env.user.company_id
 
     address_id = fields.Many2one(
-        'partner', u"工作地点", default=_default_address_id,
+        'res.company', u"工作地点", default=_default_address_id,
         help=u"员工工作的地址")
     application_ids = fields.One2many('hire.applicant', 'job_id', u"求职申请")
     application_count = fields.Integer(compute='_compute_application_count', string=u"求职申请数")
@@ -22,10 +21,6 @@ class staff_job(models.Model):
     user_id = fields.Many2one('res.users', u"招聘负责人", track_visibility='onchange')
     document_ids = fields.One2many('ir.attachment', compute='_compute_document_ids', string=u"简历")
     documents_count = fields.Integer(compute='_compute_document_ids', string=u"简历数")
-    # alias_id = fields.Many2one(
-    #     'mail.alias', "Alias", ondelete="restrict", required=True,
-    #     help="Email alias for this job position. New emails will automatically create new applicants for this job position.")
-
     expected_employees = fields.Integer(compute='_compute_employees', string=u'预计总数', store=True,
                                         help=u'招聘新员工后，预计该职位的员工人数。')
     no_of_employee = fields.Integer(compute='_compute_employees', string=u"当前员工数", store=True,
@@ -76,10 +71,6 @@ class staff_job(models.Model):
         for job in self:
             job.application_count = result.get(job.id, 0)
 
-    @api.model
-    def create(self, vals):
-        return super(staff_job, self.with_context(mail_create_nolog=True)).create(vals)
-
     @api.multi
     def action_get_attachment_tree_view(self):
         action = self.env.ref('base.action_attachment').read()[0]
@@ -91,10 +82,6 @@ class staff_job(models.Model):
         action['domain'] = ['|', '&', ('res_model', '=', 'staff.job'), ('res_id', 'in', self.ids), '&',
                             ('res_model', '=', 'hire.applicant'), ('res_id', 'in', self.mapped('application_ids').ids)]
         return action
-
-    @api.multi
-    def action_set_no_of_recruitment(self, value):
-        return self.write({'no_of_recruitment': value})
 
     @api.multi
     def set_recruit(self):
