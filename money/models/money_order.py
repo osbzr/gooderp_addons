@@ -30,6 +30,7 @@ class MoneyOrder(models.Model):
     _name = 'money.order'
     _description = u"收付款单"
     _inherit = ['mail.thread']
+    _order = 'id desc'
 
     TYPE_SELECTION = [
         ('pay', u'付款'),
