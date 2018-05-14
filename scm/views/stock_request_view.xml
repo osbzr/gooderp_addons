@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="stock_request_goods_form" model="ir.ui.view">
-            <field name="name">stock.request.goods.form</field>
-            <field name="model">goods</field>
-            <field name="inherit_id" ref="goods.goods_form"/>
-            <field name="arch" type="xml">
-                <field name="cost" position="after">
-                    <field name="min_stock_qty"/>
-                </field>
-            </field>
-        </record>
         <record id='stock_request_tree' model='ir.ui.view'>
             <field name='name'>stock.request.tree</field>
             <field name='model'>stock.request</field>

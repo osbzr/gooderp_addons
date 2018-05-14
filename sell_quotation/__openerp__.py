@@ -16,6 +16,7 @@
         'security/ir.model.access.csv',
         'views/sell_quotation_view.xml',
         'data/sell_quotation_data.xml',
+        'report/report_data.xml',
     ],
     'demo': [
         'data/demo.xml',

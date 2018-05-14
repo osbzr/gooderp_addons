@@ -3,12 +3,16 @@
 from utils import safe_division
 from odoo.exceptions import UserError
 from odoo import models, fields, api
+import odoo.addons.decimal_precision as dp
 
 
 class Goods(models.Model):
     _inherit = 'goods'
 
     net_weight = fields.Float(u'净重')
+    current_qty = fields.Float(u'当前数量', compute='compute_stock_qty', digits=dp.get_precision('Quantity'))
+    max_stock_qty = fields.Float(u'库存上限', digits=dp.get_precision('Quantity'))
+    min_stock_qty = fields.Float(u'库存下限', digits=dp.get_precision('Quantity'))
 
     # 使用SQL来取得指定商品情况下的库存数量
     def get_stock_qty(self):
@@ -29,6 +33,10 @@ class Goods(models.Model):
             ''' % (Goods.id,))
 
             return self.env.cr.dictfetchall()
+
+    @api.one
+    def compute_stock_qty(self):
+        self.current_qty = sum(line.get('qty') for line in self.get_stock_qty())
 
     def _get_cost(self, warehouse=None, ignore=None):
         # 如果没有历史的剩余数量，计算最后一条move的成本

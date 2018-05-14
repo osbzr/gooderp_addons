@@ -107,6 +107,9 @@ class TestGoods(TransactionCase):
             self.hd_warehouse, 24, ignore_move=self.others_in_keyboard_mouse.id)
         self.assertEqual(suggested_cost, 24 * 80)
 
+    def test_compute_stock_qty(self):
+        self.assertEqual(self.goods_cable.current_qty, 48)
+
 
 class TestResCompany(TransactionCase):
 
