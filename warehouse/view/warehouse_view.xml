@@ -17,6 +17,21 @@
                 </field>
             </field>
         </record>
+        <record id="warehouse_goods_tree" model="ir.ui.view">
+            <field name="name">warehouse.goods.tree</field>
+            <field name="model">goods</field>
+            <field name="inherit_id" ref="goods.goods_tree"/>
+            <field name="arch" type="xml">
+                <field name="goods_class_id" position="after">
+                    <field name='current_qty'/>
+                    <field name='max_stock_qty'/>
+                    <field name="min_stock_qty"/>
+                </field>
+                <tree position="attributes">
+                    <attribute name="colors">blue:(current_qty &gt; max_stock_qty) and (max_stock_qty &gt; 0);red:current_qty &lt; min_stock_qty</attribute>
+                </tree>
+            </field>
+        </record>
         <!-- 仓库 -->
         <record id='warehouse_tree' model='ir.ui.view'>
             <field name='name'>warehouse.tree</field>
