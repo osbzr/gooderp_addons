@@ -139,8 +139,8 @@ class SellQuotationLine(models.Model):
     goods_id = fields.Many2one('goods',
                                string=u'产品',
                                required=True)
-    price = fields.Float(u'报价(含税)')
-    qty = fields.Float(u'起订量')
+    price = fields.Float(u'报价(含税)', digits=dp.get_precision('Price'))
+    qty = fields.Float(u'起订量', digits=dp.get_precision('Quantity'))
     uom_id = fields.Many2one('uom',
                              ondelete='restrict',
                              string=u'计量单位',

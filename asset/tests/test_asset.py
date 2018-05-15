@@ -142,6 +142,11 @@ class TestAsset(TransactionCase):
         # 已提完
         self.asset.depreciation_number = 1
 
+    def test_core_category_unlink(self):
+        """不能删除系统创建的类别"""
+        with self.assertRaises(UserError):
+            self.env.ref('asset.asset').unlink()
+
 
 class TestCreateCleanWizard(TransactionCase):
 

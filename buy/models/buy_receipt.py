@@ -108,6 +108,12 @@ class BuyReceipt(models.Model):
                                   readonly=True,
                                   help=u'外币币别')
     delivery_fee = fields.Float(u'运费')
+    money_order_id = fields.Many2one(
+        'money.order',
+        u'付款单',
+        readonly=True,
+        copy=False,
+        help=u'输入本次付款确认时产生的付款单')
 
     def _compute_total(self, line_ids):
         return sum(line.subtotal for line in line_ids)
@@ -304,6 +310,7 @@ class BuyReceipt(models.Model):
             'note': self.note,
             'buy_id': self.order_id.id,
         })
+        self.money_order_id = money_order.id
         return money_order
 
     def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id, goods_qty, partner_id):
@@ -407,6 +414,9 @@ class BuyReceipt(models.Model):
             self._make_payment(invoice_id, amount, this_reconcile)
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id and not self.modifying:
+            # 如果已退货也已退款，不生成新的分单
+            if self.is_return and self.payment:
+                return True
             return self.order_id.buy_generate_receipt()
 
     @api.one

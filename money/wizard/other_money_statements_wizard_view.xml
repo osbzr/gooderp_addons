@@ -17,7 +17,7 @@
                     </group>
                     <footer>
                         <button name='confirm_other_money_statements' string='确定' type='object' class='oe_highlight'/>
-                        or
+                        或者
                         <button string='取消' class='oe_link' special='cancel'/>
                 	</footer>
                 </form>

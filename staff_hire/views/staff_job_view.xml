@@ -1,0 +1,16 @@
+<odoo>
+    <record model="ir.ui.view" id="view_staff_job_tree_inherit">
+        <field name="name">staff.job.tree.inherit</field>
+        <field name="model">staff.job</field>
+        <field name="inherit_id" ref="staff.view_staff_job_tree"/>
+        <field name="arch" type="xml">
+            <field name="department_id" position="after">
+                <field name="no_of_employee"/>
+                <field name="no_of_recruitment"/>
+                <field name="expected_employees"/>
+                <field name="no_of_hired_employee"/>
+                <field name="state"/>
+            </field>
+        </field>
+    </record>
+</odoo>

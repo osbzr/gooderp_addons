@@ -114,6 +114,7 @@
 							<group>
 								<field name="prepayment" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
 								<field name="bank_account_id" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
+								<field name="money_order_id" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"/>
 							</group>
 						</group>
 						<group>

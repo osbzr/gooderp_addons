@@ -3,6 +3,8 @@
 		<!-- 项目数据 -->
 		<record id="project_gooderp" model="project">
 			<field name="name">GoodERP</field>
+			<field name="code">gooderp</field>
+        	<field name="type">project</field>
 		</record>
 		<record id="task_sell" model="task">
 			<field name="name">维护销售模块</field>

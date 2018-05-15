@@ -8,7 +8,7 @@
                 <form string="Configure finance" class="oe_form_configuration">
                     <header>
                         <button string="应用" type="object" name="execute" class="oe_highlight"/>
-                        或
+                        或者
                         <button string="取消" type="object" name="cancel" class="oe_link"/>
                     </header>
                     <div id="main" position="inside">

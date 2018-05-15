@@ -27,7 +27,7 @@
                                 <p>承运商:<span t-field="o.express_type"/></p>
                 			</div>
                 			<div style="float:right">
-                				<p>打印时间:<span t-field="o.create_date"/></p>
+								<p>打印时间:<span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/></p>
                                 <p>打印员:<span t-field="o.create_uid.name"/></p>
                 			</div>
                 			<table class="table table-condensed">
@@ -59,12 +59,12 @@
                                                 </t>
 	                						</td>
                                             <td>
-												<t t-foreach="l.move_line_ids.sorted(key=lambda x: x.move_id.pakge_sequence)" t-as="move_line">
+												<t t-foreach="l.move_line_ids.sorted(key=lambda x: int(x.move_id.pakge_sequence))" t-as="move_line">
 	                								(<span t-field="move_line.move_id.pakge_sequence"/>)<br/>
 												</t>
 	                						</td>
 	                						<td>
-												<t t-foreach="l.move_line_ids.sorted(key=lambda x: x.move_id.pakge_sequence)" t-as="move_line">
+												<t t-foreach="l.move_line_ids.sorted(key=lambda x: int(x.move_id.pakge_sequence))" t-as="move_line">
 	                								<span t-field="move_line.goods_qty"/><br/>
 												</t>
 	                						</td>

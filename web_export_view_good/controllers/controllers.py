@@ -49,6 +49,7 @@ class ReportTemplate(models.Model):
     file_address = fields.Char(u'模板文件路径',required=True)
     active = fields.Boolean(u'可用', default=True)
     blank_rows = fields.Integer(u'空白行数',required=True)
+    header_rows = fields.Integer(u'表头行数')
 
     @api.model
     def get_time(self, model):
@@ -57,7 +58,8 @@ class ReportTemplate(models.Model):
             [('model_id.model', '=', model)], limit=1)
         file_address = report_model and report_model[0].file_address or False
         blank_rows = report_model and report_model[0].blank_rows or False
-        return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address,blank_rows)
+        header_rows = report_model and report_model[0].header_rows or False
+        return (str(time.strftime(ISOTIMEFORMAT, time.localtime(time.time()))), file_address,blank_rows,header_rows)
 
 
 def content_disposition(filename):

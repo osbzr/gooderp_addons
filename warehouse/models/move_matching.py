@@ -114,7 +114,7 @@ class WhMoveLine(models.Model):
 
         return super(WhMoveLine, self).prev_action_done()
 
-    def prev_action_cancel(self):
+    def prev_action_draft(self):
         for line in self:
             if line.qty_remaining != line.goods_qty:
                 raise UserError(u'当前的入库已经被其他出库匹配，请先取消相关的出库')
@@ -123,4 +123,4 @@ class WhMoveLine(models.Model):
             line.matching_out_ids.unlink()
             line.expiration_date = False
 
-        return super(WhMoveLine, self).prev_action_cancel()
+        return super(WhMoveLine, self).prev_action_draft()

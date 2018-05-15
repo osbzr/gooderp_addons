@@ -18,7 +18,7 @@
                     </group>
                     <footer>
                         <button name='open_non_active_report' string='确定' type='object' class='oe_highlight'/>
-                        or
+                        或者
                         <button string='取消' class='oe_link' special='cancel'/>
                     </footer>
                 </form>
@@ -31,6 +31,9 @@
                 <tree string='呆滞料报表'>
                   <field name="warehouse_id"/>
                   <field name="goods_id"/>
+                    <field name="attribute_id"/>
+                    <field name="latest_move_date"/>
+                    <field name="latest_move_qty"/>
                   <field name="first_stage_day_qty" />
                   <field name="second_stage_day_qty"/>
                   <field name="third_stage_day_qty"/>

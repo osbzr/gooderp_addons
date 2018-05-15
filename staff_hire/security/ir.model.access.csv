@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_staff_hire_stage,access_staff_hire_stage,model_staff_hire_stage,,1,1,1,0
+access_hire_applicant,access_hire_applicant,model_hire_applicant,,1,1,1,0
+access_staff_hire_report,access_staff_hire_report,model_staff_hire_report,,1,1,1,0

@@ -4,6 +4,8 @@
         <!--员工-->
         <record id="lili" model="staff">
         	<field name="name">丽丽</field>
+        	<field name="code">lili</field>
+        	<field name="type">member</field>
             <field name='identification_id'>87654321</field>
             <field name='work_phone'>18823456789</field>
             <field name='user_id' ref='base.user_demo'/>
@@ -11,6 +13,8 @@
         </record>
         <record id='staff_1' model='staff'>
             <field name='name'>Admin</field>
+            <field name="code">admin</field>
+        	<field name="type">member</field>
             <field name='identification_id'>12345678</field>
             <field name='work_phone'>12345678901</field>
             <field name='user_id' ref='base.user_root'/>
@@ -20,6 +24,8 @@
         <!--部门-->
         <record id='department_1' model='staff.department'>
             <field name='name'>人事部</field>
+            <field name="code">hr</field>
+        	<field name="type">department</field>
         </record>
         <!--职位-->
         <record id='staff_job_1' model='staff.job'>

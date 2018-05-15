@@ -3,6 +3,8 @@
 		<!-- 项目数据 -->
 		<record id="project_other" model="project">
 			<field name="name">其他</field>
+			<field name="code">project_other</field>
+        	<field name="type">project</field>
 		</record>
 		<record id="task_rest" model="task">
 			<field name="name">休息</field>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--报价单打印-->
+        <record id='report_sell_quotation' model='ir.actions.report.xml'>
+            <field name='name'>报价单</field>
+            <field name='model'>sell.quotation</field>
+            <field name='report_type'>docx</field>
+            <field name='report_name'>sell.quotation</field>
+            <field name='template_file'>sell_quotation/template/sell.quotation.docx</field>
+        </record>
+        <record id="sell_quotation_form_print_inherit" model="ir.ui.view">
+            <field name="name">sell_quotation_form_print</field>
+            <field name="model">sell.quotation</field>
+            <field name='inherit_id' ref='sell_quotation.sell_quotation_form' />
+            <field name="arch" type="xml">
+                <button name="sell_quotation_draft" position="after" >
+                    <button name="%(sell_quotation.report_sell_quotation)d" string="打印" type="action" class="oe_highlight"/>
+                </button>
+            </field>
+        </record>
+    </data>
+</openerp>
