@@ -13,8 +13,8 @@
                     <field name="order_id" groups='buy.buy_groups'/>
                     <field name="partner_id"/>
                     <field name="user_id"/>
-                    <field name="amount" sum="总金额"/>
-            		<field name='payment'/>
+                    <field name="amount" sum="总金额" groups='buy.group_buy'/>
+            		<field name='payment' groups='buy.group_buy'/>
             		<field name='date_due'/>
                     <field name='currency_id'
                            groups='finance.group_multi_currency'/>
@@ -84,7 +84,7 @@
 		                            	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)],}"/>
 		                            <field name='lot' groups='goods.batch_groups'
 											attrs="{'readonly': [('using_batch', '=', False)], 'required': [('using_batch', '=', True)]}"/>
-                                    <field name='location_id' groups="warehouse.multi_location_groups" options="{'no_open': True, 'no_create': True}"/>
+                                    <field name='location_id' groups="warehouse.multi_location_groups" options="{'no_open': True, 'no_create': True}" domain="['&amp;',('warehouse_id', '=', parent.warehouse_dest_id),'|',('goods_id', '=', goods_id),('goods_id', '=', False)]"/>
 		                            <field name="goods_uos_qty" sum="合计辅助数量"
 		                            	groups="goods.auxiliary_unit_groups"/>
 		                            <field name='uos_id' groups='goods.auxiliary_unit_groups' />
@@ -140,13 +140,20 @@
                             <field name='delivery_fee'/>
                             <field name="discount_amount" groups='buy.buy_discount_groups'
                             string="抹零"/>
-                            <field name="amount"/>
+                            <field name="amount" groups='buy.group_buy'/>
                         </group>
                         <group>
                         	<field name="payment" attrs="{'readonly': [('state','!=','draft')],
-                                                'invisible': [('invoice_by_receipt','=',False)]}"/>
+                                                'invisible': [('invoice_by_receipt','=',False)]}"
+                                   groups='buy.group_buy'
+                            />
                             <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')],
-                                                        'invisible': [('invoice_by_receipt','=',False)]}"/>
+                                                        'invisible': [('invoice_by_receipt','=',False)]}"
+                                   groups='buy.group_buy'
+                            />
+                            <field name="money_order_id" attrs="{'invisible': [('invoice_by_receipt','=',False)]}"
+                                   groups='buy.group_buy'
+                            />
                         </group>
                     </group>
                     <group>
@@ -207,8 +214,8 @@
             		<field name='name'/>
                     <field name="order_id" groups='buy.buy_groups'/>
                     <field name="partner_id"/>
-                    <field name="amount" sum="总金额"/>
-            		<field name='payment'/>
+                    <field name="amount" sum="总金额" groups='buy.group_buy'/>
+            		<field name='payment' groups='buy.group_buy'/>
             		<field name='date_due'/>
                     <field name="create_uid" string="制单人"/>
                     <field name='currency_id'
@@ -284,11 +291,11 @@
 		                            <field name='uos_id' groups='goods.auxiliary_unit_groups' />
 		                            <field name="goods_qty" sum="合计数量"/>
 		                            <field name="uom_id"/>
-		                            <field name="price"/>
+		                            <field name="price" groups='buy.group_buy'/>
 		                            <field name="price_taxed" groups='buy.in_tax_groups'/>
 		                            <field name="discount_rate" groups='buy.buy_line_discount_groups'/>
 		                            <field name="discount_amount" readonly="0" sum="合计折扣额" groups='buy.buy_line_discount_groups'/>
-		                            <field name="amount" string="购货金额" sum="合计金额"/>
+		                            <field name="amount" string="购货金额" sum="合计金额" groups='buy.group_buy'/>
 		                            <field name="tax_rate" groups='buy.in_tax_groups'/>
 		                            <field name="tax_amount" sum="合计税额" groups='buy.in_tax_groups'/>
 		                            <field name="subtotal" sum="价税合计的合计" groups='buy.in_tax_groups'/>
@@ -328,11 +335,16 @@
                     <group>
                         <group>
                             <field name="discount_amount" groups='buy.buy_discount_groups'/>
-                            <field name="amount"/>
+                            <field name="amount" groups='buy.group_buy'/>
                         </group>
                         <group>
-                        	<field name="payment" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"/>
+                        	<field name="payment" attrs="{'readonly': [('state','!=','draft')]}"
+                                   groups='buy.group_buy'
+                            />
+                            <field name="bank_account_id" attrs="{'readonly': [('state','!=','draft')]}"
+                                   groups='buy.group_buy'
+                            />
+                            <field name="money_order_id" groups='buy.group_buy'/>
                         </group>
                     </group>
                     <group>

@@ -151,6 +151,24 @@
                 </kanban>
             </field>
         </record>
+        <record id="view_staff_search" model="ir.ui.view">
+            <field name="name">staff.employee.search</field>
+            <field name="model">staff</field>
+            <field name="arch" type="xml">
+                <search string="员工">
+                    <field name="name" filter_domain="['|',('work_email','ilike',self),('name','ilike',self)]"/>
+                    <field name="work_phone"/>
+                    <field name="work_email"/>
+                    <field name="job_id"/>
+                    <field name="department_id"/>
+                    <group string="分组">
+                        <filter string="经理" domain="[]" context="{'group_by':'parent_id'}"/>
+                        <filter string="部门" domain="[]" context="{'group_by':'department_id'}"/>
+                        <filter string="职位" domain="[]" context="{'group_by':'job_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 
         <record id="staff_action" model="ir.actions.act_window">
             <field name="name">员工</field>
@@ -158,6 +176,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="context">{'type':'member'}</field>
+            <field name="search_view_id" ref="view_staff_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 点击创建员工
@@ -242,14 +261,21 @@
             <field name="model">staff.job</field>
             <field name="arch" type="xml">
                 <form string="职位">
-                	<group>
-                		<field name='name'/>
-                        <field name='department_id'/>
-                		<field name='account_id'/>
-                	</group>
-                	<group>
-                		<field name='note' placeholder='描述...'/>
-                	</group>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name" placeholder="e.g. Sales Manager"/></h1>
+                        </div>
+                        <group name="staff_data">
+                            <group>
+                                <field name='department_id'/>
+                                <field name='account_id'/>
+                            </group>
+                        </group>
+                        <label for="note"/>
+                        <field name='note' placeholder='描述...'/>
+                    </sheet>
                 </form>
             </field>
         </record>

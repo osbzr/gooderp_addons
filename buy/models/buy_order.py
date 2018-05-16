@@ -238,6 +238,13 @@ class BuyOrder(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
     paid_amount = fields.Float(
         u'已付金额', compute=_get_paid_amount, readonly=True)
+    money_order_id = fields.Many2one(
+        'money.order',
+        u'预付款单',
+        readonly=True,
+        copy=False,
+        help=u'输入预付款确认时产生的预付款单')
+
 
     @api.onchange('discount_rate', 'line_ids')
     def onchange_discount_rate(self):
@@ -293,6 +300,7 @@ class BuyOrder(models.Model):
             money_order = self.with_context(type='pay').env['money.order'].create(
                 self._get_vals()
             )
+            self.money_order_id = money_order.id
             return money_order
 
     @api.one
@@ -327,12 +335,10 @@ class BuyOrder(models.Model):
             [('order_id', '=', self.name)])
         receipt.unlink()
         # 查找产生的付款单并撤销确认，删除
-        money_order = self.env['money.order'].search(
-            [('origin_name', '=', self.name)])
-        if money_order:
-            if money_order.state == 'done':
-                money_order.money_order_draft()
-            money_order.unlink()
+        if self.money_order_id:
+            if self.money_order_id.state == 'done':
+                self.money_order_id.money_order_draft()
+            self.money_order_id.unlink()
         self.state = 'draft'
         self.approve_uid = ''
 

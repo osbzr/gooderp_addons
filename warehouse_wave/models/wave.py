@@ -6,6 +6,8 @@ from odoo.exceptions import UserError
 class Wave(models.Model):
     _name = "wave"
     _description = u"拣货单"
+    _order = 'create_date desc'
+
     state = fields.Selection([('draft', '未打印'), ('printed', '已打印'),
                               ('done', '已完成')], string='状态', default='draft',
                              index=True,
@@ -71,7 +73,7 @@ class Wave(models.Model):
         """
         for wave_row in self:
             wh_move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id),
-                                                       ('pakge_sequence', '=', False)])
+                                                       ('state', '=', 'done')])
             if wh_move_rows:
                 raise UserError(u"""发货单%s已经打包发货,拣货单%s不允许删除!
                                  """ % (u'-'.join([move_row.name for move_row in wh_move_rows]),
@@ -232,8 +234,8 @@ class CreateWave(models.TransientModel):
             available_locs = self.env['location'].search([('goods_id', '=', WaveLine.goods_id.id),
                                                           ('attribute_id', '=',
                                                            WaveLine.attribute_id.id),
-                                                          ('warehouse_id', '=', warehouse_id)])
-
+                                                          ('warehouse_id', '=', warehouse_id),
+                                                          ('save_qty', '!=', 0)])
             remaining_picking_qty = WaveLine.picking_qty
             for loc in available_locs:
                 if remaining_picking_qty < 0:
@@ -298,7 +300,7 @@ class DoPack(models.Model):
                              'wh.out': 'approve_order'}
             move_row = self.env['wh.move'].search(
                 [('name', '=', self.odd_numbers)])
-            move_row.write({'pakge_sequence': False})
+            # move_row.write({'pakge_sequence': False}) # 打包完成 格子号 写成 False? 暂时注释掉
             model_row = self.env[ORIGIN_EXPLAIN.get(move_row.origin)
                                  ].search([('sell_move_id', '=', move_row.id)])
             func = getattr(model_row, function_dict.get(model_row._name), None)

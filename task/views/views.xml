@@ -26,17 +26,31 @@
 								</field>
 							</page>
 							<page name='timeline' string='工作记录'>
-								<field name="timeline_ids">
-									<tree string="进展"  editable='BOTTOM'>
-										<field name='task_id' domain="[('user_id', 'in', [uid, False]),('status.state', '!=', 'done')]"/>
-										<field name='just_done'/>
-										<field name='next_action'/>
-										<field name='hours' sum="全天合计" groups='task.group_task_hours'/>
-										<field name="user_id"/>
-										<field name='next_datetime'/>
-										<field name='set_status'/>
-										<field name="create_date" string='创建时间' readonly='1'/>
-									</tree>
+								<field name="timeline_ids" mode='kanban' context="{'form_view_ref': 'task.timeline_form'}">
+									<kanban class="o_kanban_mobile">
+										<field name='color'/>
+										<templates>
+											<t t-name="kanban-box">
+												<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click_edit">
+													<div class="o_dropdown_kanban dropdown">
+														<a class="dropdown-toggle btn" data-toggle="dropdown" href="#" >
+															<span class="fa fa-bars fa-lg"/>
+														</a>
+														<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+															<li><a type="delete">删除</a></li>
+															<li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
+														</ul>
+													</div>
+													<span t-attf-class="oe_kanban_content">
+														<field name="just_done"/>
+														<div groups='task.group_task_hours'>
+															<field name="hours"/>
+														</div>
+													</span>
+												</div>
+											</t>
+										</templates>
+									</kanban>
 								</field>
 							</page>
 						</notebook>
@@ -51,12 +65,22 @@
 				<kanban class="o_kanban_mobile">
 					<field name="date"/>
 					<field name="user_id"/>
+					<field name="color"/>
 					<templates>
 						<t t-name="kanban-box">
-							<div t-attf-class="oe_kanban_card oe_kanban_global_click">
+							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+								<ul class="oe_kanban_colorpicker" data-field="color"/>
+								<div class="o_kanban_image">
+                                    <t>
+                                        <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)"/>
+                                    </t>
+                                    <p>
+										<t t-esc="record.user_id.value"/>
+									</p>
+                                </div>
 								<p>
 									<t t-esc="record.date.value"/>
-									<t t-esc="record.user_id.value"/>
+									<!--<t t-esc="record.user_id.value"/>-->
 								</p>
 							</div>
 						</t>
@@ -207,7 +231,7 @@
 					<field name="priority"/>
 					<templates>
 						<t t-name="kanban-box">
-							<div t-attf-class="oe_kanban_card oe_kanban_global_click">
+							<div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
 								<ul class="oe_kanban_colorpicker" data-field="color"/>
 								<div class="o_kanban_image">
                                     <t>
@@ -314,6 +338,22 @@
                 </search>
             </field>
         </record>
+		<!-- timeline Form View -->
+		<record id="timeline_form" model="ir.ui.view">
+			<field name="name">timeline.form</field>
+			<field name="model">timeline</field>
+			<field name="arch" type="xml">
+				<form string="timeline">
+					<sheet>
+						<field name="task_id" placeholder="任务" domain="[('user_id', 'in', [uid, False]),('status.state', '!=', 'done')]"/>
+						<field name="just_done" placeholder="具体内容"/>
+						<field name="hours" placeholder="小时数" groups='task.group_task_hours'/>
+						<field name="create_date" string='创建时间' readonly='1'/>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
 		<record model="ir.ui.view" id="task_status_tree">
 			<field name="name">任务阶段</field>
 			<field name="model">task.status</field>

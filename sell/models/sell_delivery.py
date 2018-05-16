@@ -110,6 +110,12 @@ class SellDelivery(models.Model):
     origin_id = fields.Many2one('sell.delivery', u'来源单据')
     voucher_id = fields.Many2one('voucher', u'出库凭证', readonly=True,
                                  help=u'发货时产生的出库凭证')
+    money_order_id = fields.Many2one(
+        'money.order',
+        u'收款单',
+        readonly=True,
+        copy=False,
+        help=u'输入本次收款确认时产生的收款单')
 
     @api.onchange('address_id')
     def onchange_address_id(self):
@@ -467,12 +473,16 @@ class SellDelivery(models.Model):
                 money_order = record._make_money_order(
                     invoice_id, amount, this_reconcile)
                 money_order.money_order_done()
+                self.money_order_id = money_order.id
 
             # 先收款后发货订单自动核销
             self.auto_reconcile_sell_order()
 
             # 生成分拆单 FIXME:无法跳转到新生成的分单
             if record.order_id and not record.modifying:
+                # 如果已退货也已退款，不生成新的分单
+                if record.is_return and record.receipt:
+                    return True
                 return record.order_id.sell_generate_delivery()
 
     @api.one

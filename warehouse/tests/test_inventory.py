@@ -37,6 +37,7 @@ class TestInventory(TransactionCase):
         # 键鼠套装  96     2
         # 鼠标     1      1
         # 网线     48     1
+        self.temp_mouse_in.location_id = self.env.ref('warehouse.b001_location').id
         self.others_in.approve_order()
         self.others_in_2.approve_order()
         self.temp_mouse_in.action_done()

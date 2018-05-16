@@ -20,8 +20,8 @@ class CountryState(models.Model):
     _description = u'省/直辖市/自治区'
 
     country_id = fields.Many2one('country', u'国家')
-    name = fields.Char(u'名称')
-    code = fields.Char(u'编号')
+    name = fields.Char(u'名称', required=True)
+    code = fields.Char(u'编号', required=True)
     city_ids = fields.One2many('all.city', 'province_id', u'下辖市/区')
     company_id = fields.Many2one(
         'res.company',
@@ -34,9 +34,10 @@ class AllCity(models.Model):
     _name = 'all.city'
     _rec_name = 'city_name'
     _description = u'地级市'
-    city_name = fields.Char(u'名称')
+    city_name = fields.Char(u'名称', required=True)
     country_ids = fields.One2many('all.county', 'city_id', u'下辖县/市')
     province_id = fields.Many2one('country.state', u'省/直辖市/自治区',
+                                  required=True,
                                   domain="[('country_id.name','=','中国')]")
     company_id = fields.Many2one(
         'res.company',
@@ -50,8 +51,8 @@ class AllCounty(models.Model):
     _rec_name = 'county_name'
     _description = u'县/市/区'
 
-    city_id = fields.Many2one('all.city', u'地级市')
-    county_name = fields.Char(u'名称')
+    city_id = fields.Many2one('all.city', u'地级市', required=True)
+    county_name = fields.Char(u'名称', required=True)
     description = fields.Char(u'描述')
     company_id = fields.Many2one(
         'res.company',

@@ -26,6 +26,7 @@ class WhMoveLine(models.Model):
     MOVE_LINE_STATE = [
         ('draft', u'草稿'),
         ('done', u'已完成'),
+        ('cancel', u'已作废'),
     ]
 
     ORIGIN_EXPLAIN = {
@@ -155,7 +156,7 @@ class WhMoveLine(models.Model):
     lot_uos_qty = fields.Float(u'批号辅助数量',
                                digits=dp.get_precision('Quantity'),
                                help=u'该单据行对应的商品的批号辅助数量')
-    location_id = fields.Many2one('location', string='库位')
+    location_id = fields.Many2one('location', ondelete='restrict', string='库位')
     production_date = fields.Date(u'生产日期', default=fields.Date.context_today,
                                   help=u'商品的生产日期')
     shelf_life = fields.Integer(u'保质期(天)',
@@ -331,9 +332,13 @@ class WhMoveLine(models.Model):
                 'date': line.move_id.date,
                 'cost_time': fields.Datetime.now(self),
             })
-            if line.type == 'in' and line.location_id:
-                line.location_id.write(
-                    {'attribute_id': line.attribute_id.id, 'goods_id': line.goods_id.id})
+            if line.type in ('in', 'internal'):
+                locations = self.env['location'].search([('warehouse_id', '=', line.warehouse_dest_id.id)])
+                if locations and not line.location_id:
+                    raise UserError(u'调入仓库 %s 进行了库位管理，请在明细行输入库位' % line.warehouse_dest_id.name)
+                if line.location_id:
+                    line.location_id.write(
+                        {'attribute_id': line.attribute_id.id, 'goods_id': line.goods_id.id})
 
             if line.type == 'in' and line.scrap:
                 if not self.env.user.company_id.wh_scrap_id:
@@ -364,14 +369,14 @@ class WhMoveLine(models.Model):
     def check_cancel(self):
         pass
 
-    def prev_action_cancel(self):
+    def prev_action_draft(self):
         pass
 
     @api.multi
-    def action_cancel(self):
+    def action_draft(self):
         for line in self:
             line.check_cancel()
-            line.prev_action_cancel()
+            line.prev_action_draft()
             line.write({
                 'state': 'draft',
                 'date': False,

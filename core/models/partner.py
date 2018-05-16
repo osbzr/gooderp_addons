@@ -45,6 +45,7 @@ class Partner(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     tag_ids = fields.Many2many('core.value',
+                               ondelete='restrict',
                                string=u'标签',
                                domain=[('type', '=', 'partner_tag')],
                                context={'type': 'partner_tag'})

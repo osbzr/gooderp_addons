@@ -124,7 +124,7 @@ class TestMoveLine(TransactionCase):
         out_iphone.action_done()
         self.assertEqual(out_iphone.cost_unit, white_iphone.cost_unit)
 
-        out_iphone.action_cancel()
+        out_iphone.action_draft()
         out_iphone.attribute_id = black_iphone.attribute_id
 
         real_domain = [

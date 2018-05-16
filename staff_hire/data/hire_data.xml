@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<odoo>
+<data noupdate="0">
+        <!-- notify all employees of module installation -->
+        <record model="mail.message" id="module_install_notification">
+            <field name="model">mail.channel</field>
+            <field name="res_id" ref="mail.channel_all_employees"/>
+            <field name="message_type">notification</field>
+            <field name="subtype_id" ref="mail.mt_comment"/>
+            <field name="subject">Recruitment Process application installed!</field>
+            <field name="body"><![CDATA[<p>Manage job positions and your company's recruitment process. This application may be integrated with the Survey application to help you define interviews for different jobs.</p>
+<p>Job applications sent by email will automatically be integrated in Odoo.</p>]]></field>
+        </record>
+
+    <!-- Meeting Types (for interview meetings) -->
+    <record model="calendar.event.type" id="categ_meet_interview">
+        <field name="name">Interview</field>
+    </record>
+
+    <!-- Templates for interest / refusing applicants -->
+    <record id="email_template_data_applicant_refuse" model="mail.template">
+        <field name="name">Applicant: Refuse</field>
+        <field name="subject">Application refused</field>
+        <field name="email_to">${object.email_from | safe}</field>
+        <!--<field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>-->
+        <field name="lang">${object.partner_id and object.partner_id.lang or ''}</field>
+        <field name="model_id" ref="staff_hire.model_hire_applicant"/>
+        <field name="user_signature" eval="False"/>
+        <field name="body_html"><![CDATA[
+<p>Dear ${object.partner_name or 'applicant'},</p>
+<p>Thank you for your enquiry.<br />
+Unfortunately, your profile does not match with our needs</p>
+<p>If you have any questions, please let us know.</p>
+<p>Best regards,</p>]]></field>
+    </record>
+
+    <record id="email_template_data_applicant_interest" model="mail.template">
+        <field name="name">Applicant: Interest</field>
+        <field name="subject">Application approved</field>
+        <field name="email_to">${object.email_from | safe}</field>
+        <!--<field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>-->
+        <!--<field name="lang">${object.partner_id and object.partner_id.lang or ''}</field>-->
+        <field name="model_id" ref="staff_hire.model_hire_applicant"/>
+        <field name="user_signature" eval="False"/>
+        <field name="body_html"><![CDATA[
+<p>Dear ${object.partner_name or 'applicant'},</p>
+<p>Thank you for your enquiry.<br />
+Your resume got our interest. I will contact you as soon as possible to plan
+next steps of the recruitment process.</p>
+<p>If you have any questions, please let us know.</p>
+<p>Best regards,</p>]]></field>
+    </record>
+
+    <record id="email_template_data_applicant_employee" model="mail.template">
+        <field name="name">Applicant: Welcome new employee</field>
+        <field name="subject">Welcome ${object.name} </field>
+        <field name="model_id" ref="staff.model_staff"/>
+        <field name="body_html"><![CDATA[
+<p>Dear all,</p>
+<p>I’m very pleased to announce that <strong> ${object.name} </strong> will be
+joining us as a ${object.job_id.name}
+%if object.department_id:
+    in ${object.department_id.name}.
+%endif
+.</p>
+<p>Please welcome him/her and help him/her finding his/her marks.</p>]]></field>
+    </record>
+
+    <record model="core.value" id="degree_bachelor">
+        <field name="name">大学本科</field>
+        <field name="type">hire_degree</field>
+    </record>
+    <record model="core.value" id="degree_master">
+        <field name="name">硕士</field>
+        <field name="type">hire_degree</field>
+    </record>
+    <record model="core.value" id="degree_doctoral">
+        <field name="name">博士</field>
+        <field name="type">hire_degree</field>
+    </record>
+
+    <!-- Applicant-related subtypes for messaging / Chatter -->
+    <record id="mt_applicant_new" model="mail.message.subtype">
+        <field name="name">New Applicant</field>
+        <field name="res_model">hire.applicant</field>
+        <field name="default" eval="False"/>
+        <field name="hidden" eval="True"/>
+        <field name="description">应聘新建</field>
+    </record>
+    <record id="mt_applicant_stage_changed" model="mail.message.subtype">
+        <field name="name">Stage Changed</field>
+        <field name="res_model">hire.applicant</field>
+        <field name="default" eval="False"/>
+        <field name="description">阶段变更</field>
+    </record>
+    <record id="mt_applicant_hired" model="mail.message.subtype">
+        <field name="name">Applicant Hired</field>
+        <field name="res_model">hire.applicant</field>
+        <field name="default" eval="True"/>
+        <field name="description">应聘者被聘用</field>
+    </record>
+
+    <!-- Job-related subtypes for messaging / Chatter -->
+    <record id="mt_job_new" model="mail.message.subtype">
+        <field name="name">Job Position created</field>
+        <field name="res_model">staff.job</field>
+        <field name="default" eval="False"/>
+        <field name="hidden" eval="True"/>
+    </record>
+    <record id="mt_job_applicant_stage_changed" model="mail.message.subtype">
+        <field name="name">Applicant Stage Changed</field>
+        <field name="res_model">staff.job</field>
+        <field name="default" eval="False"/>
+        <field name="parent_id" eval="ref('mt_applicant_stage_changed')"/>
+        <field name="relation_field">job_id</field>
+    </record>
+    <record id="mt_job_applicant_hired" model="mail.message.subtype">
+        <field name="name">Applicant Hired</field>
+        <field name="res_model">staff.job</field>
+        <field name="default" eval="True"/>
+        <field name="parent_id" eval="ref('mt_applicant_hired')"/>
+        <field name="relation_field">job_id</field>
+    </record>
+
+    <!-- Department-related (parent) subtypes for messaging / Chatter -->
+    <record id="mt_department_new" model="mail.message.subtype">
+        <field name="name">Job Position Created</field>
+        <field name="res_model">staff.department</field>
+        <field name="sequence" eval="1"/>
+        <field name="parent_id" eval="ref('mt_job_new')"/>
+        <field name="relation_field">department_id</field>
+    </record>
+
+    <!-- Applicant Categories(Tag) -->
+    <record id="tag_hire_applicant_reserve" model="core.value">
+        <field name="name">保留</field>
+        <field name="type">hire_categ</field>
+    </record>
+    <record id="tag_hire_applicant_manager" model="core.value">
+        <field name="name">经理</field>
+        <field name="type">hire_categ</field>
+    </record>
+    <record id="tag_hire_applicant_it" model="core.value">
+        <field name="name">IT</field>
+        <field name="type">hire_categ</field>
+    </record>
+    <record id="tag_hire_applicant_sale" model="core.value">
+        <field name="name">销售</field>
+        <field name="type">hire_categ</field>
+    </record>
+
+</data>
+</odoo>

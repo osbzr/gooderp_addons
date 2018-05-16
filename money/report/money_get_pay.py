@@ -67,9 +67,9 @@ class MoneyGetPayReport(models.Model):
                         omo.type,
                         omo.partner_id,
                         omol.category_id,
-                        (CASE WHEN omo.type = 'other_get' THEN omol.amount ELSE 0 END) AS get,
-                        (CASE WHEN omo.type = 'other_pay' THEN omol.amount ELSE 0 END) AS pay,
-                        (CASE WHEN omo.type = 'other_get' THEN omol.amount ELSE -omol.amount END) AS amount
+                        (CASE WHEN omo.type = 'other_get' THEN omol.amount + omol.tax_amount ELSE 0 END) AS get,
+                        (CASE WHEN omo.type = 'other_pay' THEN omol.amount + omol.tax_amount ELSE 0 END) AS pay,
+                        (CASE WHEN omo.type = 'other_get' THEN omol.amount + omol.tax_amount ELSE -(omol.amount + omol.tax_amount) END) AS amount
                 FROM other_money_order AS omo
                 LEFT JOIN other_money_order_line AS omol ON omo.id = omol.other_money_id
                 WHERE omo.state = 'done'

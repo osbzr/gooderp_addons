@@ -331,6 +331,12 @@ class WhMove(models.Model):
             order.line_out_ids.action_done()
             order.line_in_ids.action_done()
 
+        # 每次移库完成，清空库位上商品数量为0的商品和属性（不合逻辑的数据）
+        for loc in self.env['location'].search([('save_qty', '=', 0),
+                                                ('goods_id', '!=', False)
+                                                ]):
+            if not loc.current_qty:
+                continue
         return self.write({
             'approve_uid': self.env.uid,
             'approve_date': fields.Datetime.now(self),
@@ -348,14 +354,26 @@ class WhMove(models.Model):
         """
         for order in self:
             order.prev_cancel_approved_order()
-            order.line_out_ids.action_cancel()
-            order.line_in_ids.action_cancel()
+            order.line_out_ids.action_draft()
+            order.line_in_ids.action_draft()
 
         return self.write({
             'approve_uid': False,
             'approve_date': False,
             'state': 'draft',
         })
+
+    @api.multi
+    def write(self, vals):
+        """
+        作废明细行
+        """
+        if vals.get('state', False) == 'cancel':
+            for order in self:
+                order.line_out_ids.action_cancel()
+                order.line_in_ids.action_cancel()
+
+        return super(WhMove, self).write(vals)
 
     @api.multi
     def create_zero_wh_in(self, wh_in, model_name):
