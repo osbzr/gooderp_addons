@@ -3,6 +3,7 @@
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
 from odoo.tools import float_is_zero
+from odoo.exceptions import UserError, ValidationError
 
 
 class Partner(models.Model):
@@ -104,6 +105,10 @@ class BankAccount(models.Model):
         如果  init_balance 字段里面有值则 进行 一系列的操作。
         :return:
         """
+        start_date = self.env.user.company_id.start_date
+        start_date_period_id = self.env['finance.period'].search_period(start_date)
+        if self.init_balance and start_date_period_id.is_closed:
+            raise UserError(u'初始化期间(%s)已结账！' % start_date_period_id.name)
         if self.init_balance:
             # 如果有前期初值，删掉已前的单据
             other_money_id = self.env['other.money.order'].search([
@@ -128,6 +133,15 @@ class BankAccount(models.Model):
             })
             # 审核 其他收入单
             other_money_init.other_money_done()
+        else:
+            other_money_id = self.env['other.money.order'].search([
+                ('bank_id', '=', self.id),
+                ('is_init', '=', True)])
+            if other_money_id:
+                other_money_id.other_money_draft()
+                other_money_id.unlink()
+            self.balance = 0
+
 
     init_balance = fields.Float(u'期初',
                                 digits=dp.get_precision('Amount'),
