@@ -193,6 +193,47 @@
 
        <menuitem name="打包" id="do_pack_menu" parent="warehouse.warehouse_order"
 		action="do_pack_action" sequence='5'/>
-		
+
+        <!-- 拣货单预留商品 tree  -->
+        <record model="ir.ui.view" id="wave_reserved_tree">
+            <field name="name">拣货单预留</field>
+            <field name="model">wave.reserved</field>
+            <field name="arch" type="xml">
+                <tree create="false" edit="false">
+                    <field name="move_name"/>
+                    <field name="goods_id"/>
+                    <field name="attribute_id"/>
+                    <field name="warehouse_id"/>
+                    <field name="goods_qty"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="wave_reserved_search" model="ir.ui.view">
+            <field name="name">拣货单预留search</field>
+            <field name="model">wave.reserved</field>
+            <field name="arch" type="xml">
+                <search string="wave预留">
+                    <field name="move_name"/>
+                    <field name='goods_id'/>
+                    <field name='warehouse_id'/>
+                    <separator/>
+                    <group expand="0" string="分组">
+                        <filter string="商品" domain="[]" context="{'group_by':'goods_id'}"/>
+                        <filter string="属性" domain="[]" context="{'group_by':'attribute_id'}"/>
+                        <filter string="仓库" domain="[]" context="{'group_by':'warehouse_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+       <record model="ir.actions.act_window" id="wave_reserved_action">
+           <field name="name">>拣货单预留</field>
+           <field name="res_model">wave.reserved</field>
+           <field name="view_mode">tree</field>
+       </record>
+
+       <menuitem name="拣货单预留" id="wave_reserved_menu" parent='sell.sell_order_menu_root'
+        action="wave_reserved_action" sequence='10'/>
     </data>
 </odoo>
