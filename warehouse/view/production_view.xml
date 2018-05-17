@@ -100,8 +100,10 @@
             <field name='arch' type='xml'>
                 <form string='组装单' >
                     <header>
-                        <button name='approve_feeding' type='object' string='发料' class='oe_highlight' states='draft,feeding'/>
-                        <button name='approve_order' type='object' string='成品入库' class='oe_highlight' states='feeding'/>
+                        <button name='approve_feeding' type='object' string='发料' class='oe_highlight'
+                                attrs="{'invisible': [('all_line_done', '=', True)]}"/>
+                        <button name='approve_order' type='object' string='成品入库' class='oe_highlight'
+                                attrs="{'invisible': ['|', ('all_line_done', '=', False), '&amp;', ('all_line_done', '=', True), ('state', '=', 'done')]}"/>
                         <button name='cancel_approved_order' type='object' string='撤销入库' states='done' />
                         <button name='update_bom' type='object' string='存为物料清单' />
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
@@ -125,9 +127,10 @@
                                 <field name='fee'/>
                                 <field name='warehouse_dest_id' />
                                 <field name='is_many_to_many_combinations' />
-                                <field name='finance_category_id' invisible="1"/>
                                 <field name='voucher_id' readonly='1'/>
                                 <field name='out_voucher_id' readonly='1'/>
+                                <field name='finance_category_id' invisible="1"/>
+                                <field name='all_line_done' invisible="1"/>
                             </group>
                         </group>
 
@@ -207,7 +210,7 @@
                                         <field name='lot_uos_qty' invisible='1' />
                                         <field name='lot' invisible='1'/>
                                         <field name='type' invisible='1'/>
-                                        <field name='state' invisible='1'/>
+                                        <field name='state' invisible='0'/>
                                     </tree>
                             </field>
                         </group>
@@ -293,8 +296,10 @@
             <field name='arch' type='xml'>
                 <form string='委外加工单'>
                     <header>
-                        <button name='approve_feeding' type='object' string='发料' class='oe_highlight' states='draft,feeding'/>
-                        <button name='approve_order' type='object' string='成品入库' class='oe_highlight' states='feeding'/>
+                        <button name='approve_feeding' type='object' string='发料' class='oe_highlight'
+                                attrs="{'invisible': [('all_line_done', '=', True)]}"/>
+                        <button name='approve_order' type='object' string='成品入库' class='oe_highlight'
+                                attrs="{'invisible': ['|', ('all_line_done', '=', False), '&amp;', ('all_line_done', '=', True), ('state', '=', 'done')]}"/>
                         <button name='cancel_approved_order' type='object' string='撤销入库' states='done'/>
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
                         <field name='state' widget='statusbar' statusbar_visible="draft,feeding,done"/>
@@ -320,9 +325,10 @@
                                 <field name='warehouse_dest_id'/>
                                 <field name='is_many_to_many_combinations'/>
                                 <field name='invoice_id' readonly='1' options="{'no_create': True}"/>
-                                <field name='finance_category_id' invisible="1"/>
                                 <field name='voucher_id' readonly='1'/>
                                 <field name='out_voucher_id' readonly='1'/>
+                                <field name='finance_category_id' invisible="1"/>
+                                <field name='all_line_done' invisible="1"/>
                             </group>
                         </group>
 
@@ -485,8 +491,10 @@
             <field name='arch' type='xml'>
                 <form string='拆卸单' >
                     <header>
-                        <button name='approve_feeding' type='object' string='发料' class='oe_highlight' states='draft,feeding'/>
-                        <button name='approve_order' type='object' string='成品入库' class='oe_highlight' states='feeding'/>
+                        <button name='approve_feeding' type='object' string='发料' class='oe_highlight'
+                                attrs="{'invisible': [('all_line_done', '=', True)]}"/>
+                        <button name='approve_order' type='object' string='成品入库' class='oe_highlight'
+                                attrs="{'invisible': ['|', ('all_line_done', '=', False), '&amp;', ('all_line_done', '=', True), ('state', '=', 'done')]}"/>
                         <button name='cancel_approved_order' type='object' string='撤销入库' states='done' />
                         <button name='update_bom' type='object' string='存为物料清单' />
                         <button name="action_cancel" states="draft" string="作废" type="object"/>
@@ -511,9 +519,10 @@
                                 <field name='fee' />
                                 <field name='warehouse_dest_id' />
                                 <field name='is_many_to_many_combinations' />
-                                <field name='finance_category_id' invisible="1"/>
                                 <field name='voucher_id' readonly='1'/>
                                 <field name='out_voucher_id' readonly='1'/>
+                                <field name='finance_category_id' invisible="1"/>
+                                <field name='all_line_done' invisible="1"/>
                             </group>
                         </group>
 
