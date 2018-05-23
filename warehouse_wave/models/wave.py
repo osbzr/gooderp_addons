@@ -223,7 +223,6 @@ class CreateWave(models.TransientModel):
                 result = line.move_id.check_goods_qty(
                     line.goods_id, line.attribute_id, line.warehouse_id)
                 result = result[0] or 0
-                print "total_goods_qty", reserved_waves, total_goods_qty, result
                 if total_goods_qty > result:
                     raise UserError(u'您勾选的订单与未发货的拣货单商品数量总和大于库存，不能生成拣货单。\n'
                                     u'产品 %s 库存不足' % line.goods_id.name)
