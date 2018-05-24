@@ -47,3 +47,36 @@ class SellReceipt(models.TransientModel):
                 'type': 'ir.actions.act_window',
                 'res_id': order.id,
             }
+
+    @api.multi
+    def generate_reconcile_order(self):
+        """新建核销单，应收冲预收，客户为所选行客户"""
+        self.ensure_one()
+        view = self.env.ref('money.reconcile_order_form')
+        # 如果已存在该客户核销单，则查看核销单，否则创建
+        order = self.env['reconcile.order'].search([
+            ('partner_id', '=', self.partner_id.id),
+            ('business_type', '=', 'adv_pay_to_get')])
+        if order:
+            return {
+                'name': u'核销单',
+                'view_mode': 'form',
+                'views': [(view.id, 'form')],
+                'res_model': 'reconcile.order',
+                'type': 'ir.actions.act_window',
+                'res_id': order.id,
+            }
+
+        order = self.env['reconcile.order'].create({
+            'partner_id': self.partner_id.id,
+            'business_type': 'adv_pay_to_get',
+        })
+        order.onchange_partner_id()
+        return {
+            'name': u'核销单',
+            'view_mode': 'form',
+            'views': [(view.id, 'form')],
+            'res_model': 'reconcile.order',
+            'type': 'ir.actions.act_window',
+            'res_id': order.id,
+        }
