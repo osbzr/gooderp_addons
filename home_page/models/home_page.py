@@ -62,7 +62,7 @@ class HomePage(models.Model):
         """
         views_ids = [view.view_id.id for view in action.action.view_ids]
         note_one, view_mode, res_model = action.note_one, action.action.view_mode, action.action.res_model
-        domain, action_id, context, view_id = action.action.domain, action.id, action.action.context, \
+        domain, action_id, context, view_id = action.domain or action.action.domain, action.id, action.context or action.action.context, \
             views_ids or False
         action_name, target = action.action.name, action.action.target
         return [note_one, view_mode, res_model, domain, context, view_id, action_name, target]
@@ -120,4 +120,5 @@ class HomePage(models.Model):
                 self.construction_action_url_list(action, action_url_list)
         action_url_list['right'] = sorted(
             action_url_list['right'].items(), key=lambda d: d[0])
+        print 'action_result', action_url_list
         return action_url_list
