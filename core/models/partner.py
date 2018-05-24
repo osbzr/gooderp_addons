@@ -56,6 +56,8 @@ class Partner(models.Model):
                                      u'负责人员')
     share_id = fields.Many2one('res.users',
                                u'共享人员')
+    date_qualify = fields.Date(u'资质到期日期')
+    days_qualify = fields.Date(u'资质到期天数')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '业务伙伴不能重名')
