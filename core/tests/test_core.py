@@ -44,6 +44,11 @@ class TestCore(TransactionCase):
         self.assertTrue(
             self.env['res.currency'].rmb_upper(-10000100.3) == u'负壹仟万零壹佰元叁角整')
 
+    def test_check_category_exists(self):
+        ''' test_check_category_exists '''
+        partner = self.env.ref('core.jd')
+        with self.assertRaises(ValidationError):
+            partner.c_category_id = False
 
 class TestResUsers(TransactionCase):
 
