@@ -266,6 +266,10 @@ class TestWave(TransactionCase):
         with self.assertRaises(UserError):
             wave_2.unlink()
 
+    def test_move_unlink(self):
+        ''' test move unlink '''
+        self.delivery.unlink()
+
 
 class TestDoPack(TransactionCase):
 
