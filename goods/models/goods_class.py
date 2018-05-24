@@ -17,12 +17,12 @@ class GoodsClass(models.Model):
     parent_id = fields.Many2one('goods.class', string=u'上级分类', index=True)
     child_id = fields.One2many('goods.class', 'parent_id', string=u'子分类')
     sequence = fields.Integer(u'顺序')
-    type = fields.Selection([('view', u'视图'),
+    type = fields.Selection([('view', u'节点'),
                              ('normal', u'常规')],
                             u'类型',
                             required=True,
                             default='normal',
-                            help=u'货品分类的类型，分为视图和常规，只有视图的分类才可以建下级货品分类，常规分类不可作为上级货品分类')
+                            help=u'货品分类的类型，分为节点和常规，只有节点的分类才可以建下级货品分类，常规分类不可作为上级货品分类')
     note = fields.Text(u'备注')
     image = fields.Binary(attachment=True)
     image_medium = fields.Binary(string="Medium-sized image", attachment=True)
