@@ -151,9 +151,10 @@ odoo.define('home_page', function (require) {
                     row_num = parseInt(12 / (result_top.length % 4)) == 0 ? 4 : parseInt(12 / (result_top.length % 4))
                 }
                 if (top_data.length == 2) {
+                    row_num = 1;
                     var left_html_str = $("<div class='col-xs-6 col-sm-" + row_num + " block-center text-center'>\
-                          <button class='btn btn-primary button-circle oe_top_link_" + i +
-                        "' oe_top_link='" + i + "' id='" + i + "' style='width: 160px;height: 160px'>\
+                          <button class='oe_top_link_" + i +
+                        "' oe_top_link='" + i + "' id='" + i + "' style='width: 120px;height: 80px'>\
                           <h4>" + top_data[0] + "</h4>\
                           <h3>\
                           " +  self.commafy(top_data[1]) + "</h3>\
@@ -186,7 +187,7 @@ odoo.define('home_page', function (require) {
             var row_num = result_main.length / 4 > 1 ? 3 : parseInt(12 / result_main.length);
             for (var j = 0; j < result_main.length; j++) {
                 var center_html_str = "<div class='col-sm-" + row_num + " col-xs-6'><div class='feature-item text-center'>\
-                <p class='btn  btn-primary btn-lg btn-block oe_main_link'  oe_main_link='" + index
+                <p class='btn  btn-primary btn-block button-circle oe_main_link'  oe_main_link='" + index
                     + "' id='" + index + "'>" + result_main[index][0] + "</p>\
                 <p></p><p></p></div><div>";
                 self.$el.find('.feature-list').append(center_html_str);
