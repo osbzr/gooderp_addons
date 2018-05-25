@@ -80,7 +80,7 @@
         <record id='voucher_12_2_debit' model='voucher.line'>
             <field name='voucher_id' ref='finance.voucher_12_1'/>
             <field name='name'>费用</field>
-            <field name='account_id' ref='finance.account_expense_sale'/>
+            <field name='account_id' ref='finance.account_expense_sale1'/>
             <field name='debit'>5000</field>
         </record>
         <record id='voucher_12_2_credit' model='voucher.line'>
