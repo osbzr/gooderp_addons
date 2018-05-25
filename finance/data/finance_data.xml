@@ -2,6 +2,9 @@
 <openerp>
     <data  noupdate="1">
 
+        <!--创建系统启用日期所属会计期间-->
+        <function model="finance.period" name="init_period"/>
+
         <record id="account_code_default_account_hierarchy_level" model="ir.values">
             <field name="name">default_account_hierarchy_level</field>
             <field name="model">finance.config.settings</field>
@@ -1709,14 +1712,14 @@
         </record>
 
 
-        <!--公司添加利润科目>
+        <!--公司添加利润科目-->
         <record id="base.main_company" model="res.company">
             <field name="profit_account" ref='account_profit'/>
             <field name="remain_account" ref='account_remain'/>
             <field name="import_tax_account" ref='small_business_chart2221001001'/>
             <field name="output_tax_account" ref='small_business_chart2221001005'/>
             <field name="operating_cost_account_id" ref='small_business_chart2211001'/>
-        </record-->
+        </record>
         <!--设置cny为1-->
         <record forcecreate="0" id="base.rateCNY" model="res.currency.rate">
             <field name="rate">1</field>
@@ -1728,35 +1731,39 @@
 		<record id="account_exchange" model="core.category">
 			<field name="name">汇兑损益</field>
 			<field name="type">other_pay</field>
-			<field name="account_id" ref="init_account_530101"/>
+			<field name="account_id" ref="small_business_chart5603003"/>
             <field name='note'>由系统创建</field>
 		</record>
 
         <!--收发类别-->
-        <!-- 销售发货 借方科目：主营业务成本>
+        <!-- 销售发货 借方科目：主营业务成本-->
         <record id="categ_sell_goods" model="core.category">
             <field name="name">销售发货</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.account_cost"/>
-        </record-->
-        <!-- 组装单、拆卸单 借方科目：生产成本-基本生产成本
+            <field name='note'>由系统创建</field>
+        </record>
+        <!-- 组装单、拆卸单 借方科目：生产成本-基本生产成本 -->
         <record id="categ_ass_disass" model="core.category">
             <field name="name">生产</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.small_business_chart4001001"/>
-        </record-->>
-        <!-- 委外 借方科目： >
+            <field name='note'>由系统创建</field>
+        </record>
+        <!-- 委外 借方科目： -->
         <record id="categ_outsource" model="core.category">
             <field name="name">委外</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.small_business_chart1408"/>
-        </record-->
-        <!-- 采购入库凭证 贷方科目：材料采购>
+            <field name='note'>由系统创建</field>
+        </record>
+        <!-- 采购入库凭证 贷方科目：材料采购-->
         <record id="categ_buy_goods" model="core.category">
             <field name="name">采购入库</field>
             <field name="type">finance</field>
             <field name="account_id" ref="finance.small_business_chart1401"/>
-        </record-->
+            <field name='note'>由系统创建</field>
+        </record>
 
     </data>
 </openerp>
