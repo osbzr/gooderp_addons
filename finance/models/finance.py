@@ -650,7 +650,8 @@ class FinanceAccount(models.Model):
         ('cost', u'成本类'),
     ], u'类型', required="1", help=u'废弃不用，改为使用 user_type字段 动态维护', related='user_type.costs_types')
     account_type = fields.Selection(string=u'科目类型', selection=[('view', 'View'), ('normal', 'Normal')], default='normal')
-    user_type = fields.Many2one(string=u'会计要素', comodel_name='finance.account.type', ondelete='restrict', required=True )
+    user_type = fields.Many2one(string=u'会计要素', comodel_name='finance.account.type', ondelete='restrict', required=True,
+                                default=lambda s:s.env.get('finance.account.type').search([])[0].id )
     parent_left = fields.Integer('Left Parent', index=1)
     parent_right = fields.Integer('Right Parent', index=1)
     parent_id = fields.Many2one(string=u'上级科目', comodel_name='finance.account', ondelete='restrict', domain="[('account_type','=','view')]" )

@@ -5,6 +5,7 @@
             <field name='code'>160101</field>
             <field name='name'>固定资产-房屋</field>
             <field name='user_type' ref='finance.base_assest' />
+            <field name='parent_id' ref='small_business_chart1601' />
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart410101" model='finance.account'>
