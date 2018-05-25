@@ -278,12 +278,14 @@
             <field name='code'>1701</field>
             <field name='name'>无形资产</field>
             <field name='user_type' ref='base_assest' />
+            <field name='account_type'>view</field>
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1702" model='finance.account'>
             <field name='code'>1702</field>
             <field name='name'>累计摊销</field>
+            <field name='account_type'>view</field>
             <field name='user_type' ref='base_assest' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
