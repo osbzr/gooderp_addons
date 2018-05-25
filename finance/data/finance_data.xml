@@ -59,7 +59,6 @@
             <field name='name'>库存现金</field>
             <field name='user_type' ref='base_assest' />
             <field name='source'>init</field>
-            <field name='account_type'>view</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="account_chart1002" model='finance.account'>
