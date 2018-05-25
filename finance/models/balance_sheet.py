@@ -261,7 +261,6 @@ class CreateBalanceSheetWizard(models.TransientModel):
                         voucher_credit = 0
                         for voucher_line in voucher_line_ids:
                             voucher_credit += voucher_line.credit
-                        print '9999',voucher_credit,trial_balance[compute_field_list[0]]
                         if voucher_credit != update:
                             update += voucher_credit
                     subject_vals_in.append(update)
@@ -278,7 +277,6 @@ class CreateBalanceSheetWizard(models.TransientModel):
                         voucher_debit = 0
                         for voucher_line in voucher_line_ids:
                             voucher_debit += voucher_line.debit
-                        print '8888', voucher_debit, trial_balance[compute_field_list[1]]
                         if voucher_debit != update:
                             update += voucher_debit
                     subject_vals_out.append(update)
