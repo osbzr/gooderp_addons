@@ -27,6 +27,7 @@ install:
   - pip install pdfkit
   - pip install wkhtmltopdf
   - pip install httplib2
+  - pip install xmltodict
 
 script:
   - travis_run_tests
