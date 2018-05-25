@@ -1273,19 +1273,19 @@
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
+        <record id='small_business_chart5603' model='finance.account'>
+            <field name='code'>5603</field>
+            <field name='name'>财务费用</field>
+            <field name='user_type' ref='base_out' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>in</field>
+        </record>
         <record id='small_business_chart5603001' model='finance.account'>
             <field name='code'>5603001</field>
             <field name='name'>财务费用-手续及维护年费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='small_business_chart5602' />
-            <field name='source'>init</field>
-            <field name='balance_directions'>in</field>
-        </record>
-        <record id='small_business_chart5603' model='finance.account'>
-            <field name='code'>5603002</field>
-            <field name='name'>财务费用</field>
-            <field name='user_type' ref='base_out' />
-            <field name='account_type'>view</field>
+            <field name='parent_id' ref='small_business_chart5603' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
