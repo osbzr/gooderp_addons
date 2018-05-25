@@ -11,7 +11,7 @@ class TestExchange(TransactionCase):
         self.usd_account = self.env['finance.account'].create({
             'code': '1002001003',
             'name': '银行存款-美元',
-            'costs_types': 'assets',
+            'user_type': self.env.ref('finance.base_assest').id,
             'balance_directions': 'in',
             'currency_id': self.env.ref('base.USD').id,
             'exchange': True,
