@@ -2,6 +2,7 @@
 from odoo.tests.common import TransactionCase
 from psycopg2 import IntegrityError
 from odoo.exceptions import UserError
+from datetime import date, timedelta
 
 
 class TestCore(TransactionCase):
@@ -43,6 +44,12 @@ class TestCore(TransactionCase):
         # 测试输入value为负时的货币大写问题
         self.assertTrue(
             self.env['res.currency'].rmb_upper(-10000100.3) == u'负壹仟万零壹佰元叁角整')
+
+    def test_compute_days_qualify(self):
+        """计算资质到期天数"""
+        partner = self.env.ref('core.jd')
+        partner.date_qualify = (date.today()+ timedelta(days=1)).strftime('%Y-%m-%d')
+        self.assertEqual(partner.days_qualify, 1)
 
 
 class TestResUsers(TransactionCase):
