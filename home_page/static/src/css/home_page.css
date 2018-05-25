@@ -31,7 +31,7 @@
 
 
 .m-b-lg, .m-y-lg {
-    margin-bottom: 60px !important
+    margin-bottom: 80px !important
 }
 
 
@@ -39,7 +39,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, menu,
     display: block
 }
 
-.button-circle {width:30px;height:30px;border-radius:100px;}
+.button-circle {border-radius:100px;}
 .gooderp-colour { background-color:#9f5000;color: white}
 
 .gooderp-title {

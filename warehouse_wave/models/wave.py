@@ -92,6 +92,19 @@ class WhMove(models.Model):
     wave_id = fields.Many2one('wave', string=u'拣货单')
     pakge_sequence = fields.Char(u'格子号')
 
+    @api.multi
+    def unlink(self):
+        """
+        删除发货单时，删除对应的拣货单行
+        """
+        for move in self:
+            for wave_line in move.wave_id.line_ids:
+                for move_line in wave_line.move_line_ids:
+                    if move_line.move_id.id == move.id:
+                        move_line.unlink()
+
+        return super(WhMove, self).unlink()
+
 
 class WaveLine(models.Model):
     _name = "wave.line"
@@ -186,6 +199,7 @@ class CreateWave(models.TransientModel):
             'attribute_id': line.attribute_id.id,
             'warehouse_id': line.warehouse_id.id,
             'goods_qty': line.goods_qty,
+            'move_id': line.move_id.id,
             'move_name': line.move_id.name,
         }
         return reserved_dict
@@ -223,7 +237,6 @@ class CreateWave(models.TransientModel):
                 result = line.move_id.check_goods_qty(
                     line.goods_id, line.attribute_id, line.warehouse_id)
                 result = result[0] or 0
-                print "total_goods_qty", reserved_waves, total_goods_qty, result
                 if total_goods_qty > result:
                     raise UserError(u'您勾选的订单与未发货的拣货单商品数量总和大于库存，不能生成拣货单。\n'
                                     u'产品 %s 库存不足' % line.goods_id.name)
@@ -489,5 +502,10 @@ class WaveReserved(models.Model):
                                    ondelete='restrict',
                                    help=u'生成该记录的单据对应的仓库ID，在创建记录时填入。')
     goods_qty = fields.Float(u'数量')
+    move_id = fields.Many2one('wh.move',
+                              string=u'发货单',
+                              ondelete='cascade',
+                              help=u'每条记录对应的move ID，在创建记录时填入。'
+                                   u'当删除move时，级联删除预留记录。')
     move_name = fields.Char(u'发货单号',
                             help=u'每条记录对应的发货单号，在创建记录时填入。方便在打包完成时清空记录。')
