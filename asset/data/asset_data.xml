@@ -2,8 +2,8 @@
 <openerp>
     <data noupdate="1">
         <record id="small_business_chart160101" model='finance.account'>
-            <field name='code'>1601</field>
-            <field name='name'>固定资产</field>
+            <field name='code'>160101</field>
+            <field name='name'>固定资产-房屋</field>
             <field name='user_type' ref='finance.base_assest' />
             <field name='balance_directions'>in</field>
         </record>
