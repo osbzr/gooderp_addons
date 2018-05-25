@@ -69,14 +69,14 @@
             <field name="name">finance.account.tree</field>
             <field name="model">finance.account</field>
             <field name="arch" type="xml">
-                <tree editable="top" string="科目" decoration-info="account_type == 'view'" create="0">
+                <tree editable="top" string="科目" decoration-info="account_type == 'view'" create="1">
                     <button name="button_add_child" string="增加下级科目" type="object" class="oe_highlight" invisible="context.get('hide_button',True)"/>
                     <field name="code" readonly="1"/>
                     <field name="name"/>
                     <field name="costs_types" invisible="1"/>
                     <field name="account_type" invisible="1"/>
                     <field name="level" />
-                    <field name="user_type" readonly="1"/>
+                    <field name="user_type" readonly="0"/>
                     <field name="parent_id" readonly="1"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>

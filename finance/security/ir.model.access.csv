@@ -16,3 +16,4 @@ access_model_month_product_cost,access_model_month_product_cost,model_month_prod
 access_rate_period,access_rate_period,model_rate_period,,1,0,0,0
 access_report_auxiliary_accounting,access_report_auxiliary_accounting,model_report_auxiliary_accounting,,1,1,1,1
 access_dupont,access_dupont,model_dupont,,1,1,1,1
+access_finance_account_type,access_finance_account_type,model_finance_account_type,,1,1,1,1
