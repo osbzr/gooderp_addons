@@ -59,10 +59,30 @@ class TestCreateWave(TransactionCase):
 
     def test_create_wave(self):
         ''' 测试 create_wave '''
+        # goods from different locations, and the first location's qty is enough
+        order_1 = self.env.ref('sell.sell_order_1')
+        order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.env.ref('sell.sell_order_line_1').goods_id = self.env.ref('goods.cable').id
+        order_1.sell_order_done()
+        delivery_1 = self.env['sell.delivery'].search([('order_id', '=', order_1.id)])
+        others_wh_in = self.env.ref('warehouse.wh_in_whin3')
+        others_in_line = self.env.ref('warehouse.wh_move_line_keyboard_mouse_in_2')
+        others_in_line.location_id = self.env.ref('warehouse.b001_location').id
+        others_in_line.goods_id = self.env.ref('goods.cable').id
+        # 补足库存数量
+        others_wh_in.approve_order()
+
+        # wh_move_line_14 在库位 a001_location 上网线的数量是 12000
+        a001_location = self.env.ref('warehouse.a001_location')
+        self.assertEqual(a001_location.current_qty, 12000)
+        b001_location = self.env.ref('warehouse.b001_location')
+        self.assertEqual(b001_location.current_qty, 48)
+        delivery_1.express_type = 'SF'
+
         wave_wizard = self.env['create.wave'].with_context({
-            'active_ids': self.delivery.id}).create({
-                'active_model': 'sell.delivery',
-            })
+            'active_ids': [self.delivery.id, delivery_1.id]}).create({
+            'active_model': 'sell.delivery',
+        })
         wave_wizard.create_wave()
 
         # 请不要重复生成分拣货单
@@ -71,6 +91,34 @@ class TestCreateWave(TransactionCase):
                 'active_model': 'sell.delivery',
                 'active_ids': self.delivery.id,
             }).fields_view_get(None, 'form', False, False)
+
+    def test_create_wave_goods_from_different_location(self):
+        ''' Test create_wave，goods from different locations, and each location's qty is not enough '''
+        order_1 = self.env.ref('sell.sell_order_1')
+        order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.env.ref('sell.sell_order_line_1').goods_id = self.env.ref('goods.cable').id
+        self.env.ref('sell.sell_order_line_1').quantity = 12010
+        order_1.sell_order_done()
+        delivery_1 = self.env['sell.delivery'].search(
+            [('order_id', '=', order_1.id)])
+        others_wh_in = self.env.ref('warehouse.wh_in_whin3')
+        others_in_line = self.env.ref('warehouse.wh_move_line_keyboard_mouse_in_2')
+        others_in_line.location_id = self.env.ref('warehouse.b001_location').id
+        others_in_line.goods_id = self.env.ref('goods.cable').id
+        # 补足库存数量
+        others_wh_in.approve_order()
+
+        a001_location = self.env.ref('warehouse.a001_location')
+        self.assertEqual(a001_location.current_qty, 12000)
+        b001_location = self.env.ref('warehouse.b001_location')
+        self.assertEqual(b001_location.current_qty, 48)
+        delivery_1.express_type = 'SF'
+
+        wave_wizard = self.env['create.wave'].with_context({
+            'active_ids': [self.delivery.id, delivery_1.id]}).create({
+            'active_model': 'sell.delivery',
+        })
+        wave_wizard.create_wave()
 
     def test_create_wave_same_goods_line(self):
         ''' 测试 create_wave has same goods line'''
@@ -217,6 +265,10 @@ class TestWave(TransactionCase):
         pack.scan_barcode('000', pack.id)
         with self.assertRaises(UserError):
             wave_2.unlink()
+
+    def test_move_unlink(self):
+        ''' test move unlink '''
+        self.delivery.unlink()
 
 
 class TestDoPack(TransactionCase):

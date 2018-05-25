@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from psycopg2 import IntegrityError
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError,ValidationError
 
 
 class TestCore(TransactionCase):
@@ -44,6 +44,11 @@ class TestCore(TransactionCase):
         self.assertTrue(
             self.env['res.currency'].rmb_upper(-10000100.3) == u'负壹仟万零壹佰元叁角整')
 
+    def test_check_category_exists(self):
+        ''' test_check_category_exists '''
+        partner = self.env.ref('core.jd')
+        with self.assertRaises(ValidationError):
+            partner.c_category_id = False
 
 class TestResUsers(TransactionCase):
 
@@ -92,3 +97,16 @@ class TestResCompany(TransactionCase):
             'name': 'demo company',
             'partner_id': self.env.ref('core.zt').id
         })
+
+    def test_check_email(self):
+        ''' test check email '''
+        company = self.env['res.company'].create({
+            'name': 'demo company',
+            'partner_id': self.env.ref('core.zt').id
+        })
+        # 邮箱格式正确
+        company.email = 'gooderp@osbzr.com'
+
+        # 邮箱格式不正确，报错
+        with self.assertRaises(ValidationError):
+            company.email = 'gooderp'

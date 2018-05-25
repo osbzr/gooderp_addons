@@ -6,15 +6,18 @@
             <field name="name">trial.balance.form</field>
             <field name="model">trial.balance</field>
             <field name="arch" type="xml">
-                <tree string="科目余额表" create="false" edit='false'>
-                	<field name="period_id" readonly='1'/>
-                    <field name="subject_name_id" readonly='1'/>
-                    <field name="initial_balance_debit" sum="合计" base_string='期初余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
-                    <field name="initial_balance_credit" sum="合计"  merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
-                    <field name="current_occurrence_debit" sum="合计" base_string='本期发生' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
-                    <field name="current_occurrence_credit" sum="合计" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
-                    <field name="ending_balance_debit" sum="合计"    base_string='期末余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
-                    <field name="ending_balance_credit" sum="合计" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
+                <tree string="科目余额表" decoration-info="account_type == 'view'" editable="TOP" default_order='subject_name_id'>
+                    <field name="period_id" readonly="1"/>
+                    <field name="subject_code" invisible="1"/>
+                    <field name="subject_name_id" readonly="1"/>
+                    <field name="level" invisible="1"/>
+                    <field name="account_type" invisible="1"/>
+                    <field name="initial_balance_debit" base_string='期初余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
+                    <field name="initial_balance_credit" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
+                    <field name="current_occurrence_debit" base_string='本期发生' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
+                    <field name="current_occurrence_credit" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
+                    <field name="ending_balance_debit" base_string='期末余额' merge="False" child_name='借方' colspan='2' readonly='1' widget="bgcolor" color="success"/>
+                    <field name="ending_balance_credit" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
           		</tree>
             </field>
         </record>
@@ -23,16 +26,19 @@
             <field name="name">initial.balance.form</field>
             <field name="model">trial.balance</field>
             <field name="arch" type="xml">
-                <tree string="科目余额表" editable="TOP">
-                	<field name="period_id" />
-                    <field name="subject_code" />
-                    <field name="subject_name_id" />
-                    <field name="year_init_debit" sum="合计" base_string='年初余额' merge="False" child_name='借方' colspan='2'  widget="bgcolor" color="success" />
-                    <field name="year_init_credit" sum="合计" merge="True" child_name='贷方' widget="bgcolor" color="primary"/>
-                    <field name="cumulative_occurrence_debit" sum="合计" base_string='本年累计' merge="False" child_name='借方' colspan='2'  widget="bgcolor" color="success"/>
-                    <field name="cumulative_occurrence_credit" sum="合计" merge="True" child_name='贷方' widget="bgcolor" color="primary"/>
-                    <field name="ending_balance_debit" sum="合计"    base_string='期末余额' merge="False" child_name='借方' colspan='2' readonly='1'  widget="bgcolor" color="success"/>
-                    <field name="ending_balance_credit" sum="合计" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
+                <tree string="科目余额表" decoration-info="account_type == 'view'" editable="TOP" default_order='subject_name_id'>
+                    <button name="button_change_number" string="调整累计数" type="object" class="oe_highlight" attrs="{ 'invisible': [('account_type','=','view')] }" />
+                	<field name="period_id" readonly="1"/>
+                    <field name="subject_code" invisible="1"/>
+                    <field name="subject_name_id" readonly="1"/>
+                    <field name="level" invisible="1"/>
+                    <field name="account_type" invisible="1"/>
+                    <field name="year_init_debit" base_string='年初余额' merge="False" child_name='借方' colspan='2'  widget="bgcolor" color="success" />
+                    <field name="year_init_credit" merge="True" child_name='贷方' widget="bgcolor" color="primary"/>
+                    <field name="cumulative_occurrence_debit" base_string='本年累计' merge="False" child_name='借方' colspan='2'  widget="bgcolor" color="success" readonly="1"/>
+                    <field name="cumulative_occurrence_credit" merge="True" child_name='贷方' widget="bgcolor" color="primary" readonly="1"/>
+                    <field name="ending_balance_debit" base_string='期末余额' merge="False" child_name='借方' colspan='2' readonly='1'  widget="bgcolor" color="success"/>
+                    <field name="ending_balance_credit" merge="True" child_name='贷方' readonly='1' widget="bgcolor" color="primary"/>
           		</tree>
             </field>
         </record>
@@ -42,8 +48,13 @@
             <field name="model">trial.balance</field>
             <field name="arch" type="xml">
                  <search>
+                    <filter string="有发生额" name='has_transaction'
+                            domain="['|', ('current_occurrence_debit','!=', 0), ('current_occurrence_credit','!=', 0)]"/>
+                    <filter string="有余额" name='has_balance'
+                            domain="['|', ('ending_balance_debit','!=', 0), ('ending_balance_credit','!=', 0)]"/>
                     <group expand="0" string="分组">
                         <filter string="会计期间" domain="[]" context="{'group_by':'period_id'}"/>
+                        <filter string="科目级次" domain="[]" context="{'group_by':'level'}"/>
                         <filter string="科目" domain="[]" context="{'group_by':'subject_name_id'}"/>
                     </group>
                  </search>
@@ -66,6 +77,8 @@
             		<group>
                         <group>
                             <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 60%%"/>
+                            <field name="has_transaction" />
+                            <field name="has_balance" />
                         </group>
                     </group>
                     <footer>
@@ -85,6 +98,105 @@
         view_mode="form"
         target="new" 
         />
+
+        <record id="check_trial_balance_wizard_form" model="ir.ui.view">
+            <field name="name">check.trial.balance.wizard.form</field>
+            <field name="model">check.trial.balance.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group invisible="context.get('inline')">
+                        <group>
+                            <field name="period_id" options="{'no_open':True,'no_create':True}" required="True" style="width: 60%%" />
+                        </group>
+                    </group>
+                    <group invisible="not context.get('inline')">
+                        <group>
+                            <field name="is_init_period" invisible="1" />
+                            <field name="total_year_init_debit" readonly="1" attrs="{ 'invisible': [('is_init_period','=', False)]  }"/>
+                            <field name="total_year_init_credit" readonly="1" attrs="{ 'invisible': [('is_init_period','=', False)]  }"/>
+                            <field name="total_initial_balance_debit" readonly="1" attrs="{ 'invisible': [('is_init_period','=', True)]  }"/>
+                            <field name="total_initial_balance_credit" readonly="1" attrs="{ 'invisible': [('is_init_period','=', True)]  }"/>
+                            <field name="total_current_occurrence_debit" readonly="1" attrs="{ 'invisible': [('is_init_period','=', True)]  }"/>
+                            <field name="total_current_occurrence_credit" readonly="1" attrs="{ 'invisible': [('is_init_period','=', True)]  }"/>
+                            <field name="total_cumulative_occurrence_debit" readonly="1"  attrs="{ 'invisible': [('is_init_period','=', False)]  }"/>
+                            <field name="total_cumulative_occurrence_credit" readonly="1"  attrs="{ 'invisible': [('is_init_period','=', False)]  }"/>
+                            <field name="total_ending_balance_debit" readonly="1"/>
+                            <field name="total_ending_balance_credit" readonly="1"/>
+                            <field name="result"  readonly="1"/>
+                            <field name="is_balance" invisible="1"/>
+                            <field name="diff" attrs="{ 'invisible': [('is_balance','=', True)]  }" readonly="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                       <!--  <button name="check_trial_balance" string="试算平衡" type="object" class="oe_highlight" /> 或者 -->
+                        <button string="确认" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="check_trial_balance_wizard_action"
+            name='试算平衡'
+            res_model="check.trial.balance.wizard"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new" 
+            />
+
+        <act_window id="check_trial_balance_wizard_action_popup"
+            name='试算平衡'
+            res_model="check.trial.balance.wizard"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new"
+            context="{'inline':True}"
+            />
+
+        <!-- 动作绑定 -->
+        <record model="ir.values" id="check_trial_balance_wizard_values">
+            <field name="model_id" ref="finance.model_trial_balance" />
+            <field name="name">试算平衡</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('check_trial_balance_wizard_action_popup'))" />
+            <field name="key">action</field>
+            <field name="model">trial.balance</field>
+        </record>
+
+        <record id="change_cumulative_occurrence_wizard_form" model="ir.ui.view">
+            <field name="name">change.cumulative.occurrence.wizard.form</field>
+            <field name="model">change.cumulative.occurrence.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="account_id" readonly="1"/>
+                            <field name="costs_types" readonly="1"/>
+                            <field name="old_cumulative_occurrence_debit" invisible="1"/>
+                            <field name="cumulative_occurrence_debit" attrs="{ 'invisible': [('costs_types','in',('in','out'))]  }"/>
+                            <field name="old_cumulative_occurrence_credit" invisible="1"/>
+                            <field name="cumulative_occurrence_credit" attrs="{ 'invisible': [('costs_types','in',('in','out'))]  }"/>
+                            <field name="cumulative_occurrence" attrs="{ 'invisible': [('costs_types','not in',('in','out'))]  }"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="update_cumulative_occurrence" string="更新" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="change_cumulative_occurrence_wizard_action"
+            name='调整累计数'
+            res_model="change.cumulative.occurrence.wizard"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new" 
+            />
 
         <record id="create_vouchers_summary_wizard_form" model="ir.ui.view">
             <field name="name">create.vouchers.summary.wizard.form</field>
@@ -106,7 +218,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="科目明细帐表" type="object" class="oe_highlight"/>
+                        <button name="create_vouchers_summary" invisible="context.get('create_general_ledger_account')" string="科目明细账表" type="object" class="oe_highlight"/>
                          <button name="create_general_ledger_account" invisible="context.get('create_vouchers_summary')" string="科目总账" type="object" class="oe_highlight"/>
                         或者
                         <button string="取消" class="oe_link" special="cancel"/>
@@ -115,7 +227,7 @@
             </field>
         </record>
       <act_window id="create_vouchers_summary_wizard_action"
-        name='明细帐'
+        name='明细账'
         res_model="create.vouchers.summary.wizard"
         multi="True"
         view_type="form"
@@ -127,7 +239,7 @@
             <field name="name">trial.balance.form</field>
             <field name="model">vouchers.summary</field>
             <field name="arch" type="xml">
-                <tree string="科目明细帐" create="false" edit='false'>
+                <tree string="科目明细账" create="false" edit='false'>
                     <field name="date"/>
                     <field name="period_id"/>
                     <field name="voucher_id"/>
@@ -142,12 +254,12 @@
             </field>
         </record>
 
-		<!--明细帐 search 视图-->
+		<!--明细账 search 视图-->
 		<record id="vouchers_summary_search" model="ir.ui.view">
             <field name="name">vouchers.summary.search</field>
             <field name="model">vouchers.summary</field>
             <field name="arch" type="xml">
-                <search string="科目明细帐">
+                <search string="科目明细账">
                     <field name="date"/>
                     <field name="period_id"/>
                     <field name="voucher_id"/>
@@ -162,7 +274,7 @@
         </record>
 
         <record id="vouchers_summary_action" model="ir.actions.act_window">
-            <field name="name">明细帐</field>
+            <field name="name">明细账</field>
             <field name="res_model">vouchers.summary</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
@@ -192,12 +304,12 @@
             </field>
         </record>
 
-		<!--总帐 search 视图-->
+		<!--总账 search 视图-->
 		<record id="general_ledger_account_search" model="ir.ui.view">
             <field name="name">vougeneral.ledger.account.search</field>
             <field name="model">general.ledger.account</field>
             <field name="arch" type="xml">
-                <search string="科目总帐">
+                <search string="科目总账">
                     <field name="period_id"/>
                     <field name="summary"/>
                      <field name="direction" string="余额方向" domain="[('balance','=',u'平')]"/>
@@ -218,5 +330,7 @@
      <menuitem id='create_general_ledger_account_menu' action='create_ledger_account_action' parent='voucher_books_menu' sequence='60' name="科目总账"/>
      <menuitem id='create_vouchers_summary_menu' action='create_vouchers_summary_wizard_action' parent='voucher_books_menu' sequence='50' name="科目明细账"/>
 	 <menuitem id='create_trial_balance_menu' action='create_trial_balance_wizard_action' parent='voucher_books_menu' sequence='22' name="科目余额表"/>
+     <menuitem id='check_trial_balance_menu' action='check_trial_balance_wizard_action' parent='voucher_books_menu' sequence='23' name="试算平衡"/>
+     <delete  model='ir.ui.menu' id='check_trial_balance_menu' />
     </data>
 </openerp>
