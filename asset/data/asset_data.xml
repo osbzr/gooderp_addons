@@ -28,13 +28,13 @@
         <record id="small_business_chart170101" model='finance.account'>
             <field name='code'>170101</field>
             <field name='name'>无形资产-土地</field>
-            <field name='user_type' ref='base_assest' />
+            <field name='user_type' ref='finance.base_assest' />
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart170201" model='finance.account'>
             <field name='code'>170201</field>
             <field name='name'>累计摊销－土地</field>
-            <field name='user_type' ref='base_assest' />
+            <field name='user_type' ref='finance.base_assest' />
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602022' model='finance.account'>
