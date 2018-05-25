@@ -62,7 +62,7 @@ class HomePage(models.Model):
         """
         views_ids = [view.view_id.id for view in action.action.view_ids]
         note_one, view_mode, res_model = action.note_one, action.action.view_mode, action.action.res_model
-        domain, action_id, context, view_id = action.action.domain, action.id, action.action.context, \
+        domain, action_id, context, view_id = action.domain or action.action.domain, action.id, action.context or action.action.context, \
             views_ids or False
         action_name, target = action.action.name, action.action.target
         return [note_one, view_mode, res_model, domain, context, view_id, action_name, target]
