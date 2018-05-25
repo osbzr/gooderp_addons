@@ -61,7 +61,7 @@
         </record>
         <record id="account_bank" model='finance.account'>
             <field name='code'>1002</field>
-            <field name='name'>库存现金</field>
+            <field name='name'>银行存款</field>
             <field name='user_type' ref='base_assest' />
             <field name='source'>init</field>
             <field name='account_type'>view</field>

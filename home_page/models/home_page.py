@@ -120,5 +120,4 @@ class HomePage(models.Model):
                 self.construction_action_url_list(action, action_url_list)
         action_url_list['right'] = sorted(
             action_url_list['right'].items(), key=lambda d: d[0])
-        print 'action_result', action_url_list
         return action_url_list
