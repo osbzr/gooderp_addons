@@ -153,35 +153,6 @@ class CreateBalanceSheetWizard(models.TransientModel):
                                  + u'年' + self.period_id.month + u'月' + \
                                  str(days) + u'日' + u',' + u'单位：元'
 
-        report_month = "%s" % (self.period_id.name)
-        report_time_slot = "%s%s" % (self.period_id.name, str(days))
-
-        # 第一行 为字段名
-        #  从第二行开始 为数据
-
-        field_list = [
-            'balance', 'line_num', 'beginning_balance', 'ending_balance', 'balance_two', 'line_num_two',
-            'beginning_balance_two', 'ending_balance_two'
-        ]
-        domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
-        export_data = {
-            "database": self.pool._db.dbname,
-            "company": company_row.name,
-            "date": self.period_id.year + u'年' + self.period_id.month + u'月' + str(days) + u'日',
-            "report_name": u"资产负债表",
-            "report_code": u"会民非01表",
-            "rows": self.env['balance.sheet'].search_count(domain),
-            "cols": len(field_list),
-            "report_item": []
-        }
-
-        export_data, excel_title_row, excel_data_rows = self._prepare_export_data(
-            'balance.sheet', field_list, domain, attachment_information, export_data
-        )
-
-        self.export_xml('balance.sheet', {'data': export_data}, report_month, report_time_slot)
-        self.export_excel('balance.sheet', {'columns_headers': excel_title_row, 'rows': excel_data_rows}, report_month, report_time_slot)
-
         return {  # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'资产负债表：' + self.period_id.name,
@@ -231,32 +202,6 @@ class CreateBalanceSheetWizard(models.TransientModel):
             int(self.period_id.year), int(self.period_id.month))[1]
         attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
-
-        report_time_slot = report_month = "%s" % (self.period_id.name)
-
-        # 第一行 为字段名
-        #  从第二行开始 为数据
-
-        field_list = ['balance', 'line_num', 'cumulative_occurrence_balance', 'current_occurrence_balance']
-        domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
-        export_data = {
-            "database": self.pool._db.dbname,
-            "company": company_row.name,
-            "date": self.period_id.year + u'年' + self.period_id.month + u'月',
-            "report_name": u"利润表",
-            "report_code": u"会企02表",
-            "rows": self.env['profit.statement'].search_count(domain),
-            "cols": len(field_list),
-            "report_item": []
-        }
-
-        export_data, excel_title_row, excel_data_rows = self._prepare_export_data(
-            'profit.statement', field_list, domain, attachment_information, export_data
-        )
-
-        self.export_xml('profit.statement', {'data': export_data}, report_month, report_time_slot)
-        self.export_excel('profit.statement', {'columns_headers': excel_title_row, 'rows': excel_data_rows}, report_month, report_time_slot)
-
         return {  # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
             'name': u'利润表：' + self.period_id.name,

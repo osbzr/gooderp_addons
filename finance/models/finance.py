@@ -5,14 +5,6 @@ import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-import logging
-_logger = logging.getLogger(__name__)
-
-
-import xmltodict
-import os
-import time
-
 BALANCE_DIRECTIONS_TYPE = [
     ('in', u'借'),
     ('out', u'贷')]
@@ -1016,51 +1008,6 @@ class BankAccount(models.Model):
     currency_id = fields.Many2one(
         'res.currency', u'外币币别', related='account_id.currency_id', store=True)
     currency_amount = fields.Float(u'外币金额', digits=dp.get_precision('Amount'))
-
-    @api.model
-    def report_xml(self):
-        TIMEFORMAT = "%Y%m%d"
-        time_now = time.localtime(time.time())
-        date_str = time.strftime(TIMEFORMAT, time_now)
-
-        report_model = self.env['report.template'].search([('model_id.model', '=', 'balance.sheet')], limit=1)
-
-        roo_path = report_model and report_model[0].path or False
-        database_name = self.pool._db.dbname
-
-        folder_name = 'balance'
-
-        file_name = '%s_%s_%s' % (database_name, folder_name, date_str)
-
-        if roo_path:
-            path = '%s/%s/%s/%s' % (roo_path, database_name, folder_name, date_str)
-        else:
-            path = '%s/%s/%s' % (database_name, folder_name, date_str)
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        export_file_name = '%s/%s' % (path, file_name)
-
-        bank_account_ids = self.search([])
-        data = []
-        for bank_account in bank_account_ids:
-            data.append(
-                {
-                    'database': database_name,
-                    'name': bank_account.name,
-                    'number': bank_account.num or '',
-                    'date': fields.Date.context_today(self),
-                    'amount': bank_account.balance
-                }
-            )
-
-        import sys
-        reload(sys)
-        sys.setdefaultencoding('utf8')
-        xml_file = open('%s.xml' % (export_file_name), 'wb')
-        xml_string = xmltodict.unparse({'data': {'account': data}}, pretty=True)
-        xml_file.write(xml_string)
-        xml_file.close()
 
 
 class CoreCategory(models.Model):
