@@ -62,7 +62,7 @@
             <field name='account_type'>view</field>
             <field name='balance_directions'>in</field>
         </record>
-        <record id="account_bank" model='finance.account'>
+        <record id="account_chart1002" model='finance.account'>
             <field name='code'>1002</field>
             <field name='name'>银行存款</field>
             <field name='user_type' ref='base_assest' />
@@ -70,11 +70,11 @@
             <field name='account_type'>view</field>
             <field name='balance_directions'>in</field>
         </record>
-        <record id='account_bank_chart1002002' model='finance.account'>
+        <record id='account_bank' model='finance.account'>
             <field name='code'>1002002</field>
             <field name='name'>银行存款-基本户</field>
             <field name='user_type' ref='base_assest' />
-            <field name='parent_id' ref='account_bank' />
+            <field name='parent_id' ref='account_chart1002' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
