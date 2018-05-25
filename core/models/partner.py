@@ -6,7 +6,6 @@ from odoo.exceptions import UserError
 from datetime import datetime
 
 
-
 class Partner(models.Model):
     '''
     业务伙伴可能是客户： c_category_id 非空
