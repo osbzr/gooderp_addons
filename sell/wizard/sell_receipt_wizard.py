@@ -98,20 +98,43 @@ class SellReceiptWizard(models.TransientModel):
             'note': delivery.note,
         }
 
+    def compute_partner_receipt(self, partner):
+        """该客户所有收款单未核销金额合计数"""
+        orders = self.env['money.order'].search([
+            ('state', '=', 'done'),
+            ('partner_id', '=', partner.id)])
+        sum_amount = sum(order.to_reconcile for order in orders)
+        return sum_amount
+
     @api.multi
     def button_ok(self):
         self.ensure_one()
         res = []
+        dict_part = {}
         if self.date_end < self.date_start:
             raise UserError(u'开始日期不能大于结束日期！\n 所选的开始日期:%s 结束日期:%s' %
                             (self.date_start, self.date_end))
 
         delivery_obj = self.env['sell.delivery']
         for delivery in delivery_obj.search(self._get_domain(), order='partner_id'):
-            # 用查找到的发货单信息来创建一览表
-            line = self.env['sell.receipt'].create(
-                self._prepare_sell_receipt(delivery))
-            res.append(line.id)
+            if not dict_part.has_key(delivery.partner_id):
+                dict_part[delivery.partner_id] = delivery
+            else:
+                dict_part[delivery.partner_id] += delivery
+        for partner, deliverys in dict_part.iteritems():
+            for delivery in deliverys:
+                # 用查找到的发货单信息来创建一览表
+                line = self.env['sell.receipt'].create(
+                    self._prepare_sell_receipt(delivery))
+                res.append(line.id)
+            # 增加一行，编号是未核销预收款，已收款是该客户所有收款单未核销金额合计数，应收款余额为负的预收款
+            summary_line = self.env['sell.receipt'].create({
+                'partner_id': partner.id,
+                'order_name': u'未核销预收款',
+                'receipt': self.compute_partner_receipt(partner),
+                'balance': -self.compute_partner_receipt(partner),
+            })
+            res.append(summary_line.id)
 
         return {
             'name': u'销售收款一览表',
