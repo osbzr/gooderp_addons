@@ -506,6 +506,6 @@ class WhMoveLine(models.Model):
     @api.one
     @api.constrains('force_batch_one', 'goods_qty')
     def check_goods_qty(self):
-        """验证商品数量大于0"""
-        if self.force_batch_one and self.goods_qty > 1:
+        """序列号管理的商品数量必须为1"""
+        if self.force_batch_one and self.goods_qty != 1:
             raise UserError(u'商品 %s 进行了序列号管理，数量必须为1' % self.goods_id.name)
