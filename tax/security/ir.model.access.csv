@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_config_country,config_country,model_config_country,,1,1,1,1
+access_config_province,config_province,model_config_province,,1,1,1,1
