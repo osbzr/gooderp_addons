@@ -19,7 +19,7 @@ class FinanceConfigWizard(models.TransientModel):
     default_voucher_date = fields.Selection([('today', u'当前日期'), ('last', u'上一凭证日期')],
                                             string=u'新凭证的默认日期', default='today', help=u'选择新凭证的默认日期')
     # 凭证号重置设置  此部分参与了步科的设计
-    default_auto_reset = fields.Boolean(u'是否重置凭证号', )
+    default_auto_reset = fields.Boolean(u'是否重置凭证号', default=True)
     default_reset_period = fields.Selection([('year', u'每年'), ('month', u'每月')], u'重置间隔', required=True,
                                             default='month')
     default_reset_init_number = fields.Integer(
@@ -48,6 +48,19 @@ class FinanceConfigWizard(models.TransientModel):
         string=u'下级科目编码递增长度',
         selection=[('2', '2')],default='2'
     )
+
+    @api.model
+    def set_defaults(self):
+        self.env['ir.values'].set_default( 'finance.config.settings', 'default_auto_reset', True)
+        self.env['ir.values'].set_default('finance.config.settings', 'default_account_hierarchy_level', '5')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_top_length', '4')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_child_step', '2')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_voucher_date', 'today')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_reset_period', 'month')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_reset_init_number', int(1))
+        self.env['ir.values'].set_default('finance.config.settings', 'default_period_domain', True)
+        return True
+
 
     @api.multi
     def set_default_account_hierarchy_level(self):
