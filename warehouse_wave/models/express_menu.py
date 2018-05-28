@@ -100,7 +100,7 @@ class WhMove(models.Model):
                         ProvinceName=model_row.address_id.province_id.name or model_row.address_id.city_id.city_name or u'()',
                         CityName=model_row.address_id.city_id.city_name or u' ',
                         ExpAreaName=model_row.address_id.county_id.county_name or u' ',
-                        Address=detail_address or u'金海路2588号B-213')
+                        Address=detail_address or u' ')
 
         goods = []
         qty = 0
