@@ -262,7 +262,7 @@ class Asset(models.Model):
     def _bank_account_generate_other_pay(self):
         ''' 现金和银行支付的方式，选择结算账户，生成其他支出单 '''
         category = self.env.ref('asset.asset')  # 借：固定资产
-        other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
+        other_money_order = self.with_context(type='other_pay', modify_from_webclient=True).env['other.money.order'].create({
             'state': 'draft',
             'partner_id': self.partner_id.id,
             'date': self.date,
@@ -402,7 +402,7 @@ class CreateCleanWizard(models.TransientModel):
         if self.bank_account and self.bank_account.account_id.currency_id:
             raise UserError(u'系统占不支持外币结算固定资产')
         get_category = self.env.ref('asset.asset_clean_get')
-        other_money_order = self.with_context(type='other_get').env['other.money.order'].create({
+        other_money_order = self.with_context(type='other_get', modify_from_webclient=True).env['other.money.order'].create({
             'state': 'draft',
             'partner_id': None,
             'date': self.date,
@@ -434,7 +434,7 @@ class CreateCleanWizard(models.TransientModel):
         pay_category = self.env.ref('asset.asset_clean_pay')  #
         if self.cost_bank and self.cost_bank.account_id.currency_id:
             raise UserError(u'系统占不支持外币结算固定资产')
-        other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
+        other_money_order = self.with_context(type='other_pay', modify_from_webclient=True).env['other.money.order'].create({
             'state': 'draft',
             'partner_id': None,
             'date': self.date,
@@ -463,7 +463,7 @@ class CreateCleanWizard(models.TransientModel):
         get_category = self.env.ref('asset.asset_clean_get')  #
         if self.income_bank and self.income_bank.account_id.currency_id:
             raise UserError(u'系统占不支持外币结算固定资产')
-        other_money_order = self.with_context(type='other_get').env['other.money.order'].create({
+        other_money_order = self.with_context(type='other_get', modify_from_webclient=True).env['other.money.order'].create({
             'state': 'draft',
             'partner_id': None,
             'date': self.date,
@@ -746,7 +746,7 @@ class CreateChangWizard(models.TransientModel):
         if not category:
             raise UserError(u'请在固定资产中设置固定资产的类别')
 
-        other_money_order = Asset.with_context(type='other_pay').env['other.money.order'].create({
+        other_money_order = Asset.with_context(type='other_pay', modify_from_webclient=True).env['other.money.order'].create({
             'state': 'draft',
             'date': self.chang_date ,
             'bank_id': self.bank_account.id,
@@ -921,7 +921,7 @@ class CreateAssetWizard(models.TransientModel):
         if not category:
             raise UserError(u'请在固定资产中设置固定资产的类别')
 
-        other_money_order = Asset.with_context(type='other_pay').env['other.money.order'].create({
+        other_money_order = Asset.with_context(type='other_pay', modify_from_webclient=True).env['other.money.order'].create({
             'state': 'draft',
             'date': Asset.date,
             'bank_id': self.bank_account.id,
