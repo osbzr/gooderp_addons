@@ -59,7 +59,6 @@
             <field name='name'>库存现金</field>
             <field name='user_type' ref='base_assest' />
             <field name='source'>init</field>
-            <field name='account_type'>view</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="account_chart1002" model='finance.account'>
@@ -224,9 +223,9 @@
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
-        <record id="small_business_chart1601005" model='finance.account'>
+        <record id="small_business_chart160105" model='finance.account'>
             <field name='code'>160105</field>
-            <field name='name'>固定资产-服务器</field>
+            <field name='name'>固定资产-其他</field>
             <field name='user_type' ref='base_assest' />
             <field name='parent_id' ref='small_business_chart1601' />
             <field name='source'>init</field>
@@ -926,7 +925,7 @@
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
-        <record id='account_expense_sale' model='finance.account'>
+        <record id='account_expense_sale0' model='finance.account'>
             <field name='code'>5601</field>
             <field name='name'>销售费用</field>
             <field name='user_type' ref='base_out' />
@@ -934,11 +933,11 @@
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
-        <record id='account_expense_sale1' model='finance.account'>
+        <record id='account_expense_sale' model='finance.account'>
             <field name='code'>560101</field>
             <field name='name'>销售费用-职工薪酬</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -946,7 +945,7 @@
             <field name='code'>560102</field>
             <field name='name'>销售费用-劳务费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -954,7 +953,7 @@
             <field name='code'>560103</field>
             <field name='name'>销售费用-咨询顾问费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -962,7 +961,7 @@
             <field name='code'>560104</field>
             <field name='name'>销售费用-招待费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -970,7 +969,7 @@
             <field name='code'>560105</field>
             <field name='name'>销售费用-广告费和业务宣传费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -978,7 +977,7 @@
             <field name='code'>560106</field>
             <field name='name'>销售费用-佣金和手续费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -986,7 +985,7 @@
             <field name='code'>560107</field>
             <field name='name'>销售费用-资产折旧摊销费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -994,7 +993,7 @@
             <field name='code'>560108</field>
             <field name='name'>销售费用-财产损耗、盘亏及毁损损失</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1002,7 +1001,7 @@
             <field name='code'>560109</field>
             <field name='name'>销售费用-办公费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1010,7 +1009,7 @@
             <field name='code'>560110</field>
             <field name='name'>销售费用-董事会费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1018,7 +1017,7 @@
             <field name='code'>560111</field>
             <field name='name'>销售费用-租赁费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1026,7 +1025,7 @@
             <field name='code'>560112</field>
             <field name='name'>销售费用-诉讼费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1034,7 +1033,7 @@
             <field name='code'>560113</field>
             <field name='name'>销售费用-差旅费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1042,7 +1041,7 @@
             <field name='code'>560114</field>
             <field name='name'>销售费用-保险费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1050,7 +1049,7 @@
             <field name='code'>560115</field>
             <field name='name'>销售费用-运输、仓储费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1058,7 +1057,7 @@
             <field name='code'>560116</field>
             <field name='name'>销售费用-修理费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1066,7 +1065,7 @@
             <field name='code'>560117</field>
             <field name='name'>销售费用-包装费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1074,7 +1073,7 @@
             <field name='code'>560118</field>
             <field name='name'>销售费用-技术转让费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1082,7 +1081,7 @@
             <field name='code'>560119</field>
             <field name='name'>销售费用-研究费用</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1090,7 +1089,7 @@
             <field name='code'>560120</field>
             <field name='name'>销售费用-各项税费</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
@@ -1098,7 +1097,7 @@
             <field name='code'>560121</field>
             <field name='name'>销售费用-其他费用</field>
             <field name='user_type' ref='base_out' />
-            <field name='parent_id' ref='account_expense_sale' />
+            <field name='parent_id' ref='account_expense_sale0' />
             <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
