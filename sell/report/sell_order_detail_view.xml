@@ -36,7 +36,6 @@
                     <field name="goods_id"/>
                     <field name="user_id"/>
                     <field name="date"/>
-                    </group>
                 </search>
             </field>
         </record>
