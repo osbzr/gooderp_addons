@@ -28,6 +28,17 @@
                 </tree>
             </field>
         </record>
+        <record id="search_sell_order_detail_tree" model="ir.ui.view">
+            <field name="name">sell.order.detail.search</field>
+            <field name="model">sell.order.detail</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="goods_id"/>
+                    <field name="user_id"/>
+                    <field name="date"/>
+                </search>
+            </field>
+        </record>
     	<record id="sell_order_detail_graph" model="ir.ui.view">
             <field name="name">sell.order.detail.graph</field>
             <field name="model">sell.order.detail</field>
