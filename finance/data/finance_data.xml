@@ -1,31 +1,12 @@
 <?xml version="1.0"?>
 <openerp>
+    <data noupdate="0">
+        <function model="finance.config.settings" name="set_defaults" />
+    </data>
     <data  noupdate="1">
 
         <!--创建系统启用日期所属会计期间-->
         <function model="finance.period" name="init_period"/>
-
-        <record id="account_code_default_account_hierarchy_level" model="ir.values">
-            <field name="name">default_account_hierarchy_level</field>
-            <field name="model">finance.config.settings</field>
-            <field name="key">default</field>
-            <field name="key2"></field>
-            <field name="value_unpickle">5</field>
-        </record>
-        <record id="account_code_default_top_length" model="ir.values">
-            <field name="name">default_top_length</field>
-            <field name="model">finance.config.settings</field>
-            <field name="key">default</field>
-            <field name="key2"></field>
-            <field name="value_unpickle">4</field>
-        </record>
-        <record id="account_code_default_child_step" model="ir.values">
-            <field name="name">default_child_step</field>
-            <field name="model">finance.config.settings</field>
-            <field name="key">default</field>
-            <field name="key2"></field>
-            <field name="value_unpickle">2</field>
-        </record>
 
         <!--会计要素finance.account.type-->
         <record id="base_assest" model='finance.account.type'>

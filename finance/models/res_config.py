@@ -49,6 +49,19 @@ class FinanceConfigWizard(models.TransientModel):
         selection=[('2', '2')],default='2'
     )
 
+    @api.model
+    def set_defaults(self):
+        self.env['ir.values'].set_default( 'finance.config.settings', 'default_auto_reset', True)
+        self.env['ir.values'].set_default('finance.config.settings', 'default_account_hierarchy_level', '5')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_top_length', '4')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_child_step', '2')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_voucher_date', 'today')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_reset_period', 'month')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_reset_init_number', 1)
+        self.env['ir.values'].set_default('finance.config.settings', 'default_period_domain', 'can')
+
+        return True
+
     @api.multi
     def set_default_account_hierarchy_level(self):
         res = self.env['ir.values'].set_default(
