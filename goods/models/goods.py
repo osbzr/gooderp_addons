@@ -97,7 +97,7 @@ class Attribute(models.Model):
 
     _sql_constraints = [
         ('ean_uniq', 'unique (ean)', u'该条码已存在'),
-        ('name_uniq', 'unique (name)', u'该属性已存在'),
+        ('goods_attribute_uniq', 'unique (goods_id, name)', u'该SKU已存在'),
     ]
 
     @api.one
@@ -133,10 +133,6 @@ class AttributeValue(models.Model):
         string=u'公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-
-    # _sql_constraints = [
-    #     ('category_value_uniq', 'unique(category_id, value_id)', u'属性不能重复')
-    # ]
 
 
 class AttributeValueValue(models.Model):
