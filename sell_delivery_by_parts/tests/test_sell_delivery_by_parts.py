@@ -22,7 +22,7 @@ class TestSellDeliveryByParts(TransactionCase):
                                             })
         out_line_vals = {'goods_id': self.keyboard_mouse.id,
                         'price_taxed': 100,
-                        'goods_qty': 5,
+                        'goods_qty': 1,
                         'type': 'out'}
         # 报错：找不到物料清单
         with self.assertRaises(UserError):
