@@ -23,8 +23,7 @@ class Location(models.Model):
             Location.current_qty = sum([line.qty_remaining for line in lines])
             Location.write({'save_qty': Location.current_qty})
             if Location.current_qty == 0:
-                Location.goods_id = False
-                Location.attribute_id = False
+                Location.write({'goods_id': False, 'attribute_id': False})
 
     name = fields.Char(u'货位号',
                        required=True)
