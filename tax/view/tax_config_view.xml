@@ -1,41 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
 	<data>
-
-		<!--地税设置tree-->
-        <record id='config_country_tree' model='ir.ui.view'>
-			<field name='name'>config.country.tree</field>
-			<field name='model'>config.country</field>
-			<field name='arch' type='xml'>
-				<tree string='地税设置'>
-                    <field name='name'/>
-                    <field name='password'/>
-                    <field name='tel_number'/>
-				</tree>
-			</field>
-		</record>
-
-        <!--地税设置form-->
-		<record id='config_country_form' model='ir.ui.view'>
-			<field name='name'>config.country.form</field>
-			<field name='model'>config.country</field>
-			<field name='arch' type='xml'>
-                <form string="地税设置">
-			    	<sheet>
-                        <group>
-                            <group>
-                                <field name='name'/>
-                                <field name="password"/>
-							</group>
-                            <group>
-                                <field name='tel_number'/>
-							</group>
-                        </group>
-                    </sheet>
-                </form>
-			</field>
-		</record>
-
         <!--税编码设置tree-->
         <record id='tax_category_tree' model='ir.ui.view'>
 			<field name='name'>tax.category.tree</field>
@@ -55,7 +20,6 @@
 			<field name='arch' type='xml'>
 				<tree string='国税设置'>
                     <field name='name'/>
-                    <field name='company_name'/>
 				</tree>
 			</field>
 		</record>
@@ -70,8 +34,6 @@
                         <group>
                             <group>
                                 <field name='name'/>
-                                <field name='company_name'/>
-                                <field name="password"/>
 							</group>
                         </group>
                         <notebook>
@@ -145,19 +107,6 @@
                     <field name='category_id'/>
                     <field name='account_in_id'/>
                     <field name='account_out_id'/>
-				</tree>
-			</field>
-		</record>
-
-        <!--打码平台设置菜单-->
-        <record id='dmpt_config_tree' model='ir.ui.view'>
-			<field name='name'>dmpt.config.tree</field>
-			<field name='model'>dmpt.config</field>
-			<field name='arch' type='xml'>
-				<tree string='打码平台设置'>
-                    <field name='name'/>
-                    <field name='password'/>
-                    <field name='active' invisible='1'/>
 				</tree>
 			</field>
 		</record>

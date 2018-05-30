@@ -11,13 +11,13 @@
     'version': '11.11',
     'depends': ['core', 'finance', 'goods',],
     'data': [
+        'view/tax_res_config_view.xml',
         'view/tax_config_view.xml',
         'view/tax_config_action.xml',
         'view/tax_config_menu.xml',
         'security/ir.model.access.csv',
         'data/tax_code.xml',
         'data/automatic_cost.xml',
-        'data/company_config.xml',
     ],
     'demo': [
     ],

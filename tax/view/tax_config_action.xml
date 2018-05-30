@@ -2,11 +2,6 @@
 <openerp>
     <data>
         <!-- 国、地税设置 action -->
-        <record id="config_country_action" model="ir.actions.act_window">
-            <field name="name">地税设置</field>
-            <field name="res_model">config.country</field>
-            <field name="view_mode">tree,form</field>
-        </record>
 
         <record id="tax_category_action" model="ir.actions.act_window">
             <field name="name">税率设置</field>
@@ -26,10 +21,13 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <record id="dmpt_config_action" model="ir.actions.act_window">
-            <field name="name">打码平台设置</field>
-            <field name="res_model">dmpt.config</field>
-            <field name="view_mode">tree,form</field>
+        <record id="view_tax_config_setting_action" model="ir.actions.act_window">
+            <field name="name">涉税会计设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tax.config.settings</field>
+            <field name="view_id" ref="view_tax_config"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
         </record>
 
     </data>

@@ -1,6 +1,25 @@
 <?xml version="1.0"?>
 <openerp>
 	<data>
+        <!--增加类别-->
+        <record id="domestic_supplier" model="core.category">
+            <field name="name">国内供应商</field>
+            <field name="type">supplier</field>
+            <field name="account_id" ref="finance.account_ap"/>
+            <field name='note'>默认供应商类别</field>
+        </record>
+        <record id="domestic_fuwu_supplier" model="core.category">
+            <field name="name">国内服务供应商</field>
+            <field name="type">supplier</field>
+            <field name="account_id" ref="finance.account_ap"/>
+            <field name='note'>默认服务供应商类别</field>
+        </record>
+        <record id="domestic_customer" model="core.category">
+            <field name="name">国内客户</field>
+            <field name="type">customer</field>
+            <field name="account_id" ref="finance.account_ar"/>
+            <field name='note'>默认客户类别</field>
+        </record>
         <!--增加自动化数据-->
         <record id="auto_cswh" model="automatic.cost">
             <field name="name">城市维护建设税</field>

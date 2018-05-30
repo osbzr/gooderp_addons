@@ -47,12 +47,6 @@ COUNTRY_TYPE = [('no1', u'运输服务'),
                  ('no15', u'通行费'),
                  ('no16', u'有形动产租赁服务')]
 
-class config_country(models.Model):
-    _name = 'config.country'
-
-    name = fields.Char(u'地税登入名', required=True)
-    password = fields.Char(u'地税密码', required=True)
-    tel_number = fields.Char(u'手机后4位')
 
 class automatic_cost(models.Model):
     '''费用自动化基础'''
@@ -68,8 +62,6 @@ class config_province(models.Model):
     _name = 'config.province'
 
     name = fields.Char(u'社会统一编码', required=True)
-    company_name = fields.Char(u'企业名称')
-    password = fields.Char(u'国税密码')
     balance_lins = fields.One2many('balance.line',
                                'order_id',
                                u'资产负债表',
@@ -135,3 +127,101 @@ class CoreCategory(models.Model):
     _inherit = 'core.category'
     tax_category_id = fields.Many2one(
         'tax.category', string=u'税收分类')
+
+class TaxConfigWizard(models.TransientModel):
+    _name = 'tax.config.settings'
+    _inherit = 'res.config.settings'
+    _description = u'涉税会计默认设置'
+
+    default_goods_supplier = fields.Many2one('core.category',u'默认商品供应商类别', help=u'选择新建默认供应商类别')
+    default_service_supplier = fields.Many2one('core.category',u'默认服务供应商类别', help=u'选择新建默认服务供应商类别')
+    default_customer = fields.Many2one('core.category',u'默认客户类别', help=u'选择新建默认供应商客户类别')
+    default_buy_goods_account = fields.Many2one('finance.account',u'默认采购商品科目', help=u'选择新建默认购买商品类别')
+    default_sell_goods_account = fields.Many2one('finance.account', u'默认销售商品科目', help=u'选择新建默认销售商品类别')
+
+    default_tax_num = fields.Char(u'社会统一编码')
+    default_country_name = fields.Char(u'地税登入名')
+    default_country_password = fields.Char(u'地税密码')
+    default_country_tel_number = fields.Char(u'手机后4位')
+    default_company_name = fields.Char(u'企业名称')
+    default_province_password = fields.Char(u'国税密码')
+    default_dmpt_name = fields.Char(u'打码平台用户名')
+    default_dmpt_password = fields.Char(u'打码平台密码')
+
+    @api.multi
+    def set_default_goods_supplier(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_goods_supplier', self.default_goods_supplier.id)
+        return res
+
+    @api.multi
+    def set_default_service_supplier(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_service_supplier', self.default_service_supplier.id)
+        return res
+
+    @api.multi
+    def set_default_customer(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_customer', self.default_customer.id)
+        return res
+
+    @api.multi
+    def set_default_buy_goods_account(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_buy_goods_account', self.default_buy_goods_account.id)
+        return res
+
+    @api.multi
+    def set_default_sell_goods_account(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_sell_goods_account', self.default_sell_goods_account.id)
+        return res
+
+    @api.multi
+    def set_default_tax_num(self):
+        res = self.env['ir.values'].sudo().set_default(
+            'tax.config.settings', 'default_tax_num', self.default_tax_num)
+        return res
+
+    @api.multi
+    def set_default_country_name(self):
+        res = self.env['ir.values'].set_default(
+            'tax.config.settings', 'default_country_name', self.default_country_name)
+        return res
+
+    @api.multi
+    def set_default_country_tel_number(self):
+        res = self.env['ir.values'].set_default(
+            'tax.config.settings', 'default_country_tel_number', self.default_country_tel_number)
+        return res
+
+    @api.multi
+    def set_default_company_name(self):
+        res = self.env['ir.values'].set_default(
+            'tax.config.settings', 'default_company_name', self.default_company_name)
+        return res
+
+    @api.multi
+    def set_default_province_password(self):
+        res = self.env['ir.values'].set_default(
+            'tax.config.settings', 'default_province_password', self.default_province_password)
+        return res
+
+    @api.multi
+    def set_default_country_password(self):
+        res = self.env['ir.values'].set_default(
+            'tax.config.settings', 'default_country_password', self.default_country_password)
+        return res
+
+    @api.multi
+    def set_default_dmpt_name(self):
+        res = self.env['ir.values'].set_default(
+            'tax.config.settings', 'default_dmpt_name', self.default_dmpt_name)
+        return res
+
+    @api.multi
+    def set_default_dmpt_password(self):
+        res = self.env['ir.values'].set_default(
+            'tax.config.settings', 'default_dmpt_password', self.default_dmpt_password)
+        return res

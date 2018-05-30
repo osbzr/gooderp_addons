@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_tax_config" model="ir.ui.view">
+            <field name="name">tax_settings</field>
+            <field name="model">tax.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Configure tax" class="oe_form_configuration">
+                    <header>
+                        <button string="应用" type="object" name="execute" class="oe_highlight"/>
+                        或者
+                        <button string="取消" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <div id="main" position="inside">
+                        <group string="申报设置">
+                            <label for="id" string="社会统一编码"/>
+                            <div>
+                                <field name="default_tax_num" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="地税登入名"/>
+                            <div>
+                                <field name="default_country_name" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="地税密码"/>
+                            <div>
+                                <field name="default_country_password" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="国税密码"/>
+                            <div>
+                                <field name="default_province_password" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="手机后4位"/>
+                            <div>
+                                <field name="default_country_tel_number" class="oe_inline"/>
+                            </div>
+                            <label for="id" string="企业名称"/>
+                            <div>
+                                <field name="default_company_name" class="oe_inline"/>
+                            </div>
+
+                        </group>
+                        <group string="默认设置">
+                            <label for="id" string="默认商品供应商类别"/>
+                            <div>
+                                <field name="default_goods_supplier" class="oe_inline" domain="[('type','=','supplier')]"/>
+                            </div>
+                            <label for="id" string="默认服务供应商类别"/>
+                            <div>
+                                <field name="default_service_supplier" class="oe_inline" domain="[('type','=','supplier')]"/>
+                            </div>
+                            <label for="id" string="默认客户类别"/>
+                            <div>
+                                <field name="default_customer" class="oe_inline" domain="[('type','=','customer')]"/>
+                            </div>
+                            <label for="id" string="默认销售商品科目"/>
+                            <div>
+                                <field name="default_sell_goods_account" class="oe_inline" />
+                            </div>
+                            <label for="id" string="默认采购商品科目"/>
+                            <div>
+                                <field name="default_buy_goods_account" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group string="自动化设置">
+                            <label for="id" string="打码平台帐户"/>
+                            <div>
+                                <field name="default_dmpt_name" class="oe_inline" />
+                            </div>
+                            <label for="id" string="打码平台密码"/>
+                            <div>
+                                <field name="default_dmpt_password" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+    </data>
+    <!--<data noupdate='1'>-->
+        <!--<function id="default_dmpt_password"-->
+            <!--model="ir.values" name="set_default"-->
+            <!--eval="('tax.config.settings', 'default_dmpt_password', 555555)"/>-->
+    <!--</data>-->
+</openerp>

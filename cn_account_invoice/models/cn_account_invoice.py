@@ -22,6 +22,8 @@ from odoo import api, fields, models, tools, _
 import odoo.addons.decimal_precision as dp
 import datetime
 import random
+from odoo.exceptions import UserError
+
 
 #定意发票todo add confirm_month
 class cn_account_invoice(models.Model):
@@ -96,11 +98,16 @@ class cn_account_invoice(models.Model):
                 category_id = self.env['core.category'].search([
                     '&', ('type', '=', 'goods'), ('tax_category_id.print_name', '=', category)])
                 if not category_id:
+                    if self.type == 'in':
+                        account_id = self.env['ir.values'].get_default('tax.config.settings', 'default_buy_goods_account')
+                    if self.type == 'out':
+                        account_id = self.env['ir.values'].get_default('tax.config.settings',
+                                                                       'default_sell_goods_account')
                     category_id = self.env['core.category'].create({
                         'type': 'goods',
                         'name': category,
-                        'account_id': self.env.ref('tax.account_goods').id,  # todo 配置
-                        'tax_category_id': self.env['tax.category'].search([('print_name', '=', category)])[0].id,
+                        'account_id': account_id,
+                        'tax_category_id': self.env['tax.category'].search([('print_name', '=', category)],limit=1).id,
                         'note': u'由系统自动增加'
                     })
 
@@ -141,13 +148,15 @@ class cn_account_invoice(models.Model):
         if self.partner_name_in:
             partner_id = self.env['partner'].search([
                 ('name', '=', self.partner_name_in)])
+        default_goods_supplier = self.env['ir.values'].get_default('tax.config.settings', 'default_goods_supplier')
+        if not default_goods_supplier:
+            raise UserError(u'请设置默认产品供应商！')
         if not partner_id:
             partner_id = self.env['partner'].create({
                 'name': self.partner_name_in,
                 'main_mobile': self.partner_code_in,
                 'tax_num': self.partner_code_in,
-                's_category_id': self.env['core.category'].search([
-                    '&', ('type', '=', 'supplier'), ('note', '=', u'默认供应商类别')], limit=1).id,
+                's_category_id': default_goods_supplier,
                 'computer_import': True,
             })
         # 补银行帐号等信息
@@ -181,13 +190,15 @@ class cn_account_invoice(models.Model):
         elif self.partner_name_out:
             partner_id = self.env['partner'].search([
                 ('name', '=', self.partner_name_out)])
+        default_customer = self.env['ir.values'].get_default('tax.config.settings', 'default_customer')
+        if not default_customer:
+            raise UserError(u'请设置默认产品供应商！')
         if not partner_id:
             partner_id = self.env['partner'].create({
                 'name': self.partner_name_out,
                 'main_mobile': self.partner_code_out,
                 'tax_num': self.partner_code_out,
-                'c_category_id': self.env['core.category'].search([
-                    '&', ('type', '=', 'customer'), ('note', '=', u'默认客户类别')])[0].id,
+                'c_category_id':default_customer,
                 'computer_import': True,
             })
         # 补银行帐号等信息
