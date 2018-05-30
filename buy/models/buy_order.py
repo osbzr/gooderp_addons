@@ -292,7 +292,6 @@ class BuyOrder(models.Model):
             'buy_id': self.id,
         }
 
-    @api.one
     def generate_payment_order(self):
         '''由购货订单生成付款单'''
         # 入库单/退货单
@@ -300,7 +299,6 @@ class BuyOrder(models.Model):
             money_order = self.with_context(type='pay').env['money.order'].create(
                 self._get_vals()
             )
-            self.money_order_id = money_order.id
             return money_order
 
     @api.one
@@ -318,10 +316,14 @@ class BuyOrder(models.Model):
         if not self.bank_account_id and self.prepayment:
             raise UserError(u'预付款不为空时，请选择结算账户')
         # 采购预付款生成付款单
-        self.generate_payment_order()
+        money_order = self.generate_payment_order()
         self.buy_generate_receipt()
-        self.state = 'done'
+
         self.approve_uid = self._uid
+        self.write({
+            'money_order_id': money_order and money_order.id,
+            'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
+        })
 
     @api.one
     def buy_order_draft(self):
@@ -339,8 +341,10 @@ class BuyOrder(models.Model):
             if self.money_order_id.state == 'done':
                 self.money_order_id.money_order_draft()
             self.money_order_id.unlink()
-        self.state = 'draft'
-        self.approve_uid = ''
+        self.write({
+            'approve_uid': '',
+            'state': 'draft',  # 为保证审批流程顺畅，否则，未审批就可审核
+        })
 
     @api.one
     def get_receipt_line(self, line, single=False):

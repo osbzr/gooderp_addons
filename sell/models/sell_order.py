@@ -265,7 +265,6 @@ class SellOrder(models.Model):
             'sell_id': self.id,
         }
 
-    @api.one
     def generate_receipt_order(self):
         '''由销货订单生成收款单'''
         # 发库单/退货单
@@ -273,8 +272,8 @@ class SellOrder(models.Model):
             money_order = self.with_context(type='get').env['money.order'].create(
                 self._get_vals()
             )
-            self.money_order_id = money_order.id
             money_order.money_order_done()
+            return money_order
 
     @api.one
     def sell_order_done(self):
@@ -291,10 +290,14 @@ class SellOrder(models.Model):
         if not self.bank_account_id and self.pre_receipt:
             raise UserError(u'预付款不为空时，请选择结算账户！')
         # 销售预收款生成收款单
-        self.generate_receipt_order()
+        money_order = self.generate_receipt_order()
         self.sell_generate_delivery()
-        self.state = 'done'
+
         self.approve_uid = self._uid
+        self.write({
+            'money_order_id': money_order and money_order.id,
+            'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
+        })
 
     @api.one
     def sell_order_draft(self):
@@ -311,8 +314,10 @@ class SellOrder(models.Model):
         if self.money_order_id:
             self.money_order_id.money_order_draft()
             self.money_order_id.unlink()
-        self.state = 'draft'
-        self.approve_uid = ''
+        self.write({
+            'approve_uid': '',
+            'state': 'draft',  # 为保证审批流程顺畅，否则，未审批就可审核
+        })
 
     @api.one
     def get_delivery_line(self, line, single=False):
