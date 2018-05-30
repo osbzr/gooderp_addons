@@ -80,13 +80,27 @@ class WhMove(models.Model):
         if ORIGIN_EXPLAIN.get(self.origin):
             model_row = self.env[ORIGIN_EXPLAIN.get(self.origin)
                                  ].search([('sell_move_id', '=', self.id)])
+        detail_address = model_row.address_id.detail_address
+        if detail_address:
+            first_index = -1
+            if u'区' in detail_address:
+                first_index = detail_address.find(u'区')
+            if u'县' in detail_address:
+                first_index = detail_address.find(u'县')
+            # 处理县级市
+            if u'市' in detail_address and (u'区' not in detail_address or u'县' not in detail_address):
+                first_index = detail_address.find(u'市')
+            # 处理 内蒙 盟
+            if u'内蒙古' in detail_address and u'盟' in detail_address:
+                first_index = detail_address.find(u'盟')
+            detail_address = detail_address[first_index+1:]
         receiver = dict(Company=' ',
                         Name=model_row.partner_id.name,
                         Mobile=model_row.address_id.mobile,
                         ProvinceName=model_row.address_id.province_id.name or model_row.address_id.city_id.city_name or u'()',
                         CityName=model_row.address_id.city_id.city_name or u' ',
                         ExpAreaName=model_row.address_id.county_id.county_name or u' ',
-                        Address=model_row.address_id.detail_address or u'金海路2588号B-213')
+                        Address=detail_address or u' ')
 
         goods = []
         qty = 0
@@ -119,6 +133,8 @@ class WhMove(models.Model):
                             Sender=sender, Receiver=receiver, Commodity=commodity, Weight=1.0,
                             Quantity=1, Volume=0.0, Remark=remark, IsReturnPrintTemplate=1)
         request_data.update(self.get_shipping_type_config(shipping_type))
+        # if shipping_type == 'YTO':
+        #     request_data.update({'TemplateSize': 180})
         request_data = json.dumps(request_data)
         data = {'RequestData': request_data,
                 'EBusinessID': appid,

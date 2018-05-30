@@ -76,8 +76,8 @@
                     <field name="costs_types" invisible="1"/>
                     <field name="account_type" invisible="1"/>
                     <field name="level" />
-                    <field name="user_type" readonly="0"/>
-                    <field name="parent_id" readonly="1"/>
+                    <field name="user_type"/>
+                    <field name="parent_id"/>
                     <field name="balance_directions"/>
                     <field name="auxiliary_financing"/>
                     <field name="currency_id" groups='finance.group_multi_currency'/>

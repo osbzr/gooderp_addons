@@ -44,7 +44,7 @@ function compute_main_data(rows,export_columns_keys){
                 var text = cell.text || cell.textContent || cell.innerHTML || "";
                 var is_boolean_cell = cell_object.find('.o_checkbox input[type=checkbox]');
                 if (cell.classList.contains("oe_list_field_float")||cell.classList.contains("o_list_number")||cell.classList.contains("oe_number")) {
-                    export_row.push(formats.parse_value(text, {'type': "float"}, 0));
+                    export_row.push(formats.parse_value(text.replace(/[^0-9.]/g, ''), {'type': "float"}, 0));
                 }else if (is_boolean_cell.length>0) {
                     if (is_boolean_cell.get(0).checked) {
                         export_row.push('√');
