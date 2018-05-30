@@ -82,6 +82,9 @@ class Partner(models.Model):
         """
         args = args or []
         if name:
+            res_id = self.search([('code','=',name)])
+            if res_id:
+                return res_id.name_get()
             args.append(('code', 'ilike', name))
             partners = self.search(args)
             if partners:

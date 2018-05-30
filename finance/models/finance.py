@@ -719,6 +719,9 @@ class FinanceAccount(models.Model):
         args = args or []
         domain = []
         if name:
+            res_id = self.search([('code','=',name)])
+            if res_id:
+                return res_id.name_get()
             domain = ['|', ('code', '=ilike', name + '%'),
                       ('name', operator, name)]
         accounts = self.search(domain + args, limit=limit)
