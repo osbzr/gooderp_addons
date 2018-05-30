@@ -439,6 +439,7 @@ class TestCheckoutWizard(TransactionCase):
                                                                         "default_auto_reset": True,
                                                                         "default_voucher_date": "today"})
         setting_row_month.execute()
+        self.env.ref('finance.period_201512').is_closed = True
         checkout_wizard_obj.recreate_voucher_name(period_id)
 
     def test_get_last_date(self):
