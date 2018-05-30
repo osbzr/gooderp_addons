@@ -502,3 +502,10 @@ class WhMoveLine(models.Model):
     def onchange_discount_amount(self):
         """当优惠金额发生变化时，重新取默认的单位成本，以便计算实际的单位成本"""
         self.compute_suggested_cost()
+
+    @api.one
+    @api.constrains('force_batch_one', 'goods_qty')
+    def check_goods_qty(self):
+        """序列号管理的商品数量必须为1"""
+        if self.force_batch_one and self.goods_qty > 1:
+            raise UserError(u'商品 %s 进行了序列号管理，数量必须为1' % self.goods_id.name)

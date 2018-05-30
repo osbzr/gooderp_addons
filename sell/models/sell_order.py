@@ -77,7 +77,8 @@ class SellOrder(models.Model):
     @api.depends('delivery_ids')
     def _compute_delivery(self):
         for order in self:
-            order.delivery_count = len(order.delivery_ids)
+            order.delivery_count = len([deli for deli in order.delivery_ids if not deli.is_return])
+            order.return_count = len([deli for deli in order.delivery_ids if deli.is_return])
 
     partner_id = fields.Many2one('partner', u'客户',
                                  ondelete='restrict', states=READONLY_STATES,
@@ -176,9 +177,11 @@ class SellOrder(models.Model):
     received_amount = fields.Float(
         u'已收金额',  compute=_get_received_amount, readonly=True)
     delivery_ids = fields.One2many(
-        'sell.delivery', 'order_id', string='Deliverys', copy=False)
+        'sell.delivery', 'order_id', string=u'发货单', copy=False)
     delivery_count = fields.Integer(
-        compute='_compute_delivery', string='Deliverys Count', default=0)
+        compute='_compute_delivery', string=u'发货单数量', default=0)
+    return_count = fields.Integer(
+        compute='_compute_delivery', string=u'退货单数量', default=0)
     pay_method = fields.Many2one('core.value',
                                  string=u'付款方式',
                                  ondelete='restrict',
@@ -262,7 +265,6 @@ class SellOrder(models.Model):
             'sell_id': self.id,
         }
 
-    @api.one
     def generate_receipt_order(self):
         '''由销货订单生成收款单'''
         # 发库单/退货单
@@ -270,8 +272,8 @@ class SellOrder(models.Model):
             money_order = self.with_context(type='get').env['money.order'].create(
                 self._get_vals()
             )
-            self.money_order_id = money_order.id
             money_order.money_order_done()
+            return money_order
 
     @api.one
     def sell_order_done(self):
@@ -288,10 +290,14 @@ class SellOrder(models.Model):
         if not self.bank_account_id and self.pre_receipt:
             raise UserError(u'预付款不为空时，请选择结算账户！')
         # 销售预收款生成收款单
-        self.generate_receipt_order()
+        money_order = self.generate_receipt_order()
         self.sell_generate_delivery()
-        self.state = 'done'
+
         self.approve_uid = self._uid
+        self.write({
+            'money_order_id': money_order and money_order.id,
+            'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
+        })
 
     @api.one
     def sell_order_draft(self):
@@ -308,8 +314,10 @@ class SellOrder(models.Model):
         if self.money_order_id:
             self.money_order_id.money_order_draft()
             self.money_order_id.unlink()
-        self.state = 'draft'
-        self.approve_uid = ''
+        self.write({
+            'approve_uid': '',
+            'state': 'draft',  # 为保证审批流程顺畅，否则，未审批就可审核
+        })
 
     @api.one
     def get_delivery_line(self, line, single=False):
@@ -423,11 +431,9 @@ class SellOrder(models.Model):
         This function returns an action that display existing deliverys of given sells order ids.
         When only one found, show the delivery immediately.
         '''
-
         self.ensure_one()
-        name = (self.type == 'sell' and u'销售发库单' or u'销售退货单')
         action = {
-            'name': name,
+            'name': u'销售发货单',
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
@@ -435,16 +441,39 @@ class SellOrder(models.Model):
             'view_id': False,
             'target': 'current',
         }
-
-        delivery_ids = self.delivery_ids.ids
+        delivery_ids = [delivery.id for delivery in self.delivery_ids if not delivery.is_return]
         if len(delivery_ids) > 1:
             action['domain'] = "[('id','in',[" + \
                 ','.join(map(str, delivery_ids)) + "])]"
             action['view_mode'] = 'tree,form'
         elif len(delivery_ids) == 1:
-            view_id = (self.type == 'sell'
-                       and self.env.ref('sell.sell_delivery_form').id
-                       or self.env.ref('sell.sell_return_form').id)
+            view_id = self.env.ref('sell.sell_delivery_form').id
+            action['views'] = [(view_id, 'form')]
+            action['res_id'] = delivery_ids and delivery_ids[0] or False
+        return action
+
+    @api.multi
+    def action_view_return(self):
+        '''
+        该销货订单对应的退货单
+        '''
+        self.ensure_one()
+        action = {
+            'name': u'销售退货单',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sell.delivery',
+            'view_id': False,
+            'target': 'current',
+        }
+        delivery_ids = [delivery.id for delivery in self.delivery_ids if delivery.is_return]
+        if len(delivery_ids) > 1:
+            action['domain'] = "[('id','in',[" + \
+                               ','.join(map(str, delivery_ids)) + "])]"
+            action['view_mode'] = 'tree,form'
+        elif len(delivery_ids) == 1:
+            view_id = self.env.ref('sell.sell_return_form').id
             action['views'] = [(view_id, 'form')]
             action['res_id'] = delivery_ids and delivery_ids[0] or False
         return action

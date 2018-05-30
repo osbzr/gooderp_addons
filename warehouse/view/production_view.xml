@@ -186,15 +186,11 @@
                                             context="{'lot': True}"
                                             options="{'no_open': True, 'no_create': True}" />
                                         <field name='goods_uos_qty' sum='1'
-                                            widget='float_limit'
-                                            options="{'field': 'lot_uos_qty'}"
                                             groups='goods.auxiliary_unit_groups'
                                             attrs="{'readonly': [('state', '=', 'done')]}"/>
                                         <field name='uos_id' groups='goods.auxiliary_unit_groups'
                                             attrs="{'readonly': [('state', '=', 'done')]}"/>
                                         <field name='goods_qty' sum='1'
-                                            widget='float_limit'
-                                            options="{'field': 'lot_qty'}"
                                             attrs="{'readonly': ['|', ('force_batch_one', '=', True), ('state', '=', 'done')]}" />
                                         <field name='uom_id' required='1' attrs="{'readonly': [('state', '=', 'done')]}"/>
                                         <field name='cost_unit' string='出库单位成本' readonly='1' />
@@ -395,8 +391,6 @@
                                         options="{'no_open': True, 'no_create': True}"/>
                                     <field name='goods_uos_qty'
                                         sum='1'
-                                        widget='float_limit'
-                                        options="{'field': 'lot_uos_qty'}"
                                         groups='goods.auxiliary_unit_groups'
                                         attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name='uos_id'
@@ -404,8 +398,6 @@
                                         attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name='goods_qty'
                                         sum='1'
-                                        widget='float_limit'
-                                        options="{'field': 'lot_qty'}"
                                         attrs="{'readonly': ['|', ('force_batch_one', '=', True), ('state', '=', 'done')]}"/>
                                     <field name='uom_id'
                                         required='1'
@@ -546,16 +538,12 @@
                                         options="{'no_open': True, 'no_create': True}" />
                                     <field name='goods_uos_qty'
                                         sum='1'
-                                        widget='float_limit'
-                                        options="{'field': 'lot_uos_qty'}"
                                         attrs="{'readonly': [('state', '=', 'done')]}"
                                         groups='goods.auxiliary_unit_groups'/>
                                     <field name='uos_id'
                                         groups='goods.auxiliary_unit_groups'
                                         attrs="{'readonly': [('state', '=', 'done')]}"  />
                                     <field name='goods_qty' sum='1'
-                                        widget='float_limit'
-                                        options="{'field': 'lot_qty'}"
                                         attrs="{'readonly': ['|', ('force_batch_one', '=', True), ('state', '=', 'done')]}" />
                                     <field name='uom_id'
                                         required='1'

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class Goods(models.Model):
@@ -96,7 +97,18 @@ class Attribute(models.Model):
 
     _sql_constraints = [
         ('ean_uniq', 'unique (ean)', u'该条码已存在'),
+        ('goods_attribute_uniq', 'unique (goods_id, name)', u'该SKU已存在'),
     ]
+
+    @api.one
+    @api.constrains('value_ids')
+    def check_value_ids(self):
+        att_dict = {}
+        for line in self.value_ids:
+            if not att_dict.has_key(line.category_id):
+                att_dict[line.category_id] = line.category_id
+            else:
+                raise UserError(u'属性值的类别不能相同')
 
 
 class AttributeValue(models.Model):
@@ -140,5 +152,5 @@ class AttributeValueValue(models.Model):
         default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
-        ('name_category_uniq', 'unique(category_id,name)', '同一属性的值不能重复')
+        ('name_category_uniq', 'unique(category_id,name)', u'同一属性的值不能重复')
     ]

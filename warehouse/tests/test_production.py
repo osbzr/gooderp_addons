@@ -518,7 +518,7 @@ class TestProduction(TransactionCase):
         ''' 测试 拆卸单 onchange_goods_qty '''
         # has bom_id
         wh_disassembly_dis3 = self.browse_ref('warehouse.wh_disassembly_dis3')
-        wh_disassembly_dis3.goods_qty = 2
+        wh_disassembly_dis3.goods_qty = 1
         wh_disassembly_dis3.onchange_goods_qty()
 
     def test_disassembly_onchange_goods_qty_no_bom(self):
