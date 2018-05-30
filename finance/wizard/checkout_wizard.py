@@ -307,6 +307,8 @@ class CheckoutWizard(models.TransientModel):
                         {'name': next_voucher_name})
             # 按月重置
             else:
+                if not last_period.is_closed:
+                    raise UserError(u'上一个期间%s未结账' % last_period.name)
                 last_voucher_number = reset_init_number
                 voucher_ids = voucher_obj.search(
                     [('period_id', '=', period_id.id), ('state', '=', 'done')], order='create_date')
