@@ -480,6 +480,7 @@
 				 						<field name='using_attribute' invisible='1'/>
 				 						<field name='using_batch' invisible='1'/>
 					                    <field name='force_batch_one' invisible='1'/>
+										<field name='sell_line_id' invisible='1'/>
 				 					</tree>
 				 				</field>
 			 				</page>

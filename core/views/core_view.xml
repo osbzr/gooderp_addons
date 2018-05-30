@@ -68,6 +68,7 @@
 				<tree editable="TOP" string="可选值">
 					<field name="name"/>
 					<field name="type"/>
+					<field name="note" groups="base.group_no_one"/>
 					<field name='active'  invisible='1'/>
 				</tree>
 			</field>
