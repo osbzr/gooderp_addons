@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-
+access_tax_invoice_in,access_tax_invoice_in,model_tax_invoice_in,,1,1,1,1
+access_tax_invoice_in_line,access_tax_invoice_in_line,model_tax_invoice_in_line,,1,1,1,1
