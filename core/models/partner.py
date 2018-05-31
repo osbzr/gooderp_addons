@@ -3,6 +3,8 @@
 import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from datetime import datetime
+
 
 
 class Partner(models.Model):
@@ -56,6 +58,12 @@ class Partner(models.Model):
                                      u'负责人员')
     share_id = fields.Many2one('res.users',
                                u'共享人员')
+    date_qualify = fields.Date(u'资质到期日期')
+    days_qualify = fields.Float(u'资质到期天数',
+                                compute='compute_days_qualify',
+                                store=True,
+                                help=u'当天到资质到期日期的天数差',
+                                )
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', '业务伙伴不能重名')
@@ -74,6 +82,9 @@ class Partner(models.Model):
         """
         args = args or []
         if name:
+            res_id = self.search([('code','=',name)])
+            if res_id:
+                return res_id.name_get()
             args.append(('code', 'ilike', name))
             partners = self.search(args)
             if partners:
@@ -93,3 +104,13 @@ class Partner(models.Model):
         if self.s_category_id and vals.get('s_category_id') == False and self.payable != 0:
             raise UserError(u'该供应商应付余额不为0，不能取消供应商类型')
         return super(Partner, self).write(vals)
+
+    @api.one
+    @api.depends('date_qualify')
+    def compute_days_qualify(self):
+        """计算当天距离资质到期日期的天数"""
+        today = datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
+        date_qualify = self.date_qualify and datetime.strptime(
+            self.date_qualify, '%Y-%m-%d') or today
+        day = (date_qualify - today).days
+        self.days_qualify = day

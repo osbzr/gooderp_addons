@@ -2,45 +2,46 @@
 <openerp>
     <data noupdate="1">
         <record id="small_business_chart160101" model='finance.account'>
-            <field name='code'>1601</field>
-            <field name='name'>固定资产</field>
-            <field name='costs_types'>assets</field>
+            <field name='code'>160101</field>
+            <field name='name'>固定资产-房屋</field>
+            <field name='user_type' ref='finance.base_assest' />
+            <field name='parent_id' ref='finance.small_business_chart1601' />
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart410101" model='finance.account'>
             <field name='code'>410101</field>
             <field name='name'>制造费用－折旧费</field>
-            <field name='costs_types'>cost</field>
+            <field name='user_type' ref='finance.base_cost' />
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart530101" model='finance.account'>
             <field name='code'>570101</field>
             <field name='name'>营业外收入－固定资产清理</field>
-            <field name='costs_types'>in</field>
+            <field name='user_type' ref='finance.base_in' />
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart571101" model='finance.account'>
             <field name='code'>571101</field>
             <field name='name'>营业外支出－固定资产清理</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='finance.base_in' />
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart170101" model='finance.account'>
             <field name='code'>170101</field>
             <field name='name'>无形资产-土地</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='finance.base_assest' />
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart170201" model='finance.account'>
             <field name='code'>170201</field>
             <field name='name'>累计摊销－土地</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='finance.base_assest' />
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602022' model='finance.account'>
             <field name='code'>5602022</field>
             <field name='name'>管理费用-土地摊销</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='finance.base_in' />
             <field name='balance_directions'>in</field>
         </record>
 

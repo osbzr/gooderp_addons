@@ -68,6 +68,7 @@
 				<tree editable="TOP" string="可选值">
 					<field name="name"/>
 					<field name="type"/>
+					<field name="note" groups="base.group_no_one"/>
 					<field name='active'  invisible='1'/>
 				</tree>
 			</field>
@@ -233,6 +234,8 @@
 								<field name="main_address"/>
 								<field name="tax_num"/>
 								<field name="receivable"/>
+								<field name="date_qualify"/>
+								<field name="days_qualify"/>
 							</group>
 							<field name="note" placeholder="暂无备注信息"/>
 							<field name="s_category_id" placeholder="转为供应商"/>
@@ -324,6 +327,8 @@
 								<field name="main_address"/>
 								<field name="tax_num"/>
 								<field name="payable"/>
+								<field name="date_qualify"/>
+								<field name="days_qualify"/>
 							</group>
 							<field name="note" placeholder="暂无备注信息"/>
 						    <field name="c_category_id" placeholder="转为客户"/>

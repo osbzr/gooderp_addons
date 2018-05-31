@@ -64,6 +64,15 @@ class TestStaff(TransactionCase):
         lili_contract.basic_wage = 13000
         lili_contract.onchange_basic_wage()
 
+    def test_check_work_email(self):
+        ''' Test: check work email  '''
+        staff_lili = self.env.ref('staff.lili')
+        # 测试邮箱格式正确
+        staff_lili.work_email = 'gooderp@osbzr.com'
+        # 测试邮箱格式不正确，报错
+        with self.assertRaises(ValidationError):
+            staff_lili.work_email = 'gooderp'
+
 
 class TestStaffDepartment(TransactionCase):
     ''' 测试 部门 '''

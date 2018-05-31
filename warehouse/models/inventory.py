@@ -234,7 +234,8 @@ class WhInventory(models.Model):
                          ('attribute_id', '=', line['attribute_id']),
                          ('lot_id', '=', line['lot']),
                          ('warehouse_id', '=', line['warehouse_id']),
-                         ('type', '=', 'internal')]):
+                         ('type', '=', 'internal'),
+                         ('state', '=', 'draft')]):
                     line['qty'] -= int_line.goods_qty
                     line['uos_qty'] -= int_line.goods_uos_qty
                 if not line['qty']:

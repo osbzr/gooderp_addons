@@ -201,13 +201,9 @@
                     	context="{'lot': True}"
                     	options="{'no_open': True, 'no_create': True}" />
                     <field name='goods_uos_qty' sum='1'
-                    	widget='float_limit'
-                    	options="{'field': 'lot_uos_qty'}"
                     	groups='goods.auxiliary_unit_groups'/>
                     <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' sum='1'
-                    	widget='float_limit'
-                    	options="{'field': 'lot_qty'}"
                     	attrs="{'readonly': [('force_batch_one', '=', True)]}" />
                     <field name='uom_id' required='1' />
                     <field name='cost_unit' string='出库单位成本' readonly='1' />
@@ -278,14 +274,10 @@
                     	context="{'lot': True}"
                     	options="{'no_open': True, 'no_create': True}" />
                     <field name='goods_uos_qty' sum='1'
-                    	widget='float_limit'
-                    	options="{'field': 'lot_uos_qty'}"
                     	groups='goods.auxiliary_unit_groups'
                     	/>
                     <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                     <field name='goods_qty' sum='1'
-                    	widget='float_limit'
-                    	options="{'field': 'lot_qty'}"
                     	attrs="{'readonly': [('force_batch_one', '=', True)]}" />
                     <field name='uom_id' required='1' />
                     <field name='expiration_date' groups='warehouse.group_expiration_date' />
@@ -360,13 +352,9 @@
                                         context="{'lot': True}"
                                         options="{'no_open': True, 'no_create': True}" />
                                     <field name='goods_uos_qty' sum='1'
-                                        widget='float_limit'
-                                        options="{'field': 'lot_uos_qty'}"
                                         groups='goods.auxiliary_unit_groups'/>
                                     <field name='uos_id' groups='goods.auxiliary_unit_groups' />
                                     <field name='goods_qty' sum='1'
-                                        widget='float_limit'
-                                        options="{'field': 'lot_qty'}"
                                         attrs="{'readonly': [('force_batch_one', '=', True)]}" />
                                     <field name='uom_id' required='1' />
                                     <field name='cost_unit' string='出库单位成本' readonly='1' />

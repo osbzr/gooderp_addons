@@ -35,6 +35,51 @@ class FinanceConfigWizard(models.TransientModel):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
+    # 科目编码规则
+    default_account_hierarchy_level = fields.Selection(
+        string=u'科目层级级别',
+        selection=[('1', '1'), ('2', '2'),('3', '3'),('4', '4'),('5', '5')], default='5', required=True
+    )
+    default_top_length = fields.Selection(
+        string=u'一级科目编码长度',
+        selection=[('4', '4')],default='4'
+    )
+    default_child_step = fields.Selection(
+        string=u'下级科目编码递增长度',
+        selection=[('2', '2')],default='2'
+    )
+
+    @api.model
+    def set_defaults(self):
+        self.env['ir.values'].set_default( 'finance.config.settings', 'default_auto_reset', True)
+        self.env['ir.values'].set_default('finance.config.settings', 'default_account_hierarchy_level', '5')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_top_length', '4')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_child_step', '2')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_voucher_date', 'today')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_reset_period', 'month')
+        self.env['ir.values'].set_default('finance.config.settings', 'default_reset_init_number', 1)
+        self.env['ir.values'].set_default('finance.config.settings', 'default_period_domain', 'can')
+
+        return True
+
+    @api.multi
+    def set_default_account_hierarchy_level(self):
+        res = self.env['ir.values'].set_default(
+            'finance.config.settings', 'default_account_hierarchy_level', self.default_account_hierarchy_level)
+        return res
+
+    @api.multi
+    def set_default_top_length(self):
+        res = self.env['ir.values'].set_default(
+            'finance.config.settings', 'default_top_length', self.default_top_length)
+        return res
+
+    @api.multi
+    def set_default_child_step(self):
+        res = self.env['ir.values'].set_default(
+            'finance.config.settings', 'default_child_step', self.default_child_step)
+        return res
+
     @api.multi
     def set_default_voucher_date(self):
         voucher_date = self.default_voucher_date

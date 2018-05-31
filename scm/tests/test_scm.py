@@ -64,7 +64,7 @@ class TestScm(TransactionCase):
         self.wh_move_in_1.approve_order()
 
         # 请输入补货申请行商品的供应商 存在
-        self.goods_keyboard_mouse.min_stock_qty = 100
+        self.goods_keyboard_mouse.min_stock_qty = 1
         self.env.ref(
             'goods.iphone_black').goods_id = self.goods_keyboard_mouse.id
 
@@ -142,7 +142,7 @@ class TestScm(TransactionCase):
             'goods_qty': 1,
             'type': 'child'
         })
-        self.goods_computer.min_stock_qty = 5
+        self.goods_computer.min_stock_qty = 1
         self.stock_request.stock_query()
 
         # 保证不存在多条未审核购货订单行

@@ -121,6 +121,14 @@ class WhMove(models.Model):
         context={'type': 'finance'},
         help=u'生成凭证时从此字段上取商品科目的对方科目',
     )
+    all_line_done = fields.Boolean(u'出库行都完成', compute='compute_all_line_done', store=True)
+
+    @api.one
+    @api.depends('line_out_ids.state')
+    def compute_all_line_done(self):
+        """如果所有出库行的状态都为done,则置为True,以便控制发料和出库按钮显隐"""
+        if all(line.state == 'done' for line in self.line_out_ids):
+            self.all_line_done = True
 
     def scan_barcode_move_line_operation(self, line, conversion):
         """

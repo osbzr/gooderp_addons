@@ -12,6 +12,13 @@
                         <button string="取消" type="object" name="cancel" class="oe_link"/>
                     </header>
                     <div id="main" position="inside">
+                        <group string="会计科目设置">
+                            <group>
+                                <field name="default_account_hierarchy_level" />
+                                <field name="default_top_length" />
+                                <field name="default_child_step" />
+                            </group>
+                        </group>
                         <group string="凭证设置">
                             <label for="id" string="凭证日期"/>
                             <div>
@@ -46,7 +53,6 @@
             </field>
         </record>
 
-
         <record id="view_finance_config_setting_action" model="ir.actions.act_window">
             <field name="name">会计设置</field>
             <field name="type">ir.actions.act_window</field>
@@ -55,7 +61,6 @@
             <field name="view_mode">form</field>
             <field name="target">inline</field>
         </record>
-
 
     </data>
 </openerp>

@@ -182,7 +182,7 @@ class TestSellOrder(TransactionCase):
         delivery = self.env['sell.delivery'].search(
             [('order_id', '=', self.order.id)])
         for line in delivery.line_out_ids:
-            line.goods_qty = 8
+            line.goods_qty = 1
         delivery.sell_delivery_done()
         self.order.action_view_delivery()
 

@@ -1,946 +1,1318 @@
 <?xml version="1.0"?>
 <openerp>
+    <data noupdate="0">
+        <function model="finance.config.settings" name="set_defaults" />
+    </data>
     <data  noupdate="1">
+
         <!--创建系统启用日期所属会计期间-->
         <function model="finance.period" name="init_period"/>
+
+        <!--会计要素finance.account.type-->
+        <record id="base_assest" model='finance.account.type'>
+            <field name='name'>资产</field>
+            <field name='costs_types'>assets</field>
+        </record>
+        <record id="base_debt" model='finance.account.type'>
+            <field name='name'>负债</field>
+            <field name='costs_types'>debt</field>
+        </record>
+        <record id="base_equity" model='finance.account.type'>
+            <field name='name'>净资产</field>
+            <field name='costs_types'>equity</field>
+        </record>
+        <record id="base_cost" model='finance.account.type'>
+            <field name='name'>成本</field>
+            <field name='costs_types'>cost</field>
+        </record>
+        <record id="base_in" model='finance.account.type'>
+            <field name='name'>收入</field>
+            <field name='costs_types'>in</field>
+        </record>
+        <record id="base_out" model='finance.account.type'>
+            <field name='name'>费用</field>
+            <field name='costs_types'>out</field>
+        </record>
 
         <!-- 资产类 -->
         <record id="account_cash" model='finance.account'>
             <field name='code'>1001</field>
             <field name='name'>库存现金</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="account_chart1002" model='finance.account'>
+            <field name='code'>1002</field>
+            <field name='name'>银行存款</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
+            <field name='account_type'>view</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_bank' model='finance.account'>
             <field name='code'>1002002</field>
             <field name='name'>银行存款-基本户</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='parent_id' ref='account_chart1002' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1012" model='finance.account'>
             <field name='code'>1012</field>
             <field name='name'>其他货币资金</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1101" model='finance.account'>
             <field name='code'>1101</field>
             <field name='name'>短期投资</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1121" model='finance.account'>
             <field name='code'>1121</field>
             <field name='name'>应收票据</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
             <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="account_ar" model='finance.account'>
             <field name='code'>1122</field>
             <field name='name'>应收账款</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
             <field name='auxiliary_financing'>customer</field>
         </record>
         <record id="small_business_chart1123" model='finance.account'>
             <field name='code'>1123</field>
             <field name='name'>预付账款</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
             <field name='auxiliary_financing'>supplier</field>
         </record>
         <record id="small_business_chart1131" model='finance.account'>
             <field name='code'>1131</field>
             <field name='name'>应收股利</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1132" model='finance.account'>
             <field name='code'>1132</field>
             <field name='name'>应收利息</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1221" model='finance.account'>
             <field name='code'>1221</field>
             <field name='name'>其他应收款</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
             <field name='auxiliary_financing'>member</field>
         </record>
         <record id="small_business_chart1401" model='finance.account'>
             <field name='code'>1401</field>
             <field name='name'>材料采购</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1402" model='finance.account'>
             <field name='code'>1402</field>
             <field name='name'>在途物资</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1403" model='finance.account'>
             <field name='code'>1403</field>
             <field name='name'>原材料</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1404" model='finance.account'>
             <field name='code'>1404</field>
             <field name='name'>材料成本差异</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="account_goods" model='finance.account'>
             <field name='code'>1405</field>
             <field name='name'>库存商品</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1407" model='finance.account'>
             <field name='code'>1407</field>
             <field name='name'>商品进销差价</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1408" model='finance.account'>
             <field name='code'>1408</field>
             <field name='name'>委托加工物资</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1411" model='finance.account'>
             <field name='code'>1411</field>
             <field name='name'>周转材料</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1421" model='finance.account'>
             <field name='code'>1421</field>
             <field name='name'>消耗性生物资产</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1501" model='finance.account'>
             <field name='code'>1501</field>
             <field name='name'>长期债券投资</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1511" model='finance.account'>
             <field name='code'>1511</field>
             <field name='name'>长期股权投资</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1601" model='finance.account'>
-            <field name='code'>1601005</field>
-            <field name='name'>固定资产-服务器</field>
-            <field name='costs_types'>assets</field>
+            <field name='code'>1601</field>
+            <field name='name'>固定资产</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id="small_business_chart160105" model='finance.account'>
+            <field name='code'>160105</field>
+            <field name='name'>固定资产-其他</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='parent_id' ref='small_business_chart1601' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1602" model='finance.account'>
             <field name='code'>1602</field>
             <field name='name'>累计折旧</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart1604" model='finance.account'>
             <field name='code'>1604</field>
             <field name='name'>在建工程</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1605" model='finance.account'>
             <field name='code'>1605</field>
             <field name='name'>工程物资</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1606" model='finance.account'>
             <field name='code'>1606</field>
             <field name='name'>固定资产清理</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1621" model='finance.account'>
             <field name='code'>1621</field>
             <field name='name'>生产性生物资产</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1622" model='finance.account'>
             <field name='code'>1622</field>
             <field name='name'>生产性生物资产累计折旧</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1701" model='finance.account'>
             <field name='code'>1701</field>
             <field name='name'>无形资产</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1702" model='finance.account'>
             <field name='code'>1702</field>
             <field name='name'>累计摊销</field>
-            <field name='costs_types'>assets</field>
+            <field name='account_type'>view</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1801" model='finance.account'>
             <field name='code'>1801</field>
             <field name='name'>长期待摊费用</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart1901" model='finance.account'>
             <field name='code'>1901</field>
             <field name='name'>待处理财产损溢</field>
-            <field name='costs_types'>assets</field>
+            <field name='user_type' ref='base_assest' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <!-- 二、负债类 -->
         <record id="small_business_chart2001" model='finance.account'>
             <field name='code'>2001</field>
             <field name='name'>短期借款</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2201" model='finance.account'>
             <field name='code'>2201</field>
             <field name='name'>应付票据</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
             <field name='auxiliary_financing'>supplier</field>
         </record>
         <record id="account_ap" model='finance.account'>
             <field name='code'>2202</field>
             <field name='name'>应付账款</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
             <field name='auxiliary_financing'>supplier</field>
         </record>
         <record id="small_business_chart2203" model='finance.account'>
             <field name='code'>2203</field>
             <field name='name'>预收账款</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
             <field name='auxiliary_financing'>customer</field>
+        </record>
+        <record id="small_business_chart2211" model='finance.account'>
+            <field name='code'>2211</field>
+            <field name='name'>应付职工薪酬</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>out</field>
+            <field name='auxiliary_financing'>member</field>
         </record>
         <record id="small_business_chart2211001" model='finance.account'>
             <field name='code'>2211001</field>
             <field name='name'>应付职工薪酬-工资</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
             <field name='auxiliary_financing'>member</field>
         </record>
         <record id="small_business_chart2211002" model='finance.account'>
             <field name='code'>2211002</field>
             <field name='name'>应付职工薪酬-职工福利</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211003" model='finance.account'>
             <field name='code'>2211003</field>
             <field name='name'>应付职工薪酬-养老保险费</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211005" model='finance.account'>
             <field name='code'>2211005</field>
             <field name='name'>应付职工薪酬-医疗保险费</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211006" model='finance.account'>
             <field name='code'>2211006</field>
             <field name='name'>应付职工薪酬-失业保险费</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211007" model='finance.account'>
             <field name='code'>2211007</field>
             <field name='name'>应付职工薪酬-生育保险费</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211008" model='finance.account'>
             <field name='code'>2211008</field>
             <field name='name'>应付职工薪酬-工伤保险费</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211004" model='finance.account'>
             <field name='code'>2211004</field>
             <field name='name'>应付职工薪酬-职工教育经费</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2211009" model='finance.account'>
             <field name='code'>2211009</field>
             <field name='name'>应付职工薪酬-住房公积金</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2211' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
-
+        <record id="small_business_chart2221" model='finance.account'>
+            <field name='code'>2221</field>
+            <field name='name'>应交税费</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2221001" model='finance.account'>
+            <field name='code'>2221001</field>
+            <field name='name'>应交税费-增值税</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>out</field>
+        </record>
         <record id="small_business_chart2221001001" model='finance.account'>
             <field name='code'>2221001001</field>
             <field name='name'>应交税费-增值税-进项税额</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001002" model='finance.account'>
             <field name='code'>2221001002</field>
             <field name='name'>应交税费-增值税-己交税金</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001003" model='finance.account'>
             <field name='code'>2221001003</field>
             <field name='name'>应交税费-增值税-转出未交增值税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001004" model='finance.account'>
             <field name='code'>2221001004</field>
             <field name='name'>应交税费-增值税-减免税款</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001005" model='finance.account'>
             <field name='code'>2221001005</field>
             <field name='name'>应交税费-增值税-销项税额</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001006" model='finance.account'>
             <field name='code'>2221001006</field>
             <field name='name'>应交税费-增值税-出口退税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001007" model='finance.account'>
             <field name='code'>2221001007</field>
             <field name='name'>应交税费-增值税-进项税额转出</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001008" model='finance.account'>
             <field name='code'>2221001008</field>
             <field name='name'>应交税费-增值税-出口抵减内销商品应纳税额</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001009" model='finance.account'>
             <field name='code'>2221001009</field>
             <field name='name'>应交税费-增值税-转出多交增值税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221001010" model='finance.account'>
             <field name='code'>2221001010</field>
             <field name='name'>应交税费-增值税-待抵扣增值税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221002" model='finance.account'>
             <field name='code'>2221002</field>
             <field name='name'>应交税费-未交增值税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221003" model='finance.account'>
             <field name='code'>2221003</field>
             <field name='name'>应交税费-营业税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221004" model='finance.account'>
             <field name='code'>2221004</field>
             <field name='name'>应交税费-消费税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221005" model='finance.account'>
             <field name='code'>2221005</field>
             <field name='name'>应交税费-应交资源税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221006" model='finance.account'>
             <field name='code'>2221006</field>
             <field name='name'>应交税费-土地增值税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221007" model='finance.account'>
             <field name='code'>2221007</field>
             <field name='name'>应交税费-城市维护建设税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221008" model='finance.account'>
             <field name='code'>2221008</field>
             <field name='name'>应交税费-应交房产税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221009" model='finance.account'>
             <field name='code'>2221009</field>
             <field name='name'>应交税费-应交土地使用税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221010" model='finance.account'>
             <field name='code'>2221010</field>
             <field name='name'>应交税费-应交车船使用税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221011" model='finance.account'>
             <field name='code'>2221011</field>
             <field name='name'>应交税费-个人所得税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221012" model='finance.account'>
             <field name='code'>2221012</field>
             <field name='name'>应交税费-教育附加</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221013" model='finance.account'>
             <field name='code'>2221013</field>
             <field name='name'>应交税费-矿产资源补偿费</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221014" model='finance.account'>
             <field name='code'>2221014</field>
             <field name='name'>应交税费-应交保险保障基金</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221015" model='finance.account'>
             <field name='code'>2221015</field>
             <field name='name'>应交税费-所得税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221016" model='finance.account'>
             <field name='code'>2221016</field>
             <field name='name'>应交税费-水利建设基金</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2221017" model='finance.account'>
             <field name='code'>2221017</field>
             <field name='name'>应交税费-地方教育附加</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
-                <record id="small_business_chart2221018" model='finance.account'>
+        <record id="small_business_chart2221018" model='finance.account'>
             <field name='code'>2221018</field>
             <field name='name'>应交税费-印花税</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2221' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
-
         <record id="small_business_chart2231" model='finance.account'>
             <field name='code'>2231</field>
             <field name='name'>应付利息</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2232" model='finance.account'>
             <field name='code'>2232</field>
             <field name='name'>应付利润</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart2241" model='finance.account'>
+            <field name='code'>2241</field>
+            <field name='name'>其他应付款</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2241001" model='finance.account'>
             <field name='code'>2241001</field>
             <field name='name'>其他应付款-代扣个人养老保险</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2241' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2241002" model='finance.account'>
             <field name='code'>2241002</field>
             <field name='name'>其他应付款-代扣个人医疗保险</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2241' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2241003" model='finance.account'>
             <field name='code'>2241003</field>
             <field name='name'>其他应付款-代扣个人失业保险</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2241' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2241004" model='finance.account'>
             <field name='code'>2241004</field>
             <field name='name'>其他应付款-代扣个人住房公积金</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='parent_id' ref='small_business_chart2241' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2401" model='finance.account'>
             <field name='code'>2401</field>
             <field name='name'>递延收益</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2501" model='finance.account'>
             <field name='code'>2501</field>
             <field name='name'>长期借款</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart2701" model='finance.account'>
             <field name='code'>2701</field>
             <field name='name'>长期应付款</field>
-            <field name='costs_types'>debt</field>
+            <field name='user_type' ref='base_debt' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <!-- 所有者权益类 -->
         <record id="account_fund" model='finance.account'>
             <field name='code'>3001</field>
             <field name='name'>实收资本</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='source'>init</field>
+            <field name='balance_directions'>out</field>
+        </record>
+        <record id="small_business_chart3002" model='finance.account'>
+            <field name='code'>3002</field>
+            <field name='name'>资本公积</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3002001" model='finance.account'>
             <field name='code'>3002001</field>
             <field name='name'>资本公积-资本溢价</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='parent_id' ref='small_business_chart3002' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3002002" model='finance.account'>
             <field name='code'>3002002</field>
             <field name='name'>资本公积-股本溢价</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='parent_id' ref='small_business_chart3002' />
+            <field name='source'>init</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3002003" model='finance.account'>
             <field name='code'>3002003</field>
             <field name='name'>资本公积-其他资本公积</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='parent_id' ref='small_business_chart3002' />
+            <field name='source'>init</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
-
-
         <record id="small_business_chart3101" model='finance.account'>
             <field name='code'>3101</field>
             <field name='name'>盈余公积</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="account_profit" model='finance.account'>
             <field name='code'>3103</field>
             <field name='name'>本年利润</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
-
+        <record id="small_business_chart3104" model='finance.account'>
+            <field name='code'>3104</field>
+            <field name='name'>利润分配</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>out</field>
+        </record>
         <record id="small_business_chart3104001" model='finance.account'>
             <field name='code'>3104001</field>
             <field name='name'>利润分配-其他转入</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='parent_id' ref='small_business_chart3104' />
+            <field name='source'>init</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3104002" model='finance.account'>
             <field name='code'>3104002</field>
             <field name='name'>利润分配-提取法定盈余公积</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='parent_id' ref='small_business_chart3104' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart3104003" model='finance.account'>
             <field name='code'>3104003</field>
             <field name='name'>利润分配-提取任意盈余公积金</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='parent_id' ref='small_business_chart3104' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="account_remain" model='finance.account'>
             <field name='code'>3104004</field>
             <field name='name'>利润分配-未分配利润</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='parent_id' ref='small_business_chart3104' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <!-- 成本类 -->
+        <record id="small_business_chart4001" model='finance.account'>
+            <field name='code'>4001</field>
+            <field name='name'>生产成本</field>
+            <field name='user_type' ref='base_cost' />
+            <field name='source'>init</field>
+            <field name='account_type'>view</field>
+            <field name='balance_directions'>in</field>
+        </record>
         <record id="small_business_chart4001001" model='finance.account'>
             <field name='code'>4001001</field>
             <field name='name'>生产成本-基本生产成本</field>
-            <field name='costs_types'>cost</field>
+            <field name='user_type' ref='base_cost' />
+            <field name='parent_id' ref='small_business_chart4001' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4001002" model='finance.account'>
             <field name='code'>4001002</field>
             <field name='name'>生产成本-辅助生产成本</field>
-            <field name='costs_types'>cost</field>
+            <field name='user_type' ref='base_cost' />
+            <field name='parent_id' ref='small_business_chart4001' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4101" model='finance.account'>
             <field name='code'>4101</field>
             <field name='name'>制造费用</field>
-            <field name='costs_types'>cost</field>
+            <field name='user_type' ref='base_cost' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4301" model='finance.account'>
             <field name='code'>4301</field>
             <field name='name'>研发支出</field>
-            <field name='costs_types'>cost</field>
+            <field name='user_type' ref='base_cost' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4401" model='finance.account'>
             <field name='code'>4401</field>
             <field name='name'>工程施工</field>
-            <field name='costs_types'>cost</field>
+            <field name='user_type' ref='base_cost' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id="small_business_chart4403" model='finance.account'>
             <field name='code'>4403</field>
             <field name='name'>机械作业</field>
-            <field name='costs_types'>cost</field>
+            <field name='user_type' ref='base_cost' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <!-- 损益类 -->
         <record id="account_income" model='finance.account'>
             <field name='code'>5001</field>
             <field name='name'>主营业务收入</field>
-            <field name='costs_types'>in</field>
+            <field name='user_type' ref='base_in' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart5051" model='finance.account'>
             <field name='code'>5051</field>
             <field name='name'>其他业务收入</field>
-            <field name='costs_types'>in</field>
+            <field name='user_type' ref='base_in' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart5111" model='finance.account'>
             <field name='code'>5111</field>
             <field name='name'>投资收益</field>
-            <field name='costs_types'>in</field>
+            <field name='user_type' ref='base_in' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id="small_business_chart5301" model='finance.account'>
             <field name='code'>5701</field>
             <field name='name'>营业外收入</field>
-            <field name='costs_types'>in</field>
+            <field name='user_type' ref='base_in' />
+            <field name='source'>init</field>
             <field name='balance_directions'>out</field>
         </record>
         <record id='account_cost' model='finance.account'>
             <field name='code'>5401</field>
             <field name='name'>主营业务成本</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5402' model='finance.account'>
             <field name='code'>5402</field>
             <field name='name'>其他业务成本</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5403' model='finance.account'>
             <field name='code'>5403</field>
             <field name='name'>营业税金及附加</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='source'>init</field>
+            <field name='balance_directions'>in</field>
+        </record>
+        <record id='account_expense_sale0' model='finance.account'>
+            <field name='code'>5601</field>
+            <field name='name'>销售费用</field>
+            <field name='user_type' ref='base_out' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale' model='finance.account'>
             <field name='code'>560101</field>
             <field name='name'>销售费用-职工薪酬</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale2' model='finance.account'>
             <field name='code'>560102</field>
             <field name='name'>销售费用-劳务费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale3' model='finance.account'>
             <field name='code'>560103</field>
             <field name='name'>销售费用-咨询顾问费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale4' model='finance.account'>
             <field name='code'>560104</field>
             <field name='name'>销售费用-招待费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale5' model='finance.account'>
             <field name='code'>560105</field>
             <field name='name'>销售费用-广告费和业务宣传费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale6' model='finance.account'>
             <field name='code'>560106</field>
             <field name='name'>销售费用-佣金和手续费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale7' model='finance.account'>
             <field name='code'>560107</field>
             <field name='name'>销售费用-资产折旧摊销费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale8' model='finance.account'>
             <field name='code'>560108</field>
             <field name='name'>销售费用-财产损耗、盘亏及毁损损失</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale9' model='finance.account'>
             <field name='code'>560109</field>
             <field name='name'>销售费用-办公费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale10' model='finance.account'>
             <field name='code'>560110</field>
             <field name='name'>销售费用-董事会费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale11' model='finance.account'>
             <field name='code'>560111</field>
             <field name='name'>销售费用-租赁费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale12' model='finance.account'>
             <field name='code'>560112</field>
             <field name='name'>销售费用-诉讼费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale13' model='finance.account'>
             <field name='code'>560113</field>
             <field name='name'>销售费用-差旅费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale14' model='finance.account'>
             <field name='code'>560114</field>
             <field name='name'>销售费用-保险费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale15' model='finance.account'>
             <field name='code'>560115</field>
             <field name='name'>销售费用-运输、仓储费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale16' model='finance.account'>
             <field name='code'>560116</field>
             <field name='name'>销售费用-修理费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale17' model='finance.account'>
             <field name='code'>560117</field>
             <field name='name'>销售费用-包装费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale18' model='finance.account'>
             <field name='code'>560118</field>
             <field name='name'>销售费用-技术转让费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale19' model='finance.account'>
             <field name='code'>560119</field>
             <field name='name'>销售费用-研究费用</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale20' model='finance.account'>
             <field name='code'>560120</field>
             <field name='name'>销售费用-各项税费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_expense_sale21' model='finance.account'>
             <field name='code'>560121</field>
             <field name='name'>销售费用-其他费用</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='account_expense_sale0' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
-
+        <record id='small_business_chart5602' model='finance.account'>
+            <field name='code'>5602</field>
+            <field name='name'>管理费用</field>
+            <field name='user_type' ref='base_out' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>in</field>
+        </record>
         <record id='small_business_chart5602001' model='finance.account'>
             <field name='code'>5602001</field>
             <field name='name'>管理费用-职工薪酬</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602002' model='finance.account'>
             <field name='code'>5602002</field>
             <field name='name'>管理费用-劳务费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602003' model='finance.account'>
             <field name='code'>5602003</field>
             <field name='name'>管理费用-咨询顾问费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602004' model='finance.account'>
             <field name='code'>5602004</field>
             <field name='name'>管理费用-招待费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602005' model='finance.account'>
             <field name='code'>5602005</field>
             <field name='name'>管理费用-广告费和业务宣传费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602006' model='finance.account'>
             <field name='code'>5602006</field>
             <field name='name'>管理费用-佣金和手续费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602007' model='finance.account'>
             <field name='code'>5602007</field>
             <field name='name'>管理费用-资产折旧摊销费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602008' model='finance.account'>
             <field name='code'>5602008</field>
             <field name='name'>管理费用-财产损耗、盘亏及毁损损失</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602009' model='finance.account'>
             <field name='code'>5602009</field>
             <field name='name'>管理费用-办公费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602010' model='finance.account'>
             <field name='code'>5602010</field>
             <field name='name'>管理费用-董事会费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602011' model='finance.account'>
             <field name='code'>5602011</field>
             <field name='name'>管理费用-租赁费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602012' model='finance.account'>
             <field name='code'>5602012</field>
             <field name='name'>管理费用-诉讼费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602013' model='finance.account'>
             <field name='code'>5602013</field>
             <field name='name'>管理费用-差旅费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602014' model='finance.account'>
             <field name='code'>5602014</field>
             <field name='name'>管理费用-保险费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602015' model='finance.account'>
             <field name='code'>5602015</field>
             <field name='name'>管理费用-运输、仓储费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602016' model='finance.account'>
             <field name='code'>5602016</field>
             <field name='name'>管理费用-修理费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602017' model='finance.account'>
             <field name='code'>5602017</field>
             <field name='name'>管理费用-包装费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602018' model='finance.account'>
             <field name='code'>5602018</field>
             <field name='name'>管理费用-技术转让费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602019' model='finance.account'>
             <field name='code'>5602019</field>
             <field name='name'>管理费用-研究费用</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602020' model='finance.account'>
             <field name='code'>5602020</field>
             <field name='name'>管理费用-各项税费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5602021' model='finance.account'>
             <field name='code'>5602021</field>
             <field name='name'>管理费用-其他费用</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5602' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
-
+        <record id='small_business_chart5603' model='finance.account'>
+            <field name='code'>5603</field>
+            <field name='name'>财务费用</field>
+            <field name='user_type' ref='base_out' />
+            <field name='account_type'>view</field>
+            <field name='source'>init</field>
+            <field name='balance_directions'>in</field>
+        </record>
         <record id='small_business_chart5603001' model='finance.account'>
             <field name='code'>5603001</field>
             <field name='name'>财务费用-手续及维护年费</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5603' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5603002' model='finance.account'>
             <field name='code'>5603002</field>
             <field name='name'>财务费用-利息收入</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5603' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='small_business_chart5603003' model='finance.account'>
             <field name='code'>5603003</field>
             <field name='name'>财务费用-汇兑损益</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='parent_id' ref='small_business_chart5603' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
-
         <record id='small_business_chart5711' model='finance.account'>
             <field name='code'>5711</field>
             <field name='name'>营业外支出</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
         <record id='account_tax' model='finance.account'>
             <field name='code'>5801</field>
             <field name='name'>所得税费用</field>
-            <field name='costs_types'>out</field>
+            <field name='user_type' ref='base_out' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
-
         <record id='account_init' model='finance.account'>
             <field name='code'>9999</field>
             <field name='name'>期初余额</field>
-            <field name='costs_types'>equity</field>
+            <field name='user_type' ref='base_equity' />
+            <field name='source'>init</field>
             <field name='balance_directions'>in</field>
         </record>
 
-
-        <!-- 资产负债表-->
+               <!-- 资产负债表-->
         <record id='bs_0' model='balance.sheet'>
             <field name="line">1</field>
             <field name='balance'>流动资产：</field>
@@ -1337,7 +1709,7 @@
             <field name="name">2016-01-01</field>
         </record>
 
-		<!-- 汇兑损益： -->
+		<!-- 汇兑损益：-->
 		<record id="account_exchange" model="core.category">
 			<field name="name">汇兑损益</field>
 			<field name="type">other_pay</field>
@@ -1374,5 +1746,6 @@
             <field name="account_id" ref="finance.small_business_chart1401"/>
             <field name='note'>由系统创建</field>
         </record>
+
     </data>
 </openerp>
