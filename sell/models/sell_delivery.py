@@ -529,7 +529,6 @@ class SellDelivery(models.Model):
             })
         # 将原始订单中已执行数量清零
         if self.order_id:
-            line_ids = self.is_return and self.line_in_ids or self.line_out_ids
             for line in self.line_out_ids:
                 line.sell_line_id.quantity_out -= line.goods_qty
             for line in self.line_in_ids:
