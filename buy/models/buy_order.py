@@ -91,7 +91,8 @@ class BuyOrder(models.Model):
     @api.depends('receipt_ids')
     def _compute_receipt(self):
         for order in self:
-            order.receipt_count = len(order.receipt_ids.ids)
+            order.receipt_count = len([receipt for receipt in order.receipt_ids if not receipt.is_return])
+            order.return_count = len([receipt for receipt in order.receipt_ids if receipt.is_return])
 
     @api.depends('receipt_ids')
     def _compute_invoice(self):
@@ -211,9 +212,11 @@ class BuyOrder(models.Model):
     goods_id = fields.Many2one(
         'goods', related='line_ids.goods_id', string=u'商品')
     receipt_ids = fields.One2many(
-        'buy.receipt', 'order_id', string='Receptions', copy=False)
+        'buy.receipt', 'order_id', string=u'入库单', copy=False)
     receipt_count = fields.Integer(
-        compute='_compute_receipt', string='Receptions Count', default=0)
+        compute='_compute_receipt', string=u'入库单数量', default=0)
+    return_count = fields.Integer(
+        compute='_compute_receipt', string=u'退货单数量', default=0)
     invoice_ids = fields.One2many(
         'money.invoice', compute='_compute_invoice', string='Invoices')
     invoice_count = fields.Integer(
@@ -456,9 +459,8 @@ class BuyOrder(models.Model):
         '''
 
         self.ensure_one()
-        name = (self.type == 'buy' and u'采购入库单' or u'采购退货单')
         action = {
-            'name': name,
+            'name': u'采购入库单',
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
@@ -468,16 +470,41 @@ class BuyOrder(models.Model):
         }
 
         #receipt_ids = sum([order.receipt_ids.ids for order in self], [])
-        receipt_ids = self.receipt_ids.ids
+        receipt_ids = [receipt.id for receipt in self.receipt_ids if not receipt.is_return]
         # choose the view_mode accordingly
         if len(receipt_ids) > 1:
             action['domain'] = "[('id','in',[" + \
                 ','.join(map(str, receipt_ids)) + "])]"
             action['view_mode'] = 'tree,form'
         elif len(receipt_ids) == 1:
-            view_id = (self.type == 'buy'
-                       and self.env.ref('buy.buy_receipt_form').id
-                       or self.env.ref('buy.buy_return_form').id)
+            view_id = self.env.ref('buy.buy_receipt_form').id
+            action['views'] = [(view_id, 'form')]
+            action['res_id'] = receipt_ids and receipt_ids[0] or False
+        return action
+
+    @api.multi
+    def action_view_return(self):
+        '''
+        该购货订单对应的退货单
+        '''
+        self.ensure_one()
+        action = {
+            'name': u'采购退货单',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'buy.receipt',
+            'view_id': False,
+            'target': 'current',
+        }
+
+        receipt_ids = [receipt.id for receipt in self.receipt_ids if receipt.is_return]
+        if len(receipt_ids) > 1:
+            action['domain'] = "[('id','in',[" + \
+                               ','.join(map(str, receipt_ids)) + "])]"
+            action['view_mode'] = 'tree,form'
+        elif len(receipt_ids) == 1:
+            view_id = self.env.ref('buy.buy_return_form').id
             action['views'] = [(view_id, 'form')]
             action['res_id'] = receipt_ids and receipt_ids[0] or False
         return action
