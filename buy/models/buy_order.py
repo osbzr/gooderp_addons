@@ -344,10 +344,8 @@ class BuyOrder(models.Model):
             if self.money_order_id.state == 'done':
                 self.money_order_id.money_order_draft()
             self.money_order_id.unlink()
-        self.write({
-            'approve_uid': '',
-            'state': 'draft',  # 为保证审批流程顺畅，否则，未审批就可审核
-        })
+        self.approve_uid = ''
+        self.state = 'draft'
 
     @api.one
     def get_receipt_line(self, line, single=False):
