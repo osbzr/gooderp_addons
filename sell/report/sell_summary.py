@@ -31,6 +31,7 @@ class ReportSellSummary(models.Model):
     subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
     margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
     date = fields.Date(u'日期')
+    last_receipt_date = fields.Date(string=u'最后收款日期')
 
     def init(self):
         cr = self._cr
@@ -71,7 +72,8 @@ class ReportSellSummary(models.Model):
                             ELSE - wml.subtotal END) AS subtotal,
                     (SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.amount
                             ELSE - wml.amount END) - SUM(CASE WHEN wm.origin = 'sell.delivery.sell' THEN wml.goods_qty
-                                                            ELSE - wml.goods_qty END) * wml.cost_unit) AS margin
+                                                            ELSE - wml.goods_qty END) * wml.cost_unit) AS margin,
+                    mi.get_amount_date AS last_receipt_date
 
                 FROM wh_move_line wml
                 LEFT JOIN wh_move wm ON wml.move_id = wm.id
@@ -83,13 +85,16 @@ class ReportSellSummary(models.Model):
                     LEFT JOIN uom uos ON goods.uos_id = uos.id
                 LEFT JOIN attribute attribute on attribute.id = wml.attribute_id
                 LEFT JOIN location loc ON loc.goods_id = wml.goods_id
+                LEFT JOIN sell_delivery AS sd ON wm.id = sd.sell_move_id
+                LEFT JOIN money_invoice AS mi ON mi.id = sd.invoice_id
 
                 WHERE wh.type = 'stock'
                   AND wml.state = 'done'
                   AND wm.origin like 'sell.delivery%%'
                   AND (goods.no_stock is null or goods.no_stock = FALSE)
 
-                GROUP BY wm.partner_id, wm.user_id, staff.department_id, goods.name, goods.id, goods.brand, loc.name, wml.lot, attribute.name, uom.name, uos.name, wh.name, wml.cost_unit,wm.date
+                GROUP BY wm.partner_id, wm.user_id, staff.department_id, goods.name, goods.id, goods.brand, loc.name, wml.lot, attribute.name, uom.name, uos.name, wh.name, wml.cost_unit,wm.date,
+                 mi.get_amount_date
 
                 ORDER BY goods.name, wh.name, goods_qty asc
             )

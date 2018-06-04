@@ -199,7 +199,7 @@ class MailThread(models.AbstractModel):
             change_state = vals.get('state', False)
 
             # 已提交，确认时报错
-            if len(th._to_approver_ids) == th._approver_num and change_state:
+            if len(th._to_approver_ids) == th._approver_num and change_state == 'done':
                 raise ValidationError(u"审批后才能确认")
             # 已审批
             if not len(th._to_approver_ids):
