@@ -27,6 +27,7 @@ class SellOrderDetail(models.Model):
     margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
     money_state = fields.Char(u'收款状态')
     note = fields.Char(u'备注')
+    last_receipt_date = fields.Date(string=u'最后收款日期')
 
     def init(self):
         cr = self._cr
@@ -58,7 +59,8 @@ class SellOrderDetail(models.Model):
                         ELSE - wml.goods_qty END) * (wml.price - wml.cost_unit) AS margin,
                     (CASE WHEN wm.origin = 'sell.delivery.sell' THEN sd.money_state
                     ELSE sd.return_state END) AS money_state,
-                    wml.note AS note
+                    wml.note AS note,
+                    mi.get_amount_date AS last_receipt_date
 
                 FROM wh_move_line AS wml
                     LEFT JOIN wh_move wm ON wml.move_id = wm.id
@@ -69,14 +71,16 @@ class SellOrderDetail(models.Model):
                          OR wml.warehouse_dest_id = wh.id
                     LEFT JOIN uom ON goods.uom_id = uom.id
                     LEFT JOIN sell_delivery AS sd ON wm.id = sd.sell_move_id
+                    LEFT JOIN money_invoice AS mi ON mi.id = sd.invoice_id
 
                 WHERE wml.state = 'done'
                   AND wm.origin like 'sell.delivery%%'
                   AND wh.type = 'stock'
 
-                GROUP BY wm.date, wm.name, origin, wm.user_id, partner_id,
+                GROUP BY wm.date, wm.name, origin, wm.user_id, wm.partner_id,
                     goods_code, goods.id, attribute, wh.id, uom,
-                    wml.price, wml.cost_unit, sd.money_state, sd.return_state, wml.note
+                    wml.price, wml.cost_unit, sd.money_state, sd.return_state, wml.note,
+                    mi.get_amount_date
                 )
         """)
 
