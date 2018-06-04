@@ -494,7 +494,8 @@ class FinancePeriod(models.Model):
                 if period_id.is_closed and self._context.get('module_name', False) != 'checkout_wizard':
                     raise UserError(u'会计期间%s已关闭' % period_id.name)
             else:
-                raise UserError(u'%s 对应的会计期间不存在' % date)
+                # 会计期间不存在，创建会计期间
+                period_id = self.create({'year': date[0:4], 'month': str(int(date[5:7]))})
             return period_id
 
     @api.multi
