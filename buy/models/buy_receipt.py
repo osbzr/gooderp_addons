@@ -226,8 +226,11 @@ class BuyReceipt(models.Model):
         if self.order_id:
             for line in self.line_in_ids:
                 line.buy_line_id.quantity_in += line.goods_qty
-            for line in self.line_out_ids:
-                line.buy_line_id.quantity_in -= line.goods_qty
+            for line in self.line_out_ids:  # 退货单行
+                if self.order_id.type == 'return':  # 退货类型的buy_order生成的采购退货单审核
+                    line.buy_line_id.quantity_in += line.goods_qty
+                else:
+                    line.buy_line_id.quantity_in -= line.goods_qty
 
         return
 
@@ -458,9 +461,13 @@ class BuyReceipt(models.Model):
             })
         # 修改订单行中已执行数量
         if self.order_id:
-            line_ids = not self.is_return and self.line_in_ids or self.line_out_ids
-            for line in line_ids:
+            for line in self.line_in_ids:
                 line.buy_line_id.quantity_in -= line.goods_qty
+            for line in self.line_out_ids:
+                if self.order_id.type == 'return':
+                    line.buy_line_id.quantity_in -= line.goods_qty
+                else:
+                    line.buy_line_id.quantity_in += line.goods_qty
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.buy_move_id.cancel_approved_order()
 
