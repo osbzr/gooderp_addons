@@ -615,6 +615,11 @@ class MoneyInvoice(models.Model):
         self.overdue_amount = self.overdue_days > 0 and self.to_reconcile or 0.0
         self.overdue_days = self.overdue_amount and self.overdue_days or 0
 
+    @api.one
+    @api.depends('reconciled')
+    def _get_sell_amount_state(self):
+        self.get_amount_date = self.write_date[:10]
+
     state = fields.Selection([
         ('draft', u'草稿'),
         ('done', u'完成')
@@ -647,6 +652,8 @@ class MoneyInvoice(models.Model):
     tax_amount = fields.Float(u'税额',
                               digits=dp.get_precision('Amount'),
                               help=u'对应税额')
+    get_amount_date = fields.Date(u'最后收款日期', compute=_get_sell_amount_state,
+                                 store=True, copy=False)
 
     auxiliary_id = fields.Many2one('auxiliary.financing', u'辅助核算',
                                    help=u'辅助核算')

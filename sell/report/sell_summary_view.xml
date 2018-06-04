@@ -22,6 +22,7 @@
                     <field name="tax_amount" sum="税额合计" groups='sell.out_tax_groups'/>
                     <field name="subtotal" sum="价税合计的合计" groups='sell.out_tax_groups'/>
                     <field name="margin" sum="毛利合计"/>
+                    <field name="last_receipt_date"/>
                 </tree>
             </field>
         </record>
