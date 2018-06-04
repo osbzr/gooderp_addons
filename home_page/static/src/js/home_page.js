@@ -144,22 +144,23 @@ odoo.define('home_page', function (require) {
         second_part: function () {
             var self = this;
             var result_top = self.result_top;
-            var row_num = result_top.length / 4 > 1 ? 3 : parseInt(12 / result_top.length);
+            //var row_num = result_top.length / 4 > 1 ? 3 : parseInt(12 / result_top.length);
+            self.$el.find('.top_div').append($("<div class='container top_div_cotent'></div>"));
             for (var i = 0; i < result_top.length; i++) {
                 var top_data = this.result_top[i][0].split('  ');
-                if ((i + 1) / 4 > parseInt(result_top.length / 4)) {
-                    row_num = parseInt(12 / (result_top.length % 4)) == 0 ? 4 : parseInt(12 / (result_top.length % 4))
-                }
+                //if ((i + 1) / 4 > parseInt(result_top.length / 4)) {
+                //    row_num = parseInt(12 / (result_top.length % 4)) == 0 ? 4 : parseInt(12 / (result_top.length % 4))
+                //}
                 if (top_data.length == 2) {
                     //row_num = 1;
-                    var left_html_str = $("<div class='col-xs-6 col-sm-" + row_num + " block-center text-center'>\
+                    var left_html_str = $("<div class='col-xs-6 col-sm-1-5 block-center text-center'>\
                           <button class='oe_top_link_" + i +
                         "' oe_top_link='" + i + "' id='" + i + "' style='width: 120px;height: 80px'>\
                           <h4>" + top_data[0] + "</h4>\
                           <h3>\
                           " +  self.commafy(top_data[1]) + "</h3>\
                           </button><p class='m-t-sm'></p></div>");
-                    self.$el.find('.top_div').append(left_html_str);
+                    self.$el.find('.top_div_cotent').append(left_html_str);
                 }
             }
         },
