@@ -209,10 +209,10 @@ class TestPeriod(TransactionCase):
 
     def test_get_period(self):
         period_obj = self.env['finance.period']
+        # 如果对应会计期间不存在，则创建
         if not period_obj.search([('year', '=', '2100'),
                                   ('month', '=', '6')]):
-            with self.assertRaises(UserError):
-                period_obj.get_period('2100-06-20')
+            self.assertTrue(period_obj.get_period('2100-06-20').name, '210006')
         period_obj.get_year_fist_period_id()
         period_row = period_obj.search(
             [('year', '=', '2016'), ('month', '=', '10')])
