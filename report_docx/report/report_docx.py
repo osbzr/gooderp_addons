@@ -70,6 +70,8 @@ class DataModelProxy(object):
             return ""
         temp = getattr(self.data, key)
         field = self.data._fields.get(key)
+        if isinstance(temp, unicode) and ('&' in temp or '<' in temp or '>' in temp):
+            temp = temp.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
         if isinstance(temp, models.Model):
             return DataModelProxy(temp)
@@ -89,7 +91,16 @@ class DataModelProxy(object):
 
     def __str__(self):
         '''支持直接在word 上写 many2one 字段'''
-        return self.data and self.data.display_name or ''
+        name = ''
+        if self.data and self.data.display_name:
+            name = self.data.display_name
+            if '&' in self.data.display_name:
+                name = name.replace('&', '&amp;')
+            if '<' in self.data.display_name:
+                name = name.replace('<', '&lt;')
+            if '>' in self.data.display_name:
+                name = name.replace('>', '&gt;')
+        return name
 
 
 class IterDataModelProxy(object):
