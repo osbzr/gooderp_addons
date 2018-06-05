@@ -192,7 +192,6 @@ class Goods(models.Model):
 
     @api.multi
     def write(self, vals):
-        self.ensure_one()
         if (vals.get('uom_id') or vals.get('uos_id') or vals.get('conversion')) and self.current_qty:
             raise UserError(u'商品有库存，不允许修改单位或转化率')
         return super(Goods, self).write(vals)
