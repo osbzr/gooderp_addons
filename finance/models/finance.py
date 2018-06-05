@@ -488,7 +488,7 @@ class FinancePeriod(models.Model):
         if date:
             period_id = self.search([
                 ('year', '=', date[0:4]),
-                ('month', '=', int(date[5:7]))
+                ('month', '=', str(int(date[5:7])))
             ])
             if period_id:
                 if period_id.is_closed and self._context.get('module_name', False) != 'checkout_wizard':

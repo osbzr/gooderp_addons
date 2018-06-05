@@ -92,40 +92,6 @@ class CustomerStatementsReport(models.Model):
                 LEFT JOIN core_category AS c ON mi.category_id = c.id
                 LEFT JOIN sell_delivery AS sd ON sd.sell_move_id = mi.move_id
                 WHERE c.type = 'income' AND mi.state = 'done'
-                UNION ALL
-                SELECT ro.partner_id,
-                        ro.name,
-                        ro.date,
-                        ro.write_date AS done_date,
-                        0 AS sale_amount,
-                        0 AS benefit_amount,
-                        0 AS fee,
-                        0 AS amount,
-                        sol.this_reconcile AS pay_amount,
-                        0 AS discount_money,
-                        0 AS balance_amount,
-                        Null AS note,
-                        0 AS move_id
-                FROM reconcile_order AS ro
-                LEFT JOIN source_order_line AS sol ON sol.receivable_reconcile_id = ro.id
-                WHERE ro.state = 'done' AND ro.business_type IN ('get_to_pay', 'get_to_get')
-                UNION ALL
-                SELECT ro.to_partner_id AS partner_id,
-                        ro.name,
-                        ro.date,
-                        ro.write_date AS done_date,
-                        0 AS sale_amount,
-                        0 AS benefit_amount,
-                        0 AS fee,
-                        sol.this_reconcile AS amount,
-                        0 AS pay_amount,
-                        0 AS discount_money,
-                        0 AS balance_amount,
-                        ro.note AS note,
-                        0 AS move_id
-                FROM reconcile_order AS ro
-                LEFT JOIN source_order_line AS sol ON sol.receivable_reconcile_id = ro.id
-                WHERE ro.state = 'done' AND ro.business_type = 'get_to_get'
                 ) AS ps)
         """)
 
