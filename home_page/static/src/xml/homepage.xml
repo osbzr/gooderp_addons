@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates id='template' xml:space='preserve'>
     <t t-name='top_fist_1'>
-        <div  class='section m-t-lg m-b-lg top_div'>
+        <div  class='section m-t-lg top_div'>
             <div class='container'>
                     <div class='row-fluid'>
                         <div class='span12 feature-bg text-center'>
