@@ -169,8 +169,6 @@ class BuyReceipt(models.Model):
 
     @api.one
     def _wrong_receipt_done(self):
-        if self.state == 'done':
-            raise UserError(u'请不要重复入库！')
         batch_one_list_wh = []
         batch_one_list = []
         for line in self.line_in_ids:
@@ -404,8 +402,7 @@ class BuyReceipt(models.Model):
         invoice_id = self._receipt_make_invoice()
         self.write({
             'voucher_id': voucher and voucher.id,
-            'invoice_id': invoice_id and invoice_id.id,
-            'state': 'done',    # 为保证审批流程顺畅，否则，未审批就可审核
+            'invoice_id': invoice_id and invoice_id.id,# 为保证审批流程顺畅，否则，未审批就可审核
         })
         # 采购费用产生结算单
         self._buy_amount_to_invoice()
@@ -450,14 +447,12 @@ class BuyReceipt(models.Model):
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单
         self.write({
             'modifying': False,
-            'state': 'draft',
         })
         receipt_ids = self.search(
             [('order_id', '=', self.order_id.id)])
         if len(receipt_ids) > 1:
             self.write({
                 'modifying': True,
-                'state': 'draft',
             })
         # 修改订单行中已执行数量
         if self.order_id:

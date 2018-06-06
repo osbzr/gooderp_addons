@@ -87,6 +87,8 @@ class StaffWages(models.Model):
         确认方法
         :return:
         """
+        if self.state == 'done':
+            raise UserError(u'请不要重复确认')
         if not self.voucher_id:
             raise UserError(u'工资单还未计提，请先计提')
         other_money_order = self._other_pay()   # 支付工资的其他支出单
@@ -386,6 +388,8 @@ class StaffWages(models.Model):
 
     @api.one
     def staff_wages_draft(self):
+        if self.state == 'draft':
+            raise UserError(u'请不要重复撤销')
         if self.other_money_order:
             other_money_order = self.other_money_order
             self.write({
