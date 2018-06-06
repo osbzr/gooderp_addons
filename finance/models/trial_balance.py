@@ -1035,9 +1035,9 @@ class VouchersSummary(models.TransientModel):
     summary = fields.Char(u'摘要', help=u'从凭证中获取到对应的摘要')
     direction = fields.Char(u'方向', help=u'会计术语,主要方向借、贷、平, 当借方金额大于贷方金额 方向为借\n\
      ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
-    debit = fields.Float(u'借方金额', help=u'借方金额')
-    credit = fields.Float(u'贷方金额', help=u'贷方金额')
-    balance = fields.Float(u'余额', help=u'一般显示为正数，计算方式：当方向为借时 \
+    debit = fields.Float(u'借方金额', digits=dp.get_precision('Amount'), help=u'借方金额')
+    credit = fields.Float(u'贷方金额', digits=dp.get_precision('Amount'), help=u'贷方金额')
+    balance = fields.Float(u'余额', digits=dp.get_precision('Amount'), help=u'一般显示为正数，计算方式：当方向为借时 \
                                    余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')
 
     @api.multi
@@ -1066,7 +1066,7 @@ class GeneralLedgerAccount(models.TransientModel):
     summary = fields.Char(u'摘要', help=u'摘要')
     direction = fields.Char(u'方向', help=u'会计术语,主要方向借、贷、平, 当借方金额大于贷方金额 方向为借\n\
      ，当贷方金额大于借方金额 方向为贷\n  借贷相等时 方向为平')
-    debit = fields.Float(u'借方金额', help=u'借方金额')
-    credit = fields.Float(u'贷方金额', help=u'贷方金额')
-    balance = fields.Float(u'余额', help=u'一般显示为正数，计算方式：当方向为借时\
+    debit = fields.Float(u'借方金额', digits=dp.get_precision('Amount'), help=u'借方金额')
+    credit = fields.Float(u'贷方金额', digits=dp.get_precision('Amount'), help=u'贷方金额')
+    balance = fields.Float(u'余额', digits=dp.get_precision('Amount'), help=u'一般显示为正数，计算方式：当方向为借时\
                                    余额= 借方金额-贷方金额， 当方向为贷时 余额= 贷方金额-借方金额')
