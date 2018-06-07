@@ -239,13 +239,11 @@ class TestWarehouseOrder(TransactionCase):
     def test_create_voucher_init(self):
         '''初始化其他入库单时生成凭证的情况'''
         self.others_in_2.is_init = True
-        self.others_in_2.approve_order()
         self.others_in_2.cancel_approved_order()
 
     def test_create_voucher_no_voucher_line(self):
         '''初始化其他入库单时生成凭证 没有凭证行，删除凭证  的情况'''
         self.others_in_2_keyboard_mouse.cost_unit = 0.0
-        self.others_in_2.approve_order()
         self.others_in_2.cancel_approved_order()
 
     def test_voucher_can_be_draft(self):
@@ -258,6 +256,7 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_goods_inventory_others_out(self):
         ''' 其他出库单审核商品不足时调用创建盘盈入库方法 '''
+        self.others_out.cancel_approved_order()
         for line in self.others_out.line_out_ids:
             vals = {
                 'type': 'inventory',
@@ -278,6 +277,8 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_goods_inventory_internal(self):
         ''' 内部调拨单审核商品不足时调用创建盘盈入库方法 '''
+        self.others_out.cancel_approved_order()
+        self.internal.cancel_approved_order()
         for line in self.internal.line_out_ids:
             vals = {
                 'type': 'inventory',
@@ -317,7 +318,7 @@ class TestCheckOutWizard(TransactionCase):
         self.env.ref('warehouse.wh_move_line_keyboard_mouse_in_2').cost = 400
         self.browse_ref('warehouse.wh_in_whin3').approve_order()
         # 当月出库
-        others_out_2 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_2 = self.env.ref('warehouse.wh_out_whout1').copy()
         others_out_2.date = '2014-12-06'
         others_out_2.approve_order()
         # 月末结账
@@ -327,7 +328,7 @@ class TestCheckOutWizard(TransactionCase):
         self.env.ref('finance.period_201412').is_closed = True
 
         # 发出成本算法为 定额成本std
-        others_out_3 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_3 = self.env.ref('warehouse.wh_out_whout1').copy()
         others_out_3.date = '2015-12-06'
         self.env.ref('goods.keyboard_mouse').cost_method = 'std'
         others_out_3.approve_order()

@@ -426,7 +426,8 @@ class BuyReceipt(models.Model):
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
         for line in source_line:
-            line.money_id.money_order_draft()  # 反审核付款单
+            if line.money_id.state == 'done':
+                line.money_id.money_order_draft()  # 反审核付款单
             # 判断付款单 源单行 是否有别的行存在
             other_source_line = []
             for s_line in line.money_id.source_ids:

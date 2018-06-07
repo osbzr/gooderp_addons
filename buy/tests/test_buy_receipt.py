@@ -265,8 +265,8 @@ class TestBuyReceipt(TransactionCase):
         for line in self.receipt.line_in_ids:
             line.goods_qty = 2
         self.receipt.buy_receipt_done()
-        self.receipt.buy_receipt_draft()
         # 修改入库单，再次审核，并不产生分单
+        self.receipt.buy_receipt_draft()
         for line in self.receipt.line_in_ids:
             line.goods_qty = 3
         self.receipt.buy_receipt_done()
@@ -282,8 +282,8 @@ class TestBuyReceipt(TransactionCase):
         for line in self.receipt.line_in_ids:
             line.goods_qty = 2
         self.receipt.buy_receipt_done()
-        self.receipt.buy_receipt_draft()
         # 修改入库单，再次审核，并不产生分单
+        self.receipt.buy_receipt_draft()
         for line in self.receipt.line_in_ids:
             line.goods_qty = 3
         self.receipt.buy_receipt_done()
