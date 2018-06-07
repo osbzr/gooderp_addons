@@ -124,7 +124,6 @@ class Voucher(models.Model):
                                   (debit_sum, credit_sum))
 
         self.state = 'done'
-        ''' #xuan
         if self.is_checkout:   # 月结凭证不做反转
             return True
         for line in self.line_ids:
@@ -136,7 +135,6 @@ class Voucher(models.Model):
                 # 收入类科目只能在贷方记账,比如退款给客户的情况
                 line.credit = -line.debit
                 line.debit = 0
-        '''
 
     @api.one
     def voucher_can_be_draft(self):
