@@ -1,0 +1,14 @@
+<?xml version="1.0"  encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--发票按钮-->
+        <record id="cn_account_invoice_action" model="ir.actions.act_window">
+            <field name="name">发票</field>
+            <field name="res_model">cn.account.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="cn_account_invoice_search"/>
+            <field name="context">{'search_default_is_verified':0}</field>
+        </record>
+
+	</data>
+</openerp>

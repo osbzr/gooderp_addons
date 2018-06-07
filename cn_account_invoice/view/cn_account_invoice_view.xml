@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+
+        <!--发票FORM-->
+        <record id="cn_account_invoice_form" model="ir.ui.view">
+            <field name="name">cn.account.invoice.form</field>
+            <field name="model">cn.account.invoice</field>
+            <field name="arch" type="xml">
+                <form string="发票">
+                    <sheet>
+                        <div class="oe_button_box">
+                            <button name="action_get_attachment_view"
+                                class="oe_stat_button"
+                                icon="fa-book"
+                                type="object">
+                                <field name="attachment_number" widget="statinfo" string="附件"/>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type" required="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="partner_name_out" string ="客户名称"  attrs="{'invisible': [('type', '=', 'in')]}"/>
+                                <field name="partner_name_in" string ="供应商名称"  attrs="{'invisible': [('type', '=', 'out')]}"/>
+                                <field name="partner_code_out" string ="客户税号"  attrs="{'invisible': [('type', '=', 'in')]}"/>
+                                <field name="partner_code_in" string ="供应商税号"  attrs="{'invisible': [('type', '=', 'out')]}"/>
+                                <field name="partner_address_out" string ="客户地址电话"  attrs="{'invisible': [('type', '=', 'in')]}"/>
+                                <field name="partner_address_in" string ="供应商地址电话"  attrs="{'invisible': [('type', '=', 'out')]}"/>
+                                <field name="partner_bank_number_out" string ="客户银行及帐号"  attrs="{'invisible': [('type', '=', 'in')]}"/>
+                                <field name="partner_bank_number_in" string ="供应商银行及帐号"  attrs="{'invisible': [('type', '=', 'out')]}"/>
+                                <field name="invoice_confirm_date"/>
+                            </group>
+                            <group>
+                                <field name="invoice_type" required="1"/>
+                                <field name="invoice_date" required="1"/>
+                                <field name="invoice_code" attrs="{'required':[('invoice_type', '!=', 'other')]}"/>
+                                <field name="name" attrs="{'required':[('invoice_type', '!=', 'other')]}"/>
+                                <field name="invoice_heck_code" attrs="{'required':[('invoice_type', 'in', ['pt','dz'])],'invisible': [('invoice_type', '=', 'zy')]}"/>
+                                <field name="invoice_amount" attrs="{'required':[('invoice_type', '=', 'zy')]}"/>
+                                <field name="invoice_tax"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="is_deductible" attrs="{'invisible':[('invoice_type', '!=', 'zy')]}"/>
+                            <field name="is_verified"/>
+                        </group>
+                        <notebook>
+                            <page string="发票明细">
+                                <field name="line_ids" >
+                                    <tree string="发票明细行" editable="bottom">
+                                        <field name="product_name"/>
+                                        <field name="product_type"/>
+                                        <field name="product_unit"/>
+                                        <field name="product_count"/>
+                                        <field name="product_price"/>
+                                        <field name="product_amount"/>
+                                        <field name="product_tax_rate"/>
+                                        <field name="product_tax"/>
+                                        <field name="tax_type"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <field name="note"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--发票tree-->
+        <record id="cn_account_invoice_tree" model="ir.ui.view">
+            <field name="name">cn.account.invoice.tree</field>
+            <field name="model">cn.account.invoice</field>
+            <field name="arch" type="xml">
+                <tree string="发票">
+                    <field name="type"/>
+                    <field name="partner_name_out" attrs="{'invisible': [('type', '=', 'in')]}"/>
+                    <field name="partner_name_in"  attrs="{'invisible': [('type', '=', 'out')]}"/>
+                    <field name="name"/>
+                    <field name="invoice_type"/>
+                    <field name="invoice_amount"/>
+                    <field name="invoice_tax"/>
+                    <field name="is_deductible"/>
+                    <field name="is_verified"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="cn_account_invoice_search" model="ir.ui.view">
+            <field name="name">cn.account.invoice.search</field>
+            <field name="model">cn.account.invoice</field>
+            <field name="arch" type="xml">
+                <search string="选单策略">
+                    <field name='partner_name_out'/>
+                    <field name='partner_name_in'/>
+                    <field name='name'/>
+                    <field name='invoice_amount'/>
+                    <field name='note'/>
+                    <filter string="未核验" domain="[('is_verified','=', False)]" name="user_id"/>
+                    <group expand="0" string="分组">
+                        <filter string="进/销项" domain="[]" context="{'group_by':'type'}"/>
+                        <filter string="客户" domain="[]" context="{'group_by':'partner_name_out'}"/>
+                        <filter string="供应商" domain="[]" context="{'group_by':'partner_name_in'}"/>
+                        <filter string="发票类型" domain="[]" context="{'group_by':'invoice_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="cn_account_invoice_action" model="ir.actions.act_window">
+            <field name="name">过滤发票</field>
+            <field name="res_model">cn.account.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="cn_account_invoice_search"/>
+            <field name="context">{'search_default_user_id':1}</field>
+        </record>
+	</data>
+</openerp>
