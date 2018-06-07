@@ -189,3 +189,10 @@ class Goods(models.Model):
                                                  'qty': qty_to_go, 'uos_qty': uos_qty_to_go})
 
             return matching_records, cost
+
+    @api.multi
+    def write(self, vals):
+        for goods in self:
+            if (vals.get('uom_id') or vals.get('uos_id') or vals.get('conversion')) and goods.current_qty:
+                raise UserError(u'商品有库存，不允许修改单位或转化率')
+            return super(Goods, self).write(vals)

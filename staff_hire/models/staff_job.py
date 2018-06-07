@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class staff_job(models.Model):
@@ -85,15 +86,22 @@ class staff_job(models.Model):
 
     @api.multi
     def set_recruit(self):
+        """启动招聘"""
         for record in self:
+            if record.state == 'recruit':
+                raise UserError(u'请不要重复启动招聘')
             no_of_recruitment = 1 if record.no_of_recruitment == 0 else record.no_of_recruitment
             record.write({'state': 'recruit', 'no_of_recruitment': no_of_recruitment})
         return True
 
     @api.multi
     def set_open(self):
-        return self.write({
-            'state': 'open',
-            'no_of_recruitment': 0,
-            'no_of_hired_employee': 0
-        })
+        """结束招聘"""
+        for record in self:
+            if record.state == 'open':
+                raise UserError(u'请不要重复结束招聘')
+            return record.write({
+                'state': 'open',
+                'no_of_recruitment': 0,
+                'no_of_hired_employee': 0
+            })

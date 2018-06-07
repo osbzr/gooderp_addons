@@ -262,6 +262,8 @@ class MoneyOrder(models.Model):
     def money_order_done(self):
         '''对收付款单的审核按钮'''
         for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复确认')
             if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
                 raise UserError(u'请输入供应商类别(%s)上的科目' %
                                 order.partner_id.s_category_id.name)
@@ -340,6 +342,8 @@ class MoneyOrder(models.Model):
         :return: 
         """
         for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
             total = 0
             for line in order.line_ids:
                 rate_silent = self.env['res.currency'].get_rate_silent(
@@ -685,6 +689,8 @@ class MoneyInvoice(models.Model):
         :return: 
         """
         for inv in self:
+            if inv.state == 'done':
+                raise UserError(u'请不要重复确认')
             inv.reconciled = 0.0
             inv.to_reconcile = inv.amount
             inv.state = 'done'
@@ -703,6 +709,8 @@ class MoneyInvoice(models.Model):
         :return: 
         """
         for inv in self:
+            if inv.state == 'draft':
+                raise UserError(u'请不要重复撤销')
             inv.reconciled = 0.0
             inv.to_reconcile = 0.0
             inv.state = 'draft'
@@ -1019,21 +1027,32 @@ class ReconcileOrder(models.Model):
         line.name.to_reconcile -= line.this_reconcile
         line.name.reconciled += line.this_reconcile
 
-        # 应收冲应付， 业务伙伴应收减少，业务伙伴应付减少
-        if business_type == 'get_to_pay':
-            if line.receivable_reconcile_id:
-                partner_id.receivable -= line.this_reconcile
-            if line.payable_reconcile_id:
-                partner_id.payable -= line.this_reconcile
-
-        # 应收转应收，转出业务伙伴应收减少，转入业务伙伴应收增加
-        if business_type == 'get_to_get':
-            partner_id.receivable -= line.this_reconcile
-            to_partner_id.receivable += line.this_reconcile
-        # 应付转应付，转出业务伙伴应付减少，转入业务伙伴应付增加
-        if business_type == 'pay_to_pay':
-            partner_id.payable -= line.this_reconcile
-            to_partner_id.payable += line.this_reconcile
+        # 应收转应收、应付转应付
+        if business_type in ['get_to_get', 'pay_to_pay']:
+            if not float_is_zero(line.this_reconcile, 2):
+                # 转入业务伙伴往来增加
+                self.env['money.invoice'].create({
+                    'name': name,
+                    'category_id': line.category_id.id,
+                    'amount': line.this_reconcile,
+                    'date': self.date,
+                    'reconciled': 0,  # 已核销金额
+                    'to_reconcile': line.this_reconcile,  # 未核销金额
+                    'date_due': line.date_due,
+                    'partner_id': to_partner_id.id,
+                })
+                # 转出业务伙伴往来减少
+                to_invoice_id = self.env['money.invoice'].create({
+                    'name': name,
+                    'category_id': line.category_id.id,
+                    'amount': -line.this_reconcile,
+                    'date': self.date,
+                    'date_due': line.date_due,
+                    'partner_id': partner_id.id,
+                })
+                # 核销 转出业务伙伴 的转出金额
+                to_invoice_id.to_reconcile = 0
+                to_invoice_id.reconciled = -line.this_reconcile
 
         return True
 
