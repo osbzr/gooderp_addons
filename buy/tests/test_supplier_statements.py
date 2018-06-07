@@ -36,19 +36,12 @@ class TestSupplierStatements(TransactionCase):
         objReceipt = self.env['buy.receipt']
         receipt = objReceipt.search([('order_id', '=', buy_order.id)])
         receipt.buy_receipt_done()
-        objInvoice = self.env['money.invoice']
-        invoice = objInvoice.search([('name', '=', receipt.name)])
-        invoice.money_invoice_done()
         # 创建采购退货单记录
         buy_return = self.env.ref('buy.buy_return_order_1')
         buy_return.bank_account_id = False
         buy_return.buy_order_done()
         receipt_return = objReceipt.search([('order_id', '=', buy_return.id)])
         receipt_return.buy_receipt_done()
-        invoice_return = objInvoice.search([
-            ('name', '=', receipt_return.name)
-        ])
-        invoice_return.money_invoice_done()
 
     def test_supplier_statements_wizard(self):
         '''供应商对账单向导'''

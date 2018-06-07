@@ -285,10 +285,17 @@ class hire_applicant(models.Model):
 
     @api.multi
     def archive_applicant(self):
-        self.write({'active': False})
+        """拒绝"""
+        for record in self:
+            if record.active == False:
+                raise UserError(u'请不要重复拒绝')
+            record.write({'active': False})
 
     @api.multi
     def reset_applicant(self):
-        """ Reinsert the applicant into the recruitment pipe in the first stage"""
-        default_stage_id = self._default_stage_id()
-        self.write({'active': True, 'stage_id': default_stage_id})
+        """重新打开招聘"""
+        for record in self:
+            if record.active == True:
+                raise UserError(u'请不要重复重新打开招聘')
+            default_stage_id = self._default_stage_id()
+            record.write({'active': True, 'stage_id': default_stage_id})

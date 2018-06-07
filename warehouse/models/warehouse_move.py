@@ -335,6 +335,8 @@ class WhMove(models.Model):
         :return:
         """
         for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复确认')
             order.prev_approve_order()
             order.line_out_ids.action_done()
             order.line_in_ids.action_done()
@@ -361,6 +363,8 @@ class WhMove(models.Model):
         :return:
         """
         for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
             order.prev_cancel_approved_order()
             order.line_out_ids.action_draft()
             order.line_in_ids.action_draft()

@@ -60,7 +60,6 @@ class TestInvoice(TransactionCase):
                                                         'partner_id': supplier.id,
                                                         'category_id': self.env.ref('money.core_category_purchase').id,
                                                         'amount': 10.0})
-        invoice_buy.money_invoice_done()
         invoice_buy.money_invoice_draft()
 
     def test_money_invoice_draft_voucher_done(self):
@@ -72,7 +71,6 @@ class TestInvoice(TransactionCase):
                                                         'partner_id': supplier.id,
                                                         'category_id': self.env.ref('money.core_category_purchase').id,
                                                         'amount': 10.0})
-        invoice_buy.money_invoice_done()
         invoice_buy.money_invoice_draft()
 
     def test_money_invoice_voucher_line_currency(self):
@@ -83,7 +81,6 @@ class TestInvoice(TransactionCase):
             'category_id': self.env.ref('money.core_category_sale').id,
             'amount': 10.0,
             'currency_id': self.env.ref('base.USD').id})
-        invoice.money_invoice_done()
 
     def test_money_invoice_company_no_tax_account(self):
         ''' 创建 进项税行 公司 进项税科目 未设置 '''

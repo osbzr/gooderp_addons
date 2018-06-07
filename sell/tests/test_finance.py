@@ -33,13 +33,11 @@ class TestMonthProductCost(TransactionCase):
         # 离输入期间最近的 对应产品的发出成本行 存在
         wh_in_rows = self.env['wh.in'].search([])
         wh_in_rows.write({'date': '2015-12-31 18:00:00'})
-        [wh_in_row.approve_order() for wh_in_row in wh_in_rows]
         self.env['month.product.cost'].generate_issue_cost(
             self.period_id_15, '2015-12-31')
 
         wh_out_2 = self.env.ref('warehouse.wh_out_whout1')
         wh_out_2.write({'date': '2016-1-31 18:00:00'})
-        [wh_out_2.approve_order() for wh_out_row in wh_out_rows]
         self.env['month.product.cost'].generate_issue_cost(
             self.period_id, '2016-01-31')
 
