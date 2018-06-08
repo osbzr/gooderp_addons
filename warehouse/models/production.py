@@ -304,6 +304,8 @@ class WhAssembly(models.Model):
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
+            if order.state == 'feeding':
+                raise UserError(u'请不要重复发料')
             order.check_parent_length()
             order.check_is_child_enable()
 
@@ -319,6 +321,8 @@ class WhAssembly(models.Model):
     def approve_order(self):
         ''' 成品入库 '''
         for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复执行成品入库')
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
@@ -343,6 +347,8 @@ class WhAssembly(models.Model):
     @api.multi
     def cancel_approved_order(self):
         for order in self:
+            if order.state == 'feeding':
+                raise UserError(u'请不要重复撤销')
             order.line_in_ids.action_draft()
 
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
@@ -906,6 +912,8 @@ class outsource(models.Model):
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
+            if order.state == 'feeding':
+                raise UserError(u'请不要重复发料')
             order.check_parent_length()
             order.check_is_child_enable()
 
@@ -921,6 +929,8 @@ class outsource(models.Model):
     def approve_order(self):
         ''' 成品入库 '''
         for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复执行成品入库')
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
@@ -949,6 +959,8 @@ class outsource(models.Model):
     @api.multi
     def cancel_approved_order(self):
         for order in self:
+            if order.state == 'feeding':
+                raise UserError(u'请不要重复撤销')
             order.line_in_ids.action_draft()
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
@@ -1205,6 +1217,8 @@ class WhDisassembly(models.Model):
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
+            if order.state == 'feeding':
+                raise UserError(u'请不要重复发料')
             order.check_parent_length()
             order.check_is_child_enable()
 
@@ -1222,6 +1236,8 @@ class WhDisassembly(models.Model):
     def approve_order(self):
         ''' 成品入库 '''
         for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复执行成品入库')
             if order.state != 'feeding':
                 raise UserError(u'请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
@@ -1243,6 +1259,8 @@ class WhDisassembly(models.Model):
     @api.multi
     def cancel_approved_order(self):
         for order in self:
+            if order.state == 'feeding':
+                raise UserError(u'请不要重复撤销')
             order.line_in_ids.action_draft()
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:

@@ -27,7 +27,7 @@ class TestReport(TransactionCase):
             [('name', '!=', 'WH/IN/16040004')]).approve_order()
         # 先盘点商品，保证网线数量充足
         warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
-        warehouse_obj.approve_order()
+        # warehouse_obj.approve_order()
 
         self.env['wh.internal'].search([]).approve_order()
 

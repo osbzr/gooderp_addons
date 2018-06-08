@@ -111,6 +111,8 @@ class hr_expense(models.Model):
         super(hr_expense, self).unlink()
 
     def hr_expense_confirm(self):
+        if self.state == 'confirm':
+            raise UserError(u'请不要重复确认')
         if self.type == 'company':
             self.to_money_invoice()
         if self.type == 'my':
@@ -119,6 +121,8 @@ class hr_expense(models.Model):
 
     def hr_expense_draft(self):
         '''删掉其他应付款单'''
+        if self.state == 'draft':
+            raise UserError(u'请不要重复撤销')
         if self.other_money_order:
             other_money_order, self.other_money_order = self.other_money_order, False
             if other_money_order.state == 'done':
@@ -225,9 +229,13 @@ class hr_expense_line(models.Model):
     attachment_number = fields.Integer(compute='_compute_attachment_number', string=u'附件号')
 
     def hr_expense_line_confirm(self):
+        if self.state == 'confirm':
+            raise UserError(u'请不要重复确认')
         self.state = 'confirm'
 
     def hr_expense_line_draft(self):
+        if self.state == 'draft':
+            raise UserError(u'请不要重复撤销')
         if self.state == 'confirm' and not self.is_refused:
             self.state = 'draft'
         else:
