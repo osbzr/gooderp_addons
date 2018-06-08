@@ -310,6 +310,36 @@ class TestBuyReceipt(TransactionCase):
         receipts and receipts[0].buy_receipt_draft()  # 付款单 源单行 有别的行存在
         len(receipts) > 1 and receipts[1].buy_receipt_draft()  # 付款单 源单行 不存在别的行
 
+    def test_buy_receipt_draft_quantity_in(self):
+        '''反审核入库单时，回写购货订单行已执行数量'''
+        # 退货类型的购货订单生成的采购退货单的反审核
+        self.receipt.buy_receipt_done()
+        order = self.env.ref('buy.buy_return_order_1')
+        # order.bank_account_id = False
+        order.buy_order_done()
+        return_receipt = self.env['buy.receipt'].search(
+            [('order_id', '=', order.id)])
+        return_receipt.buy_receipt_done()
+        return_receipt.buy_receipt_draft()
+        self.assertEqual(return_receipt.line_out_ids[0].buy_line_id.quantity_in, 0.0)
+
+        # 购货类型的购货订单生成的采购入库单，生成退货单的反审核
+        return_dict = self.receipt.buy_to_return()
+        return_order = self.env['buy.receipt'].search(
+            [('id', '=', return_dict['res_id'])])
+        return_order.line_out_ids[0].quantity = 3
+        return_order.buy_receipt_done()
+        return_order.buy_receipt_draft()
+        self.assertEqual(return_order.line_out_ids[0].buy_line_id.quantity_in, 10.0)
+
+    def test_buy_receipt_draft_twice(self):
+        '''两次审核和反审核应报错'''
+        with self.assertRaises(UserError):
+            self.receipt.buy_receipt_draft()
+        self.receipt.buy_receipt_done()
+        with self.assertRaises(UserError):
+            self.receipt.buy_receipt_done()
+
     def test_scan_barcode(self):
         '''采购扫码出入库'''
         warehouse = self.env['wh.move']
