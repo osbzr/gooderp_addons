@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-import test_core
+# import test_core
