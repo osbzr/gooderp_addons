@@ -11,6 +11,7 @@
                         <group>
                             <group>
                                 <field name="name"/>
+                                <field name="tax_rate"/>
                             </group>
                             <group>
                                 <field name="type"/>

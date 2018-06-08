@@ -130,17 +130,7 @@ class BuyReceipt(models.Model):
     def onchange_partner_id(self):
         if self.partner_id:
             for line in self.line_in_ids:
-                if line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    if line.goods_id.tax_rate >= self.partner_id.tax_rate:
-                        line.tax_rate = self.partner_id.tax_rate
-                    else:
-                        line.tax_rate = line.goods_id.tax_rate
-                elif line.goods_id.tax_rate and not self.partner_id.tax_rate:
-                    line.tax_rate = line.goods_id.tax_rate
-                elif not line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    line.tax_rate = self.partner_id.tax_rate
-                else:
-                    line.tax_rate = self.env.user.company_id.import_tax_rate
+                line.tax_rate = line.goods_id.get_tax_rate(line.goods_id, self.partner_id, 'buy')
 
     def get_move_origin(self, vals):
         return self._name + (self.env.context.get('is_return') and

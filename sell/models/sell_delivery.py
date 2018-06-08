@@ -140,17 +140,7 @@ class SellDelivery(models.Model):
                 self.address_id = partners_add[0].id
 
             for line in self.line_out_ids:
-                if line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    if line.goods_id.tax_rate >= self.partner_id.tax_rate:
-                        line.tax_rate = self.partner_id.tax_rate
-                    else:
-                        line.tax_rate = line.goods_id.tax_rate
-                elif line.goods_id.tax_rate and not self.partner_id.tax_rate:
-                    line.tax_rate = line.goods_id.tax_rate
-                elif not line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    line.tax_rate = self.partner_id.tax_rate
-                else:
-                    line.tax_rate = self.env.user.company_id.output_tax_rate
+                line.tax_rate = line.goods_id.get_tax_rate(line.goods_id, self.partner_id, 'sell')
 
             address_list = [
                 child_list.id for child_list in self.partner_id.child_ids]
