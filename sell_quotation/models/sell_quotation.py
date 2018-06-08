@@ -152,7 +152,11 @@ class SellQuotationLine(models.Model):
         ''' 当订单行的商品变化时，带出商品上的计量单位、含税价 '''
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
-            self.price = self.goods_id.price
+            # 报价单行单价取之前确认的报价单 #1795
+            last_quo = self.search([('goods_id', '=', self.goods_id.id),
+                                    ('partner_id', '=', self.quotation_id.partner_id.id),
+                                    ('state', '=', 'done')], order='date desc', limit=1)
+            self.price = last_quo and last_quo.price or self.goods_id.price
 
 
 class SellOrderLine(models.Model):
