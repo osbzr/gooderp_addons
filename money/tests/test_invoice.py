@@ -61,6 +61,36 @@ class TestInvoice(TransactionCase):
                                                         'category_id': self.env.ref('money.core_category_purchase').id,
                                                         'amount': 10.0})
         invoice_buy.money_invoice_draft()
+        # 只允许删除未审核的单据
+        invoice_unlink = self.env['money.invoice'].create({'name': '.',
+                                                           'date': "2016-02-20",
+                                                           'partner_id': supplier.id,
+                                                           'category_id': self.env.ref('money.core_category_purchase').id,
+                                                           'amount': 10.0})
+        invoice_unlink.unlink()
+
+    def test_write(self):
+        ''' Test: When change date_due, the one with the same bill_number update together '''
+        # 创建发票
+        invoice_obj = self.env['money.invoice']
+        invoice_1 = invoice_obj.create({'name': 'test_invoice_1',
+                                        'partner_id': self.env.ref('core.jd').id,
+                                        'date': "2016-02-20",
+                                        'category_id': self.env.ref('money.core_category_sale').id,
+                                        'amount': 10.0})
+        invoice_2 = invoice_obj.create({'name': 'test_invoice_2',
+                                        'partner_id': self.env.ref('core.yixun').id,
+                                        'date': "2016-02-26",
+                                        'category_id': self.env.ref('money.core_category_sale').id,
+                                        'amount': 20.0})
+        invoice_1.bill_number = '666'
+        invoice_2.bill_number = '666'
+        invoice_1.date_due = '2016-02-28'
+        invoice_1.money_invoice_draft()
+        invoice_2.money_invoice_draft()
+        # 结算单 不可重复撤销 报错
+        with self.assertRaises(UserError):
+            invoice_2.money_invoice_draft()
 
     def test_money_invoice_draft_voucher_done(self):
         '''发票生成的凭证已审核时，反审核发票'''

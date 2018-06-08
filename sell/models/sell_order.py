@@ -218,17 +218,7 @@ class SellOrder(models.Model):
                 self.address_id = partners_add[0].id
 
             for line in self.line_ids:
-                if line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    if line.goods_id.tax_rate >= self.partner_id.tax_rate:
-                        line.tax_rate = self.partner_id.tax_rate
-                    else:
-                        line.tax_rate = line.goods_id.tax_rate
-                elif line.goods_id.tax_rate and not self.partner_id.tax_rate:
-                    line.tax_rate = line.goods_id.tax_rate
-                elif not line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    line.tax_rate = self.partner_id.tax_rate
-                else:
-                    line.tax_rate = self.env.user.company_id.output_tax_rate
+                line.tax_rate = line.goods_id.get_tax_rate(line.goods_id, self.partner_id, 'sell')
 
             address_list = [
                 child_list.id for child_list in self.partner_id.child_ids]
@@ -609,17 +599,7 @@ class SellOrderLine(models.Model):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.price_taxed = self.goods_id.price
-            if self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
-                if self.goods_id.tax_rate >= self.order_id.partner_id.tax_rate:
-                    self.tax_rate = self.order_id.partner_id.tax_rate
-                else:
-                    self.tax_rate = self.goods_id.tax_rate
-            elif self.goods_id.tax_rate and not self.order_id.partner_id.tax_rate:
-                self.tax_rate = self.goods_id.tax_rate
-            elif not self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
-                self.tax_rate = self.order_id.partner_id.tax_rate
-            else:
-                self.tax_rate = self.env.user.company_id.output_tax_rate
+            self.tax_rate = self.goods_id.get_tax_rate(self.goods_id, self.order_id.partner_id, 'sell')
 
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):

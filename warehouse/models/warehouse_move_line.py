@@ -427,20 +427,10 @@ class WhMoveLine(models.Model):
 
             partner_id = self.env.context.get('default_partner')
             partner = self.env['partner'].browse(partner_id)
-            if self.goods_id.tax_rate and partner.tax_rate:
-                if self.goods_id.tax_rate >= partner.tax_rate:
-                    self.tax_rate = partner.tax_rate
-                else:
-                    self.tax_rate = self.goods_id.tax_rate
-            elif self.goods_id.tax_rate and not partner.tax_rate:
-                self.tax_rate = self.goods_id.tax_rate
-            elif not self.goods_id.tax_rate and partner.tax_rate:
-                self.tax_rate = partner.tax_rate
-            else:
-                if self.type == 'in':
-                    self.tax_rate = self.env.user.company_id.import_tax_rate
-                if self.type == 'out':
-                    self.tax_rate = self.env.user.company_id.output_tax_rate
+            if self.type == 'in':
+                self.tax_rate = self.goods_id.get_tax_rate(self.goods_id, partner, 'buy')
+            if self.type == 'out':
+                self.tax_rate = self.goods_id.get_tax_rate(self.goods_id, partner, 'sell')
 
             if self.goods_id.using_batch and self.goods_id.force_batch_one:
                 self.goods_qty = 1

@@ -734,10 +734,9 @@ class MoneyInvoice(models.Model):
     @api.multi
     def write(self, values):
         """
-        当更新计算单到期日时，纸质发票号 相同的计算单到期日一起更新
+        当更新结算单到期日时，纸质发票号 相同的结算单到期日一起更新
         """
-        context = self.env.context.copy()
-        if values.get('date_due') and self.bill_number and not context.get('other_invoice_date_due'):
+        if values.get('date_due') and self.bill_number and not self.env.context.get('other_invoice_date_due'):
             invoices = self.search([('bill_number', '=', self.bill_number)])
             for inv in invoices:
                 inv.with_context({'other_invoice_date_due': True}).write({'date_due': values.get('date_due')})
