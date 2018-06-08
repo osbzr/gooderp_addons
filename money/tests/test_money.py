@@ -45,6 +45,9 @@ class TestMoneyOrder(TransactionCase):
         self.assertEqual(
             self.env.ref('core.lenovo').payable,
             lenovo_payable - 2000 + 2000)
+        # 不可重复撤销
+        with self.assertRaises(UserError):
+            self.env.ref('money.pay_2000').money_order_draft()
 
     def test_money_order_draft_voucher_done(self):
         ''' 测试收付款反审核 ：审核后的凭证先反审核再删除 '''
