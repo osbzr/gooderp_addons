@@ -140,12 +140,22 @@
 				</tree>
 			</field>
 		</record>
+		<record id="opportunity_calendar" model="ir.ui.view">
+            <field name="name">opportunity.calendar</field>
+            <field name="model">opportunity</field>
+            <field name="arch" type="xml">
+                <calendar color="user_id" date_start="next_datetime" quick_add="False" string="商机">
+                    <field name="name"/>
+                    <field name="next_action"/>
+                </calendar>
+            </field>
+        </record>
 
 		<!--action-->
 		<record model="ir.actions.act_window" id="action_opportunity">
 			<field name="name">商机</field>
 			<field name="res_model">opportunity</field>
-			<field name="view_mode">kanban,form,search</field>
+			<field name="view_mode">kanban,form,calendar,search</field>
 			<field name="context">{
                     'search_default_group_status': 1,
                 }
