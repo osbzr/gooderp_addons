@@ -135,8 +135,8 @@ class CheckoutWizard(models.TransientModel):
                                 'line_ids': [
                                     (0, 0, line) for line in voucher_line],
                             }
-                            voucher = voucher_obj.create(valus)
-                            voucher.voucher_done()
+                            voucher_profit = voucher_obj.create(valus)
+                            voucher_profit.voucher_done()
                     year_account = None
                     if balance.period_id.month == '12':
                         year_profit_ids = voucher_line_obj.search([
@@ -210,7 +210,7 @@ class CheckoutWizard(models.TransientModel):
                             'views': [(view.id, 'form')],
                             'res_model': 'voucher',
                             'type': 'ir.actions.act_window',
-                            'res_id': voucher.id,
+                            'res_id': voucher_profit.id,
                         }
 
     # 反结账
