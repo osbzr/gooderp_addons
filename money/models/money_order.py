@@ -732,6 +732,18 @@ class MoneyInvoice(models.Model):
         return new_id
 
     @api.multi
+    def write(self, values):
+        """
+        当更新计算单到期日时，纸质发票号 相同的计算单到期日一起更新
+        """
+        context = self.env.context.copy()
+        if values.get('date_due') and self.bill_number and not context.get('other_invoice_date_due'):
+            invoices = self.search([('bill_number', '=', self.bill_number)])
+            for inv in invoices:
+                inv.with_context({'other_invoice_date_due': True}).write({'date_due': values.get('date_due')})
+        return super(MoneyInvoice, self).write(values)
+
+    @api.multi
     def unlink(self):
         """
         只允许删除未审核的单据
