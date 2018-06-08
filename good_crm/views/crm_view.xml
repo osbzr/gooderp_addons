@@ -144,10 +144,9 @@
             <field name="name">opportunity.calendar</field>
             <field name="model">opportunity</field>
             <field name="arch" type="xml">
-                <calendar color="user_id" date_start="next_datetime" string="商机">
+                <calendar color="user_id" date_start="next_datetime" quick_add="False" string="商机">
                     <field name="name"/>
                     <field name="next_action"/>
-                    <field name="next_datetime"/>
                 </calendar>
             </field>
         </record>

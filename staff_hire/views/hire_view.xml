@@ -191,7 +191,7 @@
         <field name="priority" eval="2"/>
         <field name="arch" type="xml">
             <calendar string="Applicants"
-                date_start="date_action" color="user_id">
+                date_start="date_action" color="user_id" quick_add="False">
                 <field name="partner_name"/>
                 <field name="title_action"/>
             </calendar>

@@ -208,7 +208,6 @@
             <field name="arch" type="xml">
                 <calendar color="user_id" date_start="date_due" quick_add="False" string="采购入库单">
                     <field name="name"/>
-                    <field name="date"/>
                     <field name="partner_id"/>
                 </calendar>
             </field>
