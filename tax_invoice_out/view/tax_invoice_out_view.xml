@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!--已认证发票tree-->
+        <record id='tax_invoice_out_tree' model='ir.ui.view'>
+			<field name='name'>tax.invoice.out.tree</field>
+			<field name='model'>tax.invoice.out</field>
+			<field name='arch' type='xml'>
+				<tree string='已认证发票'>
+                    <field name='name'/>
+                    <field name="total_amount"/>
+                    <field name="total_tax"/>
+                    <field name='state'/>
+				</tree>
+			</field>
+		</record>
+		<!--已认证发票from-->
+		<record id='tax_invoice_out_form' model='ir.ui.view'>
+			<field name='name'>tax.invoice.out.form</field>
+			<field name='model'>tax.invoice.out</field>
+			<field name='arch' type='xml'>
+                <form string="已认证发票">
+	                <header>
+                        <button name='invoice_to_sell' states="draft" string="反推订单" type="object" class="oe_highlight" groups="base.group_no_one"/>
+	                	<button name='tax_invoice_done' states="draft" string="确认" type="object" class="oe_highlight"/>
+	                	<button name='tax_invoice_draft' states="done" string="反确认" type="object" />
+	                    <field name="state" widget="statusbar" readonly="1"/>
+	                </header>
+			    	<sheet>
+                        <div class="oe_button_box" name="button_box">
+                                <button type="object"
+                                        string="引入excel"
+                                        name="button_excel"
+                                        class="oe_stat_button"
+                                        icon="fa-list-alt">
+                                </button>
+                        </div>
+						<group>
+							<field name="name"/>
+                        </group>
+                        <group>
+                            <field name="total_amount"/>
+                            <field name="total_tax"/>
+                        </group>
+                        <notebook>
+                            <page string="销售发票明细">
+                                <field name="line_ids" nolabel="1" widget="many2many" domain="[('type', '=', 'out')]" options="{'not_delete': True, 'reload_on_button': True, 'no_create': True}">
+                                    <tree string="明细行" editable="bottom">
+                                         <field name="partner_name_out"/>
+                                         <field name="invoice_code"/>
+                                         <field name="name"/>
+                                         <field name="invoice_amount"/>
+                                         <field name="invoice_tax"/>
+                                         <field name="invoice_date"/>
+                                         <field name="sell_id" invisible = '1'/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+
+        <!-- 引入excel action -->
+
+        <record id="create_sale_invoice_wizard_form" model="ir.ui.view">
+            <field name="name">create_sale_invoice_wizard_form</field>
+            <field name="model">create.sale.invoice.wizard</field>
+            <field name="arch" type="xml">
+            	<form>
+            		<group>
+						<field name="excel"/>
+                    </group>
+                    <footer>
+                        <button name="create_sale_invoice"  string="引入" type="object" class="oe_highlight"/>
+                        或者
+                        <button string="取消" class="oe_link" special="cancel"/>
+                    </footer>
+            	</form>
+            </field>
+        </record>
+
+        <act_window id="create_sale_invoice_wizard_action"
+            name="引入excel"
+            src_model="tax.invoice.out"
+            res_model="create.sale.invoice.wizard"
+            view_type="form"
+            view_mode="form"
+            target="new"/>
+
+        <record id="cn_sale_invoice_form_inherit_page" model="ir.ui.view">
+            <field name="name">cn_sale_invoice_form_inherit_page</field>
+            <field name="model">cn.account.invoice</field>
+            <field name='inherit_id' ref='cn_account_invoice.cn_account_invoice_form' />
+            <field name="arch" type="xml">
+                <xpath expr="//page" position="after">
+                    <page string="销售情况" attrs="{'invisible':[('type', '!=', 'out')]}">
+                        <group>
+						    <field name="sell_id" readonly="1"/>
+                            <field name="invoice_out_id" readonly="1"/>
+                        </group>
+                    </page>
+				</xpath>
+            </field>
+        </record>
+
+	</data>
+</openerp>
