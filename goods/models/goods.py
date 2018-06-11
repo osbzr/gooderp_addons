@@ -11,10 +11,19 @@ class Goods(models.Model):
     _inherit = 'goods'
 
     @api.multi
+    def get_parent_tax_rate(self, parent_id):
+        # 逐级取商品分类上的税率
+        tax_rate = parent_id.tax_rate
+        if not tax_rate and parent_id.parent_id:
+            tax_rate = self.get_parent_tax_rate(parent_id.parent_id)
+
+        return tax_rate
+
+    @api.multi
     def get_tax_rate(self, goods, partner, type):
         """
         获得税率
-        如果商品上没有税率，则取商品分类上的税率；
+        如果商品上没有税率，则逐级取商品分类上的税率；
         商品税率和业务伙伴税率做比较：如果都存在，取小的；其中一个存在取该值；都不存在取公司上的进/销项税
         """
         if not goods:
@@ -25,6 +34,9 @@ class Goods(models.Model):
             goods_tax_rate = goods.tax_rate
         elif goods.goods_class_id.tax_rate:
             goods_tax_rate = goods.goods_class_id.tax_rate
+        elif goods.goods_class_id.parent_id:  # 逐级取商品分类上的税率
+            goods_tax_rate = self.get_parent_tax_rate(goods.goods_class_id.parent_id)
+
         # 取业务伙伴税率
         if partner:
             partner_tax_rate = partner.tax_rate
