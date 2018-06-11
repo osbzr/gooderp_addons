@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+        <!--增加类别-->
+        <record id="domestic_supplier" model="core.category">
+            <field name="name">国内供应商</field>
+            <field name="type">supplier</field>
+            <field name="account_id" ref="finance.account_ap"/>
+            <field name='note'>默认供应商类别</field>
+        </record>
+        <record id="domestic_fuwu_supplier" model="core.category">
+            <field name="name">国内服务供应商</field>
+            <field name="type">supplier</field>
+            <field name="account_id" ref="finance.account_ap"/>
+            <field name='note'>默认服务供应商类别</field>
+        </record>
+        <record id="domestic_customer" model="core.category">
+            <field name="name">国内客户</field>
+            <field name="type">customer</field>
+            <field name="account_id" ref="finance.account_ar"/>
+            <field name='note'>默认客户类别</field>
+        </record>
+        <!--增加自动化数据-->
+        <record id="auto_cswh" model="automatic.cost">
+            <field name="name">城市维护建设税</field>
+            <!--field name="account_id" ref="tax.small_business_chart5403"/>
+            <field name="category_id" ref="tax.cost_small_business_chart2221007"/-->
+        </record>
+        <record id="auto_dfjyfj" model="automatic.cost">
+            <field name="name">地方教育附加</field>
+            <!--field name="account_id" ref="tax.small_business_chart5403003"/>
+            <field name="category_id" ref="tax.cost_small_business_chart2221017"/-->
+        </record>
+        <!--record id="auto_jyfj" model="automatic.cost">
+            <field name="name">教育费附加</field>
+            <field name="account_id" ref="tax.small_business_chart5403002"/>
+            <field name="category_id" ref="tax.cost_small_business_chart2221012"/>
+        </record>
+        <record id="auto_grsd" model="automatic.cost">
+            <field name="name">个人所得税</field>
+            <field name="category_id" ref="staff_wages.personal_tax"/>
+        </record>
+        <record id="auto_yhs" model="automatic.cost">
+            <field name="name">购销合同</field>
+            <field name="account_id" ref="tax.small_business_chart5403004"/>
+            <field name="category_id" ref="tax.cost_small_business_chart2221018"/>
+        </record>
+        <record id="auto_gsbxqy" model="automatic.cost">
+            <field name="name">工伤保险基金收入企业缴纳</field>
+            <field name="account_id" ref="tax.small_business_chart5602023"/>
+            <field name="category_id" ref="staff_wages.categ_injury"/>
+        </record>
+        <record id="auto_ylbxqy" model="automatic.cost">
+            <field name="name">基本医疗保险基金收入基本医疗保险费I、Ⅱ</field>
+            <field name="account_id" ref="tax.small_business_chart5602023"/>
+            <field name="category_id" ref="staff_wages.categ_health_co"/>
+        </record>
+        <record id="auto_ylbxqy" model="automatic.cost">
+            <field name="name">企业职工基本养老保险基金收入企业缴纳</field>
+            <field name="account_id" ref="tax.small_business_chart5602023"/>
+            <field name="category_id" ref="staff_wages.categ_endowment_co"/>
+        </record>
+        <record id="auto_sybxqy" model="automatic.cost">
+            <field name="name">失业保险基金收入企业缴纳</field>
+            <field name="account_id" ref="tax.small_business_chart5602023"/>
+            <field name="category_id" ref="staff_wages.categ_unemployment_co"/>
+        </record>
+        <record id="auto_sybxqy" model="automatic.cost">
+            <field name="name">生育保险基金收入企业缴纳</field>
+            <field name="account_id" ref="tax.small_business_chart5602023"/>
+            <field name="category_id" ref="staff_wages.categ_maternity"/>
+        </record-->
+	</data>
+</openerp>

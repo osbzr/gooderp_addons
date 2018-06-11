@@ -295,11 +295,10 @@
             <field name="model">task</field>
             <field name="priority" eval="2"/>
             <field name="arch" type="xml">
-                <calendar color="user_id" date_start="next_datetime" string="Task Organization">
+                <calendar color="user_id" date_start="next_datetime" quick_add="False" string="Task Organization">
                     <field name="project_id"/>
                     <field name="name"/>
                     <field name="next_action"/>
-                    <field name="next_datetime"/>
                 </calendar>
             </field>
         </record>

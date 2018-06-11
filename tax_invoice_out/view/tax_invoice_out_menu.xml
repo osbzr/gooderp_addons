@@ -1,0 +1,10 @@
+<?xml version="1.0"  encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- 菜单加入税务模块 -->
+        <menuitem id="menu_tax_invoice_out" name='销售发票' action="tax_invoice_out_action"
+            parent="tax.tax_accounting" sequence="0"/>
+
+
+    </data>
+</openerp>

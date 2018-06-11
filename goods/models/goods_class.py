@@ -27,3 +27,4 @@ class GoodsClass(models.Model):
     image = fields.Binary(attachment=True)
     image_medium = fields.Binary(string="Medium-sized image", attachment=True)
     image_small = fields.Binary(string="Small-sized image", attachment=True)
+    tax_rate = fields.Float(u'税率(%)',  help=u'商品分类上的税率')

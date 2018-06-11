@@ -81,12 +81,20 @@ class BuyOrder(models.Model):
     @api.one
     def _get_paid_amount(self):
         '''计算购货订单付款/退款状态'''
-        receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
-        money_order_rows = self.env['money.order'].search([('buy_id', '=', self.id),
-                                                           ('reconciled', '=', 0),
-                                                           ('state', '=', 'done')])
-        self.paid_amount = sum([receipt.invoice_id.reconciled for receipt in receipts]) +\
-            sum([order_row.amount for order_row in money_order_rows])
+        if not self.invoice_by_receipt: # 分期付款时
+            money_orders = self.env['money.order'].search([
+                ('buy_id', '=', self.id),
+                ('reconciled', '!=', 0),
+                ('state', '=', 'done')])
+            self.paid_amount = sum([order.amount for order in money_orders])
+        else:
+            receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
+            # 购货订单上输入预付款时
+            money_order_rows = self.env['money.order'].search([('buy_id', '=', self.id),
+                                                               ('reconciled', '=', 0),
+                                                               ('state', '=', 'done')])
+            self.paid_amount = sum([receipt.invoice_id.reconciled for receipt in receipts]) +\
+                sum([order_row.amount for order_row in money_order_rows])
 
     @api.depends('receipt_ids')
     def _compute_receipt(self):
@@ -259,17 +267,7 @@ class BuyOrder(models.Model):
     def onchange_partner_id(self):
         if self.partner_id:
             for line in self.line_ids:
-                if line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    if line.goods_id.tax_rate >= self.partner_id.tax_rate:
-                        line.tax_rate = self.partner_id.tax_rate
-                    else:
-                        line.tax_rate = line.goods_id.tax_rate
-                elif line.goods_id.tax_rate and not self.partner_id.tax_rate:
-                    line.tax_rate = line.goods_id.tax_rate
-                elif not line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    line.tax_rate = self.partner_id.tax_rate
-                else:
-                    line.tax_rate = self.env.user.company_id.import_tax_rate
+                line.tax_rate = line.goods_id.get_tax_rate(line.goods_id, self.partner_id, 'buy')
 
     def _get_vals(self):
         '''返回创建 money_order 时所需数据'''
@@ -675,17 +673,7 @@ class BuyOrderLine(models.Model):
                     self.price_taxed = line.price
                     break
 
-            if self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
-                if self.goods_id.tax_rate >= self.order_id.partner_id.tax_rate:
-                    self.tax_rate = self.order_id.partner_id.tax_rate
-                else:
-                    self.tax_rate = self.goods_id.tax_rate
-            elif self.goods_id.tax_rate and not self.order_id.partner_id.tax_rate:
-                self.tax_rate = self.goods_id.tax_rate
-            elif not self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
-                self.tax_rate = self.order_id.partner_id.tax_rate
-            else:
-                self.tax_rate = self.env.user.company_id.import_tax_rate
+            self.tax_rate = self.goods_id.get_tax_rate(self.goods_id, self.order_id.partner_id, 'buy')
 
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):

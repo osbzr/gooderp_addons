@@ -622,7 +622,8 @@ class MoneyInvoice(models.Model):
     @api.one
     @api.depends('reconciled')
     def _get_sell_amount_state(self):
-        self.get_amount_date = self.write_date[:10]
+        if self.reconciled:
+            self.get_amount_date = self.write_date[:10]
 
     state = fields.Selection([
         ('draft', u'草稿'),
@@ -730,6 +731,17 @@ class MoneyInvoice(models.Model):
         if not self.env.user.company_id.draft_invoice:
             new_id.money_invoice_done()
         return new_id
+
+    @api.multi
+    def write(self, values):
+        """
+        当更新结算单到期日时，纸质发票号 相同的结算单到期日一起更新
+        """
+        if values.get('date_due') and self.bill_number and not self.env.context.get('other_invoice_date_due'):
+            invoices = self.search([('bill_number', '=', self.bill_number)])
+            for inv in invoices:
+                inv.with_context({'other_invoice_date_due': True}).write({'date_due': values.get('date_due')})
+        return super(MoneyInvoice, self).write(values)
 
     @api.multi
     def unlink(self):

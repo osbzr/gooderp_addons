@@ -10,6 +10,53 @@ class Goods(models.Model):
     """
     _inherit = 'goods'
 
+    @api.multi
+    def get_parent_tax_rate(self, parent_id):
+        # 逐级取商品分类上的税率
+        tax_rate = parent_id.tax_rate
+        if not tax_rate and parent_id.parent_id:
+            tax_rate = self.get_parent_tax_rate(parent_id.parent_id)
+
+        return tax_rate
+
+    @api.multi
+    def get_tax_rate(self, goods, partner, type):
+        """
+        获得税率
+        如果商品上没有税率，则逐级取商品分类上的税率；
+        商品税率和业务伙伴税率做比较：如果都存在，取小的；其中一个存在取该值；都不存在取公司上的进/销项税
+        """
+        if not goods:
+            return
+        goods_tax_rate, partner_tax_rate = False, False
+        # 如果商品上没有税率，则取商品分类上的税率
+        if goods.tax_rate:
+            goods_tax_rate = goods.tax_rate
+        elif goods.goods_class_id.tax_rate:
+            goods_tax_rate = goods.goods_class_id.tax_rate
+        elif goods.goods_class_id.parent_id:  # 逐级取商品分类上的税率
+            goods_tax_rate = self.get_parent_tax_rate(goods.goods_class_id.parent_id)
+
+        # 取业务伙伴税率
+        if partner:
+            partner_tax_rate = partner.tax_rate
+
+        # 商品税率和业务伙伴税率做比较，并根据情况返回
+        if goods_tax_rate and partner_tax_rate:
+            if goods_tax_rate >= partner_tax_rate:
+                return partner_tax_rate
+            else:
+                return goods_tax_rate
+        elif goods_tax_rate and not partner_tax_rate:
+            return goods_tax_rate
+        elif not goods_tax_rate and partner_tax_rate:
+            return partner_tax_rate
+        else:
+            if type == 'buy':
+                return self.env.user.company_id.import_tax_rate
+            elif type == 'sell':
+                return self.env.user.company_id.output_tax_rate
+
     no_stock = fields.Boolean(u'虚拟商品')
     using_batch = fields.Boolean(u'管理批号')
     force_batch_one = fields.Boolean(u'管理序列号')

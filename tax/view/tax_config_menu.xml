@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--根菜单-->
+		<menuitem id='tax_menu' name='涉税会计'  web_icon="tax,static/description/tax.png"/>
+		<menuitem id='tax_accounting' name='基本业务' parent='tax_menu' sequence='10'/>
+        <menuitem id='country_tax_updata' name='地税上报' parent='tax_menu' sequence='20'/>
+        <menuitem id='province_tax_updata' name='国税上报' parent='tax_menu' sequence='30'/>
+        <menuitem id='tax_config_menu' name='基本设置' parent='tax_menu' sequence='40' />
+        <!-- 基础设置 -->
+        <menuitem id="menu_tax_config" name='地税设置' action="view_tax_config_setting_action"
+            parent="tax_config_menu" sequence="0"/>
+        <menuitem id="menu_tax_category" name='税率设置' action="tax_category_action"
+            parent="tax_config_menu" sequence="0"/>
+        <menuitem id="menu_config_province" name='国税设置' action="config_province_action"
+            parent="tax_config_menu" sequence="1"/>
+        <menuitem id="menu_automatic_cost" name='费用自动化基础' action="automatic_cost_action"
+            parent="tax_config_menu" sequence="2" groups="base.group_no_one"/>
+
+	</data>
+</openerp>

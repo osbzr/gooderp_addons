@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+        <!--税编码设置tree-->
+        <record id='tax_category_tree' model='ir.ui.view'>
+			<field name='name'>tax.category.tree</field>
+			<field name='model'>tax.category</field>
+			<field name='arch' type='xml'>
+				<tree string='税率设置'>
+                    <field name='name'/>
+                    <field name='code'/>
+				</tree>
+			</field>
+		</record>
+
+        <!--国税设置tree-->
+        <record id='config_province_tree' model='ir.ui.view'>
+			<field name='name'>config.province.tree</field>
+			<field name='model'>config.province</field>
+			<field name='arch' type='xml'>
+				<tree string='国税设置'>
+                    <field name='name'/>
+				</tree>
+			</field>
+		</record>
+
+		<!--国税设置form-->
+		<record id='config_province_form' model='ir.ui.view'>
+			<field name='name'>config.province.form</field>
+			<field name='model'>config.province</field>
+			<field name='arch' type='xml'>
+                <form string="国税设置">
+			    	<sheet>
+                        <group>
+                            <group>
+                                <field name='name'/>
+							</group>
+                        </group>
+                        <notebook>
+                            <page string="资产负债表对应关系">
+                                <field name="balance_lins">
+                                     <tree string="资产负债表对应关系" editable="bottom">
+                                         <field name="update_name"/>
+                                         <field name="excel_ncows"/>
+                                         <field name="excel_ncols"/>
+                                     </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <notebook>
+                            <page string="利润表对应关系">
+                                <field name="profit_lins">
+                                     <tree string="利润表对应关系" editable="bottom">
+                                         <field name="update_name"/>
+                                         <field name="excel_ncows"/>
+                                         <field name="excel_ncols"/>
+                                     </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+			</field>
+		</record>
+        <!--继承partner,客户添加系统自我增加-->
+        <record id="partner_form_computer_import_inherit" model="ir.ui.view">
+            <field name="name">partner_form_computer_import_inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.customer_address_form' />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='code']" position="after">
+                    <field name="computer_import" required="1"/>
+				</xpath>
+            </field>
+        </record>
+
+        <record id="supplier_address_formr_import_inherit" model="ir.ui.view">
+            <field name="name">supplier_address_form_import_inherit</field>
+            <field name="model">partner</field>
+            <field name='inherit_id' ref='core.supplier_address_form' />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tax_rate']" position="after">
+                    <field name="computer_import" required="1"/>
+				</xpath>
+            </field>
+        </record>
+
+    <!--继承goods,添加系统自我增加-->
+        <record id="goods_form_computer_import_inherit" model="ir.ui.view">
+            <field name="name">goods_form_computer_import_inherit</field>
+            <field name="model">goods</field>
+            <field name='inherit_id' ref='goods.goods_form' />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='not_saleable']" position="after">
+                    <field name="computer_import" required="1"/>
+				</xpath>
+            </field>
+        </record>
+
+        <!--费用自动化菜单-->
+        <record id='automatic_cost_tree' model='ir.ui.view'>
+			<field name='name'>automatic.cost.tree</field>
+			<field name='model'>automatic.cost</field>
+			<field name='arch' type='xml'>
+				<tree string='地税设置'>
+                    <field name='name'/>
+                    <field name='category_id'/>
+                    <field name='account_in_id'/>
+                    <field name='account_out_id'/>
+				</tree>
+			</field>
+		</record>
+
+        <!--增加税收分类编码-->
+
+        <record id="core_category_form_inherit" model="ir.ui.view">
+            <field name="name">core.category.form.inherit</field>
+            <field name="model">core.category</field>
+            <field name='inherit_id' ref='core.core_category_form' />
+            <field name="arch" type="xml">
+                <field name="type" position="after">
+					<field name="tax_category_id" attrs="{'invisible': [('type', '!=', 'goods')],'required': [('type', '=', 'goods')]}"
+                           domain="[('can_use', '=', True)]"/>
+				</field>
+            </field>
+        </record>
+
+	</data>
+</openerp>
