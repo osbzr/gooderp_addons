@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-# import test_partner_address
+import test_partner_address
