@@ -622,7 +622,8 @@ class MoneyInvoice(models.Model):
     @api.one
     @api.depends('reconciled')
     def _get_sell_amount_state(self):
-        self.get_amount_date = self.write_date[:10]
+        if self.reconciled:
+            self.get_amount_date = self.write_date[:10]
 
     state = fields.Selection([
         ('draft', u'草稿'),
