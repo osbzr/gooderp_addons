@@ -80,7 +80,7 @@ class Voucher(models.Model):
     line_ids = fields.One2many(
         'voucher.line', 'voucher_id', u'凭证明细', copy=True, states=READONLY_STATES,)
     amount_text = fields.Float(u'总计', compute='_compute_amount', store=True,
-                               track_visibility='always', help=u'凭证金额')
+                               track_visibility='always', digits=dp.get_precision('Amount'), help=u'凭证金额')
     state = fields.Selection([('draft', u'草稿'),
                               ('done', u'已确认'),
                               ('cancel', u'已作废')], u'状态', default='draft',
@@ -124,7 +124,6 @@ class Voucher(models.Model):
                                   (debit_sum, credit_sum))
 
         self.state = 'done'
-        ''' #xuan
         if self.is_checkout:   # 月结凭证不做反转
             return True
         for line in self.line_ids:
@@ -136,7 +135,6 @@ class Voucher(models.Model):
                 # 收入类科目只能在贷方记账,比如退款给客户的情况
                 line.credit = -line.debit
                 line.debit = 0
-        '''
 
     @api.one
     def voucher_can_be_draft(self):
@@ -653,8 +651,8 @@ class FinanceAccount(models.Model):
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     voucher_line_ids = fields.One2many(string=u'Voucher Lines', comodel_name='voucher.line', inverse_name='account_id', )
-    debit = fields.Float(string=u'借方', compute='compute_balance', store=False )
-    credit = fields.Float(string=u'贷方', compute='compute_balance', store=False )
+    debit = fields.Float(string=u'借方', compute='compute_balance', store=False, digits=dp.get_precision('Amount') )
+    credit = fields.Float(string=u'贷方', compute='compute_balance', store=False, digits=dp.get_precision('Amount') )
     balance = fields.Float(u'当前余额',
                            compute='compute_balance',
                            store=False,
@@ -1031,7 +1029,7 @@ class Dupont(models.Model):
 
     period_id = fields.Many2one('finance.period', u'期间', index=True)
     kpi = fields.Char(u'指标')
-    val = fields.Float(u'值')
+    val = fields.Float(u'值', digits=dp.get_precision('Amount'))
 
     @api.model
     def fill(self, period_id):

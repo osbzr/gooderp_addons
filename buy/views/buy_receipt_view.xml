@@ -202,6 +202,16 @@
                 </search>
             </field>
         </record>
+        <record id="buy_receipt_calendar" model="ir.ui.view">
+            <field name="name">buy.receipt.calendar</field>
+            <field name="model">buy.receipt</field>
+            <field name="arch" type="xml">
+                <calendar color="user_id" date_start="date_due" quick_add="False" string="采购入库单">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                </calendar>
+            </field>
+        </record>
 
 		<!-- 采购退货单视图 -->
 

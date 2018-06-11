@@ -6,7 +6,7 @@
             <field name="model">staff.leave</field>
             <field name="arch" type="xml">
                 <calendar color="user_id" string="请假日历单"
-                          model="month" date_start="date_start" date_stop="date_stop">
+                          model="month" date_start="date_start" date_stop="date_stop" quick_add="False">
                     <field name="name"/>
                     <field name="user_id"/>
                 </calendar>

@@ -262,6 +262,8 @@ class MoneyOrder(models.Model):
     def money_order_done(self):
         '''对收付款单的审核按钮'''
         for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复确认')
             if order.type == 'pay' and not order.partner_id.s_category_id.account_id:
                 raise UserError(u'请输入供应商类别(%s)上的科目' %
                                 order.partner_id.s_category_id.name)
@@ -340,6 +342,8 @@ class MoneyOrder(models.Model):
         :return: 
         """
         for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
             total = 0
             for line in order.line_ids:
                 rate_silent = self.env['res.currency'].get_rate_silent(
@@ -685,6 +689,8 @@ class MoneyInvoice(models.Model):
         :return: 
         """
         for inv in self:
+            if inv.state == 'done':
+                raise UserError(u'请不要重复确认')
             inv.reconciled = 0.0
             inv.to_reconcile = inv.amount
             inv.state = 'done'
@@ -703,6 +709,8 @@ class MoneyInvoice(models.Model):
         :return: 
         """
         for inv in self:
+            if inv.state == 'draft':
+                raise UserError(u'请不要重复撤销')
             inv.reconciled = 0.0
             inv.to_reconcile = 0.0
             inv.state = 'draft'
@@ -722,6 +730,17 @@ class MoneyInvoice(models.Model):
         if not self.env.user.company_id.draft_invoice:
             new_id.money_invoice_done()
         return new_id
+
+    @api.multi
+    def write(self, values):
+        """
+        当更新结算单到期日时，纸质发票号 相同的结算单到期日一起更新
+        """
+        if values.get('date_due') and self.bill_number and not self.env.context.get('other_invoice_date_due'):
+            invoices = self.search([('bill_number', '=', self.bill_number)])
+            for inv in invoices:
+                inv.with_context({'other_invoice_date_due': True}).write({'date_due': values.get('date_due')})
+        return super(MoneyInvoice, self).write(values)
 
     @api.multi
     def unlink(self):

@@ -259,17 +259,7 @@ class BuyOrder(models.Model):
     def onchange_partner_id(self):
         if self.partner_id:
             for line in self.line_ids:
-                if line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    if line.goods_id.tax_rate >= self.partner_id.tax_rate:
-                        line.tax_rate = self.partner_id.tax_rate
-                    else:
-                        line.tax_rate = line.goods_id.tax_rate
-                elif line.goods_id.tax_rate and not self.partner_id.tax_rate:
-                    line.tax_rate = line.goods_id.tax_rate
-                elif not line.goods_id.tax_rate and self.partner_id.tax_rate:
-                    line.tax_rate = self.partner_id.tax_rate
-                else:
-                    line.tax_rate = self.env.user.company_id.import_tax_rate
+                line.tax_rate = line.goods_id.get_tax_rate(line.goods_id, self.partner_id, 'buy')
 
     def _get_vals(self):
         '''返回创建 money_order 时所需数据'''
@@ -675,17 +665,7 @@ class BuyOrderLine(models.Model):
                     self.price_taxed = line.price
                     break
 
-            if self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
-                if self.goods_id.tax_rate >= self.order_id.partner_id.tax_rate:
-                    self.tax_rate = self.order_id.partner_id.tax_rate
-                else:
-                    self.tax_rate = self.goods_id.tax_rate
-            elif self.goods_id.tax_rate and not self.order_id.partner_id.tax_rate:
-                self.tax_rate = self.goods_id.tax_rate
-            elif not self.goods_id.tax_rate and self.order_id.partner_id.tax_rate:
-                self.tax_rate = self.order_id.partner_id.tax_rate
-            else:
-                self.tax_rate = self.env.user.company_id.import_tax_rate
+            self.tax_rate = self.goods_id.get_tax_rate(self.goods_id, self.order_id.partner_id, 'buy')
 
     @api.onchange('quantity', 'price_taxed', 'discount_rate')
     def onchange_discount_rate(self):

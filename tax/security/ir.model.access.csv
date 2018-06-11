@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_automatic_cost,access_automatic_cost,model_automatic_cost,,1,1,1,1
+access_config_province,access_config_province,model_config_province,,1,1,1,1
+access_balance_line,access_balance_line,model_balance_line,,1,1,1,1
+access_profit_line,access_profit_line,model_profit_line,,1,1,1,1
+access_tax_base_category,access_tax_base_category,model_tax_base_category,,1,1,1,1
+access_tax_category,access_tax_category,model_tax_category,,1,1,1,1

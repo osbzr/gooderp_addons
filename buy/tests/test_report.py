@@ -27,7 +27,6 @@ class TestDetailWizard(TransactionCase):
         self.receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         self.receipt.bank_account_id = self.env.ref('core.comm')
-        self.env.ref('money.get_40000').money_order_done()
         self.receipt.payment = 2.0
         self.receipt.buy_receipt_done()
         self.receipt_return = self.browse_ref('buy.buy_receipt_return_1')
@@ -111,7 +110,6 @@ class TestTrackWizard(TransactionCase):
         self.receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         self.receipt.bank_account_id = self.env.ref('core.comm')
-        self.env.ref('money.get_40000').money_order_done()
         self.receipt.payment = 2.0
         self.receipt.buy_receipt_done()
         self.receipt_return = self.browse_ref('buy.buy_receipt_return_1')
@@ -167,7 +165,6 @@ class TestPaymentWizard(TransactionCase):
         self.receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         self.receipt.bank_account_id = self.env.ref('core.comm')
-        self.env.ref('money.get_40000').money_order_done()
         self.receipt.payment = 2.0
         new_receipt = self.receipt.copy()
         new_receipt.payment = 0
@@ -237,7 +234,6 @@ class TestGoodsWizard(TransactionCase):
         self.receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         self.receipt.bank_account_id = self.env.ref('core.comm')
-        self.env.ref('money.get_40000').money_order_done()
         self.receipt.payment = 2.0
         self.receipt.buy_receipt_done()
         self.receipt_return = self.browse_ref('buy.buy_receipt_return_1')
@@ -314,7 +310,6 @@ class TestPartnerWizard(TransactionCase):
         self.receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         self.receipt.bank_account_id = self.env.ref('core.comm')
-        self.env.ref('money.get_40000').money_order_done()
         self.receipt.payment = 2.0
         self.receipt.buy_receipt_done()
         self.receipt_return = self.browse_ref('buy.buy_receipt_return_1')

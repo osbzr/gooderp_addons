@@ -1,0 +1,18 @@
+<?xml version="1.0"  encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- 进项发票 action -->
+
+        <record id="tax_invoice_out_action" model="ir.actions.act_window">
+            <field name="name">销售发票</field>
+            <field name="res_model">tax.invoice.out</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                点击创建销售发票
+              </p>
+            </field>
+        </record>
+
+	</data>
+</openerp>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- 国、地税设置 action -->
+
+        <record id="tax_category_action" model="ir.actions.act_window">
+            <field name="name">税率设置</field>
+            <field name="res_model">tax.category</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="config_province_action" model="ir.actions.act_window">
+            <field name="name">国税设置</field>
+            <field name="res_model">config.province</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="automatic_cost_action" model="ir.actions.act_window">
+            <field name="name">费用自动化设置</field>
+            <field name="res_model">automatic.cost</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="view_tax_config_setting_action" model="ir.actions.act_window">
+            <field name="name">涉税会计设置</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tax.config.settings</field>
+            <field name="view_id" ref="view_tax_config"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+    </data>
+</openerp>

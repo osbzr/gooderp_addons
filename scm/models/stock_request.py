@@ -201,6 +201,8 @@ class StockRequest(models.Model):
 
     @api.one
     def stock_request_done(self):
+        if self.state == 'done':
+            raise UserError(u'请不要重复确认')
         todo_buy_lines = []  # 待生成购货订单
         todo_produce_lines = []  # 待生成组装单
         for line in self.line_ids:
