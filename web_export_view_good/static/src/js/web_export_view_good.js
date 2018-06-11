@@ -44,7 +44,7 @@ function compute_main_data(rows,export_columns_keys){
                 var text = cell.text || cell.textContent || cell.innerHTML || "";
                 var is_boolean_cell = cell_object.find('.o_checkbox input[type=checkbox]');
                 if (cell.classList.contains("oe_list_field_float")||cell.classList.contains("o_list_number")||cell.classList.contains("oe_number")) {
-                    export_row.push(formats.parse_value(text.replace(/[^0-9.]/g, ''), {'type': "float"}, 0));
+                    export_row.push(formats.parse_value(text.replace('^[\-]?[0-9]/g', ''), {'type': "float"}, 0));
                 }else if (is_boolean_cell.length>0) {
                     if (is_boolean_cell.get(0).checked) {
                         export_row.push('√');
@@ -85,7 +85,9 @@ function compute_footer_data(amount,export_columns_keys) {
                 if (text.indexOf(" ") == -1) {
                      if (text!==''){
                         footer = 1;
-                        export_row[index-2]=text.trim();}
+                         // footer 数字类型的字符串转化成数字，显示时单元格内容会靠右显示
+                        var cell_value = text.trim().split(",").join("");
+                        export_row[index-2]=parseFloat(cell_value);}
                 }else {
                     export_row[index-2]=text.trim();}
                 }
@@ -103,11 +105,14 @@ function button_export_action () {
     var view = self;
     var export_columns_keys = [];
     var export_columns_names = [];
+    var location = 0;
     var export_rows = [];
     $.each(view.visible_columns, function () {
-        if (this.tag == 'field') {
-            export_columns_keys.push(this.id);
-            export_columns_names.push(this.string);
+        export_columns_keys.push(this.id);
+        export_columns_names.push(this.string);
+        // 找到 查看明细 按钮所在的位置
+        if (this.tag == 'button' && this.string == '查看明细') {
+            location = export_columns_keys.length
         }
     });
     export_rows.push(export_columns_names);
@@ -115,6 +120,12 @@ function button_export_action () {
     export_rows = export_rows.concat(compute_main_data(rows,export_columns_keys));
     var amount = view.$el.find('.o_list_view > tfoot > tr');
     export_rows = export_rows.concat(compute_footer_data(amount,export_columns_keys));
+    // 排除掉 查看明细 按钮所在的列
+    if (location != 0) {
+        for (var i = 0; i < export_rows.length; i++) {
+            export_rows[i].splice(location-1, 1);
+        }
+    }
     new Model('report.template').call('get_time', [this.model], {
                 context: this.dataset.context
             }).done(function (data) {
