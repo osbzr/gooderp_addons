@@ -81,12 +81,20 @@ class BuyOrder(models.Model):
     @api.one
     def _get_paid_amount(self):
         '''计算购货订单付款/退款状态'''
-        receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
-        money_order_rows = self.env['money.order'].search([('buy_id', '=', self.id),
-                                                           ('reconciled', '!=', 0),
-                                                           ('state', '=', 'done')])
-        self.paid_amount = sum([receipt.invoice_id.reconciled for receipt in receipts]) +\
-            sum([order_row.amount for order_row in money_order_rows])
+        if not self.invoice_by_receipt: # 分期付款时
+            money_orders = self.env['money.order'].search([
+                ('buy_id', '=', self.id),
+                ('reconciled', '!=', 0),
+                ('state', '=', 'done')])
+            self.paid_amount = sum([order.amount for order in money_orders])
+        else:
+            receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
+            # 购货订单上输入预付款时
+            money_order_rows = self.env['money.order'].search([('buy_id', '=', self.id),
+                                                               ('reconciled', '=', 0),
+                                                               ('state', '=', 'done')])
+            self.paid_amount = sum([receipt.invoice_id.reconciled for receipt in receipts]) +\
+                sum([order_row.amount for order_row in money_order_rows])
 
     @api.depends('receipt_ids')
     def _compute_receipt(self):

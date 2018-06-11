@@ -68,7 +68,7 @@ class SellOrder(models.Model):
         deliverys = self.env['sell.delivery'].search(
             [('order_id', '=', self.id)])
         money_order_rows = self.env['money.order'].search([('sell_id', '=', self.id),
-                                                           ('reconciled', '!=', 0),
+                                                           ('reconciled', '=', 0),
                                                            ('state', '=', 'done')])
         self.received_amount = sum([delivery.invoice_id.reconciled for delivery in deliverys]) +\
             sum([order_row.amount for order_row in money_order_rows])
