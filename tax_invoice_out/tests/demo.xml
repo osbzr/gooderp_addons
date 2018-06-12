@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--销售发票-->
+        <record id="sell_invoice" model="tax.invoice.out">
+            <field name='name' ref='finance.period_201601'/>
+        </record>
+    </data>
+</openerp>

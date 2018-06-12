@@ -17,6 +17,7 @@
         'security/ir.model.access.csv',
     ],
     'demo': [
+        'tests/demo.xml',
     ],
     'qweb': [
         "static/src/xml/*.xml",
