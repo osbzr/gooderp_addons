@@ -198,7 +198,7 @@ class cn_account_invoice(models.Model):
             'partner_id': buy_partner_id.id,
             'date': date,
             'planned_date': self.invoice_confirm_date,
-            'warehouse_dest_id': self.env['warehouse'].search([('type', '=', 'stock')]).id,
+            'warehouse_dest_id': self.env['warehouse'].search([('type', '=', 'stock')], limit=1).id,
         })
         if self.line_ids:
             for line in self.line_ids:
