@@ -1076,7 +1076,7 @@ class ReconcileOrder(models.Model):
             if order.state == 'done':
                 raise UserError(u'核销单%s已确认，不能再次确认。' % order.name)
             order_reconcile, invoice_reconcile = 0, 0
-            if self.business_type in ['get_to_get', 'pay_to_pay'] and order.partner_id == order.to_partner_id:
+            if order.business_type in ['get_to_get', 'pay_to_pay'] and order.partner_id == order.to_partner_id:
                 raise UserError(u'业务伙伴和转入往来单位不能相同。\n业务伙伴:%s 转入往来单位:%s'
                                 % (order.partner_id.name, order.to_partner_id.name))
 
@@ -1107,7 +1107,7 @@ class ReconcileOrder(models.Model):
                                  order.to_partner_id, order.name)
 
             # 核销金额必须相同
-            if self.business_type in ['adv_pay_to_get',
+            if order.business_type in ['adv_pay_to_get',
                                       'adv_get_to_pay', 'get_to_pay']:
                 decimal_amount = self.env.ref('core.decimal_amount')
                 if float_compare(order_reconcile, invoice_reconcile, precision_digits=decimal_amount.digits) != 0:
@@ -1115,6 +1115,62 @@ class ReconcileOrder(models.Model):
                                     % (order_reconcile, invoice_reconcile))
 
             order.state = 'done'
+        return True
+
+    @api.multi
+    def _get_or_pay_cancel(self, line, business_type, name):
+        """
+        反核销时 对具体核销单行进行的操作
+        """
+        # 每一行的已核销金额减少、未核销金额增加
+        line.name.to_reconcile += line.this_reconcile
+        line.name.reconciled -= line.this_reconcile
+
+        # 应收转应收、应付转应付，找到生成的结算单反审核并删除
+        if business_type in ['get_to_get', 'pay_to_pay']:
+            invoices = self.env['money.invoice'].search([('name', '=', name)])
+            for inv in invoices:
+                inv.money_invoice_draft()
+                inv.unlink()
+        return True
+
+    @api.multi
+    def reconcile_order_draft(self):
+        ''' 核销单的反审核按钮 '''
+        for order in self:
+            if order.state == 'draft':
+                raise UserError(u'核销单%s已撤销，不能再次撤销。' % order.name)
+            order_reconcile, invoice_reconcile = 0, 0
+            if order.business_type in ['get_to_get', 'pay_to_pay'] and order.partner_id == order.to_partner_id:
+                raise UserError(u'业务伙伴和转入往来单位不能相同。\n业务伙伴:%s 转入往来单位:%s'
+                                % (order.partner_id.name, order.to_partner_id.name))
+
+            # 反核销预收预付
+            for line in order.advance_payment_ids:
+                order_reconcile += line.this_reconcile
+                # 每一行的已核销余额减少、未核销余额增加
+                line.name.to_reconcile += line.this_reconcile
+                line.name.reconciled -= line.this_reconcile
+            # 反核销应收行
+            for line in order.receivable_source_ids:
+                invoice_reconcile += line.this_reconcile
+                self._get_or_pay_cancel(line, order.business_type, order.name)
+            # 反核销应付行
+            for line in order.payable_source_ids:
+                if order.business_type == 'adv_get_to_pay':
+                    invoice_reconcile += line.this_reconcile
+                else:
+                    order_reconcile += line.this_reconcile
+                self._get_or_pay_cancel(line, order.business_type, order.name)
+
+            # 反核销时，金额必须相同
+            if self.business_type in ['adv_pay_to_get', 'adv_get_to_pay', 'get_to_pay']:
+                decimal_amount = self.env.ref('core.decimal_amount')
+                if float_compare(order_reconcile, invoice_reconcile, precision_digits=decimal_amount.digits) != 0:
+                    raise UserError(u'反核销时，金额必须相同, %s 不等于 %s'
+                                    % (order_reconcile, invoice_reconcile))
+
+            order.state = 'draft'
         return True
 
 
