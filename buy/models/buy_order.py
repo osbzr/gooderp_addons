@@ -82,11 +82,10 @@ class BuyOrder(models.Model):
     def _get_paid_amount(self):
         '''计算购货订单付款/退款状态'''
         if not self.invoice_by_receipt: # 分期付款时
-            money_orders = self.env['money.order'].search([
-                ('buy_id', '=', self.id),
-                ('reconciled', '!=', 0),
+            money_invoices = self.env['money.invoice'].search([
+                ('name', '=', self.name),
                 ('state', '=', 'done')])
-            self.paid_amount = sum([order.amount for order in money_orders])
+            self.paid_amount = sum([invoice.reconciled for invoice in money_invoices])
         else:
             receipts = self.env['buy.receipt'].search([('order_id', '=', self.id)])
             # 购货订单上输入预付款时
@@ -105,7 +104,9 @@ class BuyOrder(models.Model):
     @api.depends('receipt_ids')
     def _compute_invoice(self):
         for order in self:
-            order.invoice_ids = order.receipt_ids.mapped('invoice_id')
+            money_invoices = self.env['money.invoice'].search([
+                ('name', '=', order.name)])
+            order.invoice_ids = not money_invoices and order.receipt_ids.mapped('invoice_id') or money_invoices + order.receipt_ids.mapped('invoice_id')
             order.invoice_count = len(order.invoice_ids.ids)
 
     @api.one
@@ -729,5 +730,6 @@ class Payment(models.Model):
                 'reconciled': 0,
                 'to_reconcile': self.amount_money,
                 'state': 'draft',
+                'buy_id': self.buy_id.id,
             })
         self.date_application = datetime.now()
