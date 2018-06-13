@@ -25,6 +25,7 @@
                 <form string="Reconcile Order">
                 <header>
                 	<button name="reconcile_order_done" states="draft" string="确认" type="object" class="oe_highlight"/>
+                    <button name="reconcile_order_draft" states="done" string="撤销" type="object" class="oe_highlight"/>
                     <button name="action_cancel" states="draft" string="作废" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done" readonly="1"/>
                 </header>

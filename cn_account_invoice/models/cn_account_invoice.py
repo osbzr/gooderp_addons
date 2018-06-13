@@ -130,8 +130,8 @@ class cn_account_invoice(models.Model):
                 if not goods_id:
                     self.env['goods'].create({
                         'name': goods,
-                        'uom_id': uom_id.id or '',
-                        'uos_id': uom_id.id or '',
+                        'uom_id': uom_id and uom_id.id,
+                        'uos_id': uom_id and uom_id.id,
                         # 'tax_rate': float(in_xls_data.get(u'税率')),
                         'category_id': category_id and category_id.id,
                         'computer_import': True,
@@ -150,7 +150,7 @@ class cn_account_invoice(models.Model):
                 ('name', '=', self.partner_name_in)])
         default_goods_supplier = self.env['ir.values'].get_default('tax.config.settings', 'default_goods_supplier')
         if not default_goods_supplier:
-            raise UserError(u'请设置默认产品供应商！')
+            raise UserError(u'请设置默认供应商类别！')
         if not partner_id:
             partner_id = self.env['partner'].create({
                 'name': self.partner_name_in,
@@ -192,7 +192,7 @@ class cn_account_invoice(models.Model):
                 ('name', '=', self.partner_name_out)])
         default_customer = self.env['ir.values'].get_default('tax.config.settings', 'default_customer')
         if not default_customer:
-            raise UserError(u'请设置默认产品供应商！')
+            raise UserError(u'请设置默认客户类别！')
         if not partner_id:
             partner_id = self.env['partner'].create({
                 'name': self.partner_name_out,
