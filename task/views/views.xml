@@ -344,17 +344,16 @@
 			<field name="arch" type="xml">
 				<form string="timeline">
 					<sheet>
-						<field name="task_id" placeholder="任务" domain="[('user_id', 'in', [uid, False]),('status.state', '!=', 'done')]"/>
-						<field name="just_done" placeholder="具体内容"/>
-						<div>
-							<field name="hours" placeholder="小时数" groups='task.group_task_hours' class="oe_inline"/>
-							<label string="小时"/>
-						</div>
-						<field name='next_action' placeholder="下一步计划"/>
-						<field name='next_datetime' placeholder="下一步计划时间"/>
-						<field name='set_status' placeholder="状态更新到"/>
-						<field name='user_id' placeholder="指派给"/>
-						<field name="create_date" string='创建时间' readonly='1'/>
+						<group>
+							<field name="task_id" domain="[('user_id', 'in', [uid, False]),('status.state', '!=', 'done')]"/>
+							<field name="just_done"/>
+							<field name="hours" groups='task.group_task_hours' class="oe_inline"/>
+							<field name='next_action'/>
+							<field name='next_datetime'/>
+							<field name='set_status'/>
+							<field name='user_id'/>
+							<field name="create_date" string="创建时间" readonly='1'/>
+						</group>
 					</sheet>
 				</form>
 			</field>
