@@ -150,7 +150,7 @@ class cn_account_invoice(models.Model):
                 ('name', '=', self.partner_name_in)])
         default_goods_supplier = self.env['ir.values'].get_default('tax.config.settings', 'default_goods_supplier')
         if not default_goods_supplier:
-            raise UserError(u'请设置默认产品供应商！')
+            raise UserError(u'请设置默认供应商类别！')
         if not partner_id:
             partner_id = self.env['partner'].create({
                 'name': self.partner_name_in,
