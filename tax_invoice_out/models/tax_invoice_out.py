@@ -56,6 +56,7 @@ class tax_invoice_out(models.Model):
 
     @api.multi
     def invoice_to_sell(self):
+        '''反推订单'''
         for invoice in self.line_ids:
             invoice.create_uom()
             invoice.create_category()
@@ -66,14 +67,20 @@ class tax_invoice_out(models.Model):
 
     @api.multi
     def tax_invoice_draft(self):
-        self.state = 'draft'
+        for rec in self:
+            if rec.state == 'draft':
+                raise UserError(u'请不要重复反确认')
+            rec.state = 'draft'
 
     @api.multi
     def tax_invoice_done(self):
-        for line in self.line_ids:
-            if not line.sell_id:
-                raise UserError(u'发票号码：%s未下推生成销售订单！'%line.name)
-        self.state = 'done'
+        for rec in self:
+            if rec.state == 'done':
+                raise UserError(u'请不要重复确认')
+            for line in rec.line_ids:
+                if not line.sell_id:
+                    raise UserError(u'发票号码：%s未下推生成销售订单！'%line.name)
+            rec.state = 'done'
 
     #引入EXCEL的wizard的button
     @api.multi
@@ -112,7 +119,7 @@ class cn_account_invoice(models.Model):
             'partner_id': partner_id.id,
             'date': date,
             'delivery_date': self.invoice_date,
-            'warehouse_id': self.env['warehouse'].search([('type', '=', 'stock')]).id,
+            'warehouse_id': self.env['warehouse'].search([('type', '=', 'stock')], limit=1).id,
         })
         for line in self.line_ids:
             goods_id = self.env['goods'].search([('name', '=', line.product_name)], limit=1)
@@ -139,7 +146,7 @@ class cn_account_invoice(models.Model):
 
 
 #导入金穗发票，生成销售发票及明细
-class create_slae_invoice_wizard(models.TransientModel):
+class create_sale_invoice_wizard(models.TransientModel):
     _name = 'create.sale.invoice.wizard'
     _description = 'Sale Invoice Import'
 
@@ -182,7 +189,7 @@ class create_slae_invoice_wizard(models.TransientModel):
             product_count = in_xls_data.get(u'数量')
             product_price = in_xls_data.get(u'单价')
             product_amount = float(in_xls_data.get(u'金额'))
-            product_tax_rate = float(in_xls_data.get(u'税率')[:-1])
+            product_tax_rate = float(in_xls_data.get(u'税率') != '' and in_xls_data.get(u'税率')[:-1])
             product_tax = float(in_xls_data.get(u'税额'))
             have_type = goods.split('*')
             if len(have_type) > 1:
@@ -201,8 +208,8 @@ class create_slae_invoice_wizard(models.TransientModel):
                     'type': 'out',
                     'partner_name_out': partner_name,
                     'partner_code_out': str(in_xls_data.get(u'购方税号')),
-                    'partner_address_out':str(in_xls_data.get(u'地址电话')),
-                    'partner_bank_number_out': str(in_xls_data.get(u'银行账号')),
+                    'partner_address_out': in_xls_data.get(u'地址电话'),
+                    'partner_bank_number_out': in_xls_data.get(u'银行账号'),
                     'invoice_code': invoice_code,
                     'name': str(in_xls_data.get(u'发票号码')),
                     'invoice_date': self.excel_date(in_xls_data.get(u'开票日期')),
