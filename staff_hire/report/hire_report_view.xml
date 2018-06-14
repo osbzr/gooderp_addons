@@ -65,7 +65,6 @@
                     <field name="stage_id"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="date_create"/>
-                    <!--<field name="date_closed"/>-->
                 </group>
                 <group expand="1" string="Group By">
                    <filter string="Responsible" name='User' context="{'group_by':'user_id'}"/>

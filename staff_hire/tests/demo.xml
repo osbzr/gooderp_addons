@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--招聘申请-->
+        <record id="hire_lucy" model="hire.applicant">
+        	<field name="partner_name">Lucy</field>
+        	<field name="partner_mobile">18899996666</field>
+            <field name='job_id' ref='staff.staff_job_1'/>
+            <field name="salary_proposed">3000</field>
+        </record>
+    </data>
+</openerp>

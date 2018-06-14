@@ -22,6 +22,7 @@
     ],
     # only loaded in demonstration mode
     'demo': [
+        'tests/demo.xml',
     ],
     'installable': True,
     'application': False,
