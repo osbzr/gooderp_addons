@@ -32,14 +32,6 @@ class staff_hire_stage(models.Model):
         u"在招聘管道收起",
         help=u"当这个阶段中没有任何记录要呈现的时候，这个阶段在看板视图中被折叠起来")
 
-    @api.model
-    def default_get(self, fields):
-        if self._context and self._context.get('default_job_id') and not self._context.get('staff_hire_stage_mono', False):
-            context = dict(self._context)
-            context.pop('default_job_id')
-            self = self.with_context(context)
-        return super(staff_hire_stage, self).default_get(fields)
-
 
 class hire_applicant(models.Model):
     _name = "hire.applicant"
@@ -51,7 +43,10 @@ class hire_applicant(models.Model):
     def _default_stage_id(self):
         '''返回阶段的默认值'''
         ids = self.env['staff.hire.stage'].search([
+            '|',
             ('job_id', '=', False),
+            ('job_id', '=', self.job_id.id),
+            ('fold', '=', False),
         ], order='sequence asc', limit=1).ids
         if ids:
             return ids[0]
@@ -102,9 +97,9 @@ class hire_applicant(models.Model):
                                 context={'type': 'hire_source'}
                                 )
 
-
     @api.multi
     def _get_attachment_number(self):
+        '''计算简历个数'''
         read_group_res = self.env['ir.attachment'].read_group(
             [('res_model', '=', 'hire.applicant'), ('res_id', 'in', self.ids)],
             ['res_id'], ['res_id'])
@@ -114,11 +109,8 @@ class hire_applicant(models.Model):
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
-        # retrieve job_id from the context and write the domain: ids + contextual columns (job or default)
-        job_id = self._context.get('default_job_id')
+        '''看板视图上显示所有阶段（即使该阶段没有招聘记录）'''
         search_domain = [('job_id', '=', False)]
-        if job_id:
-            search_domain = ['|', ('job_id', '=', job_id)] + search_domain
         if stages:
             search_domain = ['|', ('id', 'in', stages.ids)] + search_domain
 
@@ -180,9 +172,7 @@ class hire_applicant(models.Model):
 
     @api.multi
     def action_makeMeeting(self):
-        """ This opens Meeting's calendar view to schedule meeting on current applicant
-            @return: Dictionary value for created Meeting view
-        """
+        """ 打开会议的日历视图来安排当前申请人的会议"""
         self.ensure_one()
         partners = self.user_id.partner_id | self.department_id.manager_id.user_id.partner_id
 
@@ -198,6 +188,7 @@ class hire_applicant(models.Model):
 
     @api.multi
     def action_get_attachment_tree_view(self):
+        '''查看简历'''
         attachment_action = self.env.ref('base.action_attachment')
         action = attachment_action.read()[0]
         action['context'] = {'default_res_model': self._name, 'default_res_id': self.ids[0]}
@@ -207,6 +198,7 @@ class hire_applicant(models.Model):
 
     @api.multi
     def _track_subtype(self, init_values):
+        '''员工或阶段变更时消息作相应更新'''
         record = self[0]
         if 'staff_id' in init_values and record.staff_id:
             return 'staff_hire.mt_applicant_hired'
