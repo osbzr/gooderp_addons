@@ -49,25 +49,13 @@ class hire_applicant(models.Model):
     _rec_name = 'partner_name'
 
     def _default_stage_id(self):
-        if self._context.get('default_job_id'):
-            ids = self.env['staff.hire.stage'].search([
-                '|',
-                ('job_id', '=', False),
-                ('job_id', '=', self._context['default_job_id']),
-                ('fold', '=', False)
-            ], order='sequence asc', limit=1).ids
-            if ids:
-                return ids[0]
+        '''返回阶段的默认值'''
+        ids = self.env['staff.hire.stage'].search([
+            ('job_id', '=', False),
+        ], order='sequence asc', limit=1).ids
+        if ids:
+            return ids[0]
         return False
-
-    def _default_company_id(self):
-        company_id = False
-        if self._context.get('default_department_id'):
-            department = self.env['staff.department'].browse(self._context['default_department_id'])
-            company_id = department.company_id.id
-        if not company_id:
-            company_id = self.env['res.company']._company_default_get('hire.applicant')
-        return company_id
 
     active = fields.Boolean(u"有效", default=True, help=u"如果“有效”字段设为false，它对信息进行隐藏但不删除它。")
     note = fields.Text(u"备注")
@@ -83,10 +71,8 @@ class hire_applicant(models.Model):
                                  domain=[('type', '=', 'hire_categ')],
                                  context={'type': 'hire_categ'}
                                  )
-    company_id = fields.Many2one('res.company', u"公司", default=_default_company_id)
+    company_id = fields.Many2one('res.company', u"公司", default=lambda self: self.env['res.company']._company_default_get())
     user_id = fields.Many2one('res.users', u"负责人", track_visibility="onchange", default=lambda self: self.env.uid)
-    # date_closed = fields.Datetime(u"关闭日期", readonly=True, index=True)
-    # date_open = fields.Datetime(u"开启日期", readonly=True, index=True)
     date_last_stage_update = fields.Datetime(u"最终阶段更新时间", index=True, default=fields.Datetime.now)
     date_action = fields.Date(u"下步计划日期")
     title_action = fields.Char(u"下步计划", size=64)
@@ -141,12 +127,14 @@ class hire_applicant(models.Model):
 
     @api.onchange('job_id')
     def onchange_job_id(self):
+        '''选择职位，带出部门、负责人及阶段'''
         vals = self._onchange_job_id_internal(self.job_id.id)
         self.department_id = vals['value']['department_id']
         self.user_id = vals['value']['user_id']
         self.stage_id = vals['value']['stage_id']
 
     def _onchange_job_id_internal(self, job_id):
+        '''选择职位具体实现'''
         department_id = False
         user_id = False
         stage_id = self.stage_id.id
@@ -169,33 +157,11 @@ class hire_applicant(models.Model):
             'stage_id': stage_id
         }}
 
-    def _onchange_stage_id_internal(self, stage_id):
-        if not stage_id:
-            return {'value': {}}
-        stage = self.env['staff.hire.stage'].browse(stage_id)
-        if stage.fold:
-            return {'value': {'date_closed': fields.datetime.now()}}
-        return {'value': {'date_closed': False}}
-
-    @api.model
-    def create(self, vals):
-        if vals.get('department_id') and not self._context.get('default_department_id'):
-            self = self.with_context(default_department_id=vals.get('department_id'))
-        if vals.get('job_id') or self._context.get('default_job_id'):
-            job_id = vals.get('job_id') or self._context.get('default_job_id')
-            for key, value in self._onchange_job_id_internal(job_id)['value'].iteritems():
-                if key not in vals:
-                    vals[key] = value
-        if 'stage_id' in vals:
-            vals.update(self._onchange_stage_id_internal(vals.get('stage_id'))['value'])
-        return super(hire_applicant, self.with_context(mail_create_nolog=True)).create(vals)
-
     @api.multi
     def write(self, vals):
         # stage_id: track last stage before update
         if 'stage_id' in vals:
             vals['date_last_stage_update'] = fields.Datetime.now()
-            vals.update(self._onchange_stage_id_internal(vals.get('stage_id'))['value'])
             for applicant in self:
                 vals['last_stage_id'] = applicant.stage_id.id
                 res = super(hire_applicant, self).write(vals)
@@ -252,7 +218,7 @@ class hire_applicant(models.Model):
 
     @api.multi
     def create_employee_from_applicant(self):
-        """ Create an staff from the hire.applicants """
+        """ 创建员工 """
         staff = False
         for applicant in self:
             if not applicant.salary_proposed:
