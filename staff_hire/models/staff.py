@@ -11,15 +11,20 @@ class staff(models.Model):
 
     @api.multi
     def _compute_newly_hired_staff(self):
+        '''计算新进员工数'''
         read_group_result = self.env['hire.applicant'].read_group(
-            [('staff_id', 'in', self.ids), ('job_id.state', '=', 'recruit')],
+            [('staff_id', 'in', self.ids), ('job_id.state', '=', 'open')],
             ['staff_id'], ['staff_id'])
         result = dict((data['staff_id'], data['staff_id_count'] > 0) for data in read_group_result)
+
         for record in self:
-            record.newly_hired_staff = result.get(record.id, False)
+            # record.newly_hired_staff = result.get(record.id, False)
+            for key, value in result.iteritems():
+                if record.id in key:
+                    record.newly_hired_staff = True
 
     def _search_newly_hired_staff(self, operator, value):
-        applicants = self.env['hire.applicant'].search([('job_id.state', '=', 'recruit')])
+        applicants = self.env['hire.applicant'].search([('job_id.state', '=', 'open')])
         return [('id', 'in', applicants.ids)]
 
     # @api.multi

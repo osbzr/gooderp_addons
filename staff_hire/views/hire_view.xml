@@ -301,9 +301,9 @@
         <field name="arch" type="xml">
             <sheet position="before">
                 <header>
-                    <button name="set_recruit" string="启动招聘" states="open" type="object" class="oe_highlight" groups="base.group_user"/>
-                    <button name="set_open" string="结束招聘" states="recruit" type="object" groups="base.group_user"/>
-                    <field name="state" widget="statusbar" statusbar_visible="recruit,open"/>
+                    <button name="set_open" string="启动招聘" states="close" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="set_close" string="结束招聘" states="open" type="object" groups="base.group_user"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,close"/>
                 </header>
             </sheet>
             <group name="staff_data" position="inside">
