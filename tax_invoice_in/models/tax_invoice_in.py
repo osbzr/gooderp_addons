@@ -58,9 +58,9 @@ class tax_invoice_in(models.Model):
         total = 0
         for line in self.line_ids:
             if line.is_deductible:
-                total = total + 0
+                total += 0
             else:
-                total = total +line.invoice_tax
+                total = total + line.invoice_tax
         self.tax_amount = total
 
     #由发票生成采购订单
@@ -101,7 +101,7 @@ class tax_invoice_in(models.Model):
     def tax_invoice_done(self):
         for line in self.line_ids:
             if not line.buy_id:
-                raise UserError(u'发票号码：%s未下推生成采购订单！'%line.name)
+                raise UserError(u'发票号码：%s未下推生成采购订单！' % line.name)
         self.state = 'done'
 
 
@@ -125,7 +125,7 @@ class create_cn_account_invoice_wizard(models.TransientModel):
         table = xls_data.sheets()[0]
         ncows = table.nrows
         ncols = 0
-        colnames =  table.row_values(0)
+        colnames = table.row_values(0)
         list =[]
         #数据读入，过滤没有开票日期的行
         for rownum in range(1,ncows):
