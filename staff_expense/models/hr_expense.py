@@ -137,7 +137,6 @@ class hr_expense(models.Model):
 
         self.state = 'draft'
 
-
     @api.one
     def to_money_invoice(self):
         tax = 0
@@ -277,6 +276,7 @@ class hr_expense_line(models.Model):
         barcode = barcode.replace(u'，', ',')
         barcode = barcode.replace(u'。', '.')
         code = barcode.split(',')
+        invoice_heck_code = ''
         if len(code) < 5:
             raise UserError(u"请确认扫描是否正确%s" % code)
         if code[0] == '01':
@@ -294,13 +294,13 @@ class hr_expense_line(models.Model):
             invoice_date = code[5]
             invoice_tax = 0
         self.browse(order_id).write({
-            'invoice_type':invoice_type,
+            'invoice_type': invoice_type,
             'invoice_code': invoice_code,
             'invoice_name': invoice_name,
             'invoice_amount': invoice_amount,
             'invoice_tax': invoice_tax,
-            'invoice_heck_code':invoice_heck_code,
-            'invoice_date':invoice_date
+            'invoice_heck_code': invoice_heck_code,
+            'invoice_date': invoice_date
         })
 
     @api.multi

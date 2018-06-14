@@ -14,14 +14,41 @@ class TestHrExpenseLine(TransactionCase):
         ''' Audit expense invoice '''
         self.expense_line.hr_expense_line_confirm()
 
+        # 不能重复确认
+        with self.assertRaises(UserError):
+            self.expense_line.hr_expense_line_confirm()
+
     def test_hr_expense_line_draft(self):
         ''' Anti audit expense invoice '''
         self.expense_line.hr_expense_line_confirm()
         self.expense_line.hr_expense_line_draft()
 
+        # 不能重复撤销
+        with self.assertRaises(UserError):
+            self.expense_line.hr_expense_line_draft()
+
     def test_action_get_attachment_view(self):
         ''' Uploading attachments of expense invoice '''
         self.expense_line.action_get_attachment_view()
+
+    def test_saomiaofapiao(self):
+        ''' Test: saomiaofapiao  '''
+        model_name = 'hr.expense.line'
+        order_id = self.expense_line.id
+
+        # 请确认扫描是否正确 报错
+        barcode = '01,10,033001600211,11255692'
+        with self.assertRaises(UserError):
+            self.expense_line.saomiaofapiao(model_name, barcode, order_id)
+
+        barcode = '01,10,033001600211,11255692,349997.85,20180227,62521957050111533932,7DF9,'
+        self.expense_line.saomiaofapiao(model_name, barcode, order_id)
+
+        barcode = '01,01,033001600211,11255692,349997.85,20180227,62521957050111533932,7DF9,'
+        self.expense_line.saomiaofapiao(model_name, barcode, order_id)
+
+        barcode = '01,04,033001600211,11255692,349997.85,20180227,62521957050111533932,7DF9,'
+        self.expense_line.saomiaofapiao(model_name, barcode, order_id)
 
 
 class TestHrExpense(TransactionCase):
@@ -44,11 +71,20 @@ class TestHrExpense(TransactionCase):
         # 支付方式是 付给报销人
         self.expense.hr_expense_confirm()
 
+        # 不能重复确认
+        with self.assertRaises(UserError):
+            self.expense.hr_expense_confirm()
+
+        self.expense.hr_expense_draft()
+        self.expense_line.invoice_type = 'zy'
+        self.expense.hr_expense_confirm()
+
     def test_hr_expense_confirm_to_company(self):
         ''' Audit employee reimbursement: to company '''
         # 支付方式是 付给公司
         self.expense.type = 'company'
         self.expense.partner_id = self.env.ref('core.lenovo').id
+        self.expense_line.invoice_type = 'dz'
         self.expense.hr_expense_confirm()
 
     def test_hr_expense_draft_to_employee(self):
@@ -57,6 +93,10 @@ class TestHrExpense(TransactionCase):
         # 反审核员工报销
         self.expense.hr_expense_draft()
 
+        # 不能重复撤销
+        with self.assertRaises(UserError):
+            self.expense.hr_expense_draft()
+
     def test_hr_expense_draft_to_company(self):
         ''' Anti audit expense invoice: to company '''
         self.expense.type = 'company'
@@ -64,3 +104,17 @@ class TestHrExpense(TransactionCase):
         self.expense.hr_expense_confirm()
         # 反审核员工报销
         self.expense.hr_expense_draft()
+
+    def test_unlink(self):
+        ''' Test: unlink  '''
+        # 只能删除草稿状态的费用报销单
+        with self.assertRaises(UserError):
+            self.expense.hr_expense_confirm()
+            self.expense.unlink()
+        self.expense.hr_expense_draft()
+        self.expense.unlink()
+
+    def test_state_to_done(self):
+        ''' Test: _state_to_done  '''
+        self.expense.hr_expense_confirm()
+        self.expense.other_money_order.other_money_done()
