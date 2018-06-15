@@ -16,7 +16,8 @@
         'views/hire_applicant_view.xml',
         'views/staff_job_view.xml',
     ],
-    'demo': [
+    'demo': ['tests/demo.xml',
+
     ],
     'installable': True,
     'application': False,
