@@ -55,12 +55,13 @@ class BuyPaymentWizard(models.TransientModel):
 
     def _compute_payment(self, receipt):
         '''计算该入库单的已付款和应付款余额'''
-        payment = 0
-        for order in self.env['money.order'].search(
-                [('state', '=', 'done')], order='name'):
-            for source in order.source_ids:
-                if source.name.name == receipt.name:
-                    payment += source.this_reconcile
+        # 查找入库单产生的结算单
+        domain = [('name', '=', receipt.name), ('state', '=', 'done')]
+        if receipt.order_id:    # 查找购货订单产生的结算单
+            domain = ['|',  '&', ('name', '=', receipt.name), ('state', '=', 'done'),
+                      '&', ('name', '=', receipt.order_id.name), ('state', '=', 'done')]
+        invoices = self.env['money.invoice'].search(domain)
+        payment = sum([invoice.reconciled for invoice in invoices])
         return payment
 
     def _compute_payment_rate(self, payment, amount):
