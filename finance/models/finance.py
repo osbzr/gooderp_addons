@@ -276,14 +276,6 @@ class VoucherLine(models.Model):
         return res
 
     @api.multi
-    def unlink(self):
-        for active_voucher_line in self:
-            if active_voucher_line.voucher_id.state == 'done':
-                raise UserError(u'不能删除已确认的凭证行\n 所属凭证%s  凭证行摘要%s'
-                                % (active_voucher_line.voucher_id.name, active_voucher_line.name))
-        return super(VoucherLine, self).unlink()
-
-    @api.multi
     def view_document(self):
         self.ensure_one()
         return {
@@ -316,15 +308,10 @@ class VoucherLine(models.Model):
 
         inner_account_credit = [ acc for acc in account_ids if acc in prohibit_account_credit_ids]
 
-        # if self.debit and self.credit:
-        #     raise UserError( u'不可以同时录入 贷方和借方')
-
         if self.debit and not self.credit and inner_account_debit:
-            _logger.info('inner accounts  %s'%inner_account_credit)
             raise UserError(u'借方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name,inner_account_debit[0].restricted_debit_msg))
 
         if not self.debit and self.credit and inner_account_credit:
-            _logger.info('inner accounts  %s'%inner_account_credit)
             raise UserError(u'贷方禁止科目: %s-%s \n\n 提示：%s '% (self.account_id.code, self.account_id.name, inner_account_credit[0].restrict_credit_msg))
 
     @api.model
@@ -545,7 +532,6 @@ class FinanceAccountType(models.Model):
         ('equity', u'所有者权益'),
         ('in', u'收入类'),
         ('out', u'费用类'),
-        # ('inout', u'收入费用类'),
         ('cost', u'成本类'),
     ], u'类型', required="1", help=u'用于会计报表的生成。')
 
@@ -591,6 +577,7 @@ class FinanceAccount(models.Model):
 
     @api.multi
     def get_balance(self, period_id=False):
+        ''' 科目当前或某期间的借方、贷方、差额 '''
         self.ensure_one()
         domain =[]
         data = {}
@@ -645,7 +632,6 @@ class FinanceAccount(models.Model):
         ('equity', u'所有者权益'),
         ('in', u'收入类'),
         ('out', u'费用类'),
-        # ('inout', u'收入费用类'),
         ('cost', u'成本类'),
     ], u'类型', required="1", help=u'废弃不用，改为使用 user_type字段 动态维护', related='user_type.costs_types')
     account_type = fields.Selection(string=u'科目类型', selection=[('view', 'View'), ('normal', 'Normal')], default='normal')

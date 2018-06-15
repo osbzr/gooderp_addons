@@ -157,6 +157,13 @@ class TestMoneyOrder(TransactionCase):
         self.env.ref('core.supplier_category_1').account_id = False
         with self.assertRaises(UserError):
             self.env.ref('money.pay_2000').money_order_done()
+    
+    def test_money_order_done_no_partner_account(self):
+        ''' 测试收款审核选定的客户没有指定科目  '''
+        # 收款
+        self.env.ref('core.customer_category_1').account_id = False
+        with self.assertRaises(UserError):
+            self.env.ref('money.get_40000').money_order_done()
 
     def test_get_category_id(self):
         ''' 测试  _get_category_id 不存在 context.get('type')'''
