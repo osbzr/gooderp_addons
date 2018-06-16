@@ -42,6 +42,15 @@ class tax_invoice_in(TransactionCase):
                                           self.env.ref('core.supplier_category_1').id)
         self.tax_invoice_in.invoice_to_buy()
 
+        # test: _compute_tax_amount
+        for line in self.tax_invoice_in.line_ids:
+            line.is_deductible = True
+            break
+
+    def test_write(self):
+        ''' Test: Write '''
+        self.tax_invoice_in.name = self.env.ref('finance.period_201604').id
+
     def test_tax_invoice_done(self):
         ''' Test: tax_invoice_done '''
         self.invoice_wizard.with_context({'active_id': self.tax_invoice_in.id}).create_cn_account_invoice()

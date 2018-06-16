@@ -174,8 +174,8 @@ class cn_account_invoice(models.Model):
             bank_number = self.split_number(self.partner_bank_number_in)
             partner_id.write({'bank_num': bank_number})
         if self.partner_bank_number_in and not (partner_id.bank_num or partner_id.bank_name):
-            if self.bank_num:
-                to_del_bank_number = len(self.bank_num)
+            if partner_id.bank_num:
+                to_del_bank_number = len(partner_id.bank_num)
             else:
                 to_del_bank_number = 0
             bank_name = self.partner_bank_number_in[:-to_del_bank_number]

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!--招聘申请-->
+        <record id="hire_lucy" model="hire.applicant">
+        	<field name="partner_name">Lucy</field>
+        	<field name="partner_mobile">18899996666</field>
+            <field name='job_id' ref='staff.staff_job_1'/>
+            <field name="salary_proposed">3000</field>
+        </record>
+        <record model="staff.hire.stage" id="stage_job1">
+            <field name="name">初选</field>
+            <field name="sequence">1</field>
+        </record>
+        <record model="staff.hire.stage" id="stage_job2">
+            <field name="name">一面</field>
+            <field name="template_id" ref="email_template_data_applicant_interest"/>
+            <field name="sequence">2</field>
+        </record>
+        <record model="staff.hire.stage" id="stage_job3">
+            <field name="name">二面</field>
+            <field name="sequence">3</field>
+        </record>
+        <record model="staff.hire.stage" id="stage_job4">
+            <field name="name">终面</field>
+            <field name="sequence">4</field>
+        </record>
+        <record model="staff.hire.stage" id="stage_job5">
+            <field name="name">已签合同</field>
+            <field name="sequence">5</field>
+            <field name="fold" eval="True"/>
+        </record>
+    </data>
+</openerp>

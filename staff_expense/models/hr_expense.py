@@ -137,17 +137,16 @@ class hr_expense(models.Model):
 
         self.state = 'draft'
 
-
     @api.one
     def to_money_invoice(self):
         tax = 0
         bill_number = ''
         for line in self.line_ids:
-            if line.invoice_type =='zy':
+            if line.invoice_type == 'zy':
                 tax += line.invoice_tax
             if line.invoice_name:
-                bill_number ='%s,%s'%(line.invoice_name,bill_number)
-            #todo 测试一下
+                bill_number = '%s, %s' % (line.invoice_name, bill_number)
+        # todo 测试一下
         money_invoice = self.env['money.invoice'].create({
             'name': self.name,
             'partner_id': self.partner_id.id,
@@ -277,6 +276,7 @@ class hr_expense_line(models.Model):
         barcode = barcode.replace(u'，', ',')
         barcode = barcode.replace(u'。', '.')
         code = barcode.split(',')
+        invoice_heck_code = ''
         if len(code) < 5:
             raise UserError(u"请确认扫描是否正确%s" % code)
         if code[0] == '01':
@@ -294,13 +294,13 @@ class hr_expense_line(models.Model):
             invoice_date = code[5]
             invoice_tax = 0
         self.browse(order_id).write({
-            'invoice_type':invoice_type,
+            'invoice_type': invoice_type,
             'invoice_code': invoice_code,
             'invoice_name': invoice_name,
             'invoice_amount': invoice_amount,
             'invoice_tax': invoice_tax,
-            'invoice_heck_code':invoice_heck_code,
-            'invoice_date':invoice_date
+            'invoice_heck_code': invoice_heck_code,
+            'invoice_date': invoice_date
         })
 
     @api.multi
@@ -328,7 +328,7 @@ class hr_expense_line(models.Model):
     @api.one
     @api.depends('order_id.state')
     def _compute_is_pay(self):
-        if self.order_id and self.order_id.state =='done':
+        if self.order_id and self.order_id.state == 'done':
             self.is_pay = True
         else:
             self.is_pay = False

@@ -266,7 +266,6 @@
         <field name="name">招聘</field>
         <field name="res_model">hire.applicant</field>
         <field name="view_mode">kanban,tree,form,graph,calendar,pivot</field>
-        <field name="context">{'search_default_job_id': [active_id], 'default_job_id': active_id}</field>
         <field name="help" type="html">
               <p>
                 Odoo helps you track applicants in the recruitment
@@ -284,7 +283,6 @@
         <field name="name">员工</field>
         <field name="res_model">staff</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="context">{'search_default_job_id': active_id}</field>
         <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to add a new employee.
@@ -303,9 +301,9 @@
         <field name="arch" type="xml">
             <sheet position="before">
                 <header>
-                    <button name="set_recruit" string="启动招聘" states="open" type="object" class="oe_highlight" groups="base.group_user"/>
-                    <button name="set_open" string="结束招聘" states="recruit" type="object" groups="base.group_user"/>
-                    <field name="state" widget="statusbar" statusbar_visible="recruit,open"/>
+                    <button name="set_open" string="启动招聘" states="close" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="set_close" string="结束招聘" states="open" type="object" groups="base.group_user"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open,close"/>
                 </header>
             </sheet>
             <group name="staff_data" position="inside">

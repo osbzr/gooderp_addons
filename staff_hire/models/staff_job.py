@@ -34,9 +34,9 @@ class staff_job(models.Model):
 
     color = fields.Integer("Color Index")
     state = fields.Selection([
-        ('recruit', u'招聘中'),
-        ('open', u'不招聘')
-    ], string=u'状态', readonly=True, required=True, track_visibility='always', copy=False, default='recruit',
+        ('open', u'招聘中'),
+        ('close', u'不招聘')
+    ], string=u'状态', readonly=True, required=True, track_visibility='always', copy=False, default='open',
         help=u"该职位在招聘流程中是开启还是关闭")
 
     @api.depends('no_of_recruitment', 'staff_ids.job_id', 'staff_ids.active')
@@ -85,23 +85,23 @@ class staff_job(models.Model):
         return action
 
     @api.multi
-    def set_recruit(self):
+    def set_open(self):
         """启动招聘"""
         for record in self:
-            if record.state == 'recruit':
+            if record.state == 'open':
                 raise UserError(u'请不要重复启动招聘')
             no_of_recruitment = 1 if record.no_of_recruitment == 0 else record.no_of_recruitment
-            record.write({'state': 'recruit', 'no_of_recruitment': no_of_recruitment})
+            record.write({'state': 'open', 'no_of_recruitment': no_of_recruitment})
         return True
 
     @api.multi
-    def set_open(self):
+    def set_close(self):
         """结束招聘"""
         for record in self:
-            if record.state == 'open':
+            if record.state == 'close':
                 raise UserError(u'请不要重复结束招聘')
             return record.write({
-                'state': 'open',
+                'state': 'close',
                 'no_of_recruitment': 0,
                 'no_of_hired_employee': 0
             })

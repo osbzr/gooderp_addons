@@ -57,12 +57,10 @@ class SellReceiptWizard(models.TransientModel):
 
     def _compute_receipt(self, delivery):
         '''计算该发货单的已收款'''
-        receipt = 0
-        for order in self.env['money.order'].search(
-                [('state', '=', 'done')], order='name'):
-            for source in order.source_ids:
-                if source.name.name == delivery.name:
-                    receipt += source.this_reconcile
+        invoices = self.env['money.invoice'].search([
+            ('name', '=', delivery.name),
+            ('state', '=', 'done')])
+        receipt = sum([invoice.reconciled for invoice in invoices])
         return receipt
 
     def _prepare_sell_receipt(self, delivery):

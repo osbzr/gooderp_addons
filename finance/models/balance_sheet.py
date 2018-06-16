@@ -1,15 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from odoo.addons.web_export_view_good.controllers.controllers import ExcelExportView, ReportTemplate
-from odoo.exceptions import UserError
 from math import fabs
 import calendar
-import os
-import logging
-import time
-
-_logger = logging.getLogger(__name__)
 
 
 class BalanceSheet(models.Model):
@@ -149,7 +142,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_row.name + u',' + self.period_id.year \
+        #TODO 格子不对 
+        attachment_information = u'编制单位：' + company_row.name + u',,,,' + self.period_id.year \
                                  + u'年' + self.period_id.month + u'月' + \
                                  str(days) + u'日' + u',' + u'单位：元'
         domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]

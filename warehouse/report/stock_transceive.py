@@ -186,12 +186,19 @@ class ReportStockTransceive(models.Model):
         # 获得'report.stock.transceive'记录集
         move_line_lists = self.get_data_from_cache(sql_type='out')
 
+        date_start = self.env.context.get('date_start')
+        date_end = self.env.context.get('date_end')
         for line in move_line_lists:
             if line.get('id') == self.id:
-                move_line_ids = line.get('id_lists')
+                domain_dict = [('date', '>=', date_start),
+                               ('date', '<=', date_end),
+                               ('id', 'in', line.get('id_lists'))
+                               ]
+                move_line_ids = [line.id for line in self.env['wh.move.line'].search(domain_dict)]
 
         view = self.env.ref('warehouse.wh_move_line_tree')
         return {
+            'name': u'库存调拨' + date_start + u'~' + date_end,
             'view_mode': 'tree',
             'views': [(view.id, 'tree')],
             'res_model': 'wh.move.line',
