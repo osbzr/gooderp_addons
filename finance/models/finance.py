@@ -757,7 +757,7 @@ class FinanceAccount(models.Model):
             if record.source == 'init' and record.env.context.get('modify_from_webclient', False):
                 raise UserError(u'不能删除预设会计科目!')
 
-            if record.env.context.get('modify_from_webclient', False) and record.voucher_line_ids:
+            if record.voucher_line_ids:
                 raise UserError(u'不能删除有记账凭证的会计科目!')
 
             if len(record.child_ids) != 0:
@@ -899,7 +899,7 @@ class WizardAccountAddChild(models.TransientModel):
                 }
             )
 
-        if not new_account:
+        if not new_account: # pragma: no cover
             raise UserError(u'新科目创建失败！')
 
         view = self.env.ref('finance.finance_account_tree')
@@ -927,7 +927,7 @@ class WizardAccountAddChild(models.TransientModel):
                 return False
 
         if self.account_code and not is_number(self.account_code):
-            self.account_code = False
+            self.account_code = '01'
             return {
                 'warning': {
                     'title': u'错误',
@@ -940,7 +940,7 @@ class WizardAccountAddChild(models.TransientModel):
             self.full_account_code = "%s%s"%(self.parent_code, self.account_code)
 
         if self.account_code and len(self.account_code) != int(default_child_step):
-            self.account_code = False
+            self.account_code = '01'
             self.full_account_code = self.parent_code
             return {
             'warning': {

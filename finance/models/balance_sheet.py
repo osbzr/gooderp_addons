@@ -100,9 +100,6 @@ class CreateBalanceSheetWizard(models.TransientModel):
                         trial_balance[compute_field_list[1]] - trial_balance[compute_field_list[0]])
             return sum(subject_vals)
 
-        else:
-            return 0
-
     def deal_with_balance_formula(self, balance_formula, period_id, year_begain_field):
         if balance_formula:
             return_vals = sum([self.compute_balance(one_formula, period_id, year_begain_field)
