@@ -350,6 +350,41 @@ class TestSellDelivery(TransactionCase):
         deliverys and deliverys[0].sell_delivery_draft() # 收款单 源单行 有别的行存在
         len(deliverys) > 1 and deliverys[1].sell_delivery_draft() # 收款单 源单行 不存在别的行
 
+    def test_sell_delivery_draft_raise_error(self):
+        '''不能反审核已核销的发货单'''
+        self.delivery.sell_delivery_done()
+        order = self.env['reconcile.order'].create({
+            'partner_id': self.env.ref('core.jd').id,
+            'business_type': 'adv_pay_to_get',
+        })
+        order.onchange_partner_id()
+        # 将预收款40000的收款单核销本次发货单（金额75）
+        for line in order.advance_payment_ids:
+            if line.name != self.env.ref('money.get_40000'):
+                line.unlink()
+            else:
+                line.this_reconcile = 75.0
+        order.reconcile_order_done()
+        with self.assertRaises(UserError):
+            self.delivery.sell_delivery_draft()
+
+    def test_sell_delivery_draft_quantity_out(self):
+        '''反审核时，回写销货订单行已执行数量'''
+        # 退货类型的销货订单生成的退货单的反审核
+        self.return_delivery.sell_delivery_done()
+        self.return_delivery.sell_delivery_draft()
+        self.assertEqual(self.return_delivery.line_in_ids[0].sell_line_id.quantity_out, 0.0)
+
+        # 销货类型的销货订单生成的发货单，生成退货单的反审核
+        return_dict = self.delivery.sell_to_return()
+        return_order = self.env['sell.delivery'].search(
+            [('id', '=', return_dict['res_id'])])
+        return_order.line_in_ids[0].goods_qty = 30
+        return_order.sell_delivery_done()
+
+        return_order.sell_delivery_draft()
+        self.assertEqual(return_order.line_in_ids[0].sell_line_id.quantity_out, 0.0)
+
     def test_no_stock(self):
         ''' 测试虚拟商品出库 '''
         delivery = self.delivery.copy()
