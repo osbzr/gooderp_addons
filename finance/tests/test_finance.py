@@ -414,6 +414,16 @@ class TestFinanceAccount(TransactionCase):
         wizard.account_code = '021'
         wizard._onchange_account_code()
 
+    def test_add_child_multi(self):
+        with self.assertRaises(UserError):
+            wizard = self.env['wizard.account.add.child'].with_context(
+                {'active_ids':[self.cash.id,
+                            self.env.ref('finance.small_business_chart1701').id]}
+                ).create({
+                'account_code':'01',
+                'account_name':'纸币',
+            })
+
 class TestVoucherTemplateWizard(TransactionCase):
     def setUp(self):
         super(TestVoucherTemplateWizard, self).setUp()
