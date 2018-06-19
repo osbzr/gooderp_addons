@@ -75,7 +75,7 @@
 		                    	'type':'in',
 		                    	}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'
+		                            <field name="goods_id" required='1' domain="[('not_buyable','=',False)]"
 		                            	context="{'default_partner':parent.partner_id,
 		         								  'default_is_return':parent.is_return}"/>
 		                            <field name="attribute_id"
@@ -285,7 +285,7 @@
 		                    	'default_warehouse_id': warehouse_id,
 		                    	}">
 		                    	<tree string="Buy Receipt Lines" editable="bottom">
-		                            <field name="goods_id" required='1'
+		                            <field name="goods_id" required='1' domain="[('not_buyable','=',False)]"
 		                            	context="{'default_partner':parent.partner_id,
 		         								  'default_is_return':parent.is_return}"/>
 		                            <field name="attribute_id"

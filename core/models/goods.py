@@ -21,6 +21,14 @@ class Goods(models.Model):
     def _get_default_not_saleable(self):
         return self._get_default_not_saleable_impl()
 
+    @api.model
+    def _get_default_not_buyable_impl(self):
+        return False
+
+    @api.model
+    def _get_default_not_buyable(self):
+        return self._get_default_not_buyable_impl()
+
     @api.multi
     def name_get(self):
         '''在many2one字段里显示 编号_名称'''
@@ -93,6 +101,9 @@ class Goods(models.Model):
     not_saleable = fields.Boolean(u'不可销售',
                                   default=_get_default_not_saleable,
                                   help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
+    not_buyable = fields.Boolean(u'不可采购',
+                                  default=_get_default_not_buyable,
+                                  help=u'商品是否不可采购，勾选了就不可采购，未勾选可采购')
     active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',

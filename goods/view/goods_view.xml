@@ -61,6 +61,7 @@
 							<page name="buy_info" string='采购'>
 								<group>
 									<group>
+										<field name="not_buyable"/>
 										<field name='cost' groups='goods.view_cost_groups'/>
 										<field name='uos_id' groups='goods.auxiliary_unit_groups' required='1'/>
 										<field name='conversion' attrs="{'required': [('uos_id', '!=', False)]}" groups='goods.auxiliary_unit_groups' />
