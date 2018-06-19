@@ -88,9 +88,20 @@ class TestCostOrder(TransactionCase):
 
     def test_cost_order_draft_has_prepayment(self):
         '''反审核服务订单'''
+        # 账户先收钱
+        get_money = self.env.ref('money.get_40000')
+        get_money.money_order_done()
+
         self.cost_order_1.prepayment = 20
-        self.cost_order_1.bank_account_id = self.env.ref('core.alipay')
+        self.cost_order_1.bank_account_id = self.env.ref('core.comm')
         self.cost_order_1.cost_order_confim()
+        # 找到对应的预收款单，并审核
+        money_order = self.env['money.order'].search(
+            [('origin_name', '=', self.cost_order_1.name)])
+        if money_order:
+            money_order.money_order_done()
+
+        # 反审核时，会找到已审核的预收款单，反审核并删除
         self.cost_order_1.cost_order_draft()
 
 

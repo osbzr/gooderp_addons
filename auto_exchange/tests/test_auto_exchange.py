@@ -21,6 +21,9 @@ class TestAutoExchange(TransactionCase):
         with self.assertRaises(UserError):
             bsd.get_exchange()
 
+        # 取汇率，self 不存在的情况
+        self.env['res.currency'].get_exchange()
+
     def test_compute_current_rate(self):
         ''' Test: _compute_current_rate '''
         self.exchange_line.date = fields.Datetime.now()
