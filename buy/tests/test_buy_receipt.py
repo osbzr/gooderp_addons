@@ -414,6 +414,29 @@ class TestBuyReceipt(TransactionCase):
         with self.assertRaises(UserError):
             self.receipt.buy_to_return()
 
+    def test_buy_to_return_using_batch(self):
+        ''' 采购入库单转化为采购退货单:订单行产品进行了批次管理 '''
+        self.receipt.line_in_ids[0].goods_id.using_batch = True
+        self.receipt.line_in_ids[0].lot = '1'
+        self.receipt.line_in_ids[0].copy()
+        self.receipt.buy_receipt_done()
+        self.receipt.buy_to_return()
+
+    def test_buy_receipt_done_return_order_has_payment(self):
+        ''' 有付款的采购退货单 系统认为是纯退货，不再生成草稿状态的发货单 '''
+        self.receipt.line_in_ids[0].copy()
+        self.receipt.buy_receipt_done()
+        self.receipt.buy_to_return()
+
+        return_order = self.env['buy.receipt'].search([
+                    ('is_return', '=', True),
+                    ('origin_id', '=', self.receipt.id),
+                ])
+        return_order.payment = 2
+        return_order.bank_account_id = self.bank_account.id
+        return_order.buy_receipt_done()
+
+
 
 class TestWhMoveLine(TransactionCase):
 
