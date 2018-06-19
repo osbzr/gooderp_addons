@@ -49,12 +49,18 @@ class TestStaffWages(TransactionCase):
 
         # 审核工资单
         self.staff_wages.staff_wages_confirm()
+        # 重复审核工资单 报错
+        with self.assertRaises(UserError):
+            self.staff_wages.staff_wages_confirm()
 
         # 反审核工资单
         self.staff_wages.payment = self.env.ref('core.alipay')
         self.staff_wages.payment.balance = 1000000
         self.staff_wages.other_money_order.other_money_done()
         self.staff_wages.staff_wages_draft()
+        # 重复撤销工资单 报错
+        with self.assertRaises(UserError):
+            self.staff_wages.staff_wages_draft()
 
         # 删除工资单
         self.staff_wages.unlink()
