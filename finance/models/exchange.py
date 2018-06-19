@@ -153,8 +153,7 @@ class CreateExchangeWizard(models.TransientModel):
         当有主营业务收入,结汇等不需要汇兑损益的科目出现后，汇兑损益将不平，就会出现财务费用汇兑损益，
         '''
         vouch_obj = vals.get('vouch_obj_id')
-        voucher = self.env['voucher'].search([('id', '=', vouch_obj),
-                                              ('state', '=', 'done')])
+        voucher = self.env['voucher'].search([('id', '=', vouch_obj)])
         voucher_lines = voucher.line_ids
         account_id = self.env.ref('finance.account_exchange')
         exp = 0
