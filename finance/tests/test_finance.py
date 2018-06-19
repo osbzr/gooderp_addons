@@ -68,7 +68,7 @@ class TestVoucher(TransactionCase):
 
     def test_voucher_done_costs_types_in(self):
         '''收入类科目只能在贷方记账'''
-        voucher = self.env['voucher'].create({
+        voucher = self.env['voucher'].with_context({'entry_manual':1}).create({
             'date': '2017-01-01',
             'line_ids': [(0, 0, {
                 'name': u'退款给客户',  # 贷方行
@@ -84,6 +84,35 @@ class TestVoucher(TransactionCase):
                 })]
         })
         voucher.voucher_done()
+    
+    def test_restricted_account(self):
+        ''' 测试受限的记账科目 '''
+        account_debit = self.env.ref('finance.small_business_chart1801')
+        account_debit.restricted_debit = True
+        self.env.ref('finance.account_chart1002').restricted_credit = True
+        account_credit = self.env.ref('finance.account_bank')
+
+        with self.assertRaises(UserError):
+            voucher = self.env['voucher'].with_context({'entry_manual':1}).create({
+                'date': '2017-01-01',
+                'line_ids': [(0, 0, {
+                    'name': u'受限科目记账',  # 贷方行
+                    'account_id': account_credit.id,
+                    'debit': 0,
+                    'credit': 50.0,
+                })]
+            })
+        with self.assertRaises(UserError):
+            voucher = self.env['voucher'].with_context({'entry_manual':1}).create({
+                'date': '2017-01-01',
+                'line_ids': [(0, 0, {
+                        'name': u'受限科目记账',  # 借方行
+                        'account_id': account_debit.id,
+                        'debit': 50.0,
+                        'credit': 0,
+                    })]
+            })
+        self.env.ref('finance.voucher_1').with_context({'entry_manual':1}).write({'note':'check on write'})
 
     def test_line_unlink(self):
         '''测试可正常删除未审核的凭证行'''
@@ -204,6 +233,10 @@ class TestVoucherLine(TransactionCase):
         ''' Test: view document method '''
         self.env.ref('finance.voucher_line_1_debit').view_document()
 
+    def test_post_view(self):
+        ''' 只能往下级科目记账 '''
+        with self.assertRaises('UserError'):
+            self.env.ref('finance.voucher_line_1_debit').account_id = self.env.ref('finance.account_chart1002')
 
 class TestPeriod(TransactionCase):
 
