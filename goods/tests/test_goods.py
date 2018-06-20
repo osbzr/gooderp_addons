@@ -133,3 +133,18 @@ class TestAttributes(TransactionCase):
 
         # return super
         self.env['attribute'].name_search('123')
+
+    def test_check_value_ids(self):
+        '''属性值的类别不能相同'''
+        # if 语句
+        iphone_white = self.env.ref('goods.iphone_white')
+        iphone_white.check_value_ids()
+
+        # else 语句
+        new_att = self.env['attribute.value'].create({
+            'attribute_id': self.env.ref('goods.iphone_white').id,
+            'category_id': self.env.ref('goods.attribute_color').id,
+            'value_id': self.env.ref('goods.white').id, })
+
+        with self.assertRaises(ValidationError):
+            self.env.ref('goods.iphone').attribute_ids.write({'value_ids': [(4, 0, new_att.id)]})

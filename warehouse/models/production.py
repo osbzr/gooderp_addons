@@ -349,12 +349,12 @@ class WhAssembly(models.Model):
         for order in self:
             if order.state == 'feeding':
                 raise UserError(u'请不要重复撤销')
-            order.line_in_ids.action_draft()
-
+            # 反审核入库到废品仓的移库单
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
                 wh_internal.cancel_approved_order()
                 wh_internal.unlink()
+            order.line_in_ids.action_draft()
 
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
@@ -961,11 +961,12 @@ class outsource(models.Model):
         for order in self:
             if order.state == 'feeding':
                 raise UserError(u'请不要重复撤销')
-            order.line_in_ids.action_draft()
+            # 反审核入库到废品仓的移库单
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
                 wh_internal.cancel_approved_order()
                 wh_internal.unlink()
+            order.line_in_ids.action_draft()
 
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
@@ -1261,12 +1262,12 @@ class WhDisassembly(models.Model):
         for order in self:
             if order.state == 'feeding':
                 raise UserError(u'请不要重复撤销')
-            order.line_in_ids.action_draft()
+            # 反审核入库到废品仓的移库单
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
                 wh_internal.cancel_approved_order()
                 wh_internal.unlink()
-
+            order.line_in_ids.action_draft()
             # 删除入库凭证
             voucher, order.voucher_id = order.voucher_id, False
             if voucher.state == 'done':
