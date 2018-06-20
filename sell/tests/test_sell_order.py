@@ -344,6 +344,11 @@ class TestApproveMultiSellOrder(TransactionCase):
     def test_fields_view_get(self):
         ''' Test: fields_view_get '''
         sell_obj = self.env['approve.multi.sell.order']
+        # 不报错的情况
+        sell_obj.with_context({
+            'active_model': 'sell.order',
+            'active_ids': [self.order.id, self.order_2.id]
+        }).fields_view_get(None, 'form', False, False)
         # 报错：存在销售订单已审核的单据
         self.order_2.sell_order_done()
         with self.assertRaises(UserError):

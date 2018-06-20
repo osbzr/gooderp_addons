@@ -327,7 +327,7 @@ class TestBuyReceipt(TransactionCase):
         return_dict = self.receipt.buy_to_return()
         return_order = self.env['buy.receipt'].search(
             [('id', '=', return_dict['res_id'])])
-        return_order.line_out_ids[0].quantity = 3
+        return_order.line_out_ids[0].goods_qty = 3
         return_order.buy_receipt_done()
         return_order.buy_receipt_draft()
         self.assertEqual(return_order.line_out_ids[0].buy_line_id.quantity_in, 10.0)
