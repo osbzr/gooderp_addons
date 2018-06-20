@@ -26,6 +26,11 @@ class TestCore(TransactionCase):
         res = self.env['partner'].name_search('jd')
         self.assertEqual(res, real_result)
 
+        # 编号 ilike
+        partner.code = '京东'
+        res = self.env['partner'].name_search('京')
+        self.assertEqual(res, real_result)
+
     def test_partner_write(self):
         ''' 测试 业务伙伴应收/应付余额不为0时，不允许取消对应的客户/供应商身份 '''
         partner = self.env.ref('core.jd')
