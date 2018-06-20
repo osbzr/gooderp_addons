@@ -20,7 +20,7 @@ class test_cn_account_invoice(TransactionCase):
             'partner_name_in': '开阖',
             'partner_code_in': '922T',
             'partner_address_in': '金海路2588B213',
-            'partner_bank_number_in': '6217 8888 8888',
+            'partner_bank_number_in': '建行6217 8888 8888',
         })
         self.cn_invoice_line = self.env['cn.account.invoice.line'].create({
             'product_name': '玉米',
@@ -53,3 +53,31 @@ class test_cn_account_invoice(TransactionCase):
         self.cn_invoice.create_buy_partner()
 
         self.cn_invoice.create_buy_partner()
+
+    def test_create_category(self):
+        ''' Test: create category '''
+        self.cn_invoice.create_category()
+
+    def test_create_product(self):
+        ''' Test: create product '''
+        # 商品 uom_id 必须存在
+        self.cn_invoice_line.product_unit = '件'
+        # 商品 category_id 必须存在
+        self.cn_invoice_line.tax_type = '不征税自来水'
+        self.env.ref('core.goods_category_1').tax_category_id = self.env.ref('tax.nsbm6110000000000000000').id
+
+        self.cn_invoice.create_product()
+
+    def test_create_sell_partner(self):
+        ''' Test: create_sell_partner '''
+        # 创建客户，但是不存在 客户类别 报错
+        with self.assertRaises(UserError):
+            self.cn_invoice.create_sell_partner()
+
+        # 主要手机号和税号相同
+        self.env['ir.values'].set_default('tax.config.settings', 'default_customer',
+                                          self.env.ref('tax.domestic_customer').id)
+        self.cn_invoice.partner_name_out = 'kaihe'
+        self.cn_invoice.partner_address_out = '金海路922T'
+        self.cn_invoice.partner_code_out = '922T'
+        self.cn_invoice.create_sell_partner()
