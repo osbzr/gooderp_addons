@@ -346,7 +346,7 @@ class WhMove(models.Model):
                                                 ('goods_id', '!=', False)
                                                 ]):
             if not loc.current_qty:
-                continue
+                continue    # pragma: no cover
         return self.write({
             'approve_uid': self.env.uid,
             'approve_date': fields.Datetime.now(self),
