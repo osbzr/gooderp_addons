@@ -494,7 +494,7 @@ class WhMoveLine(models.Model):
         self.compute_suggested_cost()
 
     @api.one
-    @api.constrains('force_batch_one', 'goods_qty')
+    @api.constrains('goods_qty')
     def check_goods_qty(self):
         """序列号管理的商品数量必须为1"""
         if self.force_batch_one and self.goods_qty > 1:
