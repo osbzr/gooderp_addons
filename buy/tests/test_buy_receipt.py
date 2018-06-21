@@ -133,6 +133,16 @@ class TestBuyReceipt(TransactionCase):
         self.assertTrue(not move)
         self.assertTrue(not move.line_in_ids)
 
+    def test_wh_move_write(self):
+        ''' Test: wh_move_write '''
+        self.receipt.buy_receipt_done()
+        with self.assertRaises(UserError):
+            self.receipt.buy_move_id.write({'state': 'cancel'})
+
+        self.receipt.buy_receipt_draft()
+        self.receipt.buy_move_id.write({'state': 'cancel'})
+
+
     def test_buy_receipt_done(self):
         '''审核采购入库单/退货单，更新本单的付款状态/退款状态，并生成结算单和付款单'''
         # 结算账户余额

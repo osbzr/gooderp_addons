@@ -34,23 +34,6 @@ class TestBuyAdjust(TransactionCase):
         new = adjust.copy()
         new.unlink()
 
-    def test_action_cancel(self):
-        ''' Test: action_cancel  '''
-        adjust = self.env['buy.adjust'].create({
-            'order_id': self.order.id,
-            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
-                                 'attribute_id': self.keyboard_black.id,
-                                 'quantity': 3.0,
-                                 }),
-                         ]
-        })
-        adjust.action_cancel()
-
-        # 只能作废草稿状态的单据 报错
-        adjust.buy_adjust_done()
-        with self.assertRaises(UserError):
-            adjust.action_cancel()
-
     def test_buy_adjust_done(self):
         '''审核采购变更单:正常情况'''
         # 正常情况下审核，新增商品鼠标（每批次为1的）、网线（无批次的）
