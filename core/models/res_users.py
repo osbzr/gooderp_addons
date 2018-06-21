@@ -26,6 +26,6 @@ class ResUsers(models.Model):
                     raise UserError(u'系统用户不可修改')
         # 如果管理员将自己的系统管理权限去掉，则报错
         else:
-            if not self.env.user.has_group('base.group_erp_manager'):
+            if not self.env.user.has_group('base.group_erp_manager'):  # pragma: no cover
                 raise UserError(u'不能删除管理员的管理权限')
         return res
