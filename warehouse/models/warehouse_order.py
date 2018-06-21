@@ -8,7 +8,7 @@ from odoo import models, fields, api
 class WhOut(models.Model):
     _name = 'wh.out'
     _description = u'其他出库单'
-    _inherit = ['mail.thread', 'scan.barcode']
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {

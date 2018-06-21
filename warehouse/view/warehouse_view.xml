@@ -313,7 +313,6 @@
                             <label string="扫描条码"/>
                         	<input type='text' class="ge_scan_barcode" autofocus="true"/>
                      	</div>
-						 <!--<field name='scan_barcode_input_code' style="width:100%; max-width:100%;" class="o_form_editable"/>-->
                         <group>
                             <group>
                                 <field name='partner_id' attrs="{'readonly': [('state', '!=', 'draft')]}"
