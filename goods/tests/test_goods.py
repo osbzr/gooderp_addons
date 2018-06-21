@@ -73,6 +73,9 @@ class TestGoods(TransactionCase):
         result = self.env['goods'].name_search('001')
         self.assertEqual(result, real_result)
 
+        # goods name_search code ilike name
+        self.env['goods'].name_search('00%')
+
     def test_create(self):
         '''导入商品时，如果辅助单位为空，则用计量单位来填充它'''
         goods = self.env['goods'].create({
