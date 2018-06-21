@@ -17,5 +17,4 @@ access_report_base,access_report_base,warehouse.model_report_base,,1,1,1,1
 access_report_stock_balance,access_report_stock_balance,warehouse.model_report_stock_balance,,1,1,1,1
 access_report_stock_transceive,access_report_stock_transceive,warehouse.model_report_stock_transceive,,1,1,1,1
 access_qc_rule,access_qc_rule,warehouse.model_qc_rule,,1,1,1,1
-access_scan_barcode,access_scan_barcode,model_scan_barcode,,1,0,0,0
 access_location_all_group,access_location_all_group,model_location,,1,1,1,1
