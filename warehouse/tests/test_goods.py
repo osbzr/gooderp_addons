@@ -27,11 +27,15 @@ class TestGoods(TransactionCase):
         self.others_in_2_keyboard_mouse.cost = self.others_in_2_keyboard_mouse.cost_unit * self.others_in_2_keyboard_mouse.goods_qty
         self.goods_keyboard_mouse = self.browse_ref('goods.keyboard_mouse')
         self.goods_cable = self.browse_ref('goods.cable')
+        self.goods_iphone = self.browse_ref('goods.iphone')
 
         # 将网线和键盘套装入库
         self.others_in.approve_order()
         time.sleep(2)
         self.others_in_2.approve_order()
+        # 有属性商品iphone黑色和白色入库
+        self.others_in_attr = self.browse_ref('warehouse.wh_in_wh_in_attribute')
+        self.others_in_attr.approve_order()
 
     def test_stock(self):
         keyboard_mouse_results = self.goods_keyboard_mouse.get_stock_qty()
@@ -106,6 +110,22 @@ class TestGoods(TransactionCase):
         suggested_cost, _ = suggested_cost_func(
             self.hd_warehouse, 24, ignore_move=self.others_in_keyboard_mouse.id)
         self.assertEqual(suggested_cost, 24 * 80)
+
+    def test_get_matching_records_with_attribute(self):
+        '''获取匹配记录（缺货向导确认时）'''
+        # 有属性商品获取匹配记录 12 * 4888 的iphone 白、12 * 5000 的iphone 黑入库
+        others_in = self.others_in.copy()
+        line = self.env['wh.move.line'].create({
+            'move_id': others_in.move_id.id,
+            'goods_id': self.goods_iphone.id,
+            'attribute_id': self.env.ref('goods.iphone_white').id,
+            'goods_qty': 1,
+            'uom_id': self.goods_iphone.uom_id.id,
+            'type': 'in',
+            'state': 'done'})
+        suggested_cost, _ = self.goods_iphone.with_context({
+            'wh_in_line_ids': [line.id]}).get_suggested_cost_by_warehouse(
+            self.hd_warehouse, qty=13, attribute=self.env.ref('goods.iphone_white'))
 
     def test_compute_stock_qty(self):
         self.assertEqual(self.goods_cable.current_qty, 48)
