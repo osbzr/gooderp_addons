@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import goods
 import warehouse_move
-import scan_barcode
 import warehouse_order
 import inventory
 import production
