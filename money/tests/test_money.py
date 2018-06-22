@@ -69,6 +69,26 @@ class TestMoneyOrder(TransactionCase):
         self.env.ref('money.pay_2000').money_order_done()
         self.env.ref('money.pay_2000').money_order_draft()
 
+    def test_money_order_draft_has_reconcile_order(self):
+        ''' Test: 反审核时，核销金额不为0，不能反审核 '''
+        self.env.ref('money.get_40000').money_order_done()
+        adv_pay_to_get = self.env.ref('money.reconcile_adv_pay_to_get')
+        adv_pay_to_get.partner_id = self.env.ref('core.jd')
+
+        self.env['money.invoice'].create({
+            'partner_id': self.env.ref('core.jd').id, 'date': "2016-02-20",
+            'name': 'invoice/2016001',
+            'category_id': self.env.ref('money.core_category_sale').id,
+            'amount': 40000.0,
+            'reconciled': 0,
+            'to_reconcile': 40000.0,
+            'date_due': '2016-09-07'})
+
+        adv_pay_to_get.onchange_partner_id()
+        adv_pay_to_get.reconcile_order_done()
+        with self.assertRaises(UserError):
+            self.env.ref('money.get_40000').money_order_draft()
+
     def test_money_order_onchange(self):
         '''测试收付款onchange'''
         # onchange_date  'get','pay'
