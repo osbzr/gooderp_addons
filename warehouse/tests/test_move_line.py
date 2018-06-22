@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class TestMoveLine(TransactionCase):
@@ -196,11 +196,12 @@ class TestMoveLine(TransactionCase):
             self.keyboard_mouse_out_line.warehouse_id, self.keyboard_mouse_out_line.goods_qty)
         self.assertEqual(self.keyboard_mouse_out_line.cost_unit, cost_unit)
 
+        self.keyboard_mouse_out_line.goods_id = self.goods_cable
         self.keyboard_mouse_out_line.goods_uos_qty = 10
         temp_goods_qty = self.keyboard_mouse_out_line.goods_id.conversion_unit(
             10)
-        # self.keyboard_mouse_out_line.onchange_goods_uos_qty()
-        #self.assertEqual(self.keyboard_mouse_out_line.goods_qty, temp_goods_qty)
+        self.keyboard_mouse_out_line.onchange_goods_uos_qty()
+        self.assertEqual(self.keyboard_mouse_out_line.goods_qty, temp_goods_qty)
 
         self.mouse_in_line.action_done()
         self.mouse_out_line.lot_qty = 0
@@ -254,3 +255,23 @@ class TestMoveLine(TransactionCase):
             self.mouse_in_line.tax_rate = -1
         with self.assertRaises(UserError):
             self.mouse_in_line.tax_rate = 102
+
+    def test_compute_cost(self):
+        '''计算成本if语句'''
+        self.mouse_in_line.with_context({'type': 'in'}).price = 100
+        self.assertEqual(self.mouse_in_line.cost, 100)
+
+    def test_onchange_discount_amount(self):
+        '''当优惠金额发生变化时'''
+        self.assertEqual(self.mouse_in_line.cost, 40)
+        self.assertEqual(self.mouse_in_line.cost_unit, 40)
+        self.mouse_in_line.with_context({'type': 'in'}).discount_amount = 5
+        self.mouse_in_line.onchange_discount_amount()
+        self.assertEqual(self.mouse_in_line.cost, 35)
+        self.assertEqual(self.mouse_in_line.cost_unit, 40)  # fixme:单位成本并没发生变化
+
+    def test_check_goods_qty(self):
+        '''序列号管理的商品数量必须为1'''
+        # 鼠标进行了序列号管理
+        with self.assertRaises(ValidationError):
+            self.mouse_in_line.goods_qty = 2

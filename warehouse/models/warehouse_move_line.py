@@ -94,9 +94,6 @@ class WhMoveLine(models.Model):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.uos_id = self.goods_id.uos_id
-        else:
-            self.uom_id = ''
-            self.uos_id = ''
 
     @api.one
     @api.depends('goods_qty', 'goods_id')
@@ -108,10 +105,6 @@ class WhMoveLine(models.Model):
 
     @api.one
     def _inverse_goods_qty(self):
-        self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
-
-    @api.onchange('goods_uos_qty', 'goods_id')
-    def onchange_goods_uos_qty(self):
         self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
 
     @api.depends('goods_id', 'goods_qty')
