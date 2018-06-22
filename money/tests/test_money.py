@@ -289,6 +289,8 @@ class TestMoneyOrder(TransactionCase):
         # 重置 结算单行 上的本次核销金额：已审核的单据不能执行这个操作
         with self.assertRaises(ValueError):
             money2.write_off_reset()
+        money2.this_reconcile = 210
+
         # 重置 结算单行 上的本次核销金额
         money2.money_order_draft()
         money2.write_off_reset()

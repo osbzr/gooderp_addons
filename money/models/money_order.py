@@ -345,7 +345,8 @@ class MoneyOrder(models.Model):
             if order.state == 'draft':
                 raise UserError(u'请不要重复撤销')
 
-            total_current_reconciled = sum(source.this_reconcile for source in order.source_ids)
+            # 收/付款单 存在已审核金额不为0的核销单
+            total_current_reconciled = order.amount - order.advance_payment
             if order.reconciled != total_current_reconciled:
                 raise UserError(u'单据已核销金额不为0，不能反审核！请检查核销单！')
 
