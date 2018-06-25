@@ -300,6 +300,29 @@ class TestSellDelivery(TransactionCase):
             # no message
             self.delivery.open_dialog('goods_inventory', vals)
 
+    def test_create_zero_wh_in_with_attribute(self):
+        '''创建一个缺货向导：有属性的商品'''
+        for line in self.delivery.line_out_ids:
+            line.goods_id = self.env.ref('goods.keyboard')
+            line.attribute_id = self.env.ref('goods.keyboard_white')
+            line.goods_qty = 610
+        self.delivery.sell_delivery_done()
+
+        # 商品的数量和含税单价不能小于0
+        vals = {'partner_id': self.partner.id,
+                'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+                'warehouse_id': self.warehouse_id.id,
+                'warehouse_dest_id': self.customer_warehouse_id.id,
+                'line_out_ids': [(0, 0, {'goods_id': self.env.ref('goods.iphone').id,
+                                         'attribute_id': self.env.ref('goods.iphone_white').id,
+                                         'price_taxed': 100,
+                                         'goods_qty': 0,
+                                         'type': 'out'})],
+                }
+        new = self.env['sell.delivery'].create(vals)
+        with self.assertRaises(UserError):
+            new.sell_delivery_done()
+
     def test_sell_delivery_done_raise_credit_limit(self):
         '''审核发货单/退货单 客户的 本次发货金额+客户应收余额 不能大于客户信用额度'''
         self.delivery.amount = 20000000

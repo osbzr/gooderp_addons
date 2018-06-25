@@ -74,3 +74,8 @@ class TestChangeLocation(TransactionCase):
         with self.assertRaises(UserError):
             self.env['change.location'].with_context({'active_model': 'location',
                                                       'active_ids': [act_id]}).fields_view_get(None, 'form', False, False)
+
+        # 不报错
+        self.assertEqual(self.location.current_qty, 12000)
+        self.env['change.location'].with_context({'active_model': 'location',
+                                                  'active_ids': self.location.id}).fields_view_get(None, 'form', False, False)
