@@ -22,7 +22,7 @@ class ReportStockBalance(models.Model):
     goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
     goods_uos_qty = fields.Float(
         u'辅助单位数量', digits=dp.get_precision('Quantity'))
-    cost = fields.Float(u'成本', digits=dp.get_precision('Amount'))
+    cost = fields.Float(u'成本', digits=dp.get_precision('Price'))
 
     def init(self):
         cr = self._cr

@@ -371,6 +371,7 @@ class TestSellDelivery(TransactionCase):
         money_order.onchange_partner_id()
         # 反审核销售发货单
         deliverys and deliverys[0].sell_delivery_draft() # 收款单 源单行 有别的行存在
+        money_order.line_ids[0].amount = 46.6
         len(deliverys) > 1 and deliverys[1].sell_delivery_draft() # 收款单 源单行 不存在别的行
 
     def test_sell_delivery_draft_raise_error(self):

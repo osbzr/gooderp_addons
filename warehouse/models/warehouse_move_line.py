@@ -207,7 +207,7 @@ class WhMoveLine(models.Model):
     cost_unit = fields.Float(u'单位成本', digits=dp.get_precision('Price'),
                              help=u'入库/出库单位成本')
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
-                        digits=dp.get_precision('Amount'), store=True,
+                        digits=dp.get_precision('Price'), store=True,
                         help=u'入库/出库成本')
     line_net_weight = fields.Float(
         string=u'净重小计', compute=compute_line_net_weight, store=True)

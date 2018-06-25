@@ -91,7 +91,7 @@ class Goods(models.Model):
         string=u'转化率', default=1, digits=(16, 3),
         help=u'1个辅助单位等于多少计量单位的数量，如1箱30个苹果，这里就输入30')
     cost = fields.Float(u'成本',
-                        digits=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Price'))
     cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法',
                                    help=u'''GoodERP仓库模块使用先进先出规则匹配
                                    每次出库对应的入库成本和数量，但不实时记账。
