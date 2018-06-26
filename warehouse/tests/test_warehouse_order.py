@@ -80,6 +80,8 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_approve_create_zero_wh_in(self):
         ''' 测试 create_zero_wh_in '''
+        self.others_out.cancel_approved_order()
+        self.internal.cancel_approved_order()
         self.env.user.company_id.is_enable_negative_stock = True
         self.env.ref('warehouse.wh_move_line_17').goods_qty = 20000
         self.internal.approve_order()
@@ -122,13 +124,14 @@ class TestWarehouseOrder(TransactionCase):
         self.assertTrue(not self.internal.exists())
         self.assertTrue(not self.others_out.exists())
 
-    def test_cancel_approve(self):
-        self.env.ref('core.goods_category_1').account_id = self.env.ref(
-            'finance.account_goods').id
-
+    def test_cancel_approve_line_action_draft(self):
         # 存在已经被匹配的出库时入库无法被取消
         with self.assertRaises(UserError):
             self.others_in.cancel_approved_order()
+
+    def test_cancel_approve(self):
+        self.env.ref('core.goods_category_1').account_id = self.env.ref(
+            'finance.account_goods').id
 
         # 取消键盘套装的出库，此时others_in的键盘套装数量回复到48
         self.others_out_2.cancel_approved_order()
@@ -320,7 +323,8 @@ class TestCheckOutWizard(TransactionCase):
         self.env.ref('warehouse.wh_move_line_keyboard_mouse_in_2').cost = 400
         self.browse_ref('warehouse.wh_in_whin3').approve_order()
         # 当月出库
-        others_out_2 = self.env.ref('warehouse.wh_out_whout1').copy()
+        others_out_2 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_2.cancel_approved_order()
         others_out_2.date = '2014-12-06'
         others_out_2.approve_order()
         # 月末结账

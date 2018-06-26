@@ -36,22 +36,24 @@ class WhOut(models.Model):
     @api.multi
     @inherits_after()
     def approve_order(self):
-        if self.state == 'done':
-            raise UserError(u'请不要重复出库')
-        voucher = self.create_voucher()
-        self.write({
-            'voucher_id': voucher and voucher[0].id,
-            'state': 'done',
-        })
+        for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复出库')
+            voucher = order.create_voucher()
+            order.write({
+                'voucher_id': voucher and voucher[0].id,
+                'state': 'done',
+            })
         return True
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
-        if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
-        self.delete_voucher()
-        self.state = 'draft'
+        for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
+            order.delete_voucher()
+            order.state = 'draft'
         return True
 
     @api.multi
@@ -167,22 +169,24 @@ class WhIn(models.Model):
     @api.multi
     @inherits()
     def approve_order(self):
-        if self.state == 'done':
-            raise UserError(u'请不要重复入库')
-        voucher = self.create_voucher()
-        self.write({
-            'voucher_id': voucher and voucher[0].id,
-            'state': 'done',
-        })
+        for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复入库')
+            voucher = order.create_voucher()
+            order.write({
+                'voucher_id': voucher and voucher[0].id,
+                'state': 'done',
+            })
         return True
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
-        if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
-        self.delete_voucher()
-        self.state = 'draft'
+        for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
+            order.delete_voucher()
+            order.state = 'draft'
         return True
 
     @api.multi
@@ -316,22 +320,24 @@ class WhInternal(models.Model):
     @api.multi
     @inherits()
     def approve_order(self):
-        if self.state == 'done':
-            raise UserError(u'请不要重复入库')
-        if self.env.user.company_id.is_enable_negative_stock:
-            result_vals = self.env['wh.move'].create_zero_wh_in(
-                self, self._name)
-            if result_vals:
-                return result_vals
-        self.state = 'done'
+        for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复入库')
+            if self.env.user.company_id.is_enable_negative_stock:
+                result_vals = self.env['wh.move'].create_zero_wh_in(
+                    self, self._name)
+                if result_vals:
+                    return result_vals
+            order.state = 'done'
         return True
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
-        if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
-        self.state = 'draft'
+        for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
+            order.state = 'draft'
         return True
 
     @api.multi
