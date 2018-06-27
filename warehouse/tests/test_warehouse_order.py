@@ -334,7 +334,8 @@ class TestCheckOutWizard(TransactionCase):
         self.env.ref('finance.period_201412').is_closed = True
 
         # 发出成本算法为 定额成本std
-        others_out_3 = self.env.ref('warehouse.wh_out_whout1').copy()
+        others_out_3 = self.env.ref('warehouse.wh_out_whout1')
+        others_out_3.cancel_approved_order()
         others_out_3.date = '2015-12-06'
         self.env.ref('goods.keyboard_mouse').cost_method = 'std'
         others_out_3.approve_order()
