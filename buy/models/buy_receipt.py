@@ -159,6 +159,8 @@ class BuyReceipt(models.Model):
 
     @api.one
     def _wrong_receipt_done(self):
+        if self.state == 'done':
+            raise UserError(u'请不要重复入库')
         batch_one_list_wh = []
         batch_one_list = []
         for line in self.line_in_ids:
@@ -389,7 +391,8 @@ class BuyReceipt(models.Model):
         invoice_id = self._receipt_make_invoice()
         self.write({
             'voucher_id': voucher and voucher.id,
-            'invoice_id': invoice_id and invoice_id.id,# 为保证审批流程顺畅，否则，未审批就可审核
+            'invoice_id': invoice_id and invoice_id.id,
+            'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
         })
         # 采购费用产生结算单
         self._buy_amount_to_invoice()
@@ -409,6 +412,8 @@ class BuyReceipt(models.Model):
     @api.one
     def buy_receipt_draft(self):
         '''反审核采购入库单/退货单，更新本单的付款状态/退款状态，并删除生成的结算单、付款单及凭证'''
+        if self.state == 'draft':
+            raise UserError(u'请不要重复撤销')
         # 查找产生的付款单
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
@@ -432,15 +437,22 @@ class BuyReceipt(models.Model):
             [('name', '=', self.invoice_id.name)])
         invoice_ids.money_invoice_draft()
         invoice_ids.unlink()
+        # 反审核采购入库单时删除对应的入库凭证
+        voucher = self.voucher_id
+        if voucher.state == 'done':
+            voucher.voucher_draft()
+        voucher.unlink()
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单
         self.write({
             'modifying': False,
+            'state': 'draft',
         })
-        receipt_ids = self.search(
-            [('order_id', '=', self.order_id.id)])
+        receipt_ids = self.order_id and self.search(
+            [('order_id', '=', self.order_id.id)]) or []
         if len(receipt_ids) > 1:
             self.write({
                 'modifying': True,
+                'state': 'draft',
             })
         # 修改订单行中已执行数量
         if self.order_id:
@@ -453,12 +465,6 @@ class BuyReceipt(models.Model):
                     line.buy_line_id.quantity_in += line.goods_qty
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.buy_move_id.cancel_approved_order()
-
-        # 反审核采购入库单时删除对应的入库凭证
-        voucher, self.voucher_id = self.voucher_id, False
-        if voucher.state == 'done':
-            voucher.voucher_draft()
-        voucher.unlink()
 
     @api.one
     def buy_share_cost(self):
