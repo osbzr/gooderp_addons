@@ -35,7 +35,7 @@ class BuyReceipt(models.Model):
         self.amount = total - self.discount_amount + self.delivery_fee
 
     @api.one
-    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount')
+    @api.depends('is_return', 'invoice_id.reconciled', 'invoice_id.amount', 'order_id.paid_amount', 'amount')
     def _get_buy_money_state(self):
         '''返回付款状态'''
         if not self.is_return:
@@ -45,6 +45,14 @@ class BuyReceipt(models.Model):
                 self.money_state = u'部分付款'
             elif self.invoice_id.reconciled == self.invoice_id.amount:
                 self.money_state = u'全部付款'
+            if not self.invoice_by_receipt and self.order_id:   # 购货订单按收货结算时
+                if self.order_id.paid_amount == 0:
+                    self.money_state = u'未付款'
+                elif self.order_id.paid_amount < self.amount:
+                    self.money_state = u'部分付款'
+                elif self.order_id.paid_amount == self.amount:
+                    self.money_state = u'全部付款'
+
         # 返回退款状态
         if self.is_return:
             if self.invoice_id.reconciled == 0:
