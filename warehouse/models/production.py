@@ -427,7 +427,7 @@ class WhAssembly(models.Model):
                     'goods_qty': line.goods_qty,
                     'cost_unit': cost_unit,
                     'cost': cost,
-                    'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
+                    'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                     'uos_id': line.goods_id.uos_id.id,
                     'attribute_id': line.attribute_id.id,
                 })
@@ -658,7 +658,7 @@ class outsource(models.Model):
                     'goods_qty': line.goods_qty,
                     'cost_unit': cost_unit,
                     'cost': cost,
-                    'goods_uos_qty': self.goods_qty / line.goods_id.conversion,
+                    'goods_uos_qty': line.goods_qty / line.goods_id.conversion,
                     'uos_id': line.goods_id.uos_id.id,
                     'type': 'out',
                 })
