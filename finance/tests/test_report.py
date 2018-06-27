@@ -54,6 +54,85 @@ class TestReport(TransactionCase):
             last_period.is_closed = True
         report_default_period.create_trial_balance()
 
+    def test_button_change_number(self):
+        ''' 测试 调整累计数 弹窗'''
+        report = self.env['create.trial.balance.wizard'].create(
+            {'period_id': self.period_201512.id})
+        # 创建科目余额表
+        report.create_trial_balance()
+        # 期间 period_201512，找到叶科目 银行存款-基本户，弹出 调整累计数向导 窗口
+        for trial in self.env['trial.balance'].search([]):
+            if trial.subject_name_id.id == self.env.ref('finance.account_bank').id:
+                trial.button_change_number()
+                break
+
+    def test_change_cumulative_occurrence_wizard_default_get(self):
+        ''' 测试 调整累计数 向导 default_get '''
+        wizard_obj = self.env['change.cumulative.occurrence.wizard']
+        report = self.env['create.trial.balance.wizard'].create(
+            {'period_id': self.period_201512.id})
+        # 创建科目余额表
+        report.create_trial_balance()
+        # 期间 period_201512，找到叶科目 银行存款-基本户，调整累计数
+        for trial in self.env['trial.balance'].search([]):
+            if trial.subject_name_id.id == self.env.ref('finance.account_bank').id:
+                ctx = self.env.context.copy()
+                ctx['active_id'] = trial.id
+                ctx['active_ids'] = [trial.id]
+                env2 = self.env(self.env.cr, self.env.uid, ctx)
+                wizard_obj.with_env(env2).default_get([
+                    'cumulative_occurrence_debit', 'cumulative_occurrence_credit',
+                    'old_cumulative_occurrence_debit', 'old_cumulative_occurrence_credit',
+                    'trial_balance_id', 'account_id'])
+
+                # 只能调整末级科目相关的行 报错
+                with self.assertRaises(UserError):
+                    trial.subject_name_id.account_type = 'view'
+                    env2 = self.env(self.env.cr, self.env.uid, ctx)
+                    wizard_obj.with_env(env2).default_get([
+                        'cumulative_occurrence_debit', 'cumulative_occurrence_credit',
+                        'old_cumulative_occurrence_debit', 'old_cumulative_occurrence_credit',
+                        'trial_balance_id', 'account_id'])
+
+                # 一次只能调整一行 报错
+                with self.assertRaises(UserError):
+                    trial.subject_name_id.account_type = 'normal'
+                    ctx['active_ids'] = [trial.id, trial.id]
+                    env2 = self.env(self.env.cr, self.env.uid, ctx)
+                    wizard_obj.with_env(env2).default_get([
+                        'cumulative_occurrence_debit', 'cumulative_occurrence_credit',
+                        'old_cumulative_occurrence_debit', 'old_cumulative_occurrence_credit',
+                        'trial_balance_id', 'account_id'])
+
+    def test_update_cumulative_occurrence(self):
+        ''' 测试：update_cumulative_occurrence '''
+        wizard_obj = self.env['change.cumulative.occurrence.wizard']
+        report = self.env['create.trial.balance.wizard'].create(
+            {'period_id': self.period_201512.id})
+        # 创建科目余额表
+        report.create_trial_balance()
+        # 期间 period_201512，找到叶科目 银行存款-基本户，调整累计数
+        for trial in self.env['trial.balance'].search([]):
+            ctx = self.env.context.copy()
+            fields_list = ['cumulative_occurrence_debit', 'cumulative_occurrence_credit',
+                           'old_cumulative_occurrence_debit', 'old_cumulative_occurrence_credit',
+                           'trial_balance_id', 'account_id']
+            # costs_types not in ('in', 'out')
+            if trial.subject_name_id == self.env.ref('finance.account_bank'):
+                ctx['active_id'] = trial.id
+                ctx['active_ids'] = [trial.id]
+                env2 = self.env(self.env.cr, self.env.uid, ctx)
+                values = wizard_obj.with_env(env2).default_get(fields_list)
+                wizard = wizard_obj.with_env(env2).create(values)
+                wizard.update_cumulative_occurrence()
+            if trial.subject_name_id == self.env.ref('finance.account_income'):  # costs_types in ('in', 'out')
+                ctx['active_id'] = trial.id
+                ctx['active_ids'] = [trial.id]
+                env2 = self.env(self.env.cr, self.env.uid, ctx)
+                values = wizard_obj.with_env(env2).default_get(fields_list)
+                wizard = wizard_obj.with_env(env2).create(values)
+                wizard.update_cumulative_occurrence()
+
     def test_vouchers_summary(self):
         ''' 测试总账和明细账'''
         report = self.env['create.vouchers.summary.wizard'].create(
