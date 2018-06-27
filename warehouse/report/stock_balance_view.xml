@@ -39,7 +39,7 @@
             <field name='model'>report.stock.balance</field>
             <field name='arch' type='xml'>
                 <search string='商品库存余额表' >
-                    <field name='goods' string='商品' filter_domain="[('goods', 'ilike', self)]" />
+                    <field name='goods' string='编号/商品名' filter_domain="[('goods_id', 'ilike', self)]" />
                     <field name='lot' string='批号' filter_domain="[('lot', 'ilike', self)]" groups='goods.batch_groups' />
                     <field name='warehouse' string='仓库' filter_domain="[('warehouse', 'ilike', self)]" groups='warehouse.multi_warehouse_groups' />
 
