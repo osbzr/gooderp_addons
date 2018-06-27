@@ -250,3 +250,10 @@ class TestInventory(TransactionCase):
             'date': '2016-12-30',
             'goods': '鼠标',
         })
+
+    def test_generate_inventory_twice(self):
+        '''重复点击生成盘点单据按钮'''
+        self.inventory.query_inventory()
+        self.inventory.generate_inventory()
+        with self.assertRaises(UserError):
+            self.inventory.generate_inventory()
