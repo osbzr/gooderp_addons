@@ -35,8 +35,8 @@ class TestSellDelivery(TransactionCase):
         for line in self.return_delivery.line_in_ids:
             line.location_id = self.env.ref('warehouse.b001_location').id
 
-        warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
-        warehouse_obj.approve_order()
+        self.warehouse_obj = self.env.ref('warehouse.wh_in_whin0')
+        self.warehouse_obj.approve_order()
 
         self.warehouse_id = self.env.ref('warehouse.hd_stock')
         self.customer_warehouse_id = self.env.ref(
@@ -98,6 +98,21 @@ class TestSellDelivery(TransactionCase):
         with self.assertRaises(UserError):
             self.delivery.sell_to_return()
 
+    def test_sell_to_return_goods_is_using_batch(self):
+        '''转化为销售退货单goods using_batch'''
+        vals = {'partner_id': self.partner.id,
+                'date_due': (datetime.now()).strftime(ISODATEFORMAT),
+                'warehouse_id': self.warehouse_id.id,
+                'warehouse_dest_id': self.customer_warehouse_id.id,
+                'line_out_ids': [(0, 0, {'goods_id': self.env.ref('goods.mouse').id,
+                                         'lot_id': self.env.ref('warehouse.wh_move_line_12').id,
+                                         'price_taxed': 400,
+                                         'goods_qty': 1,
+                                         'type': 'out'})],
+                }
+        new = self.env['sell.delivery'].create(vals)
+        new.sell_delivery_done()
+        new.sell_to_return()
 
     def test_onchange_partner_id(self):
         '''选择客户带出其默认地址信息'''
@@ -300,6 +315,33 @@ class TestSellDelivery(TransactionCase):
             # no message
             self.delivery.open_dialog('goods_inventory', vals)
 
+    def test_sell_delivery_done_not_create_voucher(self):
+        '''发库单审核商品不足时不生成凭证'''
+        # 一个有批号管理的鼠标缺货
+        self.warehouse_obj.cancel_approved_order()
+        order_1 = self.env.ref('sell.sell_order_1')
+        for line in order_1.line_ids:
+            line.quantity = 1
+            line.discount_amount = 0
+        order_1.sell_order_done()
+        delivery = self.env['sell.delivery'].search(
+            [('order_id', '=', order_1.id)])
+        line = delivery.line_out_ids[0]
+        vals = {
+            'type': 'inventory',
+            'warehouse_id': self.env.ref('warehouse.warehouse_inventory').id,
+            'warehouse_dest_id': self.delivery.warehouse_id.id,
+            'line_in_ids': [(0, 0, {
+                    'goods_id': line.goods_id.id,
+                    'uos_id': line.uos_id.id,
+                    'goods_qty': 1,
+                    'uom_id': line.uom_id.id,
+                    })]
+        }
+        self.assertEqual(line.cost, 0.0)
+        delivery.goods_inventory(vals)
+        self.assertTrue(not delivery.voucher_id)
+
     def test_create_zero_wh_in_with_attribute(self):
         '''创建一个缺货向导：有属性的商品'''
         for line in self.delivery.line_out_ids:
@@ -328,6 +370,15 @@ class TestSellDelivery(TransactionCase):
         self.delivery.amount = 20000000
         with self.assertRaises(UserError):
             self.delivery.sell_delivery_done()
+
+    def test_sell_delivery_done_return_goods_and_money(self):
+        '''如果已退货也已退款不生成新的分单'''
+        self.delivery.sell_to_return()
+        ret_order = self.env['sell.delivery'].search([('origin_id', '=', self.delivery.id)])
+        ret_order.bank_account_id = self.bank_account.id
+        ret_order.receipt = ret_order.amount
+        ret_order.sell_delivery_done()
+        self.assertEqual(ret_order.order_id.delivery_count, 1)
 
     def test_sell_delivery_draft(self):
         '''反审核发货单/退货单'''
