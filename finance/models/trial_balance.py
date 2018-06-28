@@ -100,11 +100,10 @@ class TrialBalance(models.Model):
 
             if diff_year_init != 0:
                 raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_year_init))
-            elif diff_cumulative_occurrence != 0:
+            if diff_cumulative_occurrence != 0:
                 raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_cumulative_occurrence))
-            elif diff_ending_balance != 0:
+            if diff_ending_balance != 0:
                 raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
-
         else:
             diff_initial_balance = res.get('total_initial_balance_debit', 0) - res.get('total_initial_balance_credit', 0)
             diff_current_occurrence = res.get('total_current_occurrence_debit', 0
@@ -113,9 +112,9 @@ class TrialBalance(models.Model):
 
             if diff_initial_balance != 0:
                 raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_initial_balance))
-            elif diff_current_occurrence != 0:
+            if diff_current_occurrence != 0:
                 raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_current_occurrence))
-            elif diff_ending_balance != 0:
+            if diff_ending_balance != 0:
                 raise UserError(u'期间：%s 借贷不平\n\n差异金额：%s' % (period_id.name, diff_ending_balance))
 
         return True
@@ -151,7 +150,6 @@ class CheckTrialBalanceWizard(models.TransientModel):
             res.update({field: sum(trial_balance_items.mapped(field[6:]))})
 
         res.update({'period_id': period_id.id, 'is_init_period': is_init_period})
-
         if is_init_period:
             diff_year_init = res.get('total_year_init_debit', 0) - res.get('total_year_init_credit', 0)
             diff_cumulative_occurrence = res.get('total_cumulative_occurrence_debit', 0
@@ -159,24 +157,23 @@ class CheckTrialBalanceWizard(models.TransientModel):
             diff_ending_balance = res.get('total_ending_balance_debit', 0) - res.get('total_ending_balance_credit', 0)
             if diff_year_init != 0:
                 res.update({'is_balance': False, 'result': '2', 'diff': diff_year_init})
-            elif diff_cumulative_occurrence != 0:
+            if diff_cumulative_occurrence != 0:
                 res.update({'is_balance': False, 'result': '2', 'diff': diff_cumulative_occurrence})
-            elif diff_ending_balance != 0:
+            if diff_ending_balance != 0:
                 res.update({'is_balance': False, 'result': '2', 'diff': diff_ending_balance})
-            else:
+            if not (diff_year_init or diff_cumulative_occurrence or diff_ending_balance):
                 res.update({'is_balance': True, 'result': '1'})
         else:
-
             diff_initial_balance = res.get('total_initial_balance_debit',0) - res.get('total_initial_balance_credit',0)
             diff_current_occurrence = res.get('total_current_occurrence_debit',0) - res.get('total_current_occurrence_credit',0)
             diff_ending_balance = res.get('total_ending_balance_debit',0) - res.get('total_ending_balance_credit',0)
             if diff_initial_balance != 0:
                 res.update({'is_balance': False, 'result': '2', 'diff': diff_initial_balance})
-            elif diff_current_occurrence != 0:
+            if diff_current_occurrence != 0:
                 res.update({'is_balance': False, 'result': '2', 'diff': diff_current_occurrence})
-            elif diff_ending_balance != 0:
+            if diff_ending_balance != 0:
                 res.update({'is_balance': False, 'result': '2', 'diff': diff_ending_balance})
-            else:
+            if not (diff_initial_balance or diff_current_occurrence or diff_ending_balance):
                 res.update({'is_balance': True, 'result': '1'})
 
         return res
