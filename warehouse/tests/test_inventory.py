@@ -257,3 +257,13 @@ class TestInventory(TransactionCase):
         self.inventory.generate_inventory()
         with self.assertRaises(UserError):
             self.inventory.generate_inventory()
+
+    def test_inventory_line_get_difference_qty(self):
+        '''_get_difference_qty：difference_qty=0,difference_uos_qty!=0'''
+        for line in self.inventory.line_ids:
+            if line.goods_id.name == u'鼠标':
+                mouse = line
+
+            # 实际辅助数量少1个 实际数量为1
+            mouse.inventory_uos_qty = mouse.inventory_qty - 1
+            self.assertEqual(mouse.difference_qty, -1)

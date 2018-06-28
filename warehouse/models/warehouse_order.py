@@ -41,7 +41,7 @@ class WhOut(models.Model):
                 raise UserError(u'请不要重复出库')
             voucher = order.create_voucher()
             order.write({
-                'voucher_id': voucher and voucher[0].id,
+                'voucher_id': voucher and voucher[0] and voucher[0].id,
                 'state': 'done',
             })
         return True
@@ -122,11 +122,11 @@ class WhOut(models.Model):
                 'debit': credit_sum,
                 'voucher_id': voucher.id,
             })
-        if len(self.voucher_id.line_ids) > 0:
-            self.voucher_id.voucher_done()
+        if len(voucher.line_ids) > 0:
+            voucher.voucher_done()
+            return voucher
         else:
-            self.voucher_id.unlink()
-        return voucher
+            voucher.unlink()
 
     @api.one
     def delete_voucher(self):
@@ -174,7 +174,7 @@ class WhIn(models.Model):
                 raise UserError(u'请不要重复入库')
             voucher = order.create_voucher()
             order.write({
-                'voucher_id': voucher and voucher[0].id,
+                'voucher_id': voucher and voucher[0] and voucher[0].id,
                 'state': 'done',
             })
         return True
@@ -262,11 +262,11 @@ class WhIn(models.Model):
                     'voucher_id': vouch_id.id,
                 })
         if not self.is_init:
-            if len(self.voucher_id.line_ids) > 0:
-                self.voucher_id.voucher_done()
+            if len(vouch_id.line_ids) > 0:
+                vouch_id.voucher_done()
+                return vouch_id
             else:
-                self.voucher_id.unlink()
-        return vouch_id
+                vouch_id.unlink()
 
     @api.one
     def delete_voucher(self):
