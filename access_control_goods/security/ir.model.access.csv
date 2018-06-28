@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+core.access_goods,access_goods_user,core.model_goods,base.group_user,1,0,0,0
+access_goods_operator,access_goods_operator,core.model_goods,access_control_goods.group_operate_goods_main_data,1,1,1,1
