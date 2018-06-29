@@ -433,11 +433,7 @@ class WhInventoryLine(models.Model):
             difference_qty, difference_uos_qty = abs(
                 inventory.difference_qty), abs(inventory.difference_uos_qty)
 
-            # 差异数量为0，且差异辅助数量不为0时，用差异辅助数量。否则用差差异数量
-            if float_is_zero(difference_qty, 2) and not float_is_zero(difference_uos_qty, 2):
-                res.update({'goods_uos_qty': difference_uos_qty})
-            else:
-                res.update({'goods_qty': difference_qty})
+            res.update({'goods_qty': difference_qty})
 
             return res
 
