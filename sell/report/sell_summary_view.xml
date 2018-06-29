@@ -51,7 +51,7 @@
             <field name='arch' type='xml'>
                 <search string='销售汇总表' >
                     <field name='goods' string='商品' filter_domain="[('goods', 'ilike', self)]"/>
-                    <field name='partner_id' string='客户' filter_domain="[('partner_id', 'ilike', self)]"/>
+                    <field name='partner_id' string='客户' filter_domain="[('partner_id', 'ilike', self)]" options="{'no_open': True, 'no_create': True}"/>
                     <field name='user_id' string='销售员' filter_domain="[('user_id', 'ilike', self)]"/>
                     <field name='department_id' string='部门' filter_domain="[('department_id', 'ilike', self)]"/>
                     <field name='lot' string='批号' filter_domain="[('lot', 'ilike', self)]" groups='goods.batch_groups' />
