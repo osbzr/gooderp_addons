@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <tree string="销售汇总表" create="false">
                     <field name="date"/>
-                    <field name="partner_id"/>
+                    <field name="partner_id" options="{'no_open': True, 'no_create': True}"/>
                     <field name="user_id"/>
                     <field name="goods_id"/>
                     <field name="attribute_id" groups='goods.multi_attrs_groups'/>
