@@ -432,7 +432,7 @@
                 <search string='其他出库单'>
                     <field name='name'/>
                     <field name='warehouse_id'/>
-                    <field name='partner_id' string='客户'/>
+                    <field name='partner_id' string='客户' options="{'no_open': True, 'no_create': True}"/>
                     <field name='create_uid' string='制单人'/>
                     <field name='approve_uid'/>
                     <field name='amount_total'/>
@@ -551,7 +551,7 @@
                 <search string='其他入库单'>
                     <field name='name'/>
                     <field name='warehouse_dest_id'/>
-                    <field name='partner_id' string='供应商'/>
+                    <field name='partner_id' string='供应商' options="{'no_open': True, 'no_create': True}"/>
                     <field name='create_uid' string='制单人'/>
                     <field name='approve_uid'/>
                     <field name='amount_total'/>
