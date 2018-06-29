@@ -254,7 +254,7 @@ class TestMoveLine(TransactionCase):
         result = self.env['wh.move.line'].name_search(args=[('lot', '=', 'ms160301')])
         real_result = [(self.mouse_in_line.id, self.mouse_in_line.lot + ' ' +
                         self.mouse_in_line.warehouse_dest_id.name + u' 余 ' + str(self.mouse_in_line.goods_qty))]
-        self.assertEqual(result, real_result)[('lot', 'like','0001')]
+        self.assertEqual(result, real_result)
 
     def test_compute_all_amount_wrong_tax_rate(self):
         '''明细行上输入错误税率，应报错'''
