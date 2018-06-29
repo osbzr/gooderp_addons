@@ -133,7 +133,7 @@
                     <field name='voucher_id'/>
                     <field name='name' filter_domain="[('name','ilike',self)]"/>
                     <field name='account_id'/>
-                    <field name='partner_id'/>
+                    <field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
                     <field name='goods_id'/>
                     <field name='auxiliary_id'/>
                     <field name='date'/>
@@ -164,7 +164,7 @@
                     <field name='account_id'/>
                     <field name='debit' sum='借方合计' widget="bgcolor" color="success"/>
                     <field name='credit' sum='贷方合计' widget="bgcolor" color="primary"/>
-                    <field name='partner_id'/>
+                    <field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
                     <field name='auxiliary_id'/>
                     <field name='goods_id' groups='finance.group_account_goods'/>
                     <field name='goods_qty' groups='finance.group_account_goods' sum='数量合计'/>
