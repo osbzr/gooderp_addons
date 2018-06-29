@@ -11,7 +11,7 @@
             		<field name='name'/>
             		<field name='type'/>
             		<field name='user_id'/>
-            		<field name='partner_id'/>
+            		<field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
             		<field name="amount" sum="合计"/>
             		<field name='delivery_date'/>
                     <field name='state'/>
@@ -59,6 +59,7 @@
             				<group>
             					<field name='partner_id' required='1'
             						domain="[('c_category_id', '!=', False)]"
+						        options="{'no_open': True, 'no_create': True}"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='contact'/>
             				    <field name='address_id'
@@ -182,7 +183,7 @@
                     <field name="order_id" groups='sell.sell_groups'/>
             		<field name='user_id'/>
                     <field name='warehouse_id'/>
-            		<field name='partner_id'/>
+            		<field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
 					<field name='total_qty'/>
             		<field name="amount" sum="总金额" groups='sell.group_sell'/>
 					<field name='currency_id'
@@ -216,6 +217,7 @@
             				<group>
             					<field name='partner_id' required='1'
             						attrs="{'readonly': [('state','!=','draft')]}"
+						        options="{'no_open': True, 'no_create': True}"
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             				    <field name='contact'/>
@@ -398,7 +400,7 @@
                     <field name="order_id" groups='sell.sell_groups'/>
             		<field name='user_id'/>
                     <field name='warehouse_dest_id'/>
-            		<field name='partner_id'/>
+            		<field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
 					<field name='total_qty'/>
             		<field name="amount" sum="总金额" groups='sell.group_sell'/>
             		<field name='receipt' string="本次退款"/>
@@ -433,6 +435,7 @@
             				<group>
             					<field name='partner_id' required='1'
             						attrs="{'readonly': [('state','!=','draft')]}"
+						        options="{'no_open': True, 'no_create': True}"
             						domain="[('c_category_id', '!=', False)]"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='contact'/>

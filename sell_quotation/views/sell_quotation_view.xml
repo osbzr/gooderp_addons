@@ -10,7 +10,7 @@
             		<field name='date'/>
             		<field name='name'/>
             		<field name='user_id'/>
-            		<field name='partner_id'/>
+            		<field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
                     <field name='partner_address_id'/>
                     <field name='mobile'/>
                     <field name='state'/>
@@ -35,6 +35,7 @@
             				<group>
             					<field name='partner_id' required='1'
             						domain="[('c_category_id', '!=', False)]"
+						        options="{'no_open': True, 'no_create': True}"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='partner_address_id' options="{'no_open': True, 'no_create': True}"/>
                                 <field name="contact"/>
@@ -56,7 +57,7 @@
                                         <field name='price'/>
                  						<field name='qty'/>
                  						<field name='uom_id'/>
-										<field name="partner_id" invisible="1"/>
+										<field name="partner_id" invisible="1" options="{'no_open': True, 'no_create': True}"/>
 										<field name="date" invisible="1"/>
 										<field name="state" invisible="1"/>
 				 					</tree>
