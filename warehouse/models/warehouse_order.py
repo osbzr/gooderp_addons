@@ -267,6 +267,8 @@ class WhIn(models.Model):
                 return vouch_id
             else:
                 vouch_id.unlink()
+        else:
+            return vouch_id
 
     @api.one
     def delete_voucher(self):

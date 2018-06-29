@@ -36,11 +36,12 @@ class TestWarehouseOrder(TransactionCase):
 
         self.internal = self.browse_ref('warehouse.wh_internal_whint0')
 
-        # 其他入库调拨网线48个到总仓
+        # 其他入库调拨网线48个和键鼠套装48个到总仓
         self.others_in.approve_order()
         # 睡眠2秒，使得下一次入库的确认时间和上次入库不一致
         time.sleep(2)
 
+        # 其他入库键鼠套装48个到总仓
         self.others_in_2.approve_order()
 
         # 盘盈入库调拨网线12000个到总仓
@@ -247,13 +248,16 @@ class TestWarehouseOrder(TransactionCase):
         self.others_in_2.cancel_approved_order()
 
     def test_create_voucher_no_voucher_line(self):
-        '''初始化其他入库单时生成凭证 没有凭证行，删除凭证  的情况'''
+        '''确认其他入库单时生成凭证 没有凭证行，删除凭证  的情况'''
         self.others_in_2.cancel_approved_order()
         self.others_in_2_keyboard_mouse.cost = 0.0
         self.others_in_2.approve_order()
 
         # 键鼠套装入库成本为0再出库时，没有凭证行，删除凭证行
-        self.others_out_2.cancel_approved_order() # 为下面再次审核做准备
+        self.others_out.cancel_approved_order()
+        self.internal.cancel_approved_order()
+        self.others_out_2.cancel_approved_order()
+        self.others_in.cancel_approved_order()  # 为了键鼠套装入库成本为0,匹配到others_in_2
         self.env.ref('warehouse.wh_move_line_out_2').cost = 0.0
         self.others_out_2.approve_order()
 
@@ -330,7 +334,6 @@ class TestWarehouseOrder(TransactionCase):
         self.internal.cancel_approved_order()
         with self.assertRaises(UserError):
             self.internal.cancel_approved_order()
-
 
 
 class TestCheckOutWizard(TransactionCase):
