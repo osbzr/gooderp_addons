@@ -11,7 +11,7 @@
             		<field name='name'/>
             		<field name='type'/>
             		<field name='user_id'/>
-            		<field name='partner_id'/>
+            		<field name='partner_id' options="{'no_open': True, 'no_create': True}"/>
             		<field name="amount" sum="合计"/>
             		<field name='delivery_date'/>
                     <field name='state'/>
@@ -59,6 +59,7 @@
             				<group>
             					<field name='partner_id' required='1'
             						domain="[('c_category_id', '!=', False)]"
+						        options="{'no_open': True, 'no_create': True}"
             						context="{'form_view_ref': 'core.customer_address_form'}"/>
             					<field name='contact'/>
             				    <field name='address_id'
