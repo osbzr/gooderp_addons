@@ -117,7 +117,7 @@ class Attribute(models.Model):
     @api.depends('value_ids')
     def _compute_name(self):
         self.name = ' '.join(
-            [value.category_id.name + ':' + value.value_id.name for value in self.value_ids])
+            [value.value_id.name for value in self.value_ids])
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):

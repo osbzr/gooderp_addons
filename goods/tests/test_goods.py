@@ -131,7 +131,7 @@ class TestAttributes(TransactionCase):
         iphone_value_white = self.env.ref('goods.iphone_value_white')
         result = self.env['attribute'].name_search('12345678987')
         real_result = [(iphone_value_white.id,
-                        iphone_value_white.category_id.name + ':' + iphone_value_white.value_id.name)]
+                        iphone_value_white.value_id.name)]
         self.assertEqual(result, real_result)
 
         # return super
