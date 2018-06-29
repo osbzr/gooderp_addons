@@ -202,6 +202,8 @@ class SellDelivery(models.Model):
     @api.one
     def _wrong_delivery_done(self):
         '''审核时不合法的给出报错'''
+        if self.state == 'done':
+            raise UserError(u'请不要重复发货')
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
                 raise UserError(u'商品 %s 的数量和商品含税单价不能小于0！' % line.goods_id.name)
@@ -448,7 +450,8 @@ class SellDelivery(models.Model):
             invoice_id = record._delivery_make_invoice()
             record.write({
                 'voucher_id': voucher and voucher.id,
-                'invoice_id': invoice_id and invoice_id.id,# 为保证审批流程顺畅，否则，未审批就可审核
+                'invoice_id': invoice_id and invoice_id.id,
+                'state': 'done',    # 为保证审批流程顺畅，否则，未审批就可审核
             })
             # 销售费用产生结算单
             record._sell_amount_to_invoice()
@@ -475,6 +478,8 @@ class SellDelivery(models.Model):
     @api.one
     def sell_delivery_draft(self):
         '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的结算单、收款单及凭证'''
+        if self.state == 'draft':
+            raise UserError(u'请不要重复撤销')
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
@@ -503,15 +508,22 @@ class SellDelivery(models.Model):
                 raise UserError(u'发货单已核销，不能撤销发货！')
         invoice_ids.money_invoice_draft()
         invoice_ids.unlink()
+        # 删除产生的出库凭证
+        voucher = self.voucher_id
+        if voucher and voucher.state == 'done':
+            voucher.voucher_draft()
+        voucher.unlink()
         # 如果存在分单，则将差错修改中置为 True，再次审核时不生成分单
         self.write({
             'modifying': False,
+            'state': 'draft',
         })
-        delivery_ids = self.search(
-            [('order_id', '=', self.order_id.id)])
+        delivery_ids = self.order_id and self.search(
+            [('order_id', '=', self.order_id.id)]) or []
         if len(delivery_ids) > 1:
             self.write({
                 'modifying': True,
+                'state': 'draft',
             })
         # 将原始订单中已执行数量清零
         if self.order_id:
@@ -525,11 +537,7 @@ class SellDelivery(models.Model):
         # 调用wh.move中反审核方法，更新审核人和审核状态
         self.sell_move_id.cancel_approved_order()
 
-        # 删除产生的出库凭证
-        voucher, self.voucher_id = self.voucher_id, False
-        if voucher and voucher.state == 'done':
-            voucher.voucher_draft()
-        voucher.unlink()
+        return True
 
     @api.multi
     def sell_to_return(self):

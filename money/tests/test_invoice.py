@@ -114,6 +114,7 @@ class TestInvoice(TransactionCase):
 
     def test_money_invoice_company_no_tax_account(self):
         ''' 创建 进项税行 公司 进项税科目 未设置 '''
+        self.env.user.company_id.draft_invoice = True
         # 进项税行 import_tax_account
         buy_invoice = self.env['money.invoice'].create({
             'name': 'invoice', 'date': "2016-02-20",
@@ -134,6 +135,39 @@ class TestInvoice(TransactionCase):
         self.env.user.company_id.output_tax_account = False
         with self.assertRaises(UserError):
             sell_invoice.money_invoice_done()
+
+    def test_money_invoice_done_no_category_account(self):
+        '''结算单分类上无科目审核报错'''
+        self.env.user.company_id.draft_invoice = True
+        cate = self.env['core.category'].create({
+            'name': '测试客户类别',
+            'type': 'customer',
+        })
+        invoice = self.env['money.invoice'].create({
+            'name': 'invoice', 'date': "2016-02-20",
+            'partner_id': self.env.ref('core.lenovo').id,
+            'category_id': cate.id,
+            'amount': 10.0,
+            'tax_amount': 11.7})
+        with self.assertRaises(UserError):
+            invoice.money_invoice_done()
+
+    def test_money_invoice_done_no_partner_category_account(self):
+        '''结算单客户分类上无科目审核报错'''
+        self.env.user.company_id.draft_invoice = True
+        cate = self.env['core.category'].create({
+            'name': '测试客户类别',
+            'type': 'customer',
+        })
+        self.env.ref('core.jd').c_category_id = cate
+        invoice = self.env['money.invoice'].create({
+            'name': 'invoice', 'date': "2016-02-20",
+            'partner_id': self.env.ref('core.jd').id,
+            'category_id': self.env.ref('money.core_category_sale').id,
+            'amount': 10.0,
+            'tax_amount': 11.7})
+        with self.assertRaises(UserError):
+            invoice.money_invoice_done()
 
     def test_money_invoice_name_get(self):
         ''' 测试 money invoice name_get 方法 '''

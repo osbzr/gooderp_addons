@@ -94,9 +94,6 @@ class WhMoveLine(models.Model):
         if self.goods_id:
             self.uom_id = self.goods_id.uom_id
             self.uos_id = self.goods_id.uos_id
-        else:
-            self.uom_id = ''
-            self.uos_id = ''
 
     @api.one
     @api.depends('goods_qty', 'goods_id')
@@ -108,10 +105,6 @@ class WhMoveLine(models.Model):
 
     @api.one
     def _inverse_goods_qty(self):
-        self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
-
-    @api.onchange('goods_uos_qty', 'goods_id')
-    def onchange_goods_uos_qty(self):
         self.goods_qty = self.goods_uos_qty * self.goods_id.conversion
 
     @api.depends('goods_id', 'goods_qty')
@@ -214,7 +207,7 @@ class WhMoveLine(models.Model):
     cost_unit = fields.Float(u'单位成本', digits=dp.get_precision('Price'),
                              help=u'入库/出库单位成本')
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
-                        digits=dp.get_precision('Amount'), store=True,
+                        digits=dp.get_precision('Price'), store=True,
                         help=u'入库/出库成本')
     line_net_weight = fields.Float(
         string=u'净重小计', compute=compute_line_net_weight, store=True)
@@ -494,7 +487,7 @@ class WhMoveLine(models.Model):
         self.compute_suggested_cost()
 
     @api.one
-    @api.constrains('force_batch_one', 'goods_qty')
+    @api.constrains('goods_qty')
     def check_goods_qty(self):
         """序列号管理的商品数量必须为1"""
         if self.force_batch_one and self.goods_qty > 1:

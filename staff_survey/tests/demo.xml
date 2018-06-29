@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- 招聘问卷 -->
+    <record id="survey_form" model="survey.survey">
+        <field name="title">招聘问卷</field>
+        <field name="stage_id" ref="survey.stage_permanent" />
+        <field name="auth_required" eval="True" />
+        <field name="users_can_go_back" eval="True" />
+    </record>
+    <!-- Page 1 -->
+    <record id="page_1" model="survey.page">
+        <field name="title">基本信息</field>
+        <field name="survey_id" ref="survey_form" />
+        <field name="sequence">1</field>
+        <field name="description">&lt;p&gt;&lt;/p&gt;</field>
+    </record>
+    <record id="page_1_1" model="survey.question">
+        <field name="page_id" ref="page_1" />
+        <field name="sequence">1</field>
+        <field name="question">您的毕业院校?</field>
+        <field name="type">textbox</field>
+    </record>
+    <record id="page_1_2" model="survey.question">
+        <field name="page_id" ref="page_1" />
+        <field name="sequence">2</field>
+        <field name="question">您的性别?</field>
+        <field name="type">simple_choice</field>
+        <field name="display_mode">dropdown</field>
+    </record>
+    <record id="page_1_2_1" model="survey.label">
+        <field name="question_id" ref="page_1_2"/>
+        <field name="sequence">1</field>
+        <field name="value">男</field>
+    </record>
+    <record id="page_1_2_2" model="survey.label">
+        <field name="question_id" ref="page_1_2"/>
+        <field name="sequence">2</field>
+        <field name="value">女</field>
+    </record>
+    <!--职位-->
+    <record id='staff.staff_job_1' model='staff.job'>
+        <field name='survey_id' ref='staff_survey.survey_form'/>
+    </record>
+</odoo>

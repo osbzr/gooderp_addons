@@ -10,6 +10,7 @@ class hire_applicant(models.Model):
 
     @api.multi
     def action_start_survey(self):
+        '''开始面试'''
         self.ensure_one()
         # create a response and link it to this applicant
         if not self.response_id:

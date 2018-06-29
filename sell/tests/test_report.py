@@ -481,6 +481,14 @@ class TestReceiptWizard(TransactionCase):
         for line in receipt_line2:
             line.view_detail()
 
+    def test_generate_reconcile_order(self):
+        '''新建核销单，应收冲预收，客户为所选行客户'''
+        self.receipt_wizard.button_ok()
+        for line in self.env['sell.receipt'].search([
+            ('order_name', '=', u'未核销预收款'), ('receipt', '!=', 0)]):
+            line.generate_reconcile_order()
+            # 查看生成的核销单
+            line.generate_reconcile_order()
 
 class TestSellTopTenWizard(TransactionCase):
     '''测试销量前十商品向导'''

@@ -136,9 +136,6 @@ class TestCreateWave(TransactionCase):
     def test_create_wave_add_loc_no_qty(self):
         ''' 测试 create_wave 给 拣货单行添加 库位，无产品'''
         self.others_wh_in.cancel_approved_order()
-        with self.assertRaises(UserError):
-            self.env.ref('warehouse.wh_move_line_14').location_id = False
-            self.others_wh_in.approve_order()
 
         self.env.ref('warehouse.wh_move_line_14').location_id = self.env.ref('warehouse.b001_location').id
         self.others_wh_in.approve_order()
@@ -147,6 +144,13 @@ class TestCreateWave(TransactionCase):
                 'active_model': 'sell.delivery',
             })
         wave_wizard.create_wave()
+
+    def test_create_wave_add_loc_no_qty_raise_error(self):
+        ''' 测试 create_wave 给 拣货单行添加 库位，无产品'''
+        self.others_wh_in.cancel_approved_order()
+        with self.assertRaises(UserError):
+            self.env.ref('warehouse.wh_move_line_14').location_id = False
+            self.others_wh_in.approve_order()
 
     def test_create_wave_goods_no_stock(self):
         ''' 测试 create_wave，发货单行存在 虚拟商品 '''

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class TestProduction(TransactionCase):
@@ -85,6 +85,9 @@ class TestProduction(TransactionCase):
         self.env.user.company_id.wh_scrap_id = self.env.ref('warehouse.bj_stock').id
         self.assembly_mutli.approve_order()
 
+        # 成品入库到废品仓的反审核
+        self.assembly_mutli.cancel_approved_order()
+
     def test_disassembly_apporve_exist_scape(self):
         # 拆卸单子产品入库存在报废
         # 先组装，后拆卸可以正常出入库
@@ -96,6 +99,9 @@ class TestProduction(TransactionCase):
         self.env.user.company_id.wh_scrap_id = self.env.ref('warehouse.bj_stock').id
         self.disassembly.approve_order()
 
+        # 成品入库到废品仓的反审核
+        self.disassembly.cancel_approved_order()
+
     def test_outsource_apporve_exist_scape(self):
         # 拆卸单子产品入库存在报废
         self.outsource_out1.approve_feeding()
@@ -103,6 +109,9 @@ class TestProduction(TransactionCase):
         keyboard_mouse.scrap = True
         self.env.user.company_id.wh_scrap_id = self.env.ref('warehouse.bj_stock').id
         self.outsource_out1.approve_order()
+
+        # 成品入库到废品仓的反审核
+        self.outsource_out1.cancel_approved_order()
 
     def test_check_is_child_enable_assembly(self):
         # 组装 子件中不能包含与组合件中相同的 产品+属性
@@ -614,3 +623,75 @@ class TestProduction(TransactionCase):
     def test_disassembly_unlink(self):
         ''' 测试 拆卸单 删除 '''
         self.disassembly.unlink()
+
+    def test_assembly_approve_feeding_twice(self):
+        '''组装单：重复发料和入库报错'''
+        self.assembly.approve_feeding()
+        with self.assertRaises(UserError):
+            self.assembly.approve_feeding()
+
+        self.assembly.approve_order()
+        with self.assertRaises(UserError):
+            self.assembly.approve_order()
+
+        self.assembly.cancel_approved_order()
+        with self.assertRaises(UserError):
+            self.assembly.cancel_approved_order()
+
+    def test_disassembly_approve_feeding_twice(self):
+        '''拆卸单：重复发料和入库报错'''
+        # 先组装，后拆卸可以正常出入库
+        self.assembly.approve_feeding()
+        self.assembly.approve_order()
+        self.disassembly.approve_feeding()
+        with self.assertRaises(UserError):
+            self.disassembly.approve_feeding()
+
+        self.disassembly.approve_order()
+        with self.assertRaises(UserError):
+            self.disassembly.approve_order()
+
+        self.disassembly.cancel_approved_order()
+        with self.assertRaises(UserError):
+            self.disassembly.cancel_approved_order()
+
+
+    def test_outsource_approve_feeding_twice(self):
+        '''委外单：重复发料和入库报错'''
+        self.outsource_out1.approve_feeding()
+        with self.assertRaises(UserError):
+            self.outsource_out1.approve_feeding()
+
+        self.outsource_out1.approve_order()
+        with self.assertRaises(UserError):
+            self.outsource_out1.approve_order()
+
+        self.outsource_out1.cancel_approved_order()
+        with self.assertRaises(UserError):
+            self.outsource_out1.cancel_approved_order()
+
+
+class TestWhBom(TransactionCase):
+    ''' 测试物料清单明细 '''
+
+    def setUp(self):
+        super(TestWhBom, self).setUp()
+        self.bom = self.env.ref('warehouse.wh_bom_0')
+
+    def test_check_parent_child_unique(self):
+        '''判断同一个产品不能是组合件又是子件'''
+        with self.assertRaises(ValidationError):
+            self.bom.write({'line_child_ids': [(0, 0, {'goods_id': self.env.ref('goods.keyboard_mouse').id})]})
+
+
+class TestWhBomLine(TransactionCase):
+    ''' 测试物料清单明细 '''
+
+    def setUp(self):
+        super(TestWhBomLine, self).setUp()
+        self.bom = self.env.ref('warehouse.wh_bom_0')
+
+    def test_check_goods_qty(self):
+        '''验证商品数量大于0'''
+        with self.assertRaises(ValidationError):
+            self.bom.line_child_ids[0].goods_qty = 0

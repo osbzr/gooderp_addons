@@ -73,8 +73,8 @@ class TrialBalance(models.Model):
             'target': 'new',
             'context': dict(
                 self.env.context,
-                active_id = self.id,
-                active_ids = [self.id]
+                active_id=self.id,
+                active_ids=[self.id]
             ),
         }
 
@@ -269,7 +269,7 @@ class ChangeCumulativeOccurrenceWizard(models.TransientModel):
 
     @api.model
     def default_get(self, fields):
-        if len(self.env.context.get('active_ids', False) ) >1 :
+        if len(self.env.context.get('active_ids', False)) > 1:
             raise UserError( u'一次只能调整一行')
         res = super(ChangeCumulativeOccurrenceWizard, self).default_get(fields)
         active_id = self.env.context.get('active_id', False)
@@ -288,12 +288,12 @@ class ChangeCumulativeOccurrenceWizard(models.TransientModel):
                         'account_id': trial_balance_item.subject_name_id.id
                 })
         return res
-    
+
     @api.multi
     def update_cumulative_occurrence(self):
         parent_accounts =[]
         account = self.trial_balance_id.subject_name_id
-        while account :
+        while account:
             parent_accounts.append(account)
             account = account.parent_id
 

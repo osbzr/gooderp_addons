@@ -3,12 +3,13 @@
 from utils import inherits, inherits_after, create_name, create_origin
 import odoo.addons.decimal_precision as dp
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class WhOut(models.Model):
     _name = 'wh.out'
     _description = u'其他出库单'
-    _inherit = ['mail.thread', 'scan.barcode']
+    _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
     _inherits = {
@@ -35,13 +36,24 @@ class WhOut(models.Model):
     @api.multi
     @inherits_after()
     def approve_order(self):
-        self.create_voucher()
+        for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复出库')
+            voucher = order.create_voucher()
+            order.write({
+                'voucher_id': voucher and voucher[0].id,
+                'state': 'done',
+            })
         return True
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
-        self.delete_voucher()
+        for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
+            order.delete_voucher()
+            order.state = 'draft'
         return True
 
     @api.multi
@@ -110,7 +122,6 @@ class WhOut(models.Model):
                 'debit': credit_sum,
                 'voucher_id': voucher.id,
             })
-        self.voucher_id = voucher
         if len(self.voucher_id.line_ids) > 0:
             self.voucher_id.voucher_done()
         else:
@@ -120,7 +131,7 @@ class WhOut(models.Model):
     @api.one
     def delete_voucher(self):
         # 反审核其他出库单时删除对应的出库凭证
-        voucher, self.voucher_id = self.voucher_id, False
+        voucher = self.voucher_id
         if voucher.state == 'done':
             voucher.voucher_draft()
 
@@ -158,13 +169,24 @@ class WhIn(models.Model):
     @api.multi
     @inherits()
     def approve_order(self):
-        self.create_voucher()
+        for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复入库')
+            voucher = order.create_voucher()
+            order.write({
+                'voucher_id': voucher and voucher[0].id,
+                'state': 'done',
+            })
         return True
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
-        self.delete_voucher()
+        for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
+            order.delete_voucher()
+            order.state = 'draft'
         return True
 
     @api.multi
@@ -211,7 +233,6 @@ class WhIn(models.Model):
                                                        'ref': '%s,%s' % (self._name, self.id)})
         else:
             vouch_id = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
-        self.voucher_id = vouch_id
         debit_sum = 0
         for line in self.line_in_ids:
             init_obj = self.is_init and 'init_warehouse - %s' % (self.id) or ''
@@ -253,7 +274,7 @@ class WhIn(models.Model):
         if self.voucher_id:
             if self.voucher_id.state == 'done':
                 self.voucher_id.voucher_draft()
-            voucher, self.voucher_id = self.voucher_id, False
+            voucher = self.voucher_id
             # 始初化单反审核只删除明细行
             if self.is_init:
                 vouch_obj = self.env['voucher'].search(
@@ -299,16 +320,24 @@ class WhInternal(models.Model):
     @api.multi
     @inherits()
     def approve_order(self):
-        if self.env.user.company_id.is_enable_negative_stock:
-            result_vals = self.env['wh.move'].create_zero_wh_in(
-                self, self._name)
-            if result_vals:
-                return result_vals
+        for order in self:
+            if order.state == 'done':
+                raise UserError(u'请不要重复入库')
+            if self.env.user.company_id.is_enable_negative_stock:
+                result_vals = self.env['wh.move'].create_zero_wh_in(
+                    self, self._name)
+                if result_vals:
+                    return result_vals
+            order.state = 'done'
         return True
 
     @api.multi
     @inherits()
     def cancel_approved_order(self):
+        for order in self:
+            if order.state == 'draft':
+                raise UserError(u'请不要重复撤销')
+            order.state = 'draft'
         return True
 
     @api.multi

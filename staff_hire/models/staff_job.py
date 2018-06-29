@@ -9,6 +9,7 @@ class staff_job(models.Model):
 
     @api.model
     def _default_address_id(self):
+        '''默认工作地点'''
         return self.env.user.company_id
 
     address_id = fields.Many2one(
@@ -41,6 +42,7 @@ class staff_job(models.Model):
 
     @api.depends('no_of_recruitment', 'staff_ids.job_id', 'staff_ids.active')
     def _compute_employees(self):
+        '''计算该职位员工个数'''
         employee_data = self.env['staff'].read_group([('job_id', 'in', self.ids)], ['job_id'], ['job_id'])
         result = dict((data['job_id'][0], data['job_id_count']) for data in employee_data)
         for job in self:
@@ -48,6 +50,7 @@ class staff_job(models.Model):
             job.expected_employees = result.get(job.id, 0) + job.no_of_recruitment
 
     def _compute_document_ids(self):
+        '''计算该职位简历数'''
         applicants = self.mapped('application_ids').filtered(lambda self: not self.staff_id)
         app_to_job = dict((applicant.id, applicant.job_id.id) for applicant in applicants)
         attachments = self.env['ir.attachment'].search([
@@ -56,9 +59,9 @@ class staff_job(models.Model):
             '&', ('res_model', '=', 'hire.applicant'), ('res_id', 'in', applicants.ids)])
         result = dict.fromkeys(self.ids, self.env['ir.attachment'])
         for attachment in attachments:
-            if attachment.res_model == 'hire.applicant':
+            if attachment.res_model == 'hire.applicant':    # 在招聘模型上上传简历
                 result[app_to_job[attachment.res_id]] |= attachment
-            else:
+            else:   # 在职位模型上上传简历
                 result[attachment.res_id] |= attachment
 
         for job in self:
@@ -67,6 +70,7 @@ class staff_job(models.Model):
 
     @api.multi
     def _compute_application_count(self):
+        '''计算该职位招聘数'''
         read_group_result = self.env['hire.applicant'].read_group([('job_id', '=', self.id)], ['job_id'], ['job_id'])
         result = dict((data['job_id'][0], data['job_id_count']) for data in read_group_result)
         for job in self:
@@ -74,6 +78,7 @@ class staff_job(models.Model):
 
     @api.multi
     def action_get_attachment_tree_view(self):
+        '''跳转到简历界面'''
         action = self.env.ref('base.action_attachment').read()[0]
         action['context'] = {
             'default_res_model': self._name,

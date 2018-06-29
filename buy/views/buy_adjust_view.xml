@@ -44,7 +44,7 @@
                     </group>
                     <field name="line_ids">
                     	<tree string="采购变更单行" editable="bottom">
-                            <field name="goods_id" required='1'/>
+                            <field name="goods_id" required='1' domain="[('not_buyable','=',False)]"/>
                             <field name="attribute_id"
                             	groups='goods.multi_attrs_groups'
                             	attrs="{'required': [('using_attribute','=', True)], 'readonly': [('using_attribute','!=', True)]}"/>

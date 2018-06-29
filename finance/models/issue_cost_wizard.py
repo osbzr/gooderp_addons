@@ -68,7 +68,7 @@ class MonthProductCost(models.Model):
         last_period_remaining_cost = 0
 
         # 查找 离输入期间最近的 对应产品的发出成本行
-        last_month_product_cost_row = self.search([('period_id', '<', period_id.id),
+        last_month_product_cost_row = self.search([('period_id.id', '<', period_id.id),
                                                    ('goods_id', '=', goods_id)], limit=1, order='id desc')
         if last_month_product_cost_row:
             last_period_remaining_qty = last_month_product_cost_row.current_period_remaining_qty

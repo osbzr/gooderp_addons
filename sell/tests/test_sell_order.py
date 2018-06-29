@@ -10,6 +10,7 @@ class TestSellOrder(TransactionCase):
         super(TestSellOrder, self).setUp()
         self.env.ref('core.jd').credit_limit = 100000
         self.order = self.env.ref('sell.sell_order_1')
+        self.return_order = self.env.ref('sell.sell_order_return')
         self.env.ref('sell.sell_order_line_1').tax_rate = 0
 
         # 因同一个业务伙伴不能存在两张未审核的收付款单，把系统里已有的相关业务伙伴未审核的收付款单审核
@@ -202,6 +203,22 @@ class TestSellOrder(TransactionCase):
         # compute_delivery_count
         self.assertTrue(order_2.delivery_count == 2)
 
+    def test_action_view_return(self):
+        '''该销货订单对应的退货单'''
+        self.return_order.sell_order_done()
+        self.return_order.action_view_return()
+        self.assertTrue(self.return_order.return_count == 1)
+
+        # len(delivery_ids) > 1
+        delivery = self.env['sell.delivery'].search([
+            ('order_id', '=', self.return_order.id)])
+        for line in delivery.line_in_ids:
+            line.goods_qty = 5
+            line.location_id = self.env.ref('warehouse.b001_location')
+        delivery.sell_delivery_done()
+        self.return_order.action_view_return()
+        self.assertTrue(self.return_order.return_count == 2)
+
 
 class TestSellOrderLine(TransactionCase):
 
@@ -327,6 +344,11 @@ class TestApproveMultiSellOrder(TransactionCase):
     def test_fields_view_get(self):
         ''' Test: fields_view_get '''
         sell_obj = self.env['approve.multi.sell.order']
+        # 不报错的情况
+        sell_obj.with_context({
+            'active_model': 'sell.order',
+            'active_ids': [self.order.id, self.order_2.id]
+        }).fields_view_get(None, 'form', False, False)
         # 报错：存在销售订单已审核的单据
         self.order_2.sell_order_done()
         with self.assertRaises(UserError):

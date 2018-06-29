@@ -1,20 +1,23 @@
+language: python
+sudo: false
+cache:
+  apt: true
+  directories:
+    - $HOME/.cache/pip
+
+python:
+  - "2.7.13"
+
 addons:
+  postgresql: "9.5"
   apt:
     packages:
       - expect-dev  # provides unbuffer utility
-      - python-lxml # because pip installation is slow
-
-language: python
-
-python:
-  - "2.7"
 
 env:
+  global:
   - VERSION="10.0" ODOO_REPO="osbzr/base" LINT_CHECK="0" PGPASSWORD="travis"
-
-
-virtualenv:
-  system_site_packages: true
+  - PHANTOMJS_VERSION="latest"
 
 install:
   - git clone http://github.com/GoodERPJeff/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
@@ -32,4 +35,4 @@ script:
   - travis_run_tests
 
 after_success:
-  coveralls
+  - travis_after_tests_success

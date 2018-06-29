@@ -82,7 +82,7 @@ class Currency(models.Model):
                 url, 'POST', headers=headers, body=urllib.urlencode(body))
             result = etree.HTML(content.decode('utf8')).xpath(
                 '//table[@cellpadding="0"]/tr[4]/td/text()')
-        except httplib2.HttpLib2Error:
+        except httplib2.HttpLib2Error:  # pragma: no cover
             raise UserError(u'网页设置有误(%s)请联系作者：（qq：2201864）' % url)
         return result[5]
 

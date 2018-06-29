@@ -455,14 +455,16 @@ class SellOrder(models.Model):
             'view_id': False,
             'target': 'current',
         }
+        tree_view_id = self.env.ref('sell.sell_return_tree').id
+        form_view_id = self.env.ref('sell.sell_return_form').id
         delivery_ids = [delivery.id for delivery in self.delivery_ids if delivery.is_return]
         if len(delivery_ids) > 1:
             action['domain'] = "[('id','in',[" + \
                                ','.join(map(str, delivery_ids)) + "])]"
             action['view_mode'] = 'tree,form'
+            action['views'] = [(tree_view_id, 'tree'), (form_view_id, 'form')]
         elif len(delivery_ids) == 1:
-            view_id = self.env.ref('sell.sell_return_form').id
-            action['views'] = [(view_id, 'form')]
+            action['views'] = [(form_view_id, 'form')]
             action['res_id'] = delivery_ids and delivery_ids[0] or False
         return action
 

@@ -21,6 +21,14 @@ class Goods(models.Model):
     def _get_default_not_saleable(self):
         return self._get_default_not_saleable_impl()
 
+    @api.model
+    def _get_default_not_buyable_impl(self):
+        return False
+
+    @api.model
+    def _get_default_not_buyable(self):
+        return self._get_default_not_buyable_impl()
+
     @api.multi
     def name_get(self):
         '''在many2one字段里显示 编号_名称'''
@@ -83,7 +91,7 @@ class Goods(models.Model):
         string=u'转化率', default=1, digits=(16, 3),
         help=u'1个辅助单位等于多少计量单位的数量，如1箱30个苹果，这里就输入30')
     cost = fields.Float(u'成本',
-                        digits=dp.get_precision('Amount'))
+                        digits=dp.get_precision('Price'))
     cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法',
                                    help=u'''GoodERP仓库模块使用先进先出规则匹配
                                    每次出库对应的入库成本和数量，但不实时记账。
@@ -93,6 +101,9 @@ class Goods(models.Model):
     not_saleable = fields.Boolean(u'不可销售',
                                   default=_get_default_not_saleable,
                                   help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
+    not_buyable = fields.Boolean(u'不可采购',
+                                  default=_get_default_not_buyable,
+                                  help=u'商品是否不可采购，勾选了就不可采购，未勾选可采购')
     active = fields.Boolean(u'启用', default=True)
     company_id = fields.Many2one(
         'res.company',
