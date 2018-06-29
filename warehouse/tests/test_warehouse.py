@@ -118,3 +118,8 @@ class TestWarehouse(TransactionCase):
         order = self.env.ref('warehouse.wh_out_wh_out_attribute')
         warehouse.scan_barcode(model_name, barcode, order.id)
         warehouse.scan_barcode(model_name, barcode, order.id)
+
+    def test_check_goods_qty(self):
+        '''指定商品，属性，仓库，的当前剩余数量'''
+        res = self.env['wh.move'].check_goods_qty(False, False, self.hd_warehouse)[0]
+        self.assertTrue(not res)
