@@ -248,8 +248,14 @@ class TestWarehouseOrder(TransactionCase):
 
     def test_create_voucher_no_voucher_line(self):
         '''初始化其他入库单时生成凭证 没有凭证行，删除凭证  的情况'''
-        self.others_in_2_keyboard_mouse.cost_unit = 0.0
         self.others_in_2.cancel_approved_order()
+        self.others_in_2_keyboard_mouse.cost = 0.0
+        self.others_in_2.approve_order()
+
+        # 键鼠套装入库成本为0再出库时，没有凭证行，删除凭证行
+        self.others_out_2.cancel_approved_order() # 为下面再次审核做准备
+        self.env.ref('warehouse.wh_move_line_out_2').cost = 0.0
+        self.others_out_2.approve_order()
 
     def test_voucher_can_be_draft(self):
         '''其他单据生成的凭证不能反审核'''
@@ -302,6 +308,30 @@ class TestWarehouseOrder(TransactionCase):
             }
             self.internal.goods_inventory(vals)
 
+    def test_approve_order_twice(self):
+        '''重复确认报错'''
+        with self.assertRaises(UserError):
+            self.others_in.approve_order()
+        with self.assertRaises(UserError):
+            self.internal.approve_order()
+        with self.assertRaises(UserError):
+            self.others_out.approve_order()
+
+    def test_cancel_approved_order_twice(self):
+        '''重复撤销报错'''
+        self.others_in_2.cancel_approved_order()
+        with self.assertRaises(UserError):
+            self.others_in_2.cancel_approved_order()
+
+        self.others_out.cancel_approved_order()
+        with self.assertRaises(UserError):
+            self.others_out.cancel_approved_order()
+
+        self.internal.cancel_approved_order()
+        with self.assertRaises(UserError):
+            self.internal.cancel_approved_order()
+
+
 
 class TestCheckOutWizard(TransactionCase):
     # 放在这里测试，因为代码实现时，需要安装 warehouse 模块
@@ -323,8 +353,7 @@ class TestCheckOutWizard(TransactionCase):
         self.env.ref('warehouse.wh_move_line_keyboard_mouse_in_2').cost = 400
         self.browse_ref('warehouse.wh_in_whin3').approve_order()
         # 当月出库
-        others_out_2 = self.env.ref('warehouse.wh_out_whout1')
-        others_out_2.cancel_approved_order()
+        others_out_2 = self.env.ref('warehouse.wh_out_whout1').copy()
         others_out_2.date = '2014-12-06'
         others_out_2.approve_order()
         # 月末结账
@@ -334,8 +363,7 @@ class TestCheckOutWizard(TransactionCase):
         self.env.ref('finance.period_201412').is_closed = True
 
         # 发出成本算法为 定额成本std
-        others_out_3 = self.env.ref('warehouse.wh_out_whout1')
-        others_out_3.cancel_approved_order()
+        others_out_3 = self.env.ref('warehouse.wh_out_whout1').copy()
         others_out_3.date = '2015-12-06'
         self.env.ref('goods.keyboard_mouse').cost_method = 'std'
         others_out_3.approve_order()

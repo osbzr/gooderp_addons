@@ -151,3 +151,15 @@ class TestScm(TransactionCase):
             'core.zt').id
 
         self.stock_request.stock_request_done()
+
+    def test_stock_request_done_twice(self):
+        '''不能重复审核'''
+        self.wh_move_in_1.approve_order()
+        self.stock_request.stock_query()
+        # 保证不存在多条未审核购货订单行
+        self.env.ref('buy.buy_order_line_1_same').attribute_id = False
+        self.env.ref('buy.buy_return_order_line_1').order_id.partner_id = self.env.ref(
+            'core.zt').id
+        self.stock_request.stock_request_done()
+        with self.assertRaises(UserError):
+            self.stock_request.stock_request_done()
