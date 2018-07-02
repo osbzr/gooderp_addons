@@ -30,8 +30,9 @@ class TestExpressMenu(TransactionCase):
             self.delivery.express_type = 'SF_test'
             self.env['wh.move'].get_moves_html(move.id)
 
-#         self.delivery.express_type = 'YTO'
-#         self.env['wh.move'].get_moves_html(move.id)
+        self.delivery.express_type = 'YTO'
+        self.delivery.express_code = '66668888'
+        self.env['wh.move'].get_moves_html(move.id)
 
     def test_get_moves_html_package(self):
         ''' 测试 get_moves_html_package '''
