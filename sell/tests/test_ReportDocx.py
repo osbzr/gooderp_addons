@@ -24,6 +24,14 @@ class TestReportDocx(TransactionCase):
 
     def test_lookup_report(self):
         '''测试docx报表模板'''
+        self.sell_order.note = u'测试&和<>'
+        self.report_docx_sell.create(
+            self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
+
+    def test_lookup_report_many2one(self):
+        '''测试docx报表模板many2one字段中含有特殊字符&<>'''
+        for line in self.sell_order.line_ids:
+            line.goods_id.name = u'鼠标测试&和<>'
         self.report_docx_sell.create(
             self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
 
