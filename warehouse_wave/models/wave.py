@@ -362,8 +362,6 @@ class DoPack(models.Model):
                         dialog.do_confirm()
                     # 执行完 sell_delivery_done 方法，给 打包完成 字段赋 True 值
                     self.is_pack = True
-                else:
-                    return func()
 
     def get_line_data(self, code):
         """构造行的数据"""

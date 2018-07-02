@@ -53,6 +53,22 @@ class TestNonActiveReport(TransactionCase):
         self.non_active_report_wizard.warehouse_id = False
         self.non_active_report_wizard.open_non_active_report()
 
+    def test_open_non_active_report_update_last_move_line(self):
+        ''' 呆滞料报表:更新最后发货日期和最后发货数量 '''
+        # 修改调入仓为客户仓库来模拟发货明细行
+        self.keyboard_mouse_in_line.warehouse_id = self.env.ref('warehouse.hd_stock')
+        self.keyboard_mouse_in_line.warehouse_dest_id = self.env.ref('warehouse.warehouse_customer')
+        self.keyboard_mouse_in_line.date = datetime.datetime.now() - \
+            datetime.timedelta(days=2)
+        self.keyboard_mouse_in_line.state = 'done'
+
+        new_line = self.keyboard_mouse_in_line.copy()
+        new_line.date = datetime.datetime.now() - \
+                                           datetime.timedelta(days=1)
+        new_line.state = 'done'
+
+        self.non_active_report_wizard.open_non_active_report()
+
     def test_non_active_report_fields_view_get(self):
         ''' 呆滞料报表 fields_view_get 测试 '''
         self.env['non.active.report'].with_context({
