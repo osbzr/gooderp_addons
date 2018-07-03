@@ -96,6 +96,7 @@ class TestProduction(TransactionCase):
 
         self.disassembly.approve_feeding()
         self.disassembly_mouse.scrap = True
+        self.disassembly_keyboard.scrap = True  # 为了覆盖move_line 的action_done 中最后一个else
         self.env.user.company_id.wh_scrap_id = self.env.ref('warehouse.bj_stock').id
         self.disassembly.approve_order()
 

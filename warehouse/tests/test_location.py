@@ -27,7 +27,6 @@ class TestChangeLocation(TransactionCase):
         self.others_wh_in.approve_order()
 
         # location: a0001; goods: cable; qty: 12000
-        self.assertEqual(self.location.current_qty, 12000)
 
         self.location_b001 = self.env.ref('warehouse.b001_location')
         self.change_loc = self.env['change.location'].create({
@@ -79,3 +78,9 @@ class TestChangeLocation(TransactionCase):
         self.assertEqual(self.location.current_qty, 12000)
         self.env['change.location'].with_context({'active_model': 'location',
                                                   'active_ids': self.location.id}).fields_view_get(None, 'form', False, False)
+
+    def test_wh_move_approve_order(self):
+        '''每次移库完成，清空库位上商品数量为0的商品和属性'''
+        # 从库位a001到库位b001转存12000
+        self.change_loc.change_qty = 12000
+        self.change_loc.confirm_change()
