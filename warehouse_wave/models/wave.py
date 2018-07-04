@@ -238,16 +238,12 @@ class CreateWave(models.TransientModel):
                     line.goods_id, line.attribute_id, line.warehouse_id)
                 result = result[0] or 0
                 if total_goods_qty > result:
+                    # 缺货发货单不分配进拣货单
+                    available_line.append(False)
                     raise UserError(u'您勾选的订单与未发货的拣货单商品数量总和大于库存，不能生成拣货单。\n'
                                     u'产品 %s 库存不足' % line.goods_id.name)
-
-                available_line.append(True)
-                # 缺货发货单不分配进拣货单
-                result = line.move_id.check_goods_qty(
-                    line.goods_id, line.attribute_id, line.warehouse_id)
-                result = result[0] or 0
-                if line.goods_qty > result:
-                    available_line.append(False)
+                else:
+                    available_line.append(True)
 
             if all(available_line):
                 for line in active_model.line_out_ids:
@@ -262,9 +258,7 @@ class CreateWave(models.TransientModel):
                 active_model.pakge_sequence = index
                 active_model.wave_id = wave_row.id
                 express_type = active_model.express_type
-        # 所有订单缺货
-        if not product_location_num_dict:
-            raise UserError(u'您勾选的订单缺货，不能生成拣货单')
+        # 所有订单都不缺货
         wave_row.express_type = express_type
         wave_row.line_ids = self.build_wave_line_data(
             product_location_num_dict)
@@ -368,8 +362,6 @@ class DoPack(models.Model):
                         dialog.do_confirm()
                     # 执行完 sell_delivery_done 方法，给 打包完成 字段赋 True 值
                     self.is_pack = True
-                else:
-                    return func()
 
     def get_line_data(self, code):
         """构造行的数据"""

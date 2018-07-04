@@ -97,7 +97,7 @@ class IrActionReportDocx(models.Model):
             "SELECT * FROM ir_act_report_xml WHERE report_name=%s", (name,))
         r = self._cr.dictfetchone()
         if r:
-            if r['report_type'] == 'docx':
+            if r['model'] == 'partner.statements.report.wizard' and r['report_type'] == 'docx':
                 return ReportDocxPartner('report.' + r['report_name'], r['model'], register=False)
 
         return super(IrActionReportDocx, self)._lookup_report(name)

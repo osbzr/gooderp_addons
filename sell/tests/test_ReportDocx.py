@@ -4,6 +4,8 @@ from odoo.addons.report_docx.report.report_docx import DataModelProxy
 from odoo.tools import misc
 import tempfile
 import shutil
+import datetime
+
 
 from odoo.addons.report_docx.report import report_helper
 from docxtpl import DocxTemplate
@@ -19,28 +21,36 @@ class TestReportDocx(TransactionCase):
         self.report_docx_sell = self.ir_actions._lookup_report('sell.order')
 
         self.ir_actions_pdf = self.env.ref('sell.report_sell_order_2')
-        self.sell_order = self.env.ref('sell.sell_order_1')
-        self.report_pdf_sell = self.ir_actions_pdf._lookup_report('sell.order')
+        self.report_pdf_sell = self.ir_actions_pdf._lookup_report('sell.order.pdf')
 
     def test_lookup_report(self):
         '''测试docx报表模板'''
+        self.sell_order.note = u'测试&和<>'
+        self.report_docx_sell.create(
+            self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
+
+    def test_lookup_report_many2one(self):
+        '''测试docx报表模板many2one字段中含有特殊字符&<>'''
+        for line in self.sell_order.line_ids:
+            line.goods_id.name = u'鼠标测试&和<>'
         self.report_docx_sell.create(
             self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
 
     def test_lookup_report_pdf(self):
         '''测试docx报表模，输出类型为pdf'''
-        self.ir_actions.write({'output_type': 'pdf'})
-        self.report_docx_sell.create(
-            self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
+        # 测试create_source_docx
+        # self.report_pdf_sell.create(
+        #     self.cr, self.uid, self.sell_order.id, self.ir_actions_pdf, self.env.context)
 
     def test_lookup_report_type_pdf(self):
         '''测试docx报表模，report_type 为pdf'''
+        # 模板为pdf类型,测试create
         self.ir_actions_pdf.write({'report_type': 'pdf'})
         self.report_pdf_sell.create(
             self.cr, self.uid, self.sell_order.id, self.ir_actions_pdf, self.env.context)
-        self.report_pdf_sell = self.ir_actions_pdf._lookup_report('sell.order')
-        self.ir_actions_pdf.write({'report_type':'pdf'})
-        self.report_pdf_sell.create(self.cr, self.uid,self.sell_order.id, self.ir_actions, self.env.context)
+
+        # 模板为docx类型,测试create
+        self.report_docx_sell.create(self.cr, self.uid,self.sell_order.id, self.ir_actions, self.env.context)
 
     def test_lookup_report_no_r(self):
         ''' 测试 执行 ir_report '''
@@ -62,10 +72,6 @@ class TestReportDocx(TransactionCase):
         self.report_docx_sell._save_file(
             tempname + "/sell.order.docx", doxc_file)
 
-    def test_render_to_pdf(self):
-        doxc_file = self.report_pdf_sell.create(self.cr, self.uid, self.sell_order.id, self.ir_actions_pdf,
-                                                self.env.context)
-
     def test_datamodelproxy(self):
         data = DataModelProxy([{"type": 'selection'}])
         data.__getitem__(0)
@@ -80,6 +86,12 @@ class TestReportDocx(TransactionCase):
         home = self.env['sell.order']
         data = DataModelProxy(home)
         data._compute_by_selection(home._fields.get('state'), "done")
+
+    def test_compute_by_datetime(self):
+        '''datetime打印处理'''
+        obj = self.env['sell.order']
+        data = DataModelProxy(obj)
+        data._compute_by_datetime(obj._fields.get('create_date'), (datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S'))
 
 
 class TestReportHelper(TransactionCase):

@@ -340,6 +340,11 @@ class TestDoPack(TransactionCase):
         with self.assertRaises(UserError):
             pack.scan_barcode('6666', '')
 
+        # 发货单已经打包完成
+        pack = self.env['do.pack'].create({})
+        with self.assertRaises(UserError):
+            pack.scan_barcode('123456', pack.id)
+
     def test_scan_barcode_no_goods_line(self):
         ''' 测试 scan_barcode 扫描产品不在打包行上'''
         pack = self.env['do.pack'].create({})
