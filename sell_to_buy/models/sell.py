@@ -10,10 +10,3 @@ class sell_order_line(models.Model):
                                   u'购货单行',
                                   help=u'对应的购货订单行')
     is_bought = fields.Boolean(u'已采购')
-
-
-
-
-
-
-
