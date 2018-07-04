@@ -702,7 +702,7 @@ class MoneyInvoice(models.Model):
             inv.to_reconcile = inv.amount
             inv.state = 'done'
             if not inv.date_due:
-                inv.date_due = fields.Date.context_today(self)
+                inv.date_due = fields.Date.context_today(self) + inv.partner_id.credit_time
             if inv.category_id.type == 'income':
                 inv.partner_id.receivable += inv.amount
             if inv.category_id.type == 'expense':
