@@ -207,7 +207,7 @@ class WhMoveLine(models.Model):
     cost_unit = fields.Float(u'单位成本', digits=dp.get_precision('Price'),
                              help=u'入库/出库单位成本')
     cost = fields.Float(u'成本', compute='_compute_cost', inverse='_inverse_cost',
-                        digits=dp.get_precision('Price'), store=True,
+                        digits=dp.get_precision('Amount'), store=True,
                         help=u'入库/出库成本')
     line_net_weight = fields.Float(
         string=u'净重小计', compute=compute_line_net_weight, store=True)
@@ -246,8 +246,10 @@ class WhMoveLine(models.Model):
         if self.env.context.get('type') == 'in' and self.goods_id:
             if self.price:
                 self.cost = self.price * self.goods_qty - self.discount_amount + self.share_cost
+                print '--------',self.cost
             elif self.cost_unit:
                 self.cost = self.cost_unit * self.goods_qty - self.discount_amount + self.share_cost
+                print '+++++++',self.cost
 
     @api.one
     def _inverse_cost(self):
