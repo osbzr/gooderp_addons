@@ -246,10 +246,8 @@ class WhMoveLine(models.Model):
         if self.env.context.get('type') == 'in' and self.goods_id:
             if self.price:
                 self.cost = self.price * self.goods_qty - self.discount_amount + self.share_cost
-                print '--------',self.cost
             elif self.cost_unit:
                 self.cost = self.cost_unit * self.goods_qty - self.discount_amount + self.share_cost
-                print '+++++++',self.cost
 
     @api.one
     def _inverse_cost(self):
