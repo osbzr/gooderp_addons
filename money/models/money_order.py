@@ -232,7 +232,8 @@ class MoneyOrder(models.Model):
         :return:
         """
         invoice_search_list = [('partner_id', '=', self.partner_id.id),
-                               ('to_reconcile', '!=', 0)]
+                               ('to_reconcile', '!=', 0),
+                               ('state', '=', 'done')]
         if self.env.context.get('type') == 'get':
             invoice_search_list.append(('category_id.type', '=', 'income'))
         else:  # type = 'pay':

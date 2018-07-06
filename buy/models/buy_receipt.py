@@ -443,8 +443,10 @@ class BuyReceipt(models.Model):
         # 查找产生的结算单
         invoice_ids = self.env['money.invoice'].search(
             [('name', '=', self.invoice_id.name)])
-        invoice_ids.money_invoice_draft()
-        invoice_ids.unlink()
+        for invoice in invoice_ids:
+            if invoice.state == 'done':
+                invoice.money_invoice_draft()
+            invoice.unlink()
         # 反审核采购入库单时删除对应的入库凭证
         voucher = self.voucher_id
         if voucher.state == 'done':
