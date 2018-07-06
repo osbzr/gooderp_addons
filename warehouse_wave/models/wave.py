@@ -205,6 +205,18 @@ class CreateWave(models.TransientModel):
         return reserved_dict
 
     @api.multi
+    def get_sell_delivery(self, goods_id, attribute_id):
+        ''' 查找缺货发货单  '''
+        sell_delivery_lists = []
+        for active_model in self.env[self.active_model].browse(self.env.context.get('active_ids')):
+            for line in active_model.line_out_ids:
+                if line.goods_id.id == goods_id and line.attribute_id.id == attribute_id:
+                    sell_delivery_lists.append(line.move_id.name)
+
+        return sell_delivery_lists
+
+
+    @api.multi
     def create_wave(self):
         """
         创建拣货单
@@ -240,8 +252,12 @@ class CreateWave(models.TransientModel):
                 if total_goods_qty > result:
                     # 缺货发货单不分配进拣货单
                     available_line.append(False)
+                    # 查找所有勾选的 含有该产品的 发货单
+                    deliverys_lists = self.get_sell_delivery(line.goods_id.id, line.attribute_id.id)
+
                     raise UserError(u'您勾选的订单与未发货的拣货单商品数量总和大于库存，不能生成拣货单。\n'
-                                    u'产品 %s 库存不足' % line.goods_id.name)
+                                    u'产品 %s 库存不足。\n'
+                                    u'相关拣货单 %s' % (line.goods_id.name, deliverys_lists))
                 else:
                     available_line.append(True)
 
@@ -258,6 +274,9 @@ class CreateWave(models.TransientModel):
                 active_model.pakge_sequence = index
                 active_model.wave_id = wave_row.id
                 express_type = active_model.express_type
+
+        # eeee
+
         # 所有订单都不缺货
         wave_row.express_type = express_type
         wave_row.line_ids = self.build_wave_line_data(
