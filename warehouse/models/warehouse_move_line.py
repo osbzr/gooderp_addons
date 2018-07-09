@@ -492,3 +492,15 @@ class WhMoveLine(models.Model):
         """序列号管理的商品数量必须为1"""
         if self.force_batch_one and self.goods_qty > 1:
             raise UserError(u'商品 %s 进行了序列号管理，数量必须为1' % self.goods_id.name)
+
+    @api.one
+    @api.constrains('attribute_id', 'lot', 'lot_id')
+    def check_attribute_lot(self):
+        '''检查属性或批号是否填充，防止无权限人员不填就可以保存'''
+        if self.using_attribute and not self.attribute_id:
+            raise UserError(u'请输入商品：%s 的属性' % self.goods_id.name)
+        if self.using_batch:
+            if self.type == 'in' and not self.lot:
+                raise UserError(u'请输入商品：%s 的批号' % self.goods_id.name)
+            if self.type in ['out', 'internal'] and not self.lot_id:
+                raise UserError(u'请选择商品：%s 的批号' % self.goods_id.name)
