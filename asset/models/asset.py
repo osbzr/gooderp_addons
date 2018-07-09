@@ -314,6 +314,8 @@ class Asset(models.Model):
             raise UserError(u'已变更不能撤销确认！')
         if self.period_id.is_closed:
             raise UserError(u'该会计期间(%s)已结账！不能撤销确认' % self.period_id.name)
+        if self.money_invoice.reconciled != 0:
+            raise UserError(u'固定资产已有核销，请不要撤销')
 
         '''删掉凭证'''
         if self.voucher_id:
