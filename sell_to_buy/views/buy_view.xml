@@ -12,6 +12,9 @@
             <field name="currency_id" position="after">
                 <field name="sell_id"/>
             </field>
+            <field name="using_attribute" position="after">
+                <field name="sell_line_id" invisible="1"/>
+            </field>
         </field>
     </record>
     <record id="sell_order_form_inherit" model="ir.ui.view">
@@ -20,7 +23,6 @@
         <field name='inherit_id' ref='sell.sell_order_form' />
         <field name="arch" type="xml">
             <field name="using_attribute" position="after" >
-                <field name="buy_line_id" invisible="1"/>
                 <field name="is_bought" invisible="1"/>
             </field>
         </field>

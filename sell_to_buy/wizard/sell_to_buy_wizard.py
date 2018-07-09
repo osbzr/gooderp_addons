@@ -30,6 +30,7 @@ class SellToBuyWizard(models.TransientModel):
             'discount_amount': line.discount_amount,
             'tax_rate': line.tax_rate,
             'note': line.note or '',
+            'sell_line_id': line.id,    # sell_line_id写入到购货订单行上
         }
 
     @api.multi
@@ -52,7 +53,6 @@ class SellToBuyWizard(models.TransientModel):
             for line in wizard.sell_line_ids:
                 buy_lines.append(self._get_vals(order, line))
                 line.is_bought = True
-                # fixme:buy_line_id写入到销货订单行上
             # 将销货订单行复制到购货订单
             order.write({
                 'sell_id': order_dict.keys()[0].id,

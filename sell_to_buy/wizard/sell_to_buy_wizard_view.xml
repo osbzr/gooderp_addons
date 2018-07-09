@@ -9,7 +9,7 @@
                     <group>
                         <group>
                             <field name='sell_line_ids'
-                                   domain="[(('is_bought', '=', False))]"
+                                   domain="[('is_bought', '=', False), ('order_id.type', '=', 'sell')]"
                                    context="{'search_default_group_by_order': 1,
                                    'tree_view_ref': 'sell_to_buy.sell_order_line_tree'}"
                             />

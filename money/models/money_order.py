@@ -256,8 +256,7 @@ class MoneyOrder(models.Model):
 
         for invoice in self.env['money.invoice'].search(self._get_invoice_search_list()):
             source_lines.append(self._get_source_line(invoice))
-        if source_lines:
-            self.source_ids = source_lines
+        self.source_ids = source_lines
 
     @api.multi
     def money_order_done(self):
@@ -1137,7 +1136,8 @@ class ReconcileOrder(models.Model):
         if business_type in ['get_to_get', 'pay_to_pay']:
             invoices = self.env['money.invoice'].search([('name', '=', name)])
             for inv in invoices:
-                inv.money_invoice_draft()
+                if inv.state == 'done':
+                    inv.money_invoice_draft()
                 inv.unlink()
         return True
 
