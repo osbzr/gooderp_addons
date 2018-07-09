@@ -256,8 +256,7 @@ class MoneyOrder(models.Model):
 
         for invoice in self.env['money.invoice'].search(self._get_invoice_search_list()):
             source_lines.append(self._get_source_line(invoice))
-        if source_lines:
-            self.source_ids = source_lines
+        self.source_ids = source_lines
 
     @api.multi
     def money_order_done(self):
