@@ -154,7 +154,7 @@ class Goods(models.Model):
                     ('location_id', '=', self.env.context.get('location')))
 
             # 出库单行 填写了库位
-            if move_line and move_line.location_id:
+            if not self.env.context.get('location') and move_line and move_line.location_id:
                 domain.append(('location_id', '=', move_line.location_id.id))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
