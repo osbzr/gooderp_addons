@@ -89,6 +89,9 @@ class WhMoveLine(models.Model):
         )
 
     def prev_action_done(self):
+        """
+            发货 matching
+        """
         for line in self:
             if line.warehouse_id.type == 'stock' and \
                     line.goods_id.is_using_matching():
@@ -101,9 +104,10 @@ class WhMoveLine(models.Model):
                 else:
                     matching_records, cost = line.goods_id \
                         .get_matching_records(
-                            line.warehouse_id, line.goods_qty,
-                            uos_qty=line.goods_uos_qty,
-                            attribute=line.attribute_id)
+                        line.warehouse_id, line.goods_qty,
+                        uos_qty = line.goods_uos_qty,
+                        attribute = line.attribute_id,
+                        move_line = line)
                     for matching in matching_records:
                         self.create_matching_obj(line, matching)
                 line.cost_unit = safe_division(cost, line.goods_qty)
