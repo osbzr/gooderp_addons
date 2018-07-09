@@ -23,7 +23,8 @@ from odoo.exceptions import UserError, ValidationError
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
 from odoo.tools import float_compare, float_is_zero
-from datetime import datetime
+import datetime
+#from datetime import datetime
 
 
 class MoneyOrder(models.Model):
@@ -617,8 +618,8 @@ class MoneyInvoice(models.Model):
         计算逾期金额： 逾期时等于未核销金额，否则为0
         :return: 逾期天数
         """
-        d1 = datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
-        d2 = self.date_due and datetime.strptime(
+        d1 = datetime.datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
+        d2 = self.date_due and datetime.datetime.strptime(
             self.date_due, '%Y-%m-%d') or d1
         day = (d1 - d2).days
         self.overdue_days = day > 0 and day or 0.0
