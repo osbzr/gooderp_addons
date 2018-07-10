@@ -1076,6 +1076,20 @@ class ReconcileOrder(models.Model):
                 to_invoice_id.to_reconcile = 0
                 to_invoice_id.reconciled = -line.this_reconcile
 
+        # 应收冲应付，应收行、应付行分别生成负的结算单，并且核销
+        if business_type in ['get_to_pay']:
+            if not float_is_zero(line.this_reconcile, 2):
+                invoice_id = self.env['money.invoice'].create({
+                    'name': name,
+                    'category_id': line.category_id.id,
+                    'amount': -line.this_reconcile,
+                    'date': self.date,
+                    'date_due': line.date_due,
+                    'partner_id': partner_id.id,
+                })
+                # 核销 业务伙伴 的本次核销金额
+                invoice_id.to_reconcile = 0
+                invoice_id.reconciled = -line.this_reconcile
         return True
 
     @api.multi
@@ -1136,8 +1150,8 @@ class ReconcileOrder(models.Model):
         line.name.to_reconcile += line.this_reconcile
         line.name.reconciled -= line.this_reconcile
 
-        # 应收转应收、应付转应付，找到生成的结算单反审核并删除
-        if business_type in ['get_to_get', 'pay_to_pay']:
+        # 应收转应收、应付转应付、应收冲应付，找到生成的结算单反审核并删除
+        if business_type in ['get_to_get', 'pay_to_pay', 'get_to_pay']:
             invoices = self.env['money.invoice'].search([('name', '=', name)])
             for inv in invoices:
                 if inv.state == 'done':
