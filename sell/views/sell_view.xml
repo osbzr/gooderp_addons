@@ -269,6 +269,10 @@
 	                    					domain="[('goods_id', '=', goods_id), ('state', '=', 'done'), ('lot', '!=', False), ('qty_remaining', '>', 0), ('warehouse_dest_id', '=', parent.warehouse_id)]"
 	                    					context="{'lot': True}" options="{'no_open': True, 'no_create': True}"
 	                    					groups='goods.batch_groups'/>
+										<field name="location_id"
+											   options="{'no_open':True,'no_create':True}"
+											   groups="warehouse.multi_location_groups"
+											   domain="[('warehouse_id','=',parent.warehouse_id),('goods_id','=',goods_id)]"/>
 		         						<field name='goods_uos_qty' sum='辅助数量合计'
 		         							groups='goods.auxiliary_unit_groups'/>
 				 						<field name='uos_id' groups='goods.auxiliary_unit_groups' />
