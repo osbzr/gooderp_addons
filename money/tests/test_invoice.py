@@ -199,6 +199,6 @@ class TestInvoice(TransactionCase):
             'category_id': self.env.ref('money.core_category_sale').id,
             'amount': 117,
             'tax_amount': 17,
-            'date_due': '2016-04-10',
         })
+        inv.date_due: '2016-04-10',
         self.assertEqual(invoice.overdue_amount, 117)
