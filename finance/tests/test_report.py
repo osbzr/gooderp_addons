@@ -547,6 +547,21 @@ class TestCheckoutWizard(TransactionCase):
         self.checkout_voucher.voucher_done()
         wizard.button_checkout()
 
+    def test_recreate_voucher_name(self):
+        ''' Test: recreate_voucher_name 按年重排 '''
+        wizard = self.env['checkout.wizard'].create(
+            {'date': '2015-12-31'})
+        settings = self.env['finance.config.settings'].create({'default_reset_period': 'year',
+                                                               'default_auto_reset': True,
+                                                               'default_reset_init_number': 2})
+        settings.execute()
+        self.env['ir.values'].set_default('finance.config.settings', 'default_reset_period', 'year')
+        settings.default_reset_period = 'year'
+        settings.default_auto_reset = True
+        wizard.period_id = self.env.ref('finance.period_201512')
+        self.voucher_15_12.voucher_done()
+        self.checkout_voucher.voucher_done()
+        wizard.button_checkout()
 
 class TestActionReportPickingWrapped(TransactionCase):
     def test_action_report(self):
