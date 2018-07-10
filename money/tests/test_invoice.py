@@ -200,5 +200,5 @@ class TestInvoice(TransactionCase):
             'amount': 117,
             'tax_amount': 17,
         })
-        inv.date_due = '2016-04-10',
+        invoice.date_due = '2016-04-10',
         self.assertEqual(invoice.overdue_amount, 117)
