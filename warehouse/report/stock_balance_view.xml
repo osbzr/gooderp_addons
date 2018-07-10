@@ -9,6 +9,7 @@
                     <field name='goods' />
                     <field name='attribute_id' groups='goods.multi_attrs_groups' />
                     <field name='lot' groups='goods.batch_groups' />
+                    <field name="location" groups="warehouse.multi_location_groups"/>
                     <field name='uom' />
                     <field name='uos' groups='goods.auxiliary_unit_groups' />
                     <field name='warehouse' groups='warehouse.multi_warehouse_groups' />

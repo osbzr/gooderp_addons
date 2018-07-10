@@ -206,7 +206,7 @@ class CreateWave(models.TransientModel):
 
     @api.multi
     def get_sell_delivery(self, goods_id, attribute_id):
-        ''' 查找缺货发货单  '''
+        ''' 查找缺货发货单 '''
         sell_delivery_lists = []
         for active_model in self.env[self.active_model].browse(self.env.context.get('active_ids')):
             for line in active_model.line_out_ids:
@@ -214,7 +214,6 @@ class CreateWave(models.TransientModel):
                     sell_delivery_lists.append(line.move_id.name)
 
         return sell_delivery_lists
-
 
     @api.multi
     def create_wave(self):
@@ -274,8 +273,6 @@ class CreateWave(models.TransientModel):
                 active_model.pakge_sequence = index
                 active_model.wave_id = wave_row.id
                 express_type = active_model.express_type
-
-        # eeee
 
         # 所有订单都不缺货
         wave_row.express_type = express_type

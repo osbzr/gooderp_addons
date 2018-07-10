@@ -123,8 +123,8 @@ class Goods(models.Model):
                  'expiration_date': lot_id.expiration_date}], \
             lot_id.get_real_cost_unit() * qty
 
-    def get_matching_records(self, warehouse, qty, uos_qty=0,
-                             attribute=None, ignore_stock=False, ignore=None):
+    def get_matching_records(self, warehouse, qty, uos_qty=0, attribute=None,
+                             ignore_stock=False, ignore=None, move_line=False):
         """
         获取匹配记录，不考虑批号
         :param ignore_stock: 当参数指定为True的时候，此时忽略库存警告
@@ -152,6 +152,10 @@ class Goods(models.Model):
             if self.env.context.get('location'):
                 domain.append(
                     ('location_id', '=', self.env.context.get('location')))
+
+            # 出库单行 填写了库位
+            if not self.env.context.get('location') and move_line and move_line.location_id:
+                domain.append(('location_id', '=', move_line.location_id.id))
 
             # TODO @zzx需要在大量数据的情况下评估一下速度
             # 出库顺序按 库位 就近、先到期先出、先进先出

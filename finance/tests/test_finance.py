@@ -84,7 +84,7 @@ class TestVoucher(TransactionCase):
                 })]
         })
         voucher.voucher_done()
-    
+
     def test_restricted_account(self):
         ''' 测试受限的记账科目 '''
         account_debit = self.env.ref('finance.small_business_chart1801')
@@ -224,6 +224,7 @@ class TestVoucher(TransactionCase):
             "default_voucher_date": "last", })
 
         setting_row.execute()
+        self.env['ir.values'].set_default('finance.config.settings', 'default_voucher_date', 'last')
         voucher_obj._default_voucher_date()
         voucher_obj.create({})
 
@@ -348,6 +349,11 @@ class TestFinanceAccount(TransactionCase):
 
         self.assertEqual(result, real_result)
 
+        # 搜索输入的是编号 code 1001
+        result1 = self.env['finance.account'].name_search('1001')
+        real_result1 = [(self.cash.id, self.cash.code + ' ' + self.cash.name)]
+        self.assertEqual(result1, real_result1)
+
     def test_get_smallest_code_account(self):
         account = self.env['finance.account']
         account.get_smallest_code_account()
@@ -380,28 +386,30 @@ class TestFinanceAccount(TransactionCase):
         ''' 测试删除科目 '''
         # 界面上修改预设科目报错
         with self.assertRaises(UserError):
-            self.cash.with_context({'modify_from_webclient':1}).write({'source':'1'})
-        # 界面上记过账科目不能删除
+            self.cash.source = 'init'
+            self.cash.with_context({'modify_from_webclient': 1}).write({'source': 'init'})
+        # 界面上记过账科目不能修改
+        account_bank = self.env.ref('finance.account_bank')
         with self.assertRaises(UserError):
-            self.env.ref('finance.account_bank').source = ''
-            self.env.ref('finance.account_bank').with_context({'modify_from_webclient':1}).unlink()
+            account_bank.source = ''
+            account_bank.with_context({'modify_from_webclient': 1}).write({'source': 'init'})
     def test_add_child(self):
         ''' 测试增加子科目 '''
         # 末级科目增加子科目
         self.cash.button_add_child()
+        income = self.env.ref('finance.account_income')
         wizard = self.env['wizard.account.add.child'].with_context(
-            {'active_id':self.cash.id}
+            {'active_id': income.id}
             ).create({
-            'account_code':'01',
-            'account_name':'纸币',
+            'account_code': '01',
+            'account_name': '纸币',
         })
         wizard.create_account()
-        #非末级科目增加子科目
+        # 非末级科目增加子科目
         wizard = self.env['wizard.account.add.child'].with_context(
-            {'active_id':self.env.ref('finance.small_business_chart1701').id}
-            ).create({
-            'account_code':'01',
-            'account_name':'',
+            {'active_id':self.env.ref('finance.small_business_chart1701').id}).create({
+            'account_code': '08',
+            'account_name': '',
         })
         wizard.create_account()
         # 修改下级编码
@@ -413,6 +421,17 @@ class TestFinanceAccount(TransactionCase):
         # 必须是2位
         wizard.account_code = '021'
         wizard._onchange_account_code()
+
+        # 选择的科目层级已经是最低层级科目了，不能建立在它下面建立下级科目！ 报错
+        self.env['ir.values'].set_default('finance.config.settings', 'default_account_hierarchy_level', '2')
+        business_chart170108 = self.env['finance.account'].search([('code', '=', '170108')])
+        with self.assertRaises(UserError):
+            wizard = self.env['wizard.account.add.child'].with_context({'active_id': business_chart170108.id}). \
+                create({
+                'account_code': '01',
+                'account_name': 'test'
+            })
+            wizard.create_account()
 
     def test_add_child_multi(self):
         with self.assertRaises(UserError):
