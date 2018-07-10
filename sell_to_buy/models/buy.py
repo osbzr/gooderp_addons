@@ -2,17 +2,12 @@
 
 from odoo import models, fields, api
 
-# 字段只读状态
-READONLY_STATES = {
-    'done': [('readonly', True)],
-}
-
 
 class buy_order(models.Model):
     _inherit = "buy.order"
 
     sell_id = fields.Many2one('sell.order', u'销货订单', index=True,
-                              states=READONLY_STATES,
+                              readonly=True,
                               ondelete='restrict',
                               help=u'关联的销货订单')
 
@@ -27,3 +22,19 @@ class buy_order(models.Model):
                 'type': 'ir.actions.act_window',
                 'target': 'new',
             }
+
+
+class buy_order_line(models.Model):
+    _inherit = "buy.order.line"
+
+    sell_line_id = fields.Many2one('sell.order.line',
+                                   u'销货单行',
+                                   ondelete='restrict',
+                                   help=u'对应的销货订单行')
+
+    @api.multi
+    def unlink(self):
+        '''删除购货订单行时，如果对应销货订单行已采购，则去掉打勾'''
+        for line in self:
+            line.sell_line_id.is_bought = False
+        return super(buy_order_line, self).unlink()
