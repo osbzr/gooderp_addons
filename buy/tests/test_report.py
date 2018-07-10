@@ -90,6 +90,7 @@ class TestTrackWizard(TransactionCase):
         order_2.quantity = 1
         for line in order_2.line_ids:
             line.goods_id = self.env.ref('goods.mouse').id
+            line.lot = 'mouse001'
         order_2.bank_account_id = False
         order_2.buy_order_done()
         receipt_2 = self.env['buy.receipt'].search(

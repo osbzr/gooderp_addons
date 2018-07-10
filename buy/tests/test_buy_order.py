@@ -189,6 +189,7 @@ class TestBuyOrder(TransactionCase):
         new_order = self.order.copy()
         for line in new_order.line_ids:
             line.goods_id = self.env.ref('goods.mouse').id
+            line.lot = 'mouse001'
             new_order.buy_generate_receipt()
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', new_order.id)])

@@ -273,6 +273,9 @@ class SellOrder(models.Model):
         if not self.line_ids:
             raise UserError(u'请输入商品明细行！')
         for line in self.line_ids:
+            # 检查属性是否填充，防止无权限人员不填就可以保存
+            if line.using_attribute and not line.attribute_id:
+                raise UserError(u'请输入商品：%s 的属性' % line.goods_id.name)
             if line.quantity <= 0 or line.price_taxed < 0:
                 raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.tax_amount > 0 and self.currency_id:
