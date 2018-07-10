@@ -311,6 +311,14 @@ class WhMoveLine(models.Model):
             # 如果是 商品库位转移生成的内部移库，则不用约束调入仓和调出仓是否相同；否则需要约束
             if not (self.move_id.origin == 'wh.internal' and not self.location_id == False):
                 raise UserError(u'调出仓库不可以和调入仓库一样')
+        # 检查属性或批号是否填充，防止无权限人员不填就可以保存
+        if self.using_attribute and not self.attribute_id:
+            raise UserError(u'请输入商品：%s 的属性' % self.goods_id.name)
+        if self.using_batch:
+            if self.type == 'in' and not self.lot:
+                raise UserError(u'请输入商品：%s 的批号' % self.goods_id.name)
+            if self.type in ['out', 'internal'] and not self.lot_id:
+                raise UserError(u'请选择商品：%s 的批号' % self.goods_id.name)
 
     def prev_action_done(self):
         pass
@@ -345,6 +353,8 @@ class WhMoveLine(models.Model):
                     'warehouse_id': line.warehouse_dest_id.id,
                     'warehouse_dest_id': self.env.user.company_id.wh_scrap_id.id
                 }
+                if line.lot:
+                    dic.update({'lot_id': line.id})
                 wh_internal = self.env['wh.internal'].search([('ref', '=', line.move_id.name)])
                 if not wh_internal:
                     value = {
@@ -492,15 +502,3 @@ class WhMoveLine(models.Model):
         """序列号管理的商品数量必须为1"""
         if self.force_batch_one and self.goods_qty > 1:
             raise UserError(u'商品 %s 进行了序列号管理，数量必须为1' % self.goods_id.name)
-
-    @api.one
-    @api.constrains('attribute_id', 'lot', 'lot_id')
-    def check_attribute_lot(self):
-        '''检查属性或批号是否填充，防止无权限人员不填就可以保存'''
-        if self.using_attribute and not self.attribute_id:
-            raise UserError(u'请输入商品：%s 的属性' % self.goods_id.name)
-        if self.using_batch:
-            if self.type == 'in' and not self.lot:
-                raise UserError(u'请输入商品：%s 的批号' % self.goods_id.name)
-            if self.type in ['out', 'internal'] and not self.lot_id:
-                raise UserError(u'请选择商品：%s 的批号' % self.goods_id.name)

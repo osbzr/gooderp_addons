@@ -45,6 +45,7 @@ class TestBuyAdjust(TransactionCase):
                                  }),
                          (0, 0, {'goods_id': self.mouse.id,
                                  'quantity': 1,
+                                 'lot': 'mouse001',
                                  }),
                          (0, 0, {'goods_id': self.cable.id,
                                  'quantity': 1,
