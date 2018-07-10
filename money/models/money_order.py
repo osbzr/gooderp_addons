@@ -23,7 +23,8 @@ from odoo.exceptions import UserError, ValidationError
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
 from odoo.tools import float_compare, float_is_zero
-from datetime import datetime
+import datetime
+#from datetime import datetime
 
 
 class MoneyOrder(models.Model):
@@ -617,8 +618,8 @@ class MoneyInvoice(models.Model):
         计算逾期金额： 逾期时等于未核销金额，否则为0
         :return: 逾期天数
         """
-        d1 = datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
-        d2 = self.date_due and datetime.strptime(
+        d1 = datetime.datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d')
+        d2 = self.date_due and datetime.datetime.strptime(
             self.date_due, '%Y-%m-%d') or d1
         day = (d1 - d2).days
         self.overdue_days = day > 0 and day or 0.0
@@ -701,8 +702,11 @@ class MoneyInvoice(models.Model):
             inv.reconciled = 0.0
             inv.to_reconcile = inv.amount
             inv.state = 'done'
-            if not inv.date_due:
-                inv.date_due = fields.Date.context_today(self)
+            #默认到期日取审核日期
+            #不管有没有到期日，取发票审核日期+客户的信用天数
+            #if not inv.date_due:
+            #    inv.date_due = fields.Date.context_today(self) + inv.partner_id.credit_time
+            inv.date_due = datetime.datetime.strptime(fields.Date.context_today(self), '%Y-%m-%d') + datetime.timedelta(days=inv.partner_id.credit_time)
             if inv.category_id.type == 'income':
                 inv.partner_id.receivable += inv.amount
             if inv.category_id.type == 'expense':

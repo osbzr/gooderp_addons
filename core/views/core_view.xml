@@ -222,6 +222,7 @@
 								<field name="main_mobile"/>
 								<field name="main_contact"/>
 								<field name="credit_limit"/>
+								<field name="credit_time"/>
 								<field name="tag_ids" widget="many2many_tags"/>
 								<field name="responsible_id"/>
 								<field name="share_id"/>
