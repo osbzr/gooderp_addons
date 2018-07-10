@@ -243,15 +243,15 @@ class TestWave(TransactionCase):
         ''' 测试 wave unlink'''
         self.wave[0].unlink()
 
-        order_1 = self.env.ref('sell.sell_order_1')
-        self.env.ref('sell.sell_order_line_1').tax_rate = 0
-        self.env.ref('sell.sell_order_line_1').quantity = 1
-        self.env.ref('sell.sell_order_line_1').discount_amount = 0
-        order_1.discount_amount = 0
-        order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
-        order_1.sell_order_done()
+        order_3 = self.env.ref('sell.sell_order_3')
+        self.env.ref('sell.sell_order_line_3').tax_rate = 0
+        self.env.ref('sell.sell_order_line_3').quantity = 1
+        self.env.ref('sell.sell_order_line_3').discount_amount = 0
+        order_3.discount_amount = 0
+        order_3.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        order_3.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search(
-            [('order_id', '=', order_1.id)])
+            [('order_id', '=', order_3.id)])
         delivery_1.date = '2016-01-02'
         delivery_1.express_code = '123456'
         delivery_1.express_type = 'SF'
@@ -265,7 +265,7 @@ class TestWave(TransactionCase):
         pack.scan_barcode('123456', pack.id)
 
         # 发货单已经打包发货,捡货单不允许删除
-        self.env.ref('goods.mouse').barcode = '000'
+        self.env.ref('goods.cable').barcode = '000'
         pack.scan_barcode('000', pack.id)
         with self.assertRaises(UserError):
             wave_2.unlink()
@@ -385,15 +385,15 @@ class TestDoPack(TransactionCase):
 
     def test_scan_barcode_is_pack_ok(self):
         ''' 测试 is_pack_ok, common.dialog.wizard '''
-        order_1 = self.env.ref('sell.sell_order_1')
-        order_1.warehouse_id = self.env.ref('warehouse.hd_stock').id
-        self.env.ref('sell.sell_order_line_1').quantity = 1
-        self.env.ref('sell.sell_order_line_1').discount_amount = 0
-        self.env.ref('sell.sell_order_line_1').tax_rate = 0
-        order_1.discount_amount = 0
-        order_1.sell_order_done()
+        order_3 = self.env.ref('sell.sell_order_3')
+        order_3.warehouse_id = self.env.ref('warehouse.hd_stock').id
+        self.env.ref('sell.sell_order_line_3').quantity = 1
+        self.env.ref('sell.sell_order_line_3').discount_amount = 0
+        self.env.ref('sell.sell_order_line_3').tax_rate = 0
+        order_3.discount_amount = 0
+        order_3.sell_order_done()
         delivery_1 = self.env['sell.delivery'].search(
-            [('order_id', '=', order_1.id)])
+            [('order_id', '=', order_3.id)])
         delivery_1.express_code = '8888'
         delivery_1.express_type = 'SF'
         delivery_1.date = '2016-01-02'
@@ -404,7 +404,7 @@ class TestDoPack(TransactionCase):
         self.env.ref('warehouse.wh_in_whin0').cancel_approved_order()
         pack = self.env['do.pack'].create({})
         pack.scan_barcode('8888', pack.id)
-        self.env.ref('goods.mouse').barcode = '222'
+        self.env.ref('goods.cable').barcode = '222'
         pack.scan_barcode('222', pack.id)
 
 

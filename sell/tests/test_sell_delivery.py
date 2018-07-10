@@ -317,10 +317,11 @@ class TestSellDelivery(TransactionCase):
 
     def test_sell_delivery_done_not_create_voucher(self):
         '''发库单审核商品不足时不生成凭证'''
-        # 一个有批号管理的鼠标缺货
+        # 一个网线缺货
         self.warehouse_obj.cancel_approved_order()
         order_1 = self.env.ref('sell.sell_order_1')
         for line in order_1.line_ids:
+            line.goods_id = self.env.ref('goods.cable')
             line.quantity = 1
             line.discount_amount = 0
         order_1.sell_order_done()
