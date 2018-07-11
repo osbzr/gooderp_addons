@@ -37,6 +37,8 @@ class SellToBuyWizard(models.TransientModel):
     def button_ok(self):
         '''生成按钮，复制销货订单行到购货订单中'''
         for wizard in self:
+            if not wizard.sell_line_ids:
+                raise UserError(u'销货订单行不能为空')
             active_id = self.env.context.get('active_id')
             buy_lines = []
             order_dict = {} # 用来判断勾选行是否来自同一张销货订单

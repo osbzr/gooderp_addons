@@ -8,6 +8,7 @@ class buy_order(models.Model):
 
     sell_id = fields.Many2one('sell.order', u'销货订单', index=True,
                               readonly=True,
+                              copy=False,
                               ondelete='restrict',
                               help=u'关联的销货订单')
 
@@ -29,6 +30,7 @@ class buy_order_line(models.Model):
 
     sell_line_id = fields.Many2one('sell.order.line',
                                    u'销货单行',
+                                   copy=False,
                                    ondelete='restrict',
                                    help=u'对应的销货订单行')
 

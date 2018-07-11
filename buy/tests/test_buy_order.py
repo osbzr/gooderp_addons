@@ -295,6 +295,12 @@ class TestBuyOrder(TransactionCase):
         receipt.buy_receipt_done()
         self.order.action_view_receipt()
 
+    def test_buy_order_done_no_attribute(self):
+        '''检查属性是否填充'''
+        self.order.line_ids[0].attribute_id = False
+        with self.assertRaises(UserError):
+            self.order.buy_order_done()
+
 
 class TestBuyOrderLine(TransactionCase):
 
