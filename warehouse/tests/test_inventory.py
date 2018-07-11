@@ -201,6 +201,8 @@ class TestInventory(TransactionCase):
 
     def test_check_done_state_done(self):
         ''' Test: check_done state == 'done' '''
+        mouse_line = self.browse_ref('warehouse.wh_move_line_12')
+        mouse_line.action_done()
         for line in self.inventory.line_ids:
             if line.goods_id.name == u'鼠标':
                 mouse = line
@@ -211,6 +213,8 @@ class TestInventory(TransactionCase):
         # 此时鼠标数量-1，生成一个鼠标的出库单
         self.inventory.generate_inventory()
 
+        # 鼠标进行批号管理，出库行必须选择一个批号
+        self.inventory.out_id.line_out_ids[0].lot_id = mouse_line.id
         self.inventory.out_id.approve_order()
         self.inventory.out_id.cancel_approved_order()
 

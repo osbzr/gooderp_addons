@@ -76,6 +76,9 @@ class SellAdjust(models.Model):
         if not delivery:
             raise UserError(u'销售发货单已全部出库，不能调整')
         for line in self.line_ids:
+            # 检查属性是否填充，防止无权限人员不填就可以保存
+            if line.using_attribute and not line.attribute_id:
+                raise UserError(u'请输入商品：%s 的属性' % line.goods_id.name)
             origin_line = self.env['sell.order.line'].search(
                 [('goods_id', '=', line.goods_id.id),
                  ('attribute_id', '=', line.attribute_id.id),

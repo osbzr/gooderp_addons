@@ -36,5 +36,6 @@ class buy_order_line(models.Model):
     def unlink(self):
         '''删除购货订单行时，如果对应销货订单行已采购，则去掉打勾'''
         for line in self:
-            line.sell_line_id.is_bought = False
+            if line.sell_line_id:
+                line.sell_line_id.is_bought = False
         return super(buy_order_line, self).unlink()

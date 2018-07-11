@@ -45,6 +45,7 @@ class TestBuyAdjust(TransactionCase):
                                  }),
                          (0, 0, {'goods_id': self.mouse.id,
                                  'quantity': 1,
+                                 'lot': 'mouse001',
                                  }),
                          (0, 0, {'goods_id': self.cable.id,
                                  'quantity': 1,
@@ -187,6 +188,17 @@ class TestBuyAdjust(TransactionCase):
                                  'quantity': 3.0,
                                  }),
                          ]
+        })
+        with self.assertRaises(UserError):
+            adjust.buy_adjust_done()
+
+    def test_buy_adjust_done_no_attribute(self):
+        '''检查属性是否填充'''
+        adjust = self.env['buy.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.env.ref('goods.keyboard').id,
+                                 'quantity': 10,
+                                 })]
         })
         with self.assertRaises(UserError):
             adjust.buy_adjust_done()

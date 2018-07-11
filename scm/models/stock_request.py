@@ -258,6 +258,7 @@ class StockRequest(models.Model):
                         request_line_ids = self.env['stock.request.line'].create({
                             'request_id': self.id,
                             'goods_id': line_out.goods_id.id,
+                            'attribute_id': line_out.attribute_id and line_out.attribute_id.id or False,
                             'to_delivery_qty': line_out.goods_qty,
                             'request_qty': line_out.goods_qty,
                             'uom_id': line_out.goods_id.uom_id.id,
