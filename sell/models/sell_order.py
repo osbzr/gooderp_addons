@@ -95,7 +95,6 @@ class SellOrder(models.Model):
         u'销售员',
         ondelete='restrict',
         states=READONLY_STATES,
-        default=lambda self: self.env.user,
         help=u'单据经办人',
     )
     date = fields.Date(u'单据日期',
@@ -201,6 +200,10 @@ class SellOrder(models.Model):
         if self.address_id:
             self.contact = self.address_id.contact
             self.mobile = self.address_id.mobile
+        if self.partner_id.responsible_id:
+            self.user_id = self.partner_id.responsible_id
+        else:
+            self.user_id = self._uid
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
