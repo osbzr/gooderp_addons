@@ -282,3 +282,21 @@ class TestMoveLine(TransactionCase):
         # 鼠标进行了序列号管理
         with self.assertRaises(ValidationError):
             self.mouse_in_line.goods_qty = 2
+
+    def test_action_done_no_lot_raise_error(self):
+        '''检查属性或批号是否填充'''
+        # type=in,lot为空
+        self.mouse_in_line.lot = False
+        with self.assertRaises(UserError):
+            self.mouse_in_line.action_done()
+
+        # type=out,lot_id为空
+        self.mouse_out_line.lot_id = False
+        with self.assertRaises(UserError):
+            self.mouse_out_line.action_done()
+
+        # 属性为空
+        keyboard_line = self.env.ref('warehouse.wh_move_line_13')
+        keyboard_line.attribute_id = False
+        with self.assertRaises(UserError):
+            keyboard_line.action_done()

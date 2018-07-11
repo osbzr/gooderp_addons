@@ -94,6 +94,9 @@ class BuyAdjust(models.Model):
         if not buy_receipt:
             raise UserError(u'采购入库单已全部入库，不能调整')
         for line in self.line_ids:
+            # 检查属性是否填充，防止无权限人员不填就可以保存
+            if line.using_attribute and not line.attribute_id:
+                raise UserError(u'请输入商品：%s 的属性' % line.goods_id.name)
             origin_line = self.env['buy.order.line'].search(
                 [('goods_id', '=', line.goods_id.id),
                  ('attribute_id', '=', line.attribute_id.id),
@@ -239,10 +242,3 @@ class BuyAdjustLine(models.Model):
         self.price = self.price_taxed / (1 + self.tax_rate * 0.01)
         self.discount_amount = (self.quantity * self.price *
                                 self.discount_rate * 0.01)
-
-    @api.one
-    @api.constrains('attribute_id')
-    def check_attribute(self):
-        '''检查属性是否填充，防止无权限人员不填就可以保存'''
-        if self.using_attribute and not self.attribute_id:
-            raise UserError(u'请输入商品：%s 的属性' % self.goods_id.name)
