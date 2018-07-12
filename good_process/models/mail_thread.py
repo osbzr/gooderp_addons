@@ -170,8 +170,6 @@ class MailThread(models.AbstractModel):
 
     @api.model
     def create(self, vals):
-        if not self.is_current_model():
-            return super(MailThread, self).create(vals)
         thread_row = super(MailThread, self).create(vals)
         approvers = self.__add_approver__(thread_row, self._name, thread_row.id)
         thread_row._approver_num = len(approvers)
@@ -197,6 +195,20 @@ class MailThread(models.AbstractModel):
             if any([vals.has_key(x) for x in ignore_fields]) or not th._approver_num:
                 continue
             change_state = vals.get('state', False)
+
+            if change_state == 'cancel':    # 作废时移除待审批人
+                model_row = th
+                manger_row = self.__has_manager__(th.id, th._name)
+
+                if (manger_row and manger_row.user_id.id == self.env.uid) or not manger_row:
+                    manger_user = []
+                    if manger_row:
+                        manger_user = [manger_row.user_id.id]
+                        self.__is_departement_manager__(manger_row)
+                users, can_clean_groups = (self.__get_user_group__(
+                    th.id, th._name, manger_user, model_row))
+                self.__remove_approver__(
+                    th.id, th._name, users, can_clean_groups)
 
             # 已提交，确认时报错
             if len(th._to_approver_ids) == th._approver_num and change_state == 'done':
