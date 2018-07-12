@@ -28,14 +28,14 @@ class Partner(models.Model):
 
     @api.one
     def _set_receivable_init(self):
+        # 如果有前期初值，删掉已前的单据
+        money_invoice_id = self.env['money.invoice'].search([
+            ('partner_id', '=', self.id),
+            ('is_init', '=', True)])
+        if money_invoice_id:
+            money_invoice_id.money_invoice_draft()
+            money_invoice_id.unlink()
         if self.receivable_init:
-            # 如果有前期初值，删掉已前的单据
-            money_invoice_id = self.env['money.invoice'].search([
-                ('partner_id', '=', self.id),
-                ('is_init', '=', True)])
-            if money_invoice_id:
-                money_invoice_id.money_invoice_draft()
-                money_invoice_id.unlink()
             # 创建结算单
             categ = self.env.ref('money.core_category_sale')
             self._init_source_create("期初应收余额", self.id, categ.id, True,
@@ -44,14 +44,14 @@ class Partner(models.Model):
 
     @api.one
     def _set_payable_init(self):
+        # 如果有前期初值，删掉已前的单据
+        money_invoice_id = self.env['money.invoice'].search([
+            ('partner_id', '=', self.id),
+            ('is_init', '=', True)])
+        if money_invoice_id:
+            money_invoice_id.money_invoice_draft()
+            money_invoice_id.unlink()
         if self.payable_init:
-            # 如果有前期初值，删掉已前的单据
-            money_invoice_id = self.env['money.invoice'].search([
-                ('partner_id', '=', self.id),
-                ('is_init', '=', True)])
-            if money_invoice_id:
-                money_invoice_id.money_invoice_draft()
-                money_invoice_id.unlink()
             # 创建结算单
             categ = self.env.ref('money.core_category_purchase')
             self._init_source_create("期初应付余额", self.id, categ.id, True,
@@ -110,14 +110,14 @@ class BankAccount(models.Model):
         start_date_period_id = self.env['finance.period'].search_period(start_date)
         if self.init_balance and start_date_period_id.is_closed:
             raise UserError(u'初始化期间(%s)已结账！' % start_date_period_id.name)
+        # 如果有前期初值，删掉已前的单据
+        other_money_id = self.env['other.money.order'].search([
+            ('bank_id', '=', self.id),
+            ('is_init', '=', True)])
+        if other_money_id:
+            other_money_id.other_money_draft()
+            other_money_id.unlink()
         if self.init_balance:
-            # 如果有前期初值，删掉已前的单据
-            other_money_id = self.env['other.money.order'].search([
-                ('bank_id', '=', self.id),
-                ('is_init', '=', True)])
-            if other_money_id:
-                other_money_id.other_money_draft()
-                other_money_id.unlink()
             # 资金期初 生成 其他收入
             other_money_init = self.with_context(type='other_get').env['other.money.order'].create({
                 'bank_id': self.id,
@@ -134,14 +134,6 @@ class BankAccount(models.Model):
             })
             # 审核 其他收入单
             other_money_init.other_money_done()
-        else:
-            other_money_id = self.env['other.money.order'].search([
-                ('bank_id', '=', self.id),
-                ('is_init', '=', True)])
-            if other_money_id:
-                other_money_id.other_money_draft()
-                other_money_id.unlink()
-            self.balance = 0
 
 
     init_balance = fields.Float(u'期初',

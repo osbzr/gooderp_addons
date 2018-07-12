@@ -176,6 +176,18 @@ class TestSellAdjust(TransactionCase):
         with self.assertRaises(UserError):
             adjust.sell_adjust_done()
 
+    def test_sell_adjust_done_no_attribute(self):
+        '''检查属性是否填充'''
+        adjust = self.env['sell.adjust'].create({
+            'order_id': self.order.id,
+            'line_ids': [(0, 0, {'goods_id': self.keyboard.id,
+                                 'quantity': 3.0,
+                                 }),
+                         ]
+        })
+        with self.assertRaises(UserError):
+            adjust.sell_adjust_done()
+
 
 class TestSellAdjustLine(TransactionCase):
 
