@@ -170,8 +170,6 @@ class MailThread(models.AbstractModel):
 
     @api.model
     def create(self, vals):
-        if not self.is_current_model():
-            return super(MailThread, self).create(vals)
         thread_row = super(MailThread, self).create(vals)
         approvers = self.__add_approver__(thread_row, self._name, thread_row.id)
         thread_row._approver_num = len(approvers)

@@ -137,6 +137,13 @@ class TestGoods(TransactionCase):
         with self.assertRaises(UserError):
             self.goods_cable.conversion = 3
 
+    def test_get_matching_records_has_location(self):
+        '''获取匹配记录（出库单行填写了库位）'''
+        # 已有键鼠套装入库到总仓的a库位
+        wh_out = self.env.ref('warehouse.wh_out_whout1')
+        wh_out.line_out_ids[0].location_id = self.env.ref('warehouse.a001_location')
+        wh_out.approve_order()
+
 
 class TestResCompany(TransactionCase):
 
