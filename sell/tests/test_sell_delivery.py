@@ -524,6 +524,11 @@ class TestSellDelivery(TransactionCase):
         self.delivery.currency_id = self.env.ref('base.USD')
         self.delivery.sell_delivery_done()
 
+    def test_sell_delivery_draft_twice(self):
+        '''重复撤销报错'''
+        with self.assertRaises(UserError):
+            self.delivery.sell_delivery_draft()
+
 
 class TestWhMoveLine(TransactionCase):
 

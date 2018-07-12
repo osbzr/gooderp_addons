@@ -353,14 +353,12 @@ class SellDelivery(models.Model):
         line_ids = self.is_return and self.line_in_ids or self.line_out_ids
         for line in line_ids:   # 发货单/退货单明细
             cost = self.is_return and -line.cost or line.cost
-
-            if cost:  # 贷方明细
+            if not cost:
+                continue    # 缺货审核发货单时不产生出库凭证
+            else:  # 贷方明细
                 sum_amount += cost
                 self._create_voucher_line(line.goods_id.category_id.account_id,
                                           0, cost, voucher, line.goods_id, line.goods_qty)
-            else:
-                # 缺货审核发货单时不产生出库凭证
-                continue
         if sum_amount:  # 借方明细
             self._create_voucher_line(self.sell_move_id.finance_category_id.account_id,
                                       sum_amount, 0, voucher, False, 0)
