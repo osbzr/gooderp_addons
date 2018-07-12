@@ -6,7 +6,7 @@
         <field name='inherit_id' ref='buy.buy_order_form'/>
         <field name="arch" type="xml">
             <button name="buy_order_done" position="after">
-                <button name="sell_to_buy" string="根据销货生成购货" type="object"
+                <button name="sell_to_buy" string="参照销货订单" type="object"
                         attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('sell_id', '!=', False)]}" class="oe_highlight"/>
             </button>
             <field name="currency_id" position="after">
@@ -23,7 +23,7 @@
         <field name='inherit_id' ref='sell.sell_order_form' />
         <field name="arch" type="xml">
             <field name="using_attribute" position="after" >
-                <field name="is_bought" invisible="1"/>
+                <field name="is_bought"/>
             </field>
         </field>
     </record>
