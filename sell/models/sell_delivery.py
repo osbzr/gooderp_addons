@@ -446,14 +446,10 @@ class SellDelivery(models.Model):
                 voucher = record.create_voucher()
             # 发货单/退货单 生成结算单
             invoice_id = record._delivery_make_invoice()
-            record.write({
-                'voucher_id': voucher and voucher.id,
-                'invoice_id': invoice_id and invoice_id.id,
-                'state': 'done',    # 为保证审批流程顺畅，否则，未审批就可审核
-            })
             # 销售费用产生结算单
             record._sell_amount_to_invoice()
             # 生成收款单，并审核
+            money_order = False
             if record.receipt:
                 flag = not record.is_return and 1 or -1
                 amount = flag * (record.amount + record.partner_cost)
@@ -461,7 +457,13 @@ class SellDelivery(models.Model):
                 money_order = record._make_money_order(
                     invoice_id, amount, this_reconcile)
                 money_order.money_order_done()
-                self.money_order_id = money_order.id
+
+            record.write({
+                'voucher_id': voucher and voucher.id,
+                'invoice_id': invoice_id and invoice_id.id,
+                'money_order_id': money_order and money_order.id,
+                'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
+            })
 
             # 先收款后发货订单自动核销
             self.auto_reconcile_sell_order()

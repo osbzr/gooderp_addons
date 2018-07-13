@@ -99,11 +99,12 @@ class BuyReceipt(models.Model):
                                store=True, default=u'未退款',
                                help=u"采购退货单的退款状态",
                                index=True, copy=False)
-    modifying = fields.Boolean(u'差错修改中', default=False,
+    modifying = fields.Boolean(u'差错修改中', default=False, copy=False,
                                help=u'是否处于差错修改中')
     voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True,
+                                 copy=False,
                                  help=u'入库时产生的入库凭证')
-    origin_id = fields.Many2one('buy.receipt', u'来源单据')
+    origin_id = fields.Many2one('buy.receipt', u'来源单据', copy=False)
     currency_id = fields.Many2one('res.currency',
                                   u'外币币别',
                                   readonly=True,
@@ -301,7 +302,6 @@ class BuyReceipt(models.Model):
             'note': self.note,
             'buy_id': self.order_id.id,
         })
-        self.money_order_id = money_order.id
         return money_order
 
     def _create_voucher_line(self, account_id, debit, credit, voucher_id, goods_id, goods_qty, partner_id):
@@ -390,19 +390,21 @@ class BuyReceipt(models.Model):
 
         # 入库单/退货单 生成结算单
         invoice_id = self._receipt_make_invoice()
-        self.write({
-            'voucher_id': voucher and voucher.id,
-            'invoice_id': invoice_id and invoice_id.id,
-            'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
-        })
         # 采购费用产生结算单
         self._buy_amount_to_invoice()
         # 生成付款单
+        money_order = False
         if self.payment:
             flag = not self.is_return and 1 or -1
             amount = flag * self.amount
             this_reconcile = flag * self.payment
-            self._make_payment(invoice_id, amount, this_reconcile)
+            money_order = self._make_payment(invoice_id, amount, this_reconcile)
+        self.write({
+            'voucher_id': voucher and voucher.id,
+            'invoice_id': invoice_id and invoice_id.id,
+            'money_order_id': money_order and money_order.id,
+            'state': 'done',  # 为保证审批流程顺畅，否则，未审批就可审核
+        })
         # 生成分拆单 FIXME:无法跳转到新生成的分单
         if self.order_id and not self.modifying:
             # 如果已退货也已退款，不生成新的分单

@@ -155,6 +155,20 @@ class MailThread(models.AbstractModel):
             return_vals = u'已经通过不能拒绝！'
         return return_vals, message or ''
 
+    def remove_approver(self):
+        '''移除待审批人'''
+        manger_row = self.__has_manager__(self.id, self._name)
+
+        if (manger_row and manger_row.user_id.id == self.env.uid) or not manger_row:
+            manger_user = []
+            if manger_row:
+                manger_user = [manger_row.user_id.id]
+                self.__is_departement_manager__(manger_row)
+        users, can_clean_groups = (self.__get_user_group__(
+            self.id, self._name, manger_user, self))
+        self.__remove_approver__(
+            self.id, self._name, users, can_clean_groups)
+
     def is_current_model(self):
         """检查是否是当前对象"""
         action_id = self.env.context.get('params', False) \
@@ -163,7 +177,9 @@ class MailThread(models.AbstractModel):
         if not action_id:
             return True
         current_model = self.env['ir.actions.act_window'].browse(action_id).res_model
-        if current_model != self._name:
+        # 排除good_process.approver是因为从审批向导进去所有单据current_model != self._name导致跳过审批流程
+        if current_model != self._name and current_model != 'good_process.approver':
+            self.remove_approver()
             return False
         else:
             return True
@@ -197,18 +213,11 @@ class MailThread(models.AbstractModel):
             change_state = vals.get('state', False)
 
             if change_state == 'cancel':    # 作废时移除待审批人
-                model_row = th
-                manger_row = self.__has_manager__(th.id, th._name)
-
-                if (manger_row and manger_row.user_id.id == self.env.uid) or not manger_row:
-                    manger_user = []
-                    if manger_row:
-                        manger_user = [manger_row.user_id.id]
-                        self.__is_departement_manager__(manger_row)
-                users, can_clean_groups = (self.__get_user_group__(
-                    th.id, th._name, manger_user, model_row))
-                self.__remove_approver__(
-                    th.id, th._name, users, can_clean_groups)
+                if not len(th._to_approver_ids) and th._approver_num:
+                    raise ValidationError(u"已审批不可作废")
+                if len(th._to_approver_ids) < th._approver_num:
+                    raise ValidationError(u"审批中不可作废")
+                th.remove_approver()
 
             # 已提交，确认时报错
             if len(th._to_approver_ids) == th._approver_num and change_state == 'done':
