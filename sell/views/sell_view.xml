@@ -112,6 +112,7 @@
 										<field name="discount_amount" groups='sell.sell_discount_groups'/>
                             			<field name="amount"/>
 										<field name="received_amount"/>
+										<field name="net_weight"/>
                         			</group>
                         			<group>
 										<field name="pre_receipt"/>
