@@ -225,6 +225,12 @@ class TestSellOrder(TransactionCase):
         with self.assertRaises(UserError):
             self.order.sell_order_done()
 
+    def test_compute_net_weight(self):
+        '''计算净重合计'''
+        self.env.ref('goods.mouse').net_weight = 50
+        self.order.line_ids[0].quantity = 10
+        self.assertEqual(self.order.net_weight, 50 * 10)
+
 
 class TestSellOrderLine(TransactionCase):
 
