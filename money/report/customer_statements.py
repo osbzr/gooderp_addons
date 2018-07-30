@@ -17,7 +17,7 @@ class CustomerStatementsReport(models.Model):
         pre_record = self.search(
             [('id', '<=', self.id), ('partner_id', '=', self.partner_id.id)])
         for pre in pre_record:
-            self.balance_amount += pre.amount - pre.pay_amount - self.discount_money
+            self.balance_amount += pre.amount - pre.pay_amount - pre.discount_money
 
     partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
     name = fields.Char(string=u'单据编号', readonly=True)
