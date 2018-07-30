@@ -532,8 +532,6 @@ class BuyReceipt(models.Model):
                     'discount_amount': line.discount_amount,
                     'type': 'out'
                 }
-                if line.goods_id.using_batch:
-                    dic.update({'lot_id': line.id})
                 receipt_line.append(dic)
         if len(receipt_line) == 0:
             raise UserError(u'该订单已全部退货！')
