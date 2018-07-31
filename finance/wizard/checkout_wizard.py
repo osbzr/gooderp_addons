@@ -105,8 +105,8 @@ class CheckoutWizard(models.TransientModel):
                                 }
                                 voucher_line.append(res)
                         # 利润结余
-                        year_profit_account = self.company_id.profit_account
-                        remain_account = self.company_id.remain_account
+                        year_profit_account = self.env.user.company_id.profit_account
+                        remain_account = self.env.user.company_id.remain_account
                         if not year_profit_account:
                             raise UserError(u'公司本年利润科目未配置')
                         if not remain_account:
