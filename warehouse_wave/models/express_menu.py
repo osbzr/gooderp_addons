@@ -128,13 +128,14 @@ class WhMove(models.Model):
         sender = self.get_sender(self.warehouse_id, self.pakge_sequence)
         remark = self.note or '小心轻放'
         shipping_type = self.express_type or 'YTO'
+        custom_area = self.note or '小心轻放'
         receiver, commodity, qty = self.get_receiver_goods_message()
         request_data = dict(OrderCode=order_code, PayType=3, ExpType=1, Cost=1.0, OtherCost=1.0,
                             Sender=sender, Receiver=receiver, Commodity=commodity, Weight=1.0,
                             Quantity=1, Volume=0.0, Remark=remark, IsReturnPrintTemplate=1)
         request_data.update(self.get_shipping_type_config(shipping_type))
-        # if shipping_type == 'YTO':
-        #     request_data.update({'TemplateSize': 180})
+        if shipping_type == 'YTO':
+            request_data.update({'TemplateSize': 180, 'CustomArea': custom_area})
         request_data = json.dumps(request_data)
         data = {'RequestData': request_data,
                 'EBusinessID': appid,
