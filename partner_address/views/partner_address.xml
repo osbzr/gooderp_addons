@@ -8,6 +8,7 @@
             <field name='inherit_id' ref='core.customer_tree'/>
             <field name="arch" type="xml">
                 <field name="name" position="after">
+			<field name="responsible_id"/>
                 	<field name="contact"/>
                 	<field name="mobile"/>
                 	<field name="phone"/>

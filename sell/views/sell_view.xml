@@ -65,7 +65,7 @@
             				    <field name='address_id'
             				        options="{'no_open': True, 'no_create': True}"/>
             				    <field name='mobile'/>
-            					<field name='user_id'
+            					<field name='user_id' readonly="1"
                                        options="{'no_open': True, 'no_create': True}"/>
             					<field name='date'/>
             					<field name='warehouse_id'/>
