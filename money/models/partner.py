@@ -31,6 +31,7 @@ class Partner(models.Model):
         # 如果有前期初值，删掉已前的单据
         money_invoice_id = self.env['money.invoice'].search([
             ('partner_id', '=', self.id),
+            ('name', '=', u'期初应收余额'),
             ('is_init', '=', True)])
         if money_invoice_id:
             money_invoice_id.money_invoice_draft()
@@ -47,6 +48,7 @@ class Partner(models.Model):
         # 如果有前期初值，删掉已前的单据
         money_invoice_id = self.env['money.invoice'].search([
             ('partner_id', '=', self.id),
+            ('name', '=', u'期初应付余额'),
             ('is_init', '=', True)])
         if money_invoice_id:
             money_invoice_id.money_invoice_draft()

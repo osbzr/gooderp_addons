@@ -103,6 +103,9 @@ class MoneyInvoice(models.Model):
                 vouch_line_ids = self.env['voucher.line'].search([
                     ('account_id', '=', invoice.category_id.account_id.id),
                     ('init_obj', '=', 'money_invoice')])
+                # 删除凭证明细行之前先确保凭证是草稿状态
+                if invoice.voucher_id.state == 'done':
+                    invoice.voucher_id.voucher_draft()
                 for vouch_line_id in vouch_line_ids:
                     vouch_line_id.unlink()
             else:
