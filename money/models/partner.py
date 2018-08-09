@@ -31,7 +31,6 @@ class Partner(models.Model):
         # 如果有前期初值，删掉已前的单据
         money_invoice_id = self.env['money.invoice'].search([
             ('partner_id', '=', self.id),
-            ('name', '=', u'期初应收余额'),
             ('is_init', '=', True)])
         if money_invoice_id:
             money_invoice_id.money_invoice_draft()
@@ -48,7 +47,6 @@ class Partner(models.Model):
         # 如果有前期初值，删掉已前的单据
         money_invoice_id = self.env['money.invoice'].search([
             ('partner_id', '=', self.id),
-            ('name', '=', u'期初应付余额'),
             ('is_init', '=', True)])
         if money_invoice_id:
             money_invoice_id.money_invoice_draft()
@@ -96,6 +94,13 @@ class Partner(models.Model):
             'context': ctx,
             'target': 'new',
         }
+
+    @api.one
+    @api.constrains('receivable_init', 'payable_init')
+    def _check_receivable_init(self):
+        '''应收期初和应付期初只能有一个存在'''
+        if self.receivable_init and self.payable_init:
+            raise UserError(u'应收期初和应付期初不能同时存在')
 
 
 class BankAccount(models.Model):
