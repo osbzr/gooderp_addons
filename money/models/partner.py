@@ -95,6 +95,13 @@ class Partner(models.Model):
             'target': 'new',
         }
 
+    @api.one
+    @api.constrains('receivable_init', 'payable_init')
+    def _check_receivable_init(self):
+        '''应收期初和应付期初只能有一个存在'''
+        if self.receivable_init and self.payable_init:
+            raise UserError(u'应收期初和应付期初不能同时存在')
+
 
 class BankAccount(models.Model):
     '''查看账户对账单'''
