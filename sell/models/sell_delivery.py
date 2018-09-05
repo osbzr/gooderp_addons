@@ -585,6 +585,7 @@ class SellDelivery(models.Model):
                     'price': line.price,
                     'tax_rate':line.tax_rate,
                     'cost_unit': line.cost_unit,
+                    'cost': line.cost,#退货取不到成本
                     'discount_rate': line.discount_rate,
                     'discount_amount': line.discount_amount,
                     'type': 'in',
