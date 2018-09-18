@@ -723,6 +723,8 @@ class MoneyInvoice(models.Model):
         for inv in self:
             if inv.state == 'draft':
                 raise UserError(u'请不要重复撤销')
+            if inv.reconciled != 0.0:
+                raise UserError(u'已核销的结算单不允许删除')
             inv.reconciled = 0.0
             inv.to_reconcile = 0.0
             inv.state = 'draft'
@@ -1156,6 +1158,7 @@ class ReconcileOrder(models.Model):
             invoices = self.env['money.invoice'].search([('name', '=', name)])
             for inv in invoices:
                 if inv.state == 'done':
+                    inv.reconciled = 0.0
                     inv.money_invoice_draft()
                 inv.unlink()
         return True

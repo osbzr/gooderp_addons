@@ -94,6 +94,7 @@
 					<field name='name'/>
 					<field name='brand'/>
 					<field name='code'/>
+					<field name='goods_class_id'/>
 					<field name='category_id'/>
 					<group expand="0" string="分组">
                         <filter string="商品类别" domain="[]" context="{'group_by':'category_id'}"/>
