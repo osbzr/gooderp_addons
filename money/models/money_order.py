@@ -1158,6 +1158,7 @@ class ReconcileOrder(models.Model):
             invoices = self.env['money.invoice'].search([('name', '=', name)])
             for inv in invoices:
                 if inv.state == 'done':
+                    inv.reconciled = 0.0
                     inv.money_invoice_draft()
                 inv.unlink()
         return True
