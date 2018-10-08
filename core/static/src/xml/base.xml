@@ -38,7 +38,6 @@
 	 <t t-extend="ListView">
        <t t-jquery="thead" t-operation="replace">
            <thead>
-			    <tr id="GoodERP_AD"><a href="https://item.taobao.com/item.htm?id=550421434967" target="_blank"><img src="/core/static/src/img/GoodERP_AD.gif" width="100%"/></a></tr>
                 <tr t-if="options.header">
                     <t t-foreach="columns" t-as="column" >
                         <th t-if="column.meta" rowspan="2" colspan="1">
