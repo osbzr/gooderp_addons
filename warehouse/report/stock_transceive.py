@@ -10,7 +10,7 @@ class ReportStockTransceive(models.Model):
     _description = u'商品收发明细表'
     _inherit = 'report.base'
 
-    goods = fields.Char(u'商品')
+    goods = fields.Many2one('goods',u'商品')
     attribute = fields.Char(u'属性')
     id_lists = fields.Text(u'库存调拨id列表')
     uom = fields.Char(u'单位')
@@ -35,7 +35,7 @@ class ReportStockTransceive(models.Model):
     def select_sql(self, sql_type='out'):
         return '''
         SELECT min(line.id) as id,
-                goods.name as goods,
+                goods.id as goods,
                 att.name as attribute,
                 array_agg(line.id) as id_lists,
                 uom.name as uom,
@@ -88,12 +88,12 @@ class ReportStockTransceive(models.Model):
 
     def group_sql(self, sql_type='out'):
         return '''
-        GROUP BY goods.name, att.name, uom.name, wh.name
+        GROUP BY goods.id, att.name, uom.name, wh.name
         '''
 
     def order_sql(self, sql_type='out'):
         return '''
-        ORDER BY goods.name, wh.name
+        ORDER BY goods.id, wh.name
         '''
 
     def get_context(self, sql_type='out', context=None):
