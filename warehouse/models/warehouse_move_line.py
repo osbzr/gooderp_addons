@@ -417,8 +417,12 @@ class WhMoveLine(models.Model):
 
         if self.env.context.get('type') == 'in' and self.goods_id:
             # 如果商品上设置了税率，则按商品上的计算，否则按公司上的进项税率计算
-            tax_rate = self.goods_id.tax_rate or self.env.user.company_id.import_tax_rate
-            self.cost_unit = self.goods_id.cost / (1 + tax_rate * 0.01)
+            order_id = self.sell_line_id.order_id
+            sell_delivery = self.env['sell.delivery'].search([('order_id', '=', order_id.id),
+                                                            ('is_return','=',False)])
+            sell_line_id = self.env['wh.move.line'].search([('move_id', '=', sell_delivery.sell_move_id.id),
+                                                            ('state','=','done')])
+            self.cost_unit = sell_line_id.cost_unit
 
     @api.multi
     @api.onchange('goods_id')
