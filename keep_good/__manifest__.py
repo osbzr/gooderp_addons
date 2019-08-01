@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'GoodERP开源会计软件',
     'version': '11.11',

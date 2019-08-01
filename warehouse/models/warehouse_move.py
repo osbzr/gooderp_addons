@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -6,12 +5,12 @@ from odoo.exceptions import UserError
 
 class WhMove(models.Model):
     _name = 'wh.move'
-    _description = u'移库单'
+    _description = '移库单'
 
     MOVE_STATE = [
-        ('draft', u'草稿'),
-        ('done', u'已完成'),
-        ('cancel', u'已作废'),]
+        ('draft', '草稿'),
+        ('done', '已完成'),
+        ('cancel', '已作废'),]
 
     @api.one
     @api.depends('line_out_ids', 'line_in_ids')
@@ -47,81 +46,81 @@ class WhMove(models.Model):
         '''获取调入仓库'''
         return self._get_default_warehouse_dest_impl()
 
-    origin = fields.Char(u'移库类型', required=True,
-                         help=u'移库类型')
-    name = fields.Char(u'单据编号', copy=False, default='/',
-                       help=u'单据编号，创建时会自动生成')
-    ref = fields.Char(u'外部单号')
-    state = fields.Selection(MOVE_STATE, u'状态', copy=False, default='draft',
+    origin = fields.Char('移库类型', required=True,
+                         help='移库类型')
+    name = fields.Char('单据编号', copy=False, default='/',
+                       help='单据编号，创建时会自动生成')
+    ref = fields.Char('外部单号')
+    state = fields.Selection(MOVE_STATE, '状态', copy=False, default='draft',
                              index=True,
-                             help=u'移库单状态标识，新建时状态为草稿;确认后状态为已确认',
+                             help='移库单状态标识，新建时状态为草稿;确认后状态为已确认',
                              track_visibility='onchange')
-    partner_id = fields.Many2one('partner', u'业务伙伴', ondelete='restrict',
-                                 help=u'该单据对应的业务伙伴')
-    date = fields.Date(u'单据日期', required=True, copy=False, default=fields.Date.context_today,
-                       help=u'单据创建日期，默认为当前天')
-    warehouse_id = fields.Many2one('warehouse', u'调出仓库',
+    partner_id = fields.Many2one('partner', '业务伙伴', ondelete='restrict',
+                                 help='该单据对应的业务伙伴')
+    date = fields.Date('单据日期', required=True, copy=False, default=fields.Date.context_today,
+                       help='单据创建日期，默认为当前天')
+    warehouse_id = fields.Many2one('warehouse', '调出仓库',
                                    ondelete='restrict',
                                    required=True,
                                    readonly=True,
                                    domain="['|',('user_ids','=',False),('user_ids','in',uid)]",
                                    states={'draft': [('readonly', False)]},
                                    default=_get_default_warehouse,
-                                   help=u'移库单的来源仓库')
-    warehouse_dest_id = fields.Many2one('warehouse', u'调入仓库',
+                                   help='移库单的来源仓库')
+    warehouse_dest_id = fields.Many2one('warehouse', '调入仓库',
                                         ondelete='restrict',
                                         required=True,
                                         readonly=False,
                                         domain="['|',('user_ids','=',False),('user_ids','in',uid)]",
                                         states={'done': [('readonly', True)]},
                                         default=_get_default_warehouse_dest,
-                                        help=u'移库单的目的仓库')
-    approve_uid = fields.Many2one('res.users', u'确认人',
+                                        help='移库单的目的仓库')
+    approve_uid = fields.Many2one('res.users', '确认人',
                                   copy=False, ondelete='restrict',
-                                  help=u'移库单的确认人')
-    approve_date = fields.Datetime(u'确认日期', copy=False)
-    line_out_ids = fields.One2many('wh.move.line', 'move_id', u'出库明细',
+                                  help='移库单的确认人')
+    approve_date = fields.Datetime('确认日期', copy=False)
+    line_out_ids = fields.One2many('wh.move.line', 'move_id', '出库明细',
                                    domain=[
                                        ('type', 'in', ['out', 'internal'])],
                                    copy=True,
-                                   help=u'出库类型的移库单对应的出库明细')
-    line_in_ids = fields.One2many('wh.move.line', 'move_id', u'入库明细',
+                                   help='出库类型的移库单对应的出库明细')
+    line_in_ids = fields.One2many('wh.move.line', 'move_id', '入库明细',
                                   domain=[('type', '=', 'in')],
                                   context={'type': 'in'}, copy=True,
-                                  help=u'入库类型的移库单对应的入库明细')
-    note = fields.Text(u'备注',
+                                  help='入库类型的移库单对应的入库明细')
+    note = fields.Text('备注',
                        copy=False,
-                       help=u'可以为该单据添加一些需要的标识信息')
-    total_qty = fields.Integer(u'商品总数', compute=_compute_total_qty, store=True,
-                               help=u'该移库单的入/出库明细行包含的商品总数')
+                       help='可以为该单据添加一些需要的标识信息')
+    total_qty = fields.Integer('商品总数', compute=_compute_total_qty, store=True,
+                               help='该移库单的入/出库明细行包含的商品总数')
     user_id = fields.Many2one(
         'res.users',
-        u'经办人',
+        '经办人',
         ondelete='restrict',
         states={'done': [('readonly', True)]},
         default=lambda self: self.env.user,
-        help=u'单据经办人',
+        help='单据经办人',
         track_visibility='onchange'
     )
     express_type = fields.Char(string='承运商')
-    express_code = fields.Char(u'快递单号', copy=False)
+    express_code = fields.Char('快递单号', copy=False)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    qc_result = fields.Binary(u'质检报告',
-                              help=u'点击上传质检报告')
+    qc_result = fields.Binary('质检报告',
+                              help='点击上传质检报告')
     finance_category_id = fields.Many2one(
         'core.category',
-        string=u'收发类别',
+        string='收发类别',
         ondelete='restrict',
         states={'done': [('readonly', True)]},
         domain=[('type', '=', 'finance')],
         context={'type': 'finance'},
-        help=u'生成凭证时从此字段上取商品科目的对方科目',
+        help='生成凭证时从此字段上取商品科目的对方科目',
     )
-    all_line_done = fields.Boolean(u'出库行都完成', compute='compute_all_line_done', store=True)
+    all_line_done = fields.Boolean('出库行都完成', compute='compute_all_line_done', store=True)
 
     @api.one
     @api.depends('line_out_ids.state')
@@ -296,7 +295,7 @@ class WhMove(models.Model):
                       or 'wh.move.line')
 
         if not att and not goods:
-            raise UserError(u'条码为  %s 的商品不存在' % (barcode))
+            raise UserError('条码为  %s 的商品不存在' % (barcode))
         else:
             self.check_barcode(model_name, order_id, att, goods)
             conversion = att and att.goods_id.conversion or goods.conversion
@@ -316,7 +315,7 @@ class WhMove(models.Model):
             ('warehouse_id', '=', self.warehouse_id.id),
             ('warehouse_dest_id', '=', self.warehouse_dest_id.id)])
         if qc_rule and not self.qc_result:
-            raise UserError(u'请先上传质检报告')
+            raise UserError('请先上传质检报告')
 
     def prev_approve_order(self):
         """
@@ -325,7 +324,7 @@ class WhMove(models.Model):
         """
         for order in self:
             if not order.line_out_ids and not order.line_in_ids:
-                raise UserError(u'单据的明细行不可以为空')
+                raise UserError('单据的明细行不可以为空')
             order.check_qc_result()
 
     @api.multi
@@ -347,7 +346,7 @@ class WhMove(models.Model):
                 continue    # pragma: no cover
         return self.write({
             'approve_uid': self.env.uid,
-            'approve_date': fields.Datetime.now(self),
+        approve_date = fields.Datetime.now(self)
         })
 
     def prev_cancel_approved_order(self):
@@ -404,9 +403,9 @@ class WhMove(models.Model):
                 if (line.goods_id.id, line.attribute_id.id) in goods_list:
                     continue
                 goods_list.append((line.goods_id.id, line.attribute_id.id))
-                all_line_message += u'商品 %s ' % line.goods_id.name
+                all_line_message += '商品 %s ' % line.goods_id.name
                 if line.attribute_id:
-                    all_line_message += u' 型号%s' % line.attribute_id.name
+                    all_line_message += ' 型号%s' % line.attribute_id.name
                 line_in_ids.append((0, 0, {
                     'goods_id': line.goods_id.id,
                     'attribute_id': line.attribute_id.id,
@@ -417,10 +416,10 @@ class WhMove(models.Model):
                     'cost_unit': line.goods_id.cost / (1 + line.goods_id.tax_rate * 0.01),
                     'state': 'done',
                     'date': today}))
-                all_line_message += u" 当前库存量不足，继续出售请点击确定，并及时盘点库存\n"
+                all_line_message += " 当前库存量不足，继续出售请点击确定，并及时盘点库存\n"
 
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'商品 %s 的数量和含税单价不能小于0。' % line.goods_id.name)
+                raise UserError('商品 %s 的数量和含税单价不能小于0。' % line.goods_id.name)
         if line_in_ids:
             vals = {
                 'type': 'inventory',

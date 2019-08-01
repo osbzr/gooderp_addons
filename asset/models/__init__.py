@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import asset
+from . import asset

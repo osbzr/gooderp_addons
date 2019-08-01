@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -6,15 +5,15 @@ from odoo.exceptions import UserError
 
 class BusinessDataTable(models.Model):
     _name = 'business.data.table'
-    _description = u'业务数据表'
+    _description = '业务数据表'
 
-    model = fields.Many2one('ir.model', u'需要清理的表')
-    name = fields.Char(u'业务数据表名', required=True)
+    model = fields.Many2one('ir.model', '需要清理的表')
+    name = fields.Char('业务数据表名', required=True)
     clean_business_id = fields.Many2one(
-        'clean.business.data', string=u'清理数据对象')
+        'clean.business.data', string='清理数据对象')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -25,7 +24,7 @@ class BusinessDataTable(models.Model):
 
 class CleanBusinessData(models.Model):
     _name = 'clean.business.data'
-    _description = u'清理记录'
+    _description = '清理记录'
 
     @api.model
     def _get_business_table_name(self):
@@ -43,7 +42,7 @@ class CleanBusinessData(models.Model):
                                        string='要清理的业务数据表')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -56,6 +55,6 @@ class CleanBusinessData(models.Model):
                 if obj._table_exist:
                     sql = "TRUNCATE TABLE %s CASCADE " % obj._table
                     self.env.cr.execute(sql)
-        except Exception, e:
+        except Exception as e:
             raise UserError(e)
         return True

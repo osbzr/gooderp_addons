@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api, tools
 import odoo.addons.decimal_precision as dp
@@ -6,7 +5,7 @@ import odoo.addons.decimal_precision as dp
 
 class CustomerStatementsReport(models.Model):
     _name = "customer.statements.report"
-    _description = u"客户对账单"
+    _description = "客户对账单"
     _auto = False
     _order = 'id, date'
 
@@ -19,20 +18,20 @@ class CustomerStatementsReport(models.Model):
         for pre in pre_record:
             self.balance_amount += pre.amount - pre.pay_amount - pre.discount_money
 
-    partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
-    name = fields.Char(string=u'单据编号', readonly=True)
-    date = fields.Date(string=u'单据日期', readonly=True)
-    done_date = fields.Datetime(string=u'完成日期', readonly=True)
-    amount = fields.Float(string=u'应收金额', readonly=True,
+    partner_id = fields.Many2one('partner', string='业务伙伴', readonly=True)
+    name = fields.Char(string='单据编号', readonly=True)
+    date = fields.Date(string='单据日期', readonly=True)
+    done_date = fields.Datetime(string='完成日期', readonly=True)
+    amount = fields.Float(string='应收金额', readonly=True,
                           digits=dp.get_precision('Amount'))
-    pay_amount = fields.Float(string=u'实际收款金额', readonly=True,
+    pay_amount = fields.Float(string='实际收款金额', readonly=True,
                               digits=dp.get_precision('Amount'))
-    balance_amount = fields.Float(string=u'应收款余额',
+    balance_amount = fields.Float(string='应收款余额',
                                   compute='_compute_balance_amount',
                                   digits=dp.get_precision('Amount'))
-    discount_money = fields.Float(string=u'收款折扣', readonly=True,
+    discount_money = fields.Float(string='收款折扣', readonly=True,
                                   digits=dp.get_precision('Amount'))
-    note = fields.Char(string=u'备注', readonly=True)
+    note = fields.Char(string='备注', readonly=True)
 
     def init(self):
         # union money_order(type = 'get'), money_invoice(type = 'income')

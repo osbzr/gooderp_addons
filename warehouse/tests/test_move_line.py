@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 
@@ -30,13 +29,13 @@ class TestMoveLine(TransactionCase):
 
     def test_origin_explain(self):
         explain = self.mouse_in_line.get_origin_explain()
-        self.assertEqual(explain, u'盘盈')
+        self.assertEqual(explain, '盘盈')
 
         explain = self.mouse_out_line.get_origin_explain()
-        self.assertEqual(explain, u'组装单子件')
+        self.assertEqual(explain, '组装单子件')
 
         explain = self.cable_int_line.get_origin_explain()
-        self.assertEqual(explain, u'调拨入库')
+        self.assertEqual(explain, '调拨入库')
 
         self.cable_int_line.move_id.origin = ''
         explain = self.cable_int_line.get_origin_explain()
@@ -246,14 +245,14 @@ class TestMoveLine(TransactionCase):
         move_line = self.env.ref('warehouse.wh_move_line_12')
         result = self.env['wh.move.line'].name_search('ms160301')
         real_result = [(move_line.id, move_line.lot + ' ' +
-                        move_line.warehouse_dest_id.name + u' 余 ' + str(move_line.goods_qty))]
+                        move_line.warehouse_dest_id.name + ' 余 ' + str(move_line.goods_qty))]
         self.assertEqual(result, real_result)
 
     def test_name_search_args(self):
         '''批号下拉时候以domain搜索'''
         result = self.env['wh.move.line'].name_search(args=[('lot', '=', 'ms160301')])
         real_result = [(self.mouse_in_line.id, self.mouse_in_line.lot + ' ' +
-                        self.mouse_in_line.warehouse_dest_id.name + u' 余 ' + str(self.mouse_in_line.goods_qty))]
+                        self.mouse_in_line.warehouse_dest_id.name + ' 余 ' + str(self.mouse_in_line.goods_qty))]
         self.assertEqual(result, real_result)
 
     def test_compute_all_amount_wrong_tax_rate(self):

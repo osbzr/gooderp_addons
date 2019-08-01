@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from psycopg2 import IntegrityError
 from odoo.exceptions import UserError,ValidationError
@@ -19,7 +18,7 @@ class TestCore(TransactionCase):
         """
         partner = self.env.ref('core.jd')
         # 使用 name 来搜索京东
-        result = self.env['partner'].name_search(u'京东')
+        result = self.env['partner'].name_search('京东')
         real_result = [(partner.id, partner.name)]
         self.assertEqual(result, real_result)
         # 使用 code 来搜索京东
@@ -48,7 +47,7 @@ class TestCore(TransactionCase):
         self.env['res.currency'].rmb_upper(10000100.3)
         # 测试输入value为负时的货币大写问题
         self.assertTrue(
-            self.env['res.currency'].rmb_upper(-10000100.3) == u'负壹仟万零壹佰元叁角整')
+            self.env['res.currency'].rmb_upper(-10000100.3) == '负壹仟万零壹佰元叁角整')
 
     def test_compute_days_qualify(self):
         """计算资质到期天数"""

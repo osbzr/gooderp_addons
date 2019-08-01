@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    GOODERP, Open Source Management Solution
@@ -33,35 +32,35 @@ class hr_expense(models.Model):
     '''按报销人费用汇总'''
     _name = 'hr.expense'
 
-    name = fields.Char(u"单据编号",copy=False)
-    date = fields.Date(string=u'报销日期',
+    name = fields.Char("单据编号",copy=False)
+    date = fields.Date(string='报销日期',
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
                        copy=False,required=True,
-                       help=u'报销发生日期')
-    staff = fields.Many2one('staff', u'报销员工', required=True,help=u'选择员工')
-    invoice_all_total = fields.Float(string=u'费用金额合计', store=True, readonly=True,
+                       help='报销发生日期')
+    staff = fields.Many2one('staff', '报销员工', required=True,help='选择员工')
+    invoice_all_total = fields.Float(string='费用金额合计', store=True, readonly=True,
                                  compute='_compute_invoice_all_total', track_visibility='always',
                                  digits=dp.get_precision('Amount'))
-    state = fields.Selection([('draft', u'草稿'),
-                              ('confirm', u'已提交'),
-                              ('done', u'已支付')], u'状态', default='draft',store=True,compute='_state_to_done')
+    state = fields.Selection([('draft', '草稿'),
+                              ('confirm', '已提交'),
+                              ('done', '已支付')], '状态', default='draft',store=True,compute='_state_to_done')
     type = fields.Selection([
-        ('company', u'付给公司'),
-        ('my', u'付给报销人')], string=u'支付方式：',default='my', required=True, help=u'支付给个人时走其他付款单，支付给公司时走结算单')
-    line_ids = fields.One2many('hr.expense.line', 'order_id', u'明细发票行',
+        ('company', '付给公司'),
+        ('my', '付给报销人')], string='支付方式：',default='my', required=True, help='支付给个人时走其他付款单，支付给公司时走结算单')
+    line_ids = fields.One2many('hr.expense.line', 'order_id', '明细发票行',
                                states=READONLY_STATES, copy=False)
-    note = fields.Text(u"备注")
-    bank_account_id = fields.Many2one('bank.account', u'结算账户',
+    note = fields.Text("备注")
+    bank_account_id = fields.Many2one('bank.account', '结算账户',
                                       ondelete='restrict',
-                                      help=u'付给个人/公司')
-    partner_id = fields.Many2one('partner', u'供应商',
-                                 help=u'直接支付给供应商')
+                                      help='付给个人/公司')
+    partner_id = fields.Many2one('partner', '供应商',
+                                 help='直接支付给供应商')
 
     money_invoice = fields.Many2one(
-        'money.invoice', u'对应结算单', readonly=True, ondelete='restrict', copy=False)
+        'money.invoice', '对应结算单', readonly=True, ondelete='restrict', copy=False)
     other_money_order = fields.Many2one(
-        'other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
+        'other.money.order', '对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
 
     @api.depends('other_money_order.state')
     def _state_to_done(self):
@@ -86,10 +85,10 @@ class hr_expense(models.Model):
             if line.category_id and line.category_id.id not in category_id:
                 category_id.append(line.category_id.id)
             if line.staff.id != self.staff.id:
-                raise UserError(u"费用明细必须是同一人！")
+                raise UserError("费用明细必须是同一人！")
         if self.type == 'company':
             if len(category_id) > 1:
-                raise UserError(u"申报支付给公司的费用必须同一类别！")
+                raise UserError("申报支付给公司的费用必须同一类别！")
 
     @api.model
     def create(self, vals):
@@ -107,12 +106,12 @@ class hr_expense(models.Model):
     def unlink(self):
         for record in self:
             if record.state != 'draft':
-                raise UserError(u'只能删除草稿状态的费用报销单')
+                raise UserError('只能删除草稿状态的费用报销单')
         super(hr_expense, self).unlink()
 
     def hr_expense_confirm(self):
         if self.state == 'confirm':
-            raise UserError(u'请不要重复确认')
+            raise UserError('请不要重复确认')
         if self.type == 'company':
             self.to_money_invoice()
         if self.type == 'my':
@@ -122,7 +121,7 @@ class hr_expense(models.Model):
     def hr_expense_draft(self):
         '''删掉其他应付款单'''
         if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
+            raise UserError('请不要重复撤销')
         if self.other_money_order:
             other_money_order, self.other_money_order = self.other_money_order, False
             if other_money_order.state == 'done':
@@ -155,7 +154,7 @@ class hr_expense(models.Model):
             'amount': self.invoice_all_total,
             'reconciled': 0,
             'to_reconcile': self.invoice_all_total,
-            'date_due': fields.Date.context_today(self),
+        date_due = fields.Date.context_today(self)
             'state': 'draft',
             'tax_amount': tax,
             'bill_number':bill_number
@@ -191,54 +190,54 @@ class hr_expense_line(models.Model):
     '''费用明细'''
     _name = 'hr.expense.line'
     _order = "date"
-    name = fields.Char(u'单据编号',
+    name = fields.Char('单据编号',
                        index=True,
                        copy=False,
-                       help=u"报销单的唯一编号，当创建时它会自动生成下一个编号。")
-    staff = fields.Many2one('staff', required=True, string = u'报销员工', help=u'用关键字段查找并关联类别')
-    invoice_type = fields.Selection([('pt', u'增值税普通发票'),
-                              ('zy', u'增值税专用发票'),
-                              ('dz',u'电子普通发票')], u'状态', )
-    invoice_code = fields.Char(u"发票代码",copy = False)
-    invoice_name = fields.Char(u"发票号码",copy = False)
-    invoice_amount = fields.Float(string=u'发票金额',digits=dp.get_precision('Amount'), required=True,help=u'如是增值税发票请填不含税金额')
-    invoice_tax = fields.Float(string=u'发票税额',digits=dp.get_precision('Amount'), help=u'如是增值税发票请填不含税金额')
-    invoice_total = fields.Float(string=u'发票金额合计', store=True, readonly=True,
+                       help="报销单的唯一编号，当创建时它会自动生成下一个编号。")
+    staff = fields.Many2one('staff', required=True, string = '报销员工', help='用关键字段查找并关联类别')
+    invoice_type = fields.Selection([('pt', '增值税普通发票'),
+                              ('zy', '增值税专用发票'),
+                              ('dz','电子普通发票')], '状态', )
+    invoice_code = fields.Char("发票代码",copy = False)
+    invoice_name = fields.Char("发票号码",copy = False)
+    invoice_amount = fields.Float(string='发票金额',digits=dp.get_precision('Amount'), required=True,help='如是增值税发票请填不含税金额')
+    invoice_tax = fields.Float(string='发票税额',digits=dp.get_precision('Amount'), help='如是增值税发票请填不含税金额')
+    invoice_total = fields.Float(string='发票金额合计', store=True, readonly=True,
                         compute='_compute_cost_total', digits=dp.get_precision('Amount'))
-    invoice_heck_code = fields.Char(u"发票校验码", copy=False)
-    invoice_date = fields.Char(u"发票日期", copy=False)
-    note = fields.Text(u"备注")
-    state = fields.Selection([('draft', u'草稿'),
-                              ('confirm', u'已提交')], u'状态',default='draft',copy = False)
+    invoice_heck_code = fields.Char("发票校验码", copy=False)
+    invoice_date = fields.Char("发票日期", copy=False)
+    note = fields.Text("备注")
+    state = fields.Selection([('draft', '草稿'),
+                              ('confirm', '已提交')], '状态',default='draft',copy = False)
     category_id = fields.Many2one('core.category',
-                                  u'类别', ondelete='restrict',required=True,
-                                  help=u'类型：运费、咨询费等')
-    date = fields.Date(string=u'费用日期',
+                                  '类别', ondelete='restrict',required=True,
+                                  help='类型：运费、咨询费等')
+    date = fields.Date(string='费用日期',
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
                        copy=False,required=True,
-                       help=u'费用发生日期')
-    order_id = fields.Many2one('hr.expense', u'报销单号',  index = True, copy = False, readonly = True)
+                       help='费用发生日期')
+    order_id = fields.Many2one('hr.expense', '报销单号',  index = True, copy = False, readonly = True)
     is_refused = fields.Boolean(string="已被使用", store = True, compute='_compute_is_choose', readonly=True, copy=False)
     is_pay = fields.Boolean(string="已付款", store = True, compute='_compute_is_pay', readonly=True, copy=False)
 
     _sql_constraints = [
-        ('unique_invoice_code_name', 'unique (invoice_code, invoice_name)', u'发票代码+发票号码不能相同!'),
+        ('unique_invoice_code_name', 'unique (invoice_code, invoice_name)', '发票代码+发票号码不能相同!'),
     ]
-    attachment_number = fields.Integer(compute='_compute_attachment_number', string=u'附件号')
+    attachment_number = fields.Integer(compute='_compute_attachment_number', string='附件号')
 
     def hr_expense_line_confirm(self):
         if self.state == 'confirm':
-            raise UserError(u'请不要重复确认')
+            raise UserError('请不要重复确认')
         self.state = 'confirm'
 
     def hr_expense_line_draft(self):
         if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
+            raise UserError('请不要重复撤销')
         if self.state == 'confirm' and not self.is_refused:
             self.state = 'draft'
         else:
-            raise UserError(u"请先解除关联单据%s"%self.order_id.name)
+            raise UserError("请先解除关联单据%s"%self.order_id.name)
 
 
     @api.depends('invoice_amount', 'invoice_tax')
@@ -273,12 +272,12 @@ class hr_expense_line(models.Model):
 
         """
         #中文模式下替換字符
-        barcode = barcode.replace(u'，', ',')
-        barcode = barcode.replace(u'。', '.')
+        barcode = barcode.replace('，', ',')
+        barcode = barcode.replace('。', '.')
         code = barcode.split(',')
         invoice_heck_code = ''
         if len(code) < 5:
-            raise UserError(u"请确认扫描是否正确%s" % code)
+            raise UserError("请确认扫描是否正确%s" % code)
         if code[0] == '01':
             if code[1] == '10':
                 invoice_type = 'dz'
@@ -322,7 +321,7 @@ class hr_expense_line(models.Model):
     def unlink(self):
         for record in self:
             if record.state != 'draft':
-                raise UserError(u'只能删除草稿状态的费用发票')
+                raise UserError('只能删除草稿状态的费用发票')
         super(hr_expense_line, self).unlink()
 
     @api.one

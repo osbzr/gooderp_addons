@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models
@@ -50,9 +49,9 @@ unlink_original = models.BaseModel.unlink
 @api.multi
 def unlink(self):
     for record in self:
-        if 'state' in record._fields.keys():
+        if 'state' in list(record._fields.Keys()):
             if record.state == 'done':
-                raise UserError(u'不能删除已确认的单据！')
+                raise UserError('不能删除已确认的单据！')
 
         unlink_original(record)
 
@@ -74,7 +73,7 @@ class BaseModelExtend(models.AbstractModel):
         def action_cancel(self):
             for record in self:
                 if record.state != 'draft':
-                    raise UserError(u'只能作废草稿状态的单据')
+                    raise UserError('只能作废草稿状态的单据')
                 else:
                     record.state = 'cancel'
             return True
@@ -84,31 +83,31 @@ class BaseModelExtend(models.AbstractModel):
 
 # 分类的类别
 
-CORE_CATEGORY_TYPE = [('customer', u'客户'),
-                      ('supplier', u'供应商'),
-                      ('goods', u'商品'),
-                      ('expense', u'采购'),
-                      ('income', u'收入'),
-                      ('other_pay', u'其他支出'),
-                      ('other_get', u'其他收入'),
-                      ('attribute', u'属性'),
-                      ('finance', u'核算')]
+CORE_CATEGORY_TYPE = [('customer', '客户'),
+                      ('supplier', '供应商'),
+                      ('goods', '商品'),
+                      ('expense', '采购'),
+                      ('income', '收入'),
+                      ('other_pay', '其他支出'),
+                      ('other_get', '其他收入'),
+                      ('attribute', '属性'),
+                      ('finance', '核算')]
 
 # 当客户要求下拉字段可编辑，可使用此表存储可选值，按type分类，在字段上用domain和context筛选
 
 
 class CoreValue(models.Model):
     _name = 'core.value'
-    _description = u'可选值'
+    _description = '可选值'
 
-    name = fields.Char(u'名称', required=True)
-    type = fields.Char(u'类型', required=True,
+    name = fields.Char('名称', required=True)
+    type = fields.Char('类型', required=True,
                        default=lambda self: self._context.get('type'))
-    note = fields.Text(u'备注', help=u'此字段用于详细描述该可选值的意义，或者使用一些特殊字符作为程序控制的标识')
-    active = fields.Boolean(u'启用', default=True)
+    note = fields.Text('备注', help='此字段用于详细描述该可选值的意义，或者使用一些特殊字符作为程序控制的标识')
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -119,18 +118,18 @@ class CoreValue(models.Model):
 
 class CoreCategory(models.Model):
     _name = 'core.category'
-    _description = u'类别'
+    _description = '类别'
     _order = 'type, name'
 
-    name = fields.Char(u'名称', required=True)
-    type = fields.Selection(CORE_CATEGORY_TYPE, u'类型',
+    name = fields.Char('名称', required=True)
+    type = fields.Selection(CORE_CATEGORY_TYPE, '类型',
                             required=True,
                             default=lambda self: self._context.get('type'))
-    note = fields.Text(u'备注')
-    active = fields.Boolean(u'启用', default=True)
+    note = fields.Text('备注')
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -142,20 +141,20 @@ class CoreCategory(models.Model):
     def unlink(self):
         for record in self:
             if record.note:
-                raise UserError(u'不能删除系统创建的类别')
+                raise UserError('不能删除系统创建的类别')
 
         return super(CoreCategory, self).unlink()
 
 
 class Uom(models.Model):
     _name = 'uom'
-    _description = u'计量单位'
+    _description = '计量单位'
 
-    name = fields.Char(u'名称', required=True)
-    active = fields.Boolean(u'启用', default=True)
+    name = fields.Char('名称', required=True)
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -166,13 +165,13 @@ class Uom(models.Model):
 
 class SettleMode(models.Model):
     _name = 'settle.mode'
-    _description = u'结算方式'
+    _description = '结算方式'
 
-    name = fields.Char(u'名称', required=True)
-    active = fields.Boolean(u'启用', default=True)
+    name = fields.Char('名称', required=True)
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -183,12 +182,12 @@ class SettleMode(models.Model):
 
 class Staff(models.Model):
     _name = 'staff'
-    _description = u'员工'
+    _description = '员工'
 
-    user_id = fields.Many2one('res.users', u'对应用户')
+    user_id = fields.Many2one('res.users', '对应用户')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -200,21 +199,21 @@ class Staff(models.Model):
             staffs = self.env['staff'].search(
                 [('user_id', '=', self.user_id.id)])
             if len(staffs) > 1:
-                raise UserError(u'用户 %s 已有对应员工' % self.user_id.name)
+                raise UserError('用户 %s 已有对应员工' % self.user_id.name)
 
 
 class BankAccount(models.Model):
     _name = 'bank.account'
-    _description = u'账户'
+    _description = '账户'
 
-    name = fields.Char(u'名称', required=True)
-    num = fields.Char(u'账号')
-    balance = fields.Float(u'余额', readonly=True,
+    name = fields.Char('名称', required=True)
+    num = fields.Char('账号')
+    balance = fields.Float('余额', readonly=True,
                            digits=dp.get_precision('Amount'))
-    active = fields.Boolean(u'启用', default=True)
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -226,21 +225,21 @@ class BankAccount(models.Model):
 class Service(models.Model):
     ''' 是对其他收支业务的更细分类 '''
     _name = 'service'
-    _description = u'收支项'
+    _description = '收支项'
 
-    name = fields.Char(u'名称', required=True)
+    name = fields.Char('名称', required=True)
     get_categ_id = fields.Many2one('core.category',
-                                   u'收入类别', ondelete='restrict',
+                                   '收入类别', ondelete='restrict',
                                    domain="[('type', '=', 'other_get')]",
                                    context={'type': 'other_get'})
     pay_categ_id = fields.Many2one('core.category',
-                                   u'支出类别', ondelete='restrict',
+                                   '支出类别', ondelete='restrict',
                                    domain="[('type', '=', 'other_pay')]",
                                    context={'type': 'other_pay'})
-    price = fields.Float(u'价格', required=True)
-    active = fields.Boolean(u'启用', default=True)
+    price = fields.Float('价格', required=True)
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())

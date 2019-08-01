@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
@@ -58,14 +57,14 @@ class Partner(models.Model):
                                      self.env.user.company_id.start_date, self.payable_init, 0,
                                      self.payable_init, self.env.user.company_id.start_date, 'draft')
 
-    receivable_init = fields.Float(u'应收期初',
+    receivable_init = fields.Float('应收期初',
                                    digits=dp.get_precision('Amount'),
                                    inverse=_set_receivable_init,
-                                   help=u'客户的应收期初余额')
-    payable_init = fields.Float(u'应付期初',
+                                   help='客户的应收期初余额')
+    payable_init = fields.Float('应付期初',
                                 digits=dp.get_precision('Amount'),
                                 inverse=_set_payable_init,
-                                help=u'供应商的应付期初余额')
+                                help='供应商的应付期初余额')
 
     @api.multi
     def partner_statements(self):
@@ -84,7 +83,7 @@ class Partner(models.Model):
             ctx.update({'default_supplier': True})
 
         return {
-            'name': u'业务伙伴对账单向导',
+            'name': '业务伙伴对账单向导',
             'view_type': 'form',
             'view_mode': 'form',
             'view_id': False,
@@ -100,7 +99,7 @@ class Partner(models.Model):
     def _check_receivable_init(self):
         '''应收期初和应付期初只能有一个存在'''
         if self.receivable_init and self.payable_init:
-            raise UserError(u'应收期初和应付期初不能同时存在')
+            raise UserError('应收期初和应付期初不能同时存在')
 
 
 class BankAccount(models.Model):
@@ -116,7 +115,7 @@ class BankAccount(models.Model):
         start_date = self.env.user.company_id.start_date
         start_date_period_id = self.env['finance.period'].search_period(start_date)
         if self.init_balance and start_date_period_id.is_closed:
-            raise UserError(u'初始化期间(%s)已结账！' % start_date_period_id.name)
+            raise UserError('初始化期间(%s)已结账！' % start_date_period_id.name)
         # 如果有前期初值，删掉已前的单据
         other_money_id = self.env['other.money.order'].search([
             ('bank_id', '=', self.id),
@@ -143,10 +142,10 @@ class BankAccount(models.Model):
             other_money_init.other_money_done()
 
 
-    init_balance = fields.Float(u'期初',
+    init_balance = fields.Float('期初',
                                 digits=dp.get_precision('Amount'),
                                 inverse=_set_init_balance,
-                                help=u'资金的期初余额')
+                                help='资金的期初余额')
 
     @api.multi
     def bank_statements(self):
@@ -158,7 +157,7 @@ class BankAccount(models.Model):
         view = self.env.ref('money.bank_statements_report_wizard_form')
 
         return {
-            'name': u'账户对账单向导',
+            'name': '账户对账单向导',
             'view_type': 'form',
             'view_mode': 'form',
             'view_id': False,

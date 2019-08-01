@@ -1,3 +1,2 @@
-# -*- coding: utf-8 -*-
-import test_buy
-import test_wizard
+from . import test_buy
+from . import test_wizard

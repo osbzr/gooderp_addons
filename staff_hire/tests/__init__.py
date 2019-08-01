@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
-import test_staff_hire
-import test_staff
-import test_staff_job
+from . import test_staff_hire
+from . import test_staff
+from . import test_staff_job

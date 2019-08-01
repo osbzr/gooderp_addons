@@ -1,7 +1,7 @@
 odoo.define('app_odoo_customize.switch_language', function (require) {
     "use strict";
 
-    var Model = require('web.Model');
+    var rpc = require('web.rpc');
     var session = require('web.session');
     var UserMenu = require('web.UserMenu');
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    Copyright (C) 2016  德清武康开源软件().
@@ -28,40 +27,40 @@ from odoo.exceptions import UserError
 #定意发票todo add confirm_month
 class cn_account_invoice(models.Model):
     _name = 'cn.account.invoice'
-    _description = u'中国发票'
+    _description = '中国发票'
     _rec_name='name'
 
-    partner_name_in = fields.Char(u'供应商名称', copy=False)
-    partner_code_in = fields.Char(u'供应商税号', copy=False)
-    partner_address_in = fields.Char(u'供应商地址及电话', copy=False)
-    partner_bank_number_in = fields.Char(u'供应商银行及帐号', copy=False)
-    partner_name_out = fields.Char(u'客户名称', copy=False)
-    partner_code_out = fields.Char(u'客户税号', copy=False)
-    partner_address_out = fields.Char(u'客户地址及电话', copy=False)
-    partner_bank_number_out = fields.Char(u'客户银行及帐号', copy=False)
-    type = fields.Selection([('in', u'进项发票'),
-                              ('out', u'销项发票')], u'进/出发票', copy=False)
-    invoice_type = fields.Selection([('pt', u'增值税普通发票'),
-                              ('zy', u'增值税专用发票'),
-                              ('dz',u'电子普通发票'),
-                              ('other',u'其他发票')], u'发票类型', copy=False)
-    invoice_code = fields.Char(u'发票代码', copy=False)
-    name = fields.Char(u'发票号码', copy=False)
-    invoice_amount = fields.Float(u'金额', copy=False)
-    invoice_tax = fields.Float(u'税额', copy=False)
-    invoice_heck_code = fields.Char(u"发票校验码", copy=False)
-    invoice_date = fields.Date(u'开票日期', copy=False)
-    invoice_confirm_date = fields.Date(u'认证日期', copy=False)
-    tax_rate = fields.Float(u'税率',digits=(12, 0),copy=False)
-    is_deductible = fields.Boolean(u'是否抵扣')
-    is_verified = fields.Boolean(u'已核验')
-    line_ids=fields.One2many('cn.account.invoice.line', 'order_id', u'发票明细行',
+    partner_name_in = fields.Char('供应商名称', copy=False)
+    partner_code_in = fields.Char('供应商税号', copy=False)
+    partner_address_in = fields.Char('供应商地址及电话', copy=False)
+    partner_bank_number_in = fields.Char('供应商银行及帐号', copy=False)
+    partner_name_out = fields.Char('客户名称', copy=False)
+    partner_code_out = fields.Char('客户税号', copy=False)
+    partner_address_out = fields.Char('客户地址及电话', copy=False)
+    partner_bank_number_out = fields.Char('客户银行及帐号', copy=False)
+    type = fields.Selection([('in', '进项发票'),
+                              ('out', '销项发票')], '进/出发票', copy=False)
+    invoice_type = fields.Selection([('pt', '增值税普通发票'),
+                              ('zy', '增值税专用发票'),
+                              ('dz','电子普通发票'),
+                              ('other','其他发票')], '发票类型', copy=False)
+    invoice_code = fields.Char('发票代码', copy=False)
+    name = fields.Char('发票号码', copy=False)
+    invoice_amount = fields.Float('金额', copy=False)
+    invoice_tax = fields.Float('税额', copy=False)
+    invoice_heck_code = fields.Char("发票校验码", copy=False)
+    invoice_date = fields.Date('开票日期', copy=False)
+    invoice_confirm_date = fields.Date('认证日期', copy=False)
+    tax_rate = fields.Float('税率',digits=(12, 0),copy=False)
+    is_deductible = fields.Boolean('是否抵扣')
+    is_verified = fields.Boolean('已核验')
+    line_ids=fields.One2many('cn.account.invoice.line', 'order_id', '发票明细行',
                                copy=False)
-    attachment_number = fields.Integer(compute='_compute_attachment_number', string=u'附件号')
-    note = fields.Text(u"备注")
+    attachment_number = fields.Integer(compute='_compute_attachment_number', string='附件号')
+    note = fields.Text("备注")
 
     _sql_constraints = [
-        ('unique_invoice_code_name', 'unique (invoice_code, name)', u'发票代码+发票号码不能相同!'),
+        ('unique_invoice_code_name', 'unique (invoice_code, name)', '发票代码+发票号码不能相同!'),
     ]
 
     @api.multi
@@ -108,7 +107,7 @@ class cn_account_invoice(models.Model):
                         'name': category,
                         'account_id': account_id,
                         'tax_category_id': self.env['tax.category'].search([('print_name', '=', category)],limit=1).id,
-                        'note': u'由系统自动增加'
+                        'note': '由系统自动增加'
                     })
 
     @api.multi
@@ -150,7 +149,7 @@ class cn_account_invoice(models.Model):
                 ('name', '=', self.partner_name_in)])
         default_goods_supplier = self.env['ir.values'].get_default('tax.config.settings', 'default_goods_supplier')
         if not default_goods_supplier:
-            raise UserError(u'请设置默认供应商类别！')
+            raise UserError('请设置默认供应商类别！')
         if not partner_id:
             partner_id = self.env['partner'].create({
                 'name': self.partner_name_in,
@@ -192,7 +191,7 @@ class cn_account_invoice(models.Model):
                 ('name', '=', self.partner_name_out)])
         default_customer = self.env['ir.values'].get_default('tax.config.settings', 'default_customer')
         if not default_customer:
-            raise UserError(u'请设置默认客户类别！')
+            raise UserError('请设置默认客户类别！')
         if not partner_id:
             partner_id = self.env['partner'].create({
                 'name': self.partner_name_out,
@@ -239,16 +238,16 @@ class cn_account_invoice(models.Model):
 #定义发票明细行
 class cn_account_invoice_line(models.Model):
     _name = 'cn.account.invoice.line'
-    _description = u'中国发票明细'
+    _description = '中国发票明细'
     _rec_name='product_name'
 
-    order_id = fields.Many2one('cn_account_invoice', u'发票',help=u'关联发票',copy=False)
-    product_name = fields.Char(u"货物名称",copy=False)
-    product_type = fields.Char(u"规格型号",copy=False)
-    product_unit = fields.Char(u"单位",copy=False)
-    product_count = fields.Float(u"数量",copy=False)
-    product_price = fields.Float(u"价格",copy=False)
-    product_amount = fields.Float(u"金额",copy=False)
-    product_tax_rate = fields.Float(u"税率",copy=False)
-    product_tax = fields.Float(u"税额",copy=False)
-    tax_type = fields.Char(u'税收分类编码',help=u'20170101以后使用的税收分类编码，这个很重要',copy=False)
+    order_id = fields.Many2one('cn_account_invoice', '发票',help='关联发票',copy=False)
+    product_name = fields.Char("货物名称",copy=False)
+    product_type = fields.Char("规格型号",copy=False)
+    product_unit = fields.Char("单位",copy=False)
+    product_count = fields.Float("数量",copy=False)
+    product_price = fields.Float("价格",copy=False)
+    product_amount = fields.Float("金额",copy=False)
+    product_tax_rate = fields.Float("税率",copy=False)
+    product_tax = fields.Float("税额",copy=False)
+    tax_type = fields.Char('税收分类编码',help='20170101以后使用的税收分类编码，这个很重要',copy=False)

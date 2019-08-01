@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #     This file is part of web_readonly_bypass,
@@ -23,21 +22,20 @@
 #
 ##############################################################################
 {
-    'name': 'Web Stock Query',
+    'name': 'Web Menu Create',
     'version': '11.11',
     "author": "zhengXiang",
     "website": "http://www.osbzr.com",
     'category': 'Technical Settings',
-    'depends': ['warehouse'],
-    'data': [
-        'views/assets_backend.xml',
+    'depends': [
+        'web', 'base',
     ],
     'description':
     """
-        全局范围右上角中添加一个快速搜索框
+        直接在菜单上面显示新建按钮的快速通道，需要将菜单记录中的create_tag设置位True
     """,
-    'qweb': [
-        'static/src/xml/query.xml',
+    'data': [
+        'views/assets_backend.xml',
     ],
     'installable': True,
     'auto_install': False,

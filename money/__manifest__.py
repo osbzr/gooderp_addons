@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "GOODERP 出纳模块",
     'author': "judy@osbzr.com",

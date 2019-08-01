@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # Created on 2017-11-05
 # author: 广州尚鹏，http://www.sunpop.cn

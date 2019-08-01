@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 
@@ -33,11 +32,11 @@ class TestMailThread(TransactionCase):
         """正常审批流程"""
         env2 = self.env(self.env.cr, self.user_demo.id, self.env.context)
 
-        self.assertTrue(self.order._approve_state == u'已提交')
+        self.assertTrue(self.order._approve_state == '已提交')
         # 经理审批
         self.order.with_env(env2).good_process_approve(
             self.order.id, self.order._name)
-        self.assertTrue(self.order._approve_state == u'审批中')
+        self.assertTrue(self.order._approve_state == '审批中')
         # 自己先拒绝
         self.order.good_process_refused(self.order.id, self.order._name)
         # 经理重新审批
@@ -45,7 +44,7 @@ class TestMailThread(TransactionCase):
             self.order.id, self.order._name)
         # 自己审批
         self.order.good_process_approve(self.order.id, self.order._name)
-        self.assertTrue(self.order._approve_state == u'已审批')
+        self.assertTrue(self.order._approve_state == '已审批')
         self.order.buy_order_done()
         self.order.buy_order_draft()
   #      self.order.unlink()   暂时注释掉
@@ -56,14 +55,14 @@ class TestMailThread(TransactionCase):
         # 自己审批
         result = self.order.good_process_approve(
             self.order.id, self.order._name)
-        self.assertTrue(result[0] == u'您不是这张单据的下一个审批者')
+        self.assertTrue(result[0] == '您不是这张单据的下一个审批者')
 
         # admin的经理改为空，将用户组1中的用户改为Alice,admin去审批
         self.staff_admin.parent_id = False  # TODO:不起作用
         group_1.write(
             {'users': [(6, 0, [self.env.ref('core.user_alice').id])]})
         res = self.order.good_process_approve(self.order.id, self.order._name)
-        self.assertTrue(res[0] == u'您不是这张单据的下一个审批者')
+        self.assertTrue(res[0] == '您不是这张单据的下一个审批者')
 
     def test_refuser_sequence(self):
         """拒绝顺序"""
@@ -71,14 +70,14 @@ class TestMailThread(TransactionCase):
         # 自己拒绝
         result = self.order.good_process_refused(
             self.order.id, self.order._name)
-        self.assertTrue(result[0] == u'您是第一批需要审批的人，无需拒绝！')
+        self.assertTrue(result[0] == '您是第一批需要审批的人，无需拒绝！')
 
         # 经理和自己审批之后
         self.order.with_env(env2).good_process_approve(
             self.order.id, self.order._name)
         self.order.good_process_approve(self.order.id, self.order._name)
         res = self.order.good_process_refused(self.order.id, self.order._name)
-        self.assertTrue(res[0] == u'已经通过不能拒绝！')
+        self.assertTrue(res[0] == '已经通过不能拒绝！')
 
     def test_unlink(self):
         """级联删除"""
@@ -89,13 +88,13 @@ class TestMailThread(TransactionCase):
         env2 = self.env(self.env.cr, self.user_demo.id, self.env.context)
 
         # 已提交时审核报错
-        self.assertTrue(self.order._approve_state == u'已提交')
+        self.assertTrue(self.order._approve_state == '已提交')
         with self.assertRaises(ValidationError):
             self.order.buy_order_done()
         # 经理审批，审批中审核报错
         self.order.with_env(env2).good_process_approve(
             self.order.id, self.order._name)
-        self.assertTrue(self.order._approve_state == u'审批中')
+        self.assertTrue(self.order._approve_state == '审批中')
         with self.assertRaises(ValidationError):
             self.order.buy_order_done()
         # 审批中修改其他字段报错，不可删除

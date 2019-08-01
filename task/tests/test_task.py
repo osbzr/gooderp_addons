@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 from datetime import datetime
@@ -25,7 +24,7 @@ class TestTask(TransactionCase):
     def test_default_status(self):
         '''创建任务时，任务阶段默认为doing状态的阶段'''
         new_task = self.env['task'].create({
-            'name': u'测试创建任务时任务阶段的默认值',
+            'name': '测试创建任务时任务阶段的默认值',
             'project_id': self.project_id.id,
         })
         self.assertTrue(new_task.status == self.status)
@@ -56,8 +55,8 @@ class TestTimeline(TransactionCase):
         '''创建工作记录时应更新对应task的status等字段'''
         timeline = self.env['timeline'].create({
             'task_id': self.task.id,
-            'just_done': u'创建一个销货订单',
-            'next_action': u'测试其他内容',
+            'just_done': '创建一个销货订单',
+            'next_action': '测试其他内容',
             'next_datetime': (datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
             'set_status': self.status_doing.id,
             'user_id': self.env.ref('base.user_root').id,

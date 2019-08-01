@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 from odoo import fields, models, api
 
 
 class PartnerStatementsReportWizard(models.TransientModel):
     _name = "partner.statements.report.wizard"
-    _description = u"业务伙伴对账单向导"
+    _description = "业务伙伴对账单向导"
 
     @api.model
     def _get_company_start_date(self):
@@ -16,19 +15,19 @@ class PartnerStatementsReportWizard(models.TransientModel):
         ''' 获取当前登录用户公司的启用日期 '''
         return self.env.user.company_id.start_date
 
-    partner_id = fields.Many2one('partner', string=u'业务伙伴', required=True,
-                                 help=u'查看某一个业务伙伴的对账单报表')
-    from_date = fields.Date(string=u'开始日期', required=True, default=_get_company_start_date,
-                            help=u'查看本次报表的开始日期')  # 默认公司启用日期
-    to_date = fields.Date(string=u'结束日期', required=True,
+    partner_id = fields.Many2one('partner', string='业务伙伴', required=True,
+                                 help='查看某一个业务伙伴的对账单报表')
+    from_date = fields.Date(string='开始日期', required=True, default=_get_company_start_date,
+                            help='查看本次报表的开始日期')  # 默认公司启用日期
+    to_date = fields.Date(string='结束日期', required=True,
                           default=lambda self: fields.Date.context_today(self),
-                          help=u'查看本次报表的结束日期')  # 默认当前日期
+                          help='查看本次报表的结束日期')  # 默认当前日期
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    is_doc = fields.Boolean(u'打印word格式')
+    is_doc = fields.Boolean('打印word格式')
 
     @api.multi
     def partner_statements_without_goods(self):
@@ -38,20 +37,20 @@ class PartnerStatementsReportWizard(models.TransientModel):
         """
         for s in self:
             if s.from_date > s.to_date:
-                raise UserError(u'结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' %
+                raise UserError('结束日期不能小于开始日期！\n开始日期:%s 结束日期:%s ' %
                                 (s.from_date, s.to_date))
 
             if self.env.context.get('default_customer'):  # 客户
-                view = self.env.get('sell.order') != None \
+                view = self.env['sell.order'] != None \
                     and self.env.ref('sell.customer_statements_report_tree') \
                     or self.env.ref('money.customer_statements_report_simple_tree')
-                name = u'客户对账单:' + s.partner_id.name
+                name = '客户对账单:' + s.partner_id.name
                 res_model = 'customer.statements.report'
             else:  # 供应商
-                view = self.env.get('buy.order') != None \
+                view = self.env['buy.order'] != None \
                     and self.env.ref('buy.supplier_statements_report_tree') \
                     or self.env.ref('money.supplier_statements_report_simple_tree')
-                name = u'供应商对账单:' + s.partner_id.name
+                name = '供应商对账单:' + s.partner_id.name
                 res_model = 'supplier.statements.report'
 
             return {
@@ -128,7 +127,7 @@ class PartnerStatementsReportWizard(models.TransientModel):
         for s in self:
             res_ids = []
             if s.from_date > s.to_date:
-                raise UserError(u'结束日期不能小于开始日期。\n开始日期:%s 结束日期:%s ' %
+                raise UserError('结束日期不能小于开始日期。\n开始日期:%s 结束日期:%s ' %
                                 (s.from_date, s.to_date))
 
             if self.env.context.get('default_customer'):  # 客户
@@ -177,7 +176,7 @@ class PartnerStatementsReportWizard(models.TransientModel):
                     'sell.customer_statements_report_with_goods_tree')
 
                 return {
-                    'name': u'客户对账单:' + s.partner_id.name,
+                    'name': '客户对账单:' + s.partner_id.name,
                     'view_type': 'form',
                     'view_mode': 'tree',
                     'res_model': 'customer.statements.report.with.goods',
@@ -235,7 +234,7 @@ class PartnerStatementsReportWizard(models.TransientModel):
                     'buy.supplier_statements_report_with_goods_tree')
 
                 return {
-                    'name': u'供应商对账单:' + s.partner_id.name,
+                    'name': '供应商对账单:' + s.partner_id.name,
                     'view_type': 'form',
                     'view_mode': 'tree',
                     'res_model': 'supplier.statements.report.with.goods',

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    Copyright (C) 2016  开阖软件(<http://www.osbzr.com>).
@@ -26,12 +25,12 @@ from odoo.tools import float_compare
 
 class OtherMoneyOrder(models.Model):
     _name = 'other.money.order'
-    _description = u'其他收入/其他支出'
+    _description = '其他收入/其他支出'
     _inherit = ['mail.thread']
 
     TYPE_SELECTION = [
-        ('other_pay', u'其他支出'),
-        ('other_get', u'其他收入'),
+        ('other_pay', '其他支出'),
+        ('other_get', '其他收入'),
     ]
 
     @api.model
@@ -54,61 +53,61 @@ class OtherMoneyOrder(models.Model):
                                 for line in self.line_ids)
 
     state = fields.Selection([
-        ('draft', u'草稿'),
-        ('done', u'已确认'),
-        ('cancel', u'已作废'),
-    ], string=u'状态', readonly=True,
+        ('draft', '草稿'),
+        ('done', '已确认'),
+        ('cancel', '已作废'),
+    ], string='状态', readonly=True,
         default='draft', copy=False, index=True,
-        help=u'其他收支单状态标识，新建时状态为草稿;确认后状态为已确认')
-    partner_id = fields.Many2one('partner', string=u'往来单位',
+        help='其他收支单状态标识，新建时状态为草稿;确认后状态为已确认')
+    partner_id = fields.Many2one('partner', string='往来单位',
                                  readonly=True, ondelete='restrict',
                                  states={'draft': [('readonly', False)]},
-                                 help=u'单据对应的业务伙伴，单据确认时会影响他的应收应付余额')
-    date = fields.Date(string=u'单据日期', readonly=True,
+                                 help='单据对应的业务伙伴，单据确认时会影响他的应收应付余额')
+    date = fields.Date(string='单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
                        copy=False,
-                       help=u'单据创建日期')
-    name = fields.Char(string=u'单据编号', copy=False, readonly=True, default='/',
-                       help=u'单据编号，创建时会根据类型自动生成')
-    total_amount = fields.Float(string=u'金额', compute='_compute_total_amount',
+                       help='单据创建日期')
+    name = fields.Char(string='单据编号', copy=False, readonly=True, default='/',
+                       help='单据编号，创建时会根据类型自动生成')
+    total_amount = fields.Float(string='金额', compute='_compute_total_amount',
                                 store=True, readonly=True,
                                 digits=dp.get_precision('Amount'),
-                                help=u'本次其他收支的总金额')
-    bank_id = fields.Many2one('bank.account', string=u'结算账户',
+                                help='本次其他收支的总金额')
+    bank_id = fields.Many2one('bank.account', string='结算账户',
                               required=True, ondelete='restrict',
                               readonly=True, states={
                                   'draft': [('readonly', False)]},
-                              help=u'本次其他收支的结算账户')
+                              help='本次其他收支的结算账户')
     line_ids = fields.One2many('other.money.order.line', 'other_money_id',
-                               string=u'收支单行', readonly=True,
+                               string='收支单行', readonly=True,
                                copy=True,
                                states={'draft': [('readonly', False)]},
-                               help=u'其他收支单明细行')
-    type = fields.Selection(TYPE_SELECTION, string=u'类型', readonly=True,
+                               help='其他收支单明细行')
+    type = fields.Selection(TYPE_SELECTION, string='类型', readonly=True,
                             default=lambda self: self._context.get('type'),
                             states={'draft': [('readonly', False)]},
-                            help=u'类型：其他收入 或者 其他支出')
-    note = fields.Text(u'备注',
-                       help=u'可以为该单据添加一些需要的标识信息')
+                            help='类型：其他收入 或者 其他支出')
+    note = fields.Text('备注',
+                       help='可以为该单据添加一些需要的标识信息')
 
-    is_init = fields.Boolean(u'初始化应收应付', help=u'此单是否为初始化单')
+    is_init = fields.Boolean('初始化应收应付', help='此单是否为初始化单')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    receiver = fields.Char(u'收款人',
-                           help=u'收款人')
-    bank_name = fields.Char(u'开户行')
-    bank_num = fields.Char(u'银行账号')
+    receiver = fields.Char('收款人',
+                           help='收款人')
+    bank_name = fields.Char('开户行')
+    bank_num = fields.Char('银行账号')
     voucher_id = fields.Many2one('voucher',
-                                 u'对应凭证',
+                                 '对应凭证',
                                  readonly=True,
                                  ondelete='restrict',
                                  copy=False,
-                                 help=u'其他收支单确认时生成的对应凭证')
-    currency_amount = fields.Float(u'外币金额',
+                                 help='其他收支单确认时生成的对应凭证')
+    currency_amount = fields.Float('外币金额',
                                    digits=dp.get_precision('Amount'))
 
     @api.onchange('date')
@@ -133,15 +132,15 @@ class OtherMoneyOrder(models.Model):
         '''其他收支单的审核按钮'''
         self.ensure_one()
         if float_compare(self.total_amount, 0, 3) <= 0:
-            raise UserError(u'金额应该大于0。\n金额:%s' % self.total_amount)
+            raise UserError('金额应该大于0。\n金额:%s' % self.total_amount)
         if not self.bank_id.account_id:
-            raise UserError(u'请配置%s的会计科目' % (self.bank_id.name))
+            raise UserError('请配置%s的会计科目' % (self.bank_id.name))
 
         # 根据单据类型更新账户余额
         if self.type == 'other_pay':
             decimal_amount = self.env.ref('core.decimal_amount')
             if float_compare(self.bank_id.balance, self.total_amount, decimal_amount.digits) == -1:
-                raise UserError(u'账户余额不足。\n账户余额:%s 本次支出金额:%s' %
+                raise UserError('账户余额不足。\n账户余额:%s 本次支出金额:%s' %
                                 (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
         else:
@@ -164,7 +163,7 @@ class OtherMoneyOrder(models.Model):
         else:
             decimal_amount = self.env.ref('core.decimal_amount')
             if float_compare(self.bank_id.balance, self.total_amount, decimal_amount.digits) == -1:
-                raise UserError(u'账户余额不足。\n账户余额:%s 本次支出金额:%s' %
+                raise UserError('账户余额不足。\n账户余额:%s 本次支出金额:%s' %
                                 (self.bank_id.balance, self.total_amount))
             self.bank_id.balance -= self.total_amount
 
@@ -224,7 +223,7 @@ class OtherMoneyOrder(models.Model):
         vals = {}
         for line in self.line_ids:
             if not line.category_id.account_id:
-                raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
+                raise UserError('请配置%s的会计科目' % (line.category_id.name))
 
             rate_silent = self.env['res.currency'].get_rate_silent(
                 self.date, self.bank_id.currency_id.id)
@@ -243,7 +242,7 @@ class OtherMoneyOrder(models.Model):
             # 贷方行
             if not init_obj:
                 self.env['voucher.line'].create({
-                    'name': u"%s %s" % (vals.get('name'), vals.get('note')),
+                    'name': "%s %s" % (vals.get('name'), vals.get('note')),
                     'partner_id': vals.get('partner_credit', ''),
                     'account_id': vals.get('credit_account_id'),
                     'credit': line.amount,
@@ -254,16 +253,16 @@ class OtherMoneyOrder(models.Model):
             if vals.get('sell_tax_amount'):
                 if not self.env.user.company_id.output_tax_account:
                     raise UserError(
-                        u'您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
+                        '您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
                 self.env['voucher.line'].create({
-                    'name': u"%s %s" % (vals.get('name'), vals.get('note')),
+                    'name': "%s %s" % (vals.get('name'), vals.get('note')),
                     'account_id': self.env.user.company_id.output_tax_account.id,
                     'credit': line.tax_amount or 0,
                     'voucher_id': vals.get('vouch_obj_id'),
                 })
         # 借方行
         self.env['voucher.line'].create({
-            'name': u"%s" % (vals.get('name')),
+            'name': "%s" % (vals.get('name')),
             'account_id': vals.get('debit_account_id'),
             'debit': self.total_amount,  # 借方和
             'voucher_id': vals.get('vouch_obj_id'),
@@ -284,7 +283,7 @@ class OtherMoneyOrder(models.Model):
         vals = {}
         for line in self.line_ids:
             if not line.category_id.account_id:
-                raise UserError(u'请配置%s的会计科目' % (line.category_id.name))
+                raise UserError('请配置%s的会计科目' % (line.category_id.name))
 
             rate_silent = self.env['res.currency'].get_rate_silent(
                 self.date, self.bank_id.currency_id.id)
@@ -301,7 +300,7 @@ class OtherMoneyOrder(models.Model):
                          })
             # 借方行
             self.env['voucher.line'].create({
-                'name': u"%s %s " % (vals.get('name'), vals.get('note')),
+                'name': "%s %s " % (vals.get('name'), vals.get('note')),
                 'account_id': vals.get('debit_account_id'),
                 'debit': line.amount,
                 'voucher_id': vals.get('vouch_obj_id'),
@@ -312,16 +311,16 @@ class OtherMoneyOrder(models.Model):
             # 进项税行
             if vals.get('buy_tax_amount'):
                 if not self.env.user.company_id.import_tax_account:
-                    raise UserError(u'请通过"配置-->高级配置-->公司"菜单来设置进项税科目')
+                    raise UserError('请通过"配置-->高级配置-->公司"菜单来设置进项税科目')
                 self.env['voucher.line'].create({
-                    'name': u"%s %s" % (vals.get('name'), vals.get('note')),
+                    'name': "%s %s" % (vals.get('name'), vals.get('note')),
                     'account_id': self.env.user.company_id.import_tax_account.id,
                     'debit': line.tax_amount or 0,
                     'voucher_id': vals.get('vouch_obj_id'),
                 })
         # 贷方行
         self.env['voucher.line'].create({
-            'name': u"%s" % (vals.get('name')),
+            'name': "%s" % (vals.get('name')),
             'partner_id': vals.get('partner_credit', ''),
             'account_id': vals.get('credit_account_id'),
             'credit': self.total_amount,  # 贷方和
@@ -336,7 +335,7 @@ class OtherMoneyOrder(models.Model):
 
 class OtherMoneyOrderLine(models.Model):
     _name = 'other.money.order.line'
-    _description = u'其他收支单明细'
+    _description = '其他收支单明细'
 
     @api.onchange('service')
     def onchange_service(self):
@@ -353,28 +352,28 @@ class OtherMoneyOrderLine(models.Model):
         self.tax_amount = self.amount * self.tax_rate * 0.01
 
     other_money_id = fields.Many2one('other.money.order',
-                                     u'其他收支', ondelete='cascade',
-                                     help=u'其他收支单行对应的其他收支单')
-    service = fields.Many2one('service', u'收支项', ondelete='restrict',
-                              help=u'其他收支单行上对应的收支项')
+                                     '其他收支', ondelete='cascade',
+                                     help='其他收支单行对应的其他收支单')
+    service = fields.Many2one('service', '收支项', ondelete='restrict',
+                              help='其他收支单行上对应的收支项')
     category_id = fields.Many2one('core.category',
-                                  u'类别', ondelete='restrict',
-                                  help=u'类型：运费、咨询费等')
-    auxiliary_id = fields.Many2one('auxiliary.financing', u'辅助核算',
-                                   help=u'其他收支单行上的辅助核算')
-    amount = fields.Float(u'金额',
+                                  '类别', ondelete='restrict',
+                                  help='类型：运费、咨询费等')
+    auxiliary_id = fields.Many2one('auxiliary.financing', '辅助核算',
+                                   help='其他收支单行上的辅助核算')
+    amount = fields.Float('金额',
                           digits=dp.get_precision('Amount'),
-                          help=u'其他收支单行上的金额')
-    tax_rate = fields.Float(u'税率(%)',
+                          help='其他收支单行上的金额')
+    tax_rate = fields.Float('税率(%)',
                             default=lambda self: self.env.user.company_id.import_tax_rate,
-                            help=u'其他收支单行上的税率')
-    tax_amount = fields.Float(u'税额',
+                            help='其他收支单行上的税率')
+    tax_amount = fields.Float('税额',
                               digits=dp.get_precision('Amount'),
-                              help=u'其他收支单行上的税额')
-    note = fields.Char(u'备注',
-                       help=u'可以为该单据添加一些需要的标识信息')
+                              help='其他收支单行上的税额')
+    note = fields.Char('备注',
+                       help='可以为该单据添加一些需要的标识信息')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())

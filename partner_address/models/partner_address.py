@@ -1,31 +1,30 @@
-# -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 from odoo import models, fields, api
 
 
 class Country(models.Model):
     _name = 'country'
-    _description = u'国家'
+    _description = '国家'
 
-    name = fields.Char(u'国家名')
+    name = fields.Char('国家名')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
 
 class CountryState(models.Model):
     _name = 'country.state'
-    _description = u'省/直辖市/自治区'
+    _description = '省/直辖市/自治区'
 
-    country_id = fields.Many2one('country', u'国家')
-    name = fields.Char(u'名称', required=True)
-    code = fields.Char(u'编号', required=True)
-    city_ids = fields.One2many('all.city', 'province_id', u'下辖市/区')
+    country_id = fields.Many2one('country', '国家')
+    name = fields.Char('名称', required=True)
+    code = fields.Char('编号', required=True)
+    city_ids = fields.One2many('all.city', 'province_id', '下辖市/区')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -33,15 +32,15 @@ class CountryState(models.Model):
 class AllCity(models.Model):
     _name = 'all.city'
     _rec_name = 'city_name'
-    _description = u'地级市'
-    city_name = fields.Char(u'名称', required=True)
-    country_ids = fields.One2many('all.county', 'city_id', u'下辖县/市')
-    province_id = fields.Many2one('country.state', u'省/直辖市/自治区',
+    _description = '地级市'
+    city_name = fields.Char('名称', required=True)
+    country_ids = fields.One2many('all.county', 'city_id', '下辖县/市')
+    province_id = fields.Many2one('country.state', '省/直辖市/自治区',
                                   required=True,
                                   domain="[('country_id.name','=','中国')]")
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -49,14 +48,14 @@ class AllCity(models.Model):
 class AllCounty(models.Model):
     _name = 'all.county'
     _rec_name = 'county_name'
-    _description = u'县/市/区'
+    _description = '县/市/区'
 
-    city_id = fields.Many2one('all.city', u'地级市', required=True)
-    county_name = fields.Char(u'名称', required=True)
-    description = fields.Char(u'描述')
+    city_id = fields.Many2one('all.city', '地级市', required=True)
+    county_name = fields.Char('名称', required=True)
+    description = fields.Char('描述')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -64,13 +63,13 @@ class AllCounty(models.Model):
 class StateCityCounty(models.Model):
     _name = 'state.city.county'
 
-    province_id = fields.Many2one('country.state', u'省/市',
+    province_id = fields.Many2one('country.state', '省/市',
                                   domain="[('country_id.name','=','中国')]")
-    city_id = fields.Many2one('all.city', u'市/区')
-    county_id = fields.Many2one('all.county', u'县/市')
+    city_id = fields.Many2one('all.city', '市/区')
+    county_id = fields.Many2one('all.county', '县/市')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -142,19 +141,19 @@ class StateCityCounty(models.Model):
 class PartnerAddress(models.Model):
     _name = 'partner.address'
     _inherit = "state.city.county"
-    _description = u'联系人地址'
+    _description = '联系人地址'
     _rec_name = 'detail_address'
 
-    partner_id = fields.Many2one('partner', u'业务伙伴')
-    contact = fields.Char(u'联系人')
-    mobile = fields.Char(u'手机')
-    phone = fields.Char(u'座机')
-    qq = fields.Char(u'QQ')
-    email = fields.Char(u'邮箱')
-    town = fields.Char(u'乡镇')
-    detail_address = fields.Char(u'详细地址')
-    is_default_add = fields.Boolean(u'是否默认地址')
-    job = fields.Char(u'职务')
+    partner_id = fields.Many2one('partner', '业务伙伴')
+    contact = fields.Char('联系人')
+    mobile = fields.Char('手机')
+    phone = fields.Char('座机')
+    qq = fields.Char('QQ')
+    email = fields.Char('邮箱')
+    town = fields.Char('乡镇')
+    detail_address = fields.Char('详细地址')
+    is_default_add = fields.Boolean('是否默认地址')
+    job = fields.Char('职务')
 
     @api.multi
     def name_get(self):
@@ -204,11 +203,11 @@ class Partner(models.Model):
             if child:
                 self._put_info_to_partner(child)
 
-    child_ids = fields.One2many('partner.address', 'partner_id', u'业务伙伴地址')
+    child_ids = fields.One2many('partner.address', 'partner_id', '业务伙伴地址')
     contact = fields.Char(
-        u'联系人', compute='_compute_partner_address', store=True)
-    mobile = fields.Char(u'手机', compute='_compute_partner_address', store=True)
-    phone = fields.Char(u'座机', compute='_compute_partner_address', store=True)
-    qq = fields.Char(u'QQ', compute='_compute_partner_address', store=True)
+        '联系人', compute='_compute_partner_address', store=True)
+    mobile = fields.Char('手机', compute='_compute_partner_address', store=True)
+    phone = fields.Char('座机', compute='_compute_partner_address', store=True)
+    qq = fields.Char('QQ', compute='_compute_partner_address', store=True)
     address = fields.Char(
-        u'送货地址', compute='_compute_partner_address', store=True)
+        '送货地址', compute='_compute_partner_address', store=True)

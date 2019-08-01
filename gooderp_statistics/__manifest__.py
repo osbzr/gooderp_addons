@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     "name": "GOODERP Statistics",
     "version": '11.11',

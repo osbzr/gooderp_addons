@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 
@@ -6,18 +5,18 @@ from odoo import models, fields, api
 class buy_order(models.Model):
     _inherit = "buy.order"
 
-    sell_id = fields.Many2one('sell.order', u'销货订单', index=True,
+    sell_id = fields.Many2one('sell.order', '销货订单', index=True,
                               readonly=True,
                               copy=False,
                               ondelete='restrict',
-                              help=u'关联的销货订单')
+                              help='关联的销货订单')
 
     @api.multi
     def sell_to_buy(self):
         '''根据销货订单生成购货订单'''
         for order in self:
             return {
-                'name': u'销货订单生成购货订单向导',
+                'name': '销货订单生成购货订单向导',
                 'view_mode': 'form',
                 'res_model': 'sell.to.buy.wizard',
                 'type': 'ir.actions.act_window',
@@ -29,10 +28,10 @@ class buy_order_line(models.Model):
     _inherit = "buy.order.line"
 
     sell_line_id = fields.Many2one('sell.order.line',
-                                   u'销货单行',
+                                   '销货单行',
                                    copy=False,
                                    ondelete='restrict',
-                                   help=u'对应的销货订单行')
+                                   help='对应的销货订单行')
 
     @api.multi
     def unlink(self):

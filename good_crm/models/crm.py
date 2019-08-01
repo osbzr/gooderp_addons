@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
@@ -9,7 +8,7 @@ class Opportunity(models.Model):
     _inherits = {'task': 'task_id'}
     _inherit = ['mail.thread']
     _order = 'planned_revenue desc, priority desc, id'
-    _description = u'商机'
+    _description = '商机'
 
     @api.model
     def _select_objects(self):
@@ -29,43 +28,43 @@ class Opportunity(models.Model):
             line.price * line.quantity for line in self.line_ids)
 
     task_id = fields.Many2one('task',
-                              u'任务',
+                              '任务',
                               ondelete='cascade',
                               required=True)
-    planned_revenue = fields.Float(u'预期收益',
+    planned_revenue = fields.Float('预期收益',
                                    track_visibility='always')
-    ref = fields.Reference(string=u'相关记录',
+    ref = fields.Reference(string='相关记录',
                            selection='_select_objects')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     partner_id = fields.Many2one(
         'partner',
-        u'客户',
+        '客户',
         ondelete='restrict',
-        help=u'待签约合同的客户',
+        help='待签约合同的客户',
     )
-    date = fields.Date(u'预计采购时间')
+    date = fields.Date('预计采购时间')
     line_ids = fields.One2many(
         'goods.quotation',
         'opportunity_id',
-        string=u'商品报价',
+        string='商品报价',
         copy=True,
     )
     total_amount = fields.Float(
-        u'报价总额',
+        '报价总额',
         track_visibility='always',
         compute='_compute_total_amount',
     )
     success_reason_id = fields.Many2one(
         'core.value',
-        u'成功原因',
+        '成功原因',
         ondelete='restrict',
         domain=[('type', '=', 'success_reason')],
         context={'type': 'success_reason'},
-        help=u'成功原因分析',
+        help='成功原因分析',
     )
 
     @api.multi
@@ -76,25 +75,25 @@ class Opportunity(models.Model):
 
 class GoodsQuotation(models.Model):
     _name = 'goods.quotation'
-    _description = u'商品报价'
+    _description = '商品报价'
 
     opportunity_id = fields.Many2one('opportunity',
-                                     u'商机',
+                                     '商机',
                                      index=True,
                                      required=True,
                                      ondelete='cascade',
-                                     help=u'关联的商机')
+                                     help='关联的商机')
     goods_id = fields.Many2one('goods',
-                               u'商品',
+                               '商品',
                                ondelete='restrict',
-                               help=u'商品')
-    quantity = fields.Float(u'数量',
+                               help='商品')
+    quantity = fields.Float('数量',
                             default=1,
                             digits=dp.get_precision('Quantity'),
-                            help=u'数量')
-    price = fields.Float(u'单价',
+                            help='数量')
+    price = fields.Float('单价',
                          required=True,
                          digits=dp.get_precision('Price'),
-                         help=u'商品报价')
-    note = fields.Char(u'描述',
-                       help=u'商品描述')
+                         help='商品报价')
+    note = fields.Char('描述',
+                       help='商品描述')

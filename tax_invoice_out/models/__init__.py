@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import tax_invoice_out
+from . import tax_invoice_out

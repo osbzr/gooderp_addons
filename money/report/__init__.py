@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-import bank_statements
-import other_money_statements
-import money_get_pay
-import customer_statements
-import supplier_statements
+from . import bank_statements
+from . import other_money_statements
+from . import money_get_pay
+from . import customer_statements
+from . import supplier_statements

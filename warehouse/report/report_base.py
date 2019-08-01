@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 
-from odoo.osv import osv
+from odoo.osv import models
 from odoo.http import request
 import itertools
 import operator
@@ -8,11 +7,12 @@ import time
 import pickle
 from odoo import models, api
 from odoo.exceptions import UserError
+from functools import reduce
 
 
 class ReportBase(models.Model):
     _name = 'report.base'
-    _description = u'使用search_read来直接生成数据的基本类，其他类可以直接异名继承当前类来重用搜索、过滤、分组等函数'
+    _description = '使用search_read来直接生成数据的基本类，其他类可以直接异名继承当前类来重用搜索、过滤、分组等函数'
 
     _expired_time = 60
     _cache_record = False
@@ -34,13 +34,13 @@ class ReportBase(models.Model):
     def order_sql(self, sql_type='out'):
         return ''
 
-    def get_context(self, sql_type='out', context=None):
+    def get_context(self, sql_type='out'):
         return {}
 
     def execute_sql(self, sql_type='out'):
-        context = self.get_context(sql_type, context=self.env.context)
-        for key, value in context.iteritems():
-            if isinstance(context[key], basestring):
+        context = self.get_context(sql_type)
+        for key, value in context.items():
+            if isinstance(context[key], str):
                 context[key] = value.encode('utf-8')
 
         self.env.cr.execute((self.select_sql(sql_type) + self.from_sql(sql_type) + self.where_sql(
@@ -54,7 +54,7 @@ class ReportBase(models.Model):
 
     def check_valid_domain(self, domain):
         if not isinstance(domain, (list, tuple)):
-            raise UserError(u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
+            raise UserError('不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
 
     def _get_next_domain(self, domains, index):
         domain = domains[index]
@@ -76,10 +76,10 @@ class ReportBase(models.Model):
             field, opto, value = domain
 
             compute_operator = {
-                'ilike': lambda field, value: unicode(value).lower() in unicode(field).lower(),
-                'like': lambda field, value: unicode(value) in unicode(field),
-                'not ilike': lambda field, value: unicode(value).lower() not in unicode(field).lower(),
-                'not like': lambda field, value: unicode(value) not in unicode(field),
+                'ilike': lambda field, value: str(value).lower() in str(field).lower(),
+                'like': lambda field, value: str(value) in str(field),
+                'not ilike': lambda field, value: str(value).lower() not in str(field).lower(),
+                'not like': lambda field, value: str(value) not in str(field),
                 'in': lambda field, value: field in value,
                 'not in': lambda field, value: field not in value,
                 '=': operator.eq,
@@ -92,12 +92,12 @@ class ReportBase(models.Model):
 
             opto = opto.lower()
             if field in result:
-                if opto in compute_operator.iterkeys():
+                if opto in iter(compute_operator.keys()):
                     return compute_operator.get(opto)(result.get(field), value)
 
-                raise UserError(u'暂时无法解析的domain条件%s，请联系管理员' % str(domain))
+                raise UserError('暂时无法解析的domain条件%s，请联系管理员' % str(domain))
 
-        raise UserError(u'不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
+        raise UserError('不可识别的domain条件，请检查domain"%s"是否正确' % str(domain))
 
     def _compute_domain_util(self, result, domains):
         index = 0
@@ -120,14 +120,14 @@ class ReportBase(models.Model):
         return True
 
     def _compute_domain(self, result, domain):
-        return filter(lambda res: self._compute_domain_util(res, domain), result)
+        return [res for res in result if self._compute_domain_util(res, domain)]
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=80, orderby=False, lazy=True):
 
         def dict_plus(collect, values):
-            for key, value in values.iteritems():
-                if isinstance(value, (long, int, float)):
+            for key, value in values.items():
+                if isinstance(value, (int, float)):
                     if key not in collect:
                         collect[key] = 0
                     collect[key] += value
@@ -174,7 +174,7 @@ class ReportBase(models.Model):
 
     def update_result_none_to_false(self, result):
         for val in result:
-            for key, value in val.iteritems():
+            for key, value in val.items():
                 if value is None:
                     val[key] = False
 
@@ -209,11 +209,11 @@ class ReportBase(models.Model):
         return len(result)
 
     @api.multi
-    def read(self, fields=None, context=None, load='_classic_read'):
+    def read(self, fields=None, load='_classic_read'):
         res = []
         fields = fields or []
 
-        fields.append('id')
+        fields.Append('id')
         for record in self.get_data_from_cache():
             if record.get('id') in self.ids:
                 res.append({field: record.get(field) for field in fields})

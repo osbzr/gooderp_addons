@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -6,7 +5,7 @@ from odoo.exceptions import UserError
 
 class Pricing(models.Model):
     _name = 'pricing'
-    _description = u'定价策略'
+    _description = '定价策略'
 
     # 此逻辑放在这里是为了让采购和销售都有机会使用价格策略，现在只在销售环节读取了这些策略
 
@@ -23,7 +22,7 @@ class Pricing(models.Model):
         goods = args.get('goods')
         date = args.get('date')
         # 客户类别、仓库、商品满足条件
-        message = u'适用于%s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+        message = '适用于%s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                                 warehouse.name,
                                                 goods.name,
                                                 date)
@@ -35,7 +34,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 客户类别、仓库、商品类别满足条件
-        message = u'适用于 %s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+        message = '适用于 %s,%s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                                  warehouse.name,
                                                  goods.category_id.name,
                                                  date)
@@ -47,7 +46,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 客户类别、仓库满足条件
-        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+        message = '适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                               warehouse.name,
                                               date)
         res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
@@ -58,7 +57,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 仓库、商品满足
-        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name, goods.name,
+        message = '适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name, goods.name,
                                               date)
         res.append({'domain': [('c_category_id', '=', False),
                                ('warehouse_id', '=', warehouse.id),
@@ -68,7 +67,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 仓库，商品分类满足条件
-        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name,
+        message = '适用于 %s,%s,%s 的价格策略不唯一' % (warehouse.name,
                                               goods.category_id.name,
                                               date)
         res.append({'domain': [('c_category_id', '=', False),
@@ -80,7 +79,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 仓库满足条件
-        message = u'适用于 %s,%s 的价格策略不唯一' % (warehouse.name,
+        message = '适用于 %s,%s 的价格策略不唯一' % (warehouse.name,
                                            date)
         res.append({'domain': [('c_category_id', '=', False),
                                ('warehouse_id', '=', warehouse.id),
@@ -90,7 +89,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 客户类别,商品满足条件
-        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+        message = '适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                               goods.name,
                                               date)
         res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
@@ -101,7 +100,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 客户类别,商品分类满足条件
-        message = u'适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+        message = '适用于 %s,%s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                               goods.category_id.name,
                                               date)
         res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
@@ -113,7 +112,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 客户类别满足条件
-        message = u'适用于 %s,%s 的价格策略不唯一' % (partner.c_category_id.name,
+        message = '适用于 %s,%s 的价格策略不唯一' % (partner.c_category_id.name,
                                            date)
         res.append({'domain': [('c_category_id', '=', partner.c_category_id.id),
                                ('warehouse_id', '=', False),
@@ -123,7 +122,7 @@ class Pricing(models.Model):
                                ('deactive_date', '>=', date)],
                     'message': message})
         # 所有商品打折
-        message = u'适用于 %s 的价格策略不唯一' % (date)
+        message = '适用于 %s 的价格策略不唯一' % (date)
         res.append({'domain': [('c_category_id', '=', False),
                                ('warehouse_id', '=', False),
                                ('goods_id', '=', False),
@@ -149,11 +148,11 @@ class Pricing(models.Model):
         11. 可能还是找不到有效期内的，返回 False
         '''
         if not partner:
-            raise UserError(u'请先输入客户')
+            raise UserError('请先输入客户')
         if not warehouse:
-            raise UserError(u'请先输入仓库')
+            raise UserError('请先输入仓库')
         if not goods:
-            raise UserError(u'请先输入商品')
+            raise UserError('请先输入商品')
         args = {'partner': partner,
                 'warehouse': warehouse,
                 'goods': goods,
@@ -173,29 +172,29 @@ class Pricing(models.Model):
         if sum == 0:
             return False
 
-    name = fields.Char(u'描述', help=u'描述!')
+    name = fields.Char('描述', help='描述!')
     warehouse_id = fields.Many2one('warehouse',
-                                   u'仓库',
+                                   '仓库',
                                    ondelete='restrict',
                                    )
-    c_category_id = fields.Many2one('core.category', u'客户类别',
+    c_category_id = fields.Many2one('core.category', '客户类别',
                                     ondelete='restrict',
                                     domain=[('type', '=', 'customer')],
                                     context={'type': 'customer'})
-    goods_category_id = fields.Many2one('core.category', u'商品类别',
+    goods_category_id = fields.Many2one('core.category', '商品类别',
                                         ondelete='restrict',
                                         domain=[('type', '=', 'goods')],
                                         context={'type': 'goods'})
     goods_id = fields.Many2one('goods',
-                               u'商品',
+                               '商品',
                                ondelete='restrict',
                                )
-    active_date = fields.Date(u'开始日期', required=True)
-    deactive_date = fields.Date(u'终止日期', required=True)
-    discount_rate = fields.Float(u'折扣率%', help=u'商品的价格 × 折扣率 = 商品的实际价格 !')
-    active = fields.Boolean(u'启用', default=True)
+    active_date = fields.Date('开始日期', required=True)
+    deactive_date = fields.Date('终止日期', required=True)
+    discount_rate = fields.Float('折扣率%', help='商品的价格 × 折扣率 = 商品的实际价格 !')
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())

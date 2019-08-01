@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import auto_exchange
+from . import auto_exchange

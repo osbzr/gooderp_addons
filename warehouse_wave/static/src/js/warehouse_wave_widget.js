@@ -3,7 +3,7 @@ odoo.define('warehouse.wave', function(require) {
     var FormView = require('web.FormView');
     var form_relational = require('web.form_relational');
     var data = require('web.data');
-    var Model = require('web.Model');
+    var rpc = require('web.rpc');
     var core = require('web.core');
     var Widget = require('web.Widget');
     var session = require('web.session');

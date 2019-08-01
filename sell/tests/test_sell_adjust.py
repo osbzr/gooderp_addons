@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -243,7 +242,7 @@ class TestSellAdjustLine(TransactionCase):
         for line in self.adjust.line_ids:
             line.goods_id = self.keyboard
             line.onchange_goods_id()
-            self.assertTrue(line.uom_id.name == u'件')
+            self.assertTrue(line.uom_id.name == '件')
 
     def test_onchange_discount_rate(self):
         ''' 订单行优惠率改变时，改变优惠金额'''

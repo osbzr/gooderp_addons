@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2018 上海开阖软件 ((http://www.osbzr.com).)
 
 {

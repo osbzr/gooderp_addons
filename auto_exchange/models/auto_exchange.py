@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -21,7 +20,7 @@
 
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import httplib2
 import re
 from lxml import etree
@@ -59,14 +58,14 @@ class Currency(models.Model):
     _inherit = 'res.currency'
 
     month_exchange = fields.One2many(
-        'auto.exchange.line', 'currency_id', u'期间汇率', copy=False)
+        'auto.exchange.line', 'currency_id', '期间汇率', copy=False)
 
     @api.multi
     def get_web_exchange(self, line_date):
         '''用爬虫的方法取得中国银行汇率'''
         http = httplib2.Http()
         if self.name not in currency_code:
-            raise UserError(u'中国银行找不到您的(%s)币别汇率' % self.name)
+            raise UserError('中国银行找不到您的(%s)币别汇率' % self.name)
         url = 'http://srh.bankofchina.com/search/whpj/search.jsp'
         body = {
             'erectDate': line_date,
@@ -79,11 +78,11 @@ class Currency(models.Model):
         }
         try:
             response, content = http.request(
-                url, 'POST', headers=headers, body=urllib.urlencode(body))
+                url, 'POST', headers=headers, body=urllib.parse.urlencode(body))
             result = etree.HTML(content.decode('utf8')).xpath(
                 '//table[@cellpadding="0"]/tr[4]/td/text()')
         except httplib2.HttpLib2Error:  # pragma: no cover
-            raise UserError(u'网页设置有误(%s)请联系作者：（qq：2201864）' % url)
+            raise UserError('网页设置有误(%s)请联系作者：（qq：2201864）' % url)
         return result[5]
 
     @api.multi
@@ -102,7 +101,7 @@ class Currency(models.Model):
                     line_date = line.date
                     line.exchange = float(
                         self.get_web_exchange(line_date)) / 100
-                    line.note = u'系统于(%s)从中国银行网站上取得' % fields.Date.context_today(
+                    line.note = '系统于(%s)从中国银行网站上取得' % fields.Date.context_today(
                         self)
 
     '''取汇率函数，如果要给定日期，需要在context里增加date'''
@@ -119,34 +118,34 @@ class Currency(models.Model):
 
 class AutoExchangeLine(models.Model):
     _name = 'auto.exchange.line'
-    _description = u'自动汇率明细行'
+    _description = '自动汇率明细行'
 
     @api.one
     @api.depends('date')
     def _compute_period_id(self):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
-    date = fields.Date(u'抓取日期',
-                       index=True, copy=False, help=u"应为每个月的第一个工作日")
+    date = fields.Date('抓取日期',
+                       index=True, copy=False, help="应为每个月的第一个工作日")
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    exchange = fields.Float(u'外管局中间价', digits=(12, 4),
-                            help=u'取得的汇率')
-    note = fields.Char(u'备注',
-                       help=u'本行备注')
-    currency_id = fields.Many2one('res.currency', u'币别', index=True,
+    exchange = fields.Float('外管局中间价', digits=(12, 4),
+                            help='取得的汇率')
+    note = fields.Char('备注',
+                       help='本行备注')
+    currency_id = fields.Many2one('res.currency', '币别', index=True,
                                   required=True, ondelete='cascade',
-                                  help=u'关联订单的编号')
+                                  help='关联订单的编号')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
-        ('unique_start_date', 'unique (currency_id,period_id)', u'同币别期间不能重合!'),
+        ('unique_start_date', 'unique (currency_id,period_id)', '同币别期间不能重合!'),
     ]
 
 
@@ -161,6 +160,6 @@ class CurrencyMoneyOrder(models.Model):
             if period_id == line.period_id:
                 rate = line.exchange
         if not rate:
-            raise UserError(u'没有设置会计期间内的外币%s汇率' % currency.name)
+            raise UserError('没有设置会计期间内的外币%s汇率' % currency.name)
 
         return rate

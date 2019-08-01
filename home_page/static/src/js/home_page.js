@@ -3,7 +3,7 @@ odoo.define('home_page', function (require) {
 
     var core = require('web.core');
     var Widget = require('web.Widget');
-    var Model = require('web.Model');
+    var rpc = require('web.rpc');
     var session = require('web.session');
     var framework = require('web.framework');
 

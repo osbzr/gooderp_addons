@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import test_settings
+from . import test_settings

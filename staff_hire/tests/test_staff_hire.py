@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -12,7 +11,7 @@ class TestHireApplicant(TransactionCase):
     def test_default_stage_id(self):
         '''返回阶段的默认值'''
         hire = self.env['hire.applicant'].create({
-            'partner_name': u'小赵',
+            'partner_name': '小赵',
             'partner_mobile': '188188188',
             'job_id': self.env.ref('staff.staff_job_1').id,
         })
@@ -20,7 +19,7 @@ class TestHireApplicant(TransactionCase):
         # 没有阶段时创建招聘
         self.env['staff.hire.stage'].search([]).unlink()
         hire = self.env['hire.applicant'].create({
-            'partner_name': u'小赵',
+            'partner_name': '小赵',
             'partner_mobile': '188188188',
             'job_id': self.env.ref('staff.staff_job_1').id,
         })

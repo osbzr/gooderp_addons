@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -84,7 +83,7 @@ class TestMoneyInvoice(TransactionCase):
             })
         change_wizard.create_chang_account()
         invoice = self.env['money.invoice'].search(
-            [('name', '=', u'固定资产变更' + self.asset.code)])
+            [('name', '=', '固定资产变更' + self.asset.code)])
         src = invoice.find_source_order()
         self.assertEqual(self.asset.id, src['res_id'])
 
@@ -92,6 +91,6 @@ class TestMoneyInvoice(TransactionCase):
         '''结算单上查找原始单据按钮：期初应收'''
         self.core_jd.receivable_init = 1000
         self.core_jd._set_receivable_init()
-        invoice = self.env['money.invoice'].search([('name', '=', u'期初应收余额')])
+        invoice = self.env['money.invoice'].search([('name', '=', '期初应收余额')])
         with self.assertRaises(UserError):
             invoice.find_source_order()

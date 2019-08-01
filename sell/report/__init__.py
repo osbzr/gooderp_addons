@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-import customer_statements
-import sell_order_track
-import sell_order_detail
-import sell_summary_goods
-import sell_summary_partner
-import sell_summary_staff
-import sell_receipt
-import sell_top_ten
-import sell_summary
+from . import customer_statements
+from . import sell_order_track
+from . import sell_order_detail
+from . import sell_summary_goods
+from . import sell_summary_partner
+from . import sell_summary_staff
+from . import sell_receipt
+from . import sell_top_ten
+from . import sell_summary

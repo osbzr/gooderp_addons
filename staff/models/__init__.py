@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-import staff
-import staff_contract
-import mail
-import leave
+from . import staff
+from . import staff_contract
+from . import mail
+from . import leave

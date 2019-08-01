@@ -1,1 +1,1 @@
-import test_web_export_view
+from . import test_web_export_view

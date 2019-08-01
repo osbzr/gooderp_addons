@@ -1,3 +1,3 @@
 # -*- encoding: utf-8 -*-
 
-import hire_report
+from . import hire_report

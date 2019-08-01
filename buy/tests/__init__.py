@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 
-import test_buy_order
-import test_buy_receipt
-import test_buy_adjust
-import test_payment
-import test_report
-import test_supplier_statements
+from . import test_buy_order
+from . import test_buy_receipt
+from . import test_buy_adjust
+from . import test_payment
+from . import test_report
+from . import test_supplier_statements

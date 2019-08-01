@@ -4,7 +4,7 @@ odoo.define('good.process', function(require) {
     var core = require('web.core');
     var form_common = require('web.form_common');
     var form_relational = require('web.form_relational');
-    var Model = require('web.Model');
+    var rpc = require('web.rpc');
     var QWeb = core.qweb;
     var _t = core._t;
     var chat_manager = require('mail.chat_manager');

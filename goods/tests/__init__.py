@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import test_goods
+from . import test_goods

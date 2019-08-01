@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
@@ -17,7 +16,7 @@ class SellDelivery(models.Model):
     _name = 'sell.delivery'
     _inherits = {'wh.move': 'sell_move_id'}
     _inherit = ['mail.thread']
-    _description = u'销售发货单'
+    _description = '销售发货单'
     _order = 'date desc, id desc'
 
     @api.one
@@ -40,82 +39,82 @@ class SellDelivery(models.Model):
         '''返回收款状态'''
         if not self.is_return:
             if self.invoice_id.reconciled == 0:
-                self.money_state = u'未收款'
+                self.money_state = '未收款'
             elif self.invoice_id.reconciled < self.invoice_id.amount:
-                self.money_state = u'部分收款'
+                self.money_state = '部分收款'
             elif self.invoice_id.reconciled == self.invoice_id.amount:
-                self.money_state = u'全部收款'
+                self.money_state = '全部收款'
         # 返回退款状态
         if self.is_return:
             if self.invoice_id.reconciled == 0:
-                self.return_state = u'未退款'
+                self.return_state = '未退款'
             elif abs(self.invoice_id.reconciled) < abs(self.invoice_id.amount):
-                self.return_state = u'部分退款'
+                self.return_state = '部分退款'
             elif self.invoice_id.reconciled == self.invoice_id.amount:
-                self.return_state = u'全部退款'
+                self.return_state = '全部退款'
 
-    currency_id = fields.Many2one('res.currency', u'外币币别', readonly=True,
-                                  help=u'外币币别')
-    sell_move_id = fields.Many2one('wh.move', u'发货单', required=True,
+    currency_id = fields.Many2one('res.currency', '外币币别', readonly=True,
+                                  help='外币币别')
+    sell_move_id = fields.Many2one('wh.move', '发货单', required=True,
                                    ondelete='cascade',
-                                   help=u'发货单号')
-    is_return = fields.Boolean(u'是否退货', default=lambda self:
+                                   help='发货单号')
+    is_return = fields.Boolean('是否退货', default=lambda self:
                                self.env.context.get('is_return'),
-                               help=u'是否为退货类型')
-    order_id = fields.Many2one('sell.order', u'订单号', copy=False,
+                               help='是否为退货类型')
+    order_id = fields.Many2one('sell.order', '订单号', copy=False,
                                ondelete='cascade',
-                               help=u'产生发货单/退货单的销货订单')
-    invoice_id = fields.Many2one('money.invoice', u'发票号',
+                               help='产生发货单/退货单的销货订单')
+    invoice_id = fields.Many2one('money.invoice', '发票号',
                                  copy=False, ondelete='set null',
-                                 help=u'产生的发票号')
-    date_due = fields.Date(u'到期日期', copy=False,
+                                 help='产生的发票号')
+    date_due = fields.Date('到期日期', copy=False,
                            default=lambda self: fields.Date.context_today(
                                self),
-                           help=u'收款截止日期')
-    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
-                                 help=u'整单优惠率')
-    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
+                           help='收款截止日期')
+    discount_rate = fields.Float('优惠率(%)', states=READONLY_STATES,
+                                 help='整单优惠率')
+    discount_amount = fields.Float('优惠金额', states=READONLY_STATES,
                                    digits=dp.get_precision('Amount'),
-                                   help=u'整单优惠金额，可由优惠率自动计算得出，也可手动输入')
-    amount = fields.Float(u'成交金额', compute=_compute_all_amount,
+                                   help='整单优惠金额，可由优惠率自动计算得出，也可手动输入')
+    amount = fields.Float('成交金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits=dp.get_precision('Amount'),
-                          help=u'总金额减去优惠金额')
-    partner_cost = fields.Float(u'客户承担费用',
+                          help='总金额减去优惠金额')
+    partner_cost = fields.Float('客户承担费用',
                                 digits=dp.get_precision('Amount'),
-                                help=u'客户承担费用')
-    receipt = fields.Float(u'本次收款', states=READONLY_STATES,
+                                help='客户承担费用')
+    receipt = fields.Float('本次收款', states=READONLY_STATES,
                            digits=dp.get_precision('Amount'),
-                           help=u'本次收款金额')
+                           help='本次收款金额')
     bank_account_id = fields.Many2one('bank.account',
-                                      u'结算账户', ondelete='restrict',
-                                      help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
-    cost_line_ids = fields.One2many('cost.line', 'sell_id', u'销售费用',
+                                      '结算账户', ondelete='restrict',
+                                      help='用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
+    cost_line_ids = fields.One2many('cost.line', 'sell_id', '销售费用',
                                     copy=False,
-                                    help=u'销售费用明细行')
-    money_state = fields.Char(u'收款状态', compute=_get_sell_money_state,
-                              store=True, default=u'未收款',
-                              help=u"销售发货单的收款状态", index=True, copy=False)
-    return_state = fields.Char(u'退款状态', compute=_get_sell_money_state,
-                               store=True, default=u'未退款',
-                               help=u"销售退货单的退款状态", index=True, copy=False)
-    contact = fields.Char(u'联系人', states=READONLY_STATES,
-                          help=u'客户方的联系人')
-    address_id = fields.Many2one('partner.address', u'联系人地址', states=READONLY_STATES,
-                                 help=u'联系地址')
-    mobile = fields.Char(u'手机', states=READONLY_STATES,
-                         help=u'联系手机')
-    modifying = fields.Boolean(u'差错修改中', default=False,
-                               help=u'是否处于差错修改中')
-    origin_id = fields.Many2one('sell.delivery', u'来源单据')
-    voucher_id = fields.Many2one('voucher', u'出库凭证', readonly=True,
-                                 help=u'发货时产生的出库凭证')
+                                    help='销售费用明细行')
+    money_state = fields.Char('收款状态', compute=_get_sell_money_state,
+                              store=True, default='未收款',
+                              help="销售发货单的收款状态", index=True, copy=False)
+    return_state = fields.Char('退款状态', compute=_get_sell_money_state,
+                               store=True, default='未退款',
+                               help="销售退货单的退款状态", index=True, copy=False)
+    contact = fields.Char('联系人', states=READONLY_STATES,
+                          help='客户方的联系人')
+    address_id = fields.Many2one('partner.address', '联系人地址', states=READONLY_STATES,
+                                 help='联系地址')
+    mobile = fields.Char('手机', states=READONLY_STATES,
+                         help='联系手机')
+    modifying = fields.Boolean('差错修改中', default=False,
+                               help='是否处于差错修改中')
+    origin_id = fields.Many2one('sell.delivery', '来源单据')
+    voucher_id = fields.Many2one('voucher', '出库凭证', readonly=True,
+                                 help='发货时产生的出库凭证')
     money_order_id = fields.Many2one(
         'money.order',
-        u'收款单',
+        '收款单',
         readonly=True,
         copy=False,
-        help=u'输入本次收款确认时产生的收款单')
+        help='输入本次收款确认时产生的收款单')
 
     @api.onchange('address_id')
     def onchange_address_id(self):
@@ -203,15 +202,15 @@ class SellDelivery(models.Model):
     def _wrong_delivery_done(self):
         '''审核时不合法的给出报错'''
         if self.state == 'done':
-            raise UserError(u'请不要重复发货')
+            raise UserError('请不要重复发货')
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'商品 %s 的数量和商品含税单价不能小于0！' % line.goods_id.name)
+                raise UserError('商品 %s 的数量和商品含税单价不能小于0！' % line.goods_id.name)
         if not self.bank_account_id and self.receipt:
-            raise UserError(u'收款额不为空时，请选择结算账户！')
+            raise UserError('收款额不为空时，请选择结算账户！')
         decimal_amount = self.env.ref('core.decimal_amount')
         if float_compare(self.receipt, self.amount + self.partner_cost, precision_digits=decimal_amount.digits) == 1:
-            raise UserError(u'本次收款金额不能大于成交金额！\n本次收款金额:%s 成交金额:%s' %
+            raise UserError('本次收款金额不能大于成交金额！\n本次收款金额:%s 成交金额:%s' %
                             (self.receipt, self.amount + self.partner_cost))
         # 发库单/退货单 计算客户的 本次发货金额+客户应收余额 是否小于客户信用额度， 否则报错
         if not self.is_return:
@@ -219,7 +218,7 @@ class SellDelivery(models.Model):
             if self.partner_id.credit_limit != 0:
                 if float_compare(amount - self.receipt + self.partner_id.receivable, self.partner_id.credit_limit,
                                  precision_digits=decimal_amount.digits) == 1:
-                    raise UserError(u'本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！\n\
+                    raise UserError('本次发货金额 + 客户应收余额 - 本次收款金额 不能大于客户信用额度！\n\
                      本次发货金额:%s\n 客户应收余额:%s\n 本次收款金额:%s\n客户信用额度:%s' % (
                         amount, self.partner_id.receivable, self.receipt, self.partner_id.credit_limit))
 
@@ -325,7 +324,7 @@ class SellDelivery(models.Model):
         :return:
         """
         voucher_line = self.env['voucher.line'].create({
-            'name': u'%s %s' % (self.name, self.note or ''),
+            'name': '%s %s' % (self.name, self.note or ''),
             'account_id': account_id and account_id.id,
             'debit': debit,
             'credit': credit,
@@ -420,7 +419,7 @@ class SellDelivery(models.Model):
                 'business_type': 'adv_pay_to_get',
                 'advance_payment_ids': adv_pay_result,
                 'receivable_source_ids': receive_source_result,
-                'note': u'自动核销',
+                'note': '自动核销',
             })
             reconcile_order.reconcile_order_done()  # 自动审核
 
@@ -479,7 +478,7 @@ class SellDelivery(models.Model):
     def sell_delivery_draft(self):
         '''反审核销售发货单/退货单，更新本单的收款状态/退款状态，并删除生成的结算单、收款单及凭证'''
         if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
+            raise UserError('请不要重复撤销')
         # 查找产生的收款单
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
@@ -505,7 +504,7 @@ class SellDelivery(models.Model):
         # 不能反审核已核销的发货单
         for invoice in invoice_ids:
             if invoice.to_reconcile == 0 and invoice.reconciled == invoice.amount:
-                raise UserError(u'发货单已核销，不能撤销发货！')
+                raise UserError('发货单已核销，不能撤销发货！')
         invoice_ids.money_invoice_draft()
         invoice_ids.unlink()
         # 删除产生的出库凭证
@@ -550,7 +549,7 @@ class SellDelivery(models.Model):
             ('state', '=', 'draft')
         ])
         if return_order_draft:
-            raise UserError(u'销售发货单存在草稿状态的退货单！')
+            raise UserError('销售发货单存在草稿状态的退货单！')
 
         return_order = self.search([
             ('is_return', '=', True),
@@ -594,7 +593,7 @@ class SellDelivery(models.Model):
                     dic.update({'lot': line.lot_id.lot})
                 receipt_line.append(dic)
         if len(receipt_line) == 0:
-            raise UserError(u'该订单已全部退货！')
+            raise UserError('该订单已全部退货！')
         vals = {'partner_id': self.partner_id.id,
                 'is_return': True,
                 'order_id': self.order_id.id,
@@ -610,7 +609,7 @@ class SellDelivery(models.Model):
                 }
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('sell.sell_return_form').id
-        name = u'销货退货单'
+        name = '销货退货单'
         return {
             'name': name,
             'view_type': 'form',
@@ -626,11 +625,11 @@ class SellDelivery(models.Model):
 
 class WhMoveLine(models.Model):
     _inherit = 'wh.move.line'
-    _description = u'销售发货单行'
+    _description = '销售发货单行'
 
-    sell_line_id = fields.Many2one('sell.order.line', u'销货单行',
+    sell_line_id = fields.Many2one('sell.order.line', '销货单行',
                                    ondelete='cascade',
-                                   help=u'对应的销货订单行')
+                                   help='对应的销货订单行')
 
     @api.onchange('warehouse_id', 'goods_id')
     def onchange_warehouse_id(self):

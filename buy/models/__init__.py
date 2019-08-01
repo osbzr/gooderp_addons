@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-import buy_order
-import buy_receipt
-import buy_adjust
-import money
-import vendor_goods
-import partner
+from . import buy_order
+from . import buy_receipt
+from . import buy_adjust
+from . import money
+from . import vendor_goods
+from . import partner

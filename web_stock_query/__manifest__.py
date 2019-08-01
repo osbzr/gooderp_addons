@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #     This file is part of web_readonly_bypass,
@@ -23,19 +22,22 @@
 #
 ##############################################################################
 {
-    'name': 'Web Error Dialog',
+    'name': 'Web Stock Query',
     'version': '11.11',
     "author": "zhengXiang",
     "website": "http://www.osbzr.com",
     'category': 'Technical Settings',
-    'depends': ['web'],
+    'depends': ['warehouse'],
     'data': [
         'views/assets_backend.xml',
     ],
     'description':
     """
-        给前端报错添加一个自定义的按钮
+        全局范围右上角中添加一个快速搜索框
     """,
+    'qweb': [
+        'static/src/xml/query.xml',
+    ],
     'installable': True,
     'auto_install': False,
 }

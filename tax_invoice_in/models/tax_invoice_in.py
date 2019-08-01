@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    Copyright (C) 2016  德清武康开源软件().
@@ -39,15 +38,15 @@ class tax_invoice_in(models.Model):
     _order = "name"
     name = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         ondelete='restrict',
         required=True,
         states=READONLY_STATES)
-    line_ids = fields.One2many('cn.account.invoice', 'invoice_in_id', u'进项发票明细行',
+    line_ids = fields.One2many('cn.account.invoice', 'invoice_in_id', '进项发票明细行',
                                states=READONLY_STATES, copy=False)
-    state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已结束')], u'状态', default='draft')
-    tax_amount = fields.Float(string=u'合计可抵扣税额', store=True, readonly=True,
+    state = fields.Selection([('draft', '草稿'),
+                              ('done', '已结束')], '状态', default='draft')
+    tax_amount = fields.Float(string='合计可抵扣税额', store=True, readonly=True,
                         compute='_compute_tax_amount', track_visibility='always',
                         digits=dp.get_precision('Amount'))
 
@@ -78,7 +77,7 @@ class tax_invoice_in(models.Model):
     @api.multi
     def button_excel(self):
         return {
-            'name': u'引入excel',
+            'name': '引入excel',
             'view_mode': 'form',
             'view_type': 'form',
             'res_model': 'create.cn.account.invoice.wizard',
@@ -101,7 +100,7 @@ class tax_invoice_in(models.Model):
     def tax_invoice_done(self):
         for line in self.line_ids:
             if not line.buy_id:
-                raise UserError(u'发票号码：%s未下推生成采购订单！' % line.name)
+                raise UserError('发票号码：%s未下推生成采购订单！' % line.name)
         self.state = 'done'
 
 
@@ -110,7 +109,7 @@ class create_cn_account_invoice_wizard(models.TransientModel):
     _name = 'create.cn.account.invoice.wizard'
     _description = 'Tax Invoice Import'
 
-    excel = fields.Binary(u'导入认证系统导出的excel文件',)
+    excel = fields.Binary('导入认证系统导出的excel文件',)
 
     def create_cn_account_invoice(self):
         if not self.env.context.get('active_id'):
@@ -134,7 +133,7 @@ class create_cn_account_invoice_wizard(models.TransientModel):
                 app = {}
                 for i in range(len(colnames)):
                    app[colnames[i]] = row[i]
-                if app.get(u'开票日期'):
+                if app.get('开票日期'):
                     list.append(app)
                     ncols += 1
 
@@ -142,21 +141,21 @@ class create_cn_account_invoice_wizard(models.TransientModel):
         in_xls_data = {}
         for data in range(0,ncols):
             in_xls_data = list[data]
-            invoice_code = in_xls_data.get(u'发票代码')
-            partner_name = in_xls_data.get(u'销方名称')
+            invoice_code = in_xls_data.get('发票代码')
+            partner_name = in_xls_data.get('销方名称')
             self.env['cn.account.invoice'].create({
                 'type': 'in',
                 'partner_name_in': partner_name,
-                'partner_code_in': str(in_xls_data.get(u'销方税号')),
+                'partner_code_in': str(in_xls_data.get('销方税号')),
                 'invoice_code': str(invoice_code),
-                'name': str(in_xls_data.get(u'发票号码')),
-                'invoice_amount': float(in_xls_data.get(u'金额')),
-                'invoice_tax': float(in_xls_data.get(u'税额')),
-                'invoice_date': self.excel_date(in_xls_data.get(u'开票日期')),
-                'invoice_confirm_date': self.excel_date(in_xls_data.get(u'认证时间') or in_xls_data.get(u'确认时间')),
+                'name': str(in_xls_data.get('发票号码')),
+                'invoice_amount': float(in_xls_data.get('金额')),
+                'invoice_tax': float(in_xls_data.get('税额')),
+                'invoice_date': self.excel_date(in_xls_data.get('开票日期')),
+                'invoice_confirm_date': self.excel_date(in_xls_data.get('认证时间') or in_xls_data.get('确认时间')),
                 'invoice_type': 'zy',
                 'invoice_in_id': invoice_in.id or '',
-                'tax_rate': float(in_xls_data.get(u'税额'))/float(in_xls_data.get(u'金额'))*100,
+                'tax_rate': float(in_xls_data.get('税额'))/float(in_xls_data.get('金额'))*100,
                 'is_verified': False,
                 })
 
@@ -172,13 +171,13 @@ class create_cn_account_invoice_wizard(models.TransientModel):
 #增加按月进项发票
 class cn_account_invoice(models.Model):
     _inherit = 'cn.account.invoice'
-    _description = u'中国发票'
+    _description = '中国发票'
     _rec_name='name'
 
-    invoice_in_id = fields.Many2one('tax.invoice.in', u'对应入帐月份', index=True, copy=False, readonly=True)
-    buy_id = fields.Many2one('buy.order', u'采购订单号', copy=False, readonly=True,
+    invoice_in_id = fields.Many2one('tax.invoice.in', '对应入帐月份', index=True, copy=False, readonly=True)
+    buy_id = fields.Many2one('buy.order', '采购订单号', copy=False, readonly=True,
                              ondelete='cascade',
-                             help=u'产生的采购订单')
+                             help='产生的采购订单')
 
     @api.multi
     def to_buy(self):

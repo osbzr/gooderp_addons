@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from psycopg2 import IntegrityError
 from odoo.exceptions import UserError
@@ -29,5 +28,5 @@ class TestHomePage(TransactionCase):
                                                        'domain': '[]', 'context': '{}'})
         result = partner_action.onchange_action()
         real_result = {'domain': {'view_id': [
-            ('model', '=', u'res.partner'), ('type', '=', 'tree')]}}
+            ('model', '=', 'res.partner'), ('type', '=', 'tree')]}}
         self.assertTrue(result == real_result)

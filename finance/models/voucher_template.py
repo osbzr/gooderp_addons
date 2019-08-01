@@ -1,36 +1,35 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 
 class VoucherTemplate(models.Model):
     _name = 'voucher.template'
-    _description = u'凭证模板'
+    _description = '凭证模板'
 
-    name = fields.Char(u'模板名称', required=True)
+    name = fields.Char('模板名称', required=True)
     line_ids = fields.One2many(
         'voucher.template.line', 'template_id', string='模板行')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
 
 class VoucherTemplateLine(models.Model):
     _name = 'voucher.template.line'
-    _description = u'凭证模板明细'
+    _description = '凭证模板明细'
 
-    name = fields.Char(u'摘要')
-    account_id = fields.Many2one('finance.account', u'会计科目')
-    partner_id = fields.Many2one('partner', u'往来单位')
-    goods_id = fields.Many2one('goods', u'商品')
+    name = fields.Char('摘要')
+    account_id = fields.Many2one('finance.account', '会计科目')
+    partner_id = fields.Many2one('partner', '往来单位')
+    goods_id = fields.Many2one('goods', '商品')
     template_id = fields.Many2one('voucher.template', string='模板id')
     auxiliary_id = fields.Many2one(
-        'auxiliary.financing', u'辅助核算', help='辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\
+        'auxiliary.financing', '辅助核算', help='辅助核算是对账务处理的一种补充,即实现更广泛的账务处理,\
         以适应企业管理和决策的需要.辅助核算一般通过核算项目来实现', ondelete='restrict')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     
@@ -60,16 +59,16 @@ class VoucherTemplateLine(models.Model):
 
 class VoucherTemplateWizard(models.TransientModel):
     _name = 'voucher.template.wizard'
-    _description = u'凭证模板生成向导'
+    _description = '凭证模板生成向导'
 
-    name = fields.Char(string=u'模板名称')
-    is_change_old_template = fields.Boolean(u'修改原有模板')
-    old_template_id = fields.Many2one('voucher.template', string=u'旧模板')
+    name = fields.Char(string='模板名称')
+    is_change_old_template = fields.Boolean('修改原有模板')
+    old_template_id = fields.Many2one('voucher.template', string='旧模板')
     voucher_id = fields.Many2one(
-        'voucher', u'凭证id', default=lambda self: self.env.context.get('active_id'))
+        'voucher', '凭证id', default=lambda self: self.env.context.get('active_id'))
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 

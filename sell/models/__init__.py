@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-import sell_order
-import sell_delivery
-import sell_adjust
-import money
-import partner
+from . import sell_order
+from . import sell_delivery
+from . import sell_adjust
+from . import money
+from . import partner

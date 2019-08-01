@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 from datetime import datetime
@@ -19,11 +18,11 @@ class TestSellOrder(TransactionCase):
 
         self.partner_id = self.env.ref('core.jd')
         self.province_id = self.env['country.state'].search(
-            [('name', '=', u'河北省')])
+            [('name', '=', '河北省')])
         self.city_id = self.env['all.city'].search(
-            [('city_name', '=', u'石家庄市')])
+            [('city_name', '=', '石家庄市')])
         self.county_id = self.env['all.county'].search(
-            [('county_name', '=', u'正定县')])
+            [('county_name', '=', '正定县')])
 
     def test_compute_amount(self):
         ''' 计算字段的测试'''
@@ -31,7 +30,7 @@ class TestSellOrder(TransactionCase):
 
     def test_get_sell_goods_state(self):
         '''返回发货状态'''
-        for goods_state in [(u'未出库', 0), (u'部分出库', 1), (u'全部出库', 10000)]:
+        for goods_state in [('未出库', 0), ('部分出库', 1), ('全部出库', 10000)]:
             self.order.line_ids.write({'quantity_out': goods_state[1]})
             self.assertEqual(self.order.goods_state, goods_state[0])
             if goods_state[1] != 0:
@@ -76,12 +75,12 @@ class TestSellOrder(TransactionCase):
 
         # partner 不存在默认联系人
         self.partner_id.write({'child_ids':
-                               [(0, 0, {'contact': u'小东',
+                               [(0, 0, {'contact': '小东',
                                         'province_id': self.province_id.id,
                                         'city_id': self.city_id.id,
                                         'county_id': self.county_id.id,
-                                        'town': u'曹路镇',
-                                        'detail_address': u'金海路1688号',
+                                        'town': '曹路镇',
+                                        'detail_address': '金海路1688号',
                                         }
                                  )]})
         self.order.onchange_partner_id()
@@ -95,12 +94,12 @@ class TestSellOrder(TransactionCase):
 
     def test_onchange_address(self):
         ''' sell.order onchange address '''
-        address = self.env['partner.address'].create({'contact': u'小东',
+        address = self.env['partner.address'].create({'contact': '小东',
                                                       'province_id': self.province_id.id,
                                                       'city_id': self.city_id.id,
                                                       'county_id': self.county_id.id,
-                                                      'town': u'曹路镇',
-                                                      'detail_address': u'金海路1688号',
+                                                      'town': '曹路镇',
+                                                      'detail_address': '金海路1688号',
                                                       })
         self.order.address_id = address.id
         self.order.onchange_partner_address()
@@ -293,7 +292,7 @@ class TestSellOrderLine(TransactionCase):
         for line in self.order.line_ids:
             line.goods_id = goods
             line.onchange_goods_id()
-            self.assertTrue(line.uom_id.name == u'件')
+            self.assertTrue(line.uom_id.name == '件')
             # 测试价格是否是商品的销售价
             self.assertTrue(line.price_taxed == goods.price)
 

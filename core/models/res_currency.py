@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo import api, fields, models
 
 
@@ -7,7 +6,7 @@ class ResCurrency(models.Model):
 
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -20,16 +19,16 @@ class ResCurrency(models.Model):
         :param 传入阿拉伯数字
         :return 返回值是对应阿拉伯数字的绝对值的中文数字
         """
-        rmbmap = [u"零", u"壹", u"贰", u"叁", u"肆", u"伍", u"陆", u"柒", u"捌", u"玖"]
-        unit = [u"分", u"角", u"元", u"拾", u"佰", u"仟", u"万", u"拾", u"佰", u"仟", u"亿",
-                u"拾", u"佰", u"仟", u"万", u"拾", u"佰", u"仟", u"兆"]
+        rmbmap = ["零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"]
+        unit = ["分", "角", "元", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿",
+                "拾", "佰", "仟", "万", "拾", "佰", "仟", "兆"]
         # 冲红负数处理
         xflag = 0
         if value < 0:
             xflag = value
             value = abs(value)
         # 先把value 数字进行格式化保留两位小数，转成字符串然后去除小数点
-        nums = map(int, list(str('%0.2f' % value).replace('.', '')))
+        nums = list(map(int, list(str('%0.2f' % value).replace('.', ''))))
         words = []
         zflag = 0  # 标记连续0次数，以删除万字，或适时插入零字
         start = len(nums) - 3
@@ -50,7 +49,7 @@ class ResCurrency(models.Model):
             else:
                 zflag += 1
         if words[-1] != unit[0]:  # 结尾非‘分’补整字 最小单位 如果最后一个字符不是最小单位(分)则要加一个整字
-            words.append(u"整")
+            words.append("整")
         if xflag < 0:             # 如果为负数则要在数字前面加上‘负’字
-            words.insert(0, u"负")
+            words.insert(0, "负")
         return ''.join(words)

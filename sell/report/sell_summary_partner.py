@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api
@@ -8,24 +7,24 @@ import datetime
 class SellSummaryPartner(models.Model):
     _name = 'sell.summary.partner'
     _inherit = 'report.base'
-    _description = u'销售汇总表（按客户）'
+    _description = '销售汇总表（按客户）'
 
-    id_lists = fields.Text(u'移动明细行id列表')
-    c_category = fields.Char(u'客户类别')
-    partner = fields.Char(u'客户')
-    goods_code = fields.Char(u'商品编码')
-    goods = fields.Char(u'商品名称')
-    attribute = fields.Char(u'属性')
-    warehouse = fields.Char(u'仓库')
-    qty_uos = fields.Float(u'辅助数量', digits=dp.get_precision('Quantity'))
-    uos = fields.Char(u'辅助单位')
-    qty = fields.Float(u'基本数量', digits=dp.get_precision('Quantity'))
-    uom = fields.Char(u'基本单位')
-    price = fields.Float(u'单价', digits=dp.get_precision('Price'))
-    amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
-    tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
-    subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
-    margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
+    id_lists = fields.Text('移动明细行id列表')
+    c_category = fields.Char('客户类别')
+    partner = fields.Char('客户')
+    goods_code = fields.Char('商品编码')
+    goods = fields.Char('商品名称')
+    attribute = fields.Char('属性')
+    warehouse = fields.Char('仓库')
+    qty_uos = fields.Float('辅助数量', digits=dp.get_precision('Quantity'))
+    uos = fields.Char('辅助单位')
+    qty = fields.Float('基本数量', digits=dp.get_precision('Quantity'))
+    uom = fields.Char('基本单位')
+    price = fields.Float('单价', digits=dp.get_precision('Price'))
+    amount = fields.Float('销售收入', digits=dp.get_precision('Amount'))
+    tax_amount = fields.Float('税额', digits=dp.get_precision('Amount'))
+    subtotal = fields.Float('价税合计', digits=dp.get_precision('Amount'))
+    margin = fields.Float('毛利', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
@@ -107,7 +106,7 @@ class SellSummaryPartner(models.Model):
         ORDER BY c_category,partner,goods_code,attribute,warehouse
         '''
 
-    def get_context(self, sql_type='out', context=None):
+    def get_context(self, sql_type='out'):
         date_end = datetime.datetime.strptime(
             context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
         date_end = date_end.strftime('%Y-%m-%d')
@@ -155,7 +154,7 @@ class SellSummaryPartner(models.Model):
                 res.append(detail.id)
 
         return {
-            'name': u'销售明细表',
+            'name': '销售明细表',
             'view_mode': 'tree',
             'view_id': False,
             'res_model': 'sell.order.detail',

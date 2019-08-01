@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -35,13 +34,13 @@ class TestWarehouse(TransactionCase):
 
     def test_stock(self):
         hd_real_results = [
-            {'goods': u'鼠标', 'cost': 80.0, 'qty': 2.0},
-            {'goods': u'键盘', 'cost': 48000.0, 'qty': 600.0},
-            {'goods': u'网线', 'cost': 950400.0, 'qty': 11880.0},
+            {'goods': '鼠标', 'cost': 80.0, 'qty': 2.0},
+            {'goods': '键盘', 'cost': 48000.0, 'qty': 600.0},
+            {'goods': '网线', 'cost': 950400.0, 'qty': 11880.0},
         ]
 
         sh_real_results = [
-            {'goods': u'网线', 'cost': 9600.0, 'qty': 120.0},
+            {'goods': '网线', 'cost': 9600.0, 'qty': 120.0},
         ]
 
         for result in self.hd_warehouse.get_stock_qty():

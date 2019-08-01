@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 from odoo import api, fields, models
 
 
 class hire_applicant(models.Model):
     _inherit = "hire.applicant"
 
-    survey_id = fields.Many2one('survey.survey', related='job_id.survey_id', string=u"问卷")
-    response_id = fields.Many2one('survey.user_input', u"负责人", ondelete="set null", oldname="response")
+    survey_id = fields.Many2one('survey.survey', related='job_id.survey_id', string="问卷")
+    response_id = fields.Many2one('survey.user_input', "负责人", ondelete="set null", oldname="response")
 
     @api.multi
     def action_start_survey(self):

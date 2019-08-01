@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "GOODERP 联系人地址模块",
     'author': "judy（开阖软件）",

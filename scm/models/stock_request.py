@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import tools
 import odoo.addons.decimal_precision as dp
@@ -7,40 +6,40 @@ from odoo.exceptions import UserError
 
 # 补货申请单确认状态可选值
 STOCK_REQUEST_STATES = [
-    ('unsubmit', u'未提交'),
-    ('draft', u'未确认'),
-    ('done', u'已确认'),
-    ('cancel', u'已作废')]
+    ('unsubmit', '未提交'),
+    ('draft', '未确认'),
+    ('done', '已确认'),
+    ('cancel', '已作废')]
 
 
 class StockRequest(models.Model):
     _name = 'stock.request'
     _inherit = ['mail.thread']
-    _description = u'补货申请'
+    _description = '补货申请'
 
-    name = fields.Char(u'编号')
-    date = fields.Date(u'日期',
+    name = fields.Char('编号')
+    date = fields.Date('日期',
                        default=lambda self: fields.Date.context_today(self),
                        states={'done': [('readonly', True)]})
     user_id = fields.Many2one(
         'res.users',
-        u'经办人',
+        '经办人',
         ondelete='restrict',
         states={'done': [('readonly', True)]},
         default=lambda self: self.env.user,
-        help=u'单据经办人',
+        help='单据经办人',
     )
     line_ids = fields.One2many('stock.request.line',
                                'request_id',
-                               u'补货申请行',
+                               '补货申请行',
                                states={'done': [('readonly', True)]})
-    state = fields.Selection(STOCK_REQUEST_STATES, u'确认状态', readonly=True,
-                             help=u"补货申请的确认状态", copy=False,
+    state = fields.Selection(STOCK_REQUEST_STATES, '确认状态', readonly=True,
+                             help="补货申请的确认状态", copy=False,
                              index=True,
                              default='unsubmit')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -82,7 +81,7 @@ class StockRequest(models.Model):
                 else:
                     if wh_move_line.type == 'out':
                         if wh_move_line.attribute_id:  # 商品存在属性
-                            if not to_delivery_dict.has_key(wh_move_line.attribute_id):
+                            if wh_move_line.attribute_id not in to_delivery_dict:
                                 to_delivery_dict.update(
                                     {wh_move_line.attribute_id: wh_move_line.goods_qty})
                             else:
@@ -91,7 +90,7 @@ class StockRequest(models.Model):
                             to_delivery_qty += wh_move_line.goods_qty
                     else:
                         if wh_move_line.attribute_id:  # 商品存在属性
-                            if not to_receipt_dict.has_key(wh_move_line.attribute_id):
+                            if wh_move_line.attribute_id not in to_receipt_dict:
                                 to_receipt_dict.update(
                                     {wh_move_line.attribute_id: wh_move_line.goods_qty})
                             else:
@@ -103,7 +102,7 @@ class StockRequest(models.Model):
                                                                    ('order_id.state', '=', 'draft')])
             for line in sell_order_lines:
                 if line.attribute_id:  # 商品存在属性
-                    if not to_sell_dict.has_key(line.attribute_id):
+                    if line.attribute_id not in to_sell_dict:
                         to_sell_dict.update({line.attribute_id: line.quantity})
                     else:
                         to_sell_dict[line.attribute_id] += line.quantity
@@ -114,7 +113,7 @@ class StockRequest(models.Model):
                                                                  ('order_id.state', '=', 'draft')])
             for line in buy_order_lines:
                 if line.attribute_id:  # 商品存在属性
-                    if not to_buy_dict.has_key(line.attribute_id):
+                    if line.attribute_id not in to_buy_dict:
                         to_buy_dict.update({line.attribute_id: line.quantity})
                     else:
                         to_buy_dict[line.attribute_id] += line.quantity
@@ -196,13 +195,13 @@ class StockRequest(models.Model):
             'uom_id': line.uom_id.id,
             'quantity': line.request_qty,
             'price_taxed': price_taxed,
-            'note': u'补货申请单号：%s' % line.request_id.name
+            'note': '补货申请单号：%s' % line.request_id.name
         }
 
     @api.one
     def stock_request_done(self):
         if self.state == 'done':
-            raise UserError(u'请不要重复确认')
+            raise UserError('请不要重复确认')
         todo_buy_lines = []  # 待生成购货订单
         todo_produce_lines = []  # 待生成组装单
         for line in self.line_ids:
@@ -237,7 +236,7 @@ class StockRequest(models.Model):
                     assembly.goods_qty = line.request_qty
                     assembly.onchange_goods_qty()
                     assembly.note = assembly.note or ''
-                    assembly.note += u' 补货申请单号：%s' % line.request_id.name
+                    assembly.note += ' 补货申请单号：%s' % line.request_id.name
 
                     # 如果待处理行中有属性，则把它传至组装单的组合件行中
                     if line.attribute_id:
@@ -276,7 +275,7 @@ class StockRequest(models.Model):
                 continue
 
             if not line.supplier_id:
-                raise UserError(u'请输入补货申请行商品%s%s 的供应商。' % (
+                raise UserError('请输入补货申请行商品%s%s 的供应商。' % (
                     line.goods_id.name, line.attribute_id.name or ''))
 
             # 找供应商相同的购货订单
@@ -297,14 +296,14 @@ class StockRequest(models.Model):
                                                                  line.goods_id.id),
                                                                 ('attribute_id', '=', line.attribute_id.id)])
             if len(buy_order_line) > 1:
-                raise UserError(u'供应商%s 商品%s%s 存在多条未确认购货订单行。请联系采购人员处理。'
+                raise UserError('供应商%s 商品%s%s 存在多条未确认购货订单行。请联系采购人员处理。'
                                 % (line.supplier_id.name, line.goods_id.name, line.attribute_id.name or ''))
 
             if buy_order_line:
                 # 增加原订单行的商品数量
                 buy_order_line.quantity += line.request_qty
                 buy_order_line.note = buy_order_line.note or ''
-                buy_order_line.note += u' %s' % (line.request_id.name)
+                buy_order_line.note += ' %s' % (line.request_id.name)
             else:
                 # 创建购货订单行
                 vals = self._get_buy_order_line_data(line, buy_order)
@@ -315,30 +314,30 @@ class StockRequest(models.Model):
 
 class StockRequestLine(models.Model):
     _name = 'stock.request.line'
-    _description = u'补货申请行'
+    _description = '补货申请行'
 
-    request_id = fields.Many2one('stock.request', u'补货申请')
-    goods_id = fields.Many2one('goods', u'商品')
-    attribute_id = fields.Many2one('attribute', u'属性')
-    qty = fields.Float(u'当前数量', digits=dp.get_precision('Quantity'))
-    to_sell_qty = fields.Float(u'未确认销货数量', digits=dp.get_precision('Quantity'))
+    request_id = fields.Many2one('stock.request', '补货申请')
+    goods_id = fields.Many2one('goods', '商品')
+    attribute_id = fields.Many2one('attribute', '属性')
+    qty = fields.Float('当前数量', digits=dp.get_precision('Quantity'))
+    to_sell_qty = fields.Float('未确认销货数量', digits=dp.get_precision('Quantity'))
     to_delivery_qty = fields.Float(
-        u'未发货数量', digits=dp.get_precision('Quantity'))
-    to_buy_qty = fields.Float(u'未确认购货数量', digits=dp.get_precision('Quantity'))
+        '未发货数量', digits=dp.get_precision('Quantity'))
+    to_buy_qty = fields.Float('未确认购货数量', digits=dp.get_precision('Quantity'))
     to_receipt_qty = fields.Float(
-        u'未到货数量', digits=dp.get_precision('Quantity'))
+        '未到货数量', digits=dp.get_precision('Quantity'))
     min_stock_qty = fields.Float(
-        u'安全库存数量', digits=dp.get_precision('Quantity'))
-    request_qty = fields.Float(u'申请补货数量', digits=dp.get_precision('Quantity'))
+        '安全库存数量', digits=dp.get_precision('Quantity'))
+    request_qty = fields.Float('申请补货数量', digits=dp.get_precision('Quantity'))
     to_produce_qty = fields.Float(
-        u'未完工数量', digits=dp.get_precision('Quantity'))
+        '未完工数量', digits=dp.get_precision('Quantity'))
     to_consume_qty = fields.Float(
-        u'未投料数量', digits=dp.get_precision('Quantity'))
-    uom_id = fields.Many2one('uom', u'单位')
-    supplier_id = fields.Many2one('partner', u'供应商')
-    is_buy = fields.Boolean(u'采购', default=True)
+        '未投料数量', digits=dp.get_precision('Quantity'))
+    uom_id = fields.Many2one('uom', '单位')
+    supplier_id = fields.Many2one('partner', '供应商')
+    is_buy = fields.Boolean('采购', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())

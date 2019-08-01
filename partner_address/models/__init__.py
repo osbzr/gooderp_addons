@@ -1,1 +1,1 @@
-import partner_address
+from . import partner_address

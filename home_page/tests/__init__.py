@@ -1,1 +1,1 @@
-import test_home_page
+from . import test_home_page

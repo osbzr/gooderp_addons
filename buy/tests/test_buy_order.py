@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -57,13 +56,13 @@ class TestBuyOrder(TransactionCase):
         self.order.buy_order_done()
         # 采购订单行的已入库数量为0时，将商品状态写为未入库
         self.order._get_buy_goods_state()
-        self.assertTrue(self.order.goods_state == u'未入库')
+        self.assertTrue(self.order.goods_state == '未入库')
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         # 采购订单行的已入库数量等于商品数量时，将商品状态写为全部入库
         receipt.buy_receipt_done()
         self.order._get_buy_goods_state()
-        self.assertTrue(self.order.goods_state == u'全部入库')
+        self.assertTrue(self.order.goods_state == '全部入库')
 
     def test_get_buy_goods_state_part_in(self):
         '''返回收货状态：部分入库'''
@@ -75,7 +74,7 @@ class TestBuyOrder(TransactionCase):
             line.goods_qty = 5
         receipt.buy_receipt_done()
         self.order._get_buy_goods_state()
-        self.assertTrue(self.order.goods_state == u'部分入库')
+        self.assertTrue(self.order.goods_state == '部分入库')
 
     def test_default_warehouse_dest(self):
         '''新建购货订单时默认调入仓库'''
@@ -184,7 +183,7 @@ class TestBuyOrder(TransactionCase):
         receipt = self.env['buy.receipt'].search(
             [('order_id', '=', self.order.id)])
         receipt.buy_receipt_done()
-        self.assertTrue(self.order.goods_state == u'全部入库')
+        self.assertTrue(self.order.goods_state == '全部入库')
         # 批次管理拆分订单行
         new_order = self.order.copy()
         for line in new_order.line_ids:
@@ -357,7 +356,7 @@ class TestBuyOrderLine(TransactionCase):
         for line in self.order.line_ids:
             line.goods_id = self.cable
             line.onchange_goods_id()
-            self.assertTrue(line.uom_id.name == u'件')
+            self.assertTrue(line.uom_id.name == '件')
 
             # 测试价格是否是商品的成本
             self.assertTrue(line.price_taxed == self.cable.cost)
