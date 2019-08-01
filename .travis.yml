@@ -6,17 +6,17 @@ cache:
     - $HOME/.cache/pip
 
 python:
-  - "2.7.13"
+  - "3.6.8"
 
 addons:
-  postgresql: "9.5"
+  postgresql: "11.0"
   apt:
     packages:
       - expect-dev  # provides unbuffer utility
 
 env:
   global:
-  - VERSION="10.0" ODOO_REPO="osbzr/base" LINT_CHECK="0" PGPASSWORD="travis"
+  - VERSION="12.0" ODOO_REPO="osbzr/base" LINT_CHECK="0" PGPASSWORD="travis"
   - PHANTOMJS_VERSION="latest"
 
 install:

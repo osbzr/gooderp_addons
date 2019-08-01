@@ -111,7 +111,7 @@ class CostOrder(models.Model):
         }]
         return {
             'partner_id': self.partner_id.id,
-        date = fields.Date.context_today(self)
+            'date' : fields.Date.context_today(self),
             'line_ids':
             [(0, 0, line) for line in money_lines],
             'amount': self.amount,
