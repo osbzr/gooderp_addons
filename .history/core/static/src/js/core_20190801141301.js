@@ -392,7 +392,7 @@ var FieldPdfViewer = FieldBinaryFile.extend({
     },
     get_uri: function(){
         var query_obj = {
-            rpc: this.view.dataset.rpc,
+            model: this.view.dataset.model,
             field: this.name,
             id: this.view.datarecord.id
         };

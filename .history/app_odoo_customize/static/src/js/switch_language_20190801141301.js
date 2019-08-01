@@ -9,10 +9,10 @@ odoo.define('app_odoo_customize.switch_language', function (require) {
         on_menu_lang: function (ev) {
             var self = this;
             var lang = ($(ev).data("lang-id"));
-            new rpc('res.users').call('write', [[session.uid], {'lang': lang}]).then(function () {
+            new Model('res.users').call('write', [[session.uid], {'lang': lang}]).then(function () {
                 self.do_action({
                     type: 'ir.actions.client',
-                    res_rpc: 'res.users',
+                    res_model: 'res.users',
                     tag: 'reload_context',
                     target: 'current'
                 });
@@ -25,11 +25,11 @@ odoo.define('app_odoo_customize.switch_language', function (require) {
         var self = this;
         var lang_list = '';
         setTimeout(function () {
-            new rpc('ir.config_parameter').call('search_read', [[['key', '=', 'app_show_lang']], ['value']]).then(function (show) {
+            new Model('ir.config_parameter').call('search_read', [[['key', '=', 'app_show_lang']], ['value']]).then(function (show) {
                 if (show.length >= 1 && (show[0]['value'] == "False"))
                     $('switch-lang').hide();
                 else {
-                    new rpc('res.lang').call('search_read', [[], ['name', 'code']]).then(function (res) {
+                    new Model('res.lang').call('search_read', [[], ['name', 'code']]).then(function (res) {
                         _.each(res, function (lang) {
                             var a = '';
                             if (lang['code'] === session.user_context.lang) {
