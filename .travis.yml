@@ -9,7 +9,7 @@ python:
   - "3.6"
 
 addons:
-  postgresql: "11.0"
+  postgresql: "10"
   apt:
     packages:
       - expect-dev  # provides unbuffer utility
