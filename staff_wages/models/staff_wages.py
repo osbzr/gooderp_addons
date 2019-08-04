@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 
@@ -6,14 +5,14 @@ READONLY_STATES = {
     'done': [('readonly', True)],
 }
 
-change = [('time', u'计时'),
-          ('piece', u'计件'),
-          ('efficiency', u'计效')]
+change = [('time', '计时'),
+          ('piece', '计件'),
+          ('efficiency', '计效')]
 
 
 class StaffWages(models.Model):
     _name = 'staff.wages'
-    _description = u'员工工资'
+    _description = '员工工资'
     _inherit = ['mail.thread']
     _order = "name"
 
@@ -22,40 +21,40 @@ class StaffWages(models.Model):
     def _compute_period_id(self):
         self.name = self.env['finance.period'].get_period(self.date)
 
-    date = fields.Date(u'记帐日期', required=True, states=READONLY_STATES)
+    date = fields.Date('记帐日期', required=True, states=READONLY_STATES)
     name = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已完成')], u'状态', default='draft',
+    state = fields.Selection([('draft', '草稿'),
+                              ('done', '已完成')], '状态', default='draft',
                              index=True,
                              )
-    line_ids = fields.One2many('wages.line', 'order_id', u'工资明细行', states=READONLY_STATES,
+    line_ids = fields.One2many('wages.line', 'order_id', '工资明细行', states=READONLY_STATES,
                                copy=True)
-    payment = fields.Many2one('bank.account', u'付款方式')
-    other_money_order = fields.Many2one('other.money.order', u'对应付款单', readonly=True, ondelete='restrict',
-                                        help=u'确认时生成的对应付款单', copy=False)
+    payment = fields.Many2one('bank.account', '付款方式')
+    other_money_order = fields.Many2one('other.money.order', '对应付款单', readonly=True, ondelete='restrict',
+                                        help='确认时生成的对应付款单', copy=False)
     voucher_id = fields.Many2one(
-        'voucher', u'计提工资凭证', readonly=True, ondelete='restrict', copy=False)
+        'voucher', '计提工资凭证', readonly=True, ondelete='restrict', copy=False)
     change_voucher_id = fields.Many2one(
-        'voucher', u'修正计提凭证', readonly=True, ondelete='restrict', copy=False)
-    note = fields.Char(u'备注', help=u'本月备注')
-    totoal_wage = fields.Float(u'应发工资合计')
-    totoal_endowment = fields.Float(u'应扣养老合计')
-    totoal_health = fields.Float(u'应扣医疗合计')
-    totoal_unemployment = fields.Float(u'应扣失业合计')
-    totoal_housing_fund = fields.Float(u'应扣住房合计')
-    totoal_personal_tax = fields.Float(u'应扣个税合计')
-    totoal_amount = fields.Float(u'实发工资合计')
-    totoal_endowment_co = fields.Float(u'应扣公司养老合计')
-    totoal_health_co = fields.Float(u'应扣公司医疗合计')
-    totoal_unemployment_co = fields.Float(u'应扣公司失业合计')
-    totoal_housing_fund_co = fields.Float(u'应扣公司住房合计')
-    totoal_injury = fields.Float(u'应扣公司工伤保险合计',
-                                 help=u'公司承担的工伤保险合计')
-    totoal_maternity = fields.Float(u'应扣公司生育保险合计',
-                                    help=u'公司承担的生育保险合计')
+        'voucher', '修正计提凭证', readonly=True, ondelete='restrict', copy=False)
+    note = fields.Char('备注', help='本月备注')
+    totoal_wage = fields.Float('应发工资合计')
+    totoal_endowment = fields.Float('应扣养老合计')
+    totoal_health = fields.Float('应扣医疗合计')
+    totoal_unemployment = fields.Float('应扣失业合计')
+    totoal_housing_fund = fields.Float('应扣住房合计')
+    totoal_personal_tax = fields.Float('应扣个税合计')
+    totoal_amount = fields.Float('实发工资合计')
+    totoal_endowment_co = fields.Float('应扣公司养老合计')
+    totoal_health_co = fields.Float('应扣公司医疗合计')
+    totoal_unemployment_co = fields.Float('应扣公司失业合计')
+    totoal_housing_fund_co = fields.Float('应扣公司住房合计')
+    totoal_injury = fields.Float('应扣公司工伤保险合计',
+                                 help='公司承担的工伤保险合计')
+    totoal_maternity = fields.Float('应扣公司生育保险合计',
+                                    help='公司承担的生育保险合计')
 
     @api.onchange('line_ids')
     def _total_amount_wage(self):
@@ -88,9 +87,9 @@ class StaffWages(models.Model):
         :return:
         """
         if self.state == 'done':
-            raise UserError(u'请不要重复确认')
+            raise UserError('请不要重复确认')
         if not self.voucher_id:
-            raise UserError(u'工资单还未计提，请先计提')
+            raise UserError('工资单还未计提，请先计提')
         other_money_order = self._other_pay()   # 支付工资的其他支出单
         self.create_other_pay_housing_fund()  # 住房公积金的其他支出单
         self.create_other_pay_social_security()   # 社保的其他支出单
@@ -118,7 +117,7 @@ class StaffWages(models.Model):
         :return:
         """
         if not self.line_ids:
-            raise UserError(u'明细行不能为空')
+            raise UserError('明细行不能为空')
 
         if not self.voucher_id:
             # 生成并审核计提凭证
@@ -214,10 +213,10 @@ class StaffWages(models.Model):
                 + line.injury + line.maternity,
                 'voucher_id': vouch_obj.id,
                 'account_id': debit_account.id,
-                'name': u'提本月工资'})
+                'name': '提本月工资'})
 
         # 生成借方凭证行
-        for account_id, val in res.iteritems():
+        for account_id, val in res.items():
             self.env['voucher.line'].create(
                 dict(val, account_id=account_id.id))
         # 生成贷方凭证行
@@ -232,19 +231,19 @@ class StaffWages(models.Model):
             'staff_wages.categ_housing_fund_co')  # 公司缴纳住房公积金类别
         for line in self.line_ids:
             self.create_credit_line(
-                vouch_obj, u'提本月工资', credit_account.account_id, line.all_wage, line.name.auxiliary_id)
+                vouch_obj, '提本月工资', credit_account.account_id, line.all_wage, line.name.auxiliary_id)
         self.create_credit_line(
-            vouch_obj, u'提本月养老保险', endowment_co.account_id, self.totoal_endowment_co, False)
+            vouch_obj, '提本月养老保险', endowment_co.account_id, self.totoal_endowment_co, False)
         self.create_credit_line(
-            vouch_obj, u'提本月医疗保险', health_co.account_id, self.totoal_health_co, False)
+            vouch_obj, '提本月医疗保险', health_co.account_id, self.totoal_health_co, False)
         self.create_credit_line(
-            vouch_obj, u'提本月失业保险', unemployment_co.account_id, self.totoal_unemployment_co, False)
+            vouch_obj, '提本月失业保险', unemployment_co.account_id, self.totoal_unemployment_co, False)
         self.create_credit_line(
-            vouch_obj, u'提本月生育保险', maternity.account_id, self.totoal_maternity, False)
-        self.create_credit_line(vouch_obj, u'提本月工伤保险',
+            vouch_obj, '提本月生育保险', maternity.account_id, self.totoal_maternity, False)
+        self.create_credit_line(vouch_obj, '提本月工伤保险',
                                 injury.account_id, self.totoal_injury, False)
         self.create_credit_line(
-            vouch_obj, u'提本月公积金', housing_co.account_id, self.totoal_housing_fund_co, False)
+            vouch_obj, '提本月公积金', housing_co.account_id, self.totoal_housing_fund_co, False)
         return vouch_obj
 
     @api.multi
@@ -260,7 +259,7 @@ class StaffWages(models.Model):
 
         other_money_order = self.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
-            'date': fields.Date.context_today(self),
+        date = fields.Date.context_today(self)
             'bank_id': self.payment.id,
         })
         for line in self.line_ids:
@@ -319,7 +318,7 @@ class StaffWages(models.Model):
         housing = self.env.ref('staff_wages.housing_fund')  # 个人缴纳住房公积金类别
         order = self.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
-            'date': fields.Date.context_today(self),
+        date = fields.Date.context_today(self)
             'bank_id': self.payment.id,
             'note': self.name.name,
         })
@@ -351,7 +350,7 @@ class StaffWages(models.Model):
         unemployment = self.env.ref('staff_wages.unemployment')  # 个人缴纳失业类别
         order = self.with_context(type='other_pay').env['other.money.order'].create({
             'state': 'draft',
-            'date': fields.Date.context_today(self),
+        date = fields.Date.context_today(self)
             'bank_id': self.payment.id,
             'note': self.name.name,
         })
@@ -389,7 +388,7 @@ class StaffWages(models.Model):
     @api.one
     def staff_wages_draft(self):
         if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
+            raise UserError('请不要重复撤销')
         if self.other_money_order:
             other_money_order = self.other_money_order
             self.write({
@@ -417,39 +416,39 @@ class StaffWages(models.Model):
 
 class WagesLine(models.Model):
     _name = 'wages.line'
-    _description = u'工资明细'
+    _description = '工资明细'
 
-    name = fields.Many2one('staff', u'员工', required=True)
-    date_number = fields.Float(u'出勤天数')
-    basic_wage = fields.Float(u'基础工资')
-    basic_date = fields.Float(u'基础天数')
-    wage = fields.Float(u'出勤工资', compute='_all_wage_value', store=True)
-    add_hour = fields.Float(u'加班小时')
-    add_wage = fields.Float(u'加班工资')
-    other_wage = fields.Float(u'补助')
-    deduction = fields.Float(u'扣款')
-    all_wage = fields.Float(u'应发工资', store=True, compute='_all_wage_value')
-    endowment = fields.Float(u'个人养老保险')
-    health = fields.Float(u'个人医疗保险')
-    unemployment = fields.Float(u'个人失业保险')
-    housing_fund = fields.Float(u'个人住房公积金')
-    endowment_co = fields.Float(u'公司养老保险',
-                                help=u'公司承担的养老保险')
-    health_co = fields.Float(u'公司医疗保险',
-                             help=u'公司承担的医疗保险')
-    unemployment_co = fields.Float(u'公司失业保险',
-                                   help=u'公司承担的失业保险')
-    injury = fields.Float(u'公司工伤保险',
-                          help=u'公司承担的工伤保险')
-    maternity = fields.Float(u'公司生育保险',
-                             help=u'公司承担的生育保险')
-    housing_fund_co = fields.Float(u'公司住房公积金',
-                                   help=u'公司承担的住房公积金')
+    name = fields.Many2one('staff', '员工', required=True)
+    date_number = fields.Float('出勤天数')
+    basic_wage = fields.Float('基础工资')
+    basic_date = fields.Float('基础天数')
+    wage = fields.Float('出勤工资', compute='_all_wage_value', store=True)
+    add_hour = fields.Float('加班小时')
+    add_wage = fields.Float('加班工资')
+    other_wage = fields.Float('补助')
+    deduction = fields.Float('扣款')
+    all_wage = fields.Float('应发工资', store=True, compute='_all_wage_value')
+    endowment = fields.Float('个人养老保险')
+    health = fields.Float('个人医疗保险')
+    unemployment = fields.Float('个人失业保险')
+    housing_fund = fields.Float('个人住房公积金')
+    endowment_co = fields.Float('公司养老保险',
+                                help='公司承担的养老保险')
+    health_co = fields.Float('公司医疗保险',
+                             help='公司承担的医疗保险')
+    unemployment_co = fields.Float('公司失业保险',
+                                   help='公司承担的失业保险')
+    injury = fields.Float('公司工伤保险',
+                          help='公司承担的工伤保险')
+    maternity = fields.Float('公司生育保险',
+                             help='公司承担的生育保险')
+    housing_fund_co = fields.Float('公司住房公积金',
+                                   help='公司承担的住房公积金')
     personal_tax = fields.Float(
-        u'个人所得税', store=True, compute='_personal_tax_value')
+        '个人所得税', store=True, compute='_personal_tax_value')
     amount_wage = fields.Float(
-        u'实发工资', store=True, compute='_amount_wage_value')
-    order_id = fields.Many2one('staff.wages', u'工资表', index=True,
+        '实发工资', store=True, compute='_amount_wage_value')
+    order_id = fields.Many2one('staff.wages', '工资表', index=True,
                                required=True, ondelete='cascade')
 
     _sql_constraints = [
@@ -460,7 +459,7 @@ class WagesLine(models.Model):
     def change_wage_addhour(self):
         if self.date_number > 31 or self.basic_date > 31:
             # todo 修正月份日期判断
-            raise UserError(u'一个月不可能超过31天')
+            raise UserError('一个月不可能超过31天')
         if self.date_number >= self.basic_date:
             self.add_hour = 8 * (self.date_number - self.basic_date)
             self.date_number = self.basic_date
@@ -536,4 +535,4 @@ class WagesLine(models.Model):
 
 class AddWagesChange(models.Model):
     _inherit = 'staff.contract'
-    wages_change = fields.Selection(change, u'记工类型')
+    wages_change = fields.Selection(change, '记工类型')

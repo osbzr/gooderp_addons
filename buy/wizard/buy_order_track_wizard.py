@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from datetime import date
 from odoo import models, fields, api
@@ -7,7 +6,7 @@ from odoo.exceptions import UserError
 
 class BuyOrderTrackWizard(models.TransientModel):
     _name = 'buy.order.track.wizard'
-    _description = u'采购订单跟踪表向导'
+    _description = '采购订单跟踪表向导'
 
     @api.model
     def _default_date_start(self):
@@ -17,21 +16,21 @@ class BuyOrderTrackWizard(models.TransientModel):
     def _default_date_end(self):
         return date.today()
 
-    date_start = fields.Date(u'开始日期', default=_default_date_start,
-                             help=u'报表汇总的开始日期，默认为公司启用日期')
-    date_end = fields.Date(u'结束日期', default=_default_date_end,
-                           help=u'报表汇总的结束日期，默认为当前日期')
-    partner_id = fields.Many2one('partner', u'供应商',
-                                 help=u'只统计选定的供应商')
-    goods_id = fields.Many2one('goods', u'商品',
-                               help=u'只统计选定的商品')
-    order_id = fields.Many2one('buy.order', u'订单号',
-                               help=u'只统计选定的订单号')
-    warehouse_dest_id = fields.Many2one('warehouse', u'仓库',
-                                        help=u'只统计选定的仓库')
+    date_start = fields.Date('开始日期', default=_default_date_start,
+                             help='报表汇总的开始日期，默认为公司启用日期')
+    date_end = fields.Date('结束日期', default=_default_date_end,
+                           help='报表汇总的结束日期，默认为当前日期')
+    partner_id = fields.Many2one('partner', '供应商',
+                                 help='只统计选定的供应商')
+    goods_id = fields.Many2one('goods', '商品',
+                               help='只统计选定的商品')
+    order_id = fields.Many2one('buy.order', '订单号',
+                               help='只统计选定的订单号')
+    warehouse_dest_id = fields.Many2one('warehouse', '仓库',
+                                        help='只统计选定的仓库')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -92,7 +91,7 @@ class BuyOrderTrackWizard(models.TransientModel):
         self.ensure_one()
         res = []
         if self.date_end < self.date_start:
-            raise UserError(u'开始日期不能大于结束日期！')
+            raise UserError('开始日期不能大于结束日期！')
 
         buy_order_line = self.env['buy.order.line']
         for line in buy_order_line.search(self._get_domain(), order='goods_id'):
@@ -108,7 +107,7 @@ class BuyOrderTrackWizard(models.TransientModel):
 
         view = self.env.ref('buy.buy_order_track_tree')
         return {
-            'name': u'采购订单跟踪表',
+            'name': '采购订单跟踪表',
             'view_type': 'form',
             'view_mode': 'tree',
             'view_id': False,

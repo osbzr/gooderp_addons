@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     "name": "Common Dialog",
     "version": '11.11',

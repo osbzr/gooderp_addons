@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from datetime import datetime
 
@@ -16,36 +15,36 @@ READONLY_STATES = {
 class AssetCategory(models.Model):
     '''固定资产分类'''
     _name = 'asset.category'
-    _description = u'固定资产分类'
+    _description = '固定资产分类'
 
     # 字段，命名问题很严重
-    name = fields.Char(u'名称', required=True)
+    name = fields.Char('名称', required=True)
     # 一些带到固定资产上的默认值
     account_accumulated_depreciation = fields.Many2one(
-        'finance.account', u'累计折旧科目', required=True)
+        'finance.account', '累计折旧科目', required=True)
     account_asset = fields.Many2one(
-        'finance.account', u'固定资产科目', required=True)
+        'finance.account', '固定资产科目', required=True)
     account_depreciation = fields.Many2one(
-        'finance.account', u'折旧费用科目', required=True)
-    depreciation_number = fields.Float(u'折旧期间数', required=True)
-    depreciation_value = fields.Float(u'最终残值率%', required=True)
+        'finance.account', '折旧费用科目', required=True)
+    depreciation_number = fields.Float('折旧期间数', required=True)
+    depreciation_value = fields.Float('最终残值率%', required=True)
     clean_income = fields.Many2one(
-        'finance.account', u'固定资产清理收入科目', required=True)
+        'finance.account', '固定资产清理收入科目', required=True)
     clean_costs = fields.Many2one(
-        'finance.account', u'固定资产清理成本科目', required=True)
+        'finance.account', '固定资产清理成本科目', required=True)
     # 用于软删除归档
-    active = fields.Boolean(u'启用', default=True)
+    active = fields.Boolean('启用', default=True)
     # 未来支持多公司
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
 
 class Asset(models.Model):
     _name = 'asset'
-    _description = u'固定资产'
+    _description = '固定资产'
     _order = "code"        # 按资产编号排序
 
     @api.one
@@ -99,75 +98,75 @@ class Asset(models.Model):
                 [l.cost_depreciation for l in self.line_ids] )
 
     # 字段
-    code = fields.Char(u'编号', required="1", states=READONLY_STATES)
-    name = fields.Char(u'名称', required=True, states=READONLY_STATES)
+    code = fields.Char('编号', required="1", states=READONLY_STATES)
+    name = fields.Char('名称', required=True, states=READONLY_STATES)
     category_id = fields.Many2one(
-        'asset.category', u'固定资产分类', ondelete='restrict', required=True, states=READONLY_STATES)
-    cost = fields.Float(u'金额', digits=dp.get_precision(
+        'asset.category', '固定资产分类', ondelete='restrict', required=True, states=READONLY_STATES)
+    cost = fields.Float('金额', digits=dp.get_precision(
         'Amount'), required=True, states=READONLY_STATES)
-    surplus_value = fields.Float(u'原值', digits=dp.get_precision(
+    surplus_value = fields.Float('原值', digits=dp.get_precision(
         'Amount'), store=True, compute='_get_surplus_value')
 
-    net_value = fields.Float(u'净值',digits=dp.get_precision(
+    net_value = fields.Float('净值',digits=dp.get_precision(
         'Amount'), store=True, compute='_get_net_value')
-    no_depreciation = fields.Boolean(u'不折旧')
+    no_depreciation = fields.Boolean('不折旧')
     depreciation_number = fields.Integer(
-        u'折旧期间数', required=True, states=READONLY_STATES)
-    depreciation_value = fields.Float(u'最终残值', digits=dp.get_precision(
+        '折旧期间数', required=True, states=READONLY_STATES)
+    depreciation_value = fields.Float('最终残值', digits=dp.get_precision(
         'Amount'), required=True, states=READONLY_STATES)
-    cost_depreciation = fields.Float(u'每月折旧额', digits=dp.get_precision(
+    cost_depreciation = fields.Float('每月折旧额', digits=dp.get_precision(
         'Amount'), store=True, compute='_get_cost_depreciation')
     
-    state = fields.Selection([('draft', u'草稿'),
-                              ('done', u'已确认'),
-                              ('clean', u'已清理')], u'状态', default='draft',
+    state = fields.Selection([('draft', '草稿'),
+                              ('done', '已确认'),
+                              ('clean', '已清理')], '状态', default='draft',
                              index=True,)
 
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    date = fields.Date(u'记帐日期', required=True, states=READONLY_STATES)
-    tax = fields.Float(u'税额', digits=dp.get_precision(
+    date = fields.Date('记帐日期', required=True, states=READONLY_STATES)
+    tax = fields.Float('税额', digits=dp.get_precision(
         'Amount'), required=True, states=READONLY_STATES)
-    amount = fields.Float(u'价税合计', digits=dp.get_precision(
+    amount = fields.Float('价税合计', digits=dp.get_precision(
         'Amount'), store=True, compute='_get_amount')
-    partner_id = fields.Many2one('partner', u'供应商', ondelete='restrict', states=READONLY_STATES,
+    partner_id = fields.Many2one('partner', '供应商', ondelete='restrict', states=READONLY_STATES,
                                  domain="[('s_category_id', '!=', False)]",
-                                 help=u'用于记录采购固定资产时的应付账款，据此生成结算单')
-    bank_account = fields.Many2one('bank.account', u'结算账户', ondelete='restrict', states=READONLY_STATES,
-                                   help=u'用于记录现金采购固定资产时的付款，据此生成其他支出单')
-    is_init = fields.Boolean(u'初始化资产', states=READONLY_STATES,
-                             help=u'此固定资产在ERP系统启用前就已经有折旧了')
-    depreciation_previous = fields.Float(u'以前折旧', digits=dp.get_precision(
+                                 help='用于记录采购固定资产时的应付账款，据此生成结算单')
+    bank_account = fields.Many2one('bank.account', '结算账户', ondelete='restrict', states=READONLY_STATES,
+                                   help='用于记录现金采购固定资产时的付款，据此生成其他支出单')
+    is_init = fields.Boolean('初始化资产', states=READONLY_STATES,
+                             help='此固定资产在ERP系统启用前就已经有折旧了')
+    depreciation_previous = fields.Float('以前折旧', digits=dp.get_precision(
         'Amount'), required=True, states=READONLY_STATES)
     
     account_credit = fields.Many2one(
-        'finance.account', u'资产贷方科目', required=True, states=READONLY_STATES,
-        help=u'固定资产入账时：\n 如赊购，此处为应付科目；\n 如现购，此处为资金科目；\n 如自建，此处为在建工程')
+        'finance.account', '资产贷方科目', required=True, states=READONLY_STATES,
+        help='固定资产入账时：\n 如赊购，此处为应付科目；\n 如现购，此处为资金科目；\n 如自建，此处为在建工程')
     account_asset = fields.Many2one(
-        'finance.account', u'固定资产科目', required=True, states=READONLY_STATES)
+        'finance.account', '固定资产科目', required=True, states=READONLY_STATES)
     account_depreciation = fields.Many2one(
-        'finance.account', u'折旧费用科目', required=True, states=READONLY_STATES)
+        'finance.account', '折旧费用科目', required=True, states=READONLY_STATES)
     account_accumulated_depreciation = fields.Many2one(
-        'finance.account', u'累计折旧科目', required=True, states=READONLY_STATES)
+        'finance.account', '累计折旧科目', required=True, states=READONLY_STATES)
 
-    line_ids = fields.One2many('asset.line', 'order_id', u'折旧明细行',
+    line_ids = fields.One2many('asset.line', 'order_id', '折旧明细行',
                                states=READONLY_STATES, copy=False)
-    chang_ids = fields.One2many('chang.line', 'order_id', u'变更明细行',
+    chang_ids = fields.One2many('chang.line', 'order_id', '变更明细行',
                                 states=READONLY_STATES, copy=False)
     
     # 界面上不可见的字段
     voucher_id = fields.Many2one(
-        'voucher', u'对应凭证', readonly=True, ondelete='restrict', copy=False)
+        'voucher', '对应凭证', readonly=True, ondelete='restrict', copy=False)
     money_invoice = fields.Many2one(
-        'money.invoice', u'对应结算单', readonly=True, ondelete='restrict', copy=False)
+        'money.invoice', '对应结算单', readonly=True, ondelete='restrict', copy=False)
     other_money_order = fields.Many2one(
-        'other.money.order', u'对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
+        'other.money.order', '对应其他应付款单', readonly=True, ondelete='restrict', copy=False)
     # 未来支持多公司
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -203,15 +202,15 @@ class Asset(models.Model):
     def _wrong_asset_done(self):
         ''' 固定资产确认入账前的验证 '''
         if self.state == 'done':
-            raise UserError(u'请不要重复确认！')
+            raise UserError('请不要重复确认！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间(%s)已结账！不能确认' % self.period_id.name)
+            raise UserError('该会计期间(%s)已结账！不能确认' % self.period_id.name)
         if self.cost <= 0:
-            raise UserError(u'金额必须大于0！\n金额:%s' % self.cost)
+            raise UserError('金额必须大于0！\n金额:%s' % self.cost)
         if self.tax < 0:
-            raise UserError(u'税额必须大于0！\n税额:%s' % self.tax)
+            raise UserError('税额必须大于0！\n税额:%s' % self.tax)
         if self.depreciation_previous < 0:
-            raise UserError(u'以前折旧必须大于0！\n折旧金额:%s' %
+            raise UserError('以前折旧必须大于0！\n折旧金额:%s' %
                             self.depreciation_previous)
 
     @api.one
@@ -220,14 +219,14 @@ class Asset(models.Model):
         categ = self.env.ref('asset.asset_expense')   # 固定资产采购
         # 创建结算单
         money_invoice = self.env['money.invoice'].create({
-            'name': u'固定资产' + self.code,
+            'name': '固定资产' + self.code,
             'partner_id': self.partner_id.id,
             'category_id': categ and categ.id,
             'date': self.date,
             'amount': self.amount,
             'reconciled': 0,
             'to_reconcile': self.amount,
-            'date_due': fields.Date.context_today(self),
+        date_due = fields.Date.context_today(self)
             'state': 'draft',
             'tax_amount': self.tax
         })
@@ -273,7 +272,7 @@ class Asset(models.Model):
         vals = {}
         vouch_obj = self.env['voucher'].create({'date': self.date, 'ref': '%s,%s' % (self._name, self.id)})
         self.write({'voucher_id': vouch_obj.id})
-        vals.update({'vouch_obj_id': vouch_obj.id, 'string': self.name, 'name': u'固定资产',
+        vals.update({'vouch_obj_id': vouch_obj.id, 'string': self.name, 'name': '固定资产',
                      'amount': self.amount, 'credit_account_id': self.account_credit.id,
                      'debit_account_id': self.account_asset.id, 
                      'buy_tax_amount': self.tax or 0
@@ -307,15 +306,15 @@ class Asset(models.Model):
     def asset_draft(self):
         ''' 撤销确认固定资产 '''
         if self.state == 'draft':
-            raise UserError(u'请不要重复撤销确认！')
+            raise UserError('请不要重复撤销确认！')
         if self.line_ids:
-            raise UserError(u'已折旧不能撤销确认！')
+            raise UserError('已折旧不能撤销确认！')
         if self.chang_ids:
-            raise UserError(u'已变更不能撤销确认！')
+            raise UserError('已变更不能撤销确认！')
         if self.period_id.is_closed:
-            raise UserError(u'该会计期间(%s)已结账！不能撤销确认' % self.period_id.name)
+            raise UserError('该会计期间(%s)已结账！不能撤销确认' % self.period_id.name)
         if self.money_invoice.reconciled != 0:
-            raise UserError(u'固定资产已有核销，请不要撤销')
+            raise UserError('固定资产已有核销，请不要撤销')
 
         '''删掉凭证'''
         if self.voucher_id:
@@ -343,7 +342,7 @@ class Asset(models.Model):
     def unlink(self):
         for record in self:
             if record.state != 'draft':
-                raise UserError(u'只能删除草稿状态的固定资产')
+                raise UserError('只能删除草稿状态的固定资产')
 
         return super(Asset, self).unlink()
 
@@ -351,7 +350,7 @@ class Asset(models.Model):
 class CreateCleanWizard(models.TransientModel):
     '''固定资产清理'''
     _name = 'create.clean.wizard'
-    _description = u'固定资产清理向导'
+    _description = '固定资产清理向导'
 
     @api.one
     @api.depends('date')
@@ -360,18 +359,18 @@ class CreateCleanWizard(models.TransientModel):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
     #字段
-    date = fields.Date(u'清理日期', required=True)
+    date = fields.Date('清理日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    clean_cost = fields.Float(u'清理费用', required=True)
-    residual_income = fields.Float(u'残值收入', required=True)
-    sell_tax_amount = fields.Float(u'销项税额', required=True)
-    bank_account = fields.Many2one('bank.account', u'结算账户')
+    clean_cost = fields.Float('清理费用', required=True)
+    residual_income = fields.Float('残值收入', required=True)
+    sell_tax_amount = fields.Float('销项税额', required=True)
+    bank_account = fields.Many2one('bank.account', '结算账户')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -420,14 +419,14 @@ class CreateCleanWizard(models.TransientModel):
         income = Asset.cost - depreciation
         Asset.write({'voucher_id': vouch_obj.id})
         '''借方行'''
-        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': '清理固定资产',
                                          'debit': income, 'account_id': Asset.category_id.clean_costs.id,
                                          })
-        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': '清理固定资产',
                                          'debit': depreciation, 'account_id': Asset.account_accumulated_depreciation.id,
                                          })
         '''贷方行'''
-        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': u'清理固定资产',
+        self.env['voucher.line'].create({'voucher_id': vouch_obj.id, 'name': '清理固定资产',
                                          'credit': Asset.cost, 'account_id': Asset.account_asset.id,
                                          })
         vouch_obj.voucher_done()
@@ -453,7 +452,7 @@ class CreateCleanWizard(models.TransientModel):
 class CreateChangWizard(models.TransientModel):
     '''固定资产变更'''
     _name = 'create.chang.wizard'
-    _description = u'固定资产变更向导'
+    _description = '固定资产变更向导'
 
     @api.one
     @api.depends('chang_date')
@@ -462,22 +461,22 @@ class CreateChangWizard(models.TransientModel):
         self.period_id = self.env['finance.period'].get_period(self.chang_date)
 
     # 字段
-    chang_date = fields.Date(u'变更日期', required=True)
+    chang_date = fields.Date('变更日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    chang_cost = fields.Float(u'增加金额', required=True,
+    chang_cost = fields.Float('增加金额', required=True,
                               digits=dp.get_precision('Amount'))
-    chang_depreciation_number = fields.Float(u'变更折旧期间', required=True)
+    chang_depreciation_number = fields.Float('变更折旧期间', required=True)
     chang_tax = fields.Float(
-        u'增加税额', digits=dp.get_precision('Amount'), required=True)
+        '增加税额', digits=dp.get_precision('Amount'), required=True)
     chang_partner_id = fields.Many2one(
-        'partner', u'供应商', ondelete='restrict', required=True)
-    change_reason = fields.Text(u'变更原因')
+        'partner', '供应商', ondelete='restrict', required=True)
+    change_reason = fields.Text('变更原因')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -497,14 +496,14 @@ class CreateChangWizard(models.TransientModel):
 
             categ = self.env.ref('money.core_category_purchase')
             money_invoice = self.env['money.invoice'].create({
-                'name': u'固定资产变更' + Asset.code,
+                'name': '固定资产变更' + Asset.code,
                         'partner_id': self.chang_partner_id.id,
                         'category_id': categ.id,
                         'date': self.chang_date,
                         'amount': self.chang_cost + self.chang_tax,
                         'reconciled': 0,
                         'to_reconcile': self.chang_cost + self.chang_tax,
-                        'date_due': fields.Date.context_today(self),
+                    date_due = fields.Date.context_today(self)
                         'state': 'draft',
                         'tax_amount': self.chang_tax
             })
@@ -521,7 +520,7 @@ class CreateChangWizard(models.TransientModel):
             self.env['chang.line'].create({'date': self.chang_date, 'period_id': self.period_id.id,
                                            'chang_before': chang_before_cost,
                                            'change_reason': self.change_reason,
-                                           'chang_after': Asset.cost, 'chang_name': u'原值变更',
+                                           'chang_after': Asset.cost, 'chang_name': '原值变更',
                                            'order_id': Asset.id, 'partner_id': self.chang_partner_id.id
                                            })
         Asset.depreciation_number = Asset.depreciation_number + \
@@ -532,7 +531,7 @@ class CreateChangWizard(models.TransientModel):
             self.env['chang.line'].create({'date': self.chang_date, 'period_id': self.period_id.id,
                                            'chang_before': chang_before_depreciation_number,
                                            'change_reason': self.change_reason,
-                                           'chang_after': Asset.depreciation_number, 'chang_name': u'折旧期间变更',
+                                           'chang_after': Asset.depreciation_number, 'chang_name': '折旧期间变更',
                                            'order_id': Asset.id, 'partner_id': self.chang_partner_id.id
                                            })
 
@@ -541,7 +540,7 @@ class CreateChangWizard(models.TransientModel):
 
 class AssetLine(models.Model):
     _name = 'asset.line'
-    _description = u'资产折旧明细'
+    _description = '资产折旧明细'
 
     @api.one
     @api.depends('date')
@@ -549,21 +548,21 @@ class AssetLine(models.Model):
         ''' 根据记账日期取会计期间 '''
         self.period_id = self.env['finance.period'].get_period(self.date)
 
-    order_id = fields.Many2one('asset', u'资产', index=True,
+    order_id = fields.Many2one('asset', '资产', index=True,
                                required=True, ondelete='restrict')
     cost_depreciation = fields.Float(
-        u'折旧额', required=True, digits=dp.get_precision('Amount'))
-    no_depreciation = fields.Float(u'未提折旧额')
-    code = fields.Char(u'编码')
-    name = fields.Char(u'名称')
-    date = fields.Date(u'记帐日期', required=True)
+        '折旧额', required=True, digits=dp.get_precision('Amount'))
+    no_depreciation = fields.Float('未提折旧额')
+    code = fields.Char('编码')
+    name = fields.Char('名称')
+    date = fields.Date('记帐日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -571,7 +570,7 @@ class AssetLine(models.Model):
 class CreateDepreciationWizard(models.TransientModel):
     """生成每月折旧的向导 根据输入的期间"""
     _name = "create.depreciation.wizard"
-    _description = u'资产折旧向导'
+    _description = '资产折旧向导'
 
     @api.one
     @api.depends('date')
@@ -584,14 +583,14 @@ class CreateDepreciationWizard(models.TransientModel):
         ''' 取本月的最后一天作为默认折旧日  '''
         return self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[1]
 
-    date = fields.Date(u'记帐日期', required=True, default=_get_last_date)
+    date = fields.Date('记帐日期', required=True, default=_get_last_date)
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -605,7 +604,7 @@ class CreateDepreciationWizard(models.TransientModel):
         val.update({'debit': val.get('debit') + cost_depreciation,
                     'voucher_id': vouch_obj.id,
                     'account_id': Asset.account_depreciation.id,
-                    'name': u'固定资产折旧',
+                    'name': '固定资产折旧',
                     })
 
         ''' 贷：费用科目 '''
@@ -615,7 +614,7 @@ class CreateDepreciationWizard(models.TransientModel):
             val.update({'credit': val.get('credit') + cost_depreciation,
                         'voucher_id': vouch_obj.id,
                         'account_id': Asset.account_accumulated_depreciation.id,
-                        'name': u'固定资产折旧',
+                        'name': '固定资产折旧',
                         })
         return res
 
@@ -667,33 +666,33 @@ class CreateDepreciationWizard(models.TransientModel):
         # 构造凭证明细行字典
         debit_line_dict, credit_line_dict = {}, {}
         for i in range(len(res)):
-            for account_id, val in res[i].iteritems():
+            for account_id, val in res[i].items():
                 # 生成借方凭证明细
-                if 'debit' in val.keys():
+                if 'debit' in list(val.keys()):
                     if account_id not in debit_line_dict:
                         debit_line_dict[account_id] = val
                     else:
                         debit_line_dict[account_id]['debit'] += val['debit']
                 # 生成贷方凭证明细
-                if 'credit' in val.keys():
+                if 'credit' in list(val.keys()):
                     if account_id not in credit_line_dict:
                         credit_line_dict[account_id] = val
                     else:
                         credit_line_dict[account_id]['credit'] += val['credit']
-        line_dict = dict(debit_line_dict.items() + credit_line_dict.items())
-        for account_id, val in line_dict.iteritems():
+        line_dict = dict(list(debit_line_dict.items()) + list(credit_line_dict.items()))
+        for account_id, val in line_dict.items():
             self.env['voucher.line'].create(dict(val, account_id=account_id)) # 创建凭证行
 
         # 没有凭证行则报错
         if not vouch_obj.line_ids:
-            raise UserError(u'本期没有需要折旧的固定资产。')
+            raise UserError('本期没有需要折旧的固定资产。')
         vouch_obj.voucher_done()
 
         # 界面转到本月折旧明细
         view = self.env.ref('asset.asset_line_tree')
         return {
             'view_mode': 'tree',
-            'name': u'资产折旧明细行',
+            'name': '资产折旧明细行',
             'views': [(view.id, 'tree')],
             'res_model': 'asset.line',
             'type': 'ir.actions.act_window',
@@ -703,7 +702,7 @@ class CreateDepreciationWizard(models.TransientModel):
 
 class ChangLine(models.Model):
     _name = 'chang.line'
-    _description = u'资产变更明细'
+    _description = '资产变更明细'
 
     @api.one
     @api.depends('date')
@@ -712,23 +711,23 @@ class ChangLine(models.Model):
         self.period_id = self.env['finance.period'].get_period(self.date)
 
     # 字段
-    order_id = fields.Many2one('asset', u'订单编号', index=True,
+    order_id = fields.Many2one('asset', '订单编号', index=True,
                                required=True, ondelete='cascade')
-    chang_name = fields.Char(u'变更内容', required=True)
-    date = fields.Date(u'记帐日期', required=True)
+    chang_name = fields.Char('变更内容', required=True)
+    date = fields.Date('记帐日期', required=True)
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
-    chang_before = fields.Float(u'变更前')
-    chang_after = fields.Float(u'变更后')
+    chang_before = fields.Float('变更前')
+    chang_after = fields.Float('变更后')
     chang_money_invoice = fields.Many2one(
-        'money.invoice', u'对应结算单', readonly=True, ondelete='restrict')
-    partner_id = fields.Many2one('partner', u'供应商')
-    change_reason = fields.Text(u'变更原因')
+        'money.invoice', '对应结算单', readonly=True, ondelete='restrict')
+    partner_id = fields.Many2one('partner', '供应商')
+    change_reason = fields.Text('变更原因')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -748,7 +747,7 @@ class Voucher(models.Model):
         res = {}
         if self.env['asset'].search([('is_init', '=', True),
                                      ('state', '=', 'draft')]):
-            raise UserError(u'有未确认的初始化固定资产')
+            raise UserError('有未确认的初始化固定资产')
         for Asset in self.env['asset'].search([('is_init', '=', True),
                                                ('state', '=', 'done')]):
             cost = Asset.cost
@@ -777,6 +776,6 @@ class Voucher(models.Model):
                         'name': '固定资产 期初'
                         })
 
-        for account_id, val in res.iteritems():
+        for account_id, val in res.items():
             self.env['voucher.line'].create(dict(val, account_id=account_id),
                                             )

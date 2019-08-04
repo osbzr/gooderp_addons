@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 
@@ -10,11 +9,11 @@ class SupplierStatementsReport(models.Model):
     _inherit = "supplier.statements.report"
     _auto = False
 
-    purchase_amount = fields.Float(string=u'采购金额', readonly=True,
+    purchase_amount = fields.Float(string='采购金额', readonly=True,
                                    digits=dp.get_precision('Amount'))
-    benefit_amount = fields.Float(string=u'优惠金额', readonly=True,
+    benefit_amount = fields.Float(string='优惠金额', readonly=True,
                                   digits=dp.get_precision('Amount'))
-    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
+    move_id = fields.Many2one('wh.move', string='出入库单', readonly=True)
 
     def init(self):
         # union money_order(type = 'pay'), money_invoice(type = 'expense')
@@ -76,16 +75,16 @@ class SupplierStatementsReport(models.Model):
         # 查看原始单据，三情况：收付款单、采购退货单、采购入库单、核销单
         self.ensure_one()
         model_view = {
-            'money.order': {'name': u'付款单',
+            'money.order': {'name': '付款单',
                             'view': 'money.money_order_form'},
-            'buy.receipt': {'name': u'采购入库单',
+            'buy.receipt': {'name': '采购入库单',
                             'view': 'buy.buy_receipt_form',
-                            'name_return': u'采购退货单',
+                            'name_return': '采购退货单',
                             'view_return': 'buy.buy_return_form'},
-            'reconcile.order': {'name': u'核销单',
+            'reconcile.order': {'name': '核销单',
                                 'view': 'money.reconcile_order_form'}
         }
-        for model, view_dict in model_view.iteritems():
+        for model, view_dict in model_view.items():
             res = self.env[model].search([('name', '=', self.name)])
             name = model == 'buy.receipt' and res.is_return and \
                 view_dict['name_return'] or view_dict['name']
@@ -102,64 +101,64 @@ class SupplierStatementsReport(models.Model):
                     'type': 'ir.actions.act_window',
                     'res_id': res.id,
                 }
-        raise UserError(u'期初余额没有原始单据可供查看。')
+        raise UserError('期初余额没有原始单据可供查看。')
 
 
 class SupplierStatementsReportWithGoods(models.TransientModel):
     _name = "supplier.statements.report.with.goods"
-    _description = u"供应商对账单带商品明细"
+    _description = "供应商对账单带商品明细"
 
-    partner_id = fields.Many2one('partner', string=u'业务伙伴', readonly=True)
-    name = fields.Char(string=u'单据编号', readonly=True)
-    date = fields.Date(string=u'单据日期', readonly=True)
-    done_date = fields.Date(string=u'完成日期', readonly=True)
-    category_id = fields.Many2one('core.category', u'商品类别')
-    goods_code = fields.Char(u'商品编号')
-    goods_name = fields.Char(u'商品名称')
-    attribute_id = fields.Many2one('attribute', u'规格型号')
-    uom_id = fields.Many2one('uom', u'单位')
-    quantity = fields.Float(u'数量',
+    partner_id = fields.Many2one('partner', string='业务伙伴', readonly=True)
+    name = fields.Char(string='单据编号', readonly=True)
+    date = fields.Date(string='单据日期', readonly=True)
+    done_date = fields.Date(string='完成日期', readonly=True)
+    category_id = fields.Many2one('core.category', '商品类别')
+    goods_code = fields.Char('商品编号')
+    goods_name = fields.Char('商品名称')
+    attribute_id = fields.Many2one('attribute', '规格型号')
+    uom_id = fields.Many2one('uom', '单位')
+    quantity = fields.Float('数量',
                             digits=dp.get_precision('Quantity'))
-    price = fields.Float(u'单价',
+    price = fields.Float('单价',
                          digits=dp.get_precision('Amount'))
-    discount_amount = fields.Float(u'折扣额',
+    discount_amount = fields.Float('折扣额',
                                    digits=dp.get_precision('Amount'))
-    without_tax_amount = fields.Float(u'不含税金额',
+    without_tax_amount = fields.Float('不含税金额',
                                       digits=dp.get_precision('Amount'))
-    tax_amount = fields.Float(u'税额',
+    tax_amount = fields.Float('税额',
                               digits=dp.get_precision('Amount'))
-    order_amount = fields.Float(string=u'采购金额', readonly=True,
+    order_amount = fields.Float(string='采购金额', readonly=True,
                                 digits=dp.get_precision('Amount'))  # 采购
-    benefit_amount = fields.Float(string=u'优惠金额', readonly=True,
+    benefit_amount = fields.Float(string='优惠金额', readonly=True,
                                   digits=dp.get_precision('Amount'))
-    fee = fields.Float(string=u'客户承担费用', readonly=True,
+    fee = fields.Float(string='客户承担费用', readonly=True,
                        digits=dp.get_precision('Amount'))
-    amount = fields.Float(string=u'应付金额', readonly=True,
+    amount = fields.Float(string='应付金额', readonly=True,
                           digits=dp.get_precision('Amount'))
-    pay_amount = fields.Float(string=u'实际付款金额', readonly=True,
+    pay_amount = fields.Float(string='实际付款金额', readonly=True,
                               digits=dp.get_precision('Amount'))
-    discount_money = fields.Float(string=u'付款折扣', readonly=True,
+    discount_money = fields.Float(string='付款折扣', readonly=True,
                                   digits=dp.get_precision('Amount'))
-    balance_amount = fields.Float(string=u'应付款余额', readonly=True,
+    balance_amount = fields.Float(string='应付款余额', readonly=True,
                                   digits=dp.get_precision('Amount'))
-    note = fields.Char(string=u'备注', readonly=True)
-    move_id = fields.Many2one('wh.move', string=u'出入库单', readonly=True)
+    note = fields.Char(string='备注', readonly=True)
+    move_id = fields.Many2one('wh.move', string='出入库单', readonly=True)
 
     @api.multi
     def find_source_order(self):
         # 三情况：收付款单、采购退货单、采购入库单、核销单
         self.ensure_one()
         model_view = {
-            'money.order': {'name': u'付款单',
+            'money.order': {'name': '付款单',
                             'view': 'money.money_order_form'},
-            'buy.receipt': {'name': u'采购入库单',
+            'buy.receipt': {'name': '采购入库单',
                             'view': 'buy.buy_receipt_form',
-                            'name_return': u'采购退货单',
+                            'name_return': '采购退货单',
                             'view_return': 'buy.buy_return_form'},
-            'reconcile.order': {'name': u'核销单',
+            'reconcile.order': {'name': '核销单',
                                 'view': 'money.reconcile_order_form'}
         }
-        for model, view_dict in model_view.iteritems():
+        for model, view_dict in model_view.items():
             res = self.env[model].search([('name', '=', self.name)])
             name = model == 'buy.receipt' and res.is_return and \
                 view_dict['name_return'] or view_dict['name']
@@ -176,4 +175,4 @@ class SupplierStatementsReportWithGoods(models.TransientModel):
                     'type': 'ir.actions.act_window',
                     'res_id': res.id,
                 }
-        raise UserError(u'期初余额没有原始单据可供查看。')
+        raise UserError('期初余额没有原始单据可供查看。')

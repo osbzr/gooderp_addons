@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    Copyright (C) 2012 Domsense srl (<http://www.domsense.com>)
@@ -32,24 +31,24 @@ from odoo import models, fields, api
 import xlwt
 import xlrd
 import datetime
-import StringIO
+import io
 import re
 from xlutils.copy import copy
 from odoo.tools import misc
 from odoo import http
 import odoo
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 
 class ReportTemplate(models.Model):
     _name = "report.template"
-    _description = u'报表模板'
+    _description = '报表模板'
 
-    model_id = fields.Many2one('ir.model', u'模型',required=True)
-    file_address = fields.Char(u'模板文件路径',required=True)
-    active = fields.Boolean(u'可用', default=True)
-    blank_rows = fields.Integer(u'空白行数',required=True)
-    header_rows = fields.Integer(u'表头行数')
+    model_id = fields.Many2one('ir.model', '模型',required=True)
+    file_address = fields.Char('模板文件路径',required=True)
+    active = fields.Boolean('可用', default=True)
+    blank_rows = fields.Integer('空白行数',required=True)
+    header_rows = fields.Integer('表头行数')
 
     @api.model
     def get_time(self, model):
@@ -64,14 +63,14 @@ class ReportTemplate(models.Model):
 
 def content_disposition(filename):
     filename = odoo.tools.ustr(filename)
-    escaped = urllib2.quote(filename.encode('utf8'))
+    escaped = urllib.parse.quote(filename.encode('utf8'))
     browser = request.httprequest.user_agent.browser
     version = int(
         (request.httprequest.user_agent.version or '0').split('.')[0])
     if browser == 'msie' and version < 9:
         return "attachment; filename=%s" % escaped
     elif browser == 'safari' and version < 537:
-        return u"attachment; filename=%s.xls" % filename.encode('ascii', 'replace')
+        return "attachment; filename=%s.xls" % filename.encode('ascii', 'replace')
     else:
         return "attachment; filename*=UTF-8''%s.xls" % escaped
 
@@ -152,7 +151,7 @@ class ExcelExportView(ExcelExport, ):
                 self.setOutCell(worksheet, 0, i, fieldname)
             for row, row_vals in enumerate(rows):
                 for col, col_value in enumerate(row_vals):
-                    if isinstance(col_value, basestring):
+                    if isinstance(col_value, str):
                         col_value = re.sub("\r", " ", col_value)
                     self.setOutCell(worksheet, col, row + 1, col_value)
         else:
@@ -177,7 +176,7 @@ class ExcelExportView(ExcelExport, ):
                         cell_style = colour_style
                     elif row_index != len(rows) - 1:
                         cell_style = base_style
-                        if isinstance(cell_value, basestring):
+                        if isinstance(cell_value, str):
                             cell_value = re.sub("\r", " ", cell_value)
                         elif isinstance(cell_value, datetime.datetime):
                             cell_style = datetime_style
@@ -189,7 +188,7 @@ class ExcelExportView(ExcelExport, ):
                         cell_style = xlwt.easyxf()
                     worksheet.write(row_index + 1, cell_index,
                                     cell_value, cell_style)
-            for column, widthvalue in columnwidth.items():
+            for column, widthvalue in list(columnwidth.items()):
                 """参考 下面链接关于自动列宽（探讨）的代码
                  http://stackoverflow.com/questions/6929115/python-xlwt-accessing-existing-cell-content-auto-adjust-column-width"""
                 if (widthvalue + 3) * 367 >= 65536:
@@ -201,7 +200,7 @@ class ExcelExportView(ExcelExport, ):
         worksheet.set_horz_split_pos(3)
         # if user does unfreeze, don't leave a split there
         worksheet.set_remove_splits(True)
-        fp_currency = StringIO.StringIO()
+        fp_currency = io.StringIO()
         workbook.save(fp_currency)
         fp_currency.seek(0)
         data = fp_currency.read()

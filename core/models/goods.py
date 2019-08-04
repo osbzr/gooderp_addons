@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
 import odoo.addons.decimal_precision as dp
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
-CORE_COST_METHOD = [('average', u'全月一次加权平均法'),
-                    ('std',u'定额成本'),
-                    ('fifo', u'先进先出法'),
+CORE_COST_METHOD = [('average', '全月一次加权平均法'),
+                    ('std','定额成本'),
+                    ('fifo', '先进先出法'),
                     ]
 
 
 class Goods(models.Model):
     _name = 'goods'
-    _description = u'商品'
+    _description = '商品'
 
     @api.model
     def _get_default_not_saleable_impl(self):
@@ -72,45 +71,45 @@ class Goods(models.Model):
     def copy(self, default=None):
         if default is None:
             default = {}
-        if not default.has_key('name'):
+        if 'name' not in default:
             default.update(name=_('%s (copy)') % (self.name))
         return super(Goods, self).copy(default=default)
 
-    code = fields.Char(u'编号')
-    name = fields.Char(u'名称', required=True, copy=False)
-    category_id = fields.Many2one('core.category', u'核算类别',
+    code = fields.Char('编号')
+    name = fields.Char('名称', required=True, copy=False)
+    category_id = fields.Many2one('core.category', '核算类别',
                                   ondelete='restrict',
                                   domain=[('type', '=', 'goods')],
                                   context={'type': 'goods'}, required=True,
-                                  help=u'从会计科目角度划分的类别',
+                                  help='从会计科目角度划分的类别',
                                   )
     uom_id = fields.Many2one('uom', ondelete='restrict',
-                             string=u'计量单位', required=True)
-    uos_id = fields.Many2one('uom', ondelete='restrict', string=u'辅助单位')
+                             string='计量单位', required=True)
+    uos_id = fields.Many2one('uom', ondelete='restrict', string='辅助单位')
     conversion = fields.Float(
-        string=u'转化率', default=1, digits=(16, 3),
-        help=u'1个辅助单位等于多少计量单位的数量，如1箱30个苹果，这里就输入30')
-    cost = fields.Float(u'成本',
+        string='转化率', default=1, digits=(16, 3),
+        help='1个辅助单位等于多少计量单位的数量，如1箱30个苹果，这里就输入30')
+    cost = fields.Float('成本',
                         digits=dp.get_precision('Price'))
-    cost_method = fields.Selection(CORE_COST_METHOD, u'存货计价方法',
-                                   help=u'''GoodERP仓库模块使用先进先出规则匹配
+    cost_method = fields.Selection(CORE_COST_METHOD, '存货计价方法',
+                                   help='''GoodERP仓库模块使用先进先出规则匹配
                                    每次出库对应的入库成本和数量，但不实时记账。
                                    财务月结时使用此方法相应调整发出成本''')
-    tax_rate = fields.Float(u'税率(%)',
-                            help=u'商品税率')
-    not_saleable = fields.Boolean(u'不可销售',
+    tax_rate = fields.Float('税率(%)',
+                            help='商品税率')
+    not_saleable = fields.Boolean('不可销售',
                                   default=_get_default_not_saleable,
-                                  help=u'商品是否不可销售，勾选了就不可销售，未勾选可销售')
-    not_buyable = fields.Boolean(u'不可采购',
+                                  help='商品是否不可销售，勾选了就不可销售，未勾选可销售')
+    not_buyable = fields.Boolean('不可采购',
                                   default=_get_default_not_buyable,
-                                  help=u'商品是否不可采购，勾选了就不可采购，未勾选可采购')
-    active = fields.Boolean(u'启用', default=True)
+                                  help='商品是否不可采购，勾选了就不可采购，未勾选可采购')
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    brand = fields.Many2one('core.value', u'品牌',
+    brand = fields.Many2one('core.value', '品牌',
                             ondelete='restrict',
                             domain=[('type', '=', 'brand')],
                             context={'type': 'brand'})

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import tools
 import odoo.addons.decimal_precision as dp
@@ -7,22 +6,22 @@ from odoo import models, fields
 
 class ReportStockBalance(models.Model):
     _name = 'report.stock.balance'
-    _description = u'库存余额表'
+    _description = '库存余额表'
     _auto = False
 
-    goods = fields.Char(u'商品名')
-    goods_id = fields.Many2one('goods', u'商品')
-    brand_id = fields.Many2one('core.value', u'品牌')
-    location = fields.Char(u'库位')
-    uom = fields.Char(u'单位')
-    uos = fields.Char(u'辅助单位')
-    lot = fields.Char(u'批号')
-    attribute_id = fields.Char(u'属性')
-    warehouse = fields.Char(u'仓库')
-    goods_qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
+    goods = fields.Char('商品名')
+    goods_id = fields.Many2one('goods', '商品')
+    brand_id = fields.Many2one('core.value', '品牌')
+    location = fields.Char('库位')
+    uom = fields.Char('单位')
+    uos = fields.Char('辅助单位')
+    lot = fields.Char('批号')
+    attribute_id = fields.Char('属性')
+    warehouse = fields.Char('仓库')
+    goods_qty = fields.Float('数量', digits=dp.get_precision('Quantity'))
     goods_uos_qty = fields.Float(
-        u'辅助单位数量', digits=dp.get_precision('Quantity'))
-    cost = fields.Float(u'成本', digits=dp.get_precision('Price'))
+        '辅助单位数量', digits=dp.get_precision('Quantity'))
+    cost = fields.Float('成本', digits=dp.get_precision('Price'))
 
     def init(self):
         cr = self._cr

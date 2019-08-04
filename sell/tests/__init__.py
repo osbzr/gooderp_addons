@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-import test_sell_order
-import test_sell_delivery
-import test_sell_adjust
-import test_pricing
-import test_common_dialog
-import test_report
-import test_ReportDocx
-import test_finance
+from . import test_sell_order
+from . import test_sell_delivery
+from . import test_sell_adjust
+from . import test_pricing
+from . import test_common_dialog
+from . import test_report
+from . import test_ReportDocx
+from . import test_finance

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -8,7 +7,7 @@ from odoo.tools import float_is_zero
 
 class MonthProductCost(models.Model):
     _name = 'month.product.cost'
-    _description = u'每月发出成本'
+    _description = '每月发出成本'
 
     period_id = fields.Many2one('finance.period', string='会计期间')
     goods_id = fields.Many2one('goods', string="商品")
@@ -30,7 +29,7 @@ class MonthProductCost(models.Model):
         string='剩余数量成本', digits=dp.get_precision('Amount'),)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -113,7 +112,7 @@ class MonthProductCost(models.Model):
         批次管理的产品使用个别计价
         先取产品的计价方式，再取公司上的计价方式
         '''
-        goods = self.env.get('goods').browse(goods_id)
+        goods = self.env['goods'].browse(goods_id)
         if goods.using_batch:
             return 'fifo'
         if goods.cost_method:
@@ -140,7 +139,7 @@ class MonthProductCost(models.Model):
             month_cost = data_dict.get("current_period_out_cost", 0)
         if cost_method == 'std':
             # 定额成本
-            goods = self.env.get('goods').browse(data_dict.get("goods_id"))
+            goods = self.env['goods'].browse(data_dict.get("goods_id"))
             month_cost =  goods.price * \
                 data_dict.get("current_period_out_qty", 0)
         return round(month_cost, 2)
@@ -171,7 +170,7 @@ class MonthProductCost(models.Model):
         voucher_line_data_list = []
         account_row = self.env.ref('finance.account_cost')
         all_balance_price = 0
-        for create_vals in month_product_cost_dict.values():
+        for create_vals in list(month_product_cost_dict.values()):
             goods_row = self.env['goods'].browse(create_vals.get('goods_id'))
             current_period_out_cost = self.compute_balance_price(
                 create_vals)   # 当期加权平均成本
@@ -180,7 +179,7 @@ class MonthProductCost(models.Model):
 
             diff_cost = current_period_out_cost - real_out_cost  # 两者之差
             if not float_is_zero(diff_cost,2):  # 贷方
-                voucher_line_data = {'name': u'发出成本', 'credit': diff_cost,
+                voucher_line_data = {'name': '发出成本', 'credit': diff_cost,
                                      'account_id': goods_row.category_id.account_id.id,
                                      'goods_id': create_vals.get('goods_id'),
                                      'goods_qty': create_vals.get('current_period_out_qty')}
@@ -196,7 +195,7 @@ class MonthProductCost(models.Model):
 
         if all_balance_price != 0:  # 借方
             voucher_line_data_list.append(
-                [0, 0, {'name': u'发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
+                [0, 0, {'name': '发出成本', 'account_id': account_row.id, 'debit': all_balance_price}])
         if voucher_line_data_list:
             voucher_id = self.env['voucher'].create({'date': date, 'period_id': period_id.id,
                                                      'line_ids': voucher_line_data_list,

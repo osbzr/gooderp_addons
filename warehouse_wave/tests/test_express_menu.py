@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -42,18 +41,18 @@ class TestExpressMenu(TransactionCase):
     def test_receiver_detail_address(self):
         ''' Test: receiver detail address  '''
         partner = self.env.ref('core.jd')
-        province = self.env['country.state'].search([('name', '=', u'河北省')])
-        city = self.env['all.city'].search([('city_name', '=', u'石家庄市')])
-        county = self.env['all.county'].search([('county_name', '=', u'正定县')])
+        province = self.env['country.state'].search([('name', '=', '河北省')])
+        city = self.env['all.city'].search([('city_name', '=', '石家庄市')])
+        county = self.env['all.county'].search([('county_name', '=', '正定县')])
 
         # 有联系人地址child_ids
-        partner.write({'child_ids': [(0, 0, {'contact': u'开阖',
+        partner.write({'child_ids': [(0, 0, {'contact': '开阖',
                                              'mobile': '123',
                                              'province_id': province.id,
                                              'city_id': city.id,
                                              'county_id': county.id,
-                                             'town': u'曹路镇',
-                                             'detail_address': u'河北省石家庄市正定县曹路镇金海路1688号',
+                                             'town': '曹路镇',
+                                             'detail_address': '河北省石家庄市正定县曹路镇金海路1688号',
                                             })]
                        })
         partner._compute_partner_address()

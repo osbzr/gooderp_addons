@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
@@ -8,12 +7,12 @@ import datetime
 class SellTopTen(models.Model):
     _name = 'sell.top.ten'
     _inherit = 'report.base'
-    _description = u'销量前十商品'
+    _description = '销量前十商品'
 
-    goods = fields.Char(u'商品名称')
-    warehouse = fields.Char(u'仓库')
-    qty = fields.Float(u'基本数量', digits=dp.get_precision('Quantity'))
-    amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
+    goods = fields.Char('商品名称')
+    warehouse = fields.Char('仓库')
+    qty = fields.Float('基本数量', digits=dp.get_precision('Quantity'))
+    amount = fields.Float('销售收入', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
@@ -62,7 +61,7 @@ class SellTopTen(models.Model):
         fetch first 10 rows only
         '''
 
-    def get_context(self, sql_type='out', context=None):
+    def get_context(self, sql_type='out'):
         date_end = datetime.datetime.strptime(
             context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
         date_end = date_end.strftime('%Y-%m-%d')

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -14,7 +13,7 @@ class TestStaffJob(TransactionCase):
     def test_default_address_id(self):
         '''默认工作地点'''
         hire = self.env['staff.job'].create({
-            'name': u'hr',
+            'name': 'hr',
             'department_id': self.env.ref('staff.department_1').id,
         })
         self.assertTrue(hire.address_id == self.env.user.company_id)
@@ -28,7 +27,7 @@ class TestStaffJob(TransactionCase):
         '''计算该职位简历数'''
         # 在招聘模型上上传简历
         self.env['ir.attachment'].create({
-            'name': u'Lucy 的简历',
+            'name': 'Lucy 的简历',
             'res_model': 'hire.applicant',
             'res_id': self.hire.id,
         })
@@ -36,7 +35,7 @@ class TestStaffJob(TransactionCase):
         self.assertTrue(self.job_id.documents_count == 1)
         # 在职位模型上上传简历
         self.env['ir.attachment'].create({
-            'name': u'Lucy 的简历',
+            'name': 'Lucy 的简历',
             'res_model': 'staff.job',
             'res_id': self.job_id.id,
         })

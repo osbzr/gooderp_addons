@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ##############################################################################
 #
 #    Copyright (C) 2016  开阖软件(<http://www.osbzr.com>).
@@ -23,9 +22,9 @@ from odoo.exceptions import UserError
 
 class MoneyInvoice(models.Model):
     _inherit = 'money.invoice'
-    voucher_id = fields.Many2one('voucher', u'对应凭证', readonly=True, ondelete='restrict',
+    voucher_id = fields.Many2one('voucher', '对应凭证', readonly=True, ondelete='restrict',
                                  copy=False,
-                                 help=u'结算单确认时生成的对应凭证')
+                                 help='结算单确认时生成的对应凭证')
 
     @api.multi
     def money_invoice_draft(self):
@@ -75,11 +74,11 @@ class MoneyInvoice(models.Model):
                 vouch_obj = self.env['voucher'].create({'date': invoice.date, 'ref': '%s,%s' % (self._name, self.id)})
                 invoice.write({'voucher_id': vouch_obj.id})
             if not invoice.category_id.account_id:
-                raise UserError(u'请配置%s的会计科目' % (invoice.category_id.name))
+                raise UserError('请配置%s的会计科目' % (invoice.category_id.name))
             partner_cat = invoice.category_id.type == 'income' and invoice.partner_id.c_category_id or invoice.partner_id.s_category_id
             partner_account_id = partner_cat.account_id.id
             if not partner_account_id:
-                raise UserError(u'请配置%s的会计科目' % (partner_cat.name))
+                raise UserError('请配置%s的会计科目' % (partner_cat.name))
             if invoice.category_id.type == 'income':
                 vals.update({'vouch_obj_id': vouch_obj.id, 'partner_credit': invoice.partner_id.id, 'name': invoice.name, 'string': invoice.note or '',
                              'amount': invoice.amount, 'credit_account_id': invoice.category_id.account_id.id, 'partner_debit': invoice.partner_id.id,
@@ -130,7 +129,7 @@ class MoneyInvoice(models.Model):
             'currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id:  # 结算单上是外币
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
+                'name': "%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': vals.get('debit_account_id'),
                 'debit': debit,
                 'voucher_id': vals.get('vouch_obj_id'),
@@ -143,7 +142,7 @@ class MoneyInvoice(models.Model):
             })
         else:   # 结算单上是本位币
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
+                'name': "%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': vals.get('debit_account_id'),
                 'debit': debit,
                 'voucher_id': vals.get('vouch_obj_id'),
@@ -154,9 +153,9 @@ class MoneyInvoice(models.Model):
         # 进项税行
         if vals.get('buy_tax_amount'):
             if not self.env.user.company_id.import_tax_account:
-                raise UserError(u'请通过"配置-->高级配置-->公司"菜单来设置进项税科目')
+                raise UserError('请通过"配置-->高级配置-->公司"菜单来设置进项税科目')
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
+                'name': "%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': self.env.user.company_id.import_tax_account.id, 'debit': vals.get('buy_tax_amount'), 'voucher_id': vals.get('vouch_obj_id'),
             })
         # 贷方行
@@ -164,7 +163,7 @@ class MoneyInvoice(models.Model):
             'currency_id') or self.env.user.company_id.currency_id.id
         if currency_id != self.env.user.company_id.currency_id.id:
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
+                'name': "%s %s" % (vals.get('name'), vals.get('string')),
                 'partner_id': vals.get('partner_credit', ''),
                 'account_id': vals.get('credit_account_id'),
                 'credit': credit,
@@ -176,7 +175,7 @@ class MoneyInvoice(models.Model):
             })
         else:
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
+                'name': "%s %s" % (vals.get('name'), vals.get('string')),
                 'partner_id': vals.get('partner_credit', ''),
                 'account_id': vals.get('credit_account_id'),
                 'credit': credit,
@@ -188,9 +187,9 @@ class MoneyInvoice(models.Model):
         if vals.get('sell_tax_amount'):
             if not self.env.user.company_id.output_tax_account:
                 raise UserError(
-                    u'您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
+                    '您还没有配置公司的销项税科目。\n请通过"配置-->高级配置-->公司"菜单来设置销项税科目!')
             self.env['voucher.line'].create({
-                'name': u"%s %s" % (vals.get('name'), vals.get('string')),
+                'name': "%s %s" % (vals.get('name'), vals.get('string')),
                 'account_id': self.env.user.company_id.output_tax_account.id, 'credit': sell_tax_amount, 'voucher_id': vals.get('vouch_obj_id'),
             })
 

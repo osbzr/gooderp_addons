@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 
@@ -34,13 +33,13 @@ class TestExchange(TransactionCase):
         voucher = self.env['voucher'].create({
             'date': '2015-12-01',
             'line_ids': [(0, 0, {
-                'name': u'退投资',  # 贷方行
+                'name': '退投资',  # 贷方行
                 'account_id': self.env.ref('core.jd').c_category_id.account_id.id,
                 'partner_id': self.env.ref('core.jd').id,
                 'debit': 1,
             }),
                 (0, 0, {
-                    'name': u'退投资',  # 借方行
+                    'name': '退投资',  # 借方行
                     'account_id': self.usd_account.id,
                     'credit': 1,
                 })]

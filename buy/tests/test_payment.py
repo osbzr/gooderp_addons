@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -16,6 +15,6 @@ class TestPayment(TransactionCase):
     def test_request_payment(self):
         '''付款申请'''
         line = self.order.pay_ids.create({
-            'name': u'申请付款', 'amount_money': 10, 'buy_id': self.order.id
+            'name': '申请付款', 'amount_money': 10, 'buy_id': self.order.id
         })
         line.request_payment()

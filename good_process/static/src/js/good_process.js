@@ -4,7 +4,7 @@ odoo.define('good.process', function(require) {
     var core = require('web.core');
     var form_common = require('web.form_common');
     var form_relational = require('web.form_relational');
-    var Model = require('web.Model');
+    var rpc = require('web.rpc');
     var QWeb = core.qweb;
     var _t = core._t;
     var chat_manager = require('mail.chat_manager');
@@ -41,7 +41,7 @@ odoo.define('good.process', function(require) {
 
         good_refused: function() {
             var self = this;
-            new Model('mail.thread').call('good_process_refused', [self.view.datarecord.id, self.view.model]).then(
+            new rpc('mail.thread').call('good_process_refused', [self.view.datarecord.id, self.view.rpc]).then(
                 function(result) {
                     if (result[0] && typeof(result[0]) == 'object') {
                         self.render_tag(result[0]);
@@ -63,7 +63,7 @@ odoo.define('good.process', function(require) {
                 'content': message,
                 'partner_ids': self.getParent().fields.message_follower_ids.followers,
                 'context': {
-                    'default_model': self.view.model,
+                    'default_rpc': self.view.rpc,
                     'default_res_id': self.view.datarecord.id,
                     'mail_post_autofollow': true
                 }
@@ -71,7 +71,7 @@ odoo.define('good.process', function(require) {
         },
         good_approve: function() {
             var self = this;
-            new Model('mail.thread').call('good_process_approve', [self.view.datarecord.id, self.view.model]).then(
+            new rpc('mail.thread').call('good_process_approve', [self.view.datarecord.id, self.view.rpc]).then(
                 function(result) {
                     if (result[0] && typeof(result[0]) == 'object') {
                         _.each(result[0], function(id) {

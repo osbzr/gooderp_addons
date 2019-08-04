@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 from odoo.addons.finance.report.report import ActionReportPickingWrapped
@@ -467,11 +466,11 @@ class TestCheckoutWizard(TransactionCase):
         wizard = checkout_obj.create({'date': '20160102'})
         # onchange 拿到会计期间
         wizard.onchange_period_id()
-        self.assertTrue(wizard.period_id.name == u'201601')
+        self.assertTrue(wizard.period_id.name == '201601')
         # 上期间未关闭报错
         with self.assertRaises(UserError):
             wizard.button_checkout()
-        wizard.date = u'2015-12-31'
+        wizard.date = '2015-12-31'
         wizard.onchange_period_id()
         # 本期间已结账报错
         self.period_15_12.is_closed = True

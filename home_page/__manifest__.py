@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'GoodErp 首页设置',
     'version': '11.11',

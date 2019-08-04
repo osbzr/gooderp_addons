@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
 from odoo.tools import float_is_zero
@@ -6,23 +5,23 @@ from odoo.exceptions import UserError
 
 # 状态可选值
 TASK_STATES = [
-    ('todo', u'新建'),
-    ('doing', u'正在进行'),
-    ('done', u'已完成'),
-    ('cancel', u'已取消'),
+    ('todo', '新建'),
+    ('doing', '正在进行'),
+    ('done', '已完成'),
+    ('cancel', '已取消'),
 ]
 
 AVAILABLE_PRIORITIES = [
-    ('0', u'一般'),
-    ('1', u'低'),
-    ('2', u'中'),
-    ('3', u'高'),
+    ('0', '一般'),
+    ('1', '低'),
+    ('2', '中'),
+    ('3', '高'),
 ]
 
 
 class Project(models.Model):
     _name = 'project'
-    _description = u'项目'
+    _description = '项目'
     _inherits = {'auxiliary.financing': 'auxiliary_id'}
     _inherit = ['mail.thread']
 
@@ -34,93 +33,93 @@ class Project(models.Model):
                 Project.hours += Task.hours
 
     auxiliary_id = fields.Many2one(
-        string=u'辅助核算',
+        string='辅助核算',
         comodel_name='auxiliary.financing',
         ondelete='cascade',
         required=True,
     )
 
     task_ids = fields.One2many(
-        string=u'任务',
+        string='任务',
         comodel_name='task',
         inverse_name='project_id',
     )
 
     customer_id = fields.Many2one(
-        string=u'客户',
+        string='客户',
         comodel_name='partner',
         ondelete='restrict',
     )
 
     invoice_ids = fields.One2many(
-        string=u'发票行',
+        string='发票行',
         comodel_name='project.invoice',
         inverse_name='project_id',
     )
 
-    plan_hours = fields.Float(u'计划工时',
+    plan_hours = fields.Float('计划工时',
                               track_visibility='onchange')
-    hours = fields.Float(u'实际工时',
+    hours = fields.Float('实际工时',
                          compute=_compute_hours)
-    address = fields.Char(u'地址')
-    note = fields.Text(u'备注')
-    active = fields.Boolean(u'启用', default=True)
+    address = fields.Char('地址')
+    note = fields.Text('备注')
+    active = fields.Boolean('启用', default=True)
 
 
 class ProjectInvoice(models.Model):
     _name = 'project.invoice'
-    _description = u'项目的发票'
+    _description = '项目的发票'
 
     @api.one
     @api.depends('tax_rate', 'amount')
     def _compute_tax_amount(self):
         '''计算税额'''
         if self.tax_rate > 100:
-            raise UserError(u'税率不能输入超过100的数\n当前税率:%s' % self.tax_rate)
+            raise UserError('税率不能输入超过100的数\n当前税率:%s' % self.tax_rate)
         if self.tax_rate < 0:
-            raise UserError(u'税率不能输入负数\n当前税率:%s' % self.tax_rate)
+            raise UserError('税率不能输入负数\n当前税率:%s' % self.tax_rate)
         self.tax_amount = self.amount / (100 + self.tax_rate) * self.tax_rate
 
     project_id = fields.Many2one(
-        string=u'项目',
+        string='项目',
         comodel_name='project',
         ondelete='cascade',
     )
 
     tax_rate = fields.Float(
-        string=u'税率',
+        string='税率',
         default=lambda self: self.env.user.company_id.output_tax_rate,
-        help=u'默认值取公司销项税率',
+        help='默认值取公司销项税率',
     )
 
     tax_amount = fields.Float(
-        string=u'税额',
+        string='税额',
         compute=_compute_tax_amount,
     )
 
     amount = fields.Float(
-        string=u'含税金额',
-        help=u'含税金额',
+        string='含税金额',
+        help='含税金额',
     )
 
     date_due = fields.Date(
         string='到期日',
         default=lambda self: fields.Date.context_today(self),
         required=True,
-        help=u'收款截止日期',
+        help='收款截止日期',
     )
 
     invoice_id = fields.Many2one(
-        string=u'发票号',
+        string='发票号',
         comodel_name='money.invoice',
         readonly=True,
         copy=False,
         ondelete='set null',
-        help=u'产生的发票号',
+        help='产生的发票号',
     )
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )
@@ -132,7 +131,7 @@ class ProjectInvoice(models.Model):
             'partner_id': project_id.customer_id and project_id.customer_id.id,
             'category_id': category_id.id,
             'auxiliary_id': project_id.auxiliary_id.id,
-            'date': fields.Date.context_today(self),
+        date = fields.Date.context_today(self)
             'amount': amount,
             'reconciled': 0,
             'to_reconcile': amount,
@@ -147,7 +146,7 @@ class ProjectInvoice(models.Model):
         for line in self:
             invoice_id = False
             if not line.project_id.customer_id:
-                raise UserError(u'生成发票前请输入客户')
+                raise UserError('生成发票前请输入客户')
             category = self.env.ref('money.core_category_sale')
             if not float_is_zero(self.amount, 2):
                 invoice_id = self.env['money.invoice'].create(
@@ -160,7 +159,7 @@ class ProjectInvoice(models.Model):
 
 class Task(models.Model):
     _name = 'task'
-    _description = u'任务'
+    _description = '任务'
     _inherit = ['mail.thread']
     _order = 'sequence, priority desc, id'
 
@@ -183,67 +182,67 @@ class Task(models.Model):
         return self._default_status_impl()
 
     name = fields.Char(
-        string=u'名称',
+        string='名称',
         required=True,
     )
 
     user_id = fields.Many2one(
-        string=u'指派给',
+        string='指派给',
         comodel_name='res.users',
         track_visibility='onchange',
     )
 
     project_id = fields.Many2one(
-        string=u'项目',
+        string='项目',
         comodel_name='project',
         ondelete='cascade',
     )
 
     timeline_ids = fields.One2many(
-        string=u'工作记录',
+        string='工作记录',
         comodel_name='timeline',
         inverse_name='task_id',
     )
 
     next_action = fields.Char(
-        string=u'下一步计划',
+        string='下一步计划',
         required=False,
-        help=u'针对此任务下一步的计划',
+        help='针对此任务下一步的计划',
         track_visibility='onchange',
     )
 
     next_datetime = fields.Datetime(
-        string=u'下一步计划时间',
-        help=u'下一步计划预计开始的时间',
+        string='下一步计划时间',
+        help='下一步计划预计开始的时间',
         track_visibility='onchange',
     )
 
     status = fields.Many2one(
         'task.status',
-        string=u'状态',
+        string='状态',
         default=_default_status,
         track_visibility='onchange',
     )
-    plan_hours = fields.Float(u'计划工时')
-    hours = fields.Float(u'实际工时',
+    plan_hours = fields.Float('计划工时')
+    hours = fields.Float('实际工时',
                          compute=_compute_hours)
-    sequence = fields.Integer(u'顺序')
-    is_schedule = fields.Boolean(u'列入计划')
-    note = fields.Text(u'描述')
+    sequence = fields.Integer('顺序')
+    is_schedule = fields.Boolean('列入计划')
+    note = fields.Text('描述')
     priority = fields.Selection(AVAILABLE_PRIORITIES,
-                                string=u'优先级',
+                                string='优先级',
                                 default=AVAILABLE_PRIORITIES[0][0])
     color = fields.Integer('Color Index',
                            default=0)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )
     tag_ids = fields.Many2many('core.value',
                                ondelete='restrict',
-                               string=u'标签',
+                               string='标签',
                                domain=[('type', '=', 'task_tag')],
                                context={'type': 'task_tag'})
 
@@ -258,35 +257,35 @@ class Task(models.Model):
 
 class TaskStatus(models.Model):
     _name = 'task.status'
-    _description = u'任务阶段'
+    _description = '任务阶段'
     _order = 'sequence, id'
 
-    name = fields.Char(u'名称', required=True)
+    name = fields.Char('名称', required=True)
     state = fields.Selection(TASK_STATES,
-                             string=u'任务状态',
+                             string='任务状态',
                              index=True,
                              required=True,
                              default='doing')
-    sequence = fields.Integer(u'顺序')
+    sequence = fields.Integer('顺序')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
 
 class Timesheet(models.Model):
     _name = 'timesheet'
-    _description = u'今日工作日志'
+    _description = '今日工作日志'
 
     date = fields.Date(
-        string=u'日期',
+        string='日期',
         required=True,
         readonly=True,
         default=fields.Date.context_today)
 
     user_id = fields.Many2one(
-        string=u'用户',
+        string='用户',
         required=True,
         readonly=True,
         default=lambda self: self.env.user,
@@ -294,13 +293,13 @@ class Timesheet(models.Model):
     )
 
     timeline_ids = fields.One2many(
-        string=u'工作记录',
+        string='工作记录',
         comodel_name='timeline',
         inverse_name='timesheet_id',
     )
 
     task_ids = fields.Many2many(
-        string=u'待办事项',
+        string='待办事项',
         required=False,
         readonly=False,
         default=lambda self: [(4, t.id) for t in self.env['task'].search(
@@ -314,7 +313,7 @@ class Timesheet(models.Model):
     )
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )
@@ -335,61 +334,61 @@ class Timesheet(models.Model):
 
 class Timeline(models.Model):
     _name = 'timeline'
-    _description = u'工作记录'
+    _description = '工作记录'
 
     timesheet_id = fields.Many2one(
-        string=u'记录表',
+        string='记录表',
         comodel_name='timesheet',
         ondelete='cascade',
     )
 
     task_id = fields.Many2one(
-        string=u'任务',
+        string='任务',
         required=True,
         readonly=False,
         comodel_name='task',
     )
 
     project_id = fields.Many2one(
-        string=u'项目',
+        string='项目',
         related='task_id.project_id',
         store=True,
         ondelete='cascade',
     )
 
     user_id = fields.Many2one(
-        string=u'指派给',
+        string='指派给',
         comodel_name='res.users',
     )
 
     hours = fields.Float(
-        string=u'小时数',
+        string='小时数',
         default=0.5,
         digits=(16, 1),
-        help=u'实际花的小时数',
+        help='实际花的小时数',
     )
 
     just_done = fields.Char(
-        string=u'具体工作内容',
+        string='具体工作内容',
         required=True,
-        help=u'在此时长内针对此任务实际完成的工作内容',
+        help='在此时长内针对此任务实际完成的工作内容',
     )
 # TODO 以下三个字段用于更新task的同名字段
     next_action = fields.Char(
-        string=u'下一步计划',
+        string='下一步计划',
         required=False,
-        help=u'针对此任务下一步的计划',
+        help='针对此任务下一步的计划',
     )
 
     next_datetime = fields.Datetime(
-        string=u'下一步计划时间',
-        help=u'下一步计划预计开始的时间',
+        string='下一步计划时间',
+        help='下一步计划预计开始的时间',
     )
     set_status = fields.Many2one('task.status',
-                                 string=u'状态更新到')
+                                 string='状态更新到')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get()
     )

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from openerp import models
+from odoo import models
 
 
 def open_dialog(self, func, options=None):
@@ -8,7 +7,7 @@ def open_dialog(self, func, options=None):
     context.update({'func': func})
 
     if not context.get('message'):
-        context['message'] = u'确定吗？'
+        context['message'] = '确定吗？'
 
     return {
         'type': 'ir.actions.act_window',

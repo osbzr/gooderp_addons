@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    odoo, Open Source Management Solution
@@ -22,7 +21,7 @@
 ##############################################################################
 
 from odoo import fields, models, api
-import xmlrpclib
+import xmlrpc.client
 import socket
 import os
 import time
@@ -43,7 +42,7 @@ def execute(connector, method, *args):
     res = False
     try:
         res = getattr(connector, method)(*args)
-    except socket.error, e:
+    except socket.error as e:
         raise e
     return res
 
@@ -54,12 +53,12 @@ addons_path = '%s/DBbackups' % (os.environ.get('HOME', '')
 
 class DbBackup(models.Model):
     _name = 'db.backup'
-    _description = u'数据库自动备份'
+    _description = '数据库自动备份'
 
     @api.model
     def get_db_list(self, host='localhost', port='8069'):
         uri = 'http://' + host + ':' + port
-        conn = xmlrpclib.ServerProxy(uri + '/xmlrpc/db')
+        conn = xmlrpc.client.ServerProxy(uri + '/xmlrpc/db')
         db_list = execute(conn, 'list')
         return db_list
 
@@ -71,7 +70,7 @@ class DbBackup(models.Model):
                           help='Absolute path for storing the backups', required='True', default=addons_path)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -86,7 +85,7 @@ class DbBackup(models.Model):
     def schedule_backup(self):
         confs = self.search([])
         master_pass = tools.config.get('admin_passwd', False)
-        res_user_obj = self.env.get('res.users')
+        res_user_obj = self.env['res.users']
         if not master_pass:
             raise
         for rec in confs:
@@ -112,7 +111,7 @@ class DbBackup(models.Model):
                     rec.name, curtime.strftime('%Y%m%d_%H_%M_%S'))
                 file_path = os.path.join(rec.bkp_dir, bkp_file)
                 uri = 'http://' + rec.host + ':' + rec.port
-                conn = xmlrpclib.ServerProxy(uri + '/xmlrpc/db')
+                conn = xmlrpc.client.ServerProxy(uri + '/xmlrpc/db')
                 bkp = ''
                 try:
                     bkp = execute(conn, 'dump', master_pass, rec.name, 'zip')
@@ -134,7 +133,7 @@ class DbBackup(models.Model):
     def schedule_backup_pgtool(self):
         confs = self.search([])
         master_pass = tools.config.get('admin_passwd', False)
-        res_user_obj = self.env.get('res.users')
+        res_user_obj = self.env['res.users']
         if not master_pass:
             raise
         for rec in confs:
@@ -162,7 +161,7 @@ class DbBackup(models.Model):
                 bkp = ''
                 try:
                     self._db_pg_dump(rec.name, file_path)
-                except Exception, ex:
+                except Exception as ex:
                     _logger.warn('auto_backup DUMP DB except: ' + str(ex))
                     continue
         return True
@@ -178,7 +177,7 @@ class DbBackup(models.Model):
                 'DUMP DB: %s failed! Please verify the configuration of the database password on the server. '
                 'You may need to create a .pgpass file for authentication, or specify `db_password` in the '
                 'server configuration file.\n %s', db_name, data)
-            raise Exception, "Couldn't dump database"
+            raise Exception("Couldn't dump database")
         os.environ['PGPASSWORD'] = pg_passwd
         cmd = ['pg_dump', '--format=c', '--no-owner']
         if tools.config['db_user']:

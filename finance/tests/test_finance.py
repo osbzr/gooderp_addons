@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
@@ -52,13 +51,13 @@ class TestVoucher(TransactionCase):
         voucher = self.env['voucher'].create({
             'date': '2017-01-01',
             'line_ids': [(0, 0, {
-                'name': u'收利息',  # 贷方行
+                'name': '收利息',  # 贷方行
                 'account_id': self.env.ref('finance.small_business_chart5603002').id,
                 'debit': 0,
                 'credit': 1.0,
             }),
                 (0, 0, {
-                    'name': u'收利息',  # 借方行
+                    'name': '收利息',  # 借方行
                     'account_id': self.env.ref('finance.account_bank').id,
                     'debit': 1.0,
                     'credit': 0,
@@ -71,13 +70,13 @@ class TestVoucher(TransactionCase):
         voucher = self.env['voucher'].with_context({'entry_manual':1}).create({
             'date': '2017-01-01',
             'line_ids': [(0, 0, {
-                'name': u'退款给客户',  # 贷方行
+                'name': '退款给客户',  # 贷方行
                 'account_id': self.env.ref('finance.account_bank').id,
                 'debit': 0,
                 'credit': 50.0,
             }),
                 (0, 0, {
-                    'name': u'退款给客户',  # 借方行
+                    'name': '退款给客户',  # 借方行
                     'account_id': self.env.ref('finance.account_income').id,
                     'debit': 50.0,
                     'credit': 0,
@@ -96,7 +95,7 @@ class TestVoucher(TransactionCase):
             voucher = self.env['voucher'].with_context({'entry_manual':1}).create({
                 'date': '2017-01-01',
                 'line_ids': [(0, 0, {
-                    'name': u'受限科目记账',  # 贷方行
+                    'name': '受限科目记账',  # 贷方行
                     'account_id': account_credit.id,
                     'debit': 0,
                     'credit': 50.0,
@@ -106,7 +105,7 @@ class TestVoucher(TransactionCase):
             voucher = self.env['voucher'].with_context({'entry_manual':1}).create({
                 'date': '2017-01-01',
                 'line_ids': [(0, 0, {
-                        'name': u'受限科目记账',  # 借方行
+                        'name': '受限科目记账',  # 借方行
                         'account_id': account_debit.id,
                         'debit': 50.0,
                         'credit': 0,
@@ -136,7 +135,7 @@ class TestVoucher(TransactionCase):
     def test_compute(self):
         '''新建凭证时计算字段加载'''
         voucher = self.env.ref('finance.voucher_1')
-        self.assertTrue(voucher.period_id.name == u'201601')
+        self.assertTrue(voucher.period_id.name == '201601')
         self.assertTrue(voucher.amount_text == 50000.0)
         voucher.unlink()
 
@@ -145,7 +144,7 @@ class TestVoucher(TransactionCase):
         un_balance_voucher = self.env['voucher'].create({
             'line_ids': [(0, 0, {
                 'account_id': self.env.ref('finance.account_cash').id,
-                'name': u'借贷方不平',
+                'name': '借贷方不平',
                 'debit': 100,
             })]
         })
@@ -164,7 +163,7 @@ class TestVoucher(TransactionCase):
         voucher_zero = self.env['voucher'].create({
             'line_ids': [(0, 0, {
                 'account_id': self.env.ref('finance.account_cash').id,
-                'name': u'借贷方全为0',
+                'name': '借贷方全为0',
             })]
         })
         with self.assertRaises(ValidationError):
@@ -173,7 +172,7 @@ class TestVoucher(TransactionCase):
         voucher = self.env['voucher'].create({
             'line_ids': [(0, 0, {
                 'account_id': self.env.ref('finance.account_cash').id,
-                'name': u'借贷方同时输入',
+                'name': '借贷方同时输入',
                 'debit': 100,
                 'credit': 100,
             })]
@@ -184,14 +183,14 @@ class TestVoucher(TransactionCase):
     def test_voucher_line_default_get(self):
         line = self.env['voucher.line'].create({
             'account_id': self.env.ref('finance.account_cash').id,
-            'name': u'借贷方同时输入',
+            'name': '借贷方同时输入',
             'debit': 100,
             'credit': 100,
         })
         self.env['voucher'].with_context({'line_ids': {line.id}}).create({
             'line_ids': [(0, 0, {
                 'account_id': self.env.ref('finance.account_cash').id,
-                'name': u'借贷方同时输入',
+                'name': '借贷方同时输入',
                 'debit': 100,
                 'credit': 100,
             })]
@@ -251,7 +250,7 @@ class TestPeriod(TransactionCase):
         period_row = period_obj.search(
             [('year', '=', '2016'), ('month', '=', '10')])
         if not period_row:
-            period_row = period_obj.create({'year': u'2016', 'month': u'10'})
+            period_row = period_obj.create({'year': '2016', 'month': '10'})
         self.assertTrue(("2016-10-01", "2016-10-31") ==
                         period_obj.get_period_month_date_range(period_row))
         period_row.is_closed = True
@@ -267,7 +266,7 @@ class TestPeriod(TransactionCase):
 
     def test_compute_name_month_02(self):
         ''' 测试  compute_name 月份小于10 '''
-        self.env['finance.period'].create({'year': u'2007', 'month': u'2'})
+        self.env['finance.period'].create({'year': '2007', 'month': '2'})
 
     def test_onchange_account_id(self):
         '''凭证行的科目变更影响到其他字段的可选值'''

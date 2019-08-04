@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import models, fields, api
@@ -8,21 +7,21 @@ from odoo import tools
 class ReportAuxiliaryAccounting(models.Model):
     _name = 'report.auxiliary.accounting'
     _auto = False
-    _description = u'辅助核算余额表'
+    _description = '辅助核算余额表'
 
-    account_id = fields.Many2one('finance.account', u'会计科目')
+    account_id = fields.Many2one('finance.account', '会计科目')
     auxiliary_id = fields.Many2one(
-        'auxiliary.financing', u'辅助核算', ondelete='restrict')
-    debit = fields.Float(u'借方金额', digits=dp.get_precision('Amount'))
-    credit = fields.Float(u'贷方金额', digits=dp.get_precision('Amount'))
-    balance = fields.Float(u'余额', digits=dp.get_precision('Amount'))
+        'auxiliary.financing', '辅助核算', ondelete='restrict')
+    debit = fields.Float('借方金额', digits=dp.get_precision('Amount'))
+    credit = fields.Float('贷方金额', digits=dp.get_precision('Amount'))
+    balance = fields.Float('余额', digits=dp.get_precision('Amount'))
 
     @api.multi
     def view_voucher_line_detail(self):
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'voucher.line',
-            'name': u"%s - %s 明细行" % (self.account_id.name, self.auxiliary_id.name),
+            'name': "%s - %s 明细行" % (self.account_id.name, self.auxiliary_id.name),
             'view_type': 'form',
             'view_mode': 'tree',
             'domain': [('account_id', '=', self.account_id.id), ('auxiliary_id', '=', self.auxiliary_id.id)],

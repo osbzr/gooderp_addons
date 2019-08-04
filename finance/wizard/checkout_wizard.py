@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -6,7 +5,7 @@ from odoo.exceptions import UserError
 class CheckoutWizard(models.TransientModel):
     '''月末结账的向导'''
     _name = 'checkout.wizard'
-    _description = u'月末结账向导'
+    _description = '月末结账向导'
 
     @api.model
     def _get_last_date(self):
@@ -17,11 +16,11 @@ class CheckoutWizard(models.TransientModel):
         else:
             return fields.Date.context_today(self)
 
-    period_id = fields.Many2one('finance.period', u'结账会计期间')
-    date = fields.Date(u'生成凭证日期', required=True, default=_get_last_date)
+    period_id = fields.Many2one('finance.period', '结账会计期间')
+    date = fields.Date('生成凭证日期', required=True, default=_get_last_date)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -38,16 +37,16 @@ class CheckoutWizard(models.TransientModel):
         for balance in self:
             if balance.period_id:
                 if balance.period_id.is_closed:
-                    raise UserError(u'本期间%s已结账' % balance.period_id.name)
+                    raise UserError('本期间%s已结账' % balance.period_id.name)
                 # 调用 生成科目余额表 向导的 计算上一个会计期间方法，得到 上一个会计期间
                 last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(
                     balance.period_id)
                 if last_period:
                     if not last_period.is_closed:
-                        raise UserError(u'上一个会计期间%s未结账' % last_period.name)
+                        raise UserError('上一个会计期间%s未结账' % last_period.name)
                 if balance.period_id.is_closed:
                     # TODO 此处重复，应去掉
-                    raise UserError(u'本期间%s已结账' % balance.period_id.name)
+                    raise UserError('本期间%s已结账' % balance.period_id.name)
                 else:
                     voucher_obj = self.env['voucher']
                     voucher_ids = voucher_obj.search(
@@ -58,7 +57,7 @@ class CheckoutWizard(models.TransientModel):
                         if voucher_id.state != 'done':
                             draft_voucher_count += 1
                     if draft_voucher_count != 0:
-                        raise UserError(u'该期间有%s张凭证未确认' % draft_voucher_count)
+                        raise UserError('该期间有%s张凭证未确认' % draft_voucher_count)
                     else:
                         voucher_line = []  # 生成的结账凭证行
                         account_obj = self.env['finance.account']
@@ -81,7 +80,7 @@ class CheckoutWizard(models.TransientModel):
                             revenue_total += credit_total
                             if credit_total != 0:  # 贷方冲借方
                                 res = {
-                                    'name': u'月末结账',
+                                    'name': '月末结账',
                                     'account_id': revenue_account_id.id,
                                     'debit': credit_total,
                                     'credit': 0,
@@ -98,7 +97,7 @@ class CheckoutWizard(models.TransientModel):
                             expense_total += debit_total
                             if debit_total != 0:  # 借方冲贷方
                                 res = {
-                                    'name': u'月末结账',
+                                    'name': '月末结账',
                                     'account_id': expense_account_id.id,
                                     'debit': 0,
                                     'credit': debit_total,
@@ -108,12 +107,12 @@ class CheckoutWizard(models.TransientModel):
                         year_profit_account = self.env.user.company_id.profit_account
                         remain_account = self.env.user.company_id.remain_account
                         if not year_profit_account:
-                            raise UserError(u'公司本年利润科目未配置')
+                            raise UserError('公司本年利润科目未配置')
                         if not remain_account:
-                            raise UserError(u'公司未分配利润科目未配置')
+                            raise UserError('公司未分配利润科目未配置')
                         if (revenue_total - expense_total) > 0:
                             res = {
-                                'name': u'利润结余',
+                                'name': '利润结余',
                                 'account_id': year_profit_account.id,
                                 'debit': 0,
                                 'credit': revenue_total - expense_total,
@@ -121,7 +120,7 @@ class CheckoutWizard(models.TransientModel):
                             voucher_line.append(res)
                         if (revenue_total - expense_total) < 0:
                             res = {
-                                'name': u'利润结余',
+                                'name': '利润结余',
                                 'account_id': year_profit_account.id,
                                 'debit': expense_total - revenue_total,
                                 'credit': 0,
@@ -152,12 +151,12 @@ class CheckoutWizard(models.TransientModel):
                         year_total = round(year_total, precision)
                         if year_total != 0:
                             year_line_ids = [{
-                                'name': u'年度结余',
+                                'name': '年度结余',
                                 'account_id': remain_account.id,
                                 'debit': 0,
                                 'credit': year_total,
                             }, {
-                                'name': u'年度结余',
+                                'name': '年度结余',
                                 'account_id': year_profit_account.id,
                                 'debit': year_total,
                                 'credit': 0,
@@ -204,7 +203,7 @@ class CheckoutWizard(models.TransientModel):
                              ('state', '=', 'done')], order="create_date desc",
                             limit=1)
                         return {
-                            'name': u'月末结账',
+                            'name': '月末结账',
                             'view_type': 'form',
                             'view_mode': 'form',
                             'views': [(view.id, 'form')],
@@ -219,13 +218,13 @@ class CheckoutWizard(models.TransientModel):
         for balance in self:
             if balance.period_id:
                 if not balance.period_id.is_closed:
-                    raise UserError(u'期间%s未结账' % balance.period_id.name)
+                    raise UserError('期间%s未结账' % balance.period_id.name)
                 else:
                     next_period = self.env['create.trial.balance.wizard'].compute_next_period_id(
                         balance.period_id)
                     if next_period:
                         if next_period.is_closed:
-                            raise UserError(u'下一个期间%s已结账！' % next_period.name)
+                            raise UserError('下一个期间%s已结账！' % next_period.name)
                     # 重新打开会计期间
                     balance.period_id.is_closed = False
                     # 删除相关凭证及科目余额表
@@ -277,7 +276,7 @@ class CheckoutWizard(models.TransientModel):
                 if last_period:
                     while last_period and last_voucher_number < 1:
                         if not last_period.is_closed:
-                            raise UserError(u'上一个期间%s未结账' % last_period.name)
+                            raise UserError('上一个期间%s未结账' % last_period.name)
                         if period_id.year != last_period.year:
                             # 按年，而且是第一个会计期间
                             last_voucher_number = reset_init_number
@@ -289,7 +288,7 @@ class CheckoutWizard(models.TransientModel):
                             # 凭证号转换为数字
                             if last_period_voucher_name:  # 上一期间是否有凭证？
                                 last_voucher_number = int(
-                                    filter(str.isdigit, last_period_voucher_name.encode("utf-8"))) + 1
+                                    list(filter(str.isdigit, last_period_voucher_name.encode("utf-8")))) + 1
                             # else:
                             #    raise UserError(u'请核实上一个期间：%s是否有凭证！' % last_period.name)
                             last_period = self.env['create.trial.balance.wizard'].compute_last_period_id(
@@ -308,7 +307,7 @@ class CheckoutWizard(models.TransientModel):
             # 按月重置
             else:
                 if last_period and not last_period.is_closed:
-                    raise UserError(u'上一个期间%s未结账' % last_period.name)
+                    raise UserError('上一个期间%s未结账' % last_period.name)
                 last_voucher_number = reset_init_number
                 voucher_ids = voucher_obj.search(
                     [('period_id', '=', period_id.id), ('state', '=', 'done')], order='create_date')

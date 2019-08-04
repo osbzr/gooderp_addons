@@ -4,7 +4,7 @@ var ListView = require('web.ListView');
 var FormView = require('web.FormView');
 var form_relational = require('web.form_relational');
 var data = require('web.data');
-var Model = require('web.Model');
+var rpc = require('web.rpc');
 var menu = require('web.Menu');
 
 FormView.include({

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -13,32 +12,32 @@ class staff_job(models.Model):
         return self.env.user.company_id
 
     address_id = fields.Many2one(
-        'res.company', u"工作地点", default=_default_address_id,
-        help=u"员工工作的地址")
-    application_ids = fields.One2many('hire.applicant', 'job_id', u"求职申请")
-    application_count = fields.Integer(compute='_compute_application_count', string=u"求职申请数")
+        'res.company', "工作地点", default=_default_address_id,
+        help="员工工作的地址")
+    application_ids = fields.One2many('hire.applicant', 'job_id', "求职申请")
+    application_count = fields.Integer(compute='_compute_application_count', string="求职申请数")
     manager_id = fields.Many2one(
-        'staff', related='department_id.manager_id', string=u"部门经理",
+        'staff', related='department_id.manager_id', string="部门经理",
         readonly=True, store=True)
-    user_id = fields.Many2one('res.users', u"招聘负责人", track_visibility='onchange')
-    document_ids = fields.One2many('ir.attachment', compute='_compute_document_ids', string=u"简历")
-    documents_count = fields.Integer(compute='_compute_document_ids', string=u"简历数")
-    expected_employees = fields.Integer(compute='_compute_employees', string=u'预计总数', store=True,
-                                        help=u'招聘新员工后，预计该职位的员工人数。')
-    no_of_employee = fields.Integer(compute='_compute_employees', string=u"当前员工数", store=True,
-                                    help=u'该职位当前员工数量')
-    no_of_recruitment = fields.Integer(string=u'预计新员工数', copy=False,
-                                       help=u'期望招聘的新员工数量', default=1)
-    no_of_hired_employee = fields.Integer(string=u'招到员工数', copy=False,
-                                          help=u'在招聘阶段聘用的员工数量')
-    staff_ids = fields.One2many('staff', 'job_id', string=u'员工', groups='base.group_user')
+    user_id = fields.Many2one('res.users', "招聘负责人", track_visibility='onchange')
+    document_ids = fields.One2many('ir.attachment', compute='_compute_document_ids', string="简历")
+    documents_count = fields.Integer(compute='_compute_document_ids', string="简历数")
+    expected_employees = fields.Integer(compute='_compute_employees', string='预计总数', store=True,
+                                        help='招聘新员工后，预计该职位的员工人数。')
+    no_of_employee = fields.Integer(compute='_compute_employees', string="当前员工数", store=True,
+                                    help='该职位当前员工数量')
+    no_of_recruitment = fields.Integer(string='预计新员工数', copy=False,
+                                       help='期望招聘的新员工数量', default=1)
+    no_of_hired_employee = fields.Integer(string='招到员工数', copy=False,
+                                          help='在招聘阶段聘用的员工数量')
+    staff_ids = fields.One2many('staff', 'job_id', string='员工', groups='base.group_user')
 
     color = fields.Integer("Color Index")
     state = fields.Selection([
-        ('open', u'招聘中'),
-        ('close', u'不招聘')
-    ], string=u'状态', readonly=True, required=True, track_visibility='always', copy=False, default='open',
-        help=u"该职位在招聘流程中是开启还是关闭")
+        ('open', '招聘中'),
+        ('close', '不招聘')
+    ], string='状态', readonly=True, required=True, track_visibility='always', copy=False, default='open',
+        help="该职位在招聘流程中是开启还是关闭")
 
     @api.depends('no_of_recruitment', 'staff_ids.job_id', 'staff_ids.active')
     def _compute_employees(self):
@@ -94,7 +93,7 @@ class staff_job(models.Model):
         """启动招聘"""
         for record in self:
             if record.state == 'open':
-                raise UserError(u'请不要重复启动招聘')
+                raise UserError('请不要重复启动招聘')
             no_of_recruitment = 1 if record.no_of_recruitment == 0 else record.no_of_recruitment
             record.write({'state': 'open', 'no_of_recruitment': no_of_recruitment})
         return True
@@ -104,7 +103,7 @@ class staff_job(models.Model):
         """结束招聘"""
         for record in self:
             if record.state == 'close':
-                raise UserError(u'请不要重复结束招聘')
+                raise UserError('请不要重复结束招聘')
             return record.write({
                 'state': 'close',
                 'no_of_recruitment': 0,

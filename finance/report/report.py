@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from odoo.osv import osv
+from odoo.osv import models
 from odoo.report import report_sxw
 from odoo import models, fields, api
 import math
@@ -7,9 +6,9 @@ import math
 
 class ActionReportPickingWrapped(report_sxw.rml_parse):
 
-    def __init__(self, cr, uid, name, context=None):
+    def __init__(self, name):
         super(ActionReportPickingWrapped, self).__init__(
-            cr, uid, name, context=context)
+            cr, uid, name)
         self.localcontext.update({
             'paginate': self._paginate,
             'rmb_upper': self._rmb_upper,
@@ -42,9 +41,9 @@ class ActionReportPickingWrapped(report_sxw.rml_parse):
         return int(math.ceil(float(count) / max_per_page))
 
 
-class ReportVoucher(osv.AbstractModel):
+class ReportVoucher(models.AbstractModel):
     _name = 'report.finance.report_voucher_view'
     _inherit = 'report.abstract_report'
     _template = 'finance.report_voucher_view'
     _wrapped_report_class = ActionReportPickingWrapped
-    _description = u'会计凭证打印'
+    _description = '会计凭证打印'

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
-import wizard
-import models
-import report
+from . import wizard
+from . import models
+from . import report

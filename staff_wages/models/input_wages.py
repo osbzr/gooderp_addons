@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
 from odoo import fields, models, api
 from odoo.exceptions import UserError
 
-change = [('time', u'计时'),
-          ('piece', u'计件'),
-          ('efficiency', u'计效')]
+change = [('time', '计时'),
+          ('piece', '计件'),
+          ('efficiency', '计效')]
 
 
 class CREATEWAGESLINEWIZARD(models.TransientModel):
     _name = 'create.wages.line.wizard'
     _description = 'input staff wages'
 
-    wages_change = fields.Selection(change, u'记工类型')
+    wages_change = fields.Selection(change, '记工类型')
 
     @api.one
     def input_change_wages(self):

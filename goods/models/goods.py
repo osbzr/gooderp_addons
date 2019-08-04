@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -57,24 +56,24 @@ class Goods(models.Model):
             elif type == 'sell':
                 return self.env.user.company_id.output_tax_rate
 
-    no_stock = fields.Boolean(u'虚拟商品')
-    using_batch = fields.Boolean(u'管理批号')
-    force_batch_one = fields.Boolean(u'管理序列号')
-    attribute_ids = fields.One2many('attribute', 'goods_id', string=u'属性')
-    image = fields.Binary(u'图片', attachment=True)
+    no_stock = fields.Boolean('虚拟商品')
+    using_batch = fields.Boolean('管理批号')
+    force_batch_one = fields.Boolean('管理序列号')
+    attribute_ids = fields.One2many('attribute', 'goods_id', string='属性')
+    image = fields.Binary('图片', attachment=True)
     supplier_id = fields.Many2one('partner',
-                                  u'默认供应商',
+                                  '默认供应商',
                                   ondelete='restrict',
                                   domain=[('s_category_id', '!=', False)])
-    price = fields.Float(u'零售价')
-    barcode = fields.Char(u'条形码')
-    note = fields.Text(u'备注')
+    price = fields.Float('零售价')
+    barcode = fields.Char('条形码')
+    note = fields.Text('备注')
     goods_class_id = fields.Many2one(
-        'goods.class', string=u'商品分类',
+        'goods.class', string='商品分类',
         help="Those categories are used to group similar products for point of sale.")
 
     _sql_constraints = [
-        ('barcode_uniq', 'unique(barcode)', u'条形码不能重复'),
+        ('barcode_uniq', 'unique(barcode)', '条形码不能重复'),
     ]
 
     @api.onchange('uom_id')
@@ -111,7 +110,7 @@ class Goods(models.Model):
 
 class Attribute(models.Model):
     _name = 'attribute'
-    _description = u'属性'
+    _description = '属性'
 
     @api.one
     @api.depends('value_ids')
@@ -130,21 +129,21 @@ class Attribute(models.Model):
         return super(Attribute, self).name_search(
             name=name, args=args, operator=operator, limit=limit)
 
-    ean = fields.Char(u'条码')
-    name = fields.Char(u'属性', compute='_compute_name',
+    ean = fields.Char('条码')
+    name = fields.Char('属性', compute='_compute_name',
                        store=True, readonly=True)
-    goods_id = fields.Many2one('goods', u'商品', ondelete='cascade')
+    goods_id = fields.Many2one('goods', '商品', ondelete='cascade')
     value_ids = fields.One2many(
-        'attribute.value', 'attribute_id', string=u'属性')
+        'attribute.value', 'attribute_id', string='属性')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
-        ('ean_uniq', 'unique (ean)', u'该条码已存在'),
-        ('goods_attribute_uniq', 'unique (goods_id, name)', u'该SKU已存在'),
+        ('ean_uniq', 'unique (ean)', '该条码已存在'),
+        ('goods_attribute_uniq', 'unique (goods_id, name)', '该SKU已存在'),
     ]
 
     @api.one
@@ -152,24 +151,24 @@ class Attribute(models.Model):
     def check_value_ids(self):
         att_dict = {}
         for line in self.value_ids:
-            if not att_dict.has_key(line.category_id):
+            if line.category_id not in att_dict:
                 att_dict[line.category_id] = line.category_id
             else:
-                raise UserError(u'属性值的类别不能相同')
+                raise UserError('属性值的类别不能相同')
 
 
 class AttributeValue(models.Model):
     _name = 'attribute.value'
     _rec_name = 'value_id'
-    _description = u'属性明细'
+    _description = '属性明细'
 
-    attribute_id = fields.Many2one('attribute', u'属性', ondelete='cascade')
-    category_id = fields.Many2one('core.category', u'属性',
+    attribute_id = fields.Many2one('attribute', '属性', ondelete='cascade')
+    category_id = fields.Many2one('core.category', '属性',
                                   ondelete='cascade',
                                   domain=[('type', '=', 'attribute')],
                                   context={'type': 'attribute'},
                                   required='1')
-    value_id = fields.Many2one('attribute.value.value', u'值',
+    value_id = fields.Many2one('attribute.value.value', '值',
                                ondelete='restrict',
                                domain="[('category_id','=',category_id)]",
                                default=lambda self: self.env.context.get(
@@ -177,27 +176,27 @@ class AttributeValue(models.Model):
                                required='1')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
 
 class AttributeValueValue(models.Model):
     _name = 'attribute.value.value'
-    _description = u'属性值'
+    _description = '属性值'
 
-    category_id = fields.Many2one('core.category', u'属性',
+    category_id = fields.Many2one('core.category', '属性',
                                   ondelete='cascade',
                                   domain=[('type', '=', 'attribute')],
                                   context={'type': 'attribute'},
                                   required='1')
-    name = fields.Char(u'值', required=True)
+    name = fields.Char('值', required=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
     _sql_constraints = [
-        ('name_category_uniq', 'unique(category_id,name)', u'同一属性的值不能重复')
+        ('name_category_uniq', 'unique(category_id,name)', '同一属性的值不能重复')
     ]

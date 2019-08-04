@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import test_cost_order
+from . import test_cost_order

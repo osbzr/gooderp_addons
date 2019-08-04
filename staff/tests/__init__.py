@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import test_staff
+from . import test_staff

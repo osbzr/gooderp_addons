@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.exceptions import UserError
 from odoo import fields, models, api
 
@@ -18,7 +17,7 @@ class CashFlowWizard(models.TransientModel):
 
         return self._default_period_id_impl()
 
-    period_id = fields.Many2one('finance.period', string=u'会计期间',
+    period_id = fields.Many2one('finance.period', string='会计期间',
                                 default=_default_period_id)
 
     @api.model
@@ -141,11 +140,11 @@ class CashFlowWizard(models.TransientModel):
                 )
                 rep_ids.append(new_rep.id)
         view_id = self.env.ref('money.cash_flow_statement_tree').id
-        attachment_information = u'编制单位：' + self.env.user.company_id.name + u',,' + self.period_id.year\
-                                 + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
+        attachment_information = '编制单位：' + self.env.user.company_id.name + ',' + self.period_id.year\
+                                 + '年' + self.period_id.month + '月' + ',' + '单位：元'
         return {
             'type': 'ir.actions.act_window',
-            'name': u'现金流量表：' + self.period_id.name,
+            'name': '现金流量表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'cash.flow.statement',

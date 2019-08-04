@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # © 2016 Elico Corp (www.elico-corp.com).
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
@@ -35,7 +34,7 @@ class DataModelProxy(object):
     def _compute_by_selection(self, field, temp):
         if field and field.type == 'selection':
             selection = field.selection
-            if isinstance(selection, basestring):
+            if isinstance(selection, str):
                 selection = getattr(self.data, selection)()
             elif callable(selection):
                 selection = selection(self.data)
@@ -69,8 +68,8 @@ class DataModelProxy(object):
         if not self.data:
             return ""
         temp = getattr(self.data, key)
-        field = self.data._fields.get(key)
-        if isinstance(temp, unicode) and ('&' in temp or '<' in temp or '>' in temp):
+        field = self.data._fields.Get(key)
+        if isinstance(temp, str) and ('&' in temp or '<' in temp or '>' in temp):
             temp = temp.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
         if isinstance(temp, models.Model):
@@ -111,7 +110,7 @@ class IterDataModelProxy(object):
         self.length = len(data)
         self.current = 0
 
-    def next(self):
+    def __next__(self):
         if self.current >= self.length:
             raise StopIteration()
 
@@ -122,21 +121,21 @@ class IterDataModelProxy(object):
 
 
 class ReportDocx(report_sxw):
-    def create(self, cr, uid, ids, data, context=None):
-        env = api.Environment(cr, uid, context)
+    def create(self, data):
+        env = api.Environment(context)
         report_obj = env.get('ir.actions.report.xml')
         report_ids = report_obj.search([('report_name', '=', self.name[7:])])
         self.title = report_ids[0].name
         if report_ids[0].report_type == 'docx':
-            return self.create_source_docx(cr, uid, ids, report_ids[0], context)
+            return self.create_source_docx(ids, report_ids[0], context)
 
-        return super(ReportDocx, self).create(cr, uid, ids, data, context)
+        return super(ReportDocx, self).create(ids, data, context)
 
     def generate_temp_file(self, tempname, suffix='docx'):
         return os.path.join(tempname, 'temp_%s_%s.%s' %
                             (os.getpid(), random.randint(1, 10000), suffix))
 
-    def create_source_docx(self, cr, uid, ids, report, context=None):
+    def create_source_docx(self, report):
         data = DataModelProxy(self.get_docx_data(
             cr, uid, ids, report, context))
         tempname = tempfile.mkdtemp()
@@ -175,7 +174,7 @@ class ReportDocx(report_sxw):
             <body>
             """
 
-        html += unicode(serialize.serialize(ofile.document), 'utf-8')
+        html += str(serialize.serialize(ofile.document), 'utf-8')
         html += "</body></html>"
 
         with codecs.open(temp_out_file_html, 'w', 'utf-8') as f:
@@ -187,10 +186,10 @@ class ReportDocx(report_sxw):
 
         return temp_out_file_pdf
 
-    def get_docx_data(self, cr, uid, ids, report, context):
-        env = api.Environment(cr, uid, context)
+    def get_docx_data(self, report, context):
+        env = api.Environment(context)
         # 打印时， 在消息处显示打印人
-        message = str((datetime.now()).strftime('%Y-%m-%d %H:%M:%S')) + ' ' + env.user.name + u' 打印了该单据'
+        message = str((datetime.now()).strftime('%Y-%m-%d %H:%M:%S')) + ' ' + env.user.name + ' 打印了该单据'
         env.get(report.model).message_post(body=message)
 
         return env.get(report.model).browse(ids)

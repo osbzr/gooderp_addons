@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "GOODERP HR模块",
     'author': "开阖软件",

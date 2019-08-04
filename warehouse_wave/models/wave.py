@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
 class Wave(models.Model):
     _name = "wave"
-    _description = u"拣货单"
+    _description = "拣货单"
     _order = 'create_date desc'
 
     state = fields.Selection([('draft', '未打印'), ('printed', '已打印'),
@@ -13,8 +12,8 @@ class Wave(models.Model):
                              index=True,
                              )
     express_type = fields.Char(string='承运商')
-    name = fields.Char(u'单号')
-    order_type = fields.Char(u'订单类型', default=u'客户订单')
+    name = fields.Char('单号')
+    order_type = fields.Char('订单类型', default='客户订单')
     line_ids = fields.One2many('wave.line', 'wave_id', string='任务行')
 
     @api.multi
@@ -54,7 +53,7 @@ class Wave(models.Model):
             delivery_lists = self.env['sell.delivery'].search([('wave_id', '=', wave.id)])
             view_id = self.env.ref('sell.sell_delivery_tree').id
             return {
-                'name': u'销售发货单',
+                'name': '销售发货单',
                 'view_type': 'form',
                 'view_mode': 'tree',
                 'view_id': False,
@@ -75,8 +74,8 @@ class Wave(models.Model):
             wh_move_rows = self.env['wh.move'].search([('wave_id', '=', wave_row.id),
                                                        ('state', '=', 'done')])
             if wh_move_rows:
-                raise UserError(u"""发货单%s已经打包发货,拣货单%s不允许删除!
-                                 """ % (u'-'.join([move_row.name for move_row in wh_move_rows]),
+                raise UserError("""发货单%s已经打包发货,拣货单%s不允许删除!
+                                 """ % ('-'.join([move_row.name for move_row in wh_move_rows]),
                                         wave_row.name))
             # 清空发货单上的格子号
             move_rows = self.env['wh.move'].search(
@@ -89,8 +88,8 @@ class WhMove(models.Model):
     _name = 'wh.move'
     _inherit = ['wh.move', 'state.city.county']
 
-    wave_id = fields.Many2one('wave', string=u'拣货单')
-    pakge_sequence = fields.Char(u'格子号')
+    wave_id = fields.Many2one('wave', string='拣货单')
+    pakge_sequence = fields.Char('格子号')
 
     @api.multi
     def unlink(self):
@@ -108,29 +107,29 @@ class WhMove(models.Model):
 
 class WaveLine(models.Model):
     _name = "wave.line"
-    _description = u"拣货单行"
+    _description = "拣货单行"
     _order = 'location_text'
 
-    wave_id = fields.Many2one('wave', ondelete='cascade', string=u'拣货单')
-    goods_id = fields.Many2one('goods', string=u'商品')
-    attribute_id = fields.Many2one('attribute', string=u'属性')
+    wave_id = fields.Many2one('wave', ondelete='cascade', string='拣货单')
+    goods_id = fields.Many2one('goods', string='商品')
+    attribute_id = fields.Many2one('attribute', string='属性')
     line_location_ids = fields.One2many('wave.line.location',
-                                        'wave_line_id', string=u'库位')
-    picking_qty = fields.Integer(u'拣货数量')
+                                        'wave_line_id', string='库位')
+    picking_qty = fields.Integer('拣货数量')
     move_line_ids = fields.Many2many('wh.move.line', 'wave_move_rel',
-                                     'wave_line_id', 'move_line_id', string=u'发货单行')
-    location_text = fields.Char(u'库位序列')
+                                     'wave_line_id', 'move_line_id', string='发货单行')
+    location_text = fields.Char('库位序列')
 
 
 class WaveLineLocation(models.Model):
     _name = "wave.line.location"
-    _description = u"拣货单行上的库位"
+    _description = "拣货单行上的库位"
     _order = 'location_id'
 
     wave_line_id = fields.Many2one('wave.line',
-                                   ondelete='cascade', string=u'拣货单行')
-    location_id = fields.Many2one('location', string=u'库位')
-    picking_qty = fields.Integer(u'拣货数量')
+                                   ondelete='cascade', string='拣货单行')
+    location_id = fields.Many2one('location', string='库位')
+    picking_qty = fields.Integer('拣货数量')
 
 
 class CreateWave(models.TransientModel):
@@ -150,11 +149,11 @@ class CreateWave(models.TransientModel):
         wh_id = model_rows[0].warehouse_id.id
         for model_row in model_rows:
             if model_row.wave_id:
-                raise UserError(u'请不要重复生成拣货单!')
+                raise UserError('请不要重复生成拣货单!')
             if express_type and express_type != model_row.express_type:
-                raise UserError(u'发货方式不一样的发货单不能生成同一拣货单!')
+                raise UserError('发货方式不一样的发货单不能生成同一拣货单!')
             if wh_id and wh_id != model_row.warehouse_id.id:
-                raise UserError(u'不同仓库的发货单不能生成同一拣货单!')
+                raise UserError('不同仓库的发货单不能生成同一拣货单!')
         return res
 
     @api.multi
@@ -167,9 +166,9 @@ class CreateWave(models.TransientModel):
                              self.env['sell.delivery'].browse(context.get('active_ids'))]
         return '-'.join(all_delivery_name)
 
-    note = fields.Char(u'本次处理发货单', default=set_default_note, readonly=True)
+    note = fields.Char('本次处理发货单', default=set_default_note, readonly=True)
     active_model = fields.Char(
-        u'当前模型', default=lambda self: self.env.context.get('active_model'))
+        '当前模型', default=lambda self: self.env.context.get('active_model'))
 
     def build_wave_line_data(self, product_location_num_dict):
         """
@@ -177,7 +176,7 @@ class CreateWave(models.TransientModel):
         """
         return_line_data = []
         sequence = 1
-        for key, val in product_location_num_dict.iteritems():
+        for key, val in product_location_num_dict.items():
             goods_id, attribute_id = key
             delivery_lines, picking_qty = [], 0
             for line_id, goods_qty in val:
@@ -228,7 +227,7 @@ class CreateWave(models.TransientModel):
         wave_row = self.env['wave'].create({})
         for active_model in self.env[self.active_model].browse(context.get('active_ids')):
             if not active_model.express_type:
-                raise UserError(u'请先输入%s的承运商' % active_model.name)
+                raise UserError('请先输入%s的承运商' % active_model.name)
             available_line = []
             for line in active_model.line_out_ids:
                 if not warehouse_id:
@@ -254,9 +253,9 @@ class CreateWave(models.TransientModel):
                     # 查找所有勾选的 含有该产品的 发货单
                     deliverys_lists = self.get_sell_delivery(line.goods_id.id, line.attribute_id.id)
 
-                    raise UserError(u'您勾选的订单与未发货的拣货单商品数量总和大于库存，不能生成拣货单。\n'
-                                    u'产品 %s 库存不足。\n'
-                                    u'相关拣货单 %s' % (line.goods_id.name, deliverys_lists))
+                    raise UserError('您勾选的订单与未发货的拣货单商品数量总和大于库存，不能生成拣货单。\n'
+                                    '产品 %s 库存不足。\n'
+                                    '相关拣货单 %s' % (line.goods_id.name, deliverys_lists))
                 else:
                     available_line.append(True)
 
@@ -309,7 +308,7 @@ class CreateWave(models.TransientModel):
 
         return {'type': 'ir.actions.act_window',
                 'res_model': 'wave',
-                'name': u'拣货单',
+                'name': '拣货单',
                 'view_mode': 'form',
                 'views': [(False, 'tree')],
                 'res_id': wave_row.id,
@@ -319,7 +318,7 @@ class CreateWave(models.TransientModel):
 class DoPack(models.Model):
     _name = 'do.pack'
     _rec_name = 'odd_numbers'
-    odd_numbers = fields.Char(u'单号')
+    odd_numbers = fields.Char('单号')
     product_line_ids = fields.One2many('pack.line', 'pack_id', string='商品行')
     is_pack = fields.Boolean(
         compute='compute_is_pack_ok', string='打包完成', store=True)
@@ -328,7 +327,7 @@ class DoPack(models.Model):
     def unlink(self):
         for pack in self:
             if pack.is_pack:
-                raise UserError(u'已完成打包记录不能删除!')
+                raise UserError('已完成打包记录不能删除!')
         return super(DoPack, self).unlink()
 
     @api.one
@@ -401,9 +400,9 @@ class DoPack(models.Model):
                     move_row = self.env['wh.move'].search(
                         [('express_code', '=', code)])
                     if not move_row:
-                        raise UserError(u'面单号不存在！')
+                        raise UserError('面单号不存在！')
                     if move_row.state == 'done':
-                        raise UserError(u'发货单已经打包完成!')
+                        raise UserError('发货单已经打包完成!')
                     scan_code = move_row.name
                 self.scan_one_barcode(scan_code, pack_row)
                 if pack_row.is_pack:
@@ -413,11 +412,11 @@ class DoPack(models.Model):
     def scan_one_barcode(self, code, pack_row):
         """对于一个条码的处理"""
         if pack_row.is_pack:
-            raise UserError(u'已经打包完成!')
+            raise UserError('已经打包完成!')
         if not pack_row.odd_numbers:
             line_data = self.get_line_data(code)
             if not line_data:
-                raise UserError(u'请先扫描快递面单!')
+                raise UserError('请先扫描快递面单!')
             pack_row.odd_numbers = code
             pack_row.product_line_ids = line_data
         else:
@@ -425,7 +424,7 @@ class DoPack(models.Model):
             line_rows = self.env['pack.line'].search([('goods_id', '=', goods_row.id),
                                                       ('pack_id', '=', pack_row.id)])
             if not line_rows:
-                raise UserError(u'商品%s不在当前要打包的发货单%s上!' % (
+                raise UserError('商品%s不在当前要打包的发货单%s上!' % (
                     goods_row.name, pack_row.odd_numbers))
             goods_is_enough = True
             for line_row in line_rows:
@@ -437,7 +436,7 @@ class DoPack(models.Model):
                 break
 
             if goods_is_enough:
-                raise UserError(u'发货单%s要发货的商品%s已经充足,请核对后在进行操作!' % (
+                raise UserError('发货单%s要发货的商品%s已经充足,请核对后在进行操作!' % (
                     pack_row.odd_numbers, goods_row.name))
         return True
 
@@ -447,25 +446,25 @@ class PackLine(models.Model):
 
     pack_id = fields.Many2one('do.pack', string='打包')
     goods_id = fields.Many2one('goods', string='商品')
-    goods_qty = fields.Float(u'要发货数量')
-    pack_qty = fields.Float(u'打包数量')
+    goods_qty = fields.Float('要发货数量')
+    pack_qty = fields.Float('打包数量')
 
 
 class delivery_express_package_print(models.TransientModel):
     _name = "delivery.express.package.print"
-    _description = u'销售发货单打印'
+    _description = '销售发货单打印'
     _rec_name = 'note'
 
-    note = fields.Char(u'说明', readonly=True)
+    note = fields.Char('说明', readonly=True)
 
     @api.model
     def default_get(self, fields):
         '''  '''
         defaults = {}
         if self._context.get('express_info'):
-            defaults['note'] = u'打印销售发货单的快递面单'
+            defaults['note'] = '打印销售发货单的快递面单'
         if self._context.get('package_info'):
-            defaults['note'] = u'打印销售发货单的装箱单'
+            defaults['note'] = '打印销售发货单的装箱单'
         return defaults
 
     @api.multi
@@ -489,31 +488,31 @@ class delivery_express_package_print(models.TransientModel):
 
 class WaveReserved(models.Model):
     _name = 'wave.reserved'
-    _description = u'wave预留'
+    _description = 'wave预留'
 
     wave_id = fields.Many2one('wave',
                               ondelete='cascade',
-                              string=u'拣货单',
-                              help=u'每条记录对应的拣货单ID，在创建记录完成时填入。'
-                                   u'当删除wave时，级联删除预留记录。')
+                              string='拣货单',
+                              help='每条记录对应的拣货单ID，在创建记录完成时填入。'
+                                   '当删除wave时，级联删除预留记录。')
     goods_id = fields.Many2one('goods',
                                ondelete='restrict',
-                               string=u'商品',
-                               help=u'每条记录对应的商品ID，在创建记录时填入。')
+                               string='商品',
+                               help='每条记录对应的商品ID，在创建记录时填入。')
     attribute_id = fields.Many2one('attribute',
-                                   string=u'属性',
+                                   string='属性',
                                    ondelete='restrict',
                                    domain="[('goods_id', '=', goods_id)]",
-                                   help=u'商品的属性。')
+                                   help='商品的属性。')
     warehouse_id = fields.Many2one('warehouse',
-                                   string=u'仓库',
+                                   string='仓库',
                                    ondelete='restrict',
-                                   help=u'生成该记录的单据对应的仓库ID，在创建记录时填入。')
-    goods_qty = fields.Float(u'数量')
+                                   help='生成该记录的单据对应的仓库ID，在创建记录时填入。')
+    goods_qty = fields.Float('数量')
     move_id = fields.Many2one('wh.move',
-                              string=u'发货单',
+                              string='发货单',
                               ondelete='cascade',
-                              help=u'每条记录对应的move ID，在创建记录时填入。'
-                                   u'当删除move时，级联删除预留记录。')
-    move_name = fields.Char(u'发货单号',
-                            help=u'每条记录对应的发货单号，在创建记录时填入。方便在打包完成时清空记录。')
+                              help='每条记录对应的move ID，在创建记录时填入。'
+                                   '当删除move时，级联删除预留记录。')
+    move_name = fields.Char('发货单号',
+                            help='每条记录对应的发货单号，在创建记录时填入。方便在打包完成时清空记录。')

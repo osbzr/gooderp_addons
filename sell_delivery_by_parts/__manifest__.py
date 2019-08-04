@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "GoodERP Sell Delivery by Parts模块",
     'author': "开阖软件",

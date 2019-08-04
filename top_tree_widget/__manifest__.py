@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': '列表视图上的Widget',
     'version': '10.0.1.1.0',

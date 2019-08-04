@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import models, fields, api
@@ -7,30 +6,30 @@ import datetime
 
 class ReportStockTransceive(models.Model):
     _name = 'report.stock.transceive'
-    _description = u'商品收发明细表'
+    _description = '商品收发明细表'
     _inherit = 'report.base'
 
-    goods = fields.Many2one('goods',u'商品')
-    attribute = fields.Char(u'属性')
-    id_lists = fields.Text(u'库存调拨id列表')
-    uom = fields.Char(u'单位')
-    warehouse = fields.Char(u'仓库')
+    goods = fields.Many2one('goods','商品')
+    attribute = fields.Char('属性')
+    id_lists = fields.Text('库存调拨id列表')
+    uom = fields.Char('单位')
+    warehouse = fields.Char('仓库')
     goods_qty_begain = fields.Float(
-        u'期初数量', digits=dp.get_precision('Quantity'))
+        '期初数量', digits=dp.get_precision('Quantity'))
     cost_begain = fields.Float(
-        u'期初成本', digits=dp.get_precision('Amount'))
+        '期初成本', digits=dp.get_precision('Amount'))
     goods_qty_end = fields.Float(
-        u'期末数量', digits=dp.get_precision('Quantity'))
+        '期末数量', digits=dp.get_precision('Quantity'))
     cost_end = fields.Float(
-        u'期末成本', digits=dp.get_precision('Amount'))
+        '期末成本', digits=dp.get_precision('Amount'))
     goods_qty_out = fields.Float(
-        u'出库数量', digits=dp.get_precision('Quantity'))
+        '出库数量', digits=dp.get_precision('Quantity'))
     cost_out = fields.Float(
-        u'出库成本', digits=dp.get_precision('Amount'))
+        '出库成本', digits=dp.get_precision('Amount'))
     goods_qty_in = fields.Float(
-        u'入库数量', digits=dp.get_precision('Quantity'))
+        '入库数量', digits=dp.get_precision('Quantity'))
     cost_in = fields.Float(
-        u'入库成本', digits=dp.get_precision('Amount'))
+        '入库成本', digits=dp.get_precision('Amount'))
 
     def select_sql(self, sql_type='out'):
         return '''
@@ -96,7 +95,7 @@ class ReportStockTransceive(models.Model):
         ORDER BY goods.id, wh.name
         '''
 
-    def get_context(self, sql_type='out', context=None):
+    def get_context(self, sql_type='out'):
         date_end = datetime.datetime.strptime(
             context.get('date_end'), '%Y-%m-%d') + datetime.timedelta(days=1)
         date_end = date_end.strftime('%Y-%m-%d')
@@ -173,7 +172,7 @@ class ReportStockTransceive(models.Model):
             res, out_collection, sql_type='out')
 
         result = []
-        for key, value in res.iteritems():
+        for key, value in res.items():
             value.update(self.unzip_record_key(key))
             result.append(value)
 
@@ -198,7 +197,7 @@ class ReportStockTransceive(models.Model):
 
         view = self.env.ref('warehouse.wh_move_line_tree')
         return {
-            'name': u'库存调拨' + date_start + u'~' + date_end,
+            'name': '库存调拨' + date_start + '~' + date_end,
             'view_mode': 'tree',
             'views': [(view.id, 'tree')],
             'res_model': 'wh.move.line',

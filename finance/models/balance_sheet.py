@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 from math import fabs
@@ -14,26 +13,26 @@ class BalanceSheet(models.Model):
 
     _name = "balance.sheet"
     _order = "sequence,id"
-    _description = u'资产负债表模板'
+    _description = '资产负债表模板'
 
-    sequence = fields.Integer(u'序号')
-    line = fields.Integer(u'序号', required=True, help=u'资产负债表的行次')
-    balance = fields.Char(u'资产')
-    line_num = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
-    ending_balance = fields.Float(u'期末数')
+    sequence = fields.Integer('序号')
+    line = fields.Integer('序号', required=True, help='资产负债表的行次')
+    balance = fields.Char('资产')
+    line_num = fields.Char('行次', help='此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
+    ending_balance = fields.Float('期末数')
     balance_formula = fields.Text(
-        u'科目范围', help=u'设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
-    beginning_balance = fields.Float(u'年初数')
+        '科目范围', help='设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    beginning_balance = fields.Float('年初数')
 
-    balance_two = fields.Char(u'负债和所有者权益')
-    line_num_two = fields.Char(u'行次', help=u'此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
-    ending_balance_two = fields.Float(u'期末数')
+    balance_two = fields.Char('负债和所有者权益')
+    line_num_two = fields.Char('行次', help='此处行次并不是出报表的实际的行数,只是显示用的用来符合国人习惯')
+    ending_balance_two = fields.Float('期末数')
     balance_two_formula = fields.Text(
-        u'科目范围', help=u'设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
-    beginning_balance_two = fields.Float(u'年初数', help=u'报表行本年的年余额')
+        '科目范围', help='设定本行的资产负债表的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    beginning_balance_two = fields.Float('年初数', help='报表行本年的年余额')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -41,11 +40,11 @@ class BalanceSheet(models.Model):
 class CreateBalanceSheetWizard(models.TransientModel):
     """创建资产负债 和利润表的 wizard"""
     _name = "create.balance.sheet.wizard"
-    _description = u'资产负债表和利润表的向导'
+    _description = '资产负债表和利润表的向导'
 
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -71,8 +70,8 @@ class CreateBalanceSheetWizard(models.TransientModel):
         """
         return self.env['finance.period'].get_date_now_period_id()
 
-    period_id = fields.Many2one('finance.period', string=u'会计期间', domain=_default_period_domain,
-                                default=_default_period_id, help=u'用来设定报表的期间')
+    period_id = fields.Many2one('finance.period', string='会计期间', domain=_default_period_domain,
+                                default=_default_period_id, help='用来设定报表的期间')
 
     @api.multi
     def compute_balance(self, parameter_str, period_id, compute_field_list):
@@ -140,13 +139,13 @@ class CreateBalanceSheetWizard(models.TransientModel):
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
         #TODO 格子不对 
-        attachment_information = u'编制单位：' + company_row.name + u',,,,' + self.period_id.year \
-                                 + u'年' + self.period_id.month + u'月' + \
-                                 str(days) + u'日' + u',' + u'单位：元'
+        attachment_information = '编制单位：' + company_row.name + ',' + self.period_id.year \
+                                 + '年' + self.period_id.month + '月' + \
+                                 str(days) + '日' + ',' + '单位：元'
         domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
         return {  # 返回生成资产负债表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'资产负债表：' + self.period_id.name,
+            'name': '资产负债表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'balance.sheet',
@@ -191,12 +190,12 @@ class CreateBalanceSheetWizard(models.TransientModel):
         company_row = self.env['res.company'].browse(force_company)
         days = calendar.monthrange(
             int(self.period_id.year), int(self.period_id.month))[1]
-        attachment_information = u'编制单位：' + company_row.name + u',,' + self.period_id.year \
-                                 + u'年' + self.period_id.month + u'月' + u',' + u'单位：元'
+        attachment_information = '编制单位：' + company_row.name + ',' + self.period_id.year \
+                                 + '年' + self.period_id.month + '月' + ',' + '单位：元'
         domain = [('id', 'in', [balance_sheet_obj.id for balance_sheet_obj in balance_sheet_objs])]
         return {  # 返回生成利润表的数据的列表
             'type': 'ir.actions.act_window',
-            'name': u'利润表：' + self.period_id.name,
+            'name': '利润表：' + self.period_id.name,
             'view_type': 'form',
             'view_mode': 'tree',
             'res_model': 'profit.statement',
@@ -256,19 +255,19 @@ class ProfitStatement(models.Model):
     """
     _name = "profit.statement"
     _order = "sequence,id"
-    _description = u'利润表模板'
+    _description = '利润表模板'
 
-    sequence = fields.Integer(u'序号')
+    sequence = fields.Integer('序号')
 
-    balance = fields.Char(u'项目', help=u'报表的行次的总一个名称')
-    line_num = fields.Char(u'行次', help=u'生成报表的行次')
-    cumulative_occurrence_balance = fields.Float(u'本年累计金额', help=u'本年利润金额')
+    balance = fields.Char('项目', help='报表的行次的总一个名称')
+    line_num = fields.Char('行次', help='生成报表的行次')
+    cumulative_occurrence_balance = fields.Float('本年累计金额', help='本年利润金额')
     occurrence_balance_formula = fields.Text(
-        u'科目范围', help=u'设定本行的利润的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
-    current_occurrence_balance = fields.Float(u'本月金额', help=u'本月的利润的金额')
+        '科目范围', help='设定本行的利润的科目范围，例如1001~1012999999 结束科目尽可能大一些方便以后扩展')
+    current_occurrence_balance = fields.Float('本月金额', help='本月的利润的金额')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 

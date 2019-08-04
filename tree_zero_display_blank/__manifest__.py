@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -20,20 +19,21 @@
 ##############################################################################
 
 {
-    'name': "会计中数字用中文表示",
+    'name': "零显示为空(tree页面)",
     'version': '11.11',
     'summary': """
             
     """,
     'category': 'osbzr',
     'author': "开阖静静<gilbert@osbzr.com>(开阖出品)",
-    "depends": ['web', 'core'],
+    "depends": ['web'],
     'description':
     '''
-                    该模块主要实现了一个widget 使得阿拉伯数字在页面上显示为中文。
+                    该模块实现了在tree上面显示为零的转换为显示为空(该模块为全局设置,安装后就自动启用功能,无需加参数控制!)
+                    注意:此模块功能 有可能 和其他tree 上 float 字段 上的 widegt显示 冲突!
     ''',
     'data': [
-        'views/num_to_china.xml',
+        'view/tree_zero_display_blank.xml',
     ],
     'installable': True,
 }

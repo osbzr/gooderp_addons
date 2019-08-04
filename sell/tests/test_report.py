@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -485,7 +484,7 @@ class TestReceiptWizard(TransactionCase):
         '''新建核销单，应收冲预收，客户为所选行客户'''
         self.receipt_wizard.button_ok()
         for line in self.env['sell.receipt'].search([
-            ('order_name', '=', u'未核销预收款'), ('receipt', '!=', 0)]):
+            ('order_name', '=', '未核销预收款'), ('receipt', '!=', 0)]):
             line.generate_reconcile_order()
             # 查看生成的核销单
             line.generate_reconcile_order()

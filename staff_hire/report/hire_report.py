@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, tools
 from odoo.addons.staff_hire.models import staff_hire
@@ -6,7 +5,7 @@ from odoo.addons.staff_hire.models import staff_hire
 
 class staff_hire_report(models.Model):
     _name = "staff.hire.report"
-    _description = u"招聘分析"
+    _description = "招聘分析"
     _auto = False
     _rec_name = 'date_create'
     _order = 'date_create desc'

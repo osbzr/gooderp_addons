@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import tax_config
+from . import tax_config

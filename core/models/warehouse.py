@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -6,26 +5,26 @@ from odoo.exceptions import UserError
 
 class Warehouse(models.Model):
     _name = 'warehouse'
-    _description = u'仓库'
+    _description = '仓库'
 
     # 用户只能创建stock类型的仓库
     WAREHOUSE_TYPE = [
-        ('stock', u'库存'),
-        ('supplier', u'供应商'),
-        ('customer', u'客户'),
-        ('inventory', u'盘点'),
-        ('production', u'生产'),
-        ('others', u'其他'),
+        ('stock', '库存'),
+        ('supplier', '供应商'),
+        ('customer', '客户'),
+        ('inventory', '盘点'),
+        ('production', '生产'),
+        ('others', '其他'),
     ]
 
-    name = fields.Char(u'名称', required=True)
-    code = fields.Char(u'编号')
-    type = fields.Selection(WAREHOUSE_TYPE, u'类型', default='stock')
-    active = fields.Boolean(u'启用', default=True)
-    user_ids = fields.Many2many('res.users', string=u'库管')
+    name = fields.Char('名称', required=True)
+    code = fields.Char('编号')
+    type = fields.Selection(WAREHOUSE_TYPE, '类型', default='stock')
+    active = fields.Boolean('启用', default=True)
+    user_ids = fields.Many2many('res.users', string='库管')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -60,13 +59,13 @@ class Warehouse(models.Model):
         ''' 让warehouse支持使用code来搜索'''
         args = args or []
         # 将name当成code搜
-        if name and not filter(lambda _type: _type[0] == 'code', args):
+        if name and not [_type for _type in args if _type[0] == 'code']:
             warehouses = self.search(
                 [('type', '=', 'stock'), ('code', 'ilike', name)])
             if warehouses:
                 return warehouses.name_get()
         # 下拉列表只显示stock类型的仓库
-        if not filter(lambda _type: _type[0] == 'type', args):
+        if not [_type for _type in args if _type[0] == 'type']:
             args = [['type', '=', 'stock']] + args
 
         return super(Warehouse, self).name_search(name=name, args=args,
@@ -77,15 +76,15 @@ class Warehouse(models.Model):
         '''将仓库显示为 [编号]名字 的形式'''
         res = []
         for Warehouse in self:
-            res.append((Warehouse.id, u'[%s]%s' %
+            res.append((Warehouse.id, '[%s]%s' %
                         (Warehouse.code, Warehouse.name)))
 
         return res
 
     def get_warehouse_by_type(self, _type):
         '''返回指定类型的第一个仓库'''
-        if not _type or _type not in map(lambda _type: _type[0], self.WAREHOUSE_TYPE):
-            raise UserError(u'仓库类型" % s"不在预先定义的type之中，请联系管理员' % _type)
+        if not _type or _type not in [_type[0] for _type in self.WAREHOUSE_TYPE]:
+            raise UserError('仓库类型" % s"不在预先定义的type之中，请联系管理员' % _type)
 
         domain = [('type', '=', _type)]
         # 仓库管理员带出有权限的仓库作为默认值
@@ -95,6 +94,6 @@ class Warehouse(models.Model):
 
         warehouses = self.search(domain, limit=1, order='id asc')
         if not warehouses:
-            raise UserError(u'不存在类型为%s的仓库，请检查基础数据是否全部导入' % _type)
+            raise UserError('不存在类型为%s的仓库，请检查基础数据是否全部导入' % _type)
 
         return warehouses[0]

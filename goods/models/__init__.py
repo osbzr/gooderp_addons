@@ -1,3 +1,2 @@
-# -*- coding: utf-8 -*-
-import goods
-import goods_class
+from . import goods
+from . import goods_class

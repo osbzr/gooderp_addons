@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import test_ir_sequence
+from . import test_ir_sequence

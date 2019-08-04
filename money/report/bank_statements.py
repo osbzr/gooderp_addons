@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
@@ -6,7 +5,7 @@ from odoo import fields, models, api, tools
 
 class BankStatementsReport(models.Model):
     _name = "bank.statements.report"
-    _description = u"现金银行报表"
+    _description = "现金银行报表"
     _auto = False
     _order = 'date'
 
@@ -19,18 +18,18 @@ class BankStatementsReport(models.Model):
         for pre in pre_record:
             self.balance += pre.get - pre.pay
 
-    bank_id = fields.Many2one('bank.account', string=u'账户名称', readonly=True)
-    date = fields.Date(string=u'日期', readonly=True)
-    name = fields.Char(string=u'单据编号', readonly=True)
-    get = fields.Float(string=u'收入', readonly=True,
+    bank_id = fields.Many2one('bank.account', string='账户名称', readonly=True)
+    date = fields.Date(string='日期', readonly=True)
+    name = fields.Char(string='单据编号', readonly=True)
+    get = fields.Float(string='收入', readonly=True,
                        digits=dp.get_precision('Amount'))
-    pay = fields.Float(string=u'支出', readonly=True,
+    pay = fields.Float(string='支出', readonly=True,
                        digits=dp.get_precision('Amount'))
-    balance = fields.Float(string=u'账户余额',
+    balance = fields.Float(string='账户余额',
                            compute='_compute_balance', readonly=True,
                            digits=dp.get_precision('Amount'))
-    partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
-    note = fields.Char(string=u'备注', readonly=True)
+    partner_id = fields.Many2one('partner', string='往来单位', readonly=True)
+    note = fields.Char(string='备注', readonly=True)
 
     def init(self):
         # union money_order, other_money_order, money_transfer_order
@@ -111,13 +110,13 @@ class BankStatementsReport(models.Model):
         # 查看原始单据，三种情况：收付款单、其他收支单、资金转换单
         self.ensure_one()
         model_view = {
-            'money.order': {'name': u'收付款单',
+            'money.order': {'name': '收付款单',
                             'view': 'money.money_order_form'},
-            'other.money.order': {'name': u'其他收支单',
+            'other.money.order': {'name': '其他收支单',
                                   'view': 'money.other_money_order_form'},
-            'money.transfer.order': {'name': u'资金转换单',
+            'money.transfer.order': {'name': '资金转换单',
                                      'view': 'money.money_transfer_order_form'}}
-        for model, view_dict in model_view.iteritems():
+        for model, view_dict in model_view.items():
             res = self.env[model].search([('name', '=', self.name)])
             name = view_dict['name']
             view = self.env.ref(view_dict['view'])

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #     This file is part of web_readonly_bypass,
@@ -23,21 +22,18 @@
 #
 ##############################################################################
 {
-    'name': 'Web Float Limit',
+    'name': 'Web Error Dialog',
     'version': '11.11',
     "author": "zhengXiang",
     "website": "http://www.osbzr.com",
     'category': 'Technical Settings',
-    'depends': [
-        'web',
-    ],
+    'depends': ['web'],
     'data': [
         'views/assets_backend.xml',
     ],
     'description':
     """
-        使用一个float字段的值限制另外一个float字段的最大值
-        <field name='qty' widget='float_limit' options="{'field': 'others_qty'}" />
+        给前端报错添加一个自定义的按钮
     """,
     'installable': True,
     'auto_install': False,

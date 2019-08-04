@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -20,19 +19,20 @@
 ##############################################################################
 
 {
-    'name': "tree 页面固定表头模块",
+    'name': "会计中数字用中文表示",
     'version': '11.11',
     'summary': """
             
     """,
     'category': 'osbzr',
-    'author': "开阖静静<gilbert@osbzr.com>(开阖出品), MAXodoo<9842766@qq.com>",
-    "depends": ['web'],
+    'author': "开阖静静<gilbert@osbzr.com>(开阖出品)",
+    "depends": ['web', 'core'],
     'description':
-    '''对于分组Grouping显示模式，展开关闭分组行时，重新锁定表头的代码还需要完善。
+    '''
+                    该模块主要实现了一个widget 使得阿拉伯数字在页面上显示为中文。
     ''',
     'data': [
-        'views/fixed_header.xml',
+        'views/num_to_china.xml',
     ],
     'installable': True,
 }

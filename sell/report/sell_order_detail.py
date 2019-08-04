@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
@@ -6,28 +5,28 @@ from odoo import fields, models, api, tools
 
 class SellOrderDetail(models.Model):
     _name = 'sell.order.detail'
-    _description = u'销售明细表'
+    _description = '销售明细表'
     _auto = False
 
-    date = fields.Date(u'销售日期')
-    order_name = fields.Char(u'销售单据号')
-    type = fields.Char(u'业务类型')
-    user_id = fields.Many2one('res.users', u'销售员')
-    partner_id = fields.Many2one('partner', u'客户')
-    goods_code = fields.Char(u'商品编码')
-    goods_id = fields.Many2one('goods', u'商品名称')
-    attribute = fields.Char(u'属性')
-    warehouse_id = fields.Many2one('warehouse', u'仓库')
-    qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
-    uom = fields.Char(u'单位')
-    price = fields.Float(u'单价', digits=dp.get_precision('Price'))
-    amount = fields.Float(u'销售收入', digits=dp.get_precision('Amount'))
-    tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
-    subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
-    margin = fields.Float(u'毛利', digits=dp.get_precision('Amount'))
-    money_state = fields.Char(u'收款状态')
-    note = fields.Char(u'备注')
-    last_receipt_date = fields.Date(string=u'最后收款日期')
+    date = fields.Date('销售日期')
+    order_name = fields.Char('销售单据号')
+    type = fields.Char('业务类型')
+    user_id = fields.Many2one('res.users', '销售员')
+    partner_id = fields.Many2one('partner', '客户')
+    goods_code = fields.Char('商品编码')
+    goods_id = fields.Many2one('goods', '商品名称')
+    attribute = fields.Char('属性')
+    warehouse_id = fields.Many2one('warehouse', '仓库')
+    qty = fields.Float('数量', digits=dp.get_precision('Quantity'))
+    uom = fields.Char('单位')
+    price = fields.Float('单价', digits=dp.get_precision('Price'))
+    amount = fields.Float('销售收入', digits=dp.get_precision('Amount'))
+    tax_amount = fields.Float('税额', digits=dp.get_precision('Amount'))
+    subtotal = fields.Float('价税合计', digits=dp.get_precision('Amount'))
+    margin = fields.Float('毛利', digits=dp.get_precision('Amount'))
+    money_state = fields.Char('收款状态')
+    note = fields.Char('备注')
+    last_receipt_date = fields.Date(string='最后收款日期')
 
     def init(self):
         cr = self._cr
@@ -97,7 +96,7 @@ class SellOrderDetail(models.Model):
                 view = self.env.ref('sell.sell_return_form')
 
             return {
-                'name': u'销售发货单',
+                'name': '销售发货单',
                 'view_type': 'form',
                 'view_mode': 'form',
                 'view_id': False,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import functools
 
 
@@ -37,7 +36,7 @@ def inherits_after(res_back=True):
         def func(self, *args, **kwargs):
 
             res_before = execute_inherits_func(
-                self, method.func_name, args, kwargs)
+                self, method.__name__, args, kwargs)
             res_after = method(self, *args, **kwargs)
 
             if res_back:
@@ -57,7 +56,7 @@ def inherits(res_back=True):
             res_after = method(self, *args, **kwargs)
             if not res_back or (not isinstance(res_after, dict) or (isinstance(res_after, dict) and not(res_after.get('res_model') and res_after.get('view_type')))):
                 res_before = execute_inherits_func(
-                    self, method.func_name, args, kwargs)
+                    self, method.__name__, args, kwargs)
 
             if res_back:
                 return res_after
@@ -70,11 +69,11 @@ def inherits(res_back=True):
 
 def execute_inherits_func(self, method_name, args, kwargs):
     if self._inherits and len(self._inherits) != 1:
-        raise ValueError(u'错误，当前对象不存在多重继承，或者存在多个多重继承')
+        raise ValueError('错误，当前对象不存在多重继承，或者存在多个多重继承')
 
-    model, field = self._inherits.items()[0]
+    model, field = list(self._inherits.items())[0]
     values = self.read([field])
-    field_ids = map(lambda value: value[field][0], values)
+    field_ids = [value[field][0] for value in values]
 
     models = self.env[model].browse(field_ids)
     return getattr(models, method_name)(*args, **kwargs)

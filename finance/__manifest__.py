@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "GOODERP 会计模块",
     'author': "开阖软件(开阖Jason 开阖静静gilbert@osbzr.com and 社区的贡献)",

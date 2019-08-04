@@ -1,37 +1,36 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
 
 MONEY_TYPE = [
-    ('pay', u'采购'),
-    ('get', u'销售'),
-    ('other_pay', u'其他支出'),
-    ('other_get', u'其他收入'),
+    ('pay', '采购'),
+    ('get', '销售'),
+    ('other_pay', '其他支出'),
+    ('other_get', '其他收入'),
 ]
 
 
 class MoneyGetPayReport(models.Model):
     _name = "money.get.pay.report"
-    _description = u"资金收支报表"
+    _description = "资金收支报表"
     _auto = False
     _order = 'date'
 
-    date = fields.Date(string=u'日期')
-    name = fields.Char(string=u'单据编号')
+    date = fields.Date(string='日期')
+    name = fields.Char(string='单据编号')
     type = fields.Selection(MONEY_TYPE,
-                            string=u'类别',
-                            help=u'按类型筛选')
+                            string='类别',
+                            help='按类型筛选')
     partner_id = fields.Many2one('partner',
-                                 string=u'往来单位')
+                                 string='往来单位')
     category_id = fields.Many2one('core.category',
-                                  u'收支类别',
-                                  help=u'类型：运费、咨询费等')
-    get = fields.Float(string=u'收入',
+                                  '收支类别',
+                                  help='类型：运费、咨询费等')
+    get = fields.Float(string='收入',
                        digits=dp.get_precision('Amount'))
-    pay = fields.Float(string=u'支出',
+    pay = fields.Float(string='支出',
                        digits=dp.get_precision('Amount'))
-    amount = fields.Float(string=u'金额',
+    amount = fields.Float(string='金额',
                           digits=dp.get_precision('Amount'))
 
     def init(self):

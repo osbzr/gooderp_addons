@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 import time
@@ -42,13 +41,13 @@ class TestGoods(TransactionCase):
         cable_results = self.goods_cable.get_stock_qty()
 
         real_keyboard_mouse_results = {
-            'warehouse': u'总仓',
+            'warehouse': '总仓',
             'cost': self.others_in_keyboard_mouse.cost + self.others_in_2_keyboard_mouse.cost,
             'qty': self.others_in_keyboard_mouse.goods_qty + self.others_in_2_keyboard_mouse.goods_qty,
         }
 
         real_cable_results = {
-            'warehouse': u'总仓',
+            'warehouse': '总仓',
             'qty': self.others_in_cable.goods_qty,
             'cost': self.others_in_cable.cost,
         }

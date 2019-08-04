@@ -1,2 +1,1 @@
-# -*- coding: utf-8 -*-
-import sell_quotation
+from . import sell_quotation

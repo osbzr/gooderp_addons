@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # #############################################################################
 
 # #############################################################################
@@ -12,40 +11,40 @@ _logger = logging.getLogger(__name__)
 class FinanceConfigWizard(models.TransientModel):
     _name = 'finance.config.settings'
     _inherit = 'res.config.settings'
-    _description = u'会计默认设置'
+    _description = '会计默认设置'
 
     # 凭证
     # 凭证日期
-    default_voucher_date = fields.Selection([('today', u'当前日期'), ('last', u'上一凭证日期')],
-                                            string=u'新凭证的默认日期', default='today', help=u'选择新凭证的默认日期')
+    default_voucher_date = fields.Selection([('today', '当前日期'), ('last', '上一凭证日期')],
+                                            string='新凭证的默认日期', default='today', help='选择新凭证的默认日期')
     # 凭证号重置设置  此部分参与了步科的设计
-    default_auto_reset = fields.Boolean(u'是否重置凭证号', )
-    default_reset_period = fields.Selection([('year', u'每年'), ('month', u'每月')], u'重置间隔', required=True,
+    default_auto_reset = fields.Boolean('是否重置凭证号', )
+    default_reset_period = fields.Selection([('year', '每年'), ('month', '每月')], '重置间隔', required=True,
                                             default='month')
     default_reset_init_number = fields.Integer(
-        u'重置后起始数字', required=True, default=1, help=u"重置后，起始编号的数字，例从1起：1，2，3....")
+        '重置后起始数字', required=True, default=1, help="重置后，起始编号的数字，例从1起：1，2，3....")
 
     # 资产负债表 利润表
     # 是否能查看未结账期间
-    default_period_domain = fields.Selection([('can', u'能'), ('cannot', u'不能')],
-                                             string=u'是否能查看未结账期间', default='can', help=u'是否能查看未结账期间')
+    default_period_domain = fields.Selection([('can', '能'), ('cannot', '不能')],
+                                             string='是否能查看未结账期间', default='can', help='是否能查看未结账期间')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
     # 科目编码规则
     default_account_hierarchy_level = fields.Selection(
-        string=u'科目层级级别',
+        string='科目层级级别',
         selection=[('1', '1'), ('2', '2'),('3', '3'),('4', '4'),('5', '5')], default='5', required=True
     )
     default_top_length = fields.Selection(
-        string=u'一级科目编码长度',
+        string='一级科目编码长度',
         selection=[('4', '4')],default='4'
     )
     default_child_step = fields.Selection(
-        string=u'下级科目编码递增长度',
+        string='下级科目编码递增长度',
         selection=[('2', '2')],default='2'
     )
 

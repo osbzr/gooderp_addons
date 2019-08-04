@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
@@ -502,15 +501,15 @@ class TestOtherMoneyOrder(TransactionCase):
         """更改业务伙伴，自动填入收款人、开户行和银行帐号"""
         order = self.env.ref('money.other_pay_1000')
         partner = self.env.ref('core.lenovo')
-        partner.bank_name = u'建设银行'
-        partner.bank_num = u'6000000222222'
+        partner.bank_name = '建设银行'
+        partner.bank_num = '6000000222222'
 
         # 当选择了供应商联想时
         order.partner_id = partner
         order.onchange_partner_id()
-        self.assertEqual(order.receiver, u'联想')
-        self.assertEqual(order.bank_name, u'建设银行')
-        self.assertEqual(order.bank_num, u'6000000222222')
+        self.assertEqual(order.receiver, '联想')
+        self.assertEqual(order.bank_name, '建设银行')
+        self.assertEqual(order.bank_num, '6000000222222')
 
 
 class TestOtherMoneyOrderLine(TransactionCase):

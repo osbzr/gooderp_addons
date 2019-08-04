@@ -1,3 +1,2 @@
-# -*- coding: utf-8 -*-
-import staff_wages
-import input_wages
+from . import staff_wages
+from . import input_wages

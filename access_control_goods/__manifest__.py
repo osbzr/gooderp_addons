@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "GoodERP Access Control Goods 模块",
     'author': "开阖软件",

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -69,7 +68,7 @@ class TestInventory(TransactionCase):
             goods_stock = line.goods_id.get_stock_qty()[0]
             self.assertEqual(goods_stock.get('warehouse'),
                              line.warehouse_id.name)
-            if line.goods_id.name == u'网线':  # 网线在途移库 120个，盘点时应减去
+            if line.goods_id.name == '网线':  # 网线在途移库 120个，盘点时应减去
                 self.assertEqual(goods_stock.get('qty') - 120, line.real_qty)
             else:
                 self.assertEqual(goods_stock.get('qty'), line.real_qty)
@@ -84,7 +83,7 @@ class TestInventory(TransactionCase):
         self.inventory.goods = [4, self.goods_mouse.id]  # u'鼠标'
         self.inventory.query_inventory()
         for line in self.inventory.line_ids:
-            self.assertEqual(line.goods_id.name, u'鼠标')
+            self.assertEqual(line.goods_id.name, '鼠标')
 
         self.inventory.unlink()
         self.assertTrue(not self.inventory.exists())
@@ -96,15 +95,15 @@ class TestInventory(TransactionCase):
             line.goods_qty = 48
         inventory = self.env['wh.inventory'].create({
             'warehouse_id': self.browse_ref('warehouse.hd_stock').id,
-            'goods': u'网线',
+            'goods': '网线',
         })
         inventory.query_inventory()
 
     def test_generate_inventory(self):
         for line in self.inventory.line_ids:
-            if line.goods_id.name == u'键鼠套装':
+            if line.goods_id.name == '键鼠套装':
                 keyboard_mouse = line
-            elif line.goods_id.name == u'鼠标':
+            elif line.goods_id.name == '鼠标':
                 mouse = line
             else:
                 cable = line
@@ -127,8 +126,8 @@ class TestInventory(TransactionCase):
 
         # 对于强制为1的商品，只能添加或减少一个商品
         warning = {'warning': {
-            'title': u'警告',
-            'message': u'商品上设置了序号为1，此时一次只能盘亏或盘盈一个商品数量',
+            'title': '警告',
+            'message': '商品上设置了序号为1，此时一次只能盘亏或盘盈一个商品数量',
         }}
         mouse.inventory_qty = mouse.real_qty + 2
         self.assertEqual(mouse.onchange_qty(), warning)
@@ -204,7 +203,7 @@ class TestInventory(TransactionCase):
         mouse_line = self.browse_ref('warehouse.wh_move_line_12')
         mouse_line.action_done()
         for line in self.inventory.line_ids:
-            if line.goods_id.name == u'鼠标':
+            if line.goods_id.name == '鼠标':
                 mouse = line
 
         # 实际数量小与系统库存一个的时候，差异数量为-1
@@ -221,7 +220,7 @@ class TestInventory(TransactionCase):
     def test_get_difference_uos_qty(self):
         ''' Test: _get_difference_uos_qty '''
         for line in self.inventory.line_ids:
-            if line.goods_id.name == u'鼠标':
+            if line.goods_id.name == '鼠标':
                 mouse = line
 
         # 实际辅助数量少1个
@@ -232,7 +231,7 @@ class TestInventory(TransactionCase):
     def test_check_difference_identical(self):
         ''' Test: check_difference_identical '''
         for line in self.inventory.line_ids:
-            if line.goods_id.name == u'鼠标':
+            if line.goods_id.name == '鼠标':
                 mouse = line
 
         # 实际辅助数量少1个
@@ -265,7 +264,7 @@ class TestInventory(TransactionCase):
     def test_inventory_line_get_difference_qty(self):
         '''_get_difference_qty：difference_qty=0,difference_uos_qty!=0'''
         for line in self.inventory.line_ids:
-            if line.goods_id.name == u'鼠标':
+            if line.goods_id.name == '鼠标':
                 mouse = line
 
             # 实际辅助数量少1个 实际数量为1

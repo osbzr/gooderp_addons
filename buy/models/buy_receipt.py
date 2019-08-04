@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import fields, models, api
 import odoo.addons.decimal_precision as dp
@@ -17,7 +16,7 @@ class BuyReceipt(models.Model):
     _name = "buy.receipt"
     _inherits = {'wh.move': 'buy_move_id'}
     _inherit = ['mail.thread']
-    _description = u"采购入库单"
+    _description = "采购入库单"
     _order = 'date desc, id desc'
 
     @api.one
@@ -40,82 +39,82 @@ class BuyReceipt(models.Model):
         '''返回付款状态'''
         if not self.is_return:
             if self.invoice_id.reconciled == 0:
-                self.money_state = u'未付款'
+                self.money_state = '未付款'
             elif self.invoice_id.reconciled < self.invoice_id.amount:
-                self.money_state = u'部分付款'
+                self.money_state = '部分付款'
             elif self.invoice_id.reconciled == self.invoice_id.amount:
-                self.money_state = u'全部付款'
+                self.money_state = '全部付款'
 
         # 返回退款状态
         if self.is_return:
             if self.invoice_id.reconciled == 0:
-                self.return_state = u'未退款'
+                self.return_state = '未退款'
             elif abs(self.invoice_id.reconciled) < abs(self.invoice_id.amount):
-                self.return_state = u'部分退款'
+                self.return_state = '部分退款'
             elif self.invoice_id.reconciled == self.invoice_id.amount:
-                self.return_state = u'全部退款'
+                self.return_state = '全部退款'
 
-    buy_move_id = fields.Many2one('wh.move', u'入库单',
+    buy_move_id = fields.Many2one('wh.move', '入库单',
                                   required=True, ondelete='cascade',
-                                  help=u'入库单号')
-    is_return = fields.Boolean(u'是否退货',
+                                  help='入库单号')
+    is_return = fields.Boolean('是否退货',
                                default=lambda self: self.env.context.get(
                                    'is_return'),
-                               help=u'是否为退货类型')
-    order_id = fields.Many2one('buy.order', u'订单号',
+                               help='是否为退货类型')
+    order_id = fields.Many2one('buy.order', '订单号',
                                copy=False, ondelete='cascade',
-                               help=u'产生入库单/退货单的购货订单')
-    invoice_id = fields.Many2one('money.invoice', u'发票号', copy=False,
+                               help='产生入库单/退货单的购货订单')
+    invoice_id = fields.Many2one('money.invoice', '发票号', copy=False,
                                  ondelete='set null',
-                                 help=u'产生的发票号')
-    date_due = fields.Date(u'到期日期', copy=False,
+                                 help='产生的发票号')
+    date_due = fields.Date('到期日期', copy=False,
                            default=lambda self: fields.Date.context_today(
                                self),
-                           help=u'付款截止日期')
-    discount_rate = fields.Float(u'优惠率(%)', states=READONLY_STATES,
-                                 help=u'整单优惠率')
-    discount_amount = fields.Float(u'优惠金额', states=READONLY_STATES,
+                           help='付款截止日期')
+    discount_rate = fields.Float('优惠率(%)', states=READONLY_STATES,
+                                 help='整单优惠率')
+    discount_amount = fields.Float('优惠金额', states=READONLY_STATES,
                                    digits=dp.get_precision('Amount'),
-                                   help=u'整单优惠金额，可由优惠率自动计算得出，也可手动输入')
-    invoice_by_receipt = fields.Boolean(string=u"按收货结算", default=True,
-                                        help=u'如未勾选此项，可在资金行里输入付款金额，订单保存后，采购人员可以单击资金行上的【确认】按钮。')
-    amount = fields.Float(u'成交金额', compute=_compute_all_amount,
+                                   help='整单优惠金额，可由优惠率自动计算得出，也可手动输入')
+    invoice_by_receipt = fields.Boolean(string="按收货结算", default=True,
+                                        help='如未勾选此项，可在资金行里输入付款金额，订单保存后，采购人员可以单击资金行上的【确认】按钮。')
+    amount = fields.Float('成交金额', compute=_compute_all_amount,
                           store=True, readonly=True,
                           digits=dp.get_precision('Amount'),
-                          help=u'总金额减去优惠金额')
-    payment = fields.Float(u'本次付款', states=READONLY_STATES,
+                          help='总金额减去优惠金额')
+    payment = fields.Float('本次付款', states=READONLY_STATES,
                            digits=dp.get_precision('Amount'),
-                           help=u'本次付款金额')
-    bank_account_id = fields.Many2one('bank.account', u'结算账户',
+                           help='本次付款金额')
+    bank_account_id = fields.Many2one('bank.account', '结算账户',
                                       ondelete='restrict',
-                                      help=u'用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
-    cost_line_ids = fields.One2many('cost.line', 'buy_id', u'采购费用', copy=False,
-                                    help=u'采购费用明细行')
-    money_state = fields.Char(u'付款状态', compute=_get_buy_money_state,
-                              store=True, default=u'未付款',
-                              help=u"采购入库单的付款状态",
+                                      help='用来核算和监督企业与其他单位或个人之间的债权债务的结算情况')
+    cost_line_ids = fields.One2many('cost.line', 'buy_id', '采购费用', copy=False,
+                                    help='采购费用明细行')
+    money_state = fields.Char('付款状态', compute=_get_buy_money_state,
+                              store=True, default='未付款',
+                              help="采购入库单的付款状态",
                               index=True, copy=False)
-    return_state = fields.Char(u'退款状态', compute=_get_buy_money_state,
-                               store=True, default=u'未退款',
-                               help=u"采购退货单的退款状态",
+    return_state = fields.Char('退款状态', compute=_get_buy_money_state,
+                               store=True, default='未退款',
+                               help="采购退货单的退款状态",
                                index=True, copy=False)
-    modifying = fields.Boolean(u'差错修改中', default=False, copy=False,
-                               help=u'是否处于差错修改中')
-    voucher_id = fields.Many2one('voucher', u'入库凭证', readonly=True,
+    modifying = fields.Boolean('差错修改中', default=False, copy=False,
+                               help='是否处于差错修改中')
+    voucher_id = fields.Many2one('voucher', '入库凭证', readonly=True,
                                  copy=False,
-                                 help=u'入库时产生的入库凭证')
-    origin_id = fields.Many2one('buy.receipt', u'来源单据', copy=False)
+                                 help='入库时产生的入库凭证')
+    origin_id = fields.Many2one('buy.receipt', '来源单据', copy=False)
     currency_id = fields.Many2one('res.currency',
-                                  u'外币币别',
+                                  '外币币别',
                                   readonly=True,
-                                  help=u'外币币别')
-    delivery_fee = fields.Float(u'运费')
+                                  help='外币币别')
+    delivery_fee = fields.Float('运费')
     money_order_id = fields.Many2one(
         'money.order',
-        u'付款单',
+        '付款单',
         readonly=True,
         copy=False,
-        help=u'输入本次付款确认时产生的付款单')
+        help='输入本次付款确认时产生的付款单')
 
     def _compute_total(self, line_ids):
         return sum(line.subtotal for line in line_ids)
@@ -162,12 +161,12 @@ class BuyReceipt(models.Model):
     @api.one
     def _wrong_receipt_done(self):
         if self.state == 'done':
-            raise UserError(u'请不要重复入库')
+            raise UserError('请不要重复入库')
         batch_one_list_wh = []
         batch_one_list = []
         for line in self.line_in_ids:
             if line.amount < 0:
-                raise UserError(u'购货金额不能小于 0！请修改。')
+                raise UserError('购货金额不能小于 0！请修改。')
             if line.goods_id.force_batch_one:
                 wh_move_lines = self.env['wh.move.line'].search(
                     [('state', '=', 'done'), ('type', '=', 'in'), ('goods_id', '=', line.goods_id.id)])
@@ -177,35 +176,35 @@ class BuyReceipt(models.Model):
                             (move_line.goods_id.id, move_line.lot))
 
             if (line.goods_id.id, line.lot) in batch_one_list_wh:
-                raise UserError(u'仓库已存在相同序列号的商品！\n商品:%s 序列号:%s' %
+                raise UserError('仓库已存在相同序列号的商品！\n商品:%s 序列号:%s' %
                                 (line.goods_id.name, line.lot))
 
         for line in self.line_in_ids:
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError('商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
             if line.goods_id.force_batch_one:
                 batch_one_list.append((line.goods_id.id, line.lot))
 
         if len(batch_one_list) > len(set(batch_one_list)):
-            raise UserError(u'不能创建相同序列号的商品！\n 序列号列表为%s' %
+            raise UserError('不能创建相同序列号的商品！\n 序列号列表为%s' %
                             [lot[1] for lot in batch_one_list])
 
         for line in self.line_out_ids:
             if line.amount < 0:
-                raise UserError(u'退货金额不能小于 0！请修改。')
+                raise UserError('退货金额不能小于 0！请修改。')
             if line.goods_qty <= 0 or line.price_taxed < 0:
-                raise UserError(u'商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
+                raise UserError('商品 %s 的数量和含税单价不能小于0！' % line.goods_id.name)
 
         if not self.bank_account_id and self.payment:
-            raise UserError(u'付款额不为空时，请选择结算账户！')
+            raise UserError('付款额不为空时，请选择结算账户！')
         decimal_amount = self.env.ref('core.decimal_amount')
         if float_compare(self.payment, self.amount, precision_digits=decimal_amount.digits) == 1:
-            raise UserError(u'本次付款金额不能大于折后金额！\n付款金额:%s 折后金额:%s' %
+            raise UserError('本次付款金额不能大于折后金额！\n付款金额:%s 折后金额:%s' %
                             (self.payment, self.amount))
         if float_compare(sum(cost_line.amount for cost_line in self.cost_line_ids),
                          sum(line.share_cost for line in self.line_in_ids),
                          precision_digits=decimal_amount.digits) != 0:
-            raise UserError(u'采购费用还未分摊或分摊不正确！\n采购费用:%s 分摊总费用:%s' %
+            raise UserError('采购费用还未分摊或分摊不正确！\n采购费用:%s 分摊总费用:%s' %
                             (sum(cost_line.amount for cost_line in self.cost_line_ids),
                              sum(line.share_cost for line in self.line_in_ids)))
         return
@@ -289,7 +288,7 @@ class BuyReceipt(models.Model):
             'partner_id': self.partner_id.id,
             'bank_name': self.partner_id.bank_name,
             'bank_num': self.partner_id.bank_num,
-            'date': fields.Date.context_today(self),
+            'date' : fields.Date.context_today(self),
             'line_ids':
                 [(0, 0, line) for line in money_lines],
             'source_ids':
@@ -315,7 +314,7 @@ class BuyReceipt(models.Model):
             debit = debit * (rate_silent or 1)
             credit = credit * (rate_silent or 1)
         voucher = self.env['voucher.line'].create({
-            'name': u'%s %s' % (self.name, self.note or ''),
+            'name': '%s %s' % (self.name, self.note or ''),
             'account_id': account_id and account_id.id,
             'partner_id': partner_id and partner_id.id,
             'debit': debit,
@@ -416,7 +415,7 @@ class BuyReceipt(models.Model):
     def buy_receipt_draft(self):
         '''反审核采购入库单/退货单，更新本单的付款状态/退款状态，并删除生成的结算单、付款单及凭证'''
         if self.state == 'draft':
-            raise UserError(u'请不要重复撤销')
+            raise UserError('请不要重复撤销')
         # 查找产生的付款单
         source_line = self.env['source.order.line'].search(
             [('name', '=', self.invoice_id.id)])
@@ -493,7 +492,7 @@ class BuyReceipt(models.Model):
             ('state', '=', 'draft')
         ])
         if return_order_draft:
-            raise UserError(u'采购入库单存在草稿状态的退货单！')
+            raise UserError('采购入库单存在草稿状态的退货单！')
 
         return_order = self.search([
             ('is_return', '=', True),
@@ -534,7 +533,7 @@ class BuyReceipt(models.Model):
                 }
                 receipt_line.append(dic)
         if len(receipt_line) == 0:
-            raise UserError(u'该订单已全部退货！')
+            raise UserError('该订单已全部退货！')
 
         vals = {'partner_id': self.partner_id.id,
                 'is_return': True,
@@ -551,7 +550,7 @@ class BuyReceipt(models.Model):
                 }
         delivery_return = self.with_context(is_return=True).create(vals)
         view_id = self.env.ref('buy.buy_return_form').id
-        name = u'采购退货单'
+        name = '采购退货单'
         return {
             'name': name,
             'view_type': 'form',
@@ -567,11 +566,11 @@ class BuyReceipt(models.Model):
 
 class WhMoveLine(models.Model):
     _inherit = 'wh.move.line'
-    _description = u"采购入库明细"
+    _description = "采购入库明细"
 
     buy_line_id = fields.Many2one('buy.order.line',
-                                  u'购货单行', ondelete='cascade',
-                                  help=u'对应的购货订单行')
+                                  '购货单行', ondelete='cascade',
+                                  help='对应的购货订单行')
 
     def _buy_get_price_and_tax(self):
         self.tax_rate = self.env.user.company_id.import_tax_rate

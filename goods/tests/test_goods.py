@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import ValidationError
@@ -79,7 +78,7 @@ class TestGoods(TransactionCase):
     def test_create(self):
         '''导入商品时，如果辅助单位为空，则用计量单位来填充它'''
         goods = self.env['goods'].create({
-            'name': u'显示器',
+            'name': '显示器',
             'category_id': self.env.ref('core.goods_category_1').id,
             'uom_id': self.env.ref('core.uom_pc').id,
             'conversion': 1,
@@ -90,7 +89,7 @@ class TestGoods(TransactionCase):
     def test_copy(self):
         '''测试商品的复制功能'''
         mouse = self.goods_mouse.copy()
-        self.assertEqual(u'鼠标 (copy)', mouse.name)
+        self.assertEqual('鼠标 (copy)', mouse.name)
 
     def test_get_tax_rate(self):
         ''' Test: get tax rate '''

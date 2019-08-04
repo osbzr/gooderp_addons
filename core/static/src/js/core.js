@@ -7,7 +7,7 @@ odoo.define('core.core', function (require) {
     var UserMenu = require('web.UserMenu');
     var Menu = require('web.Menu');
     var session = require('web.session');
-    var Model = require('web.Model');
+    var rpc = require('web.rpc');
     var FormView = require('web.FormView');
     var PivotView = require('web.PivotView');
     var WebClient = require('web.AbstractWebClient');
@@ -392,7 +392,7 @@ var FieldPdfViewer = FieldBinaryFile.extend({
     },
     get_uri: function(){
         var query_obj = {
-            model: this.view.dataset.model,
+            rpc: this.view.dataset.rpc,
             field: this.name,
             id: this.view.datarecord.id
         };

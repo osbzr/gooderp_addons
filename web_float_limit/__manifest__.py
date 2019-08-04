@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #     This file is part of web_readonly_bypass,
@@ -23,21 +22,22 @@
 #
 ##############################################################################
 {
-    'name': 'Web Menu Create',
+    'name': 'Web Float Limit',
     'version': '11.11',
     "author": "zhengXiang",
     "website": "http://www.osbzr.com",
     'category': 'Technical Settings',
     'depends': [
-        'web', 'base',
+        'web',
     ],
-    'description':
-    """
-        直接在菜单上面显示新建按钮的快速通道，需要将菜单记录中的create_tag设置位True
-    """,
     'data': [
         'views/assets_backend.xml',
     ],
+    'description':
+    """
+        使用一个float字段的值限制另外一个float字段的最大值
+        <field name='qty' widget='float_limit' options="{'field': 'others_qty'}" />
+    """,
     'installable': True,
     'auto_install': False,
 }

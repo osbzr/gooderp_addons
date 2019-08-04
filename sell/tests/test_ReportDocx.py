@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.addons.report_docx.report.report_docx import DataModelProxy
 from odoo.tools import misc
@@ -25,14 +24,14 @@ class TestReportDocx(TransactionCase):
 
     def test_lookup_report(self):
         '''测试docx报表模板'''
-        self.sell_order.note = u'测试&和<>'
+        self.sell_order.note = '测试&和<>'
         self.report_docx_sell.create(
             self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
 
     def test_lookup_report_many2one(self):
         '''测试docx报表模板many2one字段中含有特殊字符&<>'''
         for line in self.sell_order.line_ids:
-            line.goods_id.name = u'鼠标测试&和<>'
+            line.goods_id.name = '鼠标测试&和<>'
         self.report_docx_sell.create(
             self.cr, self.uid, self.sell_order.id, self.ir_actions, self.env.context)
 
@@ -82,16 +81,16 @@ class TestReportDocx(TransactionCase):
         data = DataModelProxy(self.env['home.page'])
         home = self.env['home.page']
         data._compute_by_selection(
-            home._fields.get('menu_type'), "all_business")
+            home._fields.Get('menu_type'), "all_business")
         home = self.env['sell.order']
         data = DataModelProxy(home)
-        data._compute_by_selection(home._fields.get('state'), "done")
+        data._compute_by_selection(home._fields.Get('state'), "done")
 
     def test_compute_by_datetime(self):
         '''datetime打印处理'''
         obj = self.env['sell.order']
         data = DataModelProxy(obj)
-        data._compute_by_datetime(obj._fields.get('create_date'), (datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S'))
+        data._compute_by_datetime(obj._fields.Get('create_date'), (datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S'))
 
 
 class TestReportHelper(TransactionCase):

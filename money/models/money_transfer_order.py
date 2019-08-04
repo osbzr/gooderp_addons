@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    Copyright (C) 2016  开阖软件(<http://www.osbzr.com>).
@@ -26,37 +25,37 @@ from odoo.tools import float_compare
 
 class MoneyTransferOrder(models.Model):
     _name = 'money.transfer.order'
-    _description = u'资金转账单'
+    _description = '资金转账单'
     _inherit = ['mail.thread']
 
     state = fields.Selection([
-        ('draft', u'草稿'),
-        ('done', u'已确认'),
-        ('cancel', u'已作废'),
-    ], string=u'状态', readonly=True,
+        ('draft', '草稿'),
+        ('done', '已确认'),
+        ('cancel', '已作废'),
+    ], string='状态', readonly=True,
         default='draft', copy=False, index=True,
-        help=u'资金转账单状态标识，新建时状态为草稿;确认后状态为已确认')
-    name = fields.Char(string=u'单据编号', copy=False, default='/',
-                       help=u'单据编号，创建时会自动生成')
-    date = fields.Date(string=u'单据日期', readonly=True,
+        help='资金转账单状态标识，新建时状态为草稿;确认后状态为已确认')
+    name = fields.Char(string='单据编号', copy=False, default='/',
+                       help='单据编号，创建时会自动生成')
+    date = fields.Date(string='单据日期', readonly=True,
                        default=lambda self: fields.Date.context_today(self),
                        states={'draft': [('readonly', False)]},
-                       help=u'单据创建日期')
-    note = fields.Text(string=u'备注', help=u'可以为该单据添加一些需要的标识信息')
+                       help='单据创建日期')
+    note = fields.Text(string='备注', help='可以为该单据添加一些需要的标识信息')
     line_ids = fields.One2many('money.transfer.order.line', 'transfer_id',
-                               string=u'资金转账单行', readonly=True,
+                               string='资金转账单行', readonly=True,
                                states={'draft': [('readonly', False)]},
-                               help=u'资金转账单明细行')
+                               help='资金转账单明细行')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
     voucher_id = fields.Many2one('voucher',
-                                 u'对应凭证',
+                                 '对应凭证',
                                  readonly=True,
                                  ondelete='restrict',
-                                 help=u'资金转账单确认时生成的对应凭证',
+                                 help='资金转账单确认时生成的对应凭证',
                                  copy=False)
     transfer_amount = fields.Float(
         compute='_compute_transfer_amount', string='转账总金额')
@@ -160,18 +159,18 @@ class MoneyTransferOrder(models.Model):
             company_currency_id = self.env.user.company_id.currency_id.id
             if (
                     out_currency_id != company_currency_id or in_currency_id != company_currency_id) and not line.currency_amount:
-                raise UserError(u'错误' u'请请输入外币金额。')
+                raise UserError('错误' '请请输入外币金额。')
             if line.currency_amount and out_currency_id != company_currency_id:
                 '''结汇'''
                 '''借方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'name': "%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.in_bank_id.account_id.id, 'debit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': '',
                 })
                 '''贷方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'name': "%s %s结汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.out_bank_id.account_id.id, 'credit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': out_currency_id,
                     'currency_amount': line.currency_amount, 'rate_silent': line.amount / line.currency_amount
@@ -180,14 +179,14 @@ class MoneyTransferOrder(models.Model):
                 '''买汇'''
                 '''借方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'name': "%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.in_bank_id.account_id.id, 'debit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': in_currency_id,
                     'currency_amount': line.currency_amount, 'rate_silent': line.amount / line.currency_amount
                 })
                 '''贷方行'''
                 self.env['voucher.line'].create({
-                    'name': u"%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
+                    'name': "%s %s买汇至%s %s" % (self.name, line.out_bank_id.name, line.in_bank_id.name, self.note),
                     'account_id': line.out_bank_id.account_id.id, 'credit': line.amount,
                     'voucher_id': vouch_obj.id, 'partner_id': '', 'currency_id': '',
                 })
@@ -205,31 +204,31 @@ class MoneyTransferOrder(models.Model):
 
 class MoneyTransferOrderLine(models.Model):
     _name = 'money.transfer.order.line'
-    _description = u'资金转账单明细'
+    _description = '资金转账单明细'
 
     transfer_id = fields.Many2one('money.transfer.order',
-                                  string=u'资金转账单', ondelete='cascade',
-                                  help=u'资金转账单行对应的资金转账单')
-    out_bank_id = fields.Many2one('bank.account', string=u'转出账户',
+                                  string='资金转账单', ondelete='cascade',
+                                  help='资金转账单行对应的资金转账单')
+    out_bank_id = fields.Many2one('bank.account', string='转出账户',
                                   required=True, ondelete='restrict',
-                                  help=u'资金转账单行上的转出账户')
-    in_bank_id = fields.Many2one('bank.account', string=u'转入账户',
+                                  help='资金转账单行上的转出账户')
+    in_bank_id = fields.Many2one('bank.account', string='转入账户',
                                  required=True, ondelete='restrict',
-                                 help=u'资金转账单行上的转入账户')
-    currency_amount = fields.Float(string=u'外币金额',
+                                 help='资金转账单行上的转入账户')
+    currency_amount = fields.Float(string='外币金额',
                                    digits=dp.get_precision('Amount'),
-                                   help=u'转出或转入的外币金额')
-    amount = fields.Float(string=u'金额',
+                                   help='转出或转入的外币金额')
+    amount = fields.Float(string='金额',
                           digits=dp.get_precision('Amount'),
-                          help=u'转出或转入的金额')
-    mode_id = fields.Many2one('settle.mode', string=u'结算方式',
+                          help='转出或转入的金额')
+    mode_id = fields.Many2one('settle.mode', string='结算方式',
                               ondelete='restrict',
-                              help=u'结算方式：支票、信用卡等')
-    number = fields.Char(string=u'结算号', help=u'本次结算号')
-    note = fields.Char(string=u'备注',
-                       help=u'可以为该单据添加一些需要的标识信息')
+                              help='结算方式：支票、信用卡等')
+    number = fields.Char(string='结算号', help='本次结算号')
+    note = fields.Char(string='备注',
+                       help='可以为该单据添加一些需要的标识信息')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -7,7 +6,7 @@ from odoo.exceptions import UserError
 class Goods(models.Model):
     _inherit = 'goods'
 
-    is_assembly_sell = fields.Boolean(u'组装销售')
+    is_assembly_sell = fields.Boolean('组装销售')
 
 
 class WhMoveLine(models.Model):
@@ -28,7 +27,7 @@ class WhMoveLine(models.Model):
                                                    ('attribute_id', '=', vals.get('attribute_id')),
                                                    ('type', '=', 'parent')])
             if not bom_line_parent:
-                raise UserError(u'请先建立组合销售产品%s的物料清单！' % goods.name)
+                raise UserError('请先建立组合销售产品%s的物料清单！' % goods.name)
             bom_line_child = bom_line_obj.search([('bom_id', '=', bom_line_parent.bom_id.id),
                                                   ('bom_id.type', '=', 'assembly'),
                                                   ('type', '=', 'child')])

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
-import test_finance
-import test_report
-import test_exchange
+from . import test_finance
+from . import test_report
+from . import test_exchange

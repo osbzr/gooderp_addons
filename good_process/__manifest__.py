@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     "name": "good_process",
     "version": '11.11',

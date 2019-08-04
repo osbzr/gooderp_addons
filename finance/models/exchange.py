@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -17,7 +16,7 @@ class Currency(models.Model):
 class CreateExchangeWizard(models.TransientModel):
     """生成每月汇况损益的向导 根据输入的期间"""
     _name = "create.exchange.wizard"
-    _description = u'期末调汇向导'
+    _description = '期末调汇向导'
 
     @api.one
     @api.depends('date')
@@ -28,15 +27,15 @@ class CreateExchangeWizard(models.TransientModel):
     def _get_last_date(self):
         return self.env['finance.period'].get_period_month_date_range(self.env['finance.period'].get_date_now_period_id())[1]
 
-    date = fields.Date(u'记帐日期', required=True, default=_get_last_date)
+    date = fields.Date('记帐日期', required=True, default=_get_last_date)
     period_id = fields.Many2one(
         'finance.period',
-        u'会计期间',
+        '会计期间',
         compute='_compute_period_id', ondelete='restrict', store=True)
     # todo 增加一个可以看到最后汇率的界面
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -71,7 +70,7 @@ class CreateExchangeWizard(models.TransientModel):
             if account.balance_directions == 'in':
                 '''科目为借，则生成借方凭证行,差额为0的凭证行不生成'''
                 if exp != 0:
-                    val.update({'name': u"汇兑损益",
+                    val.update({'name': "汇兑损益",
                                 'account_id': vals.get('account_id'),
                                 'debit': -exp,
                                 'credit': 0,
@@ -85,7 +84,7 @@ class CreateExchangeWizard(models.TransientModel):
             if account.balance_directions == 'out':
                 '''科目为贷，则生成贷方凭证行,差额为0的凭证行不生成'''
                 if exp != 0:
-                    val.update({'name': u"汇兑损益",
+                    val.update({'name': "汇兑损益",
                                 'account_id': vals.get('account_id'),
                                 'credit': exp,
                                 'voucher_id': vals.get('vouch_obj_id'),
@@ -96,7 +95,7 @@ class CreateExchangeWizard(models.TransientModel):
                                 })
 
         '''如果所有差额都为0，则无会计科目，则不生成明细行'''
-        for partner_id, val in res.iteritems():
+        for partner_id, val in res.items():
             del val['currency'], val['total_debit'], val['total_credit']
             if val:
                 self.env['voucher.line'].create(
@@ -126,7 +125,7 @@ class CreateExchangeWizard(models.TransientModel):
             '''科目为借，则生成借方凭证行,差额为0的凭证行不生成'''
             if currency_amount * vals.get('rate_silent') - debit + credit != 0:
                 self.env['voucher.line'].create({
-                    'name': u"汇兑损益",
+                    'name': "汇兑损益",
                     'account_id': account_id,
                     'debit': currency_amount * vals.get('rate_silent') - debit + credit,
                     'voucher_id': vals.get('vouch_obj_id'),
@@ -138,7 +137,7 @@ class CreateExchangeWizard(models.TransientModel):
             '''科目为贷，则生成贷方凭证行,差额为0的凭证行不生成'''
             if currency_amount * vals.get('rate_silent') - credit + debit != 0:
                 self.env['voucher.line'].create({
-                    'name': u"汇兑损益",
+                    'name': "汇兑损益",
                     'account_id': account_id,
                     'credit': currency_amount * vals.get('rate_silent') - credit + debit,
                     'voucher_id': vals.get('vouch_obj_id'),
@@ -162,7 +161,7 @@ class CreateExchangeWizard(models.TransientModel):
             exp = line.credit - line.debit + exp
         if exp != 0:
             self.env['voucher.line'].create({
-                'name': u"汇兑损益",
+                'name': "汇兑损益",
                 'account_id': account_id.account_id.id,
                 'credit': -exp,
                 'voucher_id': vals.get('vouch_obj_id'),
@@ -202,17 +201,17 @@ class CreateExchangeWizard(models.TransientModel):
 class RatePeriod(models.Model):
     """记录本月结算汇兑损益时的汇率，用于反结算后，汇兑损益正确时汇率正确"""
     _name = "rate.period"
-    _description = u'记录本月结算汇兑损益时的汇率'
+    _description = '记录本月结算汇兑损益时的汇率'
 
-    name = fields.Many2one('res.currency', u'币别', required=True)
+    name = fields.Many2one('res.currency', '币别', required=True)
     account_accumulated_depreciation = fields.Many2one(
-        'finance.account', u'累计折旧科目', required=True)
+        'finance.account', '累计折旧科目', required=True)
     account_asset = fields.Many2one(
-        'finance.account', u'固定资产科目', required=True)
+        'finance.account', '固定资产科目', required=True)
     account_depreciation = fields.Many2one(
-        'finance.account', u'折旧费用科目', required=True)
+        'finance.account', '折旧费用科目', required=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())

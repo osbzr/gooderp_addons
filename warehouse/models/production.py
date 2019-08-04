@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 
-from odoo.osv import osv
-from utils import inherits, inherits_after, \
+from odoo.osv import models
+from .utils import inherits, inherits_after, \
     create_name, safe_division, create_origin
 import odoo.addons.decimal_precision as dp
 from itertools import islice
@@ -11,7 +10,7 @@ from odoo.exceptions import UserError
 
 class WhAssembly(models.Model):
     _name = 'wh.assembly'
-    _description = u'组装单'
+    _description = '组装单'
     _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
@@ -19,45 +18,45 @@ class WhAssembly(models.Model):
         'wh.move': 'move_id',
     }
 
-    state = fields.Selection([('draft', u'草稿'),
-                              ('feeding', u'已发料'),
-                              ('done', u'完成'),
-                              ('cancel', u'已作废')],
-                             u'状态', copy=False, default='draft',
+    state = fields.Selection([('draft', '草稿'),
+                              ('feeding', '已发料'),
+                              ('done', '完成'),
+                              ('cancel', '已作废')],
+                             '状态', copy=False, default='draft',
                              index=True,
-                             help=u'组装单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
+                             help='组装单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
     move_id = fields.Many2one(
-        'wh.move', u'移库单', required=True, index=True, ondelete='cascade',
-        help=u'组装单对应的移库单')
+        'wh.move', '移库单', required=True, index=True, ondelete='cascade',
+        help='组装单对应的移库单')
     bom_id = fields.Many2one(
-        'wh.bom', u'物料清单', domain=[('type', '=', 'assembly')],
+        'wh.bom', '物料清单', domain=[('type', '=', 'assembly')],
         context={'type': 'assembly'}, ondelete='restrict',
         readonly=True,
         states={'draft': [('readonly', False)], 'feeding': [
             ('readonly', False)]},
-        help=u'组装单对应的物料清单')
+        help='组装单对应的物料清单')
     fee = fields.Float(
-        u'组装费用', digits=dp.get_precision('Amount'),
+        '组装费用', digits=dp.get_precision('Amount'),
         readonly=True,
         states={'draft': [('readonly', False)], 'feeding': [
             ('readonly', False)]},
-        help=u'组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
-    is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
+        help='组装单对应的组装费用，组装费用+组装行入库成本作为子件的出库成本')
+    is_many_to_many_combinations = fields.Boolean('专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件商品',
+    goods_id = fields.Many2one('goods', string='组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
-    lot = fields.Char(u'批号')
-    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
+    lot = fields.Char('批号')
+    goods_qty = fields.Float('组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [
                                  ('readonly', False)]},
-                             help=u"(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
+                             help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one(
-        'voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
+        'voucher', copy=False, ondelete='restrict', string='入库凭证号')
     out_voucher_id = fields.Many2one(
-        'voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
+        'voucher', copy=False, ondelete='restrict', string='出库凭证号')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -169,7 +168,7 @@ class WhAssembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise UserError(u'组合件和子件的商品必须存在')
+            raise UserError('组合件和子件的商品必须存在')
 
     def create_voucher_line(self, data):
         return [self.env['voucher.line'].create(data_line) for data_line in data]
@@ -195,7 +194,7 @@ class WhAssembly(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
                                   'account_id': account_id,
-                                  'name': u'%s 原料 %s' % (assembly.move_id.name, assembly.move_id.note or '')
+                                  'name': '%s 原料 %s' % (assembly.move_id.name, assembly.move_id.note or '')
                                   })
         for line_in in assembly.line_in_ids:  # 借方行
             if line_in.cost:
@@ -205,7 +204,7 @@ class WhAssembly(models.Model):
                                      'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
-                                     'name': u'%s 成品 %s' % (assembly.move_id.name, assembly.move_id.note or '')})
+                                     'name': '%s 成品 %s' % (assembly.move_id.name, assembly.move_id.note or '')})
         return line_out_data + line_in_data
 
     def wh_assembly_create_voucher_line(self, assembly, voucher_row):
@@ -219,7 +218,7 @@ class WhAssembly(models.Model):
         # 贷方行
         if assembly.fee:
             account_row = assembly.create_uid.company_id.operating_cost_account_id
-            voucher_line_data.append({'name': u'组装费用', 'account_id': account_row.id,
+            voucher_line_data.append({'name': '组装费用', 'account_id': account_row.id,
                                       'credit': assembly.fee, 'voucher_id': voucher_row.id})
         voucher_line_data += self.create_vourcher_line_data(
             assembly, voucher_row)
@@ -247,7 +246,7 @@ class WhAssembly(models.Model):
                                  'goods_id': False,
                                  'voucher_id': voucher.id,
                                  'account_id': account_id,
-                                 'name': u'%s 成品 %s' % (assembly.move_id.name, assembly.move_id.note or '')
+                                 'name': '%s 成品 %s' % (assembly.move_id.name, assembly.move_id.note or '')
                                  })
         for line_out in assembly.line_out_ids:  # 贷方行
             if line_out.cost:
@@ -257,7 +256,7 @@ class WhAssembly(models.Model):
                                       'goods_qty': line_out.goods_qty,
                                       'voucher_id': voucher.id,
                                       'account_id': account_id,
-                                      'name': u'%s 原料 %s' % (assembly.move_id.name, assembly.move_id.note or '')})
+                                      'name': '%s 原料 %s' % (assembly.move_id.name, assembly.move_id.note or '')})
         return line_out_data + line_in_data
 
     def create_out_voucher_line(self, assembly, voucher):
@@ -298,14 +297,14 @@ class WhAssembly(models.Model):
         for child_line in self.line_out_ids:
             for parent_line in self.line_in_ids:
                 if child_line.goods_id.id == parent_line.goods_id.id and child_line.attribute_id.id == parent_line.attribute_id.id:
-                    raise UserError(u'子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
+                    raise UserError('子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
 
     @api.multi
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
             if order.state == 'feeding':
-                raise UserError(u'请不要重复发料')
+                raise UserError('请不要重复发料')
             order.check_parent_length()
             order.check_is_child_enable()
 
@@ -322,9 +321,9 @@ class WhAssembly(models.Model):
         ''' 成品入库 '''
         for order in self:
             if order.state == 'done':
-                raise UserError(u'请不要重复执行成品入库')
+                raise UserError('请不要重复执行成品入库')
             if order.state != 'feeding':
-                raise UserError(u'请先投料')
+                raise UserError('请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
             if order.lot:                     # 入库批次
                 for line in order.line_in_ids:
@@ -348,7 +347,7 @@ class WhAssembly(models.Model):
     def cancel_approved_order(self):
         for order in self:
             if order.state == 'feeding':
-                raise UserError(u'请不要重复撤销')
+                raise UserError('请不要重复撤销')
             # 反审核入库到废品仓的移库单
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
@@ -372,7 +371,7 @@ class WhAssembly(models.Model):
     def unlink(self):
         for order in self:
             if order.state != 'draft':
-                raise UserError(u'只能删除草稿状态的单据')
+                raise UserError('只能删除草稿状态的单据')
 
         return order.move_id.unlink()
 
@@ -448,9 +447,9 @@ class WhAssembly(models.Model):
             self.is_many_to_many_combinations = True
         if line_out_ids:
             self.line_out_ids = line_out_ids
-        # /odoo-china/odoo/fields.py[1664]行添加的参数
+        # /odoo-china/odoo/fields.Py[1664]行添加的参数
         # 调用self.line_in_ids = line_in_ids的时候，此时会为其额外添加一个参数(6, 0, [])
-        # 在write函数的源代码中，会直接使用原表/odoo-china/odoo/osv/fields.py(839)来删除所有数据
+        # 在write函数的源代码中，会直接使用原表/odoo-china/odoo/osv/fields.Py(839)来删除所有数据
         # 此时，上一步赋值的数据将会被直接删除，（不确定是bug，还是特性）
         if line_in_ids:
             self.line_in_ids = line_in_ids
@@ -502,7 +501,7 @@ class WhAssembly(models.Model):
 
 class outsource(models.Model):
     _name = 'outsource'
-    _description = u'委外加工单'
+    _description = '委外加工单'
     _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
@@ -510,54 +509,54 @@ class outsource(models.Model):
         'wh.move': 'move_id',
     }
 
-    state = fields.Selection([('draft', u'草稿'),
-                              ('feeding', u'已发料'),
-                              ('done', u'完成'),
-                              ('cancel', u'已作废')],
-                             u'状态', copy=False, default='draft',
+    state = fields.Selection([('draft', '草稿'),
+                              ('feeding', '已发料'),
+                              ('done', '完成'),
+                              ('cancel', '已作废')],
+                             '状态', copy=False, default='draft',
                              index=True,
-                             help=u'委外加工单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
-    move_id = fields.Many2one('wh.move', u'移库单', required=True, index=True, ondelete='cascade',
-                              help=u'委外加工单对应的移库单')
-    bom_id = fields.Many2one('wh.bom', u'物料清单', domain=[('type', '=', 'outsource')],
+                             help='委外加工单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
+    move_id = fields.Many2one('wh.move', '移库单', required=True, index=True, ondelete='cascade',
+                              help='委外加工单对应的移库单')
+    bom_id = fields.Many2one('wh.bom', '物料清单', domain=[('type', '=', 'outsource')],
                              context={'type': 'outsource'}, ondelete='restrict',
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [
                                  ('readonly', False)]},
-                             help=u'委外加工单对应的物料清单')
-    is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
+                             help='委外加工单对应的物料清单')
+    is_many_to_many_combinations = fields.Boolean('专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件商品',
+    goods_id = fields.Many2one('goods', string='组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
-    lot = fields.Char(u'批号')
-    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
+    lot = fields.Char('批号')
+    goods_qty = fields.Float('组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [
                                  ('readonly', False)]},
-                             help=u"(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
+                             help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one(
-        'voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
+        'voucher', copy=False, ondelete='restrict', string='入库凭证号')
     out_voucher_id = fields.Many2one(
-        'voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
+        'voucher', copy=False, ondelete='restrict', string='出库凭证号')
 
-    outsource_partner_id = fields.Many2one('partner', string=u'委外供应商',
+    outsource_partner_id = fields.Many2one('partner', string='委外供应商',
                                            readonly=True,
                                            states={'draft': [('readonly', False)], 'feeding': [
                                                ('readonly', False)]},
                                            required=True)
-    wh_assembly_id = fields.Many2one('wh.assembly', string=u'关联的组装单',
+    wh_assembly_id = fields.Many2one('wh.assembly', string='关联的组装单',
                                      readonly=True,
                                      states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
-    outsource_fee = fields.Float(string=u'委外费用',
+    outsource_fee = fields.Float(string='委外费用',
                                  digits=dp.get_precision('Amount'),
                                  readonly=True,
                                  states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]})
     invoice_id = fields.Many2one('money.invoice',
                                  copy=False,
                                  ondelete='set null',
-                                 string=u'发票号')
+                                 string='发票号')
 
     @api.onchange('goods_id')
     def onchange_goods_id(self):
@@ -733,7 +732,7 @@ class outsource(models.Model):
     def unlink(self):
         for order in self:
             if order.state != 'draft':
-                raise UserError(u'只删除草稿状态的单据')
+                raise UserError('只删除草稿状态的单据')
 
         return order.move_id.unlink()
 
@@ -757,7 +756,7 @@ class outsource(models.Model):
     def check_parent_length(self):
         for outsource_line in self:
             if not len(outsource_line.line_in_ids) or not len(outsource_line.line_out_ids):
-                raise UserError(u'委外加工单必须存在组合件和子件明细行。')
+                raise UserError('委外加工单必须存在组合件和子件明细行。')
 
     def _create_money_invoice(self):
         categ = self.env.ref('money.core_category_purchase')
@@ -765,11 +764,11 @@ class outsource(models.Model):
             'name': self.name,
             'partner_id': self.outsource_partner_id.id,
             'category_id': categ.id,
-            'date': fields.Date.context_today(self),
+        date = fields.Date.context_today(self)
             'amount': self.outsource_fee,
             'reconciled': 0,
             'to_reconcile': self.outsource_fee,
-            'date_due': fields.Date.context_today(self),
+        date_due = fields.Date.context_today(self)
             'note': self.note or '',
         })
         if source_id:
@@ -800,7 +799,7 @@ class outsource(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
                                   'account_id': account_id,
-                                  'name': u'%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')
+                                  'name': '%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')
                                   })
         for line_in in outsource.line_in_ids:  # 借方行
             if line_in.cost:
@@ -810,7 +809,7 @@ class outsource(models.Model):
                                      'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
-                                     'name': u'%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
+                                     'name': '%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
                                      })
         return line_out_data + line_in_data
 
@@ -835,7 +834,7 @@ class outsource(models.Model):
                                  'goods_id': False,
                                  'voucher_id': voucher.id,
                                  'account_id': account_id,
-                                 'name': u'%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
+                                 'name': '%s 成品 %s' % (outsource.move_id.name, outsource.move_id.note or '')
                                  })
         for line_out in outsource.line_out_ids:  # 贷方行
             if line_out.cost:
@@ -845,7 +844,7 @@ class outsource(models.Model):
                                       'goods_qty': line_out.goods_qty,
                                       'voucher_id': voucher.id,
                                       'account_id': account_id,
-                                      'name': u'%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')})
+                                      'name': '%s 原料 %s' % (outsource.move_id.name, outsource.move_id.note or '')})
         return line_out_data + line_in_data
 
     def outsource_create_voucher_line(self, outsource, voucher_row):
@@ -858,7 +857,7 @@ class outsource(models.Model):
         voucher_line_data = []
         if outsource.outsource_fee:
             # 贷方行
-            voucher_line_data.append({'name': u'委外费用',
+            voucher_line_data.append({'name': '委外费用',
                                       'account_id': self.env.ref('money.core_category_purchase').account_id.id, # 采购发票类别对应的科目
                                       'credit': outsource.outsource_fee, 'voucher_id': voucher_row.id})
 
@@ -906,14 +905,14 @@ class outsource(models.Model):
         for child_line in self.line_out_ids:
             for parent_line in self.line_in_ids:
                 if child_line.goods_id.id == parent_line.goods_id.id and child_line.attribute_id.id == parent_line.attribute_id.id:
-                    raise UserError(u'子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
+                    raise UserError('子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
 
     @api.multi
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
             if order.state == 'feeding':
-                raise UserError(u'请不要重复发料')
+                raise UserError('请不要重复发料')
             order.check_parent_length()
             order.check_is_child_enable()
 
@@ -930,9 +929,9 @@ class outsource(models.Model):
         ''' 成品入库 '''
         for order in self:
             if order.state == 'done':
-                raise UserError(u'请不要重复执行成品入库')
+                raise UserError('请不要重复执行成品入库')
             if order.state != 'feeding':
-                raise UserError(u'请先投料')
+                raise UserError('请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
             if order.lot:                     # 入库批次
                 for line in order.line_in_ids:
@@ -960,7 +959,7 @@ class outsource(models.Model):
     def cancel_approved_order(self):
         for order in self:
             if order.state == 'feeding':
-                raise UserError(u'请不要重复撤销')
+                raise UserError('请不要重复撤销')
             # 反审核入库到废品仓的移库单
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
@@ -986,7 +985,7 @@ class outsource(models.Model):
 
 class WhDisassembly(models.Model):
     _name = 'wh.disassembly'
-    _description = u'拆卸单'
+    _description = '拆卸单'
     _inherit = ['mail.thread']
     _order = 'date DESC, id DESC'
 
@@ -994,46 +993,46 @@ class WhDisassembly(models.Model):
         'wh.move': 'move_id',
     }
 
-    state = fields.Selection([('draft', u'草稿'),
-                              ('feeding', u'已发料'),
-                              ('done', u'完成'),
-                              ('cancel', u'已作废')],
-                             u'状态', copy=False, default='draft',
+    state = fields.Selection([('draft', '草稿'),
+                              ('feeding', '已发料'),
+                              ('done', '完成'),
+                              ('cancel', '已作废')],
+                             '状态', copy=False, default='draft',
                              index=True,
-                             help=u'拆卸单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
+                             help='拆卸单状态标识，新建时状态为草稿；发料后状态为已发料，可以多次投料；成品入库后状态为完成。')
     move_id = fields.Many2one(
-        'wh.move', u'移库单', required=True, index=True, ondelete='cascade',
-        help=u'拆卸单对应的移库单')
+        'wh.move', '移库单', required=True, index=True, ondelete='cascade',
+        help='拆卸单对应的移库单')
     bom_id = fields.Many2one(
-        'wh.bom', u'物料清单', domain=[('type', '=', 'disassembly')],
+        'wh.bom', '物料清单', domain=[('type', '=', 'disassembly')],
         context={'type': 'disassembly'}, ondelete='restrict',
         readonly=True,
         states={'draft': [('readonly', False)], 'feeding': [
             ('readonly', False)]},
-        help=u'拆卸单对应的物料清单')
+        help='拆卸单对应的物料清单')
     fee = fields.Float(
-        u'拆卸费用', digits=dp.get_precision('Amount'),
+        '拆卸费用', digits=dp.get_precision('Amount'),
         readonly=True,
         states={'draft': [('readonly', False)], 'feeding': [
             ('readonly', False)]},
-        help=u'拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
-    is_many_to_many_combinations = fields.Boolean(u'专家模式', default=False, help=u"通用情况是一对多的组合,当为False时\
+        help='拆卸单对应的拆卸费用, 拆卸费用+拆卸行出库成本作为子件的入库成本')
+    is_many_to_many_combinations = fields.Boolean('专家模式', default=False, help="通用情况是一对多的组合,当为False时\
                             视图只能选则一个商品作为组合件,(选择物料清单后)此时选择数量会更改子件的数量,当为True时则可选择多个组合件,此时组合件商品数量\
                             不会自动影响子件的数量")
-    goods_id = fields.Many2one('goods', string=u'组合件商品',
+    goods_id = fields.Many2one('goods', string='组合件商品',
                                readonly=True,
                                states={'draft': [('readonly', False)], 'feeding': [('readonly', False)]},)
-    lot_id = fields.Many2one('wh.move.line', u'批号',
-                             help=u'用于拆卸的组合件批号')
-    goods_qty = fields.Float(u'组合件数量', default=1, digits=dp.get_precision('Quantity'),
+    lot_id = fields.Many2one('wh.move.line', '批号',
+                             help='用于拆卸的组合件批号')
+    goods_qty = fields.Float('组合件数量', default=1, digits=dp.get_precision('Quantity'),
                              readonly=True,
                              states={'draft': [('readonly', False)], 'feeding': [
                                  ('readonly', False)]},
-                             help=u"(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
+                             help="(选择使用物料清单后)当更改这个数量的时候后自动的改变相应的子件的数量")
     voucher_id = fields.Many2one(
-        'voucher', copy=False, ondelete='restrict', string=u'入库凭证号')
+        'voucher', copy=False, ondelete='restrict', string='入库凭证号')
     out_voucher_id = fields.Many2one(
-        'voucher', copy=False, ondelete='restrict', string=u'出库凭证号')
+        'voucher', copy=False, ondelete='restrict', string='出库凭证号')
 
     def apportion_cost(self, cost):
         for assembly in self:
@@ -1080,7 +1079,7 @@ class WhDisassembly(models.Model):
     @api.one
     def check_parent_length(self):
         if not len(self.line_in_ids) or not len(self.line_out_ids):
-            raise UserError(u'组合件和子件的商品必须存在')
+            raise UserError('组合件和子件的商品必须存在')
 
     def create_voucher_line(self, data):
         return [self.env['voucher.line'].create(data_line) for data_line in data]
@@ -1106,7 +1105,7 @@ class WhDisassembly(models.Model):
                                   'goods_id': False,
                                   'voucher_id': voucher_row.id,
                                   'account_id': account_id,
-                                  'name': u'%s 原料 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
+                                  'name': '%s 原料 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
                                   })
         for line_in in disassembly.line_in_ids:  # 借方行
             if line_in.cost:
@@ -1116,7 +1115,7 @@ class WhDisassembly(models.Model):
                                      'goods_qty': line_in.goods_qty,
                                      'voucher_id': voucher_row.id,
                                      'account_id': account_id,
-                                     'name': u'%s 成品 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
+                                     'name': '%s 成品 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
                                      })
         return line_out_data + line_in_data
 
@@ -1140,7 +1139,7 @@ class WhDisassembly(models.Model):
                                  'goods_id': False,
                                  'voucher_id': voucher.id,
                                  'account_id': account_id,
-                                 'name': u'%s 成品 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
+                                 'name': '%s 成品 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')
                                  })
         for line_out in disassembly.line_out_ids:  # 贷方行
             if line_out.cost:
@@ -1150,7 +1149,7 @@ class WhDisassembly(models.Model):
                                       'goods_qty': line_out.goods_qty,
                                       'voucher_id': voucher.id,
                                       'account_id': account_id,
-                                      'name': u'%s 原料 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')})
+                                      'name': '%s 原料 %s' % (disassembly.move_id.name, disassembly.move_id.note or '')})
         return line_out_data + line_in_data
 
     def wh_disassembly_create_voucher_line(self, disassembly, voucher_row):
@@ -1176,7 +1175,7 @@ class WhDisassembly(models.Model):
         # 借方行
         if disassembly.fee:
             account = disassembly.create_uid.company_id.operating_cost_account_id
-            voucher_line_data.append({'name': u'拆卸费用', 'account_id': account.id,
+            voucher_line_data.append({'name': '拆卸费用', 'account_id': account.id,
                                       'debit': disassembly.fee, 'voucher_id': voucher.id})
         voucher_line_data += self.pre_out_vourcher_line_data(
             disassembly, voucher)
@@ -1213,13 +1212,13 @@ class WhDisassembly(models.Model):
         for child_line in self.line_in_ids:
             for parent_line in self.line_out_ids:
                 if child_line.goods_id.id == parent_line.goods_id.id and child_line.attribute_id.id == parent_line.attribute_id.id:
-                    raise UserError(u'子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
+                    raise UserError('子件中不能包含与组合件中相同的 产品+属性，%s' % parent_line.goods_id.name)
 
     def approve_feeding(self):
         ''' 发料 '''
         for order in self:
             if order.state == 'feeding':
-                raise UserError(u'请不要重复发料')
+                raise UserError('请不要重复发料')
             order.check_parent_length()
             order.check_is_child_enable()
 
@@ -1238,9 +1237,9 @@ class WhDisassembly(models.Model):
         ''' 成品入库 '''
         for order in self:
             if order.state == 'done':
-                raise UserError(u'请不要重复执行成品入库')
+                raise UserError('请不要重复执行成品入库')
             if order.state != 'feeding':
-                raise UserError(u'请先投料')
+                raise UserError('请先投料')
             order.move_id.check_qc_result()  # 检验质检报告是否上传
             order.line_in_ids.action_done()  # 完成成品入库
 
@@ -1261,7 +1260,7 @@ class WhDisassembly(models.Model):
     def cancel_approved_order(self):
         for order in self:
             if order.state == 'feeding':
-                raise UserError(u'请不要重复撤销')
+                raise UserError('请不要重复撤销')
             # 反审核入库到废品仓的移库单
             wh_internal = self.env['wh.internal'].search([('ref', '=', order.move_id.name)])
             if wh_internal:
@@ -1284,7 +1283,7 @@ class WhDisassembly(models.Model):
     def unlink(self):
         for order in self:
             if order.state != 'draft':
-                raise UserError(u'只删除草稿状态的单据')
+                raise UserError('只删除草稿状态的单据')
 
         return order.move_id.unlink()
 
@@ -1479,36 +1478,36 @@ class WhDisassembly(models.Model):
         return True
 
 
-class WhBom(osv.osv):
+class WhBom(models.Model):
     _name = 'wh.bom'
-    _description = u'物料清单'
+    _description = '物料清单'
 
     BOM_TYPE = [
-        ('assembly', u'组装单'),
-        ('disassembly', u'拆卸单'),
-        ('outsource', u'委外加工单'),
+        ('assembly', '组装单'),
+        ('disassembly', '拆卸单'),
+        ('outsource', '委外加工单'),
     ]
 
-    name = fields.Char(u'物料清单名称',
-                       help=u'组装/拆卸物料清单名称')
+    name = fields.Char('物料清单名称',
+                       help='组装/拆卸物料清单名称')
     type = fields.Selection(
-        BOM_TYPE, u'类型', default=lambda self: self.env.context.get('type'),
-        help=u'类型: 组装单、拆卸单')
+        BOM_TYPE, '类型', default=lambda self: self.env.context.get('type'),
+        help='类型: 组装单、拆卸单')
     line_parent_ids = fields.One2many(
-        'wh.bom.line', 'bom_id', u'组合件', domain=[('type', '=', 'parent')],
+        'wh.bom.line', 'bom_id', '组合件', domain=[('type', '=', 'parent')],
         context={'type': 'parent'}, copy=True,
-        help=u'物料清单对应的组合件行')
+        help='物料清单对应的组合件行')
     line_child_ids = fields.One2many(
-        'wh.bom.line', 'bom_id', u'子件', domain=[('type', '=', 'child')],
+        'wh.bom.line', 'bom_id', '子件', domain=[('type', '=', 'child')],
         context={'type': 'child'}, copy=True,
-        help=u'物料清单对应的子件行')
-    active = fields.Boolean(u'启用', default=True)
+        help='物料清单对应的子件行')
+    active = fields.Boolean('启用', default=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
-    goods_id = fields.Many2one('goods', related='line_parent_ids.goods_id', string=u'组合商品')
+    goods_id = fields.Many2one('goods', related='line_parent_ids.goods_id', string='组合商品')
 
     @api.one
     @api.constrains('line_parent_ids', 'line_child_ids')
@@ -1517,34 +1516,34 @@ class WhBom(osv.osv):
         for child_line in self.line_child_ids:
             for parent_line in self.line_parent_ids:
                 if child_line.goods_id == parent_line.goods_id and child_line.attribute_id == parent_line.attribute_id:
-                    raise UserError(u'组合件和子件不能相同，产品:%s' % parent_line.goods_id.name)
+                    raise UserError('组合件和子件不能相同，产品:%s' % parent_line.goods_id.name)
 
 
-class WhBomLine(osv.osv):
+class WhBomLine(models.Model):
     _name = 'wh.bom.line'
-    _description = u'物料清单明细'
+    _description = '物料清单明细'
 
     BOM_LINE_TYPE = [
-        ('parent', u'组合件'),
-        ('child', u'子间'),
+        ('parent', '组合件'),
+        ('child', '子间'),
     ]
 
-    bom_id = fields.Many2one('wh.bom', u'物料清单', ondelete='cascade',
-                             help=u'子件行/组合件行对应的物料清单')
+    bom_id = fields.Many2one('wh.bom', '物料清单', ondelete='cascade',
+                             help='子件行/组合件行对应的物料清单')
     type = fields.Selection(
-        BOM_LINE_TYPE, u'类型',
+        BOM_LINE_TYPE, '类型',
         default=lambda self: self.env.context.get('type'),
-        help=u'类型: 组合件、子间')
-    goods_id = fields.Many2one('goods', u'商品', default=1, ondelete='restrict',
-                               help=u'子件行/组合件行上的商品')
+        help='类型: 组合件、子间')
+    goods_id = fields.Many2one('goods', '商品', default=1, ondelete='restrict',
+                               help='子件行/组合件行上的商品')
     goods_qty = fields.Float(
-        u'数量', digits=dp.get_precision('Quantity'),
+        '数量', digits=dp.get_precision('Quantity'),
         default=1.0,
-        help=u'子件行/组合件行上的商品数量')
-    attribute_id = fields.Many2one('attribute', u'属性', ondelete='restrict')
+        help='子件行/组合件行上的商品数量')
+    attribute_id = fields.Many2one('attribute', '属性', ondelete='restrict')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -1553,4 +1552,4 @@ class WhBomLine(osv.osv):
     def check_goods_qty(self):
         """验证商品数量大于0"""
         if self.goods_qty <= 0:
-            raise UserError(u'商品 %s 的数量必须大于0' % self.goods_id.name)
+            raise UserError('商品 %s 的数量必须大于0' % self.goods_id.name)

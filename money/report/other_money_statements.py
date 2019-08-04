@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
@@ -6,21 +5,21 @@ from odoo import fields, models, api, tools
 
 class OtherMoneyStatementsReport(models.Model):
     _name = "other.money.statements.report"
-    _description = u"其他收支明细表"
+    _description = "其他收支明细表"
     _auto = False
 
-    date = fields.Date(string=u'日期', readonly=True)
-    name = fields.Char(string=u'单据编号', readonly=True)
-    service = fields.Many2one('service', u'收支项')
+    date = fields.Date(string='日期', readonly=True)
+    name = fields.Char(string='单据编号', readonly=True)
+    service = fields.Many2one('service', '收支项')
     category_id = fields.Many2one('core.category',
-                                  string=u'类别', readonly=True)
+                                  string='类别', readonly=True)
     bank_id = fields.Many2one('bank.account', string='账户')
-    get = fields.Float(string=u'收入', readonly=True,
+    get = fields.Float(string='收入', readonly=True,
                        digits=dp.get_precision('Amount'))
-    pay = fields.Float(string=u'支出', readonly=True,
+    pay = fields.Float(string='支出', readonly=True,
                        digits=dp.get_precision('Amount'))
-    partner_id = fields.Many2one('partner', string=u'往来单位', readonly=True)
-    note = fields.Char(string=u'备注', readonly=True)
+    partner_id = fields.Many2one('partner', string='往来单位', readonly=True)
+    note = fields.Char(string='备注', readonly=True)
 
     def init(self):
         # select other_money_order_line、other_money_order

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 from datetime import datetime
@@ -8,18 +7,18 @@ from lxml import etree
 
 class NonActiveReport(models.TransientModel):
     _name = 'non.active.report'
-    _description = u'呆滞料报表'
+    _description = '呆滞料报表'
 
-    warehouse_id = fields.Many2one('warehouse', string=u'仓库')
-    goods_id = fields.Many2one('goods', string=u'商品')
-    attribute_id = fields.Many2one('attribute', string=u'属性')
-    first_stage_day_qty = fields.Float(string=u'第一阶段数量')
-    second_stage_day_qty = fields.Float(string=u'第二阶段数量')
-    third_stage_day_qty = fields.Float(string=u'第三阶段数量')
-    four_stage_day_qty = fields.Float(string=u'第四阶段数量')
-    subtotal = fields.Float(u'合计')
-    latest_move_date = fields.Datetime(u'最后发货日期')
-    latest_move_qty = fields.Float(u'最后发货数量')
+    warehouse_id = fields.Many2one('warehouse', string='仓库')
+    goods_id = fields.Many2one('goods', string='商品')
+    attribute_id = fields.Many2one('attribute', string='属性')
+    first_stage_day_qty = fields.Float(string='第一阶段数量')
+    second_stage_day_qty = fields.Float(string='第二阶段数量')
+    third_stage_day_qty = fields.Float(string='第三阶段数量')
+    four_stage_day_qty = fields.Float(string='第四阶段数量')
+    subtotal = fields.Float('合计')
+    latest_move_date = fields.Datetime('最后发货日期')
+    latest_move_qty = fields.Float('最后发货数量')
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
@@ -38,16 +37,16 @@ class NonActiveReport(models.TransientModel):
                 datetime.now(pytz.timezone("UTC")), '%Y-%m-%d')
             doc = etree.XML(res['arch'])
             for node in doc.xpath("//field[@name='first_stage_day_qty']"):
-                node.set('string', u"0~%s天" %
+                node.set('string', "0~%s天" %
                          (self._context.get('first_stage_day')))
             for node in doc.xpath("//field[@name='second_stage_day_qty']"):
                 node.set('string',
-                         u"%s天~%s天" % (self._context.get('first_stage_day'), self._context.get('second_stage_day')))
+                         "%s天~%s天" % (self._context.get('first_stage_day'), self._context.get('second_stage_day')))
             for node in doc.xpath("//field[@name='third_stage_day_qty']"):
                 node.set('string',
-                         u"%s天~%s天" % (self._context.get('second_stage_day'), self._context.get('third_stage_day')))
+                         "%s天~%s天" % (self._context.get('second_stage_day'), self._context.get('third_stage_day')))
             for node in doc.xpath("//field[@name='four_stage_day_qty']"):
-                node.set('string', u"大于%s天" %
+                node.set('string', "大于%s天" %
                          (self._context.get('third_stage_day')))
             res['arch'] = etree.tostring(doc)
         return res
@@ -55,15 +54,15 @@ class NonActiveReport(models.TransientModel):
 
 class NonActiveReportWizard(models.TransientModel):
     _name = 'non.active.report.wizard'
-    _description = u'呆滞料报表向导'
+    _description = '呆滞料报表向导'
 
-    warehouse_id = fields.Many2one('warehouse', string=u'仓库')
-    first_stage_day = fields.Integer(string=u'第一阶段天数', required=True)
-    second_stage_day = fields.Integer(string=u'第二阶段天数', required=True)
-    third_stage_day = fields.Integer(string=u'第三阶段天数', required=True)
+    warehouse_id = fields.Many2one('warehouse', string='仓库')
+    first_stage_day = fields.Integer(string='第一阶段天数', required=True)
+    second_stage_day = fields.Integer(string='第二阶段天数', required=True)
+    third_stage_day = fields.Integer(string='第三阶段天数', required=True)
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -160,7 +159,7 @@ class NonActiveReportWizard(models.TransientModel):
         view = self.env.ref('warehouse.non_active_report_tree')
 
         return {
-            'name': u'呆滞料报表',
+            'name': '呆滞料报表',
             'view_type': 'form',
             'view_mode': 'tree',
             'views': [(view.id, 'tree')],

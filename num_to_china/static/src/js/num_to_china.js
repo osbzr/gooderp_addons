@@ -4,7 +4,7 @@ odoo.define('num_to_china.NumberToChina', function(require) {
 var core = require('web.core');
 var formats = require('web.formats');
 var form_widgets = require('web.form_widgets');
-var Model = require('web.Model');
+var rpc = require('web.rpc');
 // Field in which the user can both type normally and scan barcodes
 
 var NumberToChina = form_widgets.FieldFloat.extend({

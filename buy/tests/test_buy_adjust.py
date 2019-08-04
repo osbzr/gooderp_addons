@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -256,7 +255,7 @@ class TestBuyAdjustLine(TransactionCase):
         for line in self.adjust.line_ids:
             line.goods_id = self.cable
             line.onchange_goods_id()
-            self.assertTrue(line.uom_id.name == u'件')
+            self.assertTrue(line.uom_id.name == '件')
 
             # 测试价格是否是商品的成本
             self.assertTrue(line.price_taxed == self.cable.cost)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
-import wave
-import report
-import express_menu
+from . import wave
+from . import report
+from . import express_menu

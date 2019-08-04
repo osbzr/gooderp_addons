@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import odoo.addons.decimal_precision as dp
 from odoo import fields, models, api, tools
@@ -6,25 +5,25 @@ from odoo import fields, models, api, tools
 
 class BuyOrderDetail(models.Model):
     _name = 'buy.order.detail'
-    _description = u'采购明细表'
+    _description = '采购明细表'
     _auto = False
 
-    date = fields.Date(u'采购日期')
-    order_name = fields.Char(u'采购单据号')
-    type = fields.Char(u'业务类型')
-    partner_id = fields.Many2one('partner', u'供应商')
-    goods_code = fields.Char(u'商品编码')
-    goods_id = fields.Many2one('goods', u'商品名称')
-    attribute = fields.Char(u'属性')
-    warehouse_dest_id = fields.Many2one('warehouse', u'仓库')
-    qty = fields.Float(u'数量', digits=dp.get_precision('Quantity'))
-    uom = fields.Char(u'单位')
-    price = fields.Float(u'单价', digits=dp.get_precision('Price'))
+    date = fields.Date('采购日期')
+    order_name = fields.Char('采购单据号')
+    type = fields.Char('业务类型')
+    partner_id = fields.Many2one('partner', '供应商')
+    goods_code = fields.Char('商品编码')
+    goods_id = fields.Many2one('goods', '商品名称')
+    attribute = fields.Char('属性')
+    warehouse_dest_id = fields.Many2one('warehouse', '仓库')
+    qty = fields.Float('数量', digits=dp.get_precision('Quantity'))
+    uom = fields.Char('单位')
+    price = fields.Float('单价', digits=dp.get_precision('Price'))
     amount = fields.Float(
-        u'采购金额', digits=dp.get_precision('Amount'))  # 商品的购货金额
-    tax_amount = fields.Float(u'税额', digits=dp.get_precision('Amount'))
-    subtotal = fields.Float(u'价税合计', digits=dp.get_precision('Amount'))
-    note = fields.Char(u'备注')
+        '采购金额', digits=dp.get_precision('Amount'))  # 商品的购货金额
+    tax_amount = fields.Float('税额', digits=dp.get_precision('Amount'))
+    subtotal = fields.Float('价税合计', digits=dp.get_precision('Amount'))
+    note = fields.Char('备注')
 
     def init(self):
         cr = self._cr
@@ -86,7 +85,7 @@ class BuyOrderDetail(models.Model):
                 view = self.env.ref('buy.buy_return_form')
 
             return {
-                'name': u'采购入库单',
+                'name': '采购入库单',
                 'view_type': 'form',
                 'view_mode': 'form',
                 'view_id': False,

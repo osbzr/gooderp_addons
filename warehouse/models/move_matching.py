@@ -1,38 +1,37 @@
-# -*- coding: utf-8 -*-
 
-from odoo.osv import osv
+from odoo.osv import models
 import odoo.addons.decimal_precision as dp
-from utils import safe_division
+from .utils import safe_division
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
 class WhMoveMatching(models.Model):
     _name = 'wh.move.matching'
-    _description = u'匹配记录'
+    _description = '匹配记录'
 
     line_in_id = fields.Many2one(
-        'wh.move.line', u'入库',
+        'wh.move.line', '入库',
         ondelete='set null', index=True,
-        help=u'入库单行')
+        help='入库单行')
     line_out_id = fields.Many2one(
-        'wh.move.line', u'出库',
+        'wh.move.line', '出库',
         ondelete='set null', index=True,
-        help=u'出库单行')
+        help='出库单行')
     qty = fields.Float(
-        u'数量',
+        '数量',
         digits=dp.get_precision('Quantity'), required=True,
-        help=u'出库单行商品的数量')
+        help='出库单行商品的数量')
     uos_qty = fields.Float(
-        u'辅助数量',
+        '辅助数量',
         digits=dp.get_precision('Quantity'), required=True,
-        help=u'出库单行商品的辅助数量')
+        help='出库单行商品的辅助数量')
     expiration_date = fields.Date(
-        u'过保日',
-        help=u'商品保质期截止日期')
+        '过保日',
+        help='商品保质期截止日期')
     company_id = fields.Many2one(
         'res.company',
-        string=u'公司',
+        string='公司',
         change_default=True,
         default=lambda self: self.env['res.company']._company_default_get())
 
@@ -53,22 +52,22 @@ class WhMoveLine(models.Model):
 
     qty_remaining = fields.Float(
         compute='_get_qty_remaining',
-        string=u'剩余数量',
+        string='剩余数量',
         digits=dp.get_precision('Quantity'),
         index=True, store=True, readonly=True,
-        help=u'商品的剩余数量')
+        help='商品的剩余数量')
     uos_qty_remaining = fields.Float(
-        compute='_get_qty_remaining', string=u'剩余辅助数量',
+        compute='_get_qty_remaining', string='剩余辅助数量',
         digits=dp.get_precision('Quantity'),
         index=True, store=True, readonly=True,
-        help=u'商品的剩余辅助数量')
+        help='商品的剩余辅助数量')
 
     matching_in_ids = fields.One2many(
-        'wh.move.matching', 'line_in_id', string=u'关联的入库',
-        help=u'关联的入库单行')
+        'wh.move.matching', 'line_in_id', string='关联的入库',
+        help='关联的入库单行')
     matching_out_ids = fields.One2many(
-        'wh.move.matching', 'line_out_id', string=u'关联的出库',
-        help=u'关联的出库单行')
+        'wh.move.matching', 'line_out_id', string='关联的出库',
+        help='关联的出库单行')
 
     # 这样的function字段的使用方式需要验证一下
     @api.one
@@ -121,7 +120,7 @@ class WhMoveLine(models.Model):
     def prev_action_draft(self):
         for line in self:
             if line.qty_remaining != line.goods_qty:
-                raise UserError(u'当前的入库已经被其他出库匹配，请先取消相关的出库')
+                raise UserError('当前的入库已经被其他出库匹配，请先取消相关的出库')
 
             line.matching_in_ids.unlink()
             line.matching_out_ids.unlink()

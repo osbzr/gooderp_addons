@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 from datetime import datetime
@@ -45,11 +44,11 @@ class TestSellDelivery(TransactionCase):
         self.partner = self.env.ref('core.lenovo')
 
         self.province_id = self.env['country.state'].search(
-            [('name', '=', u'河北省')])
+            [('name', '=', '河北省')])
         self.city_id = self.env['all.city'].search(
-            [('city_name', '=', u'石家庄市')])
+            [('city_name', '=', '石家庄市')])
         self.county_id = self.env['all.county'].search(
-            [('county_name', '=', u'正定县')])
+            [('county_name', '=', '正定县')])
 
     def test_sell_to_return(self):
         self.delivery.sell_delivery_done()
@@ -119,12 +118,12 @@ class TestSellDelivery(TransactionCase):
         # partner 不存在默认联系人
         partner = self.env.ref('core.jd')
         partner.write({'child_ids':
-                       [(0, 0, {'contact': u'小东',
+                       [(0, 0, {'contact': '小东',
                                 'province_id': self.province_id.id,
                                 'city_id': self.city_id.id,
                                 'county_id': self.county_id.id,
-                                'town': u'曹路镇',
-                                'detail_address': u'金海路1688号',
+                                'town': '曹路镇',
+                                'detail_address': '金海路1688号',
                                 }
                          )]})
         self.delivery.onchange_partner_id()
@@ -138,12 +137,12 @@ class TestSellDelivery(TransactionCase):
 
     def test_onchange_address(self):
         ''' sell.delivery onchange address '''
-        address = self.env['partner.address'].create({'contact': u'小东',
+        address = self.env['partner.address'].create({'contact': '小东',
                                                       'province_id': self.province_id.id,
                                                       'city_id': self.city_id.id,
                                                       'county_id': self.county_id.id,
-                                                      'town': u'曹路镇',
-                                                      'detail_address': u'金海路1688号',
+                                                      'town': '曹路镇',
+                                                      'detail_address': '金海路1688号',
                                                       })
         self.delivery.address_id = address.id
         self.delivery.onchange_address_id()
@@ -168,7 +167,7 @@ class TestSellDelivery(TransactionCase):
         self.delivery.sell_delivery_done()
         self.delivery.sell_to_return()
         self.delivery._get_sell_money_state()
-        self.assertEqual(self.delivery.money_state, u'未收款')
+        self.assertEqual(self.delivery.money_state, '未收款')
 
         # 部分收款
         delivery = self.delivery.copy()
@@ -178,7 +177,7 @@ class TestSellDelivery(TransactionCase):
 
         # 判断状态
         delivery._get_sell_money_state()
-        self.assertEqual(delivery.money_state, u'部分收款')
+        self.assertEqual(delivery.money_state, '部分收款')
 
         # 全部收款
         delivery = self.delivery.copy()
@@ -188,14 +187,14 @@ class TestSellDelivery(TransactionCase):
 
         # 判断状态
         delivery._get_sell_money_state()
-        self.assertEqual(delivery.money_state, u'全部收款')
+        self.assertEqual(delivery.money_state, '全部收款')
 
     def test_get_sell_money_state_return(self):
         '''测试返回退款状态'''
         #  未退款
         self.return_delivery.sell_delivery_done()
         self.return_delivery._get_sell_money_state()
-        self.assertEqual(self.return_delivery.return_state, u'未退款')
+        self.assertEqual(self.return_delivery.return_state, '未退款')
 
         #  部分退款
         return_delivery = self.return_delivery.copy()
@@ -205,7 +204,7 @@ class TestSellDelivery(TransactionCase):
 
         # 判断状态
         return_delivery._get_sell_money_state()
-        self.assertEqual(return_delivery.return_state, u'部分退款')
+        self.assertEqual(return_delivery.return_state, '部分退款')
 
         #  全部退款
         return_delivery = self.return_delivery.copy()
@@ -214,7 +213,7 @@ class TestSellDelivery(TransactionCase):
         return_delivery.sell_delivery_done()
         # 判断状态
         return_delivery._get_sell_money_state()
-        self.assertEqual(return_delivery.return_state, u'全部退款')
+        self.assertEqual(return_delivery.return_state, '全部退款')
 
     def test_unlink(self):
         '''测试删除销售发货/退货单'''

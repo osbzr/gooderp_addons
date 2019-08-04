@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 import hashlib
 import base64
 import json
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
 
@@ -16,20 +15,20 @@ class ExpressMenuConfig(models.Model):
     EMS 顺丰 圆通 百世 中通 韵达 申通 德邦 宅急送 京东 信丰 全峰 跨越速运 安能 快捷 天天 国通 优速
     """
     _name = 'express.menu.config'
-    name = fields.Char(u'快递公司名称', required=True)
-    abbreviation = fields.Char(u'简称', required=True)
-    customername = fields.Char(u'客户名称')
-    customerpwd = fields.Char(u'客户密码')
-    monthcode = fields.Char(u'月结号')
-    sendsite = fields.Char(u'发送站点')
-    logisticcode = fields.Char(u'快递单号')
+    name = fields.Char('快递公司名称', required=True)
+    abbreviation = fields.Char('简称', required=True)
+    customername = fields.Char('客户名称')
+    customerpwd = fields.Char('客户密码')
+    monthcode = fields.Char('月结号')
+    sendsite = fields.Char('发送站点')
+    logisticcode = fields.Char('快递单号')
 
 
 class Warehouse(models.Model):
     _name = 'warehouse'
     _inherit = ['warehouse', 'state.city.county']
-    detail_address = fields.Char(u'详细地址')
-    principal_id = fields.Many2one('staff', u'负责人')
+    detail_address = fields.Char('详细地址')
+    principal_id = fields.Many2one('staff', '负责人')
 
 
 class WhMove(models.Model):
@@ -38,7 +37,7 @@ class WhMove(models.Model):
     """
     _name = 'wh.move'
     _inherit = ['wh.move', 'state.city.county']
-    express_menu = fields.Text(u'快递面单', copy=False)
+    express_menu = fields.Text('快递面单', copy=False)
 
     def get_shipping_type_config(self, menu_type):
         """
@@ -47,7 +46,7 @@ class WhMove(models.Model):
         express_menu = self.env['express.menu.config'].search(
             [('abbreviation', '=', menu_type)])
         if not express_menu:
-            raise UserError(u"单据%s,承运商暂不支持 或者承运商商户简称输入错误(%s)" %
+            raise UserError("单据%s,承运商暂不支持 或者承运商商户简称输入错误(%s)" %
                             (self.name, menu_type))
         shipping_type_config = dict(ShipperCode=menu_type,
                                     CustomerName=express_menu.customername or '',
@@ -63,10 +62,10 @@ class WhMove(models.Model):
         sender = dict(Company=ware_hosue_row.company_id.name,
                       Name=ware_hosue_row.principal_id.name or ware_hosue_row.company_id.name or '',
                       Mobile=ware_hosue_row.principal_id.work_phone or ware_hosue_row.company_id.phone,
-                      ProvinceName=ware_hosue_row.province_id.name or u'上海',
-                      CityName=ware_hosue_row.city_id.city_name or u'上海',
-                      ExpAreaName=ware_hosue_row.county_id.county_name or u'浦东新区',
-                      Address=((ware_hosue_row.detail_address or u'金海路2588号B-213') + add_info))
+                      ProvinceName=ware_hosue_row.province_id.name or '上海',
+                      CityName=ware_hosue_row.city_id.city_name or '上海',
+                      ExpAreaName=ware_hosue_row.county_id.county_name or '浦东新区',
+                      Address=((ware_hosue_row.detail_address or '金海路2588号B-213') + add_info))
         return sender
 
     def get_receiver_goods_message(self):
@@ -83,24 +82,24 @@ class WhMove(models.Model):
         detail_address = model_row.address_id.detail_address
         if detail_address:
             first_index = -1
-            if u'区' in detail_address:
-                first_index = detail_address.find(u'区')
-            if u'县' in detail_address:
-                first_index = detail_address.find(u'县')
+            if '区' in detail_address:
+                first_index = detail_address.find('区')
+            if '县' in detail_address:
+                first_index = detail_address.find('县')
             # 处理县级市
-            if u'市' in detail_address and (u'区' not in detail_address or u'县' not in detail_address):
-                first_index = detail_address.find(u'市')
+            if '市' in detail_address and ('区' not in detail_address or '县' not in detail_address):
+                first_index = detail_address.find('市')
             # 处理 内蒙 盟
-            if u'内蒙古' in detail_address and u'盟' in detail_address:
-                first_index = detail_address.find(u'盟')
+            if '内蒙古' in detail_address and '盟' in detail_address:
+                first_index = detail_address.find('盟')
             detail_address = detail_address[first_index+1:]
         receiver = dict(Company=' ',
                         Name=model_row.partner_id.name,
                         Mobile=model_row.address_id.mobile,
-                        ProvinceName=model_row.address_id.province_id.name or model_row.address_id.city_id.city_name or u'()',
-                        CityName=model_row.address_id.city_id.city_name or u' ',
-                        ExpAreaName=model_row.address_id.county_id.county_name or u' ',
-                        Address=detail_address or u' ')
+                        ProvinceName=model_row.address_id.province_id.name or model_row.address_id.city_id.city_name or '()',
+                        CityName=model_row.address_id.city_id.city_name or ' ',
+                        ExpAreaName=model_row.address_id.county_id.county_name or ' ',
+                        Address=detail_address or ' ')
 
         goods = []
         qty = 0
@@ -117,12 +116,12 @@ class WhMove(models.Model):
     @api.model
     def get_express_menu(self):
         expressconfigparam = self.env['ir.config_parameter']
-        appid = expressconfigparam.get_param('express_menu_app_id', default='')
-        appkey = expressconfigparam.get_param(
+        appid = expressconfigparam.sudo().get_param('express_menu_app_id', default='')
+        appkey = expressconfigparam.sudo().get_param(
             'express_menu_app_key', default='')
-        path = expressconfigparam.get_param(
+        path = expressconfigparam.sudo().get_param(
             'express_menu_oder_url', default='')
-        header = safe_eval(expressconfigparam.get_param('express_menu_request_headers',
+        header = safe_eval(expressconfigparam.sudo().get_param('express_menu_request_headers',
                                                         default=''))
         order_code = self.name
         sender = self.get_sender(self.warehouse_id, self.pakge_sequence)
@@ -142,8 +141,8 @@ class WhMove(models.Model):
                 'RequestType': '1007',
                 'DataType': '2',
                 'DataSign': self.encrypt_kdn(request_data, appkey)}
-        req = urllib2.Request(path, urllib.urlencode(data), header)
-        resp = urllib2.urlopen(req).read()
+        req = urllib.request.Request(path, urllib.parse.urlencode(data), header)
+        resp = urllib.request.urlopen(req).read()
         content = json.loads(resp)
         self.express_code = (content.get(
             'Order', {})).get('LogisticCode', "")
@@ -160,7 +159,7 @@ class WhMove(models.Model):
         """
         key = base64.b64encode(hashlib.md5(
             "%s%s" % (data, appkey)).hexdigest(), altchars=None)
-        return urllib.quote(key, safe='/')
+        return urllib.parse.quote(key, safe='/')
 
     @api.model
     def get_package_list_data(self, move_row):

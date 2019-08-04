@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
 
@@ -6,7 +5,7 @@ from odoo import api, fields, models
 class staff(models.Model):
     _inherit = "staff"
 
-    newly_hired_staff = fields.Boolean(u'新进员工', compute='_compute_newly_hired_staff',
+    newly_hired_staff = fields.Boolean('新进员工', compute='_compute_newly_hired_staff',
                                           search='_search_newly_hired_staff')
 
     @api.multi
@@ -19,7 +18,7 @@ class staff(models.Model):
 
         for record in self:
             # record.newly_hired_staff = result.get(record.id, False)
-            for key, value in result.iteritems():
+            for key, value in result.items():
                 if record.id in key:
                     record.newly_hired_staff = True
 

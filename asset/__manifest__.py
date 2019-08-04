@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "GOODERP 固定资产模块",
     'author': "德清武康开源软件工作室",

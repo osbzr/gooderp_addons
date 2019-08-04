@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError
 
@@ -35,7 +34,7 @@ class TestBuyReceipt(TransactionCase):
         '''测试返回付款状态'''
         self.receipt.buy_receipt_done()
         self.receipt._get_buy_money_state()
-        self.assertTrue(self.receipt.money_state == u'未付款')
+        self.assertTrue(self.receipt.money_state == '未付款')
 
         receipt = self.receipt.copy()
         receipt.payment = receipt.amount - 1
@@ -48,7 +47,7 @@ class TestBuyReceipt(TransactionCase):
             line.money_id.money_order_done()
         # 判断状态
         receipt._get_buy_money_state()
-        self.assertTrue(receipt.money_state == u'部分付款')
+        self.assertTrue(receipt.money_state == '部分付款')
 
         receipt = self.receipt.copy()
         receipt.payment = receipt.amount
@@ -61,14 +60,14 @@ class TestBuyReceipt(TransactionCase):
             line.money_id.money_order_done()
         # 判断状态
         receipt._get_buy_money_state()
-        self.assertTrue(receipt.money_state == u'全部付款')
+        self.assertTrue(receipt.money_state == '全部付款')
 
     def test_get_buy_money_state_return(self):
         '''测试返回退款状态'''
         self.return_receipt._get_buy_money_state()
         self.return_receipt.buy_receipt_done()
         self.return_receipt._get_buy_money_state()
-        self.assertTrue(self.return_receipt.return_state == u'未退款')
+        self.assertTrue(self.return_receipt.return_state == '未退款')
 
         return_receipt = self.return_receipt.copy()
         return_receipt.payment = return_receipt.amount - 1
@@ -81,7 +80,7 @@ class TestBuyReceipt(TransactionCase):
             line.money_id.money_order_done()
         # 判断状态
         return_receipt._get_buy_money_state()
-        self.assertTrue(return_receipt.return_state == u'部分退款')
+        self.assertTrue(return_receipt.return_state == '部分退款')
 
         return_receipt = self.return_receipt.copy()
         return_receipt.payment = return_receipt.amount
@@ -94,7 +93,7 @@ class TestBuyReceipt(TransactionCase):
             line.money_id.money_order_done()
         # 判断状态
         return_receipt._get_buy_money_state()
-        self.assertTrue(return_receipt.return_state == u'全部退款')
+        self.assertTrue(return_receipt.return_state == '全部退款')
 
     def test_onchange_discount_rate(self):
         '''测试优惠率改变时，优惠金额改变'''
