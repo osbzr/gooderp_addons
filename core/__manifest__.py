@@ -13,7 +13,7 @@
                            定义了高级配置： 系统参数、定价策略。
     ''',
     'version': '11.11',
-    'depends': ['report',
+    'depends': ['web',
                 'web_menu_create',
                 'decimal_precision',
                 'web_export_view_good',
