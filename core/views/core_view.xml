@@ -132,6 +132,9 @@
 					  	</group>
 				    </page>
 				</xpath>
+				<xpath expr="//form" position="attributes">
+				    <attribute name="create">0</attribute>
+				</xpath>
 			</field>
 		</record>
 		<record id="company_action" model="ir.actions.act_window">

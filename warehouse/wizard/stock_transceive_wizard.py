@@ -50,6 +50,7 @@ class ReportStockTransceiveWizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'res_model': 'report.stock.transceive',
             'view_mode': 'tree',
+            'target':'main',
             'name': u'商品收发明细表 %s 至  %s ' % (self.date_start, self.date_end),
             'context': self.read(['date_start', 'date_end', 'warehouse_id', 'goods_id'])[0],
             'limit': 65535,
