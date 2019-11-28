@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-acceces_good_process_approver_all,acceces_good_process_approver_all,model_good_process_approver,,1,1,1,1
-acceces_good_process_process_all,acceces_good_process_process_all,model_good_process_process,,1,1,1,1
-acceces_good_process_process_line_all,acceces_good_process_process_line_all,model_good_process_process_line,,1,1,1,1
-
