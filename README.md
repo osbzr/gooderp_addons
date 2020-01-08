@@ -1,7 +1,7 @@
 # GoodERP 资源汇总
 [旧版本源代码](https://github.com/osbzr/gooderp_addons) 基于Odoo10社区版 Python2.7 已停止更新
 
-[在线试用](http://demo.gooderp.org/login?db=demo.gooderp.org&login=demo&key=demo)  免费
+[在线试用](http://demo.gooderp.org:8888/login?db=demo.gooderp.org&login=demo&key=demo)  免费
 
 [用户手册](https://www.kancloud.cn/osbzr/gooderp_user_manual/295107) 免费
 
