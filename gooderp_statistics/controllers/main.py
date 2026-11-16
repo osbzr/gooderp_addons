@@ -7,7 +7,7 @@ import simplejson
 
 class ActionStatistics(http.Controller):
 
-    @http.route('/get_user_info', auth='public')
+    @http.route('/get_user_info', auth='user')
     def get_user_info(self):
         user = request.env.user
 
